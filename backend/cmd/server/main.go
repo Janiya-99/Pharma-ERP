@@ -61,6 +61,23 @@ func main() {
 	compCtrl := controller.NewCompanyController(compService)
 	branchCtrl := controller.NewBranchController(branchService)
 
+	// --- Inventory Module ---
+	whRepo := repository.NewWarehouseRepository(db)
+	prodRepo := repository.NewProductRepository(db)
+	suppRepo := repository.NewSupplierRepository(db)
+	batchRepo := repository.NewProductBatchRepository(db)
+	grnRepo := repository.NewGRNRepository(db)
+
+	whService := service.NewWarehouseService(whRepo, logger)
+	prodService := service.NewProductService(prodRepo, logger)
+	suppService := service.NewSupplierService(suppRepo, logger)
+	grnService := service.NewGRNService(grnRepo, batchRepo, db, logger)
+
+	whCtrl := controller.NewWarehouseController(whService)
+	prodCtrl := controller.NewProductController(prodService)
+	suppCtrl := controller.NewSupplierController(suppService)
+	grnCtrl := controller.NewGRNController(grnService)
+
 	// 7. Setup Router
 	r := router.Setup(
 		authCtrl,
@@ -71,6 +88,10 @@ func main() {
 		desCtrl,
 		compCtrl,
 		branchCtrl,
+		whCtrl,
+		prodCtrl,
+		suppCtrl,
+		grnCtrl,
 		authService,
 		cfg.CORS.AllowedOrigins,
 	)

@@ -21,6 +21,10 @@ func Setup(
 	desCtrl *controller.DesignationController,
 	compCtrl *controller.CompanyController,
 	branchCtrl *controller.BranchController,
+	whCtrl *controller.WarehouseController,
+	prodCtrl *controller.ProductController,
+	suppCtrl *controller.SupplierController,
+	grnCtrl *controller.GRNController,
 	authService *service.AuthService,
 	allowedOrigins []string,
 ) *gin.Engine {
@@ -142,6 +146,44 @@ func Setup(
 				journal.POST("/:id/submit", journalCtrl.Submit)
 				journal.POST("/:id/approve", journalCtrl.Approve)
 				journal.POST("/:id/post", journalCtrl.Post)
+			}
+		}
+
+		// Inventory routes
+		inventory := v1.Group("/inventory")
+		inventory.Use(middleware.AuthMiddleware(authService))
+		{
+			// Products
+			products := inventory.Group("/products")
+			{
+				products.GET("", prodCtrl.List)
+				products.POST("", prodCtrl.Create)
+				products.GET("/:id", prodCtrl.Get)
+			}
+
+			// Warehouses
+			warehouses := inventory.Group("/warehouses")
+			{
+				warehouses.GET("", whCtrl.List)
+				warehouses.POST("", whCtrl.Create)
+				warehouses.GET("/:id", whCtrl.Get)
+			}
+
+			// Suppliers
+			suppliers := inventory.Group("/suppliers")
+			{
+				suppliers.GET("", suppCtrl.List)
+				suppliers.POST("", suppCtrl.Create)
+				suppliers.GET("/:id", suppCtrl.Get)
+			}
+
+			// GRNs
+			grns := inventory.Group("/grns")
+			{
+				grns.GET("", grnCtrl.List)
+				grns.POST("", grnCtrl.Create)
+				grns.GET("/:id", grnCtrl.Get)
+				grns.POST("/:id/post", grnCtrl.Post)
 			}
 		}
 	}
