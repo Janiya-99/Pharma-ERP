@@ -47,6 +47,8 @@ type ERPListPageProps = {
   onAdd?: () => void;
   addLabel?: string;
   searchKey?: string;
+  onRowClick?: (row: any) => void;
+  isLoading?: boolean;
 };
 
 export function ERPListPage({
@@ -57,6 +59,8 @@ export function ERPListPage({
   onAdd,
   addLabel = "Add New",
   searchKey = "name",
+  onRowClick,
+  isLoading = false,
 }: ERPListPageProps) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -102,13 +106,13 @@ export function ERPListPage({
               placeholder="Search..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100 transition-all"
+              className="w-full pl-9 pr-4 py-2 text-sm rounded-full bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white placeholder:text-gray-400 focus:outline-none transition-all"
             />
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-[13px] font-medium text-gray-600 hover:bg-gray-50">
+          <button className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-lightPrimary text-[13px] font-medium text-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:text-white dark:hover:bg-white/10 transition-all">
             <MdFilterList size={16} /> Filters
           </button>
-          <p className="text-[12px] text-gray-400 ml-auto shrink-0">
+          <p className="text-[12px] text-gray-400 ml-auto shrink-0 font-medium">
             {filtered.length} record{filtered.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -125,16 +129,25 @@ export function ERPListPage({
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
-              {paginated.length === 0 ? (
+            <tbody className="divide-y divide-gray-50 dark:divide-navy-700">
+              {isLoading ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-4 py-12 text-center text-sm text-gray-400">
-                    No records found.
+                  <td colSpan={columns.length} className="px-4 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-brand-500" />
+                      <p className="text-sm text-gray-400 font-medium">Loading data...</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="px-4 py-16 text-center">
+                    <p className="text-sm text-gray-400 font-medium">No records found.</p>
                   </td>
                 </tr>
               ) : (
                 paginated.map((row, i) => (
-                  <tr key={i} className="hover:bg-gray-50/60 transition-colors">
+                  <tr key={i} className={`hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`} onClick={() => onRowClick?.(row)}>
                     {columns.map((col) => (
                       <td key={col.key} className="px-4 py-3 text-[13px] text-gray-700 dark:text-gray-300">
                         {col.render ? col.render(row) : row[col.key] ?? "—"}
@@ -151,14 +164,14 @@ export function ERPListPage({
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-50">
             <p className="text-[12px] text-gray-400">Page {page} of {totalPages}</p>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}
-                className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40">
-                ‹ Prev
+                className="flex items-center justify-center h-8 px-3 rounded-full text-[12px] font-medium bg-lightPrimary text-navy-700 hover:bg-gray-100 disabled:opacity-40 transition-all dark:bg-navy-900 dark:text-white dark:hover:bg-white/10">
+                Prev
               </button>
               <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
-                className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40">
-                Next ›
+                className="flex items-center justify-center h-8 px-3 rounded-full text-[12px] font-medium bg-lightPrimary text-navy-700 hover:bg-gray-100 disabled:opacity-40 transition-all dark:bg-navy-900 dark:text-white dark:hover:bg-white/10">
+                Next
               </button>
             </div>
           </div>
