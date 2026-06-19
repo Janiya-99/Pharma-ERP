@@ -12,7 +12,6 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // sends httpOnly refresh token cookie automatically
   headers: {
     "Content-Type": "application/json",
   },
@@ -63,17 +62,23 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Call the Go backend refresh endpoint (httpOnly cookie sent automatically)
+        const refreshToken = useAuthStore.getState().refreshToken;
+        if (!refreshToken) throw new Error("No refresh token available");
+
         const response = await axios.post(
           `${BASE_URL}/auth/refresh`,
-          {},
-          { withCredentials: true }
+          { refresh_token: refreshToken }
         );
-        const { accessToken } = response.data;
-        useAuthStore.getState().setAccessToken(accessToken);
-        processQueue(null, accessToken);
+        const { access_token, refresh_token: new_refresh_token } = response.data.data.tokens;
+        
+        useAuthStore.getState().setAccessToken(access_token);
+        if (new_refresh_token) {
+          useAuthStore.getState().setRefreshToken(new_refresh_token);
+        }
+        
+        processQueue(null, access_token);
         if (originalRequest.headers) {
-          (originalRequest.headers as any)["Authorization"] = `Bearer ${accessToken}`;
+          (originalRequest.headers as any)["Authorization"] = `Bearer ${access_token}`;
         }
         return api(originalRequest);
       } catch (refreshError) {
