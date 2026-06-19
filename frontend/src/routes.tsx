@@ -5,8 +5,10 @@ import SignIn from "views/auth/SignIn";
 
 // Dashboard
 import Dashboard from "views/admin/dashboard";
+import LandingPage from "views/admin/landing";
 
 // Control Center
+import ControlCenterDashboard from "views/admin/control-center/ControlCenterDashboard";
 import CompanyPage from "views/admin/control-center/CompanyPage";
 import BranchPage from "views/admin/control-center/BranchPage";
 import UsersPage from "views/admin/control-center/UsersPage";
@@ -16,6 +18,7 @@ import SettingsPage from "views/admin/control-center/SettingsPage";
 import AuditLogsPage from "views/admin/control-center/AuditLogsPage";
 
 // Finance
+import FinanceDashboard from "views/admin/finance/FinanceDashboard";
 import ChartOfAccountsPage from "views/admin/finance/ChartOfAccountsPage";
 import JournalEntriesPage from "views/admin/finance/JournalEntriesPage";
 import PaymentsPage from "views/admin/finance/PaymentsPage";
@@ -26,6 +29,7 @@ import FinanceReportsPage from "views/admin/finance/FinanceReportsPage";
 import GeneralLedgerPage from "views/admin/finance/GeneralLedgerPage";
 
 // Inventory
+import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
 import ProductsPage from "views/admin/inventory/ProductsPage";
 import BatchesPage from "views/admin/inventory/BatchesPage";
 import WarehousesPage from "views/admin/inventory/WarehousesPage";
@@ -35,6 +39,7 @@ import StockAdjustmentPage from "views/admin/inventory/StockAdjustmentPage";
 import StockLedgerPage from "views/admin/inventory/StockLedgerPage";
 
 // Invoice Center
+import InvoiceDashboard from "views/admin/invoice-center/InvoiceDashboard";
 import SalesOrdersPage from "views/admin/invoice-center/SalesOrdersPage";
 import InvoicesPage from "views/admin/invoice-center/InvoicesPage";
 import CreditNotesPage from "views/admin/invoice-center/CreditNotesPage";
@@ -42,6 +47,7 @@ import DebitNotesPage from "views/admin/invoice-center/DebitNotesPage";
 import CustomerReceiptsPage from "views/admin/invoice-center/CustomerReceiptsPage";
 
 // Compliance Center
+import ComplianceDashboard from "views/admin/compliance/ComplianceDashboard";
 import LicenseDocumentsPage from "views/admin/compliance/LicenseDocumentsPage";
 import BatchRecallPage from "views/admin/compliance/BatchRecallPage";
 import BatchHoldPage from "views/admin/compliance/BatchHoldPage";
@@ -77,6 +83,14 @@ export type ERPRoute = {
 
 const routes: ERPRoute[] = [
   {
+    name: "Home",
+    layout: "/admin",
+    path: "home",
+    icon: <MdDashboard className="h-5 w-5" />,
+    component: <LandingPage />,
+    secondary: true, // Hidden from sidebar
+  },
+  {
     name: "Dashboard",
     layout: "/admin",
     path: "dashboard",
@@ -89,6 +103,7 @@ const routes: ERPRoute[] = [
     path: "control-center",
     icon: <MdOutlineAdminPanelSettings className="h-5 w-5" />,
     children: [
+      { name: "Dashboard", path: "control-center/dashboard", component: <ControlCenterDashboard /> },
       { name: "Company", path: "control-center/company", component: <CompanyPage /> },
       { name: "Branches", path: "control-center/branches", component: <BranchPage /> },
       { name: "Users", path: "control-center/users", component: <UsersPage /> },
@@ -104,6 +119,7 @@ const routes: ERPRoute[] = [
     path: "finance",
     icon: <MdOutlineAccountBalance className="h-5 w-5" />,
     children: [
+      { name: "Dashboard", path: "finance/dashboard", component: <FinanceDashboard /> },
       { name: "Chart of Accounts", path: "finance/chart-of-accounts", component: <ChartOfAccountsPage /> },
       { name: "Journal Entries", path: "finance/journals", component: <JournalEntriesPage /> },
       { name: "General Ledger", path: "finance/general-ledger", component: <GeneralLedgerPage /> },
@@ -120,6 +136,7 @@ const routes: ERPRoute[] = [
     path: "inventory",
     icon: <MdInventory2 className="h-5 w-5" />,
     children: [
+      { name: "Dashboard", path: "inventory/dashboard", component: <InventoryDashboard /> },
       { name: "Products", path: "inventory/products", component: <ProductsPage /> },
       { name: "Batches", path: "inventory/batches", component: <BatchesPage /> },
       { name: "Warehouses", path: "inventory/warehouses", component: <WarehousesPage /> },
@@ -135,6 +152,7 @@ const routes: ERPRoute[] = [
     path: "invoice-center",
     icon: <MdOutlineReceiptLong className="h-5 w-5" />,
     children: [
+      { name: "Dashboard", path: "invoice-center/dashboard", component: <InvoiceDashboard /> },
       { name: "Sales Orders", path: "invoice-center/sales-orders", component: <SalesOrdersPage /> },
       { name: "Invoices", path: "invoice-center/invoices", component: <InvoicesPage /> },
       { name: "Credit Notes", path: "invoice-center/credit-notes", component: <CreditNotesPage /> },
@@ -148,6 +166,7 @@ const routes: ERPRoute[] = [
     path: "compliance",
     icon: <MdOutlineVerifiedUser className="h-5 w-5" />,
     children: [
+      { name: "Dashboard", path: "compliance/dashboard", component: <ComplianceDashboard /> },
       { name: "License Documents", path: "compliance/licenses", component: <LicenseDocumentsPage /> },
       { name: "Batch Recall", path: "compliance/batch-recall", component: <BatchRecallPage /> },
       { name: "Batch Hold", path: "compliance/batch-hold", component: <BatchHoldPage /> },

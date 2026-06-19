@@ -20,7 +20,7 @@ export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element =>
     return isActive(route.path);
   };
 
-  const adminRoutes = routes.filter((r) => r.layout === "/admin");
+  const adminRoutes = routes.filter((r) => r.layout === "/admin" && !r.secondary);
 
   return (
     <ul className="flex flex-col gap-0.5 px-3">

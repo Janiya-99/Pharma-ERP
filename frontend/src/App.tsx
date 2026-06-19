@@ -24,7 +24,7 @@ const App = () => {
       <Route path="pharma/*" element={<PharmaLayout />} />
 
       {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/auth/sign-in" replace />} />
+      <Route path="/" element={<Navigate to="/admin/home" replace />} />
     </Routes>
   );
 };

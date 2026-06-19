@@ -21,6 +21,9 @@ export default function AdminLayout(props: { [x: string]: any }) {
   const location = useLocation();
   const [open, setOpen] = React.useState(true);
 
+  // Landing page renders full-screen without sidebar/topbar
+  const isLandingPage = location.pathname === "/admin/home";
+
   React.useEffect(() => {
     const handleResize = () => setOpen(window.innerWidth >= 1200);
     handleResize();
@@ -49,13 +52,13 @@ export default function AdminLayout(props: { [x: string]: any }) {
       if (route.layout !== "/admin") return;
       if (route.component) {
         result.push(
-          <Route key={i} path={`/${route.path}`} element={route.component} />
+          <Route key={i} path={route.path} element={route.component} />
         );
       }
       if (route.children) {
         route.children.forEach((child, j) => {
           result.push(
-            <Route key={`${i}-${j}`} path={`/${child.path}`} element={child.component} />
+            <Route key={`${i}-${j}`} path={child.path} element={child.component} />
           );
         });
       }
@@ -65,6 +68,21 @@ export default function AdminLayout(props: { [x: string]: any }) {
 
   document.documentElement.dir = "ltr";
 
+  // Full-screen layout for landing page (no sidebar/topbar)
+  if (isLandingPage) {
+    return (
+      <div className="h-screen w-full overflow-hidden">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {renderRoutes(routes)}
+            <Route path="/" element={<Navigate to="/admin/home" replace />} />
+          </Routes>
+        </Suspense>
+      </div>
+    );
+  }
+
+  // Standard admin layout with sidebar + topbar
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:!bg-navy-900">
       <Sidebar open={open} onClose={() => setOpen(false)} />
@@ -86,7 +104,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {renderRoutes(routes)}
-              <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="/" element={<Navigate to="/admin/home" replace />} />
             </Routes>
           </Suspense>
         </main>

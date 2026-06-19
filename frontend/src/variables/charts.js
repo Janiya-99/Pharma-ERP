@@ -274,9 +274,6 @@ export const lineChartOptionsTotalSpent = {
     show: false,
   },
 
-  theme: {
-    mode: "light",
-  },
   chart: {
     type: "line",
 
