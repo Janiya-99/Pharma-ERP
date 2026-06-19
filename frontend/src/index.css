@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html {
+		font-family: 'DM Sans', sans-serif !important;
+		font-feature-settings: 'kern' !important;
+		-webkit-font-smoothing: antialiased;
+		letter-spacing: -0.5px;
+	}
+}
+
+input.defaultCheckbox::before {
+	content: url(../src/assets/svg/checked.svg); 
+	color: white;
+	opacity: 0; 
+	height: 16px; 
+	width: 16px;
+	position: absolute; 
+	left: 50%;
+	transform: translate(-50%, 0px);
+} 
+
+input:checked.defaultCheckbox::before { 
+	opacity: 1;
+}
+
+/* Luxury Auth Page Animations */
+@keyframes ambientFloat1 {
+	0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+	25% { transform: translate(40px, -30px) scale(1.1); opacity: 0.6; }
+	50% { transform: translate(-20px, 20px) scale(0.95); opacity: 0.4; }
+	75% { transform: translate(30px, 40px) scale(1.05); opacity: 0.55; }
+}
+
+@keyframes ambientFloat2 {
+	0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+	25% { transform: translate(-50px, 20px) scale(1.08); opacity: 0.5; }
+	50% { transform: translate(30px, -40px) scale(0.92); opacity: 0.35; }
+	75% { transform: translate(-20px, -30px) scale(1.02); opacity: 0.45; }
+}
+
+@keyframes ambientFloat3 {
+	0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+	33% { transform: translate(60px, 30px) scale(1.15); opacity: 0.45; }
+	66% { transform: translate(-40px, -20px) scale(0.9); opacity: 0.25; }
+}
+
+@keyframes cardFadeIn {
+	0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+	100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes shimmer {
+	0% { background-position: -200% 0; }
+	100% { background-position: 200% 0; }
+}
+
+.animate-ambient1 {
+	animation: ambientFloat1 12s ease-in-out infinite;
+}
+
+.animate-ambient2 {
+	animation: ambientFloat2 15s ease-in-out infinite;
+}
+
+.animate-ambient3 {
+	animation: ambientFloat3 18s ease-in-out infinite;
+}
+
+.animate-cardFadeIn {
+	animation: cardFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.auth-input-luxury {
+	background: rgba(255, 255, 255, 0.06) !important;
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
+	color: #fff !important;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-input-luxury::placeholder {
+	color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.auth-input-luxury:focus {
+	border-color: rgba(255, 255, 255, 0.35) !important;
+	background: rgba(255, 255, 255, 0.1) !important;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+}
+
+.btn-luxury-primary {
+	background: linear-gradient(135deg, #422AFB 0%, #7551FF 100%);
+	position: relative;
+	overflow: hidden;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-luxury-primary::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+	background-size: 200% 100%;
+	animation: shimmer 3s infinite;
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+
+.btn-luxury-primary:hover::before {
+	opacity: 1;
+}
+
+.btn-luxury-primary:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 8px 30px rgba(66, 42, 251, 0.4);
+}
+
+.btn-luxury-primary:active {
+	transform: translateY(0);
+}
+
+.btn-google-luxury {
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-google-luxury:hover {
+	background: rgba(255, 255, 255, 0.14);
+	border-color: rgba(255, 255, 255, 0.25);
+	transform: translateY(-1px);
+}
+
+/* Luxury checkbox override for dark auth theme */
+.auth-checkbox-luxury {
+	border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.auth-checkbox-luxury:checked {
+	background-color: #422AFB !important;
+	border-color: #422AFB !important;
+}
