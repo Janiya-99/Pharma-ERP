@@ -22,6 +22,9 @@ import PermissionsPage from "../pages/control-center/permissions/PermissionsPage
 import RolePermissionMatrixPage from "../pages/control-center/role-permission-matrix/RolePermissionMatrixPage";
 import UserAccessMatrixPage from "../pages/control-center/user-access-matrix/UserAccessMatrixPage";
 
+import AuditLogsPage from "../pages/control-center/logs/AuditLogsPage";
+import LoginLogsPage from "../pages/control-center/logs/LoginLogsPage";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -45,8 +48,8 @@ const AppRoutes = () => {
           <Route path="/control-center/permissions" element={<PermissionsPage />} />
           <Route path="/control-center/role-permission-matrix" element={<RolePermissionMatrixPage />} />
           <Route path="/control-center/user-access-matrix" element={<UserAccessMatrixPage />} />
-          <Route path="/control-center/audit-logs" element={<PlaceholderPage title="Audit Logs" />} />
-          <Route path="/control-center/login-logs" element={<PlaceholderPage title="Login Logs" />} />
+          <Route path="/control-center/audit-logs" element={<AuditLogsPage />} />
+          <Route path="/control-center/login-logs" element={<LoginLogsPage />} />
           <Route path="/control-center/settings" element={<PlaceholderPage title="Settings" />} />
 
           {/* Module Placeholders */}
