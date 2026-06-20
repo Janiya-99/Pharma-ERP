@@ -45,6 +45,7 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	// --- Users ---
 	userHandler := handlers.NewUserHandler(logger)
 	accessHandler := handlers.NewUserAccessHandler(logger)
+	matrixHandler := handlers.NewUserAccessMatrixHandler(logger)
 
 	usersGrp := router.Group("/users")
 	{
@@ -64,5 +65,31 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 		usersGrp.GET("/:id/software", middleware.RequirePermission("control.access.software.view"), accessHandler.GetSoftware)
 		usersGrp.POST("/:id/software", middleware.RequirePermission("control.access.software.assign"), accessHandler.AssignSoftware)
 		usersGrp.DELETE("/:id/software/:software_id", middleware.RequirePermission("control.access.software.remove"), accessHandler.RemoveSoftware)
+
+		usersGrp.GET("/:id/access-matrix", middleware.RequirePermission("control.access_matrix.view"), matrixHandler.GetMatrix)
+		usersGrp.POST("/:id/access-matrix", middleware.RequirePermission("control.access_matrix.assign"), matrixHandler.Assign)
+		usersGrp.DELETE("/:id/access-matrix/:access_id", middleware.RequirePermission("control.access_matrix.remove"), matrixHandler.Remove)
 	}
+
+	// --- Roles & Permissions ---
+	roleHandler := handlers.NewRoleHandler(logger)
+	permHandler := handlers.NewPermissionHandler(logger)
+	rolePermHandler := handlers.NewRolePermissionHandler(logger)
+
+	router.GET("/permissions", middleware.RequirePermission("control.permission.view"), permHandler.List)
+	router.GET("/permissions/grouped", middleware.RequirePermission("control.permission.view"), permHandler.ListGrouped)
+
+	rolesGrp := router.Group("/roles")
+	{
+		rolesGrp.GET("", middleware.RequirePermission("control.role.view"), roleHandler.List)
+		rolesGrp.POST("", middleware.RequirePermission("control.role.create"), roleHandler.Create)
+		rolesGrp.GET("/:id", middleware.RequirePermission("control.role.view"), roleHandler.Get)
+		rolesGrp.PUT("/:id", middleware.RequirePermission("control.role.update"), roleHandler.Update)
+		rolesGrp.DELETE("/:id", middleware.RequirePermission("control.role.delete"), roleHandler.Delete)
+
+		rolesGrp.GET("/:id/permissions", middleware.RequirePermission("control.permission.view"), rolePermHandler.GetMatrix)
+		rolesGrp.POST("/:id/permissions", middleware.RequirePermission("control.permission.assign"), rolePermHandler.Assign)
+	}
+
+	router.GET("/software-modules/:software_id/roles", middleware.RequirePermission("control.role.view"), roleHandler.GetAvailableRolesForSoftware)
 }

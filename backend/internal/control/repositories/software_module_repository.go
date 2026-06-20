@@ -20,3 +20,11 @@ func (r *SoftwareModuleRepository) ListActive() ([]models.SoftwareModule, error)
 	}
 	return modules, nil
 }
+
+func (r *SoftwareModuleRepository) FindByID(id uint64) (*models.SoftwareModule, error) {
+	var module models.SoftwareModule
+	if err := r.db.First(&module, id).Error; err != nil {
+		return nil, err
+	}
+	return &module, nil
+}
