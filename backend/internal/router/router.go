@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	"github.com/pixandco/erp-phrma/internal/service"
@@ -26,7 +27,7 @@ func Setup(
 	suppCtrl *controller.SupplierController,
 	grnCtrl *controller.GRNController,
 	authService *service.AuthService,
-	allowedOrigins []string,
+	cfg *config.Config,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -37,7 +38,7 @@ func Setup(
 			if strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "http://127.0.0.1:") {
 				return true
 			}
-			for _, o := range allowedOrigins {
+			for _, o := range cfg.CORS.AllowedOrigins {
 				if o == origin {
 					return true
 				}
@@ -54,9 +55,12 @@ func Setup(
 	// API Version 1 group
 	v1 := r.Group("/api/v1")
 	{
-		// Health check
+		// Health check — returns service name from config
 		v1.GET("/health", func(c *gin.Context) {
-			c.JSON(200, gin.H{"status": "ok"})
+			c.JSON(200, gin.H{
+				"status":  "ok",
+				"service": cfg.App.Name + " Backend",
+			})
 		})
 
 		// Public Auth routes
