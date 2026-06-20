@@ -231,3 +231,14 @@ export const removeUserAccessMatrix = async (userId, accessId) => {
   return res.data;
 };
 
+// --- Logs ---
+export const getAuditLogs = async (params) => {
+  const res = await apiClient.get("/control/audit-logs", { params });
+  return res.data;
+};
+
+export const getLoginLogs = async (params) => {
+  const res = await apiClient.get("/control/login-logs", { params });
+  return res.data;
+};
+
