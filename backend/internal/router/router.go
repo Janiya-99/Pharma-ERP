@@ -74,15 +74,23 @@ func Setup(
 			auth.POST("/login", newAuthHandler.Login)
 			auth.POST("/refresh", authCtrl.Refresh) // Legacy fallback
 
-			// New Step 7 auth me
+			// New Step 7 auth me & context
 			authMe := auth.Group("")
 			authMe.Use(middleware.CompanyAuthMiddleware(resolver))
+			authMe.Use(middleware.BranchAccessMiddleware())
+			authMe.Use(middleware.SoftwareAccessMiddleware())
+			
 			authMe.GET("/me", newAuthHandler.AuthMe)
+			authMe.GET("/context", newAuthHandler.AuthContext)
+			authMe.POST("/switch-branch", newAuthHandler.SwitchBranch)
+			authMe.POST("/switch-software", newAuthHandler.SwitchSoftware)
 		}
 
 		// Admin & Access Management routes
 		admin := v1.Group("/admin")
 		admin.Use(middleware.CompanyAuthMiddleware(resolver))
+		admin.Use(middleware.BranchAccessMiddleware())
+		admin.Use(middleware.SoftwareAccessMiddleware())
 		{
 			// Users
 			users := admin.Group("/users")
