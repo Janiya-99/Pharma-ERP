@@ -4,6 +4,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
+	"github.com/pixandco/erp-phrma/internal/auth/handlers"
 	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	platformMigrations "github.com/pixandco/erp-phrma/internal/platform/migrations"
 	"github.com/pixandco/erp-phrma/internal/repository"
@@ -97,8 +98,14 @@ func main() {
 	suppCtrl := controller.NewSupplierController(suppService)
 	grnCtrl := controller.NewGRNController(grnService)
 
+	// Step 7: New Auth
+	companyResolver := database.NewCompanyResolver(platformDB, logger)
+	newAuthHandler := handlers.NewAuthHandler(companyResolver)
+
 	// 8. Setup Router
 	r := router.Setup(
+		newAuthHandler,
+		companyResolver,
 		authCtrl,
 		userCtrl,
 		roleCtrl,

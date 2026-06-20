@@ -7,13 +7,17 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/pixandco/erp-phrma/internal/config"
+	"github.com/pixandco/erp-phrma/internal/auth/handlers"
 	"github.com/pixandco/erp-phrma/internal/controller"
+	"github.com/pixandco/erp-phrma/internal/database"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	"github.com/pixandco/erp-phrma/internal/service"
 )
 
 // Setup configures the Gin engine with middlewares and routes.
 func Setup(
+	newAuthHandler *handlers.AuthHandler,
+	resolver *database.CompanyResolver,
 	authCtrl *controller.AuthController,
 	userCtrl *controller.UserController,
 	roleCtrl *controller.RoleController,
@@ -66,13 +70,19 @@ func Setup(
 		// Public Auth routes
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/login", authCtrl.Login)
-			auth.POST("/refresh", authCtrl.Refresh)
+			// New Step 7 login
+			auth.POST("/login", newAuthHandler.Login)
+			auth.POST("/refresh", authCtrl.Refresh) // Legacy fallback
+
+			// New Step 7 auth me
+			authMe := auth.Group("")
+			authMe.Use(middleware.CompanyAuthMiddleware(resolver))
+			authMe.GET("/me", newAuthHandler.AuthMe)
 		}
 
 		// Admin & Access Management routes
 		admin := v1.Group("/admin")
-		admin.Use(middleware.AuthMiddleware(authService))
+		admin.Use(middleware.CompanyAuthMiddleware(resolver))
 		{
 			// Users
 			users := admin.Group("/users")
