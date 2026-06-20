@@ -3,6 +3,7 @@ import Widget from "components/widget/Widget";
 import { MdOutlineAdminPanelSettings, MdPeople, MdSecurity, MdStore, MdCheckCircle } from "react-icons/md";
 import api from "lib/api";
 import Card from "components/card";
+import MiniCalendar from "components/calendar/MiniCalendar";
 
 export default function ControlCenterDashboard() {
   const [stats, setStats] = useState({

@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import routes from "routes";
 import type { ERPRoute } from "routes";
 
@@ -71,7 +72,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
   // Full-screen layout for landing page (no sidebar/topbar)
   if (isLandingPage) {
     return (
-      <div className="h-screen w-full overflow-hidden">
+      <div className="w-full min-h-screen bg-[#0b1437]">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {renderRoutes(routes)}
@@ -84,8 +85,18 @@ export default function AdminLayout(props: { [x: string]: any }) {
 
   // Standard admin layout with sidebar + topbar
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:!bg-navy-900">
+    <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:!bg-navy-900 relative">
       <Sidebar open={open} onClose={() => setOpen(false)} />
+
+      {/* Floating Sidebar Toggle Button (Desktop only) */}
+      <button
+        onClick={() => setOpen(!open)}
+        className={`absolute top-20 z-50 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:text-gray-700 dark:bg-navy-800 dark:border-navy-700 dark:text-gray-300 dark:hover:bg-navy-700 dark:hover:text-white hidden xl:flex ${
+          open ? "left-[246px]" : "left-4"
+        }`}
+      >
+        {open ? <MdChevronLeft size={20} /> : <MdChevronRight size={20} />}
+      </button>
 
       {/* Main Content */}
       <div
@@ -94,13 +105,13 @@ export default function AdminLayout(props: { [x: string]: any }) {
         }`}
       >
         <Navbar
-          onOpenSidenav={() => setOpen(true)}
+          onOpenSidenav={() => setOpen(!open)}
           brandText={currentRoute}
           secondary={false}
           {...rest}
         />
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-6 pb-6 pt-2">
+        <main className="flex-1 flex flex-col overflow-hidden px-4 md:px-6 pb-6 pt-2 h-full">
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {renderRoutes(routes)}

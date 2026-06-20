@@ -10,6 +10,7 @@
 		font-feature-settings: 'kern' !important;
 		-webkit-font-smoothing: antialiased;
 		letter-spacing: -0.5px;
+		font-size: 14px !important; /* Scale down entire layout to look smaller at 100% zoom */
 	}
 
 	:root {

@@ -1,8 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
 import { ERPFormModal, FormField } from "components/erp/ERPFormModal";
 import { MdClose, MdCheck, MdSave } from "react-icons/md";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "components/ui/sheet";
 import api from "lib/api";
+import { toast } from "sonner";
 
 // Permission categories and their permissions
 const permissionMatrix = {
@@ -107,21 +116,15 @@ function PermissionPanel({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end">
-      <div className="absolute inset-0 bg-navy-900/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-2xl bg-white shadow-2xl flex flex-col h-full">
+    <Sheet open={open} onOpenChange={(val) => !val && onClose()}>
+      <SheetContent side="right" className="w-[400px] sm:w-[600px] sm:max-w-none p-0 flex flex-col bg-white border-none shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div>
-            <h2 className="text-lg font-bold text-navy-700">Permissions — {roleName}</h2>
-            <p className="text-[12px] text-gray-400 mt-0.5">
-              {perms.length} permissions assigned
-            </p>
-          </div>
-          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50">
-            <MdClose size={20} />
-          </button>
-        </div>
+        <SheetHeader className="px-6 py-5 border-b border-gray-100 text-left">
+          <SheetTitle className="text-lg font-bold text-navy-700">Permissions — {roleName}</SheetTitle>
+          <SheetDescription className="text-[12px] text-gray-400 mt-0.5">
+            {perms.length} permissions assigned
+          </SheetDescription>
+        </SheetHeader>
 
         {/* Permission Grid */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
@@ -184,7 +187,7 @@ function PermissionPanel({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-100">
+        <SheetFooter className="flex-row sm:justify-end gap-2 px-6 py-4 border-t border-gray-100 mt-0 shrink-0">
           <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50">
             Cancel
           </button>
@@ -195,9 +198,9 @@ function PermissionPanel({
             <MdSave size={16} />
             Save Permissions
           </button>
-        </div>
-      </div>
-    </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -237,14 +240,16 @@ export default function RolesPage() {
     try {
       if (isEdit && selected) {
         await api.put(`/admin/roles/${selected.id}`, values);
+        toast.success("Role updated successfully");
       } else {
         await api.post("/admin/roles", values);
+        toast.success("Role added successfully");
       }
       await fetchData();
       setShowForm(false);
     } catch (err) {
       console.error("Failed to save role", err);
-      alert("Failed to save role. Please try again.");
+      toast.error("Failed to save role. Please try again.");
     } finally {
       setSaving(false);
     }

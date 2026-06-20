@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
 import { ERPFormModal, FormField } from "components/erp/ERPFormModal";
 import { ERPDetailPanel, DetailField } from "components/erp/ERPDetailPanel";
 import api from "lib/api";
+import { toast } from "sonner";
 
 const companyFields: FormField[] = [
   { key: "name", label: "Company Name", type: "text", required: true, placeholder: "e.g. PharmaDist Lanka" },
@@ -67,14 +68,16 @@ export default function CompanyPage() {
     try {
       if (isEdit && selected) {
         await api.put(`/admin/companies/${selected.id}`, values);
+        toast.success("Company updated successfully");
       } else {
         await api.post("/admin/companies", values);
+        toast.success("Company added successfully");
       }
       await fetchData();
       setShowForm(false);
     } catch (err) {
       console.error("Failed to save company", err);
-      alert("Failed to save company. Please try again.");
+      toast.error("Failed to save company. Please try again.");
     } finally {
       setSaving(false);
     }

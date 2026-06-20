@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
 import { ERPFormModal, FormField } from "components/erp/ERPFormModal";
 import { ERPDetailPanel, DetailField } from "components/erp/ERPDetailPanel";
 import api from "lib/api";
+import { toast } from "sonner";
 
 const branchFields: FormField[] = [
   { key: "name", label: "Branch Name", type: "text", required: true, placeholder: "e.g. Kandy Branch" },
@@ -52,14 +53,16 @@ export default function BranchPage() {
       
       if (isEdit && selected) {
         await api.put(`/admin/branches/${selected.id}`, payload);
+        toast.success("Branch updated successfully");
       } else {
         await api.post("/admin/branches", payload);
+        toast.success("Branch added successfully");
       }
       await fetchData();
       setShowForm(false);
     } catch (err) {
       console.error("Failed to save branch", err);
-      alert("Failed to save branch. Please try again.");
+      toast.error("Failed to save branch. Please try again.");
     } finally {
       setSaving(false);
     }

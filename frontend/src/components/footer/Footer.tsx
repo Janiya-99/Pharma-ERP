@@ -2,8 +2,7 @@ const Footer = () => {
   return (
     <div className="flex w-full flex-col items-center justify-between px-1 pb-8 pt-3 lg:px-8 xl:flex-row">
       <h5 className="mb-4 text-center text-sm font-medium text-gray-600 sm:!mb-0 md:text-lg">
-        <p className="mb-4 text-center text-sm text-gray-600 sm:!mb-0 md:text-base">
-          ©{1900 + new Date().getFullYear()} Horizon UI. All Rights Reserved.
+          ©{1900 + new Date().getFullYear()} PharmaDist Lanka Pvt Ltd. All Rights Reserved. <span className="hidden sm:inline">|</span> Developed by <span className="font-bold">PIXANDCO</span>
         </p>
       </h5>
       <div>

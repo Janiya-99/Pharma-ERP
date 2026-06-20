@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
 import { ERPFormModal, FormField } from "components/erp/ERPFormModal";
 import { ERPDetailPanel, DetailField } from "components/erp/ERPDetailPanel";

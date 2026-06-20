@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { MdVisibility, MdVisibilityOff, MdLocalPharmacy } from "react-icons/md";
+import { 
+  MdVisibility, 
+  MdVisibilityOff, 
+  MdLocalPharmacy,
+  MdInventory2,
+  MdOutlineReceiptLong,
+  MdOutlineVerifiedUser,
+  MdOutlineAssessment
+} from "react-icons/md";
 import { useAuthStore } from "store/authStore";
 
 export default function SignIn() {
@@ -26,75 +34,91 @@ export default function SignIn() {
   return (
     <div className="flex min-h-screen w-full">
       {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative overflow-hidden bg-navy-700">
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-800 via-navy-700 to-brand-900" />
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative overflow-hidden bg-navy-900">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=2069&auto=format&fit=crop')" }}
+        />
+        {/* Heavy dark overlay for readability */}
+        <div className="absolute inset-0 bg-navy-900/80 bg-gradient-to-br from-navy-900/90 via-navy-900/80 to-brand-900/70 backdrop-blur-[2px]" />
 
-        {/* Decorative circles */}
-        <div className="absolute -top-20 -left-20 h-80 w-80 rounded-full bg-brand-500/10 blur-3xl" />
-        <div className="absolute bottom-20 right-10 h-60 w-60 rounded-full bg-brand-400/8 blur-2xl" />
-        <div className="absolute top-1/3 right-1/4 h-40 w-40 rounded-full bg-white/5 blur-xl" />
+        {/* Decorative elements */}
+        <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl mix-blend-screen pointer-events-none" />
+        <div className="absolute bottom-20 right-10 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl mix-blend-screen pointer-events-none" />
 
         {/* Grid pattern */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.05] pointer-events-none"
           style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
             backgroundSize: "40px 40px",
           }}
         />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
+        <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full h-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 shadow-lg shadow-brand-500/30">
-              <MdLocalPharmacy className="h-5 w-5 text-white" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-lg shadow-brand-500/30">
+              <MdLocalPharmacy className="h-6 w-6 text-white" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white leading-tight">PharmaDist</p>
-              <p className="text-[10px] font-medium text-brand-200 uppercase tracking-[0.2em]">
+              <p className="text-[19px] font-extrabold text-white leading-tight tracking-wide">PharmaDist</p>
+              <p className="text-[10px] font-bold text-brand-300 uppercase tracking-[0.2em]">
                 ERP System
               </p>
             </div>
           </div>
 
-          {/* Hero Text */}
-          <div className="max-w-md">
-            <h1 className="text-3xl xl:text-4xl font-bold text-white leading-tight mb-4">
-              Streamline your pharmaceutical distribution
+          {/* Hero Text in a Glassy Card */}
+          <div className="relative z-20 mt-auto mb-8 w-full max-w-[480px] rounded-3xl bg-white/5 border border-white/10 p-8 xl:p-10 backdrop-blur-md shadow-2xl shadow-black/40">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-500/20 px-3 py-1.5 border border-brand-500/30">
+              <span className="h-2 w-2 rounded-full bg-brand-400 animate-pulse" />
+              <span className="text-[11px] font-bold uppercase tracking-widest text-brand-300">Enterprise Grade</span>
+            </div>
+            
+            <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.15] mb-5 tracking-tight">
+              Streamline your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-indigo-300">pharmaceutical</span><br />
+              distribution
             </h1>
-            <p className="text-sm text-navy-200 leading-relaxed mb-8">
-              Manage inventory, invoices, compliance, and finances — all from one unified platform built for pharmaceutical distributors.
+            
+            <p className="text-[15px] text-navy-100 leading-relaxed mb-8 font-medium">
+              Manage inventory, invoices, compliance, and finances — all from one unified platform built for modern distributors.
             </p>
 
-            {/* Feature pills */}
-            <div className="flex flex-wrap gap-2">
-              {["Inventory Control", "Invoice Management", "Compliance Ready", "Financial Reports"].map(
-                (feature) => (
-                  <span
-                    key={feature}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/8 border border-white/10 text-[12px] font-medium text-white/80"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-                    {feature}
+            {/* Features */}
+            <div className="grid grid-cols-2 gap-y-5 gap-x-4">
+              {[
+                { icon: MdInventory2, text: "Inventory Control" },
+                { icon: MdOutlineReceiptLong, text: "Invoice Management" },
+                { icon: MdOutlineVerifiedUser, text: "Compliance Ready" },
+                { icon: MdOutlineAssessment, text: "Financial Reports" }
+              ].map((feature, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-brand-300 border border-white/5 shadow-inner">
+                    <feature.icon size={18} />
+                  </div>
+                  <span className="text-[13px] font-bold text-white/90">
+                    {feature.text}
                   </span>
-                )
-              )}
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Bottom */}
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] text-navy-300">
+          <div className="flex items-center justify-between mt-auto">
+            <p className="text-[12px] font-medium text-white/50">
               © {new Date().getFullYear()} PharmaDist Lanka Pvt Ltd
             </p>
-            <div className="flex gap-4 text-[11px] text-navy-300">
+            <div className="flex gap-5 text-[12px] font-medium text-white/50">
               <a href="#" className="hover:text-white transition-colors">
-                Privacy
+                Privacy Policy
               </a>
               <a href="#" className="hover:text-white transition-colors">
-                Terms
+                Terms of Service
               </a>
             </div>
           </div>
@@ -135,8 +159,8 @@ export default function SignIn() {
             )}
 
             {/* Email Field */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[13px] font-semibold text-navy-700">
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-bold text-navy-700 tracking-wide">
                 Email address
               </label>
               <input
@@ -145,19 +169,19 @@ export default function SignIn() {
                 placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-navy-700 placeholder:text-gray-300 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-50 transition-all"
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] font-medium leading-relaxed text-navy-700 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm"
               />
             </div>
 
             {/* Password Field */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label className="text-[13px] font-semibold text-navy-700">
+                <label className="text-[13px] font-bold text-navy-700 tracking-wide">
                   Password
                 </label>
                 <a
                   href="#"
-                  className="text-[12px] font-semibold text-brand-500 hover:text-brand-600 transition-colors"
+                  className="text-[13px] font-bold text-brand-500 hover:text-brand-600 transition-colors"
                 >
                   Forgot password?
                 </a>
@@ -169,12 +193,12 @@ export default function SignIn() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-11 text-sm text-navy-700 placeholder:text-gray-300 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-50 transition-all"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 pr-12 text-[14px] font-medium leading-relaxed text-navy-700 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-brand-500 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-brand-500 transition-colors"
                 >
                   {showPassword ? (
                     <MdVisibilityOff size={18} />

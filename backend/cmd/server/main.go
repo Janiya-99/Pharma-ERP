@@ -4,6 +4,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
+	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	platformMigrations "github.com/pixandco/erp-phrma/internal/platform/migrations"
 	"github.com/pixandco/erp-phrma/internal/repository"
 	"github.com/pixandco/erp-phrma/internal/router"
@@ -38,6 +39,11 @@ func main() {
 	db, err := database.NewMySQL(&cfg.Database, logger)
 	if err != nil {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
+	}
+
+	// 4.1. Run Company AutoMigrate + Seeder (Development only)
+	if err := companyMigrations.RunCompanyMigrations(db, logger); err != nil {
+		logger.Fatal("Failed to run company migrations", zap.Error(err))
 	}
 
 	// 5. Setup Repositories

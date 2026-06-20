@@ -4,6 +4,13 @@
  */
 import React from "react";
 import { MdClose, MdEdit, MdDelete, MdCheck, MdBlock } from "react-icons/md";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "components/ui/sheet";
 import { StatusBadge } from "./ERPListPage";
 
 export type DetailField = {
@@ -39,40 +46,19 @@ export function ERPDetailPanel({
   onReject,
   children,
 }: ERPDetailPanelProps) {
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-navy-900/30 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Panel */}
-      <div className="relative w-full max-w-lg bg-white shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-200">
+    <Sheet open={open} onOpenChange={(val) => !val && onClose()}>
+      <SheetContent side="right" className="w-[400px] sm:w-[500px] sm:max-w-none p-0 flex flex-col bg-white border-none shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-navy-700 truncate">
-                  {title}
-                </h2>
-                {status && <StatusBadge status={status} />}
-              </div>
-              {subtitle && (
-                <p className="text-[12px] text-gray-400 mt-0.5">{subtitle}</p>
-              )}
-            </div>
+        <SheetHeader className="px-6 py-4 border-b border-gray-100 text-left">
+          <div className="flex items-center gap-2">
+            <SheetTitle className="text-lg font-bold text-navy-700 truncate">{title}</SheetTitle>
+            {status && <StatusBadge status={status} />}
           </div>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors shrink-0"
-          >
-            <MdClose size={20} />
-          </button>
-        </div>
+          {subtitle && (
+            <SheetDescription className="text-[12px] text-gray-400 mt-0.5">{subtitle}</SheetDescription>
+          )}
+        </SheetHeader>
 
         {/* Action buttons */}
         {(onEdit || onDelete || onApprove || onReject) && (
@@ -133,8 +119,8 @@ export function ERPDetailPanel({
           {/* Additional content (tabs, audit trail, etc.) */}
           {children && <div className="mt-6">{children}</div>}
         </div>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 

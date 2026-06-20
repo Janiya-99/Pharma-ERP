@@ -19,6 +19,8 @@ import {
   MdLocalPharmacy,
   MdNotificationsActive,
   MdTrendingUp,
+  MdGavel,
+  MdArrowForward,
 } from "react-icons/md";
 
 // Dummy data for activity feed
@@ -39,99 +41,62 @@ type ModuleCard = {
   path: string;
   badge?: string;
   badgeColor?: string;
-  gradient: string;
+  badgeColor?: string;
+  colSpan?: number;
 };
 
 const modules: ModuleCard[] = [
   {
-    id: "dashboard",
-    title: "Dashboard",
-    description: "Overview of operations, KPIs, and real-time activity feed",
-    icon: <MdDashboard className="h-7 w-7" />,
-    iconBg: "bg-blue-500/10",
-    iconColor: "text-blue-500",
-    path: "/admin/dashboard",
-    gradient: "from-blue-500/20 to-blue-600/5",
-  },
-  {
     id: "control-center",
     title: "Control Center",
-    description: "Company, branches, users, roles, permissions & audit logs",
-    icon: <MdOutlineAdminPanelSettings className="h-7 w-7" />,
+    description: "Centralized command for enterprise configuration. Manage organizational hierarchies, configure global routing parameters, and monitor real-time system health metrics across all integrated microservices.",
+    icon: <MdOutlineAdminPanelSettings className="h-6 w-6" />,
     iconBg: "bg-indigo-500/10",
-    iconColor: "text-indigo-500",
+    iconColor: "text-indigo-400",
     path: "/admin/control-center/dashboard",
-    badge: "Admin",
-    badgeColor: "bg-indigo-500/20 text-indigo-300",
-    gradient: "from-indigo-500/20 to-indigo-600/5",
-  },
-  {
-    id: "finance",
-    title: "Finance",
-    description: "Chart of accounts, journals, ledger, payments & tax",
-    icon: <MdOutlineAccountBalance className="h-7 w-7" />,
-    iconBg: "bg-emerald-500/10",
-    iconColor: "text-emerald-500",
-    path: "/admin/finance/dashboard",
-    badge: "Accounting",
-    badgeColor: "bg-emerald-500/20 text-emerald-300",
-    gradient: "from-emerald-500/20 to-emerald-600/5",
+    badge: "CORE SYSTEM",
+    badgeColor: "bg-indigo-600 text-white shadow-md shadow-indigo-600/20 border border-indigo-500",
+    colSpan: 2,
   },
   {
     id: "inventory",
-    title: "Inventory",
-    description: "Products, batches, warehouses, GRN, transfers & stock ledger",
-    icon: <MdInventory2 className="h-7 w-7" />,
+    title: "Inventory Management",
+    description: "Track stock levels, manage multi-warehouse logistics, and automate replenishment workflows.",
+    icon: <MdInventory2 className="h-6 w-6" />,
     iconBg: "bg-teal-500/10",
-    iconColor: "text-teal-500",
+    iconColor: "text-teal-400",
     path: "/admin/inventory/dashboard",
-    badge: "Stock",
-    badgeColor: "bg-teal-500/20 text-teal-300",
-    gradient: "from-teal-500/20 to-teal-600/5",
+    colSpan: 1,
+  },
+  {
+    id: "finance",
+    title: "Finance Hub",
+    description: "Access general ledgers, reconcile accounts, and generate high-level financial forecasts.",
+    icon: <MdOutlineAccountBalance className="h-6 w-6" />,
+    iconBg: "bg-emerald-500/10",
+    iconColor: "text-emerald-400",
+    path: "/admin/finance/dashboard",
+    colSpan: 1,
   },
   {
     id: "invoice-center",
     title: "Invoice Center",
-    description: "Sales orders, invoices, credit/debit notes & receipts",
-    icon: <MdOutlineReceiptLong className="h-7 w-7" />,
-    iconBg: "bg-amber-500/10",
-    iconColor: "text-amber-500",
+    description: "Process AP/AR documentation, manage vendor billing cycles, and automate payment approvals.",
+    icon: <MdOutlineReceiptLong className="h-6 w-6" />,
+    iconBg: "bg-orange-500/10",
+    iconColor: "text-orange-400",
     path: "/admin/invoice-center/dashboard",
-    badge: "Billing",
-    badgeColor: "bg-amber-500/20 text-amber-300",
-    gradient: "from-amber-500/20 to-amber-600/5",
+    colSpan: 1,
   },
   {
     id: "compliance",
     title: "Compliance Center",
-    description: "License documents, batch recall/hold, expiry disposal & regulatory",
-    icon: <MdOutlineVerifiedUser className="h-7 w-7" />,
-    iconBg: "bg-rose-500/10",
-    iconColor: "text-rose-500",
-    path: "/admin/compliance/dashboard",
-    badge: "Regulatory",
-    badgeColor: "bg-rose-500/20 text-rose-300",
-    gradient: "from-rose-500/20 to-rose-600/5",
-  },
-  {
-    id: "reports",
-    title: "Reports",
-    description: "Financial reports, inventory reports, and compliance analytics",
-    icon: <MdOutlineAssessment className="h-7 w-7" />,
+    description: "Review audit trails, manage regulatory documentation, and ensure operational standard adherence.",
+    icon: <MdGavel className="h-6 w-6" />,
     iconBg: "bg-purple-500/10",
-    iconColor: "text-purple-500",
-    path: "/admin/finance/reports",
-    gradient: "from-purple-500/20 to-purple-600/5",
-  },
-  {
-    id: "settings",
-    title: "Settings",
-    description: "System configuration, currency, prefixes & approval rules",
-    icon: <MdOutlineSettings className="h-7 w-7" />,
-    iconBg: "bg-slate-500/10",
-    iconColor: "text-slate-400",
-    path: "/admin/control-center/settings",
-    gradient: "from-slate-500/20 to-slate-600/5",
+    iconColor: "text-purple-400",
+    path: "/admin/compliance/dashboard",
+    colSpan: 1,
   },
 ];
 
@@ -154,15 +119,17 @@ export default function LandingPage() {
       : "Good evening";
 
   return (
-    <div className="min-h-screen bg-[#0b1437] flex flex-col relative overflow-hidden font-sans">
-      {/* Background Glow Effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-500/20 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-indigo-500/20 blur-[120px] pointer-events-none" />
+    <div className="h-screen overflow-hidden bg-[#0b1437] flex flex-col relative font-sans">
+      {/* Background Glow Effects (contained to prevent horizontal scroll) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-500/20 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-indigo-500/20 blur-[120px]" />
+      </div>
 
       {/* Top Bar */}
       <header className="relative z-40 bg-navy-900/50 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
-          <div className="flex h-20 items-center justify-between">
+        <div className="w-full mx-auto px-4 lg:px-8 xl:px-12">
+          <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-lg shadow-brand-500/30">
@@ -199,16 +166,16 @@ export default function LandingPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 relative z-10 py-10 pb-20">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
+      <main className="flex-1 flex flex-col relative z-10 py-4 min-h-0 overflow-hidden">
+        <div className="w-full mx-auto px-4 lg:px-8 xl:px-12 flex flex-col flex-1 min-h-0">
           {/* Greeting Section */}
-          <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="mb-4 flex flex-col xl:flex-row xl:items-end justify-between gap-4 shrink-0">
             <div>
               <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
                 {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">{user?.name?.split(" ")[0] || "Kamali"}</span> 👋
               </h1>
-              <p className="mt-3 text-[15px] text-gray-400 max-w-xl leading-relaxed">
-                Welcome to your command center. Select a module below to manage your daily operations or review the latest activity in the system.
+              <p className="mt-1 text-[14px] text-gray-400 max-w-xl leading-relaxed">
+                Welcome to your command center. Select a module below to manage your daily operations.
               </p>
             </div>
             
@@ -225,92 +192,92 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="flex flex-col xl:flex-row gap-4 flex-1 min-h-0">
             
-            {/* Left Column - Modules Grid (Takes up 8/12 space on large screens) */}
-            <div className="xl:col-span-8 2xl:col-span-9">
-              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            {/* Left Column - Modules Grid */}
+            <div className="flex-1 w-full min-w-0 flex flex-col">
+              <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2 shrink-0">
                 <MdDashboard className="text-brand-400" /> Core Modules
               </h2>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {modules.map((mod, i) => (
-                  <button
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 gap-3 xl:gap-4 flex-1 min-h-0 pb-1">
+                {modules.map((mod) => (
+                  <div
                     key={mod.id}
                     onClick={() => navigate(mod.path)}
-                    className="group relative flex flex-col items-start rounded-3xl bg-navy-800/60 backdrop-blur-sm p-6 border border-white/5 shadow-xl hover:shadow-2xl hover:shadow-brand-500/10 hover:border-brand-500/30 transition-all duration-300 text-left overflow-hidden"
+                    className={`group relative flex flex-col justify-between rounded-2xl bg-navy-800/60 backdrop-blur-sm p-4 border border-white/5 shadow-lg hover:border-white/10 cursor-pointer transition-all duration-300 text-left ${mod.colSpan === 2 ? "md:col-span-2" : "md:col-span-1"} overflow-hidden min-h-0`}
                   >
-                    {/* Hover Gradient Background */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${mod.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                    
-                    <div className="relative z-10 w-full">
-                      <div className="flex justify-between items-start mb-6">
+                    <div className="flex flex-col min-h-0">
+                      <div className="flex justify-between items-start mb-2 xl:mb-3 shrink-0">
                         <div
-                          className={`flex h-14 w-14 items-center justify-center rounded-2xl ${mod.iconBg} ${mod.iconColor} group-hover:scale-110 transition-transform duration-300 shadow-inner`}
+                          className={`flex h-10 w-10 items-center justify-center rounded-xl ${mod.iconBg} ${mod.iconColor}`}
                         >
                           {mod.icon}
                         </div>
                         {mod.badge && (
                           <span
-                            className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-white/5 shadow-sm ${mod.badgeColor}`}
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${mod.badgeColor}`}
                           >
                             {mod.badge}
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-[17px] font-bold text-white group-hover:text-brand-300 transition-colors">
+                      <h3 className="text-base xl:text-lg font-bold text-white mb-1 shrink-0">
                         {mod.title}
                       </h3>
-                      <p className="mt-2 text-[13px] text-gray-400 leading-relaxed font-medium">
+                      <p className="text-[12px] xl:text-[13px] text-gray-400 leading-snug font-medium mb-3 xl:mb-4 line-clamp-2 xl:line-clamp-3 overflow-hidden flex-1 min-h-0">
                         {mod.description}
                       </p>
                     </div>
 
-                    {/* Arrow Indicator */}
-                    <div className="absolute bottom-6 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-gray-500 group-hover:bg-brand-500 group-hover:text-white transition-all duration-300 transform group-hover:translate-x-1">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
+                    <div
+                      className={
+                        mod.colSpan === 2
+                          ? "w-[160px] xl:w-[180px] py-2 rounded-lg bg-indigo-600 group-hover:bg-indigo-500 text-white font-semibold text-[12px] xl:text-[13px] transition-colors flex items-center justify-center gap-2 shrink-0 mt-auto"
+                          : "w-full py-2 rounded-lg bg-white/5 group-hover:bg-white/10 border border-white/5 text-gray-300 group-hover:text-white font-semibold text-[12px] xl:text-[13px] transition-colors flex items-center justify-center shrink-0 mt-auto"
+                      }
+                    >
+                      Launch Module
+                      {mod.colSpan === 2 && <MdArrowForward className="h-4 w-4" />}
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Right Column - Side Panels (Takes up 4/12 space) */}
-            <div className="xl:col-span-4 2xl:col-span-3 space-y-8">
+            <div className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0 flex flex-col gap-4 min-h-0">
               
               {/* Quick Stats Panel */}
-              <div className="bg-navy-800/60 backdrop-blur-sm rounded-3xl p-6 border border-white/5 shadow-xl">
-                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+              <div className="bg-navy-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/5 shadow-lg shrink-0">
+                <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
                   <MdTrendingUp className="text-brand-400" /> Daily Snapshot
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   {[
                     { label: "Active Users", value: "18", color: "text-blue-400", bg: "bg-blue-500/10" },
                     { label: "Invoices", value: "24", color: "text-emerald-400", bg: "bg-emerald-500/10" },
                     { label: "Pending", value: "12", color: "text-amber-400", bg: "bg-amber-500/10" },
                     { label: "Alerts", value: "3", color: "text-rose-400", bg: "bg-rose-500/10" },
                   ].map((stat) => (
-                    <div key={stat.label} className={`p-4 rounded-2xl ${stat.bg} border border-white/5`}>
-                      <p className={`text-2xl font-extrabold ${stat.color} mb-1`}>{stat.value}</p>
-                      <p className="text-[12px] font-semibold text-gray-400">{stat.label}</p>
+                    <div key={stat.label} className={`p-3 rounded-xl ${stat.bg} border border-white/5`}>
+                      <p className={`text-xl font-extrabold ${stat.color} mb-0.5`}>{stat.value}</p>
+                      <p className="text-[11px] font-semibold text-gray-400">{stat.label}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Activity Feed Panel */}
-              <div className="bg-navy-800/60 backdrop-blur-sm rounded-3xl p-6 border border-white/5 shadow-xl">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <div className="bg-navy-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/5 shadow-lg flex-1 flex flex-col min-h-0">
+                <div className="flex items-center justify-between mb-4 shrink-0">
+                  <h2 className="text-base font-bold text-white flex items-center gap-2">
                     <MdNotificationsActive className="text-brand-400" /> Recent Activity
                   </h2>
                   <button className="text-[12px] font-bold text-brand-400 hover:text-brand-300">View All</button>
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-4 overflow-y-auto pr-2 flex-1 min-h-0">
                   {activities.map((activity, idx) => (
                     <div key={activity.id} className="relative pl-4">
                       {/* Timeline Line */}
@@ -333,14 +300,14 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 border-t border-white/5 bg-navy-900/50 backdrop-blur-md mt-auto">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="relative z-10 py-3 border-t border-white/5 bg-navy-900/50 backdrop-blur-md mt-auto shrink-0">
+        <div className="w-full mx-auto px-4 lg:px-8 xl:px-12 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-[12px] font-medium text-gray-500">
-            © {now.getFullYear()} PharmaDist Lanka Pvt Ltd. All rights reserved.
+            © {now.getFullYear()} PharmaDist Lanka Pvt Ltd. All rights reserved. <span className="hidden sm:inline">|</span> Developed by <span className="text-brand-400 font-bold">PIXANDCO</span>
           </p>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="flex items-center gap-1.5 text-[11px] font-bold text-green-500 bg-green-500/10 px-2.5 py-1 rounded-full border border-green-500/20">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
               System Online
             </span>
             <p className="text-[12px] font-bold text-gray-600">v1.0.0-beta</p>

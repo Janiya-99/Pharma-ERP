@@ -49,11 +49,38 @@ const Navbar = (props: {
 
         {/* Mobile menu toggle */}
         <button
-          className="flex xl:hidden h-10 w-10 items-center justify-center rounded-xl text-gray-500 hover:bg-gray-50"
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
           onClick={onOpenSidenav}
         >
           <FiAlignJustify className="h-5 w-5" />
         </button>
+
+        {/* Branch Selector */}
+        <Dropdown
+          button={
+            <button className="flex items-center gap-2 h-10 px-3 rounded-xl bg-gray-50 dark:bg-navy-700 text-sm font-semibold text-navy-700 dark:text-white hover:bg-gray-100 dark:hover:bg-navy-600 transition-colors">
+              <span className="hidden sm:block">{user?.branch || "Head Office"}</span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          }
+          children={
+            <div className="flex w-48 flex-col rounded-xl bg-white p-2 shadow-xl border border-gray-100 dark:!bg-navy-700 dark:border-navy-600">
+              <p className="px-2 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Select Branch</p>
+              <button className="w-full text-left px-2 py-2 rounded-lg text-sm text-brand-600 bg-brand-50 hover:bg-brand-100 dark:text-brand-400 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 transition-colors font-semibold">
+                {user?.branch || "Head Office"}
+              </button>
+              <button className="w-full text-left px-2 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-navy-600 transition-colors">
+                Colombo Branch
+              </button>
+              <button className="w-full text-left px-2 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-navy-600 transition-colors">
+                Kandy Branch
+              </button>
+            </div>
+          }
+          classNames={"py-2 top-12 -left-[100px] w-max"}
+        />
 
         {/* Notifications */}
         <Dropdown

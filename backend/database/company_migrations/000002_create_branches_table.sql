@@ -1,21 +1,27 @@
 -- +goose Up
--- Company Database: Branches
 CREATE TABLE IF NOT EXISTS `branches` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
     `company_id` BIGINT UNSIGNED NOT NULL,
-    `name` VARCHAR(255) NOT NULL,
-    `code` VARCHAR(50) NOT NULL,
-    `address` VARCHAR(500) DEFAULT NULL,
+
+    `branch_code` VARCHAR(50) NOT NULL,
+    `branch_name` VARCHAR(150) NOT NULL,
+    `branch_type` VARCHAR(50) DEFAULT NULL,
+
+    `address` TEXT DEFAULT NULL,
     `phone` VARCHAR(50) DEFAULT NULL,
-    `is_active` BOOLEAN NOT NULL DEFAULT TRUE,
-    `created_by` BIGINT UNSIGNED DEFAULT NULL,
-    `updated_by` BIGINT UNSIGNED DEFAULT NULL,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+    `email` VARCHAR(150) DEFAULT NULL,
+
+    `is_main_branch` BOOLEAN DEFAULT false,
+    `status` VARCHAR(30) DEFAULT 'active',
+
+    `created_at` DATETIME DEFAULT NULL,
+    `updated_at` DATETIME DEFAULT NULL,
+    `deleted_at` DATETIME DEFAULT NULL,
+
     PRIMARY KEY (`id`),
-    UNIQUE KEY `idx_branch_code` (`code`),
-    INDEX `idx_branches_company` (`company_id`),
+    CONSTRAINT `fk_branches_company` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
+    UNIQUE KEY `idx_branches_company_code` (`company_id`, `branch_code`),
     INDEX `idx_branches_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
