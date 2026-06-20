@@ -60,12 +60,25 @@ export const AuthProvider = ({ children }) => {
       const res = await login({ company_code: companyCode, email, password });
       
       // Handle different token path structures
-      const tokenStr = res.data?.tokens?.access_token || res.token || res.data?.token;
+      const data = res.data || res;
+      const tokenStr = data?.tokens?.access_token || res.token || data?.token;
       const isSuccess = res.success !== false;
 
       if (isSuccess && tokenStr) {
         localStorage.setItem("erp_token", tokenStr);
         setToken(tokenStr);
+        
+        // If login returns the context, set it immediately to prevent redirect loops
+        if (data && data.user) {
+          setUser(data.user);
+          setCompany(data.company);
+          setActiveBranch(data.active_branch);
+          setActiveSoftware(data.active_software);
+          setBranches(data.branches || []);
+          setSoftwareModules(data.software_modules || []);
+          setPermissions(data.permissions || []);
+        }
+        
         return { success: true };
       }
       return { success: false, message: res.message || "Login failed" };
