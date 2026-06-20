@@ -41,4 +41,28 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 
 	// --- Software Modules ---
 	router.GET("/software-modules", middleware.RequirePermission("control.permission.view"), moduleHandler.List)
+
+	// --- Users ---
+	userHandler := handlers.NewUserHandler(logger)
+	accessHandler := handlers.NewUserAccessHandler(logger)
+
+	usersGrp := router.Group("/users")
+	{
+		usersGrp.GET("", middleware.RequirePermission("control.user.view"), userHandler.List)
+		usersGrp.POST("", middleware.RequirePermission("control.user.create"), userHandler.Create)
+		usersGrp.GET("/:id", middleware.RequirePermission("control.user.view"), userHandler.Get)
+		usersGrp.PUT("/:id", middleware.RequirePermission("control.user.update"), userHandler.Update)
+		usersGrp.DELETE("/:id", middleware.RequirePermission("control.user.delete"), userHandler.Delete)
+
+		usersGrp.POST("/:id/change-status", middleware.RequirePermission("control.user.change_status"), userHandler.ChangeStatus)
+		usersGrp.POST("/:id/reset-password", middleware.RequirePermission("control.user.reset_password"), userHandler.ResetPassword)
+
+		usersGrp.GET("/:id/branches", middleware.RequirePermission("control.access.branch.view"), accessHandler.GetBranches)
+		usersGrp.POST("/:id/branches", middleware.RequirePermission("control.access.branch.assign"), accessHandler.AssignBranches)
+		usersGrp.DELETE("/:id/branches/:branch_id", middleware.RequirePermission("control.access.branch.remove"), accessHandler.RemoveBranch)
+
+		usersGrp.GET("/:id/software", middleware.RequirePermission("control.access.software.view"), accessHandler.GetSoftware)
+		usersGrp.POST("/:id/software", middleware.RequirePermission("control.access.software.assign"), accessHandler.AssignSoftware)
+		usersGrp.DELETE("/:id/software/:software_id", middleware.RequirePermission("control.access.software.remove"), accessHandler.RemoveSoftware)
+	}
 }
