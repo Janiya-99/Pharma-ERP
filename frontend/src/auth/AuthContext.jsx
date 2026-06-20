@@ -27,14 +27,19 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const res = await getAuthContext();
-      if (res.success && res.data) {
-        setUser(res.data.user);
-        setCompany(res.data.company);
-        setActiveBranch(res.data.active_branch);
-        setActiveSoftware(res.data.active_software);
-        setBranches(res.data.branches || []);
-        setSoftwareModules(res.data.software_modules || []);
-        setPermissions(res.data.permissions || []);
+      
+      // Handle both {success: true, data: {...}} and direct object {...}
+      const data = res.data || res;
+      const isSuccess = res.success !== false; // Treat undefined as success
+
+      if (isSuccess && data && data.user) {
+        setUser(data.user);
+        setCompany(data.company);
+        setActiveBranch(data.active_branch);
+        setActiveSoftware(data.active_software);
+        setBranches(data.branches || []);
+        setSoftwareModules(data.software_modules || []);
+        setPermissions(data.permissions || []);
       } else {
         logoutUser();
       }
@@ -53,10 +58,14 @@ export const AuthProvider = ({ children }) => {
   const loginUser = async (companyCode, email, password) => {
     try {
       const res = await login({ company_code: companyCode, email, password });
-      const token = res.data?.tokens?.access_token || res.token;
-      if (res.success && token) {
-        localStorage.setItem("erp_token", token);
-        setToken(token);
+      
+      // Handle different token path structures
+      const tokenStr = res.data?.tokens?.access_token || res.token || res.data?.token;
+      const isSuccess = res.success !== false;
+
+      if (isSuccess && tokenStr) {
+        localStorage.setItem("erp_token", tokenStr);
+        setToken(tokenStr);
         return { success: true };
       }
       return { success: false, message: res.message || "Login failed" };
