@@ -4,6 +4,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
+	platformMigrations "github.com/pixandco/erp-phrma/internal/platform/migrations"
 	"github.com/pixandco/erp-phrma/internal/repository"
 	"github.com/pixandco/erp-phrma/internal/router"
 	"github.com/pixandco/erp-phrma/internal/service"
@@ -21,13 +22,25 @@ func main() {
 		logger.Fatal("Failed to load config", zap.Error(err))
 	}
 
-	// 3. Init Database
+	// 3. Init Platform Database (erp_platform)
+	platformDB, err := database.NewPlatformDB(&cfg.PlatformDB, logger)
+	if err != nil {
+		logger.Fatal("Failed to connect to platform database", zap.Error(err))
+	}
+	logger.Info("Platform database ready", zap.String("db", cfg.PlatformDB.Name))
+
+	// 3.1. Run Platform AutoMigrate + Seeder
+	if err := platformMigrations.RunPlatformMigrations(platformDB, logger); err != nil {
+		logger.Fatal("Failed to run platform migrations", zap.Error(err))
+	}
+
+	// 4. Init Company Database (legacy single-company connection)
 	db, err := database.NewMySQL(&cfg.Database, logger)
 	if err != nil {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
 
-	// 4. Setup Repositories
+	// 5. Setup Repositories
 	userRepo := repository.NewUserRepository(db)
 	sessionRepo := repository.NewSessionRepository(db)
 	roleRepo := repository.NewRoleRepository(db)
@@ -39,7 +52,7 @@ func main() {
 	compRepo := repository.NewCompanyRepository(db)
 	branchRepo := repository.NewBranchRepository(db)
 
-	// 5. Setup Services
+	// 6. Setup Services
 	authService := service.NewAuthService(userRepo, sessionRepo, &cfg.JWT, logger)
 	auditService := service.NewAuditService(auditRepo, logger)
 	permService := service.NewPermissionService(roleRepo, nil, logger) // No cache for now
@@ -51,7 +64,7 @@ func main() {
 	compService := service.NewCompanyService(compRepo, logger)
 	branchService := service.NewBranchService(branchRepo, logger)
 
-	// 6. Setup Controllers
+	// 7. Setup Controllers
 	authCtrl := controller.NewAuthController(authService)
 	userCtrl := controller.NewUserController(userService)
 	roleCtrl := controller.NewRoleController(roleService)
@@ -78,7 +91,7 @@ func main() {
 	suppCtrl := controller.NewSupplierController(suppService)
 	grnCtrl := controller.NewGRNController(grnService)
 
-	// 7. Setup Router
+	// 8. Setup Router
 	r := router.Setup(
 		authCtrl,
 		userCtrl,
@@ -93,10 +106,10 @@ func main() {
 		suppCtrl,
 		grnCtrl,
 		authService,
-		cfg.CORS.AllowedOrigins,
+		cfg,
 	)
 
-	// 8. Start Server
+	// 9. Start Server
 	logger.Info("Starting API Server", zap.String("port", cfg.App.Port))
 	if err := r.Run(":" + cfg.App.Port); err != nil {
 		logger.Fatal("Server failed", zap.Error(err))
