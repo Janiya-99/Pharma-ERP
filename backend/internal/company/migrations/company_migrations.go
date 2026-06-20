@@ -30,6 +30,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.Role{},
 		&models.Permission{},
 		&models.RolePermission{},
+		&models.UserBranchSoftwareRole{},
 	)
 	if err != nil {
 		logger.Error("Company AutoMigrate failed", zap.Error(err))
@@ -62,6 +63,11 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 
 	if err := seeders.SeedAdminUser(db, logger); err != nil {
 		logger.Error("Admin user seeder failed", zap.Error(err))
+		return err
+	}
+
+	if err := seeders.SeedUserAccessMatrix(db, logger); err != nil {
+		logger.Error("User access matrix seeder failed", zap.Error(err))
 		return err
 	}
 
