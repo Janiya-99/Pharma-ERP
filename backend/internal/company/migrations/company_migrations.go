@@ -22,6 +22,14 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.Department{},
 		&models.Designation{},
 		&models.SoftwareModule{},
+		&models.User{},
+		&models.UserBranchAccess{},
+		&models.UserSoftwareAccess{},
+		&models.LoginLog{},
+		&models.PasswordResetToken{},
+		&models.Role{},
+		&models.Permission{},
+		&models.RolePermission{},
 	)
 	if err != nil {
 		logger.Error("Company AutoMigrate failed", zap.Error(err))
@@ -34,6 +42,26 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 	logger.Info("Running company seeders...")
 	if err := seeders.SeedSoftwareModules(db, logger); err != nil {
 		logger.Error("Company software module seeder failed", zap.Error(err))
+		return err
+	}
+
+	if err := seeders.SeedPermissions(db, logger); err != nil {
+		logger.Error("Company permission seeder failed", zap.Error(err))
+		return err
+	}
+
+	if err := seeders.SeedRoles(db, logger); err != nil {
+		logger.Error("Company role seeder failed", zap.Error(err))
+		return err
+	}
+
+	if err := seeders.SeedRolePermissions(db, logger); err != nil {
+		logger.Error("Company role permission seeder failed", zap.Error(err))
+		return err
+	}
+
+	if err := seeders.SeedAdminUser(db, logger); err != nil {
+		logger.Error("Admin user seeder failed", zap.Error(err))
 		return err
 	}
 
