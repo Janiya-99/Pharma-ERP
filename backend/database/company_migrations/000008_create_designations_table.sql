@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS `designations` (
     `deleted_at` TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_designations_company` (`company_id`),
-    INDEX `idx_designations_deleted_at` (`deleted_at`),
-    CONSTRAINT `fk_designations_company` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE RESTRICT
+    INDEX `idx_designations_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE `users` ADD COLUMN `designation_id` BIGINT UNSIGNED DEFAULT NULL AFTER `branch_id`;

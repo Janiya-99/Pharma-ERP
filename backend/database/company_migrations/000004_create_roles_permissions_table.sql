@@ -1,5 +1,8 @@
 -- +goose Up
--- Roles table
+-- Company Database: Roles & Permissions
+-- Roles are scoped per company.
+-- Permissions are global definitions.
+
 CREATE TABLE IF NOT EXISTS `roles` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `company_id` BIGINT UNSIGNED NOT NULL,
@@ -7,17 +10,17 @@ CREATE TABLE IF NOT EXISTS `roles` (
     `slug` VARCHAR(100) NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `is_system` BOOLEAN NOT NULL DEFAULT FALSE,
+    `created_by` BIGINT UNSIGNED DEFAULT NULL,
+    `updated_by` BIGINT UNSIGNED DEFAULT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at` TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `idx_role_slug` (`slug`),
     INDEX `idx_roles_company` (`company_id`),
-    INDEX `idx_roles_deleted_at` (`deleted_at`),
-    CONSTRAINT `fk_roles_company` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE RESTRICT
+    INDEX `idx_roles_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Permissions table (global, not company-scoped)
 CREATE TABLE IF NOT EXISTS `permissions` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `module` VARCHAR(50) NOT NULL,
@@ -46,7 +49,6 @@ CREATE TABLE IF NOT EXISTS `role_permissions` (
     CONSTRAINT `fk_role_perms_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_role_perms_perm` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 -- +goose Down
 DROP TABLE IF EXISTS `role_permissions`;
