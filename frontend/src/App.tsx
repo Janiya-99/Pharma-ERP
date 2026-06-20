@@ -3,10 +3,16 @@ import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import PharmaLayout from "layouts/pharma";
 import ProtectedRoute from "components/auth/ProtectedRoute";
+import { Toaster } from "components/ui/sonner";
+import StartupPage from "pages/StartupPage";
 
 const App = () => {
   return (
+    <>
     <Routes>
+      {/* Startup / placeholder page */}
+      <Route path="startup" element={<StartupPage />} />
+
       {/* Public auth routes */}
       <Route path="auth/*" element={<AuthLayout />} />
 
@@ -26,6 +32,8 @@ const App = () => {
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/admin/home" replace />} />
     </Routes>
+    <Toaster position="top-right" richColors />
+    </>
   );
 };
 
