@@ -107,8 +107,9 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const res = await switchBranch(branchId);
-      const token = res.data?.tokens?.access_token || res.token;
-      if (res.success && token) {
+      const token = res.data?.tokens?.access_token || res.token || res.data?.token;
+      const isSuccess = res.success !== false;
+      if (isSuccess && token) {
         localStorage.setItem("erp_token", token);
         setToken(token);
         await refreshContext();
@@ -127,8 +128,9 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const res = await switchSoftware(softwareCode);
-      const token = res.data?.tokens?.access_token || res.token;
-      if (res.success && token) {
+      const token = res.data?.tokens?.access_token || res.token || res.data?.token;
+      const isSuccess = res.success !== false;
+      if (isSuccess && token) {
         localStorage.setItem("erp_token", token);
         setToken(token);
         await refreshContext();
