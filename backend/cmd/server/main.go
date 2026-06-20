@@ -120,6 +120,7 @@ func main() {
 		grnCtrl,
 		authService,
 		cfg,
+		logger,
 	)
 
 	// 9. Start Server

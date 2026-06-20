@@ -31,6 +31,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.Permission{},
 		&models.RolePermission{},
 		&models.UserBranchSoftwareRole{},
+		&models.AuditLog{},
 	)
 	if err != nil {
 		logger.Error("Company AutoMigrate failed", zap.Error(err))

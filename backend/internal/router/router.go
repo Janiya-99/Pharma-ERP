@@ -8,10 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/auth/handlers"
+	"github.com/pixandco/erp-phrma/internal/control"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	"github.com/pixandco/erp-phrma/internal/service"
+	"go.uber.org/zap"
 )
 
 // Setup configures the Gin engine with middlewares and routes.
@@ -32,6 +34,7 @@ func Setup(
 	grnCtrl *controller.GRNController,
 	authService *service.AuthService,
 	cfg *config.Config,
+	logger *zap.Logger,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -85,6 +88,13 @@ func Setup(
 			authMe.POST("/switch-branch", newAuthHandler.SwitchBranch)
 			authMe.POST("/switch-software", newAuthHandler.SwitchSoftware)
 		}
+
+		// Control Center routes
+		controlGrp := v1.Group("/control")
+		controlGrp.Use(middleware.CompanyAuthMiddleware(resolver))
+		controlGrp.Use(middleware.BranchAccessMiddleware())
+		controlGrp.Use(middleware.SoftwareAccessMiddleware())
+		control.SetupRoutes(controlGrp, logger)
 
 		// Admin & Access Management routes
 		admin := v1.Group("/admin")
