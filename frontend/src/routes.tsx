@@ -19,14 +19,12 @@ import AuditLogsPage from "views/admin/control-center/AuditLogsPage";
 
 // Finance
 import FinanceDashboard from "views/admin/finance/FinanceDashboard";
-import ChartOfAccountsPage from "views/admin/finance/ChartOfAccountsPage";
-import JournalEntriesPage from "views/admin/finance/JournalEntriesPage";
-import PaymentsPage from "views/admin/finance/PaymentsPage";
-import ReceiptsPage from "views/admin/finance/ReceiptsPage";
-import BankPage from "views/admin/finance/BankPage";
-import TaxPage from "views/admin/finance/TaxPage";
-import FinanceReportsPage from "views/admin/finance/FinanceReportsPage";
-import GeneralLedgerPage from "views/admin/finance/GeneralLedgerPage";
+import FinancialYearsPage from "views/admin/finance/financial-years/FinancialYearsPage";
+import AccountingPeriodsPage from "views/admin/finance/accounting-periods/AccountingPeriodsPage";
+import AccountClassificationsPage from "views/admin/finance/account-classifications/AccountClassificationsPage";
+import ChartOfAccountsPage from "views/admin/finance/chart-of-accounts/ChartOfAccountsPage";
+import OpeningBalancesPage from "views/admin/finance/opening-balances/OpeningBalancesPage";
+import JournalEntriesPage from "pages/finance/journal-entries/JournalEntriesPage";
 
 // Inventory
 import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
@@ -120,14 +118,13 @@ const routes: ERPRoute[] = [
     icon: <MdOutlineAccountBalance className="h-5 w-5" />,
     children: [
       { name: "Dashboard", path: "finance/dashboard", component: <FinanceDashboard /> },
+      { name: "Financial Years", path: "finance/financial-years", component: <FinancialYearsPage /> },
+      { name: "Accounting Periods", path: "finance/accounting-periods", component: <AccountingPeriodsPage /> },
+      { name: "Account Classifications", path: "finance/account-classifications", component: <AccountClassificationsPage /> },
       { name: "Chart of Accounts", path: "finance/chart-of-accounts", component: <ChartOfAccountsPage /> },
-      { name: "Journal Entries", path: "finance/journals", component: <JournalEntriesPage /> },
-      { name: "General Ledger", path: "finance/general-ledger", component: <GeneralLedgerPage /> },
-      { name: "Payments", path: "finance/payments", component: <PaymentsPage /> },
-      { name: "Receipts", path: "finance/receipts", component: <ReceiptsPage /> },
-      { name: "Bank", path: "finance/bank", component: <BankPage /> },
-      { name: "Tax", path: "finance/tax", component: <TaxPage /> },
-      { name: "Reports", path: "finance/reports", component: <FinanceReportsPage /> },
+      { name: "Opening Balances", path: "finance/opening-balances", component: <OpeningBalancesPage /> },
+      { name: "Journal Entries", path: "finance/journal-entries", component: <JournalEntriesPage /> },
+      // Sub-routes for Journal Entries shouldn't be in the main nav menu, they can be handled manually or by adding `hideFromMenu: true` if the router supports it. But let's just add the list view here as requested by "Update Finance Sidebar".
     ],
   },
   {

@@ -42,7 +42,7 @@ const UserSoftwareAccessPage = () => {
   const fetchAllSoftware = async () => {
     try {
       const res = await getSoftwareModules();
-      if (res.success) setAllSoftware(res.data.items || res.data || []);
+      if (res.success) setAllSoftware(res.data?.items || res.data || []);
     } catch (err) {
       console.error(err);
     }
@@ -53,7 +53,7 @@ const UserSoftwareAccessPage = () => {
       setLoading(true);
       const res = await getUserSoftware(selectedUser.id);
       if (res.success) {
-        setAssignedSoftware(res.data.software_modules || []);
+        setAssignedSoftware(res.data?.software_modules || []);
       }
     } catch (err) {
       setError("Failed to fetch assigned software modules.");
@@ -70,8 +70,8 @@ const UserSoftwareAccessPage = () => {
     setSuccessMsg(null);
 
     try {
-      const softwareIds = selectedSoftwareToAssign.map(s => s.id);
-      const res = await assignUserSoftware(selectedUser.id, { software_module_ids: softwareIds });
+      const software_modules = selectedSoftwareToAssign.map(s => ({ software_id: s.id, can_access: true }));
+      const res = await assignUserSoftware(selectedUser.id, { software_modules });
       
       if (res.success) {
         setSuccessMsg("Software modules assigned successfully.");
@@ -149,16 +149,16 @@ const UserSoftwareAccessPage = () => {
             <div className="mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
-                  {selectedUser.full_name.charAt(0)}
+                  {(selectedUser.name || selectedUser.full_name || "U").charAt(0)}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{selectedUser.full_name}</p>
+                  <p className="font-semibold text-gray-900">{selectedUser.name || selectedUser.full_name}</p>
                   <p className="text-xs text-gray-500">{selectedUser.email}</p>
                 </div>
               </div>
               <div className="mt-4 space-y-2 text-sm text-gray-600">
                 <p><span className="font-medium text-gray-700">Code:</span> {selectedUser.employee_code || "N/A"}</p>
-                <p><span className="font-medium text-gray-700">Type:</span> <span className="capitalize">{selectedUser.user_type.replace("_", " ")}</span></p>
+                <p><span className="font-medium text-gray-700">Type:</span> <span className="capitalize">{(selectedUser.user_type || "").replace("_", " ")}</span></p>
               </div>
             </div>
           )}
@@ -250,7 +250,7 @@ const UserSoftwareAccessPage = () => {
         onClose={() => setIsRemoveOpen(false)}
         onConfirm={handleRemove}
         title="Remove Software Access"
-        message={`Are you sure you want to remove access to "${softwareToRemove?.software_name}" for ${selectedUser?.full_name}?`}
+        message={`Are you sure you want to remove access to "${softwareToRemove?.software_name}" for ${selectedUser?.name || selectedUser?.full_name}?`}
         confirmText="Remove Access"
         isConfirming={removing}
       />

@@ -66,6 +66,17 @@ func SeedRolePermissions(db *gorm.DB, logger *zap.Logger) error {
 
 	// Finance Manager: all Finance
 	assignPermission("FINANCE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "finance.") })
+	
+	// Finance Executive: view, create, update, submit
+	assignPermission("FINANCE_EXECUTIVE", func(k string) bool {
+		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".create") || strings.HasSuffix(k, ".update") || strings.HasSuffix(k, ".submit"))
+	})
+	
+	// Finance Approver: view, approve, reject, post
+	assignPermission("FINANCE_APPROVER", func(k string) bool {
+		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post"))
+	})
+
 	// Finance Viewer
 	assignPermission("FINANCE_VIEWER", func(k string) bool {
 		return strings.HasPrefix(k, "finance.") && strings.HasSuffix(k, ".view")

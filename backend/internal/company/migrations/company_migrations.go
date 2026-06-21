@@ -3,6 +3,7 @@ package migrations
 import (
 	"github.com/pixandco/erp-phrma/internal/company/models"
 	"github.com/pixandco/erp-phrma/internal/company/seeders"
+	financeMigrations "github.com/pixandco/erp-phrma/internal/finance/migrations"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -69,6 +70,12 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 
 	if err := seeders.SeedUserAccessMatrix(db, logger); err != nil {
 		logger.Error("User access matrix seeder failed", zap.Error(err))
+		return err
+	}
+
+	logger.Info("Running finance migrations and seeders...")
+	if err := financeMigrations.RunFinanceMigrations(db, logger); err != nil {
+		logger.Error("Finance migrations failed", zap.Error(err))
 		return err
 	}
 

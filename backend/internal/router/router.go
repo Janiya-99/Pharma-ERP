@@ -11,6 +11,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/control"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
+	financeModule "github.com/pixandco/erp-phrma/internal/finance"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	"github.com/pixandco/erp-phrma/internal/service"
 	"go.uber.org/zap"
@@ -154,32 +155,13 @@ func Setup(
 			}
 		}
 
-		// Finance routes
-		finance := v1.Group("/finance")
-		finance.Use(middleware.AuthMiddleware(authService))
-		{
-			// Chart of Accounts
-			coa := finance.Group("/accounts")
-			{
-				coa.GET("", coaCtrl.List)
-				coa.GET("/tree", coaCtrl.ListTree)
-				coa.POST("", coaCtrl.Create)
-				coa.GET("/:id", coaCtrl.Get)
-				coa.PUT("/:id", coaCtrl.Update)
-				coa.DELETE("/:id", coaCtrl.Delete)
-			}
+		// Finance routes (new module)
+		financeGrp := v1.Group("/finance")
+		financeGrp.Use(middleware.CompanyAuthMiddleware(resolver))
+		financeGrp.Use(middleware.BranchAccessMiddleware())
+		financeGrp.Use(middleware.SoftwareAccessMiddleware())
+		financeModule.SetupRoutes(financeGrp, logger)
 
-			// Journal Entries
-			journal := finance.Group("/journals")
-			{
-				journal.GET("", journalCtrl.List)
-				journal.POST("", journalCtrl.Create)
-				journal.GET("/:id", journalCtrl.Get)
-				journal.POST("/:id/submit", journalCtrl.Submit)
-				journal.POST("/:id/approve", journalCtrl.Approve)
-				journal.POST("/:id/post", journalCtrl.Post)
-			}
-		}
 
 		// Inventory routes
 		inventory := v1.Group("/inventory")

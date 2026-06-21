@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "../../../components/common/Modal";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
+import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import { createRole, updateRole } from "../../../api/controlApi";
 
@@ -116,22 +117,17 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }) =>
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Software Module *</label>
-          <select
-            name="software_id"
-            value={formData.software_id}
-            onChange={handleChange}
-            disabled={isEdit} // Software Module read-only on edit
-            required
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 disabled:bg-gray-100 disabled:text-gray-500"
-          >
-            <option value="">Select Software Module</option>
-            {softwareModules.map((s) => (
-              <option key={s.id} value={s.id}>{s.software_name}</option>
-            ))}
-          </select>
-        </div>
+        <Select
+          label="Software Module"
+          name="software_id"
+          value={formData.software_id}
+          onChange={handleChange}
+          disabled={isEdit}
+          required
+          searchable={true}
+          placeholder="Select Software Module"
+          options={softwareModules.map((s) => ({ value: s.id, label: s.software_name }))}
+        />
 
         <Input
           label="Role Name *"
@@ -162,19 +158,17 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }) =>
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            required
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+        <Select
+          label="Status"
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          required
+          options={[
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ]}
+        />
 
         <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
           <Button variant="secondary" onClick={onClose} type="button">

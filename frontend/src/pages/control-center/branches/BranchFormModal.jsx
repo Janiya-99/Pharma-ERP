@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "../../../components/common/Modal";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
+import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import { createBranch, updateBranch } from "../../../api/controlApi";
 
@@ -114,36 +115,32 @@ const BranchFormModal = ({ isOpen, onClose, branch = null, onSuccess }) => {
             required
           />
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Branch Type *</label>
-            <select
-              name="branch_type"
-              value={formData.branch_type}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-            >
-              <option value="Main Branch">Main Branch</option>
-              <option value="Warehouse">Warehouse</option>
-              <option value="Sales Branch">Sales Branch</option>
-              <option value="Distribution Center">Distribution Center</option>
-              <option value="Admin Office">Admin Office</option>
-            </select>
-          </div>
+          <Select
+            label="Branch Type"
+            name="branch_type"
+            value={formData.branch_type}
+            onChange={handleChange}
+            required
+            options={[
+              { value: "Main Branch", label: "Main Branch" },
+              { value: "Warehouse", label: "Warehouse" },
+              { value: "Sales Branch", label: "Sales Branch" },
+              { value: "Distribution Center", label: "Distribution Center" },
+              { value: "Admin Office", label: "Admin Office" },
+            ]}
+          />
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
+          <Select
+            label="Status"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            required
+            options={[
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+            ]}
+          />
 
           <Input
             label="Phone"

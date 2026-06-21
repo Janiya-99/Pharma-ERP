@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../../components/common/Button";
+import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import RoleSelector from "../../../components/common/RoleSelector";
 import { getUserBranches, getUserSoftware, assignUserAccessMatrix } from "../../../api/controlApi";
@@ -129,37 +130,25 @@ const UserAccessMatrixForm = ({ user, onSuccess }) => {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Branch *</label>
-              <select
-                name="branch_id"
-                value={formData.branch_id}
-                onChange={handleChange}
-                required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-              >
-                <option value="">Select Branch</option>
-                {branches.map(b => (
-                  <option key={b.id} value={b.id}>{b.branch_name}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Branch"
+              name="branch_id"
+              value={formData.branch_id}
+              onChange={handleChange}
+              searchable={true}
+              placeholder="Select Branch"
+              options={branches.map(b => ({ value: b.id, label: b.branch_name }))}
+            />
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Software Module *</label>
-              <select
-                name="software_id"
-                value={formData.software_id}
-                onChange={handleChange}
-                required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-              >
-                <option value="">Select Software</option>
-                {softwareModules.map(s => (
-                  <option key={s.id} value={s.id}>{s.software_name}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Software Module"
+              name="software_id"
+              value={formData.software_id}
+              onChange={handleChange}
+              searchable={true}
+              placeholder="Select Software"
+              options={softwareModules.map(s => ({ value: s.id, label: s.software_name }))}
+            />
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Role *</label>

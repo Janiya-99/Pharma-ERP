@@ -110,16 +110,16 @@ const UserAccessMatrixPage = () => {
             <div className="mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
-                  {selectedUser.full_name.charAt(0)}
+                  {(selectedUser.name || selectedUser.full_name || "U").charAt(0)}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{selectedUser.full_name}</p>
+                  <p className="font-semibold text-gray-900">{selectedUser.name || selectedUser.full_name}</p>
                   <p className="text-xs text-gray-500">{selectedUser.email}</p>
                 </div>
               </div>
               <div className="mt-4 space-y-2 text-sm text-gray-600">
                 <p><span className="font-medium text-gray-700">Code:</span> {selectedUser.employee_code || "N/A"}</p>
-                <p><span className="font-medium text-gray-700">Type:</span> <span className="capitalize">{selectedUser.user_type.replace("_", " ")}</span></p>
+                <p><span className="font-medium text-gray-700">Type:</span> <span className="capitalize">{(selectedUser.user_type || "").replace("_", " ")}</span></p>
               </div>
             </div>
           )}
@@ -168,7 +168,7 @@ const UserAccessMatrixPage = () => {
         onClose={() => setIsRemoveOpen(false)}
         onConfirm={handleRemove}
         title="Remove Access Record"
-        message={`Are you sure you want to remove the "${accessToRemove?.role?.role_name}" role from ${selectedUser?.full_name} for branch "${accessToRemove?.branch?.branch_name}" and module "${accessToRemove?.software_module?.software_name}"?`}
+        message={`Are you sure you want to remove the "${accessToRemove?.role?.role_name}" role from ${selectedUser?.name || selectedUser?.full_name} for branch "${accessToRemove?.branch?.branch_name}" and module "${accessToRemove?.software_module?.software_name}"?`}
         confirmText="Remove Access"
         isConfirming={removing}
       />

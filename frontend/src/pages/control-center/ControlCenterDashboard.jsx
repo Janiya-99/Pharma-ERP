@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../auth/AuthContext";
 import { Building2, MapPin, Users, Shield, Key } from "lucide-react";
+import { getUsers, getRoles } from "../../api/controlApi";
 
 const StatCard = ({ title, value, icon: Icon }) => (
   <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100 flex items-center">
@@ -16,21 +17,49 @@ const StatCard = ({ title, value, icon: Icon }) => (
 
 const ControlCenterDashboard = () => {
   const { user, company, activeBranch, activeSoftware } = useAuth();
+  const [usersCount, setUsersCount] = useState("...");
+  const [rolesCount, setRolesCount] = useState("...");
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const usersRes = await getUsers({ limit: 1 });
+        if (usersRes.success) {
+          setUsersCount(usersRes.meta?.total ?? usersRes.data?.length ?? 0);
+        }
+      } catch (err) {
+        console.error("Failed to fetch users count", err);
+        setUsersCount("0");
+      }
+
+      try {
+        const rolesRes = await getRoles({ limit: 1 });
+        if (rolesRes.success) {
+          setRolesCount(rolesRes.meta?.total ?? rolesRes.data?.length ?? 0);
+        }
+      } catch (err) {
+        console.error("Failed to fetch roles count", err);
+        setRolesCount("0");
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Control Center Overview</h1>
-          <p className="text-sm text-gray-500 mt-1">Welcome back, {user?.name}</p>
+          <p className="text-sm text-gray-500 mt-1">Welcome back, {user?.name || user?.full_name}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Company" value={company?.company_name || "-"} icon={Building2} />
+        <StatCard title="Company" value={company?.company_name || company?.name || "-"} icon={Building2} />
         <StatCard title="Active Branch" value={activeBranch?.branch_name || activeBranch?.branch?.branch_name || "-"} icon={MapPin} />
-        <StatCard title="Users" value="..." icon={Users} />
-        <StatCard title="Roles" value="..." icon={Shield} />
+        <StatCard title="Users" value={usersCount} icon={Users} />
+        <StatCard title="Roles" value={rolesCount} icon={Shield} />
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mt-6">
@@ -39,7 +68,7 @@ const ControlCenterDashboard = () => {
           <div className="p-4 rounded-md bg-gray-50 border border-gray-200">
             <h3 className="text-sm font-medium text-gray-500 mb-1">Active Software</h3>
             <p className="font-semibold text-gray-900 flex items-center">
-              {activeSoftware?.software?.software_name || "Platform Base"}
+              {activeSoftware?.software?.software_name || activeSoftware?.software_name || "Platform Base"}
             </p>
           </div>
           <div className="p-4 rounded-md bg-gray-50 border border-gray-200">

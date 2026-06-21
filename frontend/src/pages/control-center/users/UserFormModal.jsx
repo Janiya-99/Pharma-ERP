@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "../../../components/common/Modal";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
+import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import { createUser, updateUser, getBranches, getUserBranches } from "../../../api/controlApi";
 
@@ -220,85 +221,68 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <select
-              name="department_id"
-              value={formData.department_id}
-              onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-            >
-              <option value="">Select Department</option>
-              {departments.map((d) => (
-                <option key={d.id} value={d.id}>{d.department_name}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Department"
+            name="department_id"
+            value={formData.department_id}
+            onChange={handleChange}
+            searchable={true}
+            placeholder="Select Department"
+            options={departments.map((d) => ({ value: d.id, label: d.department_name }))}
+          />
+
+          <Select
+            label="Designation"
+            name="designation_id"
+            value={formData.designation_id}
+            onChange={handleChange}
+            searchable={true}
+            placeholder="Select Designation"
+            options={designations.map((d) => ({ value: d.id, label: d.designation_name }))}
+          />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-            <select
-              name="designation_id"
-              value={formData.designation_id}
-              onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-            >
-              <option value="">Select Designation</option>
-              {designations.map((d) => (
-                <option key={d.id} value={d.id}>{d.designation_name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Default Branch</label>
-            <select
+            <Select
+              label="Default Branch"
               name="default_branch_id"
               value={formData.default_branch_id}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-            >
-              <option value="">Select Branch</option>
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>{b.branch_name}</option>
-              ))}
-            </select>
+              searchable={true}
+              placeholder="Select Branch"
+              options={branches.map((b) => ({ value: b.id, label: b.branch_name }))}
+            />
             {isEdit && branches.length === 0 && (
               <p className="text-xs text-gray-500 mt-1">User has no assigned branches.</p>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">User Type</label>
-            <select
-              name="user_type"
-              value={formData.user_type}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-            >
-              <option value="company_user">Company User</option>
-              <option value="company_admin">Company Admin</option>
-              <option value="super_admin">Super Admin</option>
-              <option value="viewer">Viewer</option>
-            </select>
-          </div>
+          <Select
+            label="User Type"
+            name="user_type"
+            value={formData.user_type}
+            onChange={handleChange}
+            required
+            options={[
+              { value: "company_user", label: "Company User" },
+              { value: "company_admin", label: "Company Admin" },
+              { value: "super_admin", label: "Super Admin" },
+              { value: "viewer", label: "Viewer" },
+            ]}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="suspended">Suspended</option>
-              <option value="locked">Locked</option>
-            </select>
-          </div>
+          <Select
+            label="Status"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            required
+            options={[
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+              { value: "suspended", label: "Suspended" },
+              { value: "locked", label: "Locked" },
+            ]}
+          />
         </div>
 
         <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">

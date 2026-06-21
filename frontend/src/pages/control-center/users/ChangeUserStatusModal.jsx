@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "../../../components/common/Modal";
 import Button from "../../../components/common/Button";
 import Input from "../../../components/common/Input";
+import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import { changeUserStatus } from "../../../api/controlApi";
 
@@ -49,25 +50,24 @@ const ChangeUserStatusModal = ({ isOpen, onClose, user, onSuccess }) => {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="bg-blue-50 p-3 rounded-md mb-4 text-sm text-blue-800">
-          Updating status for: <span className="font-semibold">{user?.full_name}</span> ({user?.email})
+          Updating status for: <span className="font-semibold">{user?.name || user?.full_name}</span> ({user?.email})
         </div>
 
         <FormError message={error} />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            required
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-            <option value="locked">Locked</option>
-          </select>
-        </div>
+        <Select
+          label="Status"
+          name="status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          required
+          options={[
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+            { value: "suspended", label: "Suspended" },
+            { value: "locked", label: "Locked" },
+          ]}
+        />
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Reason (Optional)</label>

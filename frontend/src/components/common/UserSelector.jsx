@@ -3,7 +3,7 @@ import { Search, Loader2 } from "lucide-react";
 import { getUsers } from "../../api/controlApi";
 
 const UserSelector = ({ onSelect, selectedUser }) => {
-  const [searchTerm, setSearchTerm] = useState(selectedUser?.full_name || "");
+  const [searchTerm, setSearchTerm] = useState(selectedUser?.name || selectedUser?.full_name || "");
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +23,7 @@ const UserSelector = ({ onSelect, selectedUser }) => {
   // Sync prop changes
   useEffect(() => {
     if (selectedUser) {
-      setSearchTerm(selectedUser.full_name || "");
+      setSearchTerm(selectedUser.name || selectedUser.full_name || "");
     } else {
       setSearchTerm("");
     }
@@ -60,7 +60,7 @@ const UserSelector = ({ onSelect, selectedUser }) => {
   }, [searchTerm, isOpen]);
 
   const handleSelect = (user) => {
-    setSearchTerm(user.full_name);
+    setSearchTerm(user.name || user.full_name || "");
     setIsOpen(false);
     onSelect(user);
   };
@@ -107,7 +107,7 @@ const UserSelector = ({ onSelect, selectedUser }) => {
               >
                 <div className="flex items-center">
                   <span className="font-normal block truncate">
-                    {user.full_name} ({user.employee_code || "N/A"})
+                    {user.name || user.full_name} ({user.employee_code || "N/A"})
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">{user.email}</p>

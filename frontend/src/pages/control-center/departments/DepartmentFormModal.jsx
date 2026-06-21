@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "../../../components/common/Modal";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
+import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import { createDepartment, updateDepartment } from "../../../api/controlApi";
 
@@ -106,19 +107,17 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }) 
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            required
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+        <Select
+          label="Status"
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          required
+          options={[
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ]}
+        />
 
         <div className="mt-6 flex justify-end space-x-3 border-t border-gray-200 pt-4">
           <Button variant="secondary" onClick={onClose} disabled={loading}>

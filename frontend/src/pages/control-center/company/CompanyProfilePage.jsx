@@ -7,7 +7,6 @@ import Input from "../../../components/common/Input";
 import FormError from "../../../components/common/FormError";
 import Badge from "../../../components/common/Badge";
 import PermissionGuard from "../../../auth/PermissionGuard";
-import LoadingScreen from "../../../components/common/LoadingScreen";
 import { Save } from "lucide-react";
 
 const CompanyProfilePage = () => {
@@ -89,8 +88,6 @@ const CompanyProfilePage = () => {
     }
   };
 
-  if (loading) return <LoadingScreen text="Loading profile..." />;
-
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <PageHeader
@@ -106,9 +103,17 @@ const CompanyProfilePage = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-6">
+      {loading ? (
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 flex justify-center items-center h-64">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-8 h-8 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-sm text-gray-500">Loading profile data...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+          <form onSubmit={handleSubmit}>
+            <div className="p-6 space-y-6">
             <div className="flex items-center space-x-4 mb-4 pb-4 border-b border-gray-100">
               <div>
                 <h3 className="text-lg font-medium text-gray-900">System Identifiers</h3>
@@ -211,6 +216,7 @@ const CompanyProfilePage = () => {
           </PermissionGuard>
         </form>
       </div>
+      )}
     </div>
   );
 };
