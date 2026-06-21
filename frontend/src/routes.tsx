@@ -26,6 +26,7 @@ import ChartOfAccountsPage from "views/admin/finance/chart-of-accounts/ChartOfAc
 import OpeningBalancesPage from "views/admin/finance/opening-balances/OpeningBalancesPage";
 import JournalEntriesPage from "pages/finance/journal-entries/JournalEntriesPage";
 import JournalEntryFormPage from "pages/finance/journal-entries/JournalEntryFormPage";
+import JournalEntryDetailsPage from "pages/finance/journal-entries/JournalEntryDetailsPage";
 
 // Inventory
 import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
@@ -127,7 +128,7 @@ const routes: ERPRoute[] = [
       { name: "Journal Entries", path: "finance/journal-entries", component: <JournalEntriesPage /> },
       { name: "Create Journal Entry", path: "finance/journal-entries/create", component: <JournalEntryFormPage />, hide: true },
       { name: "Edit Journal Entry", path: "finance/journal-entries/:id/edit", component: <JournalEntryFormPage />, hide: true },
-      // { name: "Journal Entry Details", path: "finance/journal-entries/:id", component: <JournalEntryDetailsPage />, hide: true },
+      { name: "Journal Entry Details", path: "finance/journal-entries/:id", component: <JournalEntryDetailsPage />, hide: true },
     ],
   },
   {
