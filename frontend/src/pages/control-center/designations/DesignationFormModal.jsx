@@ -5,6 +5,8 @@ import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import { createDesignation, updateDesignation } from "../../../api/controlApi";
 
+import { toast } from "sonner";
+
 const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }) => {
   const isEdit = !!designation;
   const [loading, setLoading] = useState(false);
@@ -50,8 +52,10 @@ const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }
     try {
       if (isEdit) {
         await updateDesignation(designation.id, formData);
+        toast.success("Designation updated successfully!");
       } else {
         await createDesignation(formData);
+        toast.success("Designation created successfully!");
       }
       onSuccess();
     } catch (err) {

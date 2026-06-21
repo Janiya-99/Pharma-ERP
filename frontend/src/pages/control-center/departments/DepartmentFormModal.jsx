@@ -5,6 +5,8 @@ import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import { createDepartment, updateDepartment } from "../../../api/controlApi";
 
+import { toast } from "sonner";
+
 const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }) => {
   const isEdit = !!department;
   const [loading, setLoading] = useState(false);
@@ -53,8 +55,10 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }) 
     try {
       if (isEdit) {
         await updateDepartment(department.id, formData);
+        toast.success("Department updated successfully!");
       } else {
         await createDepartment(formData);
+        toast.success("Department created successfully!");
       }
       onSuccess();
     } catch (err) {

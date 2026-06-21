@@ -5,6 +5,8 @@ import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import { createBranch, updateBranch } from "../../../api/controlApi";
 
+import { toast } from "sonner";
+
 const BranchFormModal = ({ isOpen, onClose, branch = null, onSuccess }) => {
   const isEdit = !!branch;
   const [loading, setLoading] = useState(false);
@@ -71,8 +73,10 @@ const BranchFormModal = ({ isOpen, onClose, branch = null, onSuccess }) => {
 
       if (isEdit) {
         await updateBranch(branch.id, payload);
+        toast.success("Branch updated successfully!");
       } else {
         await createBranch(payload);
+        toast.success("Branch created successfully!");
       }
       onSuccess();
     } catch (err) {

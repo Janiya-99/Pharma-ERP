@@ -5,6 +5,8 @@ import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import { createUser, updateUser, getBranches, getUserBranches } from "../../../api/controlApi";
 
+import { toast } from "sonner";
+
 const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designations }) => {
   const isEdit = !!user;
 
@@ -139,6 +141,11 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
       }
 
       if (res.success) {
+        if (isEdit) {
+          toast.success("User updated successfully!");
+        } else {
+          toast.success("User created successfully!");
+        }
         onSuccess();
       } else {
         setError(res.message || "An error occurred");

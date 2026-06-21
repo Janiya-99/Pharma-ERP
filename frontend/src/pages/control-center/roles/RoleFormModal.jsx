@@ -5,6 +5,8 @@ import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import { createRole, updateRole } from "../../../api/controlApi";
 
+import { toast } from "sonner";
+
 const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }) => {
   const isEdit = !!role;
 
@@ -82,6 +84,11 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }) =>
       }
 
       if (res.success) {
+        if (isEdit) {
+          toast.success("Role updated successfully!");
+        } else {
+          toast.success("Role created successfully!");
+        }
         onSuccess();
       } else {
         setError(res.message || "An error occurred");
