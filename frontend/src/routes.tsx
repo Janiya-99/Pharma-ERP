@@ -25,6 +25,7 @@ import AccountClassificationsPage from "views/admin/finance/account-classificati
 import ChartOfAccountsPage from "views/admin/finance/chart-of-accounts/ChartOfAccountsPage";
 import OpeningBalancesPage from "views/admin/finance/opening-balances/OpeningBalancesPage";
 import JournalEntriesPage from "pages/finance/journal-entries/JournalEntriesPage";
+import JournalEntryFormPage from "pages/finance/journal-entries/JournalEntryFormPage";
 
 // Inventory
 import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
@@ -124,7 +125,9 @@ const routes: ERPRoute[] = [
       { name: "Chart of Accounts", path: "finance/chart-of-accounts", component: <ChartOfAccountsPage /> },
       { name: "Opening Balances", path: "finance/opening-balances", component: <OpeningBalancesPage /> },
       { name: "Journal Entries", path: "finance/journal-entries", component: <JournalEntriesPage /> },
-      // Sub-routes for Journal Entries shouldn't be in the main nav menu, they can be handled manually or by adding `hideFromMenu: true` if the router supports it. But let's just add the list view here as requested by "Update Finance Sidebar".
+      { name: "Create Journal Entry", path: "finance/journal-entries/create", component: <JournalEntryFormPage />, hide: true },
+      { name: "Edit Journal Entry", path: "finance/journal-entries/:id/edit", component: <JournalEntryFormPage />, hide: true },
+      // { name: "Journal Entry Details", path: "finance/journal-entries/:id", component: <JournalEntryDetailsPage />, hide: true },
     ],
   },
   {
