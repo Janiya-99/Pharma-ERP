@@ -16,6 +16,7 @@ import ReverseJournalModal from "./ReverseJournalModal";
 export default function JournalEntryDetailsPage() {
   const { id } = useParams();
   const history = useHistory();
+  const { activeSoftware } = useAuth();
   const [journal, setJournal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,8 +42,10 @@ export default function JournalEntryDetailsPage() {
   };
 
   useEffect(() => {
-    loadJournal();
-  }, [id]);
+    if (activeSoftware?.software_code === "FINANCE") {
+      loadJournal();
+    }
+  }, [id, activeSoftware]);
 
   const handleAction = async (action, jnl) => {
     if (action === "edit") {
@@ -62,6 +65,10 @@ export default function JournalEntryDetailsPage() {
   };
 
   const closeModal = () => setModalState({ type: null, journal: null });
+
+  if (activeSoftware?.software_code !== "FINANCE") {
+    return <div className="p-8 text-center text-red-500 font-medium">Please switch to Finance module to access this page.</div>;
+  }
 
   if (loading) return <div className="p-8 text-center">Loading details...</div>;
   if (error || !journal) return <div className="p-8 text-center text-red-500">{error || "Journal not found"}</div>;

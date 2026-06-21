@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { financeApi } from "../../../../api/financeApi";
+import { useAuth } from "../../../../auth/AuthContext";
 import BranchSelector from "../../../../components/common/BranchSelector";
 import FinancialYearSelect from "../../../../components/finance/FinancialYearSelect";
 import AccountingPeriodSelect from "../../../../components/finance/AccountingPeriodSelect";
@@ -10,6 +11,7 @@ import { MdArrowBack, MdSave } from "react-icons/md";
 export default function JournalEntryFormPage() {
   const { id } = useParams();
   const history = useHistory();
+  const { activeSoftware } = useAuth();
   const isEdit = Boolean(id);
 
   const [loading, setLoading] = useState(false);
@@ -31,10 +33,10 @@ export default function JournalEntryFormPage() {
   ]);
 
   useEffect(() => {
-    if (isEdit) {
+    if (isEdit && activeSoftware?.software_code === "FINANCE") {
       loadJournal();
     }
-  }, [id]);
+  }, [id, activeSoftware]);
 
   const loadJournal = async () => {
     setLoading(true);
@@ -150,6 +152,10 @@ export default function JournalEntryFormPage() {
 
   if (loading) {
     return <div className="p-8 text-center">Loading...</div>;
+  }
+
+  if (activeSoftware?.software_code !== "FINANCE") {
+    return <div className="p-8 text-center text-red-500 font-medium">Please switch to Finance module to access this page.</div>;
   }
 
   const isBalanced = 

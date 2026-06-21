@@ -19,7 +19,7 @@ import AccountingPeriodSelect from "../../../../components/finance/AccountingPer
 
 export default function JournalEntriesPage() {
   const history = useHistory();
-  const { hasPermission } = useAuth();
+  const { hasPermission, activeSoftware } = useAuth();
   
   const [journals, setJournals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,8 +60,10 @@ export default function JournalEntriesPage() {
   };
 
   useEffect(() => {
-    fetchJournals();
-  }, [filters, pagination.page]);
+    if (activeSoftware?.software_code === "FINANCE") {
+      fetchJournals();
+    }
+  }, [filters, pagination.page, activeSoftware]);
 
   const handleAction = async (action, journal) => {
     if (action === "edit") {
@@ -79,6 +81,10 @@ export default function JournalEntriesPage() {
       setModalState({ type: action, journal });
     }
   };
+
+  if (activeSoftware?.software_code !== "FINANCE") {
+    return <div className="p-8 text-center text-red-500 font-medium">Please switch to Finance module to access this page.</div>;
+  }
 
   return (
     <div className="flex flex-col gap-4 py-4 h-full">
