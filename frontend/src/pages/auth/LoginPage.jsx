@@ -57,10 +57,10 @@ const LoginPage = () => {
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=2069&auto=format&fit=crop')" }}
         />
         {/* Heavy dark overlay for readability */}
-        <div className="absolute inset-0 bg-navy-900/80 bg-gradient-to-br from-navy-900/90 via-navy-900/80 to-blue-900/70 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-navy-900/80 bg-gradient-to-br from-navy-900/90 via-navy-900/80 to-brand-900/70 backdrop-blur-[2px]" />
 
         {/* Decorative elements */}
-        <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl mix-blend-screen pointer-events-none" />
+        <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl mix-blend-screen pointer-events-none" />
         <div className="absolute bottom-20 right-10 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl mix-blend-screen pointer-events-none" />
 
         {/* Grid pattern */}
@@ -76,12 +76,12 @@ const LoginPage = () => {
         <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full h-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/30">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-lg shadow-brand-500/30">
               <MdLocalPharmacy className="h-6 w-6 text-white" />
             </div>
             <div>
               <p className="text-[19px] font-extrabold text-white leading-tight tracking-wide">Pharma ERP</p>
-              <p className="text-[10px] font-bold text-blue-300 uppercase tracking-[0.2em]">
+              <p className="text-[10px] font-bold text-brand-300 uppercase tracking-[0.2em]">
                 Enterprise System
               </p>
             </div>
@@ -89,14 +89,14 @@ const LoginPage = () => {
 
           {/* Hero Text in a Glassy Card */}
           <div className="relative z-20 mt-auto mb-8 w-full max-w-[480px] rounded-3xl bg-white/5 border border-white/10 p-8 xl:p-10 backdrop-blur-md shadow-2xl shadow-black/40">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-500/20 px-3 py-1.5 border border-blue-500/30">
-              <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
-              <span className="text-[11px] font-bold uppercase tracking-widest text-blue-300">Enterprise Grade</span>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-500/20 px-3 py-1.5 border border-brand-500/30">
+              <span className="h-2 w-2 rounded-full bg-brand-400 animate-pulse" />
+              <span className="text-[11px] font-bold uppercase tracking-widest text-brand-300">Enterprise Grade</span>
             </div>
             
             <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.15] mb-5 tracking-tight">
               Streamline your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300">pharmaceutical</span><br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-indigo-300">pharmaceutical</span><br />
               distribution
             </h1>
             
@@ -113,7 +113,7 @@ const LoginPage = () => {
                 { icon: MdOutlineAssessment, text: "Financial Reports" }
               ].map((feature, idx) => (
                 <div key={idx} className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-blue-300 border border-white/5 shadow-inner">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-brand-300 border border-white/5 shadow-inner">
                     <feature.icon size={18} />
                   </div>
                   <span className="text-[13px] font-bold text-white/90">
@@ -145,7 +145,7 @@ const LoginPage = () => {
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 bg-gray-50 lg:bg-white">
         {/* Mobile logo */}
         <div className="flex lg:hidden items-center gap-3 mb-8">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-500/20">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 shadow-md shadow-brand-500/20">
             <MdLocalPharmacy className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -186,7 +186,7 @@ const LoginPage = () => {
                 placeholder="e.g. OMACX"
                 value={formData.companyCode}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] font-medium leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-gray-300 transition-all shadow-sm uppercase"
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] font-medium leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm uppercase"
               />
             </div>
 
@@ -202,7 +202,7 @@ const LoginPage = () => {
                 placeholder="admin@omacx.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] font-medium leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-gray-300 transition-all shadow-sm"
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] font-medium leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm"
               />
             </div>
 
@@ -214,7 +214,7 @@ const LoginPage = () => {
                 </label>
                 <a
                   href="#"
-                  className="text-[13px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                  className="text-[13px] font-bold text-brand-500 hover:text-brand-600 transition-colors"
                 >
                   Forgot password?
                 </a>
@@ -227,12 +227,12 @@ const LoginPage = () => {
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 pr-12 text-[14px] font-medium leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-gray-300 transition-all shadow-sm"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 pr-12 text-[14px] font-medium leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-brand-500 transition-colors"
                 >
                   {showPassword ? (
                     <MdVisibilityOff size={18} />
@@ -249,7 +249,7 @@ const LoginPage = () => {
                 type="checkbox"
                 id="remember"
                 defaultChecked
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
               />
               <label
                 htmlFor="remember"
@@ -263,7 +263,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading || !formData.email || !formData.password || !formData.companyCode}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-brand-600 hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
             >
               {loading ? (
                 <>
