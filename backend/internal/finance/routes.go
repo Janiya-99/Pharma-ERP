@@ -80,4 +80,34 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		je.POST("/:id/post", middleware.RequirePermission("finance.journal.post"), jeHandler.PostJournalEntry)
 		je.POST("/:id/reverse", middleware.RequirePermission("finance.journal.reverse"), jeHandler.ReverseJournalEntry)
 	}
+
+	// Payment Vouchers
+	pvHandler := handlers.NewPaymentVoucherHandler(logger)
+	pv := finance.Group("/payment-vouchers")
+	{
+		pv.GET("", middleware.RequirePermission("finance.payments.view"), pvHandler.ListPaymentVouchers)
+		pv.GET("/:id", middleware.RequirePermission("finance.payments.view"), pvHandler.GetPaymentVoucherByID)
+		pv.POST("", middleware.RequirePermission("finance.payments.create"), pvHandler.CreatePaymentVoucher)
+		pv.PUT("/:id", middleware.RequirePermission("finance.payments.update"), pvHandler.UpdatePaymentVoucher)
+		pv.DELETE("/:id", middleware.RequirePermission("finance.payments.delete"), pvHandler.DeletePaymentVoucher)
+		pv.POST("/:id/submit", middleware.RequirePermission("finance.payments.submit"), pvHandler.SubmitPaymentVoucher)
+		pv.POST("/:id/approve", middleware.RequirePermission("finance.payments.approve"), pvHandler.ApprovePaymentVoucher)
+		pv.POST("/:id/reject", middleware.RequirePermission("finance.payments.reject"), pvHandler.RejectPaymentVoucher)
+		pv.POST("/:id/post", middleware.RequirePermission("finance.payments.post"), pvHandler.PostPaymentVoucher)
+	}
+
+	// Receipt Vouchers
+	rvHandler := handlers.NewReceiptVoucherHandler(logger)
+	rv := finance.Group("/receipt-vouchers")
+	{
+		rv.GET("", middleware.RequirePermission("finance.receipts.view"), rvHandler.ListReceiptVouchers)
+		rv.GET("/:id", middleware.RequirePermission("finance.receipts.view"), rvHandler.GetReceiptVoucherByID)
+		rv.POST("", middleware.RequirePermission("finance.receipts.create"), rvHandler.CreateReceiptVoucher)
+		rv.PUT("/:id", middleware.RequirePermission("finance.receipts.update"), rvHandler.UpdateReceiptVoucher)
+		rv.DELETE("/:id", middleware.RequirePermission("finance.receipts.delete"), rvHandler.DeleteReceiptVoucher)
+		rv.POST("/:id/submit", middleware.RequirePermission("finance.receipts.submit"), rvHandler.SubmitReceiptVoucher)
+		rv.POST("/:id/approve", middleware.RequirePermission("finance.receipts.approve"), rvHandler.ApproveReceiptVoucher)
+		rv.POST("/:id/reject", middleware.RequirePermission("finance.receipts.reject"), rvHandler.RejectReceiptVoucher)
+		rv.POST("/:id/post", middleware.RequirePermission("finance.receipts.post"), rvHandler.PostReceiptVoucher)
+	}
 }
