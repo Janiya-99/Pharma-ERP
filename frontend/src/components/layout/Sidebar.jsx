@@ -4,7 +4,8 @@ import { useAuth } from "../../auth/AuthContext";
 import PermissionGuard from "../../auth/PermissionGuard";
 import { 
    LayoutDashboard, Building, MapPin, Users, Network, Key, Shield, ShieldCheck, FileCheck, LogIn, Settings,
-   Briefcase, Calculator, Clock, CheckSquare, List, CalendarCheck, Archive, BookOpen, PieChart, FileText
+   Briefcase, Calculator, Clock, CheckSquare, List, CalendarCheck, Archive, BookOpen, PieChart, FileText,
+   Package, Layers, Tags, Target, Beaker, Factory, Truck, Box, GitMerge, ListChecks, BarChart2
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
 
@@ -88,6 +89,56 @@ const Sidebar = () => {
       ];
 
       return financeMenus.map((menu) => (
+        <PermissionGuard key={menu.path} permission={menu.permission}>
+          <NavLink
+            to={menu.path}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${
+                isHovered ? "px-4 py-2.5" : "justify-center p-2.5 mx-2"
+              } ${
+                isActive
+                  ? "bg-brand-50 text-brand-600 dark:bg-navy-700 dark:text-white font-bold shadow-sm"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:hover:bg-navy-700 dark:text-gray-400"
+              }`
+            }
+            title={!isHovered ? menu.name : undefined}
+          >
+            {({ isActive }) => (
+              <>
+                <menu.icon className={`w-5 h-5 shrink-0 ${
+                  isActive ? "text-brand-600 dark:text-white" : "text-gray-400"
+                }`} />
+                {isHovered && (
+                  <>
+                    <span className="flex-1 text-left truncate transition-all duration-300">{menu.name}</span>
+                    {isActive && <div className="h-1.5 w-1.5 rounded-full bg-brand-500 shrink-0" />}
+                  </>
+                )}
+              </>
+            )}
+          </NavLink>
+        </PermissionGuard>
+      ));
+    }
+
+    if (activeSoftware?.software_code === "INVENTORY") {
+      const inventoryMenus = [
+        { name: "Dashboard", path: "/inventory/dashboard", icon: LayoutDashboard, permission: "inventory.dashboard.view" },
+        { name: "Warehouses", path: "/inventory/warehouses", icon: Building, permission: "inventory.warehouse.view" },
+        { name: "Warehouse Locations", path: "/inventory/warehouse-locations", icon: MapPin, permission: "inventory.warehouse.view" },
+        { name: "Product Categories", path: "/inventory/product-categories", icon: GitMerge, permission: "inventory.product_category.view" },
+        { name: "Product Units", path: "/inventory/product-units", icon: Target, permission: "inventory.product_master.view" },
+        { name: "Dosage Forms", path: "/inventory/dosage-forms", icon: Beaker, permission: "inventory.product_master.view" },
+        { name: "Generic Names", path: "/inventory/generic-names", icon: Tags, permission: "inventory.product_master.view" },
+        { name: "Manufacturers", path: "/inventory/manufacturers", icon: Factory, permission: "inventory.product_master.view" },
+        { name: "Suppliers", path: "/inventory/suppliers", icon: Truck, permission: "inventory.product_master.view" },
+        { name: "Products", path: "/inventory/products", icon: Package, permission: "inventory.product_master.view" },
+        { name: "Product Batches", path: "/inventory/product-batches", icon: Layers, permission: "inventory.product_batch.view" },
+        { name: "Stock Balances", path: "/inventory/stock-balances", icon: Box, permission: "inventory.stock_balance.view" },
+        { name: "Stock Ledger", path: "/inventory/stock-ledger", icon: ListChecks, permission: "inventory.stock_ledger.view" },
+      ];
+
+      return inventoryMenus.map((menu) => (
         <PermissionGuard key={menu.path} permission={menu.permission}>
           <NavLink
             to={menu.path}

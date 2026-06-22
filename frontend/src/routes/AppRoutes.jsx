@@ -39,6 +39,25 @@ import JournalRegisterReportPage from "../pages/finance/reports/journal-register
 import PaymentRegisterReportPage from "../pages/finance/reports/payment-register/PaymentRegisterReportPage";
 import ReceiptRegisterReportPage from "../pages/finance/reports/receipt-register/ReceiptRegisterReportPage";
 
+// Inventory Module
+import InventoryDashboard from "../pages/inventory/dashboard/InventoryDashboard";
+import WarehousesPage from "../pages/inventory/warehouses/WarehousesPage";
+import WarehouseLocationsPage from "../pages/inventory/warehouse-locations/WarehouseLocationsPage";
+import ProductCategoriesPage from "../pages/inventory/product-categories/ProductCategoriesPage";
+import ProductUnitsPage from "../pages/inventory/product-units/ProductUnitsPage";
+import DosageFormsPage from "../pages/inventory/dosage-forms/DosageFormsPage";
+import GenericNamesPage from "../pages/inventory/generic-names/GenericNamesPage";
+import ManufacturersPage from "../pages/inventory/manufacturers/ManufacturersPage";
+import SuppliersPage from "../pages/inventory/suppliers/SuppliersPage";
+import ProductsPage from "../pages/inventory/products/ProductsPage";
+import ProductFormPage from "../pages/inventory/products/ProductFormPage";
+import ProductDetailsPage from "../pages/inventory/products/ProductDetailsPage";
+import ProductBatchesPage from "../pages/inventory/product-batches/ProductBatchesPage";
+import ProductBatchFormPage from "../pages/inventory/product-batches/ProductBatchFormPage";
+import ProductBatchDetailsPage from "../pages/inventory/product-batches/ProductBatchDetailsPage";
+import StockBalancesPage from "../pages/inventory/stock-balances/StockBalancesPage";
+import StockLedgerPage from "../pages/inventory/stock-ledger/StockLedgerPage";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -81,8 +100,29 @@ const AppRoutes = () => {
           <Route path="/finance/reports/day-book" element={<DayBookReportPage />} />
           <Route path="/finance/reports/journal-register" element={<JournalRegisterReportPage />} />
           <Route path="/finance/reports/payment-register" element={<PaymentRegisterReportPage />} />
+          <Route path="/finance/reports/payment-register" element={<PaymentRegisterReportPage />} />
           <Route path="/finance/reports/receipt-register" element={<ReceiptRegisterReportPage />} />
-          <Route path="/inventory/dashboard" element={<PlaceholderPage title="Inventory Dashboard" />} />
+
+          {/* Inventory Module */}
+          <Route path="/inventory/dashboard" element={<InventoryDashboard />} />
+          <Route path="/inventory/warehouses" element={<WarehousesPage />} />
+          <Route path="/inventory/warehouse-locations" element={<WarehouseLocationsPage />} />
+          <Route path="/inventory/product-categories" element={<ProductCategoriesPage />} />
+          <Route path="/inventory/product-units" element={<ProductUnitsPage />} />
+          <Route path="/inventory/dosage-forms" element={<DosageFormsPage />} />
+          <Route path="/inventory/generic-names" element={<GenericNamesPage />} />
+          <Route path="/inventory/manufacturers" element={<ManufacturersPage />} />
+          <Route path="/inventory/suppliers" element={<SuppliersPage />} />
+          <Route path="/inventory/products" element={<ProductsPage />} />
+          <Route path="/inventory/products/create" element={<ProductFormPage />} />
+          <Route path="/inventory/products/:id" element={<ProductDetailsPage />} />
+          <Route path="/inventory/products/:id/edit" element={<ProductFormPage />} />
+          <Route path="/inventory/product-batches" element={<ProductBatchesPage />} />
+          <Route path="/inventory/product-batches/create" element={<ProductBatchFormPage />} />
+          <Route path="/inventory/product-batches/:id" element={<ProductBatchDetailsPage />} />
+          <Route path="/inventory/product-batches/:id/edit" element={<ProductBatchFormPage />} />
+          <Route path="/inventory/stock-balances" element={<StockBalancesPage />} />
+          <Route path="/inventory/stock-ledger" element={<StockLedgerPage />} />
           <Route path="/invoice-center/dashboard" element={<PlaceholderPage title="Invoice Center Dashboard" />} />
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>
