@@ -99,4 +99,33 @@ export const financeApi = {
   completeBankReconciliation: (id) => apiClient.post(`/finance/bank-reconciliations/${id}/complete`),
   cancelBankReconciliation: (id, payload) => apiClient.post(`/finance/bank-reconciliations/${id}/cancel`, payload),
   deleteBankReconciliation: (id) => apiClient.delete(`/finance/bank-reconciliations/${id}`),
+
+  // Petty Cash Funds
+  getPettyCashFunds: (params) => apiClient.get("/finance/petty-cash-funds", { params }),
+  getPettyCashFundById: (id) => apiClient.get(`/finance/petty-cash-funds/${id}`),
+  createPettyCashFund: (payload) => apiClient.post("/finance/petty-cash-funds", payload),
+  updatePettyCashFund: (id, payload) => apiClient.put(`/finance/petty-cash-funds/${id}`, payload),
+  deletePettyCashFund: (id) => apiClient.delete(`/finance/petty-cash-funds/${id}`),
+
+  // Petty Cash Vouchers
+  getPettyCashVouchers: (params) => apiClient.get("/finance/petty-cash-vouchers", { params }),
+  getPettyCashVoucherById: (id) => apiClient.get(`/finance/petty-cash-vouchers/${id}`),
+  createPettyCashVoucher: (payload) => apiClient.post("/finance/petty-cash-vouchers", payload),
+  updatePettyCashVoucher: (id, payload) => apiClient.put(`/finance/petty-cash-vouchers/${id}`, payload),
+  deletePettyCashVoucher: (id) => apiClient.delete(`/finance/petty-cash-vouchers/${id}`),
+  submitPettyCashVoucher: (id, payload) => apiClient.post(`/finance/petty-cash-vouchers/${id}/submit`, payload),
+  approvePettyCashVoucher: (id, payload) => apiClient.post(`/finance/petty-cash-vouchers/${id}/approve`, payload),
+  rejectPettyCashVoucher: (id, payload) => apiClient.post(`/finance/petty-cash-vouchers/${id}/reject`, payload),
+  postPettyCashVoucher: (id) => apiClient.post(`/finance/petty-cash-vouchers/${id}/post`),
+
+  // Petty Cash Replenishments
+  getPettyCashReplenishments: (params) => apiClient.get("/finance/petty-cash-replenishments", { params }),
+  getPettyCashReplenishmentById: (id) => apiClient.get(`/finance/petty-cash-replenishments/${id}`),
+  createPettyCashReplenishment: (payload) => apiClient.post("/finance/petty-cash-replenishments", payload),
+  updatePettyCashReplenishment: (id, payload) => apiClient.put(`/finance/petty-cash-replenishments/${id}`, payload),
+  deletePettyCashReplenishment: (id) => apiClient.delete(`/finance/petty-cash-replenishments/${id}`),
+  submitPettyCashReplenishment: (id, payload) => apiClient.post(`/finance/petty-cash-replenishments/${id}/submit`, payload),
+  approvePettyCashReplenishment: (id, payload) => apiClient.post(`/finance/petty-cash-replenishments/${id}/approve`, payload),
+  rejectPettyCashReplenishment: (id, payload) => apiClient.post(`/finance/petty-cash-replenishments/${id}/reject`, payload),
+  postPettyCashReplenishment: (id) => apiClient.post(`/finance/petty-cash-replenishments/${id}/post`),
 };

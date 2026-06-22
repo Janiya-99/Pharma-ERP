@@ -45,6 +45,15 @@ import BankTransactionDetailsPage from "pages/finance/bank-transactions/BankTran
 import BankReconciliationsPage from "pages/finance/bank-reconciliations/BankReconciliationsPage";
 import BankReconciliationFormPage from "pages/finance/bank-reconciliations/BankReconciliationFormPage";
 import BankReconciliationDetailsPage from "pages/finance/bank-reconciliations/BankReconciliationDetailsPage";
+import PettyCashFundsPage from "pages/finance/petty-cash-funds/PettyCashFundsPage";
+import PettyCashFundFormPage from "pages/finance/petty-cash-funds/PettyCashFundFormPage";
+import PettyCashFundDetailsPage from "pages/finance/petty-cash-funds/PettyCashFundDetailsPage";
+import PettyCashVouchersPage from "pages/finance/petty-cash-vouchers/PettyCashVouchersPage";
+import PettyCashVoucherFormPage from "pages/finance/petty-cash-vouchers/PettyCashVoucherFormPage";
+import PettyCashVoucherDetailsPage from "pages/finance/petty-cash-vouchers/PettyCashVoucherDetailsPage";
+import PettyCashReplenishmentsPage from "pages/finance/petty-cash-replenishments/PettyCashReplenishmentsPage";
+import PettyCashReplenishmentFormPage from "pages/finance/petty-cash-replenishments/PettyCashReplenishmentFormPage";
+import PettyCashReplenishmentDetailsPage from "pages/finance/petty-cash-replenishments/PettyCashReplenishmentDetailsPage";
 
 // Inventory
 import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
@@ -171,6 +180,18 @@ const routes: ERPRoute[] = [
       { name: "Create Bank Reconciliation", path: "finance/bank-reconciliations/create", component: <BankReconciliationFormPage />, hide: true },
       { name: "Edit Bank Reconciliation", path: "finance/bank-reconciliations/:id/edit", component: <BankReconciliationFormPage />, hide: true },
       { name: "Bank Reconciliation Details", path: "finance/bank-reconciliations/:id", component: <BankReconciliationDetailsPage />, hide: true },
+      { name: "Petty Cash Funds", path: "finance/petty-cash-funds", component: <PettyCashFundsPage /> },
+      { name: "Create Petty Cash Fund", path: "finance/petty-cash-funds/create", component: <PettyCashFundFormPage />, hide: true },
+      { name: "Edit Petty Cash Fund", path: "finance/petty-cash-funds/:id/edit", component: <PettyCashFundFormPage />, hide: true },
+      { name: "Petty Cash Fund Details", path: "finance/petty-cash-funds/:id", component: <PettyCashFundDetailsPage />, hide: true },
+      { name: "Petty Cash Vouchers", path: "finance/petty-cash-vouchers", component: <PettyCashVouchersPage /> },
+      { name: "Create Petty Cash Voucher", path: "finance/petty-cash-vouchers/create", component: <PettyCashVoucherFormPage />, hide: true },
+      { name: "Edit Petty Cash Voucher", path: "finance/petty-cash-vouchers/:id/edit", component: <PettyCashVoucherFormPage />, hide: true },
+      { name: "Petty Cash Voucher Details", path: "finance/petty-cash-vouchers/:id", component: <PettyCashVoucherDetailsPage />, hide: true },
+      { name: "Petty Cash Replenishments", path: "finance/petty-cash-replenishments", component: <PettyCashReplenishmentsPage /> },
+      { name: "Create Replenishment", path: "finance/petty-cash-replenishments/create", component: <PettyCashReplenishmentFormPage />, hide: true },
+      { name: "Edit Replenishment", path: "finance/petty-cash-replenishments/:id/edit", component: <PettyCashReplenishmentFormPage />, hide: true },
+      { name: "Replenishment Details", path: "finance/petty-cash-replenishments/:id", component: <PettyCashReplenishmentDetailsPage />, hide: true },
     ],
   },
   {
