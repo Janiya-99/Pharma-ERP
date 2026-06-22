@@ -26,12 +26,12 @@ type PettyCashFund struct {
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	Company        *companyModels.Company `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
-	Branch         *companyModels.Branch  `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
-	ChartOfAccount *ChartOfAccount        `gorm:"foreignKey:ChartAccountID" json:"chart_of_account,omitempty"`
-	CustodianUser  *companyModels.User    `gorm:"foreignKey:CustodianUserID" json:"custodian_user,omitempty"`
-	Creator        *companyModels.User    `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	Updater        *companyModels.User    `gorm:"foreignKey:UpdatedBy" json:"updater,omitempty"`
+	Company        *companyModels.Company `gorm:"foreignKey:CompanyID;references:ID" json:"company,omitempty"`
+	Branch         *companyModels.Branch  `gorm:"foreignKey:BranchID;references:ID" json:"branch,omitempty"`
+	ChartOfAccount *ChartOfAccount        `gorm:"foreignKey:ChartAccountID;references:ID" json:"chart_of_account,omitempty"`
+	CustodianUser  *companyModels.User    `gorm:"-;references:ID" json:"custodian_user,omitempty"`
+	Creator        *companyModels.User    `gorm:"-;references:ID" json:"creator,omitempty"`
+	Updater        *companyModels.User    `gorm:"-;references:ID" json:"updater,omitempty"`
 }
 
 func (PettyCashFund) TableName() string {

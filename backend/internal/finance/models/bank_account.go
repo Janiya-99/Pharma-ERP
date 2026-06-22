@@ -35,7 +35,7 @@ type BankAccount struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	ChartAccount *ChartOfAccount `gorm:"foreignKey:ChartAccountID" json:"chart_account,omitempty"`
+	ChartAccount *ChartOfAccount `gorm:"foreignKey:ChartAccountID;references:ID" json:"chart_account,omitempty"`
 }
 
 func (BankAccount) TableName() string {

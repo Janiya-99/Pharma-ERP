@@ -4,6 +4,8 @@ import (
 	"github.com/pixandco/erp-phrma/internal/company/models"
 	"github.com/pixandco/erp-phrma/internal/company/seeders"
 	financeMigrations "github.com/pixandco/erp-phrma/internal/finance/migrations"
+	inventoryMigrations "github.com/pixandco/erp-phrma/internal/inventory/migrations"
+	inventorySeeders "github.com/pixandco/erp-phrma/internal/inventory/seeders"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -76,6 +78,36 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 	logger.Info("Running finance migrations and seeders...")
 	if err := financeMigrations.RunFinanceMigrations(db, logger); err != nil {
 		logger.Error("Finance migrations failed", zap.Error(err))
+		return err
+	}
+
+	logger.Info("Running inventory migrations and seeders...")
+	if err := inventoryMigrations.RunInventoryMigrations(db, logger); err != nil {
+		logger.Error("Inventory migrations failed", zap.Error(err))
+		return err
+	}
+
+	// For company-specific seeders that need company ID, we can get the OMACX ID
+	var mainCompany models.Company
+	if err := db.Where("company_code = ?", "OMACX").First(&mainCompany).Error; err == nil {
+		if err := inventorySeeders.SeedProductUnits(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Product unit seeder failed", zap.Error(err))
+		}
+		if err := inventorySeeders.SeedDosageForms(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Dosage form seeder failed", zap.Error(err))
+		}
+		if err := inventorySeeders.SeedProductCategories(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Product category seeder failed", zap.Error(err))
+		}
+		if err := inventorySeeders.SeedWarehouses(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Warehouse seeder failed", zap.Error(err))
+		}
+	} else {
+		logger.Warn("OMACX company not found, skipping inventory structural seeders")
+	}
+
+	if err := inventorySeeders.SeedInventoryPermissions(db, logger); err != nil {
+		logger.Error("Inventory permission seeder failed", zap.Error(err))
 		return err
 	}
 

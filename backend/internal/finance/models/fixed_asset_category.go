@@ -10,7 +10,7 @@ import (
 type FixedAssetCategory struct {
 	ID        uint64                 `gorm:"primaryKey;autoIncrement" json:"id"`
 	CompanyID uint64                 `gorm:"not null;index:idx_fac_company_code,unique" json:"company_id"`
-	Company   *companyModels.Company `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
+	Company   *companyModels.Company `gorm:"foreignKey:CompanyID;references:ID" json:"company,omitempty"`
 
 	CategoryCode string `gorm:"type:varchar(50);not null;index:idx_fac_company_code,unique" json:"category_code"`
 	CategoryName string `gorm:"type:varchar(150);not null" json:"category_name"`
@@ -33,9 +33,9 @@ type FixedAssetCategory struct {
 	Status string `gorm:"type:varchar(30);default:'active'" json:"status"`
 
 	CreatedBy     *uint64             `json:"created_by"`
-	CreatedByUser *companyModels.User `gorm:"foreignKey:CreatedBy" json:"created_by_user,omitempty"`
+	CreatedByUser *companyModels.User `gorm:"-;references:ID" json:"created_by_user,omitempty"`
 	UpdatedBy     *uint64             `json:"updated_by"`
-	UpdatedByUser *companyModels.User `gorm:"foreignKey:UpdatedBy" json:"updated_by_user,omitempty"`
+	UpdatedByUser *companyModels.User `gorm:"-;references:ID" json:"updated_by_user,omitempty"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

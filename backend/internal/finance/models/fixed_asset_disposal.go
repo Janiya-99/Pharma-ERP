@@ -10,18 +10,18 @@ import (
 type FixedAssetDisposal struct {
 	ID        uint64                 `gorm:"primaryKey;autoIncrement" json:"id"`
 	CompanyID uint64                 `gorm:"not null;index:idx_fadi_company_disp,unique" json:"company_id"`
-	Company   *companyModels.Company `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
+	Company   *companyModels.Company `gorm:"foreignKey:CompanyID;references:ID" json:"company,omitempty"`
 	BranchID  uint64                 `gorm:"not null;index" json:"branch_id"`
-	Branch    *companyModels.Branch  `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
+	Branch    *companyModels.Branch  `gorm:"foreignKey:BranchID;references:ID" json:"branch,omitempty"`
 
 	FixedAssetID uint64      `gorm:"not null;index" json:"fixed_asset_id"`
 	FixedAsset   *FixedAsset `gorm:"foreignKey:FixedAssetID" json:"fixed_asset,omitempty"`
 
 	FinancialYearID uint64         `gorm:"not null;index" json:"financial_year_id"`
-	FinancialYear   *FinancialYear `gorm:"foreignKey:FinancialYearID" json:"financial_year,omitempty"`
+	FinancialYear   *FinancialYear `gorm:"foreignKey:FinancialYearID;references:ID" json:"financial_year,omitempty"`
 
 	AccountingPeriodID uint64            `gorm:"not null;index" json:"accounting_period_id"`
-	AccountingPeriod   *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID" json:"accounting_period,omitempty"`
+	AccountingPeriod   *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID;references:ID" json:"accounting_period,omitempty"`
 
 	DisposalNumber string     `gorm:"type:varchar(50);not null;index:idx_fadi_company_disp,unique" json:"disposal_number"`
 	DisposalDate   *time.Time `gorm:"type:date;not null" json:"disposal_date"`
@@ -44,20 +44,20 @@ type FixedAssetDisposal struct {
 
 	ApprovalStatus string              `gorm:"type:varchar(30);default:'draft';index" json:"approval_status"` // draft, pending, approved, rejected, cancelled
 	ApprovedBy     *uint64             `json:"approved_by"`
-	ApprovedByUser *companyModels.User `gorm:"foreignKey:ApprovedBy" json:"approved_by_user,omitempty"`
+	ApprovedByUser *companyModels.User `gorm:"-;references:ID" json:"approved_by_user,omitempty"`
 	ApprovedAt     *time.Time          `json:"approved_at"`
 
 	PostedStatus string              `gorm:"type:varchar(30);default:'unposted';index" json:"posted_status"` // unposted, posted
 	PostedBy     *uint64             `json:"posted_by"`
-	PostedByUser *companyModels.User `gorm:"foreignKey:PostedBy" json:"posted_by_user,omitempty"`
+	PostedByUser *companyModels.User `gorm:"-;references:ID" json:"posted_by_user,omitempty"`
 	PostedAt     *time.Time          `json:"posted_at"`
 
 	Status string `gorm:"type:varchar(30);default:'active'" json:"status"`
 
 	CreatedBy     *uint64             `json:"created_by"`
-	CreatedByUser *companyModels.User `gorm:"foreignKey:CreatedBy" json:"created_by_user,omitempty"`
+	CreatedByUser *companyModels.User `gorm:"-;references:ID" json:"created_by_user,omitempty"`
 	UpdatedBy     *uint64             `json:"updated_by"`
-	UpdatedByUser *companyModels.User `gorm:"foreignKey:UpdatedBy" json:"updated_by_user,omitempty"`
+	UpdatedByUser *companyModels.User `gorm:"-;references:ID" json:"updated_by_user,omitempty"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

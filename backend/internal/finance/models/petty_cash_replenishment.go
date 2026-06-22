@@ -34,16 +34,16 @@ type PettyCashReplenishment struct {
 	DeletedAt           gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	Company          *companyModels.Company           `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
-	Branch           *companyModels.Branch            `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
-	PettyCashFund    *PettyCashFund                   `gorm:"foreignKey:PettyCashFundID" json:"petty_cash_fund,omitempty"`
-	FinancialYear    *FinancialYear                   `gorm:"foreignKey:FinancialYearID" json:"financial_year,omitempty"`
-	AccountingPeriod *AccountingPeriod                `gorm:"foreignKey:AccountingPeriodID" json:"accounting_period,omitempty"`
-	PaidFromAccount  *ChartOfAccount                  `gorm:"foreignKey:PaidFromAccountID" json:"paid_from_account,omitempty"`
-	Approver         *companyModels.User              `gorm:"foreignKey:ApprovedBy" json:"approver,omitempty"`
-	Poster           *companyModels.User              `gorm:"foreignKey:PostedBy" json:"poster,omitempty"`
-	Creator          *companyModels.User              `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	Updater          *companyModels.User              `gorm:"foreignKey:UpdatedBy" json:"updater,omitempty"`
+	Company          *companyModels.Company           `gorm:"foreignKey:CompanyID;references:ID" json:"company,omitempty"`
+	Branch           *companyModels.Branch            `gorm:"foreignKey:BranchID;references:ID" json:"branch,omitempty"`
+	PettyCashFund    *PettyCashFund                   `gorm:"foreignKey:PettyCashFundID;references:ID" json:"petty_cash_fund,omitempty"`
+	FinancialYear    *FinancialYear                   `gorm:"foreignKey:FinancialYearID;references:ID" json:"financial_year,omitempty"`
+	AccountingPeriod *AccountingPeriod                `gorm:"foreignKey:AccountingPeriodID;references:ID" json:"accounting_period,omitempty"`
+	PaidFromAccount  *ChartOfAccount                  `gorm:"foreignKey:PaidFromAccountID;references:ID" json:"paid_from_account,omitempty"`
+	Approver         *companyModels.User              `gorm:"-;references:ID" json:"approver,omitempty"`
+	Poster           *companyModels.User              `gorm:"-;references:ID" json:"poster,omitempty"`
+	Creator          *companyModels.User              `gorm:"-;references:ID" json:"creator,omitempty"`
+	Updater          *companyModels.User              `gorm:"-;references:ID" json:"updater,omitempty"`
 	Approvals        []PettyCashReplenishmentApproval `gorm:"foreignKey:PettyCashReplenishmentID" json:"approvals,omitempty"`
 }
 

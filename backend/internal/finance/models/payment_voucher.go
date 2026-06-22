@@ -40,7 +40,7 @@ type PaymentVoucher struct {
 	Lines     []PaymentVoucherLine     `gorm:"foreignKey:PaymentVoucherID" json:"lines,omitempty"`
 	Approvals []PaymentVoucherApproval `gorm:"foreignKey:PaymentVoucherID" json:"approvals,omitempty"`
 
-	FinancialYear    *FinancialYear    `gorm:"foreignKey:FinancialYearID" json:"financial_year,omitempty"`
-	AccountingPeriod *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID" json:"accounting_period,omitempty"`
-	PaidFromAccount  *ChartOfAccount   `gorm:"foreignKey:PaidFromAccountID" json:"paid_from_account,omitempty"`
+	FinancialYear    *FinancialYear    `gorm:"foreignKey:FinancialYearID;references:ID" json:"financial_year,omitempty"`
+	AccountingPeriod *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID;references:ID" json:"accounting_period,omitempty"`
+	PaidFromAccount  *ChartOfAccount   `gorm:"foreignKey:PaidFromAccountID;references:ID" json:"paid_from_account,omitempty"`
 }

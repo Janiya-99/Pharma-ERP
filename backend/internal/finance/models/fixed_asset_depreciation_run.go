@@ -10,15 +10,15 @@ import (
 type FixedAssetDepreciationRun struct {
 	ID        uint64                 `gorm:"primaryKey;autoIncrement" json:"id"`
 	CompanyID uint64                 `gorm:"not null;index:idx_fadr_company_run,unique" json:"company_id"`
-	Company   *companyModels.Company `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
+	Company   *companyModels.Company `gorm:"foreignKey:CompanyID;references:ID" json:"company,omitempty"`
 	BranchID  *uint64                `gorm:"index" json:"branch_id"`
-	Branch    *companyModels.Branch  `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
+	Branch    *companyModels.Branch  `gorm:"foreignKey:BranchID;references:ID" json:"branch,omitempty"`
 
 	FinancialYearID uint64         `gorm:"not null;index" json:"financial_year_id"`
-	FinancialYear   *FinancialYear `gorm:"foreignKey:FinancialYearID" json:"financial_year,omitempty"`
+	FinancialYear   *FinancialYear `gorm:"foreignKey:FinancialYearID;references:ID" json:"financial_year,omitempty"`
 
 	AccountingPeriodID uint64            `gorm:"not null;index" json:"accounting_period_id"`
-	AccountingPeriod   *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID" json:"accounting_period,omitempty"`
+	AccountingPeriod   *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID;references:ID" json:"accounting_period,omitempty"`
 
 	RunNumber string     `gorm:"type:varchar(50);not null;index:idx_fadr_company_run,unique" json:"run_number"`
 	RunDate   *time.Time `gorm:"type:date;not null" json:"run_date"`
@@ -30,7 +30,7 @@ type FixedAssetDepreciationRun struct {
 
 	PostedStatus string              `gorm:"type:varchar(30);default:'draft';index" json:"posted_status"` // draft, posted, cancelled
 	PostedBy     *uint64             `json:"posted_by"`
-	PostedByUser *companyModels.User `gorm:"foreignKey:PostedBy" json:"posted_by_user,omitempty"`
+	PostedByUser *companyModels.User `gorm:"-;references:ID" json:"posted_by_user,omitempty"`
 	PostedAt     *time.Time          `json:"posted_at"`
 
 	Remarks string `gorm:"type:text" json:"remarks"`
@@ -38,9 +38,9 @@ type FixedAssetDepreciationRun struct {
 	Status string `gorm:"type:varchar(30);default:'active'" json:"status"`
 
 	CreatedBy     *uint64             `json:"created_by"`
-	CreatedByUser *companyModels.User `gorm:"foreignKey:CreatedBy" json:"created_by_user,omitempty"`
+	CreatedByUser *companyModels.User `gorm:"-;references:ID" json:"created_by_user,omitempty"`
 	UpdatedBy     *uint64             `json:"updated_by"`
-	UpdatedByUser *companyModels.User `gorm:"foreignKey:UpdatedBy" json:"updated_by_user,omitempty"`
+	UpdatedByUser *companyModels.User `gorm:"-;references:ID" json:"updated_by_user,omitempty"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

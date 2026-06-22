@@ -43,7 +43,7 @@ type BankTransaction struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	BankAccount  *BankAccount    `gorm:"foreignKey:BankAccountID" json:"bank_account,omitempty"`
-	ChartAccount *ChartOfAccount `gorm:"foreignKey:ChartAccountID" json:"chart_account,omitempty"`
+	ChartAccount *ChartOfAccount `gorm:"foreignKey:ChartAccountID;references:ID" json:"chart_account,omitempty"`
 }
 
 func (BankTransaction) TableName() string {

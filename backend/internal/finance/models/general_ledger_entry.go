@@ -44,8 +44,8 @@ type GeneralLedgerEntry struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	FinancialYear    FinancialYear    `gorm:"foreignKey:FinancialYearID" json:"financial_year,omitempty"`
-	AccountingPeriod AccountingPeriod `gorm:"foreignKey:AccountingPeriodID" json:"accounting_period,omitempty"`
+	FinancialYear    FinancialYear    `gorm:"foreignKey:FinancialYearID;references:ID" json:"financial_year,omitempty"`
+	AccountingPeriod AccountingPeriod `gorm:"foreignKey:AccountingPeriodID;references:ID" json:"accounting_period,omitempty"`
 	ChartOfAccount   ChartOfAccount   `gorm:"foreignKey:AccountID" json:"account,omitempty"`
 }
 
