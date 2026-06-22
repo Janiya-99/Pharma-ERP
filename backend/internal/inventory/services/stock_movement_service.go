@@ -12,8 +12,9 @@ import (
 
 type InventoryStockMovementService interface {
 	ProcessStockIn(db *gorm.DB, payload dto.StockInPayload) error
-	ProcessStockOut(db *gorm.DB, payload interface{}) error
+	ProcessStockOut(db *gorm.DB, payload dto.StockOutPayload) error
 	ProcessStockTransfer(db *gorm.DB, payload interface{}) error
+	ValidateStockAvailability(db *gorm.DB, payload dto.StockOutPayload) error
 }
 
 type inventoryStockMovementService struct {
@@ -55,9 +56,69 @@ func (s *inventoryStockMovementService) ProcessStockIn(db *gorm.DB, payload dto.
 	return s.createStockLedgerEntry(db, payload, balance)
 }
 
-func (s *inventoryStockMovementService) ProcessStockOut(db *gorm.DB, payload interface{}) error {
-	// Stub for future modules
-	return errors.New("not implemented")
+func (s *inventoryStockMovementService) ProcessStockOut(db *gorm.DB, payload dto.StockOutPayload) error {
+	// 1. Validate Stock Availability and get entities
+	_, _, err := s.validateStockOutMovement(db, payload)
+	if err != nil {
+		return err
+	}
+
+	// 2. Get Stock Balance
+	balance, err := s.repo.FindStockBalance(db, payload.CompanyID, payload.WarehouseID, payload.WarehouseLocationID, payload.ProductID, payload.ProductBatchID)
+	if err != nil {
+		return err
+	}
+	if balance == nil {
+		return errors.New("stock balance not found")
+	}
+
+	// 3. Prevent Negative Stock
+	if balance.QuantityOnHand < payload.Quantity {
+		return errors.New("insufficient stock available")
+	}
+
+	// 4. Update Stock Balance
+	balance.QuantityOnHand -= payload.Quantity
+	
+	// If stock reaches zero, keep the last average cost but set stock value to 0. 
+	// The problem states: "If quantity_on_hand becomes zero, keep last average_cost or set stock_value = 0."
+	if balance.QuantityOnHand <= 0 {
+		balance.QuantityOnHand = 0
+		balance.StockValue = 0
+	} else {
+		balance.StockValue = s.calculateStockValue(balance.QuantityOnHand, balance.AverageCost)
+	}
+
+	balance.QuantityAvailable = s.calculateAvailableQuantity(balance.QuantityOnHand, balance.QuantityAllocated)
+
+	err = s.repo.UpdateStockBalance(db, balance)
+	if err != nil {
+		return err
+	}
+
+	// 5. Create Stock Ledger Entry
+	return s.createStockOutLedgerEntry(db, payload, balance)
+}
+
+func (s *inventoryStockMovementService) ValidateStockAvailability(db *gorm.DB, payload dto.StockOutPayload) error {
+	_, _, err := s.validateStockOutMovement(db, payload)
+	if err != nil {
+		return err
+	}
+
+	balance, err := s.repo.FindStockBalance(db, payload.CompanyID, payload.WarehouseID, payload.WarehouseLocationID, payload.ProductID, payload.ProductBatchID)
+	if err != nil {
+		return err
+	}
+	if balance == nil {
+		return errors.New("stock balance not found")
+	}
+
+	if balance.QuantityOnHand < payload.Quantity {
+		return errors.New("insufficient stock available")
+	}
+
+	return nil
 }
 
 func (s *inventoryStockMovementService) ProcessStockTransfer(db *gorm.DB, payload interface{}) error {
@@ -180,7 +241,99 @@ func (s *inventoryStockMovementService) createStockLedgerEntry(db *gorm.DB, payl
 		CreatedBy:           &payload.CreatedBy,
 	}
 
+	if payload.SourceType == "stock_transfer" {
+		entry.MovementType = "transfer_in"
+	}
+
 	return s.repo.CreateStockLedgerEntry(db, entry)
+}
+
+func (s *inventoryStockMovementService) createStockOutLedgerEntry(db *gorm.DB, payload dto.StockOutPayload, balance *models.StockBalance) error {
+	totalCost := payload.Quantity * balance.AverageCost // Using stock balance average cost for out movements
+
+	entry := &models.StockLedgerEntry{
+		CompanyID:           payload.CompanyID,
+		BranchID:            payload.BranchID,
+		WarehouseID:         payload.WarehouseID,
+		WarehouseLocationID: payload.WarehouseLocationID,
+		ProductID:           payload.ProductID,
+		ProductBatchID:      payload.ProductBatchID,
+		TransactionDate:     payload.TransactionDate,
+		SourceType:          payload.SourceType,
+		SourceID:            &payload.SourceID,
+		SourceNumber:        payload.SourceNumber,
+		MovementType:        "out", // Usually "out" or derived, but specifically for ST it's "transfer_out" or just "out", wait, instructions say "movement_type = transfer_out" if source_type = stock_transfer.
+		QuantityIn:          0,
+		QuantityOut:         payload.Quantity,
+		BalanceQuantity:     balance.QuantityOnHand,
+		UnitCost:            balance.AverageCost,
+		TotalCost:           totalCost,
+		Remarks:             payload.Remarks,
+		CreatedBy:           &payload.CreatedBy,
+	}
+
+	if payload.SourceType == "stock_transfer" {
+		entry.MovementType = "transfer_out"
+	}
+
+	return s.repo.CreateStockLedgerEntry(db, entry)
+}
+
+func (s *inventoryStockMovementService) validateStockOutMovement(db *gorm.DB, payload dto.StockOutPayload) (*models.Product, *models.ProductBatch, error) {
+	if payload.Quantity <= 0 {
+		return nil, nil, errors.New("quantity must be greater than zero")
+	}
+
+	warehouse, err := s.repo.FindWarehouseByID(db, payload.WarehouseID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if warehouse == nil || warehouse.Status != "active" {
+		return nil, nil, errors.New("invalid or inactive warehouse")
+	}
+
+	if payload.WarehouseLocationID != nil {
+		location, err := s.repo.FindWarehouseLocationByID(db, *payload.WarehouseLocationID)
+		if err != nil {
+			return nil, nil, err
+		}
+		if location == nil || location.WarehouseID != payload.WarehouseID || location.Status != "active" {
+			return nil, nil, errors.New("invalid warehouse location")
+		}
+	}
+
+	product, err := s.repo.FindProductByID(db, payload.ProductID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if product == nil || product.Status != "active" {
+		return nil, nil, errors.New("invalid or inactive product")
+	}
+
+	var batch *models.ProductBatch
+	if product.RequiresBatchTracking {
+		if payload.ProductBatchID == nil {
+			return nil, nil, errors.New("product batch is required for batch-tracked product")
+		}
+		batch, err = s.repo.FindBatchByID(db, *payload.ProductBatchID)
+		if err != nil {
+			return nil, nil, err
+		}
+		if batch == nil {
+			return nil, nil, errors.New("invalid product batch")
+		}
+		if batch.IsBlocked {
+			return nil, nil, errors.New("product batch is blocked")
+		}
+		if batch.BatchStatus == "expired" || batch.BatchStatus == "recalled" || batch.BatchStatus == "disposed" || batch.BatchStatus == "inactive" {
+			return nil, nil, errors.New("product batch is in invalid state for stock out")
+		}
+		if product.RequiresExpiryTracking && batch.ExpiryDate != nil && batch.ExpiryDate.Before(time.Now()) {
+			return nil, nil, errors.New("product batch is expired")
+		}
+	}
+
+	return product, batch, nil
 }
 
 func (s *inventoryStockMovementService) calculateAverageCost(existingQty, existingCost, newQty, newCost float64) float64 {

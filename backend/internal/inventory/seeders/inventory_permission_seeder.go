@@ -45,6 +45,33 @@ func SeedInventoryPermissions(db *gorm.DB, logger *zap.Logger) error {
 
 		{"Stock Balance", "inventory.stock_balance.view", "View Stock Balance"},
 		{"Stock Ledger", "inventory.stock_ledger.view", "View Stock Ledger"},
+
+		{"Opening Stock", "inventory.opening_stock.view", "View Opening Stock"},
+		{"Opening Stock", "inventory.opening_stock.create", "Create Opening Stock"},
+		{"Opening Stock", "inventory.opening_stock.update", "Update Opening Stock"},
+		{"Opening Stock", "inventory.opening_stock.delete", "Delete Opening Stock"},
+		{"Opening Stock", "inventory.opening_stock.submit", "Submit Opening Stock"},
+		{"Opening Stock", "inventory.opening_stock.approve", "Approve Opening Stock"},
+		{"Opening Stock", "inventory.opening_stock.reject", "Reject Opening Stock"},
+		{"Opening Stock", "inventory.opening_stock.post", "Post Opening Stock"},
+
+		{"GRN", "inventory.grn.view", "View GRN"},
+		{"GRN", "inventory.grn.create", "Create GRN"},
+		{"GRN", "inventory.grn.update", "Update GRN"},
+		{"GRN", "inventory.grn.delete", "Delete GRN"},
+		{"GRN", "inventory.grn.submit", "Submit GRN"},
+		{"GRN", "inventory.grn.approve", "Approve GRN"},
+		{"GRN", "inventory.grn.reject", "Reject GRN"},
+		{"GRN", "inventory.grn.post", "Post GRN"},
+
+		{"Stock Transfer", "inventory.stock_transfer.view", "View Stock Transfer"},
+		{"Stock Transfer", "inventory.stock_transfer.create", "Create Stock Transfer"},
+		{"Stock Transfer", "inventory.stock_transfer.update", "Update Stock Transfer"},
+		{"Stock Transfer", "inventory.stock_transfer.delete", "Delete Stock Transfer"},
+		{"Stock Transfer", "inventory.stock_transfer.submit", "Submit Stock Transfer"},
+		{"Stock Transfer", "inventory.stock_transfer.approve", "Approve Stock Transfer"},
+		{"Stock Transfer", "inventory.stock_transfer.reject", "Reject Stock Transfer"},
+		{"Stock Transfer", "inventory.stock_transfer.post", "Post Stock Transfer"},
 	}
 
 	for _, p := range permissions {
@@ -98,8 +125,19 @@ func SeedInventoryPermissions(db *gorm.DB, logger *zap.Logger) error {
 			k == "inventory.stock_ledger.view" ||
 			k == "inventory.product_batch.create" ||
 			k == "inventory.product_batch.update" ||
-			k == "inventory.product_batch.block" ||
-			k == "inventory.product_batch.unblock"
+			k == "inventory.product_batch.unblock" ||
+			k == "inventory.opening_stock.create" ||
+			k == "inventory.opening_stock.update" ||
+			k == "inventory.opening_stock.delete" ||
+			k == "inventory.opening_stock.submit" ||
+			k == "inventory.grn.create" ||
+			k == "inventory.grn.update" ||
+			k == "inventory.grn.delete" ||
+			k == "inventory.grn.submit" ||
+			k == "inventory.stock_transfer.create" ||
+			k == "inventory.stock_transfer.update" ||
+			k == "inventory.stock_transfer.delete" ||
+			k == "inventory.stock_transfer.submit"
 	})
 
 	assignPermission("INVENTORY_VIEWER", func(k string) bool {
@@ -107,7 +145,7 @@ func SeedInventoryPermissions(db *gorm.DB, logger *zap.Logger) error {
 	})
 
 	assignPermission("INVENTORY_APPROVER", func(k string) bool {
-		return strings.HasPrefix(k, "inventory.") && strings.HasSuffix(k, ".view")
+		return strings.HasPrefix(k, "inventory.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post"))
 	})
 
 	logger.Info("Inventory Permissions seeding completed")

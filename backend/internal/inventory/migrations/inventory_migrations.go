@@ -30,6 +30,9 @@ func RunInventoryMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.GoodsReceiptNote{},
 		&models.GoodsReceiptNoteLine{},
 		&models.GoodsReceiptNoteApproval{},
+		&models.StockTransfer{},
+		&models.StockTransferLine{},
+		&models.StockTransferApproval{},
 	)
 
 	if err != nil {

@@ -41,6 +41,8 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	openingStockSvc := services.NewOpeningStockService(openingStockRepo, stockMovementRepo, stockMovementSvc, invAuditLogger)
 	grnRepo := repositories.NewGRNRepository()
 	grnSvc := services.NewGRNService(grnRepo, stockMovementRepo, productMasterRepo, stockMovementSvc, invAuditLogger, logger)
+	stockTransferRepo := repositories.NewStockTransferRepository()
+	stockTransferSvc := services.NewStockTransferService(stockTransferRepo, stockMovementSvc, stockMovementRepo, invAuditLogger)
 
 	// 3. Initialize Handlers
 	warehouseHdl := handlers.NewWarehouseHandler(warehouseSvc, logger)
@@ -57,6 +59,7 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	stockLedgerHdl := handlers.NewStockLedgerHandler(stockLedgerSvc, logger)
 	openingStockHdl := handlers.NewOpeningStockHandler(openingStockSvc)
 	grnHdl := handlers.NewGRNHandler(grnSvc)
+	stockTransferHdl := handlers.NewStockTransferHandler(stockTransferSvc)
 	dashboardHdl := handlers.NewDashboardHandler(logger)
 
 	inventory := r.Group("")
@@ -207,4 +210,17 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 		grns.POST("/:id/post", middleware.RequirePermission("inventory.grn.post"), grnHdl.PostGRN)
 	}
 
+	// Stock Transfers
+	stockTransfers := inventory.Group("/stock-transfers")
+	{
+		stockTransfers.GET("", middleware.RequirePermission("inventory.stock_transfer.view"), stockTransferHdl.ListStockTransfers)
+		stockTransfers.GET("/:id", middleware.RequirePermission("inventory.stock_transfer.view"), stockTransferHdl.GetStockTransfer)
+		stockTransfers.POST("", middleware.RequirePermission("inventory.stock_transfer.create"), stockTransferHdl.CreateStockTransfer)
+		stockTransfers.PUT("/:id", middleware.RequirePermission("inventory.stock_transfer.update"), stockTransferHdl.UpdateStockTransfer)
+		stockTransfers.DELETE("/:id", middleware.RequirePermission("inventory.stock_transfer.delete"), stockTransferHdl.DeleteStockTransfer)
+		stockTransfers.POST("/:id/submit", middleware.RequirePermission("inventory.stock_transfer.submit"), stockTransferHdl.SubmitStockTransfer)
+		stockTransfers.POST("/:id/approve", middleware.RequirePermission("inventory.stock_transfer.approve"), stockTransferHdl.ApproveStockTransfer)
+		stockTransfers.POST("/:id/reject", middleware.RequirePermission("inventory.stock_transfer.reject"), stockTransferHdl.RejectStockTransfer)
+		stockTransfers.POST("/:id/post", middleware.RequirePermission("inventory.stock_transfer.post"), stockTransferHdl.PostStockTransfer)
+	}
 }
