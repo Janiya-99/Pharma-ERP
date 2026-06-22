@@ -67,6 +67,15 @@ func SeedPermissions(db *gorm.DB) error {
 
 		// Audit
 		{Module: "audit", Resource: "audit_logs", Action: "read", Slug: "audit.audit_logs.read"},
+
+		// Inventory: Opening Stock
+		{Module: "inventory", Resource: "opening_stock", Action: "view", Slug: "inventory.opening_stock.view"},
+		{Module: "inventory", Resource: "opening_stock", Action: "create", Slug: "inventory.opening_stock.create"},
+		{Module: "inventory", Resource: "opening_stock", Action: "update", Slug: "inventory.opening_stock.update"},
+		{Module: "inventory", Resource: "opening_stock", Action: "delete", Slug: "inventory.opening_stock.delete"},
+		{Module: "inventory", Resource: "opening_stock", Action: "submit", Slug: "inventory.opening_stock.submit"},
+		{Module: "inventory", Resource: "opening_stock", Action: "approve", Slug: "inventory.opening_stock.approve"},
+		{Module: "inventory", Resource: "opening_stock", Action: "post", Slug: "inventory.opening_stock.post"},
 	}
 
 	for _, p := range permissions {

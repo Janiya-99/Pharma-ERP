@@ -19,6 +19,8 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	productRepo := repositories.NewProductRepository()
 	productBatchRepo := repositories.NewProductBatchRepository()
 	stockRepo := repositories.NewStockRepository()
+	stockMovementRepo := repositories.NewStockMovementRepository()
+	openingStockRepo := repositories.NewOpeningStockRepository()
 
 	// 2. Initialize Services
 	warehouseSvc := services.NewWarehouseService(warehouseRepo, stockRepo, auditService)
@@ -33,6 +35,10 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	productBatchSvc := services.NewProductBatchService(productBatchRepo, productRepo, stockRepo, auditService)
 	stockBalanceSvc := services.NewStockBalanceService(stockRepo)
 	stockLedgerSvc := services.NewStockLedgerService(stockRepo)
+	
+	invAuditLogger := services.NewAuditLogService(logger)
+	stockMovementSvc := services.NewInventoryStockMovementService(stockMovementRepo)
+	openingStockSvc := services.NewOpeningStockService(openingStockRepo, stockMovementRepo, stockMovementSvc, invAuditLogger)
 
 	// 3. Initialize Handlers
 	warehouseHdl := handlers.NewWarehouseHandler(warehouseSvc, logger)
@@ -47,6 +53,7 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	productBatchHdl := handlers.NewProductBatchHandler(productBatchSvc, logger)
 	stockBalanceHdl := handlers.NewStockBalanceHandler(stockBalanceSvc, logger)
 	stockLedgerHdl := handlers.NewStockLedgerHandler(stockLedgerSvc, logger)
+	openingStockHdl := handlers.NewOpeningStockHandler(openingStockSvc)
 	dashboardHdl := handlers.NewDashboardHandler(logger)
 
 	inventory := r.Group("")
@@ -167,6 +174,20 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	stockLedger := inventory.Group("/stock-ledger")
 	{
 		stockLedger.GET("", middleware.RequirePermission("inventory.stock_ledger.view"), stockLedgerHdl.List)
+	}
+
+	// Opening Stock Entries
+	openingStocks := inventory.Group("/opening-stock-entries")
+	{
+		openingStocks.GET("", middleware.RequirePermission("inventory.opening_stock.view"), openingStockHdl.ListOpeningStockEntries)
+		openingStocks.GET("/:id", middleware.RequirePermission("inventory.opening_stock.view"), openingStockHdl.GetOpeningStockEntryByID)
+		openingStocks.POST("", middleware.RequirePermission("inventory.opening_stock.create"), openingStockHdl.CreateOpeningStockEntry)
+		openingStocks.PUT("/:id", middleware.RequirePermission("inventory.opening_stock.update"), openingStockHdl.UpdateOpeningStockEntry)
+		openingStocks.DELETE("/:id", middleware.RequirePermission("inventory.opening_stock.delete"), openingStockHdl.DeleteOpeningStockEntry)
+		openingStocks.POST("/:id/submit", middleware.RequirePermission("inventory.opening_stock.submit"), openingStockHdl.SubmitOpeningStockEntry)
+		openingStocks.POST("/:id/approve", middleware.RequirePermission("inventory.opening_stock.approve"), openingStockHdl.ApproveOpeningStockEntry)
+		openingStocks.POST("/:id/reject", middleware.RequirePermission("inventory.opening_stock.approve"), openingStockHdl.RejectOpeningStockEntry)
+		openingStocks.POST("/:id/post", middleware.RequirePermission("inventory.opening_stock.post"), openingStockHdl.PostOpeningStockEntry)
 	}
 
 }
