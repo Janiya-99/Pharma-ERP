@@ -6,12 +6,13 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/auth/handlers"
+	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/control"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
 	financeModule "github.com/pixandco/erp-phrma/internal/finance"
+	inventoryModule "github.com/pixandco/erp-phrma/internal/inventory"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	"github.com/pixandco/erp-phrma/internal/service"
 	"go.uber.org/zap"
@@ -83,7 +84,7 @@ func Setup(
 			authMe.Use(middleware.CompanyAuthMiddleware(resolver))
 			authMe.Use(middleware.BranchAccessMiddleware())
 			authMe.Use(middleware.SoftwareAccessMiddleware())
-			
+
 			authMe.GET("/me", newAuthHandler.AuthMe)
 			authMe.GET("/context", newAuthHandler.AuthContext)
 			authMe.POST("/switch-branch", newAuthHandler.SwitchBranch)
@@ -162,44 +163,14 @@ func Setup(
 		financeGrp.Use(middleware.SoftwareAccessMiddleware())
 		financeModule.SetupRoutes(financeGrp, logger)
 
-
 		// Inventory routes
-		inventory := v1.Group("/inventory")
-		inventory.Use(middleware.AuthMiddleware(authService))
-		{
-			// Products
-			products := inventory.Group("/products")
-			{
-				products.GET("", prodCtrl.List)
-				products.POST("", prodCtrl.Create)
-				products.GET("/:id", prodCtrl.Get)
-			}
+		inventoryGrp := v1.Group("/inventory")
+		inventoryGrp.Use(middleware.CompanyAuthMiddleware(resolver))
+		inventoryGrp.Use(middleware.BranchAccessMiddleware())
+		inventoryGrp.Use(middleware.SoftwareAccessMiddleware())
 
-			// Warehouses
-			warehouses := inventory.Group("/warehouses")
-			{
-				warehouses.GET("", whCtrl.List)
-				warehouses.POST("", whCtrl.Create)
-				warehouses.GET("/:id", whCtrl.Get)
-			}
-
-			// Suppliers
-			suppliers := inventory.Group("/suppliers")
-			{
-				suppliers.GET("", suppCtrl.List)
-				suppliers.POST("", suppCtrl.Create)
-				suppliers.GET("/:id", suppCtrl.Get)
-			}
-
-			// GRNs
-			grns := inventory.Group("/grns")
-			{
-				grns.GET("", grnCtrl.List)
-				grns.POST("", grnCtrl.Create)
-				grns.GET("/:id", grnCtrl.Get)
-				grns.POST("/:id/post", grnCtrl.Post)
-			}
-		}
+		// Initialize the audit log service to pass down to inventory routes
+		inventoryModule.SetupRoutes(inventoryGrp, service.NewAuditService(nil, logger), logger)
 	}
 
 	return r
