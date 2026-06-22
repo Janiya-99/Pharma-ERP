@@ -132,7 +132,30 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.delete", "Delete Bank Reconciliation"},
 		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.complete", "Complete Bank Reconciliation"},
 		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.cancel", "Cancel Bank Reconciliation"},
-		
+
+		{"FINANCE", "Petty Cash Fund", "finance.petty_cash_fund.view", "View Petty Cash Fund"},
+		{"FINANCE", "Petty Cash Fund", "finance.petty_cash_fund.create", "Create Petty Cash Fund"},
+		{"FINANCE", "Petty Cash Fund", "finance.petty_cash_fund.update", "Update Petty Cash Fund"},
+		{"FINANCE", "Petty Cash Fund", "finance.petty_cash_fund.delete", "Delete Petty Cash Fund"},
+
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.view", "View Petty Cash Voucher"},
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.create", "Create Petty Cash Voucher"},
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.update", "Update Petty Cash Voucher"},
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.delete", "Delete Petty Cash Voucher"},
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.submit", "Submit Petty Cash Voucher"},
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.approve", "Approve Petty Cash Voucher"},
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.reject", "Reject Petty Cash Voucher"},
+		{"FINANCE", "Petty Cash Voucher", "finance.petty_cash_voucher.post", "Post Petty Cash Voucher"},
+
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.view", "View Petty Cash Replenishment"},
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.create", "Create Petty Cash Replenishment"},
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.update", "Update Petty Cash Replenishment"},
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.delete", "Delete Petty Cash Replenishment"},
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.submit", "Submit Petty Cash Replenishment"},
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.approve", "Approve Petty Cash Replenishment"},
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.reject", "Reject Petty Cash Replenishment"},
+		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.post", "Post Petty Cash Replenishment"},
+
 		{"FINANCE", "Report", "finance.report.view", "View Finance Report"},
 
 		// INVENTORY

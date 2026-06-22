@@ -35,6 +35,12 @@ func RunFinanceMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.BankTransaction{},
 		&models.BankReconciliation{},
 		&models.BankReconciliationLine{},
+		&models.PettyCashFund{},
+		&models.PettyCashVoucher{},
+		&models.PettyCashVoucherLine{},
+		&models.PettyCashVoucherApproval{},
+		&models.PettyCashReplenishment{},
+		&models.PettyCashReplenishmentApproval{},
 	)
 	if err != nil {
 		logger.Error("Finance AutoMigrate failed", zap.Error(err))

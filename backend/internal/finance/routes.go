@@ -15,6 +15,11 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	coaHandler := handlers.NewChartOfAccountHandler(logger)
 	obHandler := handlers.NewOpeningBalanceHandler(logger)
 
+	// Petty Cash Handlers
+	pcfHandler := handlers.NewPettyCashFundHandler(logger)
+	pcvHandler := handlers.NewPettyCashVoucherHandler(logger)
+	pcrHandler := handlers.NewPettyCashReplenishmentHandler(logger)
+
 	// Routes
 	finance := r.Group("")
 
@@ -157,5 +162,43 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		br.POST("/:id/complete", middleware.RequirePermission("finance.bank_reconciliation.complete"), brHandler.CompleteBankReconciliation)
 		br.POST("/:id/cancel", middleware.RequirePermission("finance.bank_reconciliation.cancel"), brHandler.CancelBankReconciliation)
 		br.DELETE("/:id", middleware.RequirePermission("finance.bank_reconciliation.delete"), brHandler.DeleteBankReconciliation)
+	}
+
+	// Petty Cash Funds
+	pcf := finance.Group("/petty-cash-funds")
+	{
+		pcf.GET("", middleware.RequirePermission("finance.petty_cash_fund.view"), pcfHandler.ListPettyCashFunds)
+		pcf.GET("/:id", middleware.RequirePermission("finance.petty_cash_fund.view"), pcfHandler.GetPettyCashFundByID)
+		pcf.POST("", middleware.RequirePermission("finance.petty_cash_fund.create"), pcfHandler.CreatePettyCashFund)
+		pcf.PUT("/:id", middleware.RequirePermission("finance.petty_cash_fund.update"), pcfHandler.UpdatePettyCashFund)
+		pcf.DELETE("/:id", middleware.RequirePermission("finance.petty_cash_fund.delete"), pcfHandler.DeletePettyCashFund)
+	}
+
+	// Petty Cash Vouchers
+	pcv := finance.Group("/petty-cash-vouchers")
+	{
+		pcv.GET("", middleware.RequirePermission("finance.petty_cash_voucher.view"), pcvHandler.ListPettyCashVouchers)
+		pcv.GET("/:id", middleware.RequirePermission("finance.petty_cash_voucher.view"), pcvHandler.GetPettyCashVoucherByID)
+		pcv.POST("", middleware.RequirePermission("finance.petty_cash_voucher.create"), pcvHandler.CreatePettyCashVoucher)
+		pcv.PUT("/:id", middleware.RequirePermission("finance.petty_cash_voucher.update"), pcvHandler.UpdatePettyCashVoucher)
+		pcv.DELETE("/:id", middleware.RequirePermission("finance.petty_cash_voucher.delete"), pcvHandler.DeletePettyCashVoucher)
+		pcv.POST("/:id/submit", middleware.RequirePermission("finance.petty_cash_voucher.submit"), pcvHandler.SubmitPettyCashVoucher)
+		pcv.POST("/:id/approve", middleware.RequirePermission("finance.petty_cash_voucher.approve"), pcvHandler.ApprovePettyCashVoucher)
+		pcv.POST("/:id/reject", middleware.RequirePermission("finance.petty_cash_voucher.reject"), pcvHandler.RejectPettyCashVoucher)
+		pcv.POST("/:id/post", middleware.RequirePermission("finance.petty_cash_voucher.post"), pcvHandler.PostPettyCashVoucher)
+	}
+
+	// Petty Cash Replenishments
+	pcr := finance.Group("/petty-cash-replenishments")
+	{
+		pcr.GET("", middleware.RequirePermission("finance.petty_cash_replenishment.view"), pcrHandler.ListPettyCashReplenishments)
+		pcr.GET("/:id", middleware.RequirePermission("finance.petty_cash_replenishment.view"), pcrHandler.GetPettyCashReplenishmentByID)
+		pcr.POST("", middleware.RequirePermission("finance.petty_cash_replenishment.create"), pcrHandler.CreatePettyCashReplenishment)
+		pcr.PUT("/:id", middleware.RequirePermission("finance.petty_cash_replenishment.update"), pcrHandler.UpdatePettyCashReplenishment)
+		pcr.DELETE("/:id", middleware.RequirePermission("finance.petty_cash_replenishment.delete"), pcrHandler.DeletePettyCashReplenishment)
+		pcr.POST("/:id/submit", middleware.RequirePermission("finance.petty_cash_replenishment.submit"), pcrHandler.SubmitPettyCashReplenishment)
+		pcr.POST("/:id/approve", middleware.RequirePermission("finance.petty_cash_replenishment.approve"), pcrHandler.ApprovePettyCashReplenishment)
+		pcr.POST("/:id/reject", middleware.RequirePermission("finance.petty_cash_replenishment.reject"), pcrHandler.RejectPettyCashReplenishment)
+		pcr.POST("/:id/post", middleware.RequirePermission("finance.petty_cash_replenishment.post"), pcrHandler.PostPettyCashReplenishment)
 	}
 }
