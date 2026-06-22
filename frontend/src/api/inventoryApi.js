@@ -78,4 +78,15 @@ export const inventoryApi = {
   // Stock
   getStockBalances: (params) => apiClient.get("/inventory/stock-balances", { params }),
   getStockLedgerEntries: (params) => apiClient.get("/inventory/stock-ledger", { params }),
+
+  // Opening Stock
+  getOpeningStockEntries: (params) => apiClient.get("/inventory/opening-stock-entries", { params }),
+  getOpeningStockEntryById: (id) => apiClient.get(`/inventory/opening-stock-entries/${id}`),
+  createOpeningStockEntry: (payload) => apiClient.post("/inventory/opening-stock-entries", payload),
+  updateOpeningStockEntry: (id, payload) => apiClient.put(`/inventory/opening-stock-entries/${id}`, payload),
+  deleteOpeningStockEntry: (id) => apiClient.delete(`/inventory/opening-stock-entries/${id}`),
+  submitOpeningStockEntry: (id, payload) => apiClient.post(`/inventory/opening-stock-entries/${id}/submit`, payload),
+  approveOpeningStockEntry: (id, payload) => apiClient.post(`/inventory/opening-stock-entries/${id}/approve`, payload),
+  rejectOpeningStockEntry: (id, payload) => apiClient.post(`/inventory/opening-stock-entries/${id}/reject`, payload),
+  postOpeningStockEntry: (id) => apiClient.post(`/inventory/opening-stock-entries/${id}/post`),
 };

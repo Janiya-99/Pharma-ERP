@@ -64,6 +64,9 @@ import GRNPage from "views/admin/inventory/GRNPage";
 import StockTransferPage from "views/admin/inventory/StockTransferPage";
 import StockAdjustmentPage from "views/admin/inventory/StockAdjustmentPage";
 import StockLedgerPage from "views/admin/inventory/StockLedgerPage";
+import OpeningStockEntriesPage from "pages/inventory/opening-stock/OpeningStockEntriesPage";
+import OpeningStockEntryFormPage from "pages/inventory/opening-stock/OpeningStockEntryFormPage";
+import OpeningStockEntryDetailsPage from "pages/inventory/opening-stock/OpeningStockEntryDetailsPage";
 
 // Invoice Center
 import InvoiceDashboard from "views/admin/invoice-center/InvoiceDashboard";
@@ -208,6 +211,10 @@ const routes: ERPRoute[] = [
       { name: "Stock Transfer", path: "inventory/stock-transfer", component: <StockTransferPage /> },
       { name: "Stock Adjustment", path: "inventory/stock-adjustment", component: <StockAdjustmentPage /> },
       { name: "Stock Ledger", path: "inventory/stock-ledger", component: <StockLedgerPage /> },
+      { name: "Opening Stock", path: "inventory/opening-stock", component: <OpeningStockEntriesPage /> },
+      { name: "Create Opening Stock", path: "inventory/opening-stock/create", component: <OpeningStockEntryFormPage />, hide: true },
+      { name: "Edit Opening Stock", path: "inventory/opening-stock/:id/edit", component: <OpeningStockEntryFormPage />, hide: true },
+      { name: "Opening Stock Details", path: "inventory/opening-stock/:id", component: <OpeningStockEntryDetailsPage />, hide: true },
     ],
   },
   {
