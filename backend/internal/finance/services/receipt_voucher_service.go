@@ -32,6 +32,7 @@ type receiptVoucherService struct {
 	coaRepo      *repositories.ChartOfAccountRepository
 	bankTxSvc    *BankTransactionService
 	auditService *services.AuditService
+	glService    *GeneralLedgerService
 	logger       *zap.Logger
 }
 
@@ -42,6 +43,7 @@ func NewReceiptVoucherService(
 	coaRepo *repositories.ChartOfAccountRepository,
 	bankTxSvc *BankTransactionService,
 	auditService *services.AuditService,
+	glService *GeneralLedgerService,
 	logger *zap.Logger,
 ) ReceiptVoucherService {
 	return &receiptVoucherService{
@@ -51,6 +53,7 @@ func NewReceiptVoucherService(
 		coaRepo:      coaRepo,
 		bankTxSvc:    bankTxSvc,
 		auditService: auditService,
+		glService:    glService,
 		logger:       logger,
 	}
 }
@@ -144,27 +147,27 @@ func (s *receiptVoucherService) CreateReceiptVoucher(companyID, branchID, userID
 	newNum := s.generateNextVoucherNumber(lastNum)
 
 	voucher := models.ReceiptVoucher{
-		CompanyID:          companyID,
-		BranchID:           branchID,
-		FinancialYearID:    req.FinancialYearID,
-		AccountingPeriodID: req.AccountingPeriodID,
-		ReceiptNumber:      newNum,
-		ReceiptDate:        rDate,
-		ReceiptType:        req.ReceiptType,
-		ReceiptMethod:      req.ReceiptMethod,
-		CustomerID:         req.CustomerID,
-		SupplierID:         req.SupplierID,
+		CompanyID:           companyID,
+		BranchID:            branchID,
+		FinancialYearID:     req.FinancialYearID,
+		AccountingPeriodID:  req.AccountingPeriodID,
+		ReceiptNumber:       newNum,
+		ReceiptDate:         rDate,
+		ReceiptType:         req.ReceiptType,
+		ReceiptMethod:       req.ReceiptMethod,
+		CustomerID:          req.CustomerID,
+		SupplierID:          req.SupplierID,
 		ReceivedToAccountID: req.ReceivedToAccountID,
-		ChequeNumber:       req.ChequeNumber,
-		ChequeDate:         chequeDate,
-		ReferenceNumber:    req.ReferenceNumber,
-		Description:        req.Description,
-		TotalAmount:        totalAmount,
-		ApprovalStatus:     "draft",
-		PostedStatus:       "unposted",
-		Status:             "active",
-		CreatedBy:          &userID,
-		Lines:              lines,
+		ChequeNumber:        req.ChequeNumber,
+		ChequeDate:          chequeDate,
+		ReferenceNumber:     req.ReferenceNumber,
+		Description:         req.Description,
+		TotalAmount:         totalAmount,
+		ApprovalStatus:      "draft",
+		PostedStatus:        "unposted",
+		Status:              "active",
+		CreatedBy:           &userID,
+		Lines:               lines,
 	}
 
 	if err := s.repo.CreateReceiptVoucherWithLines(&voucher); err != nil {
@@ -413,6 +416,54 @@ func (s *receiptVoucherService) PostReceiptVoucher(companyID, voucherID, userID 
 			if err := s.bankTxSvc.CreateBankTransactionFromReceipt(tx, companyID, userID, voucher); err != nil {
 				return err
 			}
+		}
+
+		// General Ledger Posting
+		var glEntries []models.GeneralLedgerEntry
+		// Debit side (received to account)
+		glEntries = append(glEntries, models.GeneralLedgerEntry{
+			CompanyID:          companyID,
+			BranchID:           &voucher.BranchID,
+			FinancialYearID:    &voucher.FinancialYearID,
+			AccountingPeriodID: &voucher.AccountingPeriodID,
+			TransactionDate:    voucher.ReceiptDate,
+			SourceType:         "receipt_voucher",
+			SourceID:           voucher.ID,
+			SourceNumber:       voucher.ReceiptNumber,
+			AccountID:          voucher.ReceivedToAccountID,
+			Description:        "Receipt Voucher Received To: " + voucher.Description,
+			DebitAmount:        voucher.TotalAmount,
+			CreditAmount:       0,
+			ReferenceNumber:    voucher.ReferenceNumber,
+			PostedBy:           &userID,
+			PostedAt:           &now,
+			Status:             "posted",
+		})
+
+		// Credit side (each line)
+		for _, line := range voucher.Lines {
+			glEntries = append(glEntries, models.GeneralLedgerEntry{
+				CompanyID:          companyID,
+				BranchID:           &voucher.BranchID,
+				FinancialYearID:    &voucher.FinancialYearID,
+				AccountingPeriodID: &voucher.AccountingPeriodID,
+				TransactionDate:    voucher.ReceiptDate,
+				SourceType:         "receipt_voucher",
+				SourceID:           voucher.ID,
+				SourceNumber:       voucher.ReceiptNumber,
+				AccountID:          line.AccountID,
+				Description:        line.LineDescription,
+				DebitAmount:        0,
+				CreditAmount:       line.Amount,
+				ReferenceNumber:    voucher.ReferenceNumber,
+				PostedBy:           &userID,
+				PostedAt:           &now,
+				Status:             "posted",
+			})
+		}
+
+		if err := s.glService.PostLedgerEntries(tx, glEntries); err != nil {
+			return err
 		}
 
 		return nil

@@ -32,6 +32,7 @@ type paymentVoucherService struct {
 	coaRepo      *repositories.ChartOfAccountRepository
 	bankTxSvc    *BankTransactionService
 	auditService *services.AuditService
+	glService    *GeneralLedgerService
 	logger       *zap.Logger
 }
 
@@ -42,6 +43,7 @@ func NewPaymentVoucherService(
 	coaRepo *repositories.ChartOfAccountRepository,
 	bankTxSvc *BankTransactionService,
 	auditService *services.AuditService,
+	glService *GeneralLedgerService,
 	logger *zap.Logger,
 ) PaymentVoucherService {
 	return &paymentVoucherService{
@@ -51,6 +53,7 @@ func NewPaymentVoucherService(
 		coaRepo:      coaRepo,
 		bankTxSvc:    bankTxSvc,
 		auditService: auditService,
+		glService:    glService,
 		logger:       logger,
 	}
 }
@@ -413,6 +416,53 @@ func (s *paymentVoucherService) PostPaymentVoucher(companyID, voucherID, userID 
 			if err := s.bankTxSvc.CreateBankTransactionFromPayment(tx, companyID, userID, voucher); err != nil {
 				return err
 			}
+		}
+
+		// General Ledger Posting
+		var glEntries []models.GeneralLedgerEntry
+		for _, line := range voucher.Lines {
+			glEntries = append(glEntries, models.GeneralLedgerEntry{
+				CompanyID:          companyID,
+				BranchID:           &voucher.BranchID,
+				FinancialYearID:    &voucher.FinancialYearID,
+				AccountingPeriodID: &voucher.AccountingPeriodID,
+				TransactionDate:    voucher.PaymentDate,
+				SourceType:         "payment_voucher",
+				SourceID:           voucher.ID,
+				SourceNumber:       voucher.VoucherNumber,
+				AccountID:          line.AccountID,
+				Description:        line.LineDescription,
+				DebitAmount:        line.Amount,
+				CreditAmount:       0,
+				ReferenceNumber:    voucher.ReferenceNumber,
+				PostedBy:           &userID,
+				PostedAt:           &now,
+				Status:             "posted",
+			})
+		}
+
+		// Credit side
+		glEntries = append(glEntries, models.GeneralLedgerEntry{
+			CompanyID:          companyID,
+			BranchID:           &voucher.BranchID,
+			FinancialYearID:    &voucher.FinancialYearID,
+			AccountingPeriodID: &voucher.AccountingPeriodID,
+			TransactionDate:    voucher.PaymentDate,
+			SourceType:         "payment_voucher",
+			SourceID:           voucher.ID,
+			SourceNumber:       voucher.VoucherNumber,
+			AccountID:          voucher.PaidFromAccountID,
+			Description:        "Payment Voucher Paid From: " + voucher.Description,
+			DebitAmount:        0,
+			CreditAmount:       voucher.TotalAmount,
+			ReferenceNumber:    voucher.ReferenceNumber,
+			PostedBy:           &userID,
+			PostedAt:           &now,
+			Status:             "posted",
+		})
+
+		if err := s.glService.PostLedgerEntries(tx, glEntries); err != nil {
+			return err
 		}
 
 		return nil

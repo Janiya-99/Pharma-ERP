@@ -14,11 +14,12 @@ import (
 )
 
 type PettyCashVoucherService struct {
-	voucherRepo      *repositories.PettyCashVoucherRepository
-	fundRepo         *repositories.PettyCashFundRepository
-	chartRepo        *repositories.ChartOfAccountRepository
-	accountingRepo   *repositories.AccountingPeriodRepository
-	auditLogService  *AuditLogService
+	voucherRepo     *repositories.PettyCashVoucherRepository
+	fundRepo        *repositories.PettyCashFundRepository
+	chartRepo       *repositories.ChartOfAccountRepository
+	accountingRepo  *repositories.AccountingPeriodRepository
+	auditLogService *AuditLogService
+	glService       *GeneralLedgerService
 }
 
 func NewPettyCashVoucherService(
@@ -27,13 +28,15 @@ func NewPettyCashVoucherService(
 	chartRepo *repositories.ChartOfAccountRepository,
 	accountingRepo *repositories.AccountingPeriodRepository,
 	auditLogService *AuditLogService,
+	glService *GeneralLedgerService,
 ) *PettyCashVoucherService {
 	return &PettyCashVoucherService{
-		voucherRepo:      voucherRepo,
-		fundRepo:         fundRepo,
-		chartRepo:        chartRepo,
-		accountingRepo:   accountingRepo,
-		auditLogService:  auditLogService,
+		voucherRepo:     voucherRepo,
+		fundRepo:        fundRepo,
+		chartRepo:       chartRepo,
+		accountingRepo:  accountingRepo,
+		auditLogService: auditLogService,
+		glService:       glService,
 	}
 }
 
@@ -319,7 +322,74 @@ func (s *PettyCashVoucherService) PostPettyCashVoucher(companyID uint64, id uint
 			ActionBy:           userID,
 			ActionAt:           now,
 		}
-		return s.voucherRepo.CreatePettyCashVoucherApprovalRecord(tx, approval)
+		if err := s.voucherRepo.CreatePettyCashVoucherApprovalRecord(tx, approval); err != nil {
+			return err
+		}
+
+		// General Ledger Posting
+		var glEntries []models.GeneralLedgerEntry
+		isDebitLines := true
+		if voucher.VoucherType == "refund" {
+			isDebitLines = false
+		}
+
+		for _, line := range voucher.Lines {
+			debit := line.Amount
+			credit := 0.0
+			if !isDebitLines {
+				debit = 0.0
+				credit = line.Amount
+			}
+			glEntries = append(glEntries, models.GeneralLedgerEntry{
+				CompanyID:          companyID,
+				BranchID:           &voucher.BranchID,
+				FinancialYearID:    &voucher.FinancialYearID,
+				AccountingPeriodID: &voucher.AccountingPeriodID,
+				TransactionDate:    func() time.Time { t, _ := time.Parse("2006-01-02", voucher.VoucherDate); return t }(),
+				SourceType:         "petty_cash_voucher",
+				SourceID:           voucher.ID,
+				SourceNumber:       voucher.VoucherNumber,
+				AccountID:          line.AccountID,
+				Description:        line.LineDescription,
+				DebitAmount:        debit,
+				CreditAmount:       credit,
+				ReferenceNumber:    voucher.ReferenceNumber,
+				PostedBy:           &userID,
+				PostedAt:           &now,
+				Status:             "posted",
+			})
+		}
+
+		fundDebit := 0.0
+		fundCredit := voucher.TotalAmount
+		if voucher.VoucherType == "refund" {
+			fundDebit = voucher.TotalAmount
+			fundCredit = 0.0
+		}
+		glEntries = append(glEntries, models.GeneralLedgerEntry{
+			CompanyID:          companyID,
+			BranchID:           &voucher.BranchID,
+			FinancialYearID:    &voucher.FinancialYearID,
+			AccountingPeriodID: &voucher.AccountingPeriodID,
+			TransactionDate:    func() time.Time { t, _ := time.Parse("2006-01-02", voucher.VoucherDate); return t }(),
+			SourceType:         "petty_cash_voucher",
+			SourceID:           voucher.ID,
+			SourceNumber:       voucher.VoucherNumber,
+			AccountID:          voucher.PettyCashFund.ChartAccountID,
+			Description:        "Petty Cash Voucher: " + voucher.Description,
+			DebitAmount:        fundDebit,
+			CreditAmount:       fundCredit,
+			ReferenceNumber:    voucher.ReferenceNumber,
+			PostedBy:           &userID,
+			PostedAt:           &now,
+			Status:             "posted",
+		})
+
+		if err := s.glService.PostLedgerEntries(tx, glEntries); err != nil {
+			return err
+		}
+
+		return nil
 	})
 
 	if err != nil {

@@ -32,6 +32,7 @@ type journalEntryService struct {
 	apRepo       *repositories.AccountingPeriodRepository
 	coaRepo      *repositories.ChartOfAccountRepository
 	auditService *services.AuditService
+	glService    *GeneralLedgerService
 	logger       *zap.Logger
 }
 
@@ -41,6 +42,7 @@ func NewJournalEntryService(
 	apRepo *repositories.AccountingPeriodRepository,
 	coaRepo *repositories.ChartOfAccountRepository,
 	auditService *services.AuditService,
+	glService *GeneralLedgerService,
 	logger *zap.Logger,
 ) JournalEntryService {
 	return &journalEntryService{
@@ -49,6 +51,7 @@ func NewJournalEntryService(
 		apRepo:       apRepo,
 		coaRepo:      coaRepo,
 		auditService: auditService,
+		glService:    glService,
 		logger:       logger,
 	}
 }
@@ -405,6 +408,32 @@ func (s *journalEntryService) PostJournalEntry(companyID, journalID, userID uint
 			}
 		}
 
+		// 3. General Ledger Posting
+		var glEntries []models.GeneralLedgerEntry
+		for _, line := range journal.Lines {
+			glEntries = append(glEntries, models.GeneralLedgerEntry{
+				CompanyID:          companyID,
+				BranchID:           &journal.BranchID,
+				FinancialYearID:    &journal.FinancialYearID,
+				AccountingPeriodID: &journal.AccountingPeriodID,
+				TransactionDate:    journal.JournalDate,
+				SourceType:         "journal_entry",
+				SourceID:           journal.ID,
+				SourceNumber:       journal.JournalNumber,
+				AccountID:          line.AccountID,
+				Description:        line.LineDescription,
+				DebitAmount:        line.DebitAmount,
+				CreditAmount:       line.CreditAmount,
+				ReferenceNumber:    journal.ReferenceNumber,
+				PostedBy:           &userID,
+				PostedAt:           &now,
+				Status:             "posted",
+			})
+		}
+		if err := s.glService.PostLedgerEntries(tx, glEntries); err != nil {
+			return err
+		}
+
 		return nil
 	})
 
@@ -503,6 +532,32 @@ func (s *journalEntryService) ReverseJournalEntry(companyID, journalID, userID u
 					return err
 				}
 			}
+		}
+
+		// 3.5 General Ledger Posting for Reversal
+		var revGlEntries []models.GeneralLedgerEntry
+		for _, line := range originalJournal.Lines {
+			revGlEntries = append(revGlEntries, models.GeneralLedgerEntry{
+				CompanyID:          companyID,
+				BranchID:           &reversalJournal.BranchID,
+				FinancialYearID:    &reversalJournal.FinancialYearID,
+				AccountingPeriodID: &reversalJournal.AccountingPeriodID,
+				TransactionDate:    reversalJournal.JournalDate,
+				SourceType:         "journal_reversal",
+				SourceID:           reversalJournal.ID,
+				SourceNumber:       reversalJournal.JournalNumber,
+				AccountID:          line.AccountID,
+				Description:        "Reversal: " + line.LineDescription,
+				DebitAmount:        line.CreditAmount, // SWAP
+				CreditAmount:       line.DebitAmount,  // SWAP
+				ReferenceNumber:    reversalJournal.ReferenceNumber,
+				PostedBy:           &userID,
+				PostedAt:           &now,
+				Status:             "posted",
+			})
+		}
+		if err := s.glService.PostLedgerEntries(tx, revGlEntries); err != nil {
+			return err
 		}
 
 		// 4. Update Original Journal
