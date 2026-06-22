@@ -76,6 +76,16 @@ func SeedPermissions(db *gorm.DB) error {
 		{Module: "inventory", Resource: "opening_stock", Action: "submit", Slug: "inventory.opening_stock.submit"},
 		{Module: "inventory", Resource: "opening_stock", Action: "approve", Slug: "inventory.opening_stock.approve"},
 		{Module: "inventory", Resource: "opening_stock", Action: "post", Slug: "inventory.opening_stock.post"},
+
+		// Inventory: GRN
+		{Module: "inventory", Resource: "grn", Action: "view", Slug: "inventory.grn.view"},
+		{Module: "inventory", Resource: "grn", Action: "create", Slug: "inventory.grn.create"},
+		{Module: "inventory", Resource: "grn", Action: "update", Slug: "inventory.grn.update"},
+		{Module: "inventory", Resource: "grn", Action: "delete", Slug: "inventory.grn.delete"},
+		{Module: "inventory", Resource: "grn", Action: "submit", Slug: "inventory.grn.submit"},
+		{Module: "inventory", Resource: "grn", Action: "approve", Slug: "inventory.grn.approve"},
+		{Module: "inventory", Resource: "grn", Action: "reject", Slug: "inventory.grn.reject"},
+		{Module: "inventory", Resource: "grn", Action: "post", Slug: "inventory.grn.post"},
 	}
 
 	for _, p := range permissions {

@@ -13,11 +13,93 @@ warn - If this is content and not a class, replace it with `duration-&lsqb;0.2s&
 
 warn - The class `duration-[0.5s]` is ambiguous and matches multiple utilities.
 warn - If this is content and not a class, replace it with `duration-&lsqb;0.5s&rsqb;` to silence this warning.
-✓ 1864 modules transformed.
-rendering chunks...
-computing gzip size...
-build/index.html                   1.94 kB │ gzip:   0.76 kB
-build/assets/index-CHGnCT7v.css  119.19 kB │ gzip:  20.07 kB
-build/assets/index-BEZsAddR.js   353.07 kB │ gzip: 102.28 kB
+✓ 2055 modules transformed.
+✗ Build failed in 10.19s
+error during build:
+Build failed with 11 errors:
 
-✓ built in 7.54s
+[31m[UNRESOLVED_IMPORT] [0mCould not resolve '../../../../components/ui/label' in src/pages/finance/reports/bank-book/BankBookReportPage.jsx
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/pages/finance/reports/bank-book/BankBookReportPage.jsx:14:23 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m14 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mL[0m[38;5;249ma[0m[38;5;249mb[0m[38;5;249me[0m[38;5;249ml[0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m"../../../../components/ui/label"[38;5;249m;[0m
+ [38;5;240m   │[0m                       ────────────────┬────────────────  
+ [38;5;240m   │[0m                                       ╰────────────────── Module not found.
+ [38;5;240m   │[0m 
+ [38;5;240m   │[0m [38;5;115mHelp[0m: 'src/pages/finance/reports/bank-book/BankBookReportPage.jsx' is imported by the following path:
+ [38;5;240m   │[0m         - src/pages/finance/reports/bank-book/BankBookReportPage.jsx
+ [38;5;240m   │[0m         - src/routes/AppRoutes.jsx
+ [38;5;240m   │[0m         - src/App.tsx
+ [38;5;240m   │[0m         - src/index.tsx
+ [38;5;240m   │[0m         - index.html
+[38;5;246m────╯[0m
+
+[31m[UNRESOLVED_IMPORT] [0mCould not resolve '../../../../components/ui/label' in src/pages/finance/reports/day-book/DayBookReportPage.jsx
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/pages/finance/reports/day-book/DayBookReportPage.jsx:12:23 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m12 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mL[0m[38;5;249ma[0m[38;5;249mb[0m[38;5;249me[0m[38;5;249ml[0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m"../../../../components/ui/label"[38;5;249m;[0m
+ [38;5;240m   │[0m                       ────────────────┬────────────────  
+ [38;5;240m   │[0m                                       ╰────────────────── Module not found.
+ [38;5;240m   │[0m 
+ [38;5;240m   │[0m [38;5;115mHelp[0m: 'src/pages/finance/reports/day-book/DayBookReportPage.jsx' is imported by the following path:
+ [38;5;240m   │[0m         - src/pages/finance/reports/day-book/DayBookReportPage.jsx
+ [38;5;240m   │[0m         - src/routes/AppRoutes.jsx
+ [38;5;240m   │[0m         - src/App.tsx
+ [38;5;240m   │[0m         - src/index.tsx
+ [38;5;240m   │[0m         - index.html
+[38;5;246m────╯[0m
+
+[31m[UNRESOLVED_IMPORT] [0mCould not resolve '../../../../components/ui/label' in src/pages/finance/reports/journal-register/JournalRegisterReportPage.jsx
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/pages/finance/reports/journal-register/JournalRegisterReportPage.jsx:12:23 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m12 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mL[0m[38;5;249ma[0m[38;5;249mb[0m[38;5;249me[0m[38;5;249ml[0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m"../../../../components/ui/label"[38;5;249m;[0m
+ [38;5;240m   │[0m                       ────────────────┬────────────────  
+ [38;5;240m   │[0m                                       ╰────────────────── Module not found.
+ [38;5;240m   │[0m 
+ [38;5;240m   │[0m [38;5;115mHelp[0m: 'src/pages/finance/reports/journal-register/JournalRegisterReportPage.jsx' is imported by the following path:
+ [38;5;240m   │[0m         - src/pages/finance/reports/journal-register/JournalRegisterReportPage.jsx
+ [38;5;240m   │[0m         - src/routes/AppRoutes.jsx
+ [38;5;240m   │[0m         - src/App.tsx
+ [38;5;240m   │[0m         - src/index.tsx
+ [38;5;240m   │[0m         - index.html
+[38;5;246m────╯[0m
+
+[31m[UNRESOLVED_IMPORT] [0mCould not resolve '../../../../components/ui/label' in src/pages/finance/reports/profit-loss/ProfitLossReportPage.jsx
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/pages/finance/reports/profit-loss/ProfitLossReportPage.jsx:12:23 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m12 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mL[0m[38;5;249ma[0m[38;5;249mb[0m[38;5;249me[0m[38;5;249ml[0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m"../../../../components/ui/label"[38;5;249m;[0m
+ [38;5;240m   │[0m                       ────────────────┬────────────────  
+ [38;5;240m   │[0m                                       ╰────────────────── Module not found.
+ [38;5;240m   │[0m 
+ [38;5;240m   │[0m [38;5;115mHelp[0m: 'src/pages/finance/reports/profit-loss/ProfitLossReportPage.jsx' is imported by the following path:
+ [38;5;240m   │[0m         - src/pages/finance/reports/profit-loss/ProfitLossReportPage.jsx
+ [38;5;240m   │[0m         - src/routes/AppRoutes.jsx
+ [38;5;240m   │[0m         - src/App.tsx
+ [38;5;240m   │[0m         - src/index.tsx
+ [38;5;240m   │[0m         - index.html
+[38;5;246m────╯[0m
+
+[31m[UNRESOLVED_IMPORT] [0mCould not resolve '../../../../components/ui/label' in src/pages/finance/reports/balance-sheet/BalanceSheetReportPage.jsx
+    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/pages/finance/reports/balance-sheet/BalanceSheetReportPage.jsx:12:23 [38;5;246m][0m
+    [38;5;246m│[0m
+ [38;5;246m12 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mL[0m[38;5;249ma[0m[38;5;249mb[0m[38;5;249me[0m[38;5;249ml[0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m"../../../../components/ui/label"[38;5;249m;[0m
+ [38;5;240m   │[0m                       ────────────────┬────────────────  
+ [38;5;240m   │[0m                                       ╰────────────────── Module not found.
+ [38;5;240m   │[0m 
+ [38;5;240m   │[0m [38;5;115mHelp[0m: 'src/pages/finance/reports/balance-sheet/BalanceSheetReportPage.jsx' is imported by the following path:
+ [38;5;240m   │[0m         - src/pages/finance/reports/balance-sheet/BalanceSheetReportPage.jsx
+ [38;5;240m   │[0m         - src/routes/AppRoutes.jsx
+ [38;5;240m   │[0m         - src/App.tsx
+ [38;5;240m   │[0m         - src/index.tsx
+ [38;5;240m   │[0m         - index.html
+[38;5;246m────╯[0m
+
+...
+    at aggregateBindingErrorsIntoJsError (file:///home/janith/Projects/pixandco-web/erp/frontend/node_modules/rolldown/dist/shared/error-BuvQYXuZ.mjs:48:18)
+    at unwrapBindingResult (file:///home/janith/Projects/pixandco-web/erp/frontend/node_modules/rolldown/dist/shared/error-BuvQYXuZ.mjs:18:128)
+    at #build (file:///home/janith/Projects/pixandco-web/erp/frontend/node_modules/rolldown/dist/shared/rolldown-build-CrPk_lZe.mjs:3246:34)
+    at async buildEnvironment (file:///home/janith/Projects/pixandco-web/erp/frontend/node_modules/vite/dist/node/chunks/node.js:33253:64)
+    at async Object.build (file:///home/janith/Projects/pixandco-web/erp/frontend/node_modules/vite/dist/node/chunks/node.js:33675:19)
+    at async Object.buildApp (file:///home/janith/Projects/pixandco-web/erp/frontend/node_modules/vite/dist/node/chunks/node.js:33672:153)
+    at async CAC.<anonymous> (file:///home/janith/Projects/pixandco-web/erp/frontend/node_modules/vite/dist/node/cli.js:777:3) {
+  errors: [Getter/Setter]
+}

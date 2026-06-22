@@ -89,4 +89,15 @@ export const inventoryApi = {
   approveOpeningStockEntry: (id, payload) => apiClient.post(`/inventory/opening-stock-entries/${id}/approve`, payload),
   rejectOpeningStockEntry: (id, payload) => apiClient.post(`/inventory/opening-stock-entries/${id}/reject`, payload),
   postOpeningStockEntry: (id) => apiClient.post(`/inventory/opening-stock-entries/${id}/post`),
+
+  // Goods Receipt Notes (GRN)
+  getGRNs: (params) => apiClient.get("/inventory/grns", { params }),
+  getGRNById: (id) => apiClient.get(`/inventory/grns/${id}`),
+  createGRN: (payload) => apiClient.post("/inventory/grns", payload),
+  updateGRN: (id, payload) => apiClient.put(`/inventory/grns/${id}`, payload),
+  deleteGRN: (id) => apiClient.delete(`/inventory/grns/${id}`),
+  submitGRN: (id, payload) => apiClient.post(`/inventory/grns/${id}/submit`, payload),
+  approveGRN: (id, payload) => apiClient.post(`/inventory/grns/${id}/approve`, payload),
+  rejectGRN: (id, payload) => apiClient.post(`/inventory/grns/${id}/reject`, payload),
+  postGRN: (id) => apiClient.post(`/inventory/grns/${id}/post`),
 };

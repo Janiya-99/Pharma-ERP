@@ -134,6 +134,8 @@ const Sidebar = () => {
         { name: "Suppliers", path: "/inventory/suppliers", icon: Truck, permission: "inventory.product_master.view" },
         { name: "Products", path: "/inventory/products", icon: Package, permission: "inventory.product_master.view" },
         { name: "Product Batches", path: "/inventory/product-batches", icon: Layers, permission: "inventory.product_batch.view" },
+        { name: "Opening Stock", path: "/inventory/opening-stock", icon: CheckSquare, permission: "inventory.opening_stock.view" },
+        { name: "GRN / Goods Receipt Notes", path: "/inventory/grns", icon: FileCheck, permission: "inventory.grn.view" },
         { name: "Stock Balances", path: "/inventory/stock-balances", icon: Box, permission: "inventory.stock_balance.view" },
         { name: "Stock Ledger", path: "/inventory/stock-ledger", icon: ListChecks, permission: "inventory.stock_ledger.view" },
       ];

@@ -60,7 +60,9 @@ import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
 import ProductsPage from "views/admin/inventory/ProductsPage";
 import BatchesPage from "views/admin/inventory/BatchesPage";
 import WarehousesPage from "views/admin/inventory/WarehousesPage";
-import GRNPage from "views/admin/inventory/GRNPage";
+import GRNsPage from "pages/inventory/grns/GRNsPage";
+import GRNFormPage from "pages/inventory/grns/GRNFormPage";
+import GRNDetailsPage from "pages/inventory/grns/GRNDetailsPage";
 import StockTransferPage from "views/admin/inventory/StockTransferPage";
 import StockAdjustmentPage from "views/admin/inventory/StockAdjustmentPage";
 import StockLedgerPage from "views/admin/inventory/StockLedgerPage";
@@ -207,7 +209,10 @@ const routes: ERPRoute[] = [
       { name: "Products", path: "inventory/products", component: <ProductsPage /> },
       { name: "Batches", path: "inventory/batches", component: <BatchesPage /> },
       { name: "Warehouses", path: "inventory/warehouses", component: <WarehousesPage /> },
-      { name: "GRN", path: "inventory/grn", component: <GRNPage /> },
+      { name: "GRN", path: "inventory/grns", component: <GRNsPage /> },
+      { name: "Create GRN", path: "inventory/grns/create", component: <GRNFormPage />, hide: true },
+      { name: "Edit GRN", path: "inventory/grns/:id/edit", component: <GRNFormPage />, hide: true },
+      { name: "GRN Details", path: "inventory/grns/:id", component: <GRNDetailsPage />, hide: true },
       { name: "Stock Transfer", path: "inventory/stock-transfer", component: <StockTransferPage /> },
       { name: "Stock Adjustment", path: "inventory/stock-adjustment", component: <StockAdjustmentPage /> },
       { name: "Stock Ledger", path: "inventory/stock-ledger", component: <StockLedgerPage /> },

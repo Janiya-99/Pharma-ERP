@@ -39,6 +39,8 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	invAuditLogger := services.NewAuditLogService(logger)
 	stockMovementSvc := services.NewInventoryStockMovementService(stockMovementRepo)
 	openingStockSvc := services.NewOpeningStockService(openingStockRepo, stockMovementRepo, stockMovementSvc, invAuditLogger)
+	grnRepo := repositories.NewGRNRepository()
+	grnSvc := services.NewGRNService(grnRepo, stockMovementRepo, productMasterRepo, stockMovementSvc, invAuditLogger, logger)
 
 	// 3. Initialize Handlers
 	warehouseHdl := handlers.NewWarehouseHandler(warehouseSvc, logger)
@@ -54,6 +56,7 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	stockBalanceHdl := handlers.NewStockBalanceHandler(stockBalanceSvc, logger)
 	stockLedgerHdl := handlers.NewStockLedgerHandler(stockLedgerSvc, logger)
 	openingStockHdl := handlers.NewOpeningStockHandler(openingStockSvc)
+	grnHdl := handlers.NewGRNHandler(grnSvc)
 	dashboardHdl := handlers.NewDashboardHandler(logger)
 
 	inventory := r.Group("")
@@ -188,6 +191,20 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 		openingStocks.POST("/:id/approve", middleware.RequirePermission("inventory.opening_stock.approve"), openingStockHdl.ApproveOpeningStockEntry)
 		openingStocks.POST("/:id/reject", middleware.RequirePermission("inventory.opening_stock.approve"), openingStockHdl.RejectOpeningStockEntry)
 		openingStocks.POST("/:id/post", middleware.RequirePermission("inventory.opening_stock.post"), openingStockHdl.PostOpeningStockEntry)
+	}
+
+	// GRNs
+	grns := inventory.Group("/grns")
+	{
+		grns.GET("", middleware.RequirePermission("inventory.grn.view"), grnHdl.ListGRNs)
+		grns.GET("/:id", middleware.RequirePermission("inventory.grn.view"), grnHdl.GetGRN)
+		grns.POST("", middleware.RequirePermission("inventory.grn.create"), grnHdl.CreateGRN)
+		grns.PUT("/:id", middleware.RequirePermission("inventory.grn.update"), grnHdl.UpdateGRN)
+		grns.DELETE("/:id", middleware.RequirePermission("inventory.grn.delete"), grnHdl.DeleteGRN)
+		grns.POST("/:id/submit", middleware.RequirePermission("inventory.grn.submit"), grnHdl.SubmitGRN)
+		grns.POST("/:id/approve", middleware.RequirePermission("inventory.grn.approve"), grnHdl.ApproveGRN)
+		grns.POST("/:id/reject", middleware.RequirePermission("inventory.grn.reject"), grnHdl.RejectGRN)
+		grns.POST("/:id/post", middleware.RequirePermission("inventory.grn.post"), grnHdl.PostGRN)
 	}
 
 }
