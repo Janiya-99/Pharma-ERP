@@ -14,11 +14,12 @@ import (
 )
 
 type PettyCashReplenishmentService struct {
-	replRepo         *repositories.PettyCashReplenishmentRepository
-	fundRepo         *repositories.PettyCashFundRepository
-	chartRepo        *repositories.ChartOfAccountRepository
-	accountingRepo   *repositories.AccountingPeriodRepository
-	auditLogService  *AuditLogService
+	replRepo        *repositories.PettyCashReplenishmentRepository
+	fundRepo        *repositories.PettyCashFundRepository
+	chartRepo       *repositories.ChartOfAccountRepository
+	accountingRepo  *repositories.AccountingPeriodRepository
+	auditLogService *AuditLogService
+	glService       *GeneralLedgerService
 }
 
 func NewPettyCashReplenishmentService(
@@ -27,13 +28,15 @@ func NewPettyCashReplenishmentService(
 	chartRepo *repositories.ChartOfAccountRepository,
 	accountingRepo *repositories.AccountingPeriodRepository,
 	auditLogService *AuditLogService,
+	glService *GeneralLedgerService,
 ) *PettyCashReplenishmentService {
 	return &PettyCashReplenishmentService{
-		replRepo:         replRepo,
-		fundRepo:         fundRepo,
-		chartRepo:        chartRepo,
-		accountingRepo:   accountingRepo,
-		auditLogService:  auditLogService,
+		replRepo:        replRepo,
+		fundRepo:        fundRepo,
+		chartRepo:       chartRepo,
+		accountingRepo:  accountingRepo,
+		auditLogService: auditLogService,
+		glService:       glService,
 	}
 }
 
@@ -56,22 +59,22 @@ func (s *PettyCashReplenishmentService) CreatePettyCashReplenishment(companyID u
 	}
 
 	repl := &models.PettyCashReplenishment{
-		CompanyID:          companyID,
-		BranchID:           req.BranchID,
-		PettyCashFundID:    req.PettyCashFundID,
-		FinancialYearID:    req.FinancialYearID,
-		AccountingPeriodID: req.AccountingPeriodID,
+		CompanyID:           companyID,
+		BranchID:            req.BranchID,
+		PettyCashFundID:     req.PettyCashFundID,
+		FinancialYearID:     req.FinancialYearID,
+		AccountingPeriodID:  req.AccountingPeriodID,
 		ReplenishmentNumber: replNum,
-		ReplenishmentDate:  req.ReplenishmentDate,
-		PaidFromAccountID:  req.PaidFromAccountID,
-		ReferenceNumber:    req.ReferenceNumber,
-		Description:        req.Description,
-		Amount:             req.Amount,
-		ApprovalStatus:     "draft",
-		PostedStatus:       "unposted",
-		Status:             "active",
-		CreatedBy:          &userID,
-		UpdatedBy:          &userID,
+		ReplenishmentDate:   req.ReplenishmentDate,
+		PaidFromAccountID:   req.PaidFromAccountID,
+		ReferenceNumber:     req.ReferenceNumber,
+		Description:         req.Description,
+		Amount:              req.Amount,
+		ApprovalStatus:      "draft",
+		PostedStatus:        "unposted",
+		Status:              "active",
+		CreatedBy:           &userID,
+		UpdatedBy:           &userID,
 	}
 
 	err = s.replRepo.DB().Transaction(func(tx *gorm.DB) error {

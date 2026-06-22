@@ -41,6 +41,13 @@ func RunFinanceMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.PettyCashVoucherApproval{},
 		&models.PettyCashReplenishment{},
 		&models.PettyCashReplenishmentApproval{},
+		&models.FixedAssetCategory{},
+		&models.FixedAsset{},
+		&models.FixedAssetDepreciationRun{},
+		&models.FixedAssetDepreciationLine{},
+		&models.FixedAssetDisposal{},
+		&models.FixedAssetDisposalApproval{},
+		&models.GeneralLedgerEntry{},
 	)
 	if err != nil {
 		logger.Error("Finance AutoMigrate failed", zap.Error(err))
@@ -51,7 +58,7 @@ func RunFinanceMigrations(db *gorm.DB, logger *zap.Logger) error {
 
 	// Run seeders for finance module
 	logger.Info("Running finance seeders...")
-	
+
 	if err := seeders.SeedAccountClassifications(db, logger); err != nil {
 		logger.Error("Finance account classification seeder failed", zap.Error(err))
 		return err

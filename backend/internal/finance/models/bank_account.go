@@ -7,8 +7,8 @@ import (
 )
 
 type BankAccount struct {
-	ID        uint64 `gorm:"primaryKey;autoIncrement" json:"id"`
-	CompanyID uint64 `gorm:"not null;uniqueIndex:idx_company_account_number" json:"company_id"`
+	ID        uint64  `gorm:"primaryKey;autoIncrement" json:"id"`
+	CompanyID uint64  `gorm:"not null;uniqueIndex:idx_company_account_number" json:"company_id"`
 	BranchID  *uint64 `gorm:"index" json:"branch_id"`
 
 	ChartAccountID uint64 `gorm:"not null;index" json:"chart_account_id"`
@@ -29,10 +29,10 @@ type BankAccount struct {
 
 	Status string `gorm:"type:varchar(30);default:'active'" json:"status"`
 
-	CreatedBy *uint64 `json:"created_by"`
-	UpdatedBy *uint64 `json:"updated_by"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedBy *uint64        `json:"created_by"`
+	UpdatedBy *uint64        `json:"updated_by"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	ChartAccount *ChartOfAccount `gorm:"foreignKey:ChartAccountID" json:"chart_account,omitempty"`

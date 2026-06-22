@@ -15,12 +15,20 @@ type OpeningBalanceService struct {
 	repo         *repositories.OpeningBalanceRepository
 	fyRepo       *repositories.FinancialYearRepository
 	coaRepo      *repositories.ChartOfAccountRepository
+	glService    *GeneralLedgerService
 	auditService *services.AuditService
 	logger       *zap.Logger
 }
 
-func NewOpeningBalanceService(repo *repositories.OpeningBalanceRepository, fyRepo *repositories.FinancialYearRepository, coaRepo *repositories.ChartOfAccountRepository, auditService *services.AuditService, logger *zap.Logger) *OpeningBalanceService {
-	return &OpeningBalanceService{repo: repo, fyRepo: fyRepo, coaRepo: coaRepo, auditService: auditService, logger: logger}
+func NewOpeningBalanceService(repo *repositories.OpeningBalanceRepository, fyRepo *repositories.FinancialYearRepository, coaRepo *repositories.ChartOfAccountRepository, glService *GeneralLedgerService, auditService *services.AuditService, logger *zap.Logger) *OpeningBalanceService {
+	return &OpeningBalanceService{
+		repo:         repo,
+		fyRepo:       fyRepo,
+		coaRepo:      coaRepo,
+		glService:    glService,
+		auditService: auditService,
+		logger:       logger,
+	}
 }
 
 func (s *OpeningBalanceService) List(companyID uint64, filters map[string]interface{}, search string, page, limit int) ([]models.OpeningBalance, int64, error) {

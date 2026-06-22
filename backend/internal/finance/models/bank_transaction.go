@@ -7,8 +7,8 @@ import (
 )
 
 type BankTransaction struct {
-	ID        uint64 `gorm:"primaryKey;autoIncrement" json:"id"`
-	CompanyID uint64 `gorm:"not null;index" json:"company_id"`
+	ID        uint64  `gorm:"primaryKey;autoIncrement" json:"id"`
+	CompanyID uint64  `gorm:"not null;index" json:"company_id"`
 	BranchID  *uint64 `gorm:"index" json:"branch_id"`
 
 	BankAccountID  uint64 `gorm:"not null;index" json:"bank_account_id"`
@@ -19,9 +19,9 @@ type BankTransaction struct {
 
 	TransactionType string `gorm:"type:varchar(30);not null" json:"transaction_type"`
 
-	ReferenceType   string `gorm:"type:varchar(50)" json:"reference_type"`
+	ReferenceType   string  `gorm:"type:varchar(50)" json:"reference_type"`
 	ReferenceID     *uint64 `json:"reference_id"`
-	ReferenceNumber string `gorm:"type:varchar(100)" json:"reference_number"`
+	ReferenceNumber string  `gorm:"type:varchar(100)" json:"reference_number"`
 
 	Description string `gorm:"type:text" json:"description"`
 
@@ -30,16 +30,16 @@ type BankTransaction struct {
 
 	RunningBalance float64 `gorm:"type:decimal(18,2);default:0" json:"running_balance"`
 
-	IsReconciled  bool       `gorm:"default:false;index" json:"is_reconciled"`
-	ReconciledAt  *time.Time `json:"reconciled_at"`
-	ReconciledBy  *uint64    `json:"reconciled_by"`
+	IsReconciled bool       `gorm:"default:false;index" json:"is_reconciled"`
+	ReconciledAt *time.Time `json:"reconciled_at"`
+	ReconciledBy *uint64    `json:"reconciled_by"`
 
 	Status string `gorm:"type:varchar(30);default:'active'" json:"status"`
 
-	CreatedBy *uint64 `json:"created_by"`
-	UpdatedBy *uint64 `json:"updated_by"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedBy *uint64        `json:"created_by"`
+	UpdatedBy *uint64        `json:"updated_by"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	BankAccount  *BankAccount    `gorm:"foreignKey:BankAccountID" json:"bank_account,omitempty"`

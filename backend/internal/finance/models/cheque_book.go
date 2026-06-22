@@ -7,8 +7,8 @@ import (
 )
 
 type ChequeBook struct {
-	ID        uint64 `gorm:"primaryKey;autoIncrement" json:"id"`
-	CompanyID uint64 `gorm:"not null;index" json:"company_id"`
+	ID        uint64  `gorm:"primaryKey;autoIncrement" json:"id"`
+	CompanyID uint64  `gorm:"not null;index" json:"company_id"`
 	BranchID  *uint64 `gorm:"index" json:"branch_id"`
 
 	BankAccountID uint64 `gorm:"not null;index" json:"bank_account_id"`
@@ -27,13 +27,13 @@ type ChequeBook struct {
 
 	Status string `gorm:"type:varchar(30);default:'active'" json:"status"`
 
-	CreatedBy *uint64 `json:"created_by"`
-	UpdatedBy *uint64 `json:"updated_by"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedBy *uint64        `json:"created_by"`
+	UpdatedBy *uint64        `json:"updated_by"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	BankAccount *BankAccount `gorm:"foreignKey:BankAccountID" json:"bank_account,omitempty"`
+	BankAccount  *BankAccount `gorm:"foreignKey:BankAccountID" json:"bank_account,omitempty"`
 	ChequeLeaves []ChequeLeaf `gorm:"foreignKey:ChequeBookID" json:"cheque_leaves,omitempty"`
 }
 

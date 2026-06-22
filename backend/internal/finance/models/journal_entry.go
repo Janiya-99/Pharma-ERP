@@ -24,12 +24,12 @@ type JournalEntry struct {
 	TotalDebit  float64 `gorm:"type:decimal(18,2);default:0" json:"total_debit"`
 	TotalCredit float64 `gorm:"type:decimal(18,2);default:0" json:"total_credit"`
 
-	ApprovalStatus string    `gorm:"type:varchar(30);default:draft;index:idx_je_approval" json:"approval_status"`
-	ApprovedBy     *uint64   `json:"approved_by,omitempty"`
+	ApprovalStatus string     `gorm:"type:varchar(30);default:draft;index:idx_je_approval" json:"approval_status"`
+	ApprovedBy     *uint64    `json:"approved_by,omitempty"`
 	ApprovedAt     *time.Time `json:"approved_at,omitempty"`
 
-	PostedStatus string    `gorm:"type:varchar(30);default:unposted;index:idx_je_posted" json:"posted_status"`
-	PostedBy     *uint64   `json:"posted_by,omitempty"`
+	PostedStatus string     `gorm:"type:varchar(30);default:unposted;index:idx_je_posted" json:"posted_status"`
+	PostedBy     *uint64    `json:"posted_by,omitempty"`
 	PostedAt     *time.Time `json:"posted_at,omitempty"`
 
 	IsReversed        bool    `gorm:"default:false" json:"is_reversed"`

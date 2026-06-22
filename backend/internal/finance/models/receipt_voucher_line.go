@@ -5,14 +5,14 @@ import (
 )
 
 type ReceiptVoucherLine struct {
-	ID                 uint64    `gorm:"primaryKey;autoIncrement" json:"id"`
-	ReceiptVoucherID   uint64    `gorm:"not null;index" json:"receipt_voucher_id"`
-	AccountID          uint64    `gorm:"not null;index" json:"account_id"`
-	LineDescription    string    `gorm:"type:text" json:"line_description"`
-	Amount             float64   `gorm:"type:decimal(18,2);not null;default:0" json:"amount"`
-	LineOrder          int       `gorm:"default:1" json:"line_order"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID               uint64    `gorm:"primaryKey;autoIncrement" json:"id"`
+	ReceiptVoucherID uint64    `gorm:"not null;index" json:"receipt_voucher_id"`
+	AccountID        uint64    `gorm:"not null;index" json:"account_id"`
+	LineDescription  string    `gorm:"type:text" json:"line_description"`
+	Amount           float64   `gorm:"type:decimal(18,2);not null;default:0" json:"amount"`
+	LineOrder        int       `gorm:"default:1" json:"line_order"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 
 	Account *ChartOfAccount `gorm:"foreignKey:AccountID" json:"account,omitempty"`
 }

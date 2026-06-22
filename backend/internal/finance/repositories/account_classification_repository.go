@@ -56,12 +56,12 @@ func (r *AccountClassificationRepository) List(companyID uint64, filters map[str
 
 func (r *AccountClassificationRepository) ListTree(companyID uint64) ([]models.AccountClassification, error) {
 	var classifications []models.AccountClassification
-	
+
 	// Fetch Level 1 first, then preload all children recursively using GORM Preload
 	err := r.db.Where("company_id = ? AND parent_id IS NULL", companyID).
 		Preload("Children.Children").
 		Order("sort_order ASC").
 		Find(&classifications).Error
-		
+
 	return classifications, err
 }

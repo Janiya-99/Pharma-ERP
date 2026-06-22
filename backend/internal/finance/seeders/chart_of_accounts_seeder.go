@@ -39,7 +39,7 @@ func SeedChartOfAccounts(db *gorm.DB, logger *zap.Logger) error {
 		{"100001", "Cash in Hand", "Cash and Cash Equivalents", "Debit", true, false, false},
 		{"100002", "Petty Cash", "Cash and Cash Equivalents", "Debit", true, false, false},
 		{"100003", "Bank Account", "Cash and Cash Equivalents", "Debit", false, true, false},
-		
+
 		{"110001", "Trade Debtors", "Trade Receivables", "Debit", false, false, true},
 		{"120001", "Inventory Account", "Inventory", "Debit", false, false, true},
 		{"130001", "Prepaid Expenses", "Prepayments", "Debit", false, false, false},

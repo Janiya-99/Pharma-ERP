@@ -173,7 +173,7 @@ func (s *BankTransactionService) UpdateManualBankTransaction(companyID, userID, 
 	// We'll calculate a simple diff and update the account.
 	diffDebit := req.DebitAmount - transaction.DebitAmount
 	diffCredit := req.CreditAmount - transaction.CreditAmount
-	
+
 	transaction.TransactionDate = tDate
 	transaction.ValueDate = vDate
 	transaction.ReferenceNumber = req.ReferenceNumber

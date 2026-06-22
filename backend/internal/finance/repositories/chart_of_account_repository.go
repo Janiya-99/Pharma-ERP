@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"github.com/pixandco/erp-phrma/internal/finance/models"
 	"gorm.io/gorm"
 )
@@ -57,18 +58,46 @@ func (r *ChartOfAccountRepository) List(companyID uint64, filters map[string]int
 
 	query := r.db.Model(&models.ChartOfAccount{}).Where("company_id = ?", companyID)
 
-	for k, v := range filters {
-		query = query.Where(k, v)
+	if status, ok := filters["status"].(string); ok && status != "" {
+		query = query.Where("status = ?", status)
 	}
 
 	if search != "" {
-		query = query.Where("account_code LIKE ? OR account_name LIKE ?", "%"+search+"%", "%"+search+"%")
+		query = query.Where("account_name LIKE ? OR account_code LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 
-	query.Count(&total)
+	err := query.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
 
 	offset := (page - 1) * limit
-	err := query.Preload("AccountClassification").Order("account_code ASC").Offset(offset).Limit(limit).Find(&accounts).Error
+	err = query.Offset(offset).Limit(limit).Find(&accounts).Error
 
 	return accounts, total, err
+}
+
+func (r *ChartOfAccountRepository) UpdateCurrentBalanceWithTx(tx *gorm.DB, accountID uint64, companyID uint64, balanceType string, amount float64) error {
+	var account models.ChartOfAccount
+	if err := tx.Where("id = ? AND company_id = ?", accountID, companyID).First(&account).Error; err != nil {
+		return err
+	}
+
+	if balanceType == "debit" {
+		if account.NormalBalance == "debit" {
+			account.CurrentBalance += amount
+		} else {
+			account.CurrentBalance -= amount
+		}
+	} else if balanceType == "credit" {
+		if account.NormalBalance == "credit" {
+			account.CurrentBalance += amount
+		} else {
+			account.CurrentBalance -= amount
+		}
+	} else {
+		return fmt.Errorf("invalid balance type: %s", balanceType)
+	}
+
+	return tx.Save(&account).Error
 }

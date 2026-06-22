@@ -5,8 +5,8 @@ import (
 )
 
 type ChequeLeaf struct {
-	ID        uint64 `gorm:"primaryKey;autoIncrement" json:"id"`
-	CompanyID uint64 `gorm:"not null;uniqueIndex:idx_company_bank_leaf" json:"company_id"`
+	ID        uint64  `gorm:"primaryKey;autoIncrement" json:"id"`
+	CompanyID uint64  `gorm:"not null;uniqueIndex:idx_company_bank_leaf" json:"company_id"`
 	BranchID  *uint64 `gorm:"index" json:"branch_id"`
 
 	ChequeBookID  uint64 `gorm:"not null;index" json:"cheque_book_id"`
@@ -23,8 +23,8 @@ type ChequeLeaf struct {
 	CancelledDate *time.Time `gorm:"type:date" json:"cancelled_date"`
 	CancelReason  string     `gorm:"type:text" json:"cancel_reason"`
 
-	CreatedBy *uint64 `json:"created_by"`
-	UpdatedBy *uint64 `json:"updated_by"`
+	CreatedBy *uint64   `json:"created_by"`
+	UpdatedBy *uint64   `json:"updated_by"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
