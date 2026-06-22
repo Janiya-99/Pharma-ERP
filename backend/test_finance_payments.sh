@@ -17,7 +17,9 @@ fi
 echo "Token received."
 
 echo "--- 1. Set Active Software to FINANCE ---"
-curl -s -X POST $BASE_URL/auth/active-software -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"software": "FINANCE"}' | python3 -m json.tool
+SWITCH_RES=$(curl -s -X POST $BASE_URL/auth/switch-software -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"software_code": "FINANCE"}')
+TOKEN=$(echo $SWITCH_RES | python3 -c "import sys, json; print(json.load(sys.stdin).get('token', ''))")
+echo "Switched software. New token received."
 
 echo "--- 2. Create Payment Voucher (Draft) ---"
 CREATE_RES=$(curl -s -X POST $BASE_URL/finance/payment-vouchers -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{

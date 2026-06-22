@@ -72,9 +72,9 @@ func SeedRolePermissions(db *gorm.DB, logger *zap.Logger) error {
 		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".create") || strings.HasSuffix(k, ".update") || strings.HasSuffix(k, ".submit"))
 	})
 	
-	// Finance Approver: view, approve, reject, post
+	// Finance Approver: view, approve, reject, post, complete, cancel
 	assignPermission("FINANCE_APPROVER", func(k string) bool {
-		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post"))
+		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post") || strings.HasSuffix(k, ".complete") || strings.HasSuffix(k, ".cancel"))
 	})
 
 	// Finance Viewer

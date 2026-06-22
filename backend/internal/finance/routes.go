@@ -85,29 +85,77 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	pvHandler := handlers.NewPaymentVoucherHandler(logger)
 	pv := finance.Group("/payment-vouchers")
 	{
-		pv.GET("", middleware.RequirePermission("finance.payments.view"), pvHandler.ListPaymentVouchers)
-		pv.GET("/:id", middleware.RequirePermission("finance.payments.view"), pvHandler.GetPaymentVoucherByID)
-		pv.POST("", middleware.RequirePermission("finance.payments.create"), pvHandler.CreatePaymentVoucher)
-		pv.PUT("/:id", middleware.RequirePermission("finance.payments.update"), pvHandler.UpdatePaymentVoucher)
-		pv.DELETE("/:id", middleware.RequirePermission("finance.payments.delete"), pvHandler.DeletePaymentVoucher)
-		pv.POST("/:id/submit", middleware.RequirePermission("finance.payments.submit"), pvHandler.SubmitPaymentVoucher)
-		pv.POST("/:id/approve", middleware.RequirePermission("finance.payments.approve"), pvHandler.ApprovePaymentVoucher)
-		pv.POST("/:id/reject", middleware.RequirePermission("finance.payments.reject"), pvHandler.RejectPaymentVoucher)
-		pv.POST("/:id/post", middleware.RequirePermission("finance.payments.post"), pvHandler.PostPaymentVoucher)
+		pv.GET("", middleware.RequirePermission("finance.payment.view"), pvHandler.ListPaymentVouchers)
+		pv.GET("/:id", middleware.RequirePermission("finance.payment.view"), pvHandler.GetPaymentVoucherByID)
+		pv.POST("", middleware.RequirePermission("finance.payment.create"), pvHandler.CreatePaymentVoucher)
+		pv.PUT("/:id", middleware.RequirePermission("finance.payment.update"), pvHandler.UpdatePaymentVoucher)
+		pv.DELETE("/:id", middleware.RequirePermission("finance.payment.delete"), pvHandler.DeletePaymentVoucher)
+		pv.POST("/:id/submit", middleware.RequirePermission("finance.payment.submit"), pvHandler.SubmitPaymentVoucher)
+		pv.POST("/:id/approve", middleware.RequirePermission("finance.payment.approve"), pvHandler.ApprovePaymentVoucher)
+		pv.POST("/:id/reject", middleware.RequirePermission("finance.payment.reject"), pvHandler.RejectPaymentVoucher)
+		pv.POST("/:id/post", middleware.RequirePermission("finance.payment.post"), pvHandler.PostPaymentVoucher)
 	}
 
 	// Receipt Vouchers
 	rvHandler := handlers.NewReceiptVoucherHandler(logger)
 	rv := finance.Group("/receipt-vouchers")
 	{
-		rv.GET("", middleware.RequirePermission("finance.receipts.view"), rvHandler.ListReceiptVouchers)
-		rv.GET("/:id", middleware.RequirePermission("finance.receipts.view"), rvHandler.GetReceiptVoucherByID)
-		rv.POST("", middleware.RequirePermission("finance.receipts.create"), rvHandler.CreateReceiptVoucher)
-		rv.PUT("/:id", middleware.RequirePermission("finance.receipts.update"), rvHandler.UpdateReceiptVoucher)
-		rv.DELETE("/:id", middleware.RequirePermission("finance.receipts.delete"), rvHandler.DeleteReceiptVoucher)
-		rv.POST("/:id/submit", middleware.RequirePermission("finance.receipts.submit"), rvHandler.SubmitReceiptVoucher)
-		rv.POST("/:id/approve", middleware.RequirePermission("finance.receipts.approve"), rvHandler.ApproveReceiptVoucher)
-		rv.POST("/:id/reject", middleware.RequirePermission("finance.receipts.reject"), rvHandler.RejectReceiptVoucher)
-		rv.POST("/:id/post", middleware.RequirePermission("finance.receipts.post"), rvHandler.PostReceiptVoucher)
+		rv.GET("", middleware.RequirePermission("finance.receipt.view"), rvHandler.ListReceiptVouchers)
+		rv.GET("/:id", middleware.RequirePermission("finance.receipt.view"), rvHandler.GetReceiptVoucherByID)
+		rv.POST("", middleware.RequirePermission("finance.receipt.create"), rvHandler.CreateReceiptVoucher)
+		rv.PUT("/:id", middleware.RequirePermission("finance.receipt.update"), rvHandler.UpdateReceiptVoucher)
+		rv.DELETE("/:id", middleware.RequirePermission("finance.receipt.delete"), rvHandler.DeleteReceiptVoucher)
+		rv.POST("/:id/submit", middleware.RequirePermission("finance.receipt.submit"), rvHandler.SubmitReceiptVoucher)
+		rv.POST("/:id/approve", middleware.RequirePermission("finance.receipt.approve"), rvHandler.ApproveReceiptVoucher)
+		rv.POST("/:id/reject", middleware.RequirePermission("finance.receipt.reject"), rvHandler.RejectReceiptVoucher)
+		rv.POST("/:id/post", middleware.RequirePermission("finance.receipt.post"), rvHandler.PostReceiptVoucher)
+	}
+
+	// Bank Accounts
+	baHandler := handlers.NewBankAccountHandler(logger)
+	ba := finance.Group("/bank-accounts")
+	{
+		ba.GET("", middleware.RequirePermission("finance.bank_account.view"), baHandler.ListBankAccounts)
+		ba.GET("/:id", middleware.RequirePermission("finance.bank_account.view"), baHandler.GetBankAccountByID)
+		ba.POST("", middleware.RequirePermission("finance.bank_account.create"), baHandler.CreateBankAccount)
+		ba.PUT("/:id", middleware.RequirePermission("finance.bank_account.update"), baHandler.UpdateBankAccount)
+		ba.DELETE("/:id", middleware.RequirePermission("finance.bank_account.delete"), baHandler.DeleteBankAccount)
+	}
+
+	// Cheque Books
+	cbHandler := handlers.NewChequeBookHandler(logger)
+	cb := finance.Group("/cheque-books")
+	{
+		cb.GET("", middleware.RequirePermission("finance.cheque_book.view"), cbHandler.ListChequeBooks)
+		cb.GET("/:id", middleware.RequirePermission("finance.cheque_book.view"), cbHandler.GetChequeBookByID)
+		cb.POST("", middleware.RequirePermission("finance.cheque_book.create"), cbHandler.CreateChequeBook)
+		cb.PUT("/:id", middleware.RequirePermission("finance.cheque_book.update"), cbHandler.UpdateChequeBook)
+		cb.DELETE("/:id", middleware.RequirePermission("finance.cheque_book.delete"), cbHandler.DeleteChequeBook)
+		cb.POST("/leaves/:id/cancel", middleware.RequirePermission("finance.cheque_book.cancel"), cbHandler.CancelChequeLeaf)
+	}
+
+	// Bank Transactions
+	btHandler := handlers.NewBankTransactionHandler(logger)
+	bt := finance.Group("/bank-transactions")
+	{
+		bt.GET("", middleware.RequirePermission("finance.bank_transaction.view"), btHandler.ListBankTransactions)
+		bt.GET("/:id", middleware.RequirePermission("finance.bank_transaction.view"), btHandler.GetBankTransactionByID)
+		bt.POST("", middleware.RequirePermission("finance.bank_transaction.create"), btHandler.CreateManualBankTransaction)
+		bt.PUT("/:id", middleware.RequirePermission("finance.bank_transaction.update"), btHandler.UpdateManualBankTransaction)
+		bt.DELETE("/:id", middleware.RequirePermission("finance.bank_transaction.delete"), btHandler.DeleteManualBankTransaction)
+	}
+
+	// Bank Reconciliations
+	brHandler := handlers.NewBankReconciliationHandler(logger)
+	br := finance.Group("/bank-reconciliations")
+	{
+		br.GET("", middleware.RequirePermission("finance.bank_reconciliation.view"), brHandler.ListBankReconciliations)
+		br.GET("/:id", middleware.RequirePermission("finance.bank_reconciliation.view"), brHandler.GetBankReconciliationByID)
+		br.GET("/unreconciled-transactions/:id", middleware.RequirePermission("finance.bank_reconciliation.view"), brHandler.GetUnreconciledTransactions)
+		br.POST("", middleware.RequirePermission("finance.bank_reconciliation.create"), brHandler.CreateBankReconciliation)
+		br.PUT("/:id", middleware.RequirePermission("finance.bank_reconciliation.update"), brHandler.UpdateBankReconciliation)
+		br.POST("/:id/complete", middleware.RequirePermission("finance.bank_reconciliation.complete"), brHandler.CompleteBankReconciliation)
+		br.POST("/:id/cancel", middleware.RequirePermission("finance.bank_reconciliation.cancel"), brHandler.CancelBankReconciliation)
+		br.DELETE("/:id", middleware.RequirePermission("finance.bank_reconciliation.delete"), brHandler.DeleteBankReconciliation)
 	}
 }

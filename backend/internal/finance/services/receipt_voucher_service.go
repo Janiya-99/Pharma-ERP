@@ -30,6 +30,7 @@ type receiptVoucherService struct {
 	fyRepo       *repositories.FinancialYearRepository
 	apRepo       *repositories.AccountingPeriodRepository
 	coaRepo      *repositories.ChartOfAccountRepository
+	bankTxSvc    *BankTransactionService
 	auditService *services.AuditService
 	logger       *zap.Logger
 }
@@ -39,6 +40,7 @@ func NewReceiptVoucherService(
 	fyRepo *repositories.FinancialYearRepository,
 	apRepo *repositories.AccountingPeriodRepository,
 	coaRepo *repositories.ChartOfAccountRepository,
+	bankTxSvc *BankTransactionService,
 	auditService *services.AuditService,
 	logger *zap.Logger,
 ) ReceiptVoucherService {
@@ -47,6 +49,7 @@ func NewReceiptVoucherService(
 		fyRepo:       fyRepo,
 		apRepo:       apRepo,
 		coaRepo:      coaRepo,
+		bankTxSvc:    bankTxSvc,
 		auditService: auditService,
 		logger:       logger,
 	}
@@ -402,6 +405,12 @@ func (s *receiptVoucherService) PostReceiptVoucher(companyID, voucherID, userID 
 
 		for _, line := range voucher.Lines {
 			if err := s.repo.UpdateAccountBalance(tx, line.AccountID, line.Amount, false); err != nil {
+				return err
+			}
+		}
+
+		if s.bankTxSvc != nil {
+			if err := s.bankTxSvc.CreateBankTransactionFromReceipt(tx, companyID, userID, voucher); err != nil {
 				return err
 			}
 		}

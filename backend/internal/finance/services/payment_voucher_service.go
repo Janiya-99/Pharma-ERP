@@ -30,6 +30,7 @@ type paymentVoucherService struct {
 	fyRepo       *repositories.FinancialYearRepository
 	apRepo       *repositories.AccountingPeriodRepository
 	coaRepo      *repositories.ChartOfAccountRepository
+	bankTxSvc    *BankTransactionService
 	auditService *services.AuditService
 	logger       *zap.Logger
 }
@@ -39,6 +40,7 @@ func NewPaymentVoucherService(
 	fyRepo *repositories.FinancialYearRepository,
 	apRepo *repositories.AccountingPeriodRepository,
 	coaRepo *repositories.ChartOfAccountRepository,
+	bankTxSvc *BankTransactionService,
 	auditService *services.AuditService,
 	logger *zap.Logger,
 ) PaymentVoucherService {
@@ -47,6 +49,7 @@ func NewPaymentVoucherService(
 		fyRepo:       fyRepo,
 		apRepo:       apRepo,
 		coaRepo:      coaRepo,
+		bankTxSvc:    bankTxSvc,
 		auditService: auditService,
 		logger:       logger,
 	}
@@ -404,6 +407,12 @@ func (s *paymentVoucherService) PostPaymentVoucher(companyID, voucherID, userID 
 
 		if err := s.repo.UpdateAccountBalance(tx, voucher.PaidFromAccountID, voucher.TotalAmount, false); err != nil {
 			return err
+		}
+
+		if s.bankTxSvc != nil {
+			if err := s.bankTxSvc.CreateBankTransactionFromPayment(tx, companyID, userID, voucher); err != nil {
+				return err
+			}
 		}
 
 		return nil

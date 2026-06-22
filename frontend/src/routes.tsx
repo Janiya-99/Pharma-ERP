@@ -27,6 +27,24 @@ import OpeningBalancesPage from "views/admin/finance/opening-balances/OpeningBal
 import JournalEntriesPage from "pages/finance/journal-entries/JournalEntriesPage";
 import JournalEntryFormPage from "pages/finance/journal-entries/JournalEntryFormPage";
 import JournalEntryDetailsPage from "pages/finance/journal-entries/JournalEntryDetailsPage";
+import PaymentVouchersPage from "pages/finance/payment-vouchers/PaymentVouchersPage";
+import PaymentVoucherFormPage from "pages/finance/payment-vouchers/PaymentVoucherFormPage";
+import PaymentVoucherDetailsPage from "pages/finance/payment-vouchers/PaymentVoucherDetailsPage";
+import ReceiptVouchersPage from "pages/finance/receipt-vouchers/ReceiptVouchersPage";
+import ReceiptVoucherFormPage from "pages/finance/receipt-vouchers/ReceiptVoucherFormPage";
+import ReceiptVoucherDetailsPage from "pages/finance/receipt-vouchers/ReceiptVoucherDetailsPage";
+import BankAccountsPage from "pages/finance/bank-accounts/BankAccountsPage";
+import BankAccountFormPage from "pages/finance/bank-accounts/BankAccountFormPage";
+import BankAccountDetailsPage from "pages/finance/bank-accounts/BankAccountDetailsPage";
+import ChequeBooksPage from "pages/finance/cheque-books/ChequeBooksPage";
+import ChequeBookFormPage from "pages/finance/cheque-books/ChequeBookFormPage";
+import ChequeBookDetailsPage from "pages/finance/cheque-books/ChequeBookDetailsPage";
+import BankTransactionsPage from "pages/finance/bank-transactions/BankTransactionsPage";
+import BankTransactionFormPage from "pages/finance/bank-transactions/BankTransactionFormPage";
+import BankTransactionDetailsPage from "pages/finance/bank-transactions/BankTransactionDetailsPage";
+import BankReconciliationsPage from "pages/finance/bank-reconciliations/BankReconciliationsPage";
+import BankReconciliationFormPage from "pages/finance/bank-reconciliations/BankReconciliationFormPage";
+import BankReconciliationDetailsPage from "pages/finance/bank-reconciliations/BankReconciliationDetailsPage";
 
 // Inventory
 import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
@@ -129,6 +147,30 @@ const routes: ERPRoute[] = [
       { name: "Create Journal Entry", path: "finance/journal-entries/create", component: <JournalEntryFormPage />, hide: true },
       { name: "Edit Journal Entry", path: "finance/journal-entries/:id/edit", component: <JournalEntryFormPage />, hide: true },
       { name: "Journal Entry Details", path: "finance/journal-entries/:id", component: <JournalEntryDetailsPage />, hide: true },
+      { name: "Payment Vouchers", path: "finance/payment-vouchers", component: <PaymentVouchersPage /> },
+      { name: "Create Payment Voucher", path: "finance/payment-vouchers/create", component: <PaymentVoucherFormPage />, hide: true },
+      { name: "Edit Payment Voucher", path: "finance/payment-vouchers/:id/edit", component: <PaymentVoucherFormPage />, hide: true },
+      { name: "Payment Voucher Details", path: "finance/payment-vouchers/:id", component: <PaymentVoucherDetailsPage />, hide: true },
+      { name: "Receipt Vouchers", path: "finance/receipt-vouchers", component: <ReceiptVouchersPage /> },
+      { name: "Create Receipt Voucher", path: "finance/receipt-vouchers/create", component: <ReceiptVoucherFormPage />, hide: true },
+      { name: "Edit Receipt Voucher", path: "finance/receipt-vouchers/:id/edit", component: <ReceiptVoucherFormPage />, hide: true },
+      { name: "Receipt Voucher Details", path: "finance/receipt-vouchers/:id", component: <ReceiptVoucherDetailsPage />, hide: true },
+      { name: "Bank Accounts", path: "finance/bank-accounts", component: <BankAccountsPage /> },
+      { name: "Create Bank Account", path: "finance/bank-accounts/create", component: <BankAccountFormPage />, hide: true },
+      { name: "Edit Bank Account", path: "finance/bank-accounts/:id/edit", component: <BankAccountFormPage />, hide: true },
+      { name: "Bank Account Details", path: "finance/bank-accounts/:id", component: <BankAccountDetailsPage />, hide: true },
+      { name: "Cheque Books", path: "finance/cheque-books", component: <ChequeBooksPage /> },
+      { name: "Create Cheque Book", path: "finance/cheque-books/create", component: <ChequeBookFormPage />, hide: true },
+      { name: "Edit Cheque Book", path: "finance/cheque-books/:id/edit", component: <ChequeBookFormPage />, hide: true },
+      { name: "Cheque Book Details", path: "finance/cheque-books/:id", component: <ChequeBookDetailsPage />, hide: true },
+      { name: "Bank Transactions", path: "finance/bank-transactions", component: <BankTransactionsPage /> },
+      { name: "Create Bank Transaction", path: "finance/bank-transactions/create", component: <BankTransactionFormPage />, hide: true },
+      { name: "Edit Bank Transaction", path: "finance/bank-transactions/:id/edit", component: <BankTransactionFormPage />, hide: true },
+      { name: "Bank Transaction Details", path: "finance/bank-transactions/:id", component: <BankTransactionDetailsPage />, hide: true },
+      { name: "Bank Reconciliations", path: "finance/bank-reconciliations", component: <BankReconciliationsPage /> },
+      { name: "Create Bank Reconciliation", path: "finance/bank-reconciliations/create", component: <BankReconciliationFormPage />, hide: true },
+      { name: "Edit Bank Reconciliation", path: "finance/bank-reconciliations/:id/edit", component: <BankReconciliationFormPage />, hide: true },
+      { name: "Bank Reconciliation Details", path: "finance/bank-reconciliations/:id", component: <BankReconciliationDetailsPage />, hide: true },
     ],
   },
   {

@@ -45,4 +45,58 @@ export const financeApi = {
   rejectJournalEntry: (id, payload) => apiClient.post(`/finance/journal-entries/${id}/reject`, payload),
   postJournalEntry: (id) => apiClient.post(`/finance/journal-entries/${id}/post`),
   reverseJournalEntry: (id, payload) => apiClient.post(`/finance/journal-entries/${id}/reverse`, payload),
+
+  // Payment Vouchers
+  getPaymentVouchers: (params) => apiClient.get("/finance/payment-vouchers", { params }),
+  getPaymentVoucherById: (id) => apiClient.get(`/finance/payment-vouchers/${id}`),
+  createPaymentVoucher: (payload) => apiClient.post("/finance/payment-vouchers", payload),
+  updatePaymentVoucher: (id, payload) => apiClient.put(`/finance/payment-vouchers/${id}`, payload),
+  deletePaymentVoucher: (id) => apiClient.delete(`/finance/payment-vouchers/${id}`),
+  submitPaymentVoucher: (id, payload) => apiClient.post(`/finance/payment-vouchers/${id}/submit`, payload),
+  approvePaymentVoucher: (id, payload) => apiClient.post(`/finance/payment-vouchers/${id}/approve`, payload),
+  rejectPaymentVoucher: (id, payload) => apiClient.post(`/finance/payment-vouchers/${id}/reject`, payload),
+  postPaymentVoucher: (id) => apiClient.post(`/finance/payment-vouchers/${id}/post`),
+
+  // Receipt Vouchers
+  getReceiptVouchers: (params) => apiClient.get("/finance/receipt-vouchers", { params }),
+  getReceiptVoucherById: (id) => apiClient.get(`/finance/receipt-vouchers/${id}`),
+  createReceiptVoucher: (payload) => apiClient.post("/finance/receipt-vouchers", payload),
+  updateReceiptVoucher: (id, payload) => apiClient.put(`/finance/receipt-vouchers/${id}`, payload),
+  deleteReceiptVoucher: (id) => apiClient.delete(`/finance/receipt-vouchers/${id}`),
+  submitReceiptVoucher: (id, payload) => apiClient.post(`/finance/receipt-vouchers/${id}/submit`, payload),
+  approveReceiptVoucher: (id, payload) => apiClient.post(`/finance/receipt-vouchers/${id}/approve`, payload),
+  rejectReceiptVoucher: (id, payload) => apiClient.post(`/finance/receipt-vouchers/${id}/reject`, payload),
+  postReceiptVoucher: (id) => apiClient.post(`/finance/receipt-vouchers/${id}/post`),
+
+  // Bank Accounts
+  getBankAccounts: (params) => apiClient.get("/finance/bank-accounts", { params }),
+  getBankAccountById: (id) => apiClient.get(`/finance/bank-accounts/${id}`),
+  createBankAccount: (payload) => apiClient.post("/finance/bank-accounts", payload),
+  updateBankAccount: (id, payload) => apiClient.put(`/finance/bank-accounts/${id}`, payload),
+  deleteBankAccount: (id) => apiClient.delete(`/finance/bank-accounts/${id}`),
+
+  // Cheque Books
+  getChequeBooks: (params) => apiClient.get("/finance/cheque-books", { params }),
+  getChequeBookById: (id) => apiClient.get(`/finance/cheque-books/${id}`),
+  createChequeBook: (payload) => apiClient.post("/finance/cheque-books", payload),
+  updateChequeBook: (id, payload) => apiClient.put(`/finance/cheque-books/${id}`, payload),
+  deleteChequeBook: (id) => apiClient.delete(`/finance/cheque-books/${id}`),
+  cancelChequeLeaf: (id, payload) => apiClient.post(`/finance/cheque-books/leaves/${id}/cancel`, payload),
+
+  // Bank Transactions
+  getBankTransactions: (params) => apiClient.get("/finance/bank-transactions", { params }),
+  getBankTransactionById: (id) => apiClient.get(`/finance/bank-transactions/${id}`),
+  createBankTransaction: (payload) => apiClient.post("/finance/bank-transactions", payload),
+  updateBankTransaction: (id, payload) => apiClient.put(`/finance/bank-transactions/${id}`, payload),
+  deleteBankTransaction: (id) => apiClient.delete(`/finance/bank-transactions/${id}`),
+
+  // Bank Reconciliations
+  getBankReconciliations: (params) => apiClient.get("/finance/bank-reconciliations", { params }),
+  getBankReconciliationById: (id) => apiClient.get(`/finance/bank-reconciliations/${id}`),
+  getUnreconciledTransactions: (bankAccountId, params) => apiClient.get(`/finance/bank-reconciliations/unreconciled-transactions/${bankAccountId}`, { params }),
+  createBankReconciliation: (payload) => apiClient.post("/finance/bank-reconciliations", payload),
+  updateBankReconciliation: (id, payload) => apiClient.put(`/finance/bank-reconciliations/${id}`, payload),
+  completeBankReconciliation: (id) => apiClient.post(`/finance/bank-reconciliations/${id}/complete`),
+  cancelBankReconciliation: (id, payload) => apiClient.post(`/finance/bank-reconciliations/${id}/cancel`, payload),
+  deleteBankReconciliation: (id) => apiClient.delete(`/finance/bank-reconciliations/${id}`),
 };

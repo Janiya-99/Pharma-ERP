@@ -109,6 +109,30 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"FINANCE", "Receipt", "finance.receipt.approve", "Approve Receipt"},
 		{"FINANCE", "Receipt", "finance.receipt.reject", "Reject Receipt"},
 		{"FINANCE", "Receipt", "finance.receipt.post", "Post Receipt"},
+		
+		{"FINANCE", "Bank Account", "finance.bank_account.view", "View Bank Account"},
+		{"FINANCE", "Bank Account", "finance.bank_account.create", "Create Bank Account"},
+		{"FINANCE", "Bank Account", "finance.bank_account.update", "Update Bank Account"},
+		{"FINANCE", "Bank Account", "finance.bank_account.delete", "Delete Bank Account"},
+		
+		{"FINANCE", "Cheque Book", "finance.cheque_book.view", "View Cheque Book"},
+		{"FINANCE", "Cheque Book", "finance.cheque_book.create", "Create Cheque Book"},
+		{"FINANCE", "Cheque Book", "finance.cheque_book.update", "Update Cheque Book"},
+		{"FINANCE", "Cheque Book", "finance.cheque_book.delete", "Delete Cheque Book"},
+		{"FINANCE", "Cheque Book", "finance.cheque_book.cancel_leaf", "Cancel Cheque Leaf"},
+		
+		{"FINANCE", "Bank Transaction", "finance.bank_transaction.view", "View Bank Transaction"},
+		{"FINANCE", "Bank Transaction", "finance.bank_transaction.create", "Create Bank Transaction"},
+		{"FINANCE", "Bank Transaction", "finance.bank_transaction.update", "Update Bank Transaction"},
+		{"FINANCE", "Bank Transaction", "finance.bank_transaction.delete", "Delete Bank Transaction"},
+		
+		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.view", "View Bank Reconciliation"},
+		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.create", "Create Bank Reconciliation"},
+		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.update", "Update Bank Reconciliation"},
+		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.delete", "Delete Bank Reconciliation"},
+		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.complete", "Complete Bank Reconciliation"},
+		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.cancel", "Cancel Bank Reconciliation"},
+		
 		{"FINANCE", "Report", "finance.report.view", "View Finance Report"},
 
 		// INVENTORY
