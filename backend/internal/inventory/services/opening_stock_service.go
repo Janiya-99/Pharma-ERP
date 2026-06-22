@@ -13,19 +13,18 @@ import (
 )
 
 type OpeningStockService interface {
-	ListOpeningStockEntries(filter dto.OpeningStockFilter) ([]dto.OpeningStockResponse, int64, error)
-	GetOpeningStockEntryByID(companyID, id uint64) (*models.OpeningStockEntry, error)
-	CreateOpeningStockEntry(payload dto.CreateOpeningStockPayload) (*models.OpeningStockEntry, error)
-	UpdateOpeningStockEntry(id uint64, payload dto.UpdateOpeningStockPayload) (*models.OpeningStockEntry, error)
-	DeleteOpeningStockEntry(companyID, id uint64, deletedBy uint64) error
-	SubmitOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, submittedBy uint64) error
-	ApproveOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, approvedBy uint64) error
-	RejectOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, rejectedBy uint64) error
-	PostOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, postedBy uint64) error
+	ListOpeningStockEntries(db *gorm.DB, filter dto.OpeningStockFilter) ([]dto.OpeningStockResponse, int64, error)
+	GetOpeningStockEntryByID(db *gorm.DB, companyID, id uint64) (*models.OpeningStockEntry, error)
+	CreateOpeningStockEntry(db *gorm.DB, payload dto.CreateOpeningStockPayload) (*models.OpeningStockEntry, error)
+	UpdateOpeningStockEntry(db *gorm.DB, id uint64, payload dto.UpdateOpeningStockPayload) (*models.OpeningStockEntry, error)
+	DeleteOpeningStockEntry(db *gorm.DB, companyID, id uint64, deletedBy uint64) error
+	SubmitOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, submittedBy uint64) error
+	ApproveOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, approvedBy uint64) error
+	RejectOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, rejectedBy uint64) error
+	PostOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, postedBy uint64) error
 }
 
 type openingStockService struct {
-	db                      *gorm.DB
 	repo                    repositories.OpeningStockRepository
 	stockMovementRepo       repositories.StockMovementRepository
 	stockMovementService    InventoryStockMovementService
@@ -33,14 +32,12 @@ type openingStockService struct {
 }
 
 func NewOpeningStockService(
-	db *gorm.DB,
 	repo repositories.OpeningStockRepository,
 	stockMovementRepo repositories.StockMovementRepository,
 	stockMovementService InventoryStockMovementService,
 	auditLogger *AuditLogService,
 ) OpeningStockService {
 	return &openingStockService{
-		db:                   db,
 		repo:                 repo,
 		stockMovementRepo:    stockMovementRepo,
 		stockMovementService: stockMovementService,
@@ -48,8 +45,8 @@ func NewOpeningStockService(
 	}
 }
 
-func (s *openingStockService) ListOpeningStockEntries(filter dto.OpeningStockFilter) ([]dto.OpeningStockResponse, int64, error) {
-	entries, total, err := s.repo.FindOpeningStockEntries(s.db, filter)
+func (s *openingStockService) ListOpeningStockEntries(db *gorm.DB, filter dto.OpeningStockFilter) ([]dto.OpeningStockResponse, int64, error) {
+	entries, total, err := s.repo.FindOpeningStockEntries(db, filter)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -74,8 +71,8 @@ func (s *openingStockService) ListOpeningStockEntries(filter dto.OpeningStockFil
 	return response, total, nil
 }
 
-func (s *openingStockService) GetOpeningStockEntryByID(companyID, id uint64) (*models.OpeningStockEntry, error) {
-	entry, err := s.repo.FindOpeningStockEntryByID(s.db, companyID, id)
+func (s *openingStockService) GetOpeningStockEntryByID(db *gorm.DB, companyID, id uint64) (*models.OpeningStockEntry, error) {
+	entry, err := s.repo.FindOpeningStockEntryByID(db, companyID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +82,8 @@ func (s *openingStockService) GetOpeningStockEntryByID(companyID, id uint64) (*m
 	return entry, nil
 }
 
-func (s *openingStockService) GenerateOpeningStockNumber(companyID uint64) (string, error) {
-	lastNumber, err := s.repo.GetLastOpeningStockNumber(s.db, companyID)
+func (s *openingStockService) GenerateOpeningStockNumber(db *gorm.DB, companyID uint64) (string, error) {
+	lastNumber, err := s.repo.GetLastOpeningStockNumber(db, companyID)
 	if err != nil {
 		return "", err
 	}
@@ -110,7 +107,7 @@ func (s *openingStockService) GenerateOpeningStockNumber(companyID uint64) (stri
 	return fmt.Sprintf("OS-%06d", number+1), nil
 }
 
-func (s *openingStockService) validateOpeningStockLines(payloadLines []dto.OpeningStockLinePayload, warehouseID uint64) ([]models.OpeningStockEntryLine, float64, float64, error) {
+func (s *openingStockService) validateOpeningStockLines(db *gorm.DB, payloadLines []dto.OpeningStockLinePayload, warehouseID uint64) ([]models.OpeningStockEntryLine, float64, float64, error) {
 	var lines []models.OpeningStockEntryLine
 	var totalQuantity, totalValue float64
 
@@ -122,7 +119,7 @@ func (s *openingStockService) validateOpeningStockLines(payloadLines []dto.Openi
 			return nil, 0, 0, fmt.Errorf("line %d: unit cost cannot be negative", i+1)
 		}
 
-		product, err := s.stockMovementRepo.FindProductByID(s.db, line.ProductID)
+		product, err := s.stockMovementRepo.FindProductByID(db, line.ProductID)
 		if err != nil || product == nil || product.Status != "active" {
 			return nil, 0, 0, fmt.Errorf("line %d: invalid or inactive product", i+1)
 		}
@@ -133,7 +130,7 @@ func (s *openingStockService) validateOpeningStockLines(payloadLines []dto.Openi
 			if line.ProductBatchID == nil {
 				return nil, 0, 0, fmt.Errorf("line %d: batch is required for this product", i+1)
 			}
-			batch, err := s.stockMovementRepo.FindBatchByID(s.db, *line.ProductBatchID)
+			batch, err := s.stockMovementRepo.FindBatchByID(db, *line.ProductBatchID)
 			if err != nil || batch == nil {
 				return nil, 0, 0, fmt.Errorf("line %d: invalid batch", i+1)
 			}
@@ -149,7 +146,7 @@ func (s *openingStockService) validateOpeningStockLines(payloadLines []dto.Openi
 		}
 
 		if line.WarehouseLocationID != nil {
-			location, err := s.stockMovementRepo.FindWarehouseLocationByID(s.db, *line.WarehouseLocationID)
+			location, err := s.stockMovementRepo.FindWarehouseLocationByID(db, *line.WarehouseLocationID)
 			if err != nil || location == nil || location.WarehouseID != warehouseID {
 				return nil, 0, 0, fmt.Errorf("line %d: invalid warehouse location", i+1)
 			}
@@ -175,8 +172,8 @@ func (s *openingStockService) validateOpeningStockLines(payloadLines []dto.Openi
 	return lines, totalQuantity, totalValue, nil
 }
 
-func (s *openingStockService) CreateOpeningStockEntry(payload dto.CreateOpeningStockPayload) (*models.OpeningStockEntry, error) {
-	warehouse, err := s.stockMovementRepo.FindWarehouseByID(s.db, payload.WarehouseID)
+func (s *openingStockService) CreateOpeningStockEntry(db *gorm.DB, payload dto.CreateOpeningStockPayload) (*models.OpeningStockEntry, error) {
+	warehouse, err := s.stockMovementRepo.FindWarehouseByID(db, payload.WarehouseID)
 	if err != nil || warehouse == nil || warehouse.BranchID != payload.BranchID {
 		return nil, errors.New("invalid warehouse for branch")
 	}
@@ -186,12 +183,12 @@ func (s *openingStockService) CreateOpeningStockEntry(payload dto.CreateOpeningS
 		return nil, errors.New("invalid opening stock date")
 	}
 
-	lines, totalQty, totalVal, err := s.validateOpeningStockLines(payload.Lines, payload.WarehouseID)
+	lines, totalQty, totalVal, err := s.validateOpeningStockLines(db, payload.Lines, payload.WarehouseID)
 	if err != nil {
 		return nil, err
 	}
 
-	osNumber, err := s.GenerateOpeningStockNumber(payload.CompanyID)
+	osNumber, err := s.GenerateOpeningStockNumber(db, payload.CompanyID)
 	if err != nil {
 		return nil, err
 	}
@@ -216,18 +213,18 @@ func (s *openingStockService) CreateOpeningStockEntry(payload dto.CreateOpeningS
 		Lines:              lines,
 	}
 
-	err = s.repo.CreateOpeningStockEntryWithLines(s.db, entry)
+	err = s.repo.CreateOpeningStockEntryWithLines(db, entry)
 	if err != nil {
 		return nil, err
 	}
 
-	s.auditLogger.LogAction(payload.CompanyID, payload.CreatedBy, "OPENING_STOCK_CREATED", "Opening Stock Entry", entry.ID)
+	s.auditLogger.LogAction(db, payload.CompanyID, payload.CreatedBy, "OPENING_STOCK_CREATED", "Opening Stock Entry", entry.ID)
 
 	return entry, nil
 }
 
-func (s *openingStockService) UpdateOpeningStockEntry(id uint64, payload dto.UpdateOpeningStockPayload) (*models.OpeningStockEntry, error) {
-	entry, err := s.repo.FindOpeningStockEntryByID(s.db, payload.CompanyID, id)
+func (s *openingStockService) UpdateOpeningStockEntry(db *gorm.DB, id uint64, payload dto.UpdateOpeningStockPayload) (*models.OpeningStockEntry, error) {
+	entry, err := s.repo.FindOpeningStockEntryByID(db, payload.CompanyID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +236,7 @@ func (s *openingStockService) UpdateOpeningStockEntry(id uint64, payload dto.Upd
 		return nil, errors.New("only draft or rejected entries can be updated")
 	}
 
-	warehouse, err := s.stockMovementRepo.FindWarehouseByID(s.db, payload.WarehouseID)
+	warehouse, err := s.stockMovementRepo.FindWarehouseByID(db, payload.WarehouseID)
 	if err != nil || warehouse == nil || warehouse.BranchID != payload.BranchID {
 		return nil, errors.New("invalid warehouse for branch")
 	}
@@ -249,7 +246,7 @@ func (s *openingStockService) UpdateOpeningStockEntry(id uint64, payload dto.Upd
 		return nil, errors.New("invalid opening stock date")
 	}
 
-	lines, totalQty, totalVal, err := s.validateOpeningStockLines(payload.Lines, payload.WarehouseID)
+	lines, totalQty, totalVal, err := s.validateOpeningStockLines(db, payload.Lines, payload.WarehouseID)
 	if err != nil {
 		return nil, err
 	}
@@ -266,18 +263,18 @@ func (s *openingStockService) UpdateOpeningStockEntry(id uint64, payload dto.Upd
 	entry.UpdatedBy = payload.UpdatedBy
 	entry.Lines = lines
 
-	err = s.repo.UpdateOpeningStockEntryWithLines(s.db, entry)
+	err = s.repo.UpdateOpeningStockEntryWithLines(db, entry)
 	if err != nil {
 		return nil, err
 	}
 
-	s.auditLogger.LogAction(payload.CompanyID, payload.UpdatedBy, "OPENING_STOCK_UPDATED", "Opening Stock Entry", entry.ID)
+	s.auditLogger.LogAction(db, payload.CompanyID, payload.UpdatedBy, "OPENING_STOCK_UPDATED", "Opening Stock Entry", entry.ID)
 
 	return entry, nil
 }
 
-func (s *openingStockService) DeleteOpeningStockEntry(companyID, id uint64, deletedBy uint64) error {
-	entry, err := s.repo.FindOpeningStockEntryByID(s.db, companyID, id)
+func (s *openingStockService) DeleteOpeningStockEntry(db *gorm.DB, companyID, id uint64, deletedBy uint64) error {
+	entry, err := s.repo.FindOpeningStockEntryByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -292,17 +289,17 @@ func (s *openingStockService) DeleteOpeningStockEntry(companyID, id uint64, dele
 		return errors.New("only draft or rejected entries can be deleted")
 	}
 
-	err = s.repo.SoftDeleteOpeningStockEntry(s.db, companyID, id, deletedBy)
+	err = s.repo.SoftDeleteOpeningStockEntry(db, companyID, id, deletedBy)
 	if err != nil {
 		return err
 	}
 
-	s.auditLogger.LogAction(companyID, deletedBy, "OPENING_STOCK_DELETED", "Opening Stock Entry", id)
+	s.auditLogger.LogAction(db, companyID, deletedBy, "OPENING_STOCK_DELETED", "Opening Stock Entry", id)
 	return nil
 }
 
-func (s *openingStockService) SubmitOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, submittedBy uint64) error {
-	entry, err := s.repo.FindOpeningStockEntryByID(s.db, companyID, id)
+func (s *openingStockService) SubmitOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, submittedBy uint64) error {
+	entry, err := s.repo.FindOpeningStockEntryByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -321,7 +318,7 @@ func (s *openingStockService) SubmitOpeningStockEntry(companyID, id uint64, payl
 		return errors.New("total quantity must be greater than zero")
 	}
 
-	return s.db.Transaction(func(tx *gorm.DB) error {
+	return db.Transaction(func(tx *gorm.DB) error {
 		entry.ApprovalStatus = "pending"
 		entry.UpdatedBy = submittedBy
 		if err := tx.Save(entry).Error; err != nil {
@@ -339,13 +336,13 @@ func (s *openingStockService) SubmitOpeningStockEntry(companyID, id uint64, payl
 			return err
 		}
 
-		s.auditLogger.LogAction(companyID, submittedBy, "OPENING_STOCK_SUBMITTED", "Opening Stock Entry", entry.ID)
+		s.auditLogger.LogAction(tx, companyID, submittedBy, "OPENING_STOCK_SUBMITTED", "Opening Stock Entry", entry.ID)
 		return nil
 	})
 }
 
-func (s *openingStockService) ApproveOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, approvedBy uint64) error {
-	entry, err := s.repo.FindOpeningStockEntryByID(s.db, companyID, id)
+func (s *openingStockService) ApproveOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, approvedBy uint64) error {
+	entry, err := s.repo.FindOpeningStockEntryByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -357,7 +354,7 @@ func (s *openingStockService) ApproveOpeningStockEntry(companyID, id uint64, pay
 		return errors.New("only pending entries can be approved")
 	}
 
-	return s.db.Transaction(func(tx *gorm.DB) error {
+	return db.Transaction(func(tx *gorm.DB) error {
 		now := time.Now()
 		entry.ApprovalStatus = "approved"
 		entry.ApprovedBy = &approvedBy
@@ -378,13 +375,13 @@ func (s *openingStockService) ApproveOpeningStockEntry(companyID, id uint64, pay
 			return err
 		}
 
-		s.auditLogger.LogAction(companyID, approvedBy, "OPENING_STOCK_APPROVED", "Opening Stock Entry", entry.ID)
+		s.auditLogger.LogAction(tx, companyID, approvedBy, "OPENING_STOCK_APPROVED", "Opening Stock Entry", entry.ID)
 		return nil
 	})
 }
 
-func (s *openingStockService) RejectOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, rejectedBy uint64) error {
-	entry, err := s.repo.FindOpeningStockEntryByID(s.db, companyID, id)
+func (s *openingStockService) RejectOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, rejectedBy uint64) error {
+	entry, err := s.repo.FindOpeningStockEntryByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -400,7 +397,7 @@ func (s *openingStockService) RejectOpeningStockEntry(companyID, id uint64, payl
 		return errors.New("remarks are required for rejection")
 	}
 
-	return s.db.Transaction(func(tx *gorm.DB) error {
+	return db.Transaction(func(tx *gorm.DB) error {
 		entry.ApprovalStatus = "rejected"
 		entry.UpdatedBy = rejectedBy
 		if err := tx.Save(entry).Error; err != nil {
@@ -418,13 +415,13 @@ func (s *openingStockService) RejectOpeningStockEntry(companyID, id uint64, payl
 			return err
 		}
 
-		s.auditLogger.LogAction(companyID, rejectedBy, "OPENING_STOCK_REJECTED", "Opening Stock Entry", entry.ID)
+		s.auditLogger.LogAction(tx, companyID, rejectedBy, "OPENING_STOCK_REJECTED", "Opening Stock Entry", entry.ID)
 		return nil
 	})
 }
 
-func (s *openingStockService) PostOpeningStockEntry(companyID, id uint64, payload dto.ActionOpeningStockPayload, postedBy uint64) error {
-	entry, err := s.repo.FindOpeningStockEntryByID(s.db, companyID, id)
+func (s *openingStockService) PostOpeningStockEntry(db *gorm.DB, companyID, id uint64, payload dto.ActionOpeningStockPayload, postedBy uint64) error {
+	entry, err := s.repo.FindOpeningStockEntryByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -439,7 +436,7 @@ func (s *openingStockService) PostOpeningStockEntry(companyID, id uint64, payloa
 		return errors.New("entry is already posted")
 	}
 
-	exists, err := s.repo.CheckOpeningStockLedgerExists(s.db, companyID, entry.ID)
+	exists, err := s.repo.CheckOpeningStockLedgerExists(db, companyID, entry.ID)
 	if err != nil {
 		return err
 	}
@@ -447,7 +444,7 @@ func (s *openingStockService) PostOpeningStockEntry(companyID, id uint64, payloa
 		return errors.New("opening stock entry is already posted to stock ledger")
 	}
 
-	return s.db.Transaction(func(tx *gorm.DB) error {
+	return db.Transaction(func(tx *gorm.DB) error {
 		// Process each line as a Stock In movement
 		for _, line := range entry.Lines {
 			movementPayload := dto.StockInPayload{
@@ -494,7 +491,7 @@ func (s *openingStockService) PostOpeningStockEntry(companyID, id uint64, payloa
 			return err
 		}
 
-		s.auditLogger.LogAction(companyID, postedBy, "OPENING_STOCK_POSTED", "Opening Stock Entry", entry.ID)
+		s.auditLogger.LogAction(tx, companyID, postedBy, "OPENING_STOCK_POSTED", "Opening Stock Entry", entry.ID)
 		return nil
 	})
 }
