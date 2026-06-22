@@ -201,4 +201,77 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		pcr.POST("/:id/reject", middleware.RequirePermission("finance.petty_cash_replenishment.reject"), pcrHandler.RejectPettyCashReplenishment)
 		pcr.POST("/:id/post", middleware.RequirePermission("finance.petty_cash_replenishment.post"), pcrHandler.PostPettyCashReplenishment)
 	}
+
+	// Fixed Asset Handlers
+	facHandler := handlers.NewFixedAssetCategoryHandler(logger)
+	faHandler := handlers.NewFixedAssetHandler(logger)
+	fadepHandler := handlers.NewFixedAssetDepreciationHandler(logger)
+	fadispHandler := handlers.NewFixedAssetDisposalHandler(logger)
+
+	// Fixed Asset Categories
+	fac := finance.Group("/fixed-asset-categories")
+	{
+		fac.GET("", middleware.RequirePermission("finance.fixed_asset_category.view"), facHandler.ListFixedAssetCategories)
+		fac.GET("/:id", middleware.RequirePermission("finance.fixed_asset_category.view"), facHandler.GetFixedAssetCategoryByID)
+		fac.POST("", middleware.RequirePermission("finance.fixed_asset_category.create"), facHandler.CreateFixedAssetCategory)
+		fac.PUT("/:id", middleware.RequirePermission("finance.fixed_asset_category.update"), facHandler.UpdateFixedAssetCategory)
+		fac.DELETE("/:id", middleware.RequirePermission("finance.fixed_asset_category.delete"), facHandler.DeleteFixedAssetCategory)
+	}
+
+	// Fixed Assets
+	fa := finance.Group("/fixed-assets")
+	{
+		fa.GET("", middleware.RequirePermission("finance.fixed_asset.view"), faHandler.ListFixedAssets)
+		fa.GET("/:id", middleware.RequirePermission("finance.fixed_asset.view"), faHandler.GetFixedAssetByID)
+		fa.POST("", middleware.RequirePermission("finance.fixed_asset.create"), faHandler.CreateFixedAsset)
+		fa.PUT("/:id", middleware.RequirePermission("finance.fixed_asset.update"), faHandler.UpdateFixedAsset)
+		fa.DELETE("/:id", middleware.RequirePermission("finance.fixed_asset.delete"), faHandler.DeleteFixedAsset)
+	}
+
+	// Fixed Asset Depreciation Runs
+	fadep := finance.Group("/fixed-asset-depreciations")
+	{
+		fadep.GET("", middleware.RequirePermission("finance.fixed_asset_depreciation.view"), fadepHandler.ListDepreciationRuns)
+		fadep.GET("/:id", middleware.RequirePermission("finance.fixed_asset_depreciation.view"), fadepHandler.GetDepreciationRunByID)
+		fadep.POST("/preview", middleware.RequirePermission("finance.fixed_asset_depreciation.create"), fadepHandler.PreviewDepreciation)
+		fadep.POST("", middleware.RequirePermission("finance.fixed_asset_depreciation.create"), fadepHandler.CreateDepreciationRun)
+		fadep.DELETE("/:id", middleware.RequirePermission("finance.fixed_asset_depreciation.delete"), fadepHandler.DeleteDepreciationRun)
+		fadep.POST("/:id/post", middleware.RequirePermission("finance.fixed_asset_depreciation.post"), fadepHandler.PostDepreciationRun)
+	}
+
+	// Fixed Asset Disposals
+	fadisp := finance.Group("/fixed-asset-disposals")
+	{
+		fadisp.GET("", middleware.RequirePermission("finance.fixed_asset_disposal.view"), fadispHandler.ListFixedAssetDisposals)
+		fadisp.GET("/:id", middleware.RequirePermission("finance.fixed_asset_disposal.view"), fadispHandler.GetFixedAssetDisposalByID)
+		fadisp.POST("", middleware.RequirePermission("finance.fixed_asset_disposal.create"), fadispHandler.CreateFixedAssetDisposal)
+		fadisp.PUT("/:id", middleware.RequirePermission("finance.fixed_asset_disposal.update"), fadispHandler.UpdateFixedAssetDisposal)
+		fadisp.DELETE("/:id", middleware.RequirePermission("finance.fixed_asset_disposal.delete"), fadispHandler.DeleteFixedAssetDisposal)
+		fadisp.POST("/:id/submit", middleware.RequirePermission("finance.fixed_asset_disposal.submit"), fadispHandler.SubmitFixedAssetDisposal)
+		fadisp.POST("/:id/approve", middleware.RequirePermission("finance.fixed_asset_disposal.approve"), fadispHandler.ApproveFixedAssetDisposal)
+		fadisp.POST("/:id/reject", middleware.RequirePermission("finance.fixed_asset_disposal.reject"), fadispHandler.RejectFixedAssetDisposal)
+		fadisp.POST("/:id/post", middleware.RequirePermission("finance.fixed_asset_disposal.post"), fadispHandler.PostFixedAssetDisposal)
+	}
+	// General Ledger
+	glHandler := handlers.NewGeneralLedgerHandler(logger)
+	gl := finance.Group("/general-ledger")
+	{
+		gl.GET("", middleware.RequirePermission("finance.general_ledger.view"), glHandler.ListEntries)
+		gl.POST("/rebuild", middleware.RequirePermission("finance.general_ledger.rebuild"), glHandler.RebuildLedger)
+	}
+
+	// Finance Reports
+	frHandler := handlers.NewFinanceReportHandler(logger)
+	reports := finance.Group("/reports")
+	{
+		reports.GET("/account-ledger", middleware.RequirePermission("finance.reports.view"), frHandler.AccountLedger)
+		reports.GET("/trial-balance", middleware.RequirePermission("finance.reports.view"), frHandler.TrialBalance)
+		reports.GET("/profit-loss", middleware.RequirePermission("finance.reports.view"), frHandler.ProfitLoss)
+		reports.GET("/balance-sheet", middleware.RequirePermission("finance.reports.view"), frHandler.BalanceSheet)
+		reports.GET("/cash-bank-book", middleware.RequirePermission("finance.reports.view"), frHandler.CashBankBook)
+		reports.GET("/day-book", middleware.RequirePermission("finance.reports.view"), frHandler.DayBook)
+		reports.GET("/journal-register", middleware.RequirePermission("finance.reports.view"), frHandler.JournalRegister)
+		reports.GET("/payment-register", middleware.RequirePermission("finance.reports.view"), frHandler.PaymentRegister)
+		reports.GET("/receipt-register", middleware.RequirePermission("finance.reports.view"), frHandler.ReceiptRegister)
+	}
 }

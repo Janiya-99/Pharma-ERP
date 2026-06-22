@@ -36,8 +36,13 @@ func (h *JournalEntryHandler) getService(c *gin.Context) (financeServices.Journa
 	fyRepo := repositories.NewFinancialYearRepository(db)
 	apRepo := repositories.NewAccountingPeriodRepository(db)
 	coaRepo := repositories.NewChartOfAccountRepository(db)
+
+	financeAudit := financeServices.NewAuditLogService(db, h.logger)
+	glRepo := repositories.NewGeneralLedgerRepository(db)
+	glService := financeServices.NewGeneralLedgerService(glRepo, coaRepo, fyRepo, financeAudit, h.logger)
+
 	auditService := services.NewAuditService(db, h.logger)
-	service := financeServices.NewJournalEntryService(repo, fyRepo, apRepo, coaRepo, auditService, h.logger)
+	service := financeServices.NewJournalEntryService(repo, fyRepo, apRepo, coaRepo, auditService, glService, h.logger)
 
 	return service, ctx.CompanyID, ctx.UserID, nil
 }

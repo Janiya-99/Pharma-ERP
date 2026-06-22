@@ -35,9 +35,13 @@ func (h *PettyCashReplenishmentHandler) getService(c *gin.Context) (*financeServ
 	fundRepo := repositories.NewPettyCashFundRepository(db)
 	chartRepo := repositories.NewChartOfAccountRepository(db)
 	accountingRepo := repositories.NewAccountingPeriodRepository(db)
-	auditLogService := financeServices.NewAuditLogService(db, h.logger)
+	financeAudit := financeServices.NewAuditLogService(db, h.logger)
 
-	service := financeServices.NewPettyCashReplenishmentService(replRepo, fundRepo, chartRepo, accountingRepo, auditLogService)
+	glRepo := repositories.NewGeneralLedgerRepository(db)
+	fyRepo := repositories.NewFinancialYearRepository(db)
+	glService := financeServices.NewGeneralLedgerService(glRepo, chartRepo, fyRepo, financeAudit, h.logger)
+
+	service := financeServices.NewPettyCashReplenishmentService(replRepo, fundRepo, chartRepo, accountingRepo, financeAudit, glService)
 
 	return service, ctx.CompanyID, ctx.UserID, nil
 }

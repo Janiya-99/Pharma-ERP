@@ -33,17 +33,21 @@ func (h *PaymentVoucherHandler) getService(c *gin.Context) (financeServices.Paym
 	}
 	ctx := authCtx.(*middleware.AuthContext)
 
-	repo := repositories.NewPaymentVoucherRepository(db)
+	paymentRepo := repositories.NewPaymentVoucherRepository(db)
 	fyRepo := repositories.NewFinancialYearRepository(db)
 	apRepo := repositories.NewAccountingPeriodRepository(db)
 	coaRepo := repositories.NewChartOfAccountRepository(db)
-	
+
 	bankRepo := repositories.NewBankAccountRepository(db)
 	transRepo := repositories.NewBankTransactionRepository(db)
-	bankTxSvc := financeServices.NewBankTransactionService(transRepo, bankRepo, financeServices.NewAuditLogService(db, h.logger))
-	
+	financeAudit := financeServices.NewAuditLogService(db, h.logger)
+	bankTxSvc := financeServices.NewBankTransactionService(transRepo, bankRepo, financeAudit)
+
+	glRepo := repositories.NewGeneralLedgerRepository(db)
+	glService := financeServices.NewGeneralLedgerService(glRepo, coaRepo, fyRepo, financeAudit, h.logger)
+
 	auditService := services.NewAuditService(db, h.logger)
-	service := financeServices.NewPaymentVoucherService(repo, fyRepo, apRepo, coaRepo, bankTxSvc, auditService, h.logger)
+	service := financeServices.NewPaymentVoucherService(paymentRepo, fyRepo, apRepo, coaRepo, bankTxSvc, auditService, glService, h.logger)
 
 	return service, ctx.CompanyID, ctx.UserID, nil
 }

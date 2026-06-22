@@ -41,10 +41,14 @@ func (h *ReceiptVoucherHandler) getService(c *gin.Context) (financeServices.Rece
 
 	bankRepo := repositories.NewBankAccountRepository(db)
 	transRepo := repositories.NewBankTransactionRepository(db)
-	bankTxSvc := financeServices.NewBankTransactionService(transRepo, bankRepo, financeServices.NewAuditLogService(db, h.logger))
+	financeAudit := financeServices.NewAuditLogService(db, h.logger)
+	bankTxSvc := financeServices.NewBankTransactionService(transRepo, bankRepo, financeAudit)
+
+	glRepo := repositories.NewGeneralLedgerRepository(db)
+	glService := financeServices.NewGeneralLedgerService(glRepo, coaRepo, fyRepo, financeAudit, h.logger)
 
 	auditService := services.NewAuditService(db, h.logger)
-	service := financeServices.NewReceiptVoucherService(repo, fyRepo, apRepo, coaRepo, bankTxSvc, auditService, h.logger)
+	service := financeServices.NewReceiptVoucherService(repo, fyRepo, apRepo, coaRepo, bankTxSvc, auditService, glService, h.logger)
 
 	return service, ctx.CompanyID, ctx.UserID, nil
 }

@@ -35,8 +35,13 @@ func (h *OpeningBalanceHandler) getService(c *gin.Context) (*financeServices.Ope
 	repo := repositories.NewOpeningBalanceRepository(db)
 	fyRepo := repositories.NewFinancialYearRepository(db)
 	coaRepo := repositories.NewChartOfAccountRepository(db)
+	financeAudit := financeServices.NewAuditLogService(db, h.logger)
+
+	glRepo := repositories.NewGeneralLedgerRepository(db)
+	glService := financeServices.NewGeneralLedgerService(glRepo, coaRepo, fyRepo, financeAudit, h.logger)
+
 	auditService := services.NewAuditService(db, h.logger)
-	service := financeServices.NewOpeningBalanceService(repo, fyRepo, coaRepo, auditService, h.logger)
+	service := financeServices.NewOpeningBalanceService(repo, fyRepo, coaRepo, glService, auditService, h.logger)
 
 	return service, ctx.CompanyID, ctx.UserID, nil
 }

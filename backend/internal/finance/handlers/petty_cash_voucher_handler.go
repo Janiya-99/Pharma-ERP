@@ -35,9 +35,13 @@ func (h *PettyCashVoucherHandler) getService(c *gin.Context) (*financeServices.P
 	fundRepo := repositories.NewPettyCashFundRepository(db)
 	chartRepo := repositories.NewChartOfAccountRepository(db)
 	accountingRepo := repositories.NewAccountingPeriodRepository(db)
-	auditLogService := financeServices.NewAuditLogService(db, h.logger)
+	financeAudit := financeServices.NewAuditLogService(db, h.logger)
 
-	service := financeServices.NewPettyCashVoucherService(voucherRepo, fundRepo, chartRepo, accountingRepo, auditLogService)
+	glRepo := repositories.NewGeneralLedgerRepository(db)
+	fyRepo := repositories.NewFinancialYearRepository(db)
+	glService := financeServices.NewGeneralLedgerService(glRepo, chartRepo, fyRepo, financeAudit, h.logger)
+
+	service := financeServices.NewPettyCashVoucherService(voucherRepo, fundRepo, chartRepo, accountingRepo, financeAudit, glService)
 
 	return service, ctx.CompanyID, ctx.UserID, nil
 }
