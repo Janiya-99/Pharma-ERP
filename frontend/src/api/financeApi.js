@@ -128,4 +128,53 @@ export const financeApi = {
   approvePettyCashReplenishment: (id, payload) => apiClient.post(`/finance/petty-cash-replenishments/${id}/approve`, payload),
   rejectPettyCashReplenishment: (id, payload) => apiClient.post(`/finance/petty-cash-replenishments/${id}/reject`, payload),
   postPettyCashReplenishment: (id) => apiClient.post(`/finance/petty-cash-replenishments/${id}/post`),
+
+  // Fixed Asset Categories
+  getFixedAssetCategories: (params) => apiClient.get("/finance/fixed-asset-categories", { params }),
+  getFixedAssetCategoryById: (id) => apiClient.get(`/finance/fixed-asset-categories/${id}`),
+  createFixedAssetCategory: (payload) => apiClient.post("/finance/fixed-asset-categories", payload),
+  updateFixedAssetCategory: (id, payload) => apiClient.put(`/finance/fixed-asset-categories/${id}`, payload),
+  deleteFixedAssetCategory: (id) => apiClient.delete(`/finance/fixed-asset-categories/${id}`),
+
+  // Fixed Assets
+  getFixedAssets: (params) => apiClient.get("/finance/fixed-assets", { params }),
+  getFixedAssetById: (id) => apiClient.get(`/finance/fixed-assets/${id}`),
+  createFixedAsset: (payload) => apiClient.post("/finance/fixed-assets", payload),
+  updateFixedAsset: (id, payload) => apiClient.put(`/finance/fixed-assets/${id}`, payload),
+  deleteFixedAsset: (id) => apiClient.delete(`/finance/fixed-assets/${id}`),
+
+  // Fixed Asset Depreciation Runs
+  getFixedAssetDepreciationRuns: (params) => apiClient.get("/finance/fixed-asset-depreciation-runs", { params }),
+  getFixedAssetDepreciationRunById: (id) => apiClient.get(`/finance/fixed-asset-depreciation-runs/${id}`),
+  previewFixedAssetDepreciation: (payload) => apiClient.post("/finance/fixed-asset-depreciation-runs/preview", payload),
+  createFixedAssetDepreciationRun: (payload) => apiClient.post("/finance/fixed-asset-depreciation-runs", payload),
+  postFixedAssetDepreciationRun: (id) => apiClient.post(`/finance/fixed-asset-depreciation-runs/${id}/post`),
+  deleteFixedAssetDepreciationRun: (id) => apiClient.delete(`/finance/fixed-asset-depreciation-runs/${id}`),
+
+  // Fixed Asset Disposals
+  getFixedAssetDisposals: (params) => apiClient.get("/finance/fixed-asset-disposals", { params }),
+  getFixedAssetDisposalById: (id) => apiClient.get(`/finance/fixed-asset-disposals/${id}`),
+  createFixedAssetDisposal: (payload) => apiClient.post("/finance/fixed-asset-disposals", payload),
+  updateFixedAssetDisposal: (id, payload) => apiClient.put(`/finance/fixed-asset-disposals/${id}`, payload),
+  deleteFixedAssetDisposal: (id) => apiClient.delete(`/finance/fixed-asset-disposals/${id}`),
+  submitFixedAssetDisposal: (id, payload) => apiClient.post(`/finance/fixed-asset-disposals/${id}/submit`, payload),
+  approveFixedAssetDisposal: (id, payload) => apiClient.post(`/finance/fixed-asset-disposals/${id}/approve`, payload),
+  rejectFixedAssetDisposal: (id, payload) => apiClient.post(`/finance/fixed-asset-disposals/${id}/reject`, payload),
+  postFixedAssetDisposal: (id) => apiClient.post(`/finance/fixed-asset-disposals/${id}/post`),
+
+  // General Ledger
+  getGeneralLedgerEntries: (params) => apiClient.get("/finance/general-ledger", { params }),
+  rebuildGeneralLedger: (payload) => apiClient.post("/finance/general-ledger/rebuild", payload),
+
+  // Finance Reports
+  getAccountLedgerReport: (params) => apiClient.get("/finance/reports/account-ledger", { params }),
+  getTrialBalanceReport: (params) => apiClient.get("/finance/reports/trial-balance", { params }),
+  getProfitLossReport: (params) => apiClient.get("/finance/reports/profit-loss", { params }),
+  getBalanceSheetReport: (params) => apiClient.get("/finance/reports/balance-sheet", { params }),
+  getCashBookReport: (params) => apiClient.get("/finance/reports/cash-book", { params }),
+  getBankBookReport: (params) => apiClient.get("/finance/reports/bank-book", { params }),
+  getDayBookReport: (params) => apiClient.get("/finance/reports/day-book", { params }),
+  getJournalRegisterReport: (params) => apiClient.get("/finance/reports/journal-register", { params }),
+  getPaymentRegisterReport: (params) => apiClient.get("/finance/reports/payment-register", { params }),
+  getReceiptRegisterReport: (params) => apiClient.get("/finance/reports/receipt-register", { params }),
 };

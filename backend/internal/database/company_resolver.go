@@ -78,10 +78,10 @@ func (r *CompanyResolver) GetOrCreateCompanyDBConnection(company models.Platform
 	// In production, the credentials might be stored in the platform DB or standard across all company DBs.
 	// Since .env contains DB_USER and DB_PASSWORD, we should inject them, but resolver only gets platformDB.
 	// Let's rely on standard config or DSN format.
-	// Given earlier setup: PLATFORM_DB_HOST, DB_HOST, etc. 
-	// The prompt implies platform database stores routing details. 
+	// Given earlier setup: PLATFORM_DB_HOST, DB_HOST, etc.
+	// The prompt implies platform database stores routing details.
 	// Let's connect using standard root:root@tcp(127.0.0.1:3306)/dbname?parseTime=true
-	
+
 	// Default to local dev credentials for the company database.
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		"root",

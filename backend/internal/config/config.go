@@ -13,14 +13,14 @@ import (
 // Config holds all application configuration loaded from environment variables.
 // Like Laravel's config/*.php files, but as a single typed struct.
 type Config struct {
-	App             AppConfig
-	PlatformDB      DatabaseConfig // Platform database (erp_platform)
-	Database        DatabaseConfig // Company database (legacy / default)
-	Redis           RedisConfig
-	JWT             JWTConfig
-	RateLimit       RateLimitConfig
-	CORS            CORSConfig
-	Log             LogConfig
+	App        AppConfig
+	PlatformDB DatabaseConfig // Platform database (erp_platform)
+	Database   DatabaseConfig // Company database (legacy / default)
+	Redis      RedisConfig
+	JWT        JWTConfig
+	RateLimit  RateLimitConfig
+	CORS       CORSConfig
+	Log        LogConfig
 }
 
 type AppConfig struct {
@@ -66,10 +66,10 @@ func (r *RedisConfig) Addr() string {
 }
 
 type JWTConfig struct {
-	Secret            string
-	RefreshSecret     string
-	AccessExpiryMins  int
-	RefreshExpiryHrs  int
+	Secret           string
+	RefreshSecret    string
+	AccessExpiryMins int
+	RefreshExpiryHrs int
 }
 
 func (j *JWTConfig) AccessExpiry() time.Duration {

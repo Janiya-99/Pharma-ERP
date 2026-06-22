@@ -66,20 +66,20 @@ func SeedRolePermissions(db *gorm.DB, logger *zap.Logger) error {
 
 	// Finance Manager: all Finance
 	assignPermission("FINANCE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "finance.") })
-	
-	// Finance Executive: view, create, update, submit
+
+	// Finance Executive: view, create, update, submit, export
 	assignPermission("FINANCE_EXECUTIVE", func(k string) bool {
-		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".create") || strings.HasSuffix(k, ".update") || strings.HasSuffix(k, ".submit"))
+		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".create") || strings.HasSuffix(k, ".update") || strings.HasSuffix(k, ".submit") || strings.HasSuffix(k, ".export")) && k != "finance.ledger.rebuild"
 	})
-	
+
 	// Finance Approver: view, approve, reject, post, complete, cancel
 	assignPermission("FINANCE_APPROVER", func(k string) bool {
-		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post") || strings.HasSuffix(k, ".complete") || strings.HasSuffix(k, ".cancel"))
+		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post") || strings.HasSuffix(k, ".complete") || strings.HasSuffix(k, ".cancel")) && k != "finance.ledger.rebuild"
 	})
 
 	// Finance Viewer
 	assignPermission("FINANCE_VIEWER", func(k string) bool {
-		return strings.HasPrefix(k, "finance.") && strings.HasSuffix(k, ".view")
+		return strings.HasPrefix(k, "finance.") && strings.HasSuffix(k, ".view") && k != "finance.ledger.rebuild"
 	})
 
 	// Warehouse Manager: all Inventory

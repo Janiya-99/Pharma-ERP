@@ -78,7 +78,7 @@ func (s *GRNService) Post(ctx context.Context, grnID uint64) error {
 		for _, item := range grn.Items {
 			var batch model.ProductBatch
 			err := tx.Where("product_id = ? AND batch_no = ? AND warehouse_id = ?", item.ProductID, item.BatchNo, item.WarehouseID).First(&batch).Error
-			
+
 			if err == gorm.ErrRecordNotFound {
 				// Create new batch
 				batch = model.ProductBatch{

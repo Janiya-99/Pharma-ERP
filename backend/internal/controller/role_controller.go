@@ -20,7 +20,7 @@ func NewRoleController(roleService *service.RoleService) *RoleController {
 
 func (c *RoleController) List(ctx *gin.Context) {
 	companyID, _ := c.GetCompanyID(ctx)
-	
+
 	var req dto.PaginationRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		req.Page = 1

@@ -12,7 +12,7 @@ type Permission struct {
 	Action   string `gorm:"size:50;not null;index:idx_perm_slug" json:"action"`   // e.g., "create", "read", "update", "delete", "approve"
 	Slug     string `gorm:"size:150;uniqueIndex;not null" json:"slug"`            // e.g., "finance.journal_entries.create"
 	// Relationships
-	Roles    []Role `gorm:"many2many:role_permissions" json:"roles,omitempty"`
+	Roles []Role `gorm:"many2many:role_permissions" json:"roles,omitempty"`
 }
 
 func (Permission) TableName() string {

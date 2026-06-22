@@ -4,12 +4,12 @@ package model
 type User struct {
 	BaseModel
 	TenantModel
-	Email         string       `gorm:"size:255;uniqueIndex;not null" json:"email"`
-	PasswordHash  string       `gorm:"size:255;not null" json:"-"` // Never serialize password hash
-	FullName      string       `gorm:"size:255;not null" json:"full_name"`
-	Phone         string       `gorm:"size:50" json:"phone"`
-	IsActive      bool         `gorm:"default:true;not null" json:"is_active"`
-	DesignationID *uint64      `gorm:"index" json:"designation_id,omitempty"`
+	Email         string  `gorm:"size:255;uniqueIndex;not null" json:"email"`
+	PasswordHash  string  `gorm:"size:255;not null" json:"-"` // Never serialize password hash
+	FullName      string  `gorm:"size:255;not null" json:"full_name"`
+	Phone         string  `gorm:"size:50" json:"phone"`
+	IsActive      bool    `gorm:"default:true;not null" json:"is_active"`
+	DesignationID *uint64 `gorm:"index" json:"designation_id,omitempty"`
 	// Relationships
 	Company     Company      `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
 	Branch      Branch       `gorm:"foreignKey:BranchID" json:"branch,omitempty"`

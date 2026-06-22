@@ -1,14 +1,14 @@
 package dto
 
 type LoginResponse struct {
-	Token            string            `json:"token"`
-	User             UserDTO           `json:"user"`
-	Company          CompanyDTO        `json:"company"`
-	ActiveBranch     BranchDTO         `json:"active_branch"`
-	ActiveSoftware   SoftwareDTO       `json:"active_software"`
-	Branches         []BranchDTO       `json:"branches"`
-	SoftwareModules  []SoftwareDTO     `json:"software_modules"`
-	Permissions      []string          `json:"permissions"`
+	Token           string        `json:"token"`
+	User            UserDTO       `json:"user"`
+	Company         CompanyDTO    `json:"company"`
+	ActiveBranch    BranchDTO     `json:"active_branch"`
+	ActiveSoftware  SoftwareDTO   `json:"active_software"`
+	Branches        []BranchDTO   `json:"branches"`
+	SoftwareModules []SoftwareDTO `json:"software_modules"`
+	Permissions     []string      `json:"permissions"`
 }
 
 type UserDTO struct {

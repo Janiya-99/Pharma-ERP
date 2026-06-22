@@ -1,0 +1,10 @@
+import React from 'react';
+
+const ReportAmountCell = ({ amount, className = "" }) => {
+  if (amount === undefined || amount === null || amount === 0) {
+    return <div className={`text-right text-gray-400 dark:text-gray-500 ${className}`}>-</div>;
+  }
+  const formatted = new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR' }).format(amount);
+  return <div className={`text-right font-medium ${className}`}>{formatted}</div>;
+};
+export default ReportAmountCell;

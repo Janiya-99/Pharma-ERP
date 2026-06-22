@@ -25,6 +25,20 @@ import UserAccessMatrixPage from "../pages/control-center/user-access-matrix/Use
 import AuditLogsPage from "../pages/control-center/logs/AuditLogsPage";
 import LoginLogsPage from "../pages/control-center/logs/LoginLogsPage";
 
+// Finance General Ledger & Reports
+import GeneralLedgerPage from "../pages/finance/general-ledger/GeneralLedgerPage";
+import FinanceReportsDashboard from "../pages/finance/reports/FinanceReportsDashboard";
+import AccountLedgerReportPage from "../pages/finance/reports/account-ledger/AccountLedgerReportPage";
+import TrialBalanceReportPage from "../pages/finance/reports/trial-balance/TrialBalanceReportPage";
+import ProfitLossReportPage from "../pages/finance/reports/profit-loss/ProfitLossReportPage";
+import BalanceSheetReportPage from "../pages/finance/reports/balance-sheet/BalanceSheetReportPage";
+import CashBookReportPage from "../pages/finance/reports/cash-book/CashBookReportPage";
+import BankBookReportPage from "../pages/finance/reports/bank-book/BankBookReportPage";
+import DayBookReportPage from "../pages/finance/reports/day-book/DayBookReportPage";
+import JournalRegisterReportPage from "../pages/finance/reports/journal-register/JournalRegisterReportPage";
+import PaymentRegisterReportPage from "../pages/finance/reports/payment-register/PaymentRegisterReportPage";
+import ReceiptRegisterReportPage from "../pages/finance/reports/receipt-register/ReceiptRegisterReportPage";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -54,6 +68,20 @@ const AppRoutes = () => {
 
           {/* Module Placeholders */}
           <Route path="/finance/dashboard" element={<PlaceholderPage title="Finance Dashboard" />} />
+          
+          {/* Finance General Ledger & Reports */}
+          <Route path="/finance/general-ledger" element={<GeneralLedgerPage />} />
+          <Route path="/finance/reports" element={<FinanceReportsDashboard />} />
+          <Route path="/finance/reports/account-ledger" element={<AccountLedgerReportPage />} />
+          <Route path="/finance/reports/trial-balance" element={<TrialBalanceReportPage />} />
+          <Route path="/finance/reports/profit-loss" element={<ProfitLossReportPage />} />
+          <Route path="/finance/reports/balance-sheet" element={<BalanceSheetReportPage />} />
+          <Route path="/finance/reports/cash-book" element={<CashBookReportPage />} />
+          <Route path="/finance/reports/bank-book" element={<BankBookReportPage />} />
+          <Route path="/finance/reports/day-book" element={<DayBookReportPage />} />
+          <Route path="/finance/reports/journal-register" element={<JournalRegisterReportPage />} />
+          <Route path="/finance/reports/payment-register" element={<PaymentRegisterReportPage />} />
+          <Route path="/finance/reports/receipt-register" element={<ReceiptRegisterReportPage />} />
           <Route path="/inventory/dashboard" element={<PlaceholderPage title="Inventory Dashboard" />} />
           <Route path="/invoice-center/dashboard" element={<PlaceholderPage title="Invoice Center Dashboard" />} />
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />

@@ -1,0 +1,19 @@
+import React from "react";
+
+const StockQuantityDisplay = ({ quantity, unit = "" }) => {
+  if (quantity === undefined || quantity === null) return <span className="text-gray-400">-</span>;
+  
+  const formattedQuantity = Number(quantity).toLocaleString("en-US", {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  });
+
+  return (
+    <div className="text-right tabular-nums whitespace-nowrap">
+      <span className="font-medium text-navy-700 dark:text-white">{formattedQuantity}</span>
+      {unit && <span className="text-xs text-gray-500 ml-1">{unit}</span>}
+    </div>
+  );
+};
+
+export default StockQuantityDisplay;

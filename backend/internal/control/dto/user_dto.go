@@ -39,16 +39,16 @@ type ResetPasswordRequest struct {
 }
 
 type UserResponse struct {
-	ID              uint64                      `json:"id"`
-	EmployeeCode    string                      `json:"employee_code"`
-	Name            string                      `json:"name"`
-	Email           string                      `json:"email"`
-	Phone           string                      `json:"phone"`
-	Department      string                      `json:"department"`
-	Designation     string                      `json:"designation"`
-	DefaultBranch   string                      `json:"default_branch"`
-	UserType        string                      `json:"user_type"`
-	Status          string                      `json:"status"`
+	ID               uint64                      `json:"id"`
+	EmployeeCode     string                      `json:"employee_code"`
+	Name             string                      `json:"name"`
+	Email            string                      `json:"email"`
+	Phone            string                      `json:"phone"`
+	Department       string                      `json:"department"`
+	Designation      string                      `json:"designation"`
+	DefaultBranch    string                      `json:"default_branch"`
+	UserType         string                      `json:"user_type"`
+	Status           string                      `json:"status"`
 	AssignedBranches []models.UserBranchAccess   `json:"assigned_branches,omitempty"`
 	AssignedSoftware []models.UserSoftwareAccess `json:"assigned_software,omitempty"`
 }

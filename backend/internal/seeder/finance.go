@@ -16,7 +16,7 @@ func SeedFinance(db *gorm.DB) error {
 		{Code: "ASST", Name: "Assets"},
 		{Code: "LIAB", Name: "Liabilities"},
 		{Code: "EQTY", Name: "Equity"},
-		{Code: "REV",  Name: "Revenue"},
+		{Code: "REV", Name: "Revenue"},
 		{Code: "EXPS", Name: "Expenses"},
 	}
 	for i := range types {

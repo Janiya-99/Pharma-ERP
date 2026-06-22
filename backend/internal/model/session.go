@@ -16,7 +16,7 @@ type Session struct {
 	ExpiresAt     time.Time `gorm:"not null;index" json:"expires_at"`
 	CreatedAt     time.Time `gorm:"not null" json:"created_at"`
 	// Relationships
-	User          User      `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	User User `gorm:"foreignKey:UserID" json:"user,omitempty"`
 }
 
 func (Session) TableName() string {

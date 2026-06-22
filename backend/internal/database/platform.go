@@ -50,8 +50,8 @@ func NewPlatformDB(cfg *config.DatabaseConfig, zapLogger *zap.Logger) (*gorm.DB,
 		DontSupportRenameColumn:   true,
 		SkipInitializeWithVersion: false,
 	}), &gorm.Config{
-		Logger:      logger.Default.LogMode(gormLogLevel),
-		PrepareStmt: true,
+		Logger:                                   logger.Default.LogMode(gormLogLevel),
+		PrepareStmt:                              true,
 		DisableForeignKeyConstraintWhenMigrating: false,
 	})
 	if err != nil {

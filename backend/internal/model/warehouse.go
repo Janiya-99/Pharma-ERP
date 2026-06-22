@@ -10,6 +10,6 @@ type Warehouse struct {
 	Status   string `gorm:"type:enum('Active', 'Inactive');default:'Active'" json:"status"`
 
 	// Relationships
-	Branch  *Branch         `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
-	Batches []ProductBatch  `gorm:"foreignKey:WarehouseID" json:"batches,omitempty"`
+	Branch  *Branch        `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
+	Batches []ProductBatch `gorm:"foreignKey:WarehouseID" json:"batches,omitempty"`
 }

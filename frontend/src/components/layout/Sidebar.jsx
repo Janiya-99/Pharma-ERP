@@ -3,7 +3,8 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import PermissionGuard from "../../auth/PermissionGuard";
 import { 
-   LayoutDashboard, Building, MapPin, Users, Network, Key, Shield, ShieldCheck, FileCheck, LogIn, Settings 
+   LayoutDashboard, Building, MapPin, Users, Network, Key, Shield, ShieldCheck, FileCheck, LogIn, Settings,
+   Briefcase, Calculator, Clock, CheckSquare, List, CalendarCheck, Archive, BookOpen, PieChart, FileText
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
 
@@ -33,6 +34,60 @@ const Sidebar = () => {
   const renderMenus = () => {
     if (activeSoftware?.software_code === "CONTROL_CENTER") {
       return controlCenterMenus.map((menu) => (
+        <PermissionGuard key={menu.path} permission={menu.permission}>
+          <NavLink
+            to={menu.path}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${
+                isHovered ? "px-4 py-2.5" : "justify-center p-2.5 mx-2"
+              } ${
+                isActive
+                  ? "bg-brand-50 text-brand-600 dark:bg-navy-700 dark:text-white font-bold shadow-sm"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:hover:bg-navy-700 dark:text-gray-400"
+              }`
+            }
+            title={!isHovered ? menu.name : undefined}
+          >
+            {({ isActive }) => (
+              <>
+                <menu.icon className={`w-5 h-5 shrink-0 ${
+                  isActive ? "text-brand-600 dark:text-white" : "text-gray-400"
+                }`} />
+                {isHovered && (
+                  <>
+                    <span className="flex-1 text-left truncate transition-all duration-300">{menu.name}</span>
+                    {isActive && <div className="h-1.5 w-1.5 rounded-full bg-brand-500 shrink-0" />}
+                  </>
+                )}
+              </>
+            )}
+          </NavLink>
+        </PermissionGuard>
+      ));
+    }
+
+    if (activeSoftware?.software_code === "FINANCE") {
+      const financeMenus = [
+        { name: "Dashboard", path: "/finance/dashboard", icon: LayoutDashboard },
+        { name: "General Ledger", path: "/finance/general-ledger", icon: BookOpen, permission: "finance.general_ledger.view" },
+        { name: "Reports Dashboard", path: "/finance/reports", icon: PieChart, permission: "finance.report.view" },
+        { name: "Account Ledger", path: "/finance/reports/account-ledger", icon: FileText, permission: "finance.report.account_ledger.view" },
+        { name: "Trial Balance", path: "/finance/reports/trial-balance", icon: FileText, permission: "finance.report.trial_balance.view" },
+        { name: "Profit and Loss", path: "/finance/reports/profit-loss", icon: FileText, permission: "finance.report.profit_loss.view" },
+        { name: "Balance Sheet", path: "/finance/reports/balance-sheet", icon: FileText, permission: "finance.report.balance_sheet.view" },
+        { name: "Cash Book", path: "/finance/reports/cash-book", icon: FileText, permission: "finance.report.cash_book.view" },
+        { name: "Bank Book", path: "/finance/reports/bank-book", icon: FileText, permission: "finance.report.bank_book.view" },
+        { name: "Day Book", path: "/finance/reports/day-book", icon: FileText, permission: "finance.report.day_book.view" },
+        { name: "Journal Register", path: "/finance/reports/journal-register", icon: FileText, permission: "finance.report.journal_register.view" },
+        { name: "Payment Register", path: "/finance/reports/payment-register", icon: FileText, permission: "finance.report.payment_register.view" },
+        { name: "Receipt Register", path: "/finance/reports/receipt-register", icon: FileText, permission: "finance.report.receipt_register.view" },
+        { name: "Fixed Asset Categories", path: "/finance/fixed-asset-categories", icon: List, permission: "finance.fixed_asset_category.view" },
+        { name: "Fixed Assets", path: "/finance/fixed-assets", icon: Briefcase, permission: "finance.fixed_asset.view" },
+        { name: "Depreciation Runs", path: "/finance/fixed-asset-depreciation-runs", icon: Calculator, permission: "finance.fixed_asset_depreciation.view" },
+        { name: "Asset Disposals", path: "/finance/fixed-asset-disposals", icon: Archive, permission: "finance.fixed_asset_disposal.view" },
+      ];
+
+      return financeMenus.map((menu) => (
         <PermissionGuard key={menu.path} permission={menu.permission}>
           <NavLink
             to={menu.path}

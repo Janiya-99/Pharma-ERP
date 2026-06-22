@@ -109,23 +109,23 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"FINANCE", "Receipt", "finance.receipt.approve", "Approve Receipt"},
 		{"FINANCE", "Receipt", "finance.receipt.reject", "Reject Receipt"},
 		{"FINANCE", "Receipt", "finance.receipt.post", "Post Receipt"},
-		
+
 		{"FINANCE", "Bank Account", "finance.bank_account.view", "View Bank Account"},
 		{"FINANCE", "Bank Account", "finance.bank_account.create", "Create Bank Account"},
 		{"FINANCE", "Bank Account", "finance.bank_account.update", "Update Bank Account"},
 		{"FINANCE", "Bank Account", "finance.bank_account.delete", "Delete Bank Account"},
-		
+
 		{"FINANCE", "Cheque Book", "finance.cheque_book.view", "View Cheque Book"},
 		{"FINANCE", "Cheque Book", "finance.cheque_book.create", "Create Cheque Book"},
 		{"FINANCE", "Cheque Book", "finance.cheque_book.update", "Update Cheque Book"},
 		{"FINANCE", "Cheque Book", "finance.cheque_book.delete", "Delete Cheque Book"},
 		{"FINANCE", "Cheque Book", "finance.cheque_book.cancel_leaf", "Cancel Cheque Leaf"},
-		
+
 		{"FINANCE", "Bank Transaction", "finance.bank_transaction.view", "View Bank Transaction"},
 		{"FINANCE", "Bank Transaction", "finance.bank_transaction.create", "Create Bank Transaction"},
 		{"FINANCE", "Bank Transaction", "finance.bank_transaction.update", "Update Bank Transaction"},
 		{"FINANCE", "Bank Transaction", "finance.bank_transaction.delete", "Delete Bank Transaction"},
-		
+
 		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.view", "View Bank Reconciliation"},
 		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.create", "Create Bank Reconciliation"},
 		{"FINANCE", "Bank Reconciliation", "finance.bank_reconciliation.update", "Update Bank Reconciliation"},
@@ -156,7 +156,45 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.reject", "Reject Petty Cash Replenishment"},
 		{"FINANCE", "Petty Cash Replenishment", "finance.petty_cash_replenishment.post", "Post Petty Cash Replenishment"},
 
+		{"FINANCE", "Fixed Asset Category", "finance.fixed_asset_category.view", "View Fixed Asset Category"},
+		{"FINANCE", "Fixed Asset Category", "finance.fixed_asset_category.create", "Create Fixed Asset Category"},
+		{"FINANCE", "Fixed Asset Category", "finance.fixed_asset_category.update", "Update Fixed Asset Category"},
+		{"FINANCE", "Fixed Asset Category", "finance.fixed_asset_category.delete", "Delete Fixed Asset Category"},
+
+		{"FINANCE", "Fixed Asset", "finance.fixed_asset.view", "View Fixed Asset"},
+		{"FINANCE", "Fixed Asset", "finance.fixed_asset.create", "Create Fixed Asset"},
+		{"FINANCE", "Fixed Asset", "finance.fixed_asset.update", "Update Fixed Asset"},
+		{"FINANCE", "Fixed Asset", "finance.fixed_asset.delete", "Delete Fixed Asset"},
+
+		{"FINANCE", "Depreciation", "finance.fixed_asset_depreciation.view", "View Depreciation"},
+		{"FINANCE", "Depreciation", "finance.fixed_asset_depreciation.create", "Create Depreciation"},
+		{"FINANCE", "Depreciation", "finance.fixed_asset_depreciation.post", "Post Depreciation"},
+		{"FINANCE", "Depreciation", "finance.fixed_asset_depreciation.delete", "Delete Depreciation"},
+
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.view", "View Disposal"},
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.create", "Create Disposal"},
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.update", "Update Disposal"},
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.delete", "Delete Disposal"},
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.submit", "Submit Disposal"},
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.approve", "Approve Disposal"},
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.reject", "Reject Disposal"},
+		{"FINANCE", "Disposal", "finance.fixed_asset_disposal.post", "Post Disposal"},
+
+		{"FINANCE", "General Ledger", "finance.general_ledger.view", "View General Ledger"},
+		{"FINANCE", "General Ledger", "finance.ledger.rebuild", "Rebuild Ledger"},
+
 		{"FINANCE", "Report", "finance.report.view", "View Finance Report"},
+		{"FINANCE", "Report", "finance.report.account_ledger.view", "View Account Ledger"},
+		{"FINANCE", "Report", "finance.report.trial_balance.view", "View Trial Balance"},
+		{"FINANCE", "Report", "finance.report.profit_loss.view", "View Profit & Loss"},
+		{"FINANCE", "Report", "finance.report.balance_sheet.view", "View Balance Sheet"},
+		{"FINANCE", "Report", "finance.report.cash_book.view", "View Cash Book"},
+		{"FINANCE", "Report", "finance.report.bank_book.view", "View Bank Book"},
+		{"FINANCE", "Report", "finance.report.day_book.view", "View Day Book"},
+		{"FINANCE", "Report", "finance.report.journal_register.view", "View Journal Register"},
+		{"FINANCE", "Report", "finance.report.payment_register.view", "View Payment Register"},
+		{"FINANCE", "Report", "finance.report.receipt_register.view", "View Receipt Register"},
+		{"FINANCE", "Report", "finance.report.export", "Export Finance Reports"},
 
 		// INVENTORY
 		{"INVENTORY", "Dashboard", "inventory.dashboard.view", "View Inventory Dashboard"},

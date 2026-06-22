@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/pixandco/erp-phrma/internal/auth/handlers"
+	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
-	"github.com/pixandco/erp-phrma/internal/auth/handlers"
-	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	platformMigrations "github.com/pixandco/erp-phrma/internal/platform/migrations"
 	"github.com/pixandco/erp-phrma/internal/repository"
 	"github.com/pixandco/erp-phrma/internal/router"

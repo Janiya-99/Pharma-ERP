@@ -9,10 +9,10 @@ import (
 // Internal details are logged but NEVER exposed to the client.
 // This is like Laravel's exception handler — map internal errors to safe HTTP responses.
 type AppError struct {
-	Code     string `json:"code"`               // Machine-readable error code
-	Message  string `json:"message"`             // Safe, user-facing message
-	Status   int    `json:"-"`                   // HTTP status code
-	Internal error  `json:"-"`                   // Internal error for logging (never serialized)
+	Code     string `json:"code"`    // Machine-readable error code
+	Message  string `json:"message"` // Safe, user-facing message
+	Status   int    `json:"-"`       // HTTP status code
+	Internal error  `json:"-"`       // Internal error for logging (never serialized)
 }
 
 func (e *AppError) Error() string {
