@@ -23,7 +23,7 @@ GOOSE_DBSTRING ?= $(DB_USER):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_NAME
 
 build:
 	@echo "Building $(APP_NAME)..."
-	@go build -o $(BUILD_DIR)/$(APP_NAME) $(MAIN_FILE)
+	@go build -o "$(BUILD_DIR)/$(APP_NAME)" $(MAIN_FILE)
 	@echo "Build complete: $(BUILD_DIR)/$(APP_NAME)"
 
 run: build
