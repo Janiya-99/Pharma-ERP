@@ -24,6 +24,9 @@ func RunInventoryMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.ProductBatch{},
 		&models.StockBalance{},
 		&models.StockLedgerEntry{},
+		&models.OpeningStockEntry{},
+		&models.OpeningStockEntryLine{},
+		&models.OpeningStockEntryApproval{},
 	)
 
 	if err != nil {
