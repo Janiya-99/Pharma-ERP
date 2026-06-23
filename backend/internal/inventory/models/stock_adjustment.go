@@ -19,9 +19,7 @@ type StockAdjustment struct {
 	Warehouse   *Warehouse `gorm:"foreignKey:WarehouseID" json:"warehouse,omitempty"`
 
 	FinancialYearID    *uint64                        `gorm:"index" json:"financial_year_id,omitempty"`
-	FinancialYear      *companyModels.FinancialYear   `gorm:"foreignKey:FinancialYearID" json:"financial_year,omitempty"`
 	AccountingPeriodID *uint64                        `gorm:"index" json:"accounting_period_id,omitempty"`
-	AccountingPeriod   *companyModels.AccountingPeriod `gorm:"foreignKey:AccountingPeriodID" json:"accounting_period,omitempty"`
 
 	AdjustmentNumber string    `gorm:"type:varchar(50);uniqueIndex:idx_company_adjustment_no;not null" json:"adjustment_number"`
 	AdjustmentDate   time.Time `gorm:"type:date;index;not null" json:"adjustment_date"`

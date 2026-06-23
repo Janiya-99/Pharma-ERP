@@ -72,6 +72,15 @@ func SeedInventoryPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"Stock Transfer", "inventory.stock_transfer.approve", "Approve Stock Transfer"},
 		{"Stock Transfer", "inventory.stock_transfer.reject", "Reject Stock Transfer"},
 		{"Stock Transfer", "inventory.stock_transfer.post", "Post Stock Transfer"},
+
+		{"Stock Adjustment", "inventory.stock_adjustment.view", "View Stock Adjustment"},
+		{"Stock Adjustment", "inventory.stock_adjustment.create", "Create Stock Adjustment"},
+		{"Stock Adjustment", "inventory.stock_adjustment.update", "Update Stock Adjustment"},
+		{"Stock Adjustment", "inventory.stock_adjustment.delete", "Delete Stock Adjustment"},
+		{"Stock Adjustment", "inventory.stock_adjustment.submit", "Submit Stock Adjustment"},
+		{"Stock Adjustment", "inventory.stock_adjustment.approve", "Approve Stock Adjustment"},
+		{"Stock Adjustment", "inventory.stock_adjustment.reject", "Reject Stock Adjustment"},
+		{"Stock Adjustment", "inventory.stock_adjustment.post", "Post Stock Adjustment"},
 	}
 
 	for _, p := range permissions {
@@ -137,7 +146,11 @@ func SeedInventoryPermissions(db *gorm.DB, logger *zap.Logger) error {
 			k == "inventory.stock_transfer.create" ||
 			k == "inventory.stock_transfer.update" ||
 			k == "inventory.stock_transfer.delete" ||
-			k == "inventory.stock_transfer.submit"
+			k == "inventory.stock_transfer.submit" ||
+			k == "inventory.stock_adjustment.view" ||
+			k == "inventory.stock_adjustment.create" ||
+			k == "inventory.stock_adjustment.update" ||
+			k == "inventory.stock_adjustment.submit"
 	})
 
 	assignPermission("INVENTORY_VIEWER", func(k string) bool {

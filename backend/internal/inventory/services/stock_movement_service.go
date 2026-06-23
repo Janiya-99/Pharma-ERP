@@ -243,6 +243,8 @@ func (s *inventoryStockMovementService) createStockLedgerEntry(db *gorm.DB, payl
 
 	if payload.SourceType == "stock_transfer" {
 		entry.MovementType = "transfer_in"
+	} else if payload.SourceType == "stock_adjustment" {
+		entry.MovementType = "adjustment_in"
 	}
 
 	return s.repo.CreateStockLedgerEntry(db, entry)
@@ -274,6 +276,8 @@ func (s *inventoryStockMovementService) createStockOutLedgerEntry(db *gorm.DB, p
 
 	if payload.SourceType == "stock_transfer" {
 		entry.MovementType = "transfer_out"
+	} else if payload.SourceType == "stock_adjustment" {
+		entry.MovementType = "adjustment_out"
 	}
 
 	return s.repo.CreateStockLedgerEntry(db, entry)

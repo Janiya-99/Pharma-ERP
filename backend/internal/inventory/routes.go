@@ -43,6 +43,8 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	grnSvc := services.NewGRNService(grnRepo, stockMovementRepo, productMasterRepo, stockMovementSvc, invAuditLogger, logger)
 	stockTransferRepo := repositories.NewStockTransferRepository()
 	stockTransferSvc := services.NewStockTransferService(stockTransferRepo, stockMovementSvc, stockMovementRepo, invAuditLogger)
+	stockAdjRepo := repositories.NewStockAdjustmentRepository()
+	stockAdjService := services.NewStockAdjustmentService(stockAdjRepo, stockMovementRepo, stockMovementSvc, invAuditLogger)
 
 	// 3. Initialize Handlers
 	warehouseHdl := handlers.NewWarehouseHandler(warehouseSvc, logger)
@@ -60,6 +62,7 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	openingStockHdl := handlers.NewOpeningStockHandler(openingStockSvc)
 	grnHdl := handlers.NewGRNHandler(grnSvc)
 	stockTransferHdl := handlers.NewStockTransferHandler(stockTransferSvc)
+	stockAdjHandler := handlers.NewStockAdjustmentHandler(stockAdjService)
 	dashboardHdl := handlers.NewDashboardHandler(logger)
 
 	inventory := r.Group("")
@@ -222,5 +225,19 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 		stockTransfers.POST("/:id/approve", middleware.RequirePermission("inventory.stock_transfer.approve"), stockTransferHdl.ApproveStockTransfer)
 		stockTransfers.POST("/:id/reject", middleware.RequirePermission("inventory.stock_transfer.reject"), stockTransferHdl.RejectStockTransfer)
 		stockTransfers.POST("/:id/post", middleware.RequirePermission("inventory.stock_transfer.post"), stockTransferHdl.PostStockTransfer)
+	}
+
+	stockAdjustments := inventory.Group("/stock-adjustments")
+	{
+		stockAdjustments.GET("", middleware.RequirePermission("inventory.stock_adjustment.view"), stockAdjHandler.ListStockAdjustments)
+		stockAdjustments.GET("/:id", middleware.RequirePermission("inventory.stock_adjustment.view"), stockAdjHandler.GetStockAdjustment)
+		stockAdjustments.POST("", middleware.RequirePermission("inventory.stock_adjustment.create"), stockAdjHandler.CreateStockAdjustment)
+		stockAdjustments.PUT("/:id", middleware.RequirePermission("inventory.stock_adjustment.update"), stockAdjHandler.UpdateStockAdjustment)
+		stockAdjustments.DELETE("/:id", middleware.RequirePermission("inventory.stock_adjustment.delete"), stockAdjHandler.DeleteStockAdjustment)
+
+		stockAdjustments.POST("/:id/submit", middleware.RequirePermission("inventory.stock_adjustment.submit"), stockAdjHandler.SubmitStockAdjustment)
+		stockAdjustments.POST("/:id/approve", middleware.RequirePermission("inventory.stock_adjustment.approve"), stockAdjHandler.ApproveStockAdjustment)
+		stockAdjustments.POST("/:id/reject", middleware.RequirePermission("inventory.stock_adjustment.reject"), stockAdjHandler.RejectStockAdjustment)
+		stockAdjustments.POST("/:id/post", middleware.RequirePermission("inventory.stock_adjustment.post"), stockAdjHandler.PostStockAdjustment)
 	}
 }
