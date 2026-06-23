@@ -100,4 +100,15 @@ export const inventoryApi = {
   approveGRN: (id, payload) => apiClient.post(`/inventory/grns/${id}/approve`, payload),
   rejectGRN: (id, payload) => apiClient.post(`/inventory/grns/${id}/reject`, payload),
   postGRN: (id) => apiClient.post(`/inventory/grns/${id}/post`),
+
+  // Stock Transfers
+  getStockTransfers: (params) => apiClient.get("/inventory/stock-transfers", { params }),
+  getStockTransferById: (id) => apiClient.get(`/inventory/stock-transfers/${id}`),
+  createStockTransfer: (payload) => apiClient.post("/inventory/stock-transfers", payload),
+  updateStockTransfer: (id, payload) => apiClient.put(`/inventory/stock-transfers/${id}`, payload),
+  deleteStockTransfer: (id) => apiClient.delete(`/inventory/stock-transfers/${id}`),
+  submitStockTransfer: (id, payload) => apiClient.post(`/inventory/stock-transfers/${id}/submit`, payload),
+  approveStockTransfer: (id, payload) => apiClient.post(`/inventory/stock-transfers/${id}/approve`, payload),
+  rejectStockTransfer: (id, payload) => apiClient.post(`/inventory/stock-transfers/${id}/reject`, payload),
+  postStockTransfer: (id) => apiClient.post(`/inventory/stock-transfers/${id}/post`),
 };

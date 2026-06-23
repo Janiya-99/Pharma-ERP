@@ -33,6 +33,9 @@ func RunInventoryMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.StockTransfer{},
 		&models.StockTransferLine{},
 		&models.StockTransferApproval{},
+		&models.StockAdjustment{},
+		&models.StockAdjustmentLine{},
+		&models.StockAdjustmentApproval{},
 	)
 
 	if err != nil {

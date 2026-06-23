@@ -57,6 +57,9 @@ import ProductBatchFormPage from "../pages/inventory/product-batches/ProductBatc
 import ProductBatchDetailsPage from "../pages/inventory/product-batches/ProductBatchDetailsPage";
 import StockBalancesPage from "../pages/inventory/stock-balances/StockBalancesPage";
 import StockLedgerPage from "../pages/inventory/stock-ledger/StockLedgerPage";
+import StockTransfersPage from "../pages/inventory/stock-transfers/StockTransfersPage";
+import StockTransferFormPage from "../pages/inventory/stock-transfers/StockTransferFormPage";
+import StockTransferDetailsPage from "../pages/inventory/stock-transfers/StockTransferDetailsPage";
 
 const AppRoutes = () => {
   return (
@@ -123,6 +126,10 @@ const AppRoutes = () => {
           <Route path="/inventory/product-batches/:id/edit" element={<ProductBatchFormPage />} />
           <Route path="/inventory/stock-balances" element={<StockBalancesPage />} />
           <Route path="/inventory/stock-ledger" element={<StockLedgerPage />} />
+          <Route path="/inventory/stock-transfers" element={<StockTransfersPage />} />
+          <Route path="/inventory/stock-transfers/create" element={<StockTransferFormPage />} />
+          <Route path="/inventory/stock-transfers/:id" element={<StockTransferDetailsPage />} />
+          <Route path="/inventory/stock-transfers/:id/edit" element={<StockTransferFormPage />} />
           <Route path="/invoice-center/dashboard" element={<PlaceholderPage title="Invoice Center Dashboard" />} />
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>
