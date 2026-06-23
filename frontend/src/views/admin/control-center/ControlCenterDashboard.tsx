@@ -83,7 +83,7 @@ export default function ControlCenterDashboard() {
               { text: "New branch 'Kandy Central' was created", time: "1 hour ago" },
               { text: "Permissions updated for 'Warehouse Manager'", time: "3 hours ago" },
               { text: "Company settings modified by admin", time: "5 hours ago" },
-            ].map((log, i) => (
+            ].map((log: unknown, i: unknown) => (
               <div key={i} className="flex items-center gap-3 bg-gray-50 dark:bg-navy-800 p-3 rounded-xl border border-gray-100 dark:border-navy-700">
                 <div className="h-8 w-8 rounded-full bg-brand-50 dark:bg-brand-400/10 flex items-center justify-center">
                   <MdCheckCircle className="h-4 w-4 text-brand-500" />
@@ -108,7 +108,7 @@ export default function ControlCenterDashboard() {
               { role: "Sales Manager", count: 12, width: "40%" },
               { role: "Warehouse Staff", count: 24, width: "80%" },
               { role: "Finance Officer", count: 5, width: "20%" },
-            ].map((role, i) => (
+            ].map((role: unknown, i: unknown) => (
               <div key={i}>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium text-navy-700 dark:text-white">{role.role}</span>

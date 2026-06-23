@@ -23,7 +23,7 @@ const AccountClassificationSelect: React.FC<AccountClassificationSelectProps> = 
   placeholder = "Select Classification",
   className,
   disabled,
-}) => {
+}: { value?: unknown; onChange?: unknown; placeholder?: unknown; className?: unknown; disabled?: unknown }) => {
   const [classifications, setClassifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +51,7 @@ const AccountClassificationSelect: React.FC<AccountClassificationSelectProps> = 
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
       <SelectContent className="bg-white dark:bg-navy-800">
-        {classifications.map((item) => (
+        {classifications.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
             {item.name} (Level {item.level})
           </SelectItem>

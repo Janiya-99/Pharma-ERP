@@ -67,7 +67,7 @@ export function ERPFormModal({
   useEffect(() => {
     if (open) {
       const defaults: Record<string, any> = {};
-      fields.forEach((f) => {
+      fields.forEach((f: unknown) => {
         defaults[f.key] = initialValues[f.key] ?? "";
       });
       setValues(defaults);
@@ -77,19 +77,19 @@ export function ERPFormModal({
   }, [open, initialValues]);
 
   const handleChange = (key: string, value: any) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
+    setValues((prev: unknown) => ({ ...prev, [key]: value }));
     if (touched[key]) {
       validateField(key, value);
     }
   };
 
   const handleBlur = (key: string) => {
-    setTouched((prev) => ({ ...prev, [key]: true }));
+    setTouched((prev: unknown) => ({ ...prev, [key]: true }));
     validateField(key, values[key]);
   };
 
   const validateField = (key: string, value: any): boolean => {
-    const field = fields.find((f) => f.key === key);
+    const field = fields.find((f: unknown) => f.key === key);
     if (!field) return true;
 
     let error = "";
@@ -104,7 +104,7 @@ export function ERPFormModal({
       if (customError) error = customError;
     }
 
-    setErrors((prev) => ({ ...prev, [key]: error }));
+    setErrors((prev: unknown) => ({ ...prev, [key]: error }));
     return !error;
   };
 
@@ -113,7 +113,7 @@ export function ERPFormModal({
     const newErrors: Record<string, string> = {};
     const allTouched: Record<string, boolean> = {};
 
-    fields.forEach((field) => {
+    fields.forEach((field: unknown) => {
       allTouched[field.key] = true;
       const value = values[field.key];
       let error = "";
@@ -145,7 +145,7 @@ export function ERPFormModal({
   };
 
   return (
-    <Sheet open={open} onOpenChange={(val) => !val && onClose()}>
+    <Sheet open={open} onOpenChange={(val: unknown) => !val && onClose()}>
       <SheetContent side="right" className="w-[400px] sm:w-[540px] sm:max-w-none p-0 flex flex-col bg-gray-50 dark:bg-navy-900 border-none shadow-2xl">
         {/* Header */}
         <SheetHeader className="px-6 py-5 bg-white dark:bg-navy-800 border-b border-gray-100 dark:border-navy-700 text-left">
@@ -167,7 +167,7 @@ export function ERPFormModal({
         {/* Form Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-            {fields.map((field) => (
+            {fields.map((field: unknown) => (
               <div
                 key={field.key}
                 className={field.span === 2 ? "sm:col-span-2" : ""}
@@ -182,7 +182,7 @@ export function ERPFormModal({
                 {field.type === "select" ? (
                   <Select
                     value={values[field.key] !== undefined && values[field.key] !== null && values[field.key] !== "" ? String(values[field.key]) : undefined}
-                    onValueChange={(val) => { handleChange(field.key, val); setTouched(prev => ({...prev, [field.key]: true})); }}
+                    onValueChange={(val: unknown) => { handleChange(field.key, val); setTouched((prev: unknown) => ({...prev, [field.key]: true})); }}
                     disabled={isPosted || field.disabled}
                   >
                     <SelectTrigger className={`w-full rounded-xl border px-4 h-[44px] text-sm text-navy-700 dark:text-white bg-white dark:bg-navy-900 dark:border-white/10 focus:ring-2 focus:ring-offset-0 disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
@@ -193,7 +193,7 @@ export function ERPFormModal({
                       <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
                     </SelectTrigger>
                     <SelectContent>
-                      {field.options?.map((opt) => (
+                      {field.options?.map((opt: unknown) => (
                         <SelectItem key={opt.value} value={opt.value}>
                           {opt.label}
                         </SelectItem>
@@ -222,10 +222,10 @@ export function ERPFormModal({
                       <Calendar
                         mode="single"
                         selected={values[field.key] ? new Date(values[field.key]) : undefined}
-                        onSelect={(date) => {
+                        onSelect={(date: unknown) => {
                           const dateString = date ? format(date, "yyyy-MM-dd") : "";
                           handleChange(field.key, dateString);
-                          setTouched(prev => ({...prev, [field.key]: true}));
+                          setTouched((prev: unknown) => ({...prev, [field.key]: true}));
                         }}
                         initialFocus
                       />
@@ -234,7 +234,7 @@ export function ERPFormModal({
                 ) : field.type === "textarea" ? (
                   <textarea
                     value={values[field.key] || ""}
-                    onChange={(e) => handleChange(field.key, e.target.value)}
+                    onChange={(e: any) => handleChange(field.key, e.target.value)}
                     onBlur={() => handleBlur(field.key)}
                     disabled={isPosted || field.disabled}
                     placeholder={field.placeholder}
@@ -249,7 +249,7 @@ export function ERPFormModal({
                   <input
                     type={field.type}
                     value={values[field.key] || ""}
-                    onChange={(e) => handleChange(field.key, e.target.value)}
+                    onChange={(e: any) => handleChange(field.key, e.target.value)}
                     onBlur={() => handleBlur(field.key)}
                     disabled={isPosted || field.disabled}
                     placeholder={field.placeholder}

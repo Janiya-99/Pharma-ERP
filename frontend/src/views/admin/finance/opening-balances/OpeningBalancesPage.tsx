@@ -133,7 +133,7 @@ export default function OpeningBalancesPage() {
           onLimitChange={setLimit}
           onSearch={setSearch}
           searchPlaceholder="Search balances..."
-          actions={(record) => (
+          actions={(record: unknown) => (
             <div className="flex space-x-2 justify-end">
               <PermissionGuard permission="finance.opening_balance.update">
                 <button 

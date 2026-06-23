@@ -97,7 +97,7 @@ export default function AccountClassificationTree({
 
   return (
     <div className="py-2 overflow-x-auto">
-      {data.map((node) => (
+      {data.map((node: unknown) => (
         <TreeNode 
           key={node.id} 
           node={node} 

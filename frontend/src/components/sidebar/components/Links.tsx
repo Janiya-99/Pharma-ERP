@@ -9,22 +9,22 @@ export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element =>
   const [openModule, setOpenModule] = useState<string | null>(() => {
     // Auto-open the module matching current path
     const match = routes.find(
-      (r) => r.children && r.children.some((c) => location.pathname.includes(c.path))
+      (r: unknown) => r.children && r.children.some((c: unknown) => location.pathname.includes(c.path))
     );
     return match?.path ?? null;
   });
 
   const isActive = (path: string) => location.pathname.includes(path);
   const isModuleActive = (route: ERPRoute) => {
-    if (route.children) return route.children.some((c) => isActive(c.path));
+    if (route.children) return route.children.some((c: unknown) => isActive(c.path));
     return isActive(route.path);
   };
 
-  const adminRoutes = routes.filter((r) => r.layout === "/admin" && !r.secondary);
+  const adminRoutes = routes.filter((r: unknown) => r.layout === "/admin" && !r.secondary);
 
   return (
     <ul className="flex flex-col gap-0.5 px-3">
-      {adminRoutes.map((route) => {
+      {adminRoutes.map((route: unknown) => {
         const active = isModuleActive(route);
 
         // Flat route (e.g. Dashboard)
@@ -77,7 +77,7 @@ export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element =>
               }`}
             >
               <ul className="ml-8 mt-0.5 flex flex-col gap-0.5 border-l border-gray-100 dark:border-navy-600 pl-3">
-                {route.children.map((child) => (
+                {route.children.map((child: unknown) => (
                   <li key={child.path}>
                     <Link
                       to={`/admin/${child.path}`}

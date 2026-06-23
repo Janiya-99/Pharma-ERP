@@ -33,7 +33,7 @@ export default function ComplexTable(props: { tableData: any }) {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">NAME</p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
@@ -46,7 +46,7 @@ export default function ComplexTable(props: { tableData: any }) {
           STATUS
         </p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <div className="flex items-center">
           {info.getValue() === "Approved" ? (
             <MdCheckCircle className="text-green-500 me-1 dark:text-green-300" />
@@ -66,7 +66,7 @@ export default function ComplexTable(props: { tableData: any }) {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
@@ -79,7 +79,7 @@ export default function ComplexTable(props: { tableData: any }) {
           PROGRESS
         </p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <div className="flex items-center">
           <Progress width="w-[108px]" value={info.getValue()} />
         </div>
@@ -110,9 +110,9 @@ export default function ComplexTable(props: { tableData: any }) {
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
         <table className="w-full">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: unknown) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header: unknown) => {
                   return (
                     <th
                       key={header.id}
@@ -140,10 +140,10 @@ export default function ComplexTable(props: { tableData: any }) {
             {table
               .getRowModel()
               .rows.slice(0, 5)
-              .map((row) => {
+              .map((row: unknown) => {
                 return (
                   <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
+                    {row.getVisibleCells().map((cell: unknown) => {
                       return (
                         <td
                           key={cell.id}

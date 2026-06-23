@@ -44,7 +44,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8888/api/v1";
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set: unknown, get: unknown) => ({
       accessToken: null,
       refreshToken: null,
   user: null,
@@ -52,10 +52,10 @@ export const useAuthStore = create<AuthState>()(
   isLoading: false,
   error: null,
 
-  setAccessToken: (token) => set({ accessToken: token }),
-  setRefreshToken: (token) => set({ refreshToken: token }),
+  setAccessToken: (token: unknown) => set({ accessToken: token }),
+  setRefreshToken: (token: unknown) => set({ refreshToken: token }),
 
-  setUser: (user) => set({ user, isAuthenticated: true }),
+  setUser: (user: unknown) => set({ user, isAuthenticated: true }),
 
   login: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
@@ -111,7 +111,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      partialize: (state) => ({ 
+      partialize: (state: unknown) => ({ 
         user: state.user, 
         isAuthenticated: state.isAuthenticated,
         accessToken: state.accessToken,

@@ -13,20 +13,20 @@ const apiClient = axios.create({
 
 // Request interceptor — attach auth token if available
 apiClient.interceptors.request.use(
-  (config) => {
+  (config: unknown) => {
     const token = localStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: unknown) => Promise.reject(error)
 );
 
 // Response interceptor — handle common errors
 apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: unknown) => response,
+  (error: unknown) => {
     if (error.response?.status === 401) {
       // Token expired or invalid — future: redirect to login
       console.warn("Unauthorized — token may be expired");

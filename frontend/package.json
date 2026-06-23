@@ -14,10 +14,7 @@
     "@fontsource-variable/geist": "^5.2.9",
     "@radix-ui/react-label": "^2.1.10",
     "@tanstack/react-table": "^8.7.9",
-    "@testing-library/jest-dom": "^6.4.6",
-    "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
-    "@types/jest": "^25.2.3",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "apexcharts": "^3.35.5",
@@ -72,19 +69,25 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.19.21",
     "@types/react-calendar": "^3.5.2",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-table": "^7.7.12",
     "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.4.8",
+    "jsdom": "^29.1.1",
     "postcss": "^8.4.16",
     "prettier": "^2.8.3",
     "prettier-plugin-tailwindcss": "^0.2.1",
     "tailwindcss": "^3.1.8",
     "tailwindcss-animate": "^1.0.7",
+    "ts-morph": "^28.0.0",
     "typescript": "^7.0.1-rc",
     "vite": "^8.0.16",
-    "vite-tsconfig-paths": "^6.1.1"
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.9"
   }
 }

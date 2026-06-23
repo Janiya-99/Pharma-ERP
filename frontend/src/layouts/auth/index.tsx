@@ -4,7 +4,7 @@ import type { ERPRoute } from "routes";
 
 export default function Auth() {
   const getRoutes = (routes: ERPRoute[]): any => {
-    return routes.map((prop, key) => {
+    return routes.map((prop: unknown, key: unknown) => {
       if (prop.layout === "/auth") {
         return (
           <Route path={`/${prop.path}`} element={prop.component} key={key} />

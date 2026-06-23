@@ -84,7 +84,7 @@ export function ERPListPage({
   });
 
   const filtered = React.useMemo(() => {
-    return data.filter((row) =>
+    return data.filter((row: unknown) =>
       String(row[searchKey] || "").toLowerCase().includes(search.toLowerCase())
     );
   }, [data, search, searchKey]);
@@ -92,7 +92,7 @@ export function ERPListPage({
   const columnHelper = createColumnHelper<any>();
 
   const tableColumns = React.useMemo(() => {
-    const cols = columns.map((col) =>
+    const cols = columns.map((col: unknown) =>
       columnHelper.accessor(col.key, {
         id: col.key,
         header: () => (
@@ -100,7 +100,7 @@ export function ERPListPage({
             {col.label.toUpperCase()}
           </p>
         ),
-        cell: (info) => (
+        cell: (info: unknown) => (
           <div className="text-[13px] font-bold text-navy-700 dark:text-white">
             {col.render ? col.render(info.row.original) : info.getValue() ?? "—"}
           </div>
@@ -117,11 +117,11 @@ export function ERPListPage({
               ACTIONS
             </p>
           ),
-          cell: (info) => (
+          cell: (info: unknown) => (
             <div className="flex items-center justify-end gap-2">
               {onRowClick && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); onRowClick(info.row.original); }}
+                  onClick={(e: any) => { e.stopPropagation(); onRowClick(info.row.original); }}
                   className="px-3 py-1.5 rounded-lg bg-brand-50 text-brand-600 text-[12px] font-bold hover:bg-brand-100 transition-colors"
                 >
                   View
@@ -129,7 +129,7 @@ export function ERPListPage({
               )}
               {onEdit && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); onEdit(info.row.original); }}
+                  onClick={(e: any) => { e.stopPropagation(); onEdit(info.row.original); }}
                   className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 text-[12px] font-bold hover:bg-amber-100 transition-colors"
                 >
                   Edit
@@ -137,7 +137,7 @@ export function ERPListPage({
               )}
               {onDelete && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); onDelete(info.row.original); }}
+                  onClick={(e: any) => { e.stopPropagation(); onDelete(info.row.original); }}
                   className="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-[12px] font-bold hover:bg-red-100 transition-colors"
                 >
                   Delete
@@ -198,7 +198,7 @@ export function ERPListPage({
               type="text"
               placeholder="Search..."
               value={search}
-              onChange={(e) => { setSearch(e.target.value); table.setPageIndex(0); }}
+              onChange={(e: any) => { setSearch(e.target.value); table.setPageIndex(0); }}
               className="w-full pl-9 pr-4 py-2 text-sm rounded-full bg-lightPrimary dark:bg-navy-900 text-navy-700 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all border border-transparent dark:border-navy-700"
             />
           </div>
@@ -214,9 +214,9 @@ export function ERPListPage({
         <div className="flex-1 overflow-auto w-full">
           <table className="w-full text-sm">
             <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
+              {table.getHeaderGroups().map((headerGroup: unknown) => (
                 <tr key={headerGroup.id} className="border-b border-gray-200 dark:border-navy-700">
-                  {headerGroup.headers.map((header) => (
+                  {headerGroup.headers.map((header: unknown) => (
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
@@ -256,12 +256,12 @@ export function ERPListPage({
                   </td>
                 </tr>
               ) : (
-                table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map((row: unknown) => (
                   <tr
                     key={row.id}
                     className="border-b border-gray-50 dark:border-navy-700 hover:bg-gray-50/50 dark:hover:bg-navy-700/30 transition-colors"
                   >
-                    {row.getVisibleCells().map((cell) => (
+                    {row.getVisibleCells().map((cell: unknown) => (
                       <td key={cell.id} className="px-4 py-4">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>

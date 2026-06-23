@@ -10,7 +10,7 @@ const FinancePageHeader: React.FC<FinancePageHeaderProps> = ({
   title,
   description,
   action,
-}) => {
+}: { title?: unknown; description?: unknown; action?: unknown }) => {
   return (
     <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
       <div>

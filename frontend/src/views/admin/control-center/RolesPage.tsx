@@ -102,21 +102,21 @@ function PermissionPanel({
   if (!open) return null;
 
   const togglePerm = (p: string) => {
-    setPerms((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+    setPerms((prev: unknown) => prev.includes(p) ? prev.filter((x: unknown) => x !== p) : [...prev, p]);
   };
 
   const toggleCategory = (category: string) => {
     const categoryPerms = permissionMatrix[category as keyof typeof permissionMatrix];
-    const allSelected = categoryPerms.every((p) => perms.includes(p));
+    const allSelected = categoryPerms.every((p: unknown) => perms.includes(p));
     if (allSelected) {
-      setPerms((prev) => prev.filter((p) => !categoryPerms.includes(p)));
+      setPerms((prev: unknown) => prev.filter((p: unknown) => !categoryPerms.includes(p)));
     } else {
-      setPerms((prev) => [...new Set([...prev, ...categoryPerms])]);
+      setPerms((prev: unknown) => [...new Set([...prev, ...categoryPerms])]);
     }
   };
 
   return (
-    <Sheet open={open} onOpenChange={(val) => !val && onClose()}>
+    <Sheet open={open} onOpenChange={(val: unknown) => !val && onClose()}>
       <SheetContent side="right" className="w-[400px] sm:w-[600px] sm:max-w-none p-0 flex flex-col bg-white border-none shadow-2xl">
         {/* Header */}
         <SheetHeader className="px-6 py-5 border-b border-gray-100 text-left">
@@ -128,9 +128,9 @@ function PermissionPanel({
 
         {/* Permission Grid */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-          {Object.entries(permissionMatrix).map(([category, categoryPerms]) => {
-            const allSelected = categoryPerms.every((p) => perms.includes(p));
-            const someSelected = categoryPerms.some((p) => perms.includes(p));
+          {Object.entries(permissionMatrix).map(([category, categoryPerms]: unknown) => {
+            const allSelected = categoryPerms.every((p: unknown) => perms.includes(p));
+            const someSelected = categoryPerms.some((p: unknown) => perms.includes(p));
 
             return (
               <div key={category}>
@@ -151,11 +151,11 @@ function PermissionPanel({
                   </button>
                   <h3 className="text-sm font-bold text-navy-700">{category}</h3>
                   <span className="text-[11px] text-gray-400">
-                    {categoryPerms.filter((p) => perms.includes(p)).length}/{categoryPerms.length}
+                    {categoryPerms.filter((p: unknown) => perms.includes(p)).length}/{categoryPerms.length}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 ml-8">
-                  {categoryPerms.map((perm) => {
+                  {categoryPerms.map((perm: unknown) => {
                     const isChecked = perms.includes(perm);
                     return (
                       <button
@@ -274,9 +274,9 @@ export default function RolesPage() {
           {
             key: "actions",
             label: "Permissions",
-            render: (row) => (
+            render: (row: unknown) => (
               <button
-                onClick={(e) => { e.stopPropagation(); handleManagePerms(row); }}
+                onClick={(e: any) => { e.stopPropagation(); handleManagePerms(row); }}
                 className="text-[12px] font-semibold text-brand-500 hover:underline"
               >
                 Manage →

@@ -128,7 +128,7 @@ export default function AccountClassificationsPage() {
             loading={loading}
             onSearch={setSearch}
             searchPlaceholder="Search classifications..."
-            actions={(record) => (
+            actions={(record: unknown) => (
               <div className="flex space-x-2 justify-end">
                 <PermissionGuard permission="finance.account_classification.update">
                   <button 

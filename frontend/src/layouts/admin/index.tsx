@@ -37,7 +37,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
     for (const route of routes) {
       if (route.layout !== "/admin") continue;
       if (route.children) {
-        const child = route.children.find((c) => location.pathname.includes(c.path));
+        const child = route.children.find((c: unknown) => location.pathname.includes(c.path));
         if (child) return `${route.name} / ${child.name}`;
       } else if (location.pathname.includes(route.path)) {
         return route.name;
@@ -49,7 +49,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
   // Flatten all admin routes for rendering
   const renderRoutes = (routes: ERPRoute[]) => {
     const result: JSX.Element[] = [];
-    routes.forEach((route, i) => {
+    routes.forEach((route: unknown, i: unknown) => {
       if (route.layout !== "/admin") return;
       if (route.component) {
         result.push(
@@ -57,7 +57,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
         );
       }
       if (route.children) {
-        route.children.forEach((child, j) => {
+        route.children.forEach((child: unknown, j: unknown) => {
           result.push(
             <Route key={`${i}-${j}`} path={child.path} element={child.component} />
           );

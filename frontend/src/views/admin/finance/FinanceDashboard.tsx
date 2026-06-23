@@ -39,7 +39,7 @@ export default function FinanceDashboard() {
       });
     } catch (err) {
       console.error("Failed to fetch finance stats", err);
-      setStats((prev) => ({ ...prev, activeFinancialYear: "Error loading" }));
+      setStats((prev: unknown) => ({ ...prev, activeFinancialYear: "Error loading" }));
     }
   };
 

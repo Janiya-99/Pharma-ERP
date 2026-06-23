@@ -10,7 +10,7 @@ const MoneyDisplay: React.FC<MoneyDisplayProps> = ({
   amount,
   currency = "LKR",
   className = "",
-}) => {
+}: { amount?: unknown; currency?: unknown; className?: unknown }) => {
   const numericAmount = typeof amount === "string" ? parseFloat(amount) : amount;
   
   const formattedAmount = new Intl.NumberFormat("en-US", {

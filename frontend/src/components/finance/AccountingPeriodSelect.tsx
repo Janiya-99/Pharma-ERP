@@ -25,7 +25,7 @@ const AccountingPeriodSelect: React.FC<AccountingPeriodSelectProps> = ({
   placeholder = "Select Period",
   className,
   disabled,
-}) => {
+}: { value?: unknown; onChange?: unknown; financialYearId?: string | number; placeholder?: unknown; className?: unknown; disabled?: unknown }) => {
   const [periods, setPeriods] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -61,7 +61,7 @@ const AccountingPeriodSelect: React.FC<AccountingPeriodSelectProps> = ({
         <SelectValue placeholder={!financialYearId ? "Select FY first" : loading ? "Loading..." : placeholder} />
       </SelectTrigger>
       <SelectContent className="bg-white dark:bg-navy-800">
-        {periods.map((item) => (
+        {periods.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
             {item.period_name} ({item.start_date} to {item.end_date})
           </SelectItem>

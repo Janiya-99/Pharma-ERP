@@ -134,7 +134,7 @@ export default function FinancialYearsPage() {
           onLimitChange={setLimit}
           onSearch={setSearch}
           searchPlaceholder="Search financial years..."
-          actions={(record) => (
+          actions={(record: unknown) => (
             <div className="flex space-x-2 justify-end">
               {!record.is_closed && (
                 <PermissionGuard permission="finance.financial_year.update">

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 const branchFields: FormField[] = [
   { key: "name", label: "Branch Name", type: "text", required: true, placeholder: "e.g. Kandy Branch" },
-  { key: "code", label: "Branch Code", type: "text", required: true, placeholder: "e.g. KDY", validate: (v) => v && v.length > 5 ? "Code must be 5 characters or less" : null },
+  { key: "code", label: "Branch Code", type: "text", required: true, placeholder: "e.g. KDY", validate: (v: unknown) => v && v.length > 5 ? "Code must be 5 characters or less" : null },
   { key: "address", label: "Address", type: "textarea", span: 2, placeholder: "Full branch address" },
   { key: "phone", label: "Contact Number", type: "tel", placeholder: "+94 81 222 3344" },
   { key: "is_active", label: "Status", type: "select", options: [
@@ -92,7 +92,7 @@ export default function BranchPage() {
           { key: "name", label: "Branch Name" },
           { key: "address", label: "Address" },
           { key: "phone", label: "Contact" },
-          { key: "status", label: "Status", render: (row) => <StatusBadge status={row.is_active ? "Active" : "Inactive"} /> },
+          { key: "status", label: "Status", render: (row: unknown) => <StatusBadge status={row.is_active ? "Active" : "Inactive"} /> },
         ]}
       />
 

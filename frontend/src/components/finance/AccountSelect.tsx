@@ -23,7 +23,7 @@ const AccountSelect: React.FC<AccountSelectProps> = ({
   placeholder = "Select Account",
   className,
   disabled,
-}) => {
+}: { value?: unknown; onChange?: unknown; placeholder?: unknown; className?: unknown; disabled?: unknown }) => {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +51,7 @@ const AccountSelect: React.FC<AccountSelectProps> = ({
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
       <SelectContent className="bg-white dark:bg-navy-800">
-        {accounts.map((item) => (
+        {accounts.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
             {item.account_code} - {item.account_name}
           </SelectItem>

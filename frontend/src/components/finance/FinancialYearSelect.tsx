@@ -23,7 +23,7 @@ const FinancialYearSelect: React.FC<FinancialYearSelectProps> = ({
   placeholder = "Select Financial Year",
   className,
   disabled,
-}) => {
+}: { value?: unknown; onChange?: unknown; placeholder?: unknown; className?: unknown; disabled?: unknown }) => {
   const [years, setYears] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +51,7 @@ const FinancialYearSelect: React.FC<FinancialYearSelectProps> = ({
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
       <SelectContent className="bg-white dark:bg-navy-800">
-        {years.map((item) => (
+        {years.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
             {item.year_name} ({item.start_date} to {item.end_date})
           </SelectItem>

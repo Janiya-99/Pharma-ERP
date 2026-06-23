@@ -139,7 +139,7 @@ export default function AccountingPeriodsPage() {
           onLimitChange={setLimit}
           onSearch={setSearch}
           searchPlaceholder="Search periods..."
-          actions={(record) => (
+          actions={(record: unknown) => (
             <div className="flex space-x-2 justify-end">
               {!record.is_closed && (
                 <PermissionGuard permission="finance.accounting_period.update">

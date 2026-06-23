@@ -37,7 +37,7 @@ function Calendar({
       captionLayout={captionLayout}
       locale={locale}
       formatters={{
-        formatMonthDropdown: (date) =>
+        formatMonthDropdown: (date: unknown) =>
           date.toLocaleString(locale?.code, { month: "short" }),
         ...formatters,
       }}
@@ -132,7 +132,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
+        Root: ({ className, rootRef, ...props }: { className?: unknown; rootRef?: unknown; props?: unknown }) => {
           return (
             <div
               data-slot="calendar"
@@ -142,7 +142,7 @@ function Calendar({
             />
           )
         },
-        Chevron: ({ className, orientation, ...props }) => {
+        Chevron: ({ className, orientation, ...props }: { className?: unknown; orientation?: unknown; props?: unknown }) => {
           if (orientation === "left") {
             return (
               <ChevronLeftIcon className={cn("size-4", className)} {...props} />
@@ -159,10 +159,10 @@ function Calendar({
             <ChevronDownIcon className={cn("size-4", className)} {...props} />
           )
         },
-        DayButton: ({ ...props }) => (
+        DayButton: ({ ...props }: { props?: unknown }) => (
           <CalendarDayButton locale={locale} {...props} />
         ),
-        WeekNumber: ({ children, ...props }) => {
+        WeekNumber: ({ children, ...props }: { children?: React.ReactNode; props?: unknown }) => {
           return (
             <td {...props}>
               <div className="flex size-[var(--cell-size)] items-center justify-center text-center">

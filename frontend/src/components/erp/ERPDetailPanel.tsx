@@ -47,7 +47,7 @@ export function ERPDetailPanel({
   children,
 }: ERPDetailPanelProps) {
   return (
-    <Sheet open={open} onOpenChange={(val) => !val && onClose()}>
+    <Sheet open={open} onOpenChange={(val: unknown) => !val && onClose()}>
       <SheetContent side="right" className="w-[400px] sm:w-[500px] sm:max-w-none p-0 flex flex-col bg-white border-none shadow-2xl">
         {/* Header */}
         <SheetHeader className="px-6 py-4 border-b border-gray-100 text-left">
@@ -101,7 +101,7 @@ export function ERPDetailPanel({
         {/* Detail Fields */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-            {fields.map((field, i) => (
+            {fields.map((field: unknown, i: unknown) => (
               <div
                 key={i}
                 className={field.span === 2 ? "col-span-2" : ""}

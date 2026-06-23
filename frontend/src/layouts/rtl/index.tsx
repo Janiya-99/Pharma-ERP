@@ -44,7 +44,7 @@ export default function RTL() {
     return activeNavbar;
   };
   const getRoutes = (routes: RoutesType[]): any => {
-    return routes.map((prop, key) => {
+    return routes.map((prop: unknown, key: unknown) => {
       if (prop.layout === "/rtl") {
         return (
           <Route path={`/${prop.path}`} element={prop.component} key={key} />

@@ -121,7 +121,7 @@ export default function ChartOfAccountsPage() {
           onLimitChange={setLimit}
           onSearch={setSearch}
           searchPlaceholder="Search accounts by code or name..."
-          actions={(record) => (
+          actions={(record: unknown) => (
             <div className="flex space-x-2 justify-end">
               <PermissionGuard permission="finance.chart_of_account.update">
                 <button 

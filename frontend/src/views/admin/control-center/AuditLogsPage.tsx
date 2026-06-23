@@ -17,7 +17,7 @@ export default function AuditLogsPage() {
         { key: "table", label: "Table" },
         { key: "recordId", label: "Record ID" },
         { key: "ip", label: "IP Address" },
-        { key: "status", label: "Status", render: (row) => <StatusBadge status={row.status} /> },
+        { key: "status", label: "Status", render: (row: unknown) => <StatusBadge status={row.status} /> },
       ]}
     />
   );

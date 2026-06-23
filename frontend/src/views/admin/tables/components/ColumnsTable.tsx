@@ -41,7 +41,7 @@ function ColumnsTable(props: { tableData: any }) {
           PROGRESS
         </p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
@@ -54,7 +54,7 @@ function ColumnsTable(props: { tableData: any }) {
           QUANTITY
         </p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
@@ -65,7 +65,7 @@ function ColumnsTable(props: { tableData: any }) {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
@@ -96,9 +96,9 @@ function ColumnsTable(props: { tableData: any }) {
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
         <table className="w-full">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: unknown) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header: unknown) => {
                   return (
                     <th
                       key={header.id}
@@ -126,10 +126,10 @@ function ColumnsTable(props: { tableData: any }) {
             {table
               .getRowModel()
               .rows.slice(0, 5)
-              .map((row) => {
+              .map((row: unknown) => {
                 return (
                   <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
+                    {row.getVisibleCells().map((cell: unknown) => {
                       return (
                         <td
                           key={cell.id}

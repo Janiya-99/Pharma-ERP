@@ -19,14 +19,14 @@ const api = axios.create({
 
 // Request Interceptor — attach JWT access token from Zustand store
 api.interceptors.request.use(
-  (config) => {
+  (config: unknown) => {
     const token = useAuthStore.getState().accessToken;
     if (token && config.headers) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: unknown) => Promise.reject(error)
 );
 
 // Response Interceptor — handle 401 (token expired) and trigger refresh
@@ -34,7 +34,7 @@ let isRefreshing = false;
 let failedQueue: Array<{ resolve: (val: string) => void; reject: (err: any) => void }> = [];
 
 const processQueue = (error: any, token: string | null) => {
-  failedQueue.forEach((prom) => {
+  failedQueue.forEach((prom: unknown) => {
     if (error) prom.reject(error);
     else prom.resolve(token!);
   });
@@ -48,9 +48,9 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve: unknown, reject: unknown) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
+        }).then((token: unknown) => {
           if (originalRequest.headers) {
             (originalRequest.headers as any)["Authorization"] = `Bearer ${token}`;
           }

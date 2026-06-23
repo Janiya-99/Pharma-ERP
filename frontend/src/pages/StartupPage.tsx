@@ -11,7 +11,7 @@ const StartupPage = () => {
 
   useEffect(() => {
     checkHealth()
-      .then((data) => {
+      .then((data: Record<string, unknown>) => {
         setBackendStatus(data.status);
         setServiceName(data.service);
       })

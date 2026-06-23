@@ -100,14 +100,14 @@ export default function UsersPage() {
 
   // Dynamically update form fields with options
   const dynamicFields = [...userFields];
-  const bField = dynamicFields.find(f => f.key === "branch_id");
-  if (bField) bField.options = branches.map(b => ({ label: b.name, value: b.id.toString() }));
+  const bField = dynamicFields.find((f: unknown) => f.key === "branch_id");
+  if (bField) bField.options = branches.map((b: unknown) => ({ label: b.name, value: b.id.toString() }));
   
-  const dField = dynamicFields.find(f => f.key === "designation_id");
-  if (dField) dField.options = designations.map(d => ({ label: d.name, value: d.id.toString() }));
+  const dField = dynamicFields.find((f: unknown) => f.key === "designation_id");
+  if (dField) dField.options = designations.map((d: unknown) => ({ label: d.name, value: d.id.toString() }));
   
-  const rField = dynamicFields.find(f => f.key === "role_ids");
-  if (rField) rField.options = roles.map(r => ({ label: r.name, value: r.id.toString() }));
+  const rField = dynamicFields.find((f: unknown) => f.key === "role_ids");
+  if (rField) rField.options = roles.map((r: unknown) => ({ label: r.name, value: r.id.toString() }));
 
   const detailFields: DetailField[] = selected ? [
     { label: "Full Name", value: selected.full_name },
@@ -132,9 +132,9 @@ export default function UsersPage() {
         columns={[
           { key: "full_name", label: "Name" },
           { key: "email", label: "Email" },
-          { key: "designation", label: "Designation", render: (row) => row.designation?.name || "—" },
-          { key: "branch", label: "Branch", render: (row) => row.branch?.name || "—" },
-          { key: "status", label: "Status", render: (row) => <StatusBadge status={row.is_active ? "Active" : "Inactive"} /> },
+          { key: "designation", label: "Designation", render: (row: unknown) => row.designation?.name || "—" },
+          { key: "branch", label: "Branch", render: (row: unknown) => row.branch?.name || "—" },
+          { key: "status", label: "Status", render: (row: unknown) => <StatusBadge status={row.is_active ? "Active" : "Inactive"} /> },
         ]}
       />
 
@@ -143,7 +143,7 @@ export default function UsersPage() {
         onClose={() => setShowForm(false)}
         title={isEdit ? "Edit User" : "Add User"}
         subtitle="User account and access configuration"
-        fields={dynamicFields.map(f => isEdit && f.key === "password" ? { ...f, required: false, disabled: true, placeholder: "Hidden in edit mode" } : f)}
+        fields={dynamicFields.map((f: unknown) => isEdit && f.key === "password" ? { ...f, required: false, disabled: true, placeholder: "Hidden in edit mode" } : f)}
         initialValues={selected ? {
           ...selected,
           branch_id: selected.branch_id?.toString(),

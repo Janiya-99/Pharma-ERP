@@ -53,7 +53,7 @@ const NftCard = (props: {
             <span className="z-0 ml-px inline-flex h-8 w-8 items-center justify-center rounded-full border border-white bg-[#E0E5F2] text-xs text-navy-700 dark:!border-navy-800 dark:bg-gray-800 dark:text-white">
               +5
             </span>
-            {bidders.map((avt, key) => (
+            {bidders.map((avt: unknown, key: unknown) => (
               <span
                 key={key}
                 className="z-10 -mr-3 h-8 w-8 rounded-full border border-white dark:!border-navy-800"

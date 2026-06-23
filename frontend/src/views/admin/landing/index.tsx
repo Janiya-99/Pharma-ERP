@@ -102,8 +102,8 @@ const modules: ModuleCard[] = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
+  const user = useAuthStore((s: unknown) => s.user);
+  const logout = useAuthStore((s: unknown) => s.logout);
 
   const handleLogout = () => {
     logout();
@@ -201,7 +201,7 @@ export default function LandingPage() {
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 gap-3 xl:gap-4 flex-1 min-h-0 pb-1">
-                {modules.map((mod) => (
+                {modules.map((mod: unknown) => (
                   <div
                     key={mod.id}
                     onClick={() => navigate(mod.path)}
@@ -259,7 +259,7 @@ export default function LandingPage() {
                     { label: "Invoices", value: "24", color: "text-emerald-400", bg: "bg-emerald-500/10" },
                     { label: "Pending", value: "12", color: "text-amber-400", bg: "bg-amber-500/10" },
                     { label: "Alerts", value: "3", color: "text-rose-400", bg: "bg-rose-500/10" },
-                  ].map((stat) => (
+                  ].map((stat: unknown) => (
                     <div key={stat.label} className={`p-3 rounded-xl ${stat.bg} border border-white/5`}>
                       <p className={`text-xl font-extrabold ${stat.color} mb-0.5`}>{stat.value}</p>
                       <p className="text-[11px] font-semibold text-gray-400">{stat.label}</p>
@@ -278,7 +278,7 @@ export default function LandingPage() {
                 </div>
                 
                 <div className="space-y-4 overflow-y-auto pr-2 flex-1 min-h-0">
-                  {activities.map((activity, idx) => (
+                  {activities.map((activity: unknown, idx: unknown) => (
                     <div key={activity.id} className="relative pl-4">
                       {/* Timeline Line */}
                       {idx !== activities.length - 1 && (

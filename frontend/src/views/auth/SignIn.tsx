@@ -95,7 +95,7 @@ export default function SignIn() {
                 { icon: MdOutlineReceiptLong, text: "Invoice Management" },
                 { icon: MdOutlineVerifiedUser, text: "Compliance Ready" },
                 { icon: MdOutlineAssessment, text: "Financial Reports" }
-              ].map((feature, idx) => (
+              ].map((feature: unknown, idx: unknown) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-brand-300 border border-white/5 shadow-inner">
                     <feature.icon size={18} />
@@ -168,7 +168,7 @@ export default function SignIn() {
                 required
                 placeholder="you@company.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: any) => setEmail(e.target.value)}
                 className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] font-medium leading-relaxed text-navy-700 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm"
               />
             </div>
@@ -192,7 +192,7 @@ export default function SignIn() {
                   required
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e: any) => setPassword(e.target.value)}
                   className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 pr-12 text-[14px] font-medium leading-relaxed text-navy-700 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm"
                 />
                 <button
