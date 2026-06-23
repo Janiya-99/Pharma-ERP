@@ -96,12 +96,6 @@ company-migrate-create:
 	@read -p "Enter migration name: " name; \
 	GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(COMPANY_MIGRATE_DIR) create $$name sql
 
-# ==================== Seeding ====================
-
-seed:
-	@echo "Running database seeders..."
-	@go run ./cmd/seeder/main.go
-
 # ==================== Cleanup ====================
 
 clean:
