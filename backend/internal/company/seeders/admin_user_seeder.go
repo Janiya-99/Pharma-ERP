@@ -13,15 +13,36 @@ func SeedAdminUser(db *gorm.DB, logger *zap.Logger) error {
 	// 1. Find company by company_code = OMACX
 	var company models.Company
 	if err := db.Where("company_code = ?", "OMACX").First(&company).Error; err != nil {
-		logger.Warn("Company OMACX not found, skipping admin seeder", zap.Error(err))
-		return nil // Not an error to fail migration, just skip if company isn't there
+		logger.Warn("Company OMACX not found, attempting to create one", zap.Error(err))
+		company = models.Company{
+			CompanyCode: "OMACX",
+			CompanyName: "OMACX Pharmaceuticals",
+			Status:      "active",
+		}
+		if createErr := db.Create(&company).Error; createErr != nil {
+			logger.Error("Failed to create company, skipping admin seeder", zap.Error(createErr))
+			return nil
+		}
+		logger.Info("Created default company OMACX")
 	}
 
 	// 2. Find main branch where is_main_branch = true
 	var mainBranch models.Branch
 	if err := db.Where("company_id = ? AND is_main_branch = ?", company.ID, true).First(&mainBranch).Error; err != nil {
-		logger.Warn("Main branch not found, skipping admin seeder", zap.Error(err))
-		return nil
+		logger.Warn("Main branch not found, attempting to create one", zap.Error(err))
+		mainBranch = models.Branch{
+			CompanyID:    company.ID,
+			BranchCode:   "MAIN",
+			BranchName:   "Main Branch",
+			BranchType:   "Headquarters",
+			IsMainBranch: true,
+			Status:       "active",
+		}
+		if createErr := db.Create(&mainBranch).Error; createErr != nil {
+			logger.Error("Failed to create main branch, skipping admin seeder", zap.Error(createErr))
+			return nil
+		}
+		logger.Info("Created default main branch")
 	}
 
 	// 3. Find Administration department if available

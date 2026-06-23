@@ -125,7 +125,7 @@ func main() {
 
 	// 9. Start Server
 	logger.Info("Starting API Server", zap.String("port", cfg.App.Port))
-	if err := r.Run(":" + cfg.App.Port); err != nil {
+	if err := r.Run("0.0.0.0:" + cfg.App.Port); err != nil {
 		logger.Fatal("Server failed", zap.Error(err))
 	}
 }

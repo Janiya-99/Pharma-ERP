@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/pixandco/erp-phrma/internal/model"
+	"github.com/pixandco/erp-phrma/internal/company/models"
 )
 
 // GoodsReceiptNoteApproval stores the approval history for a GRN
@@ -19,7 +19,7 @@ type GoodsReceiptNoteApproval struct {
 	ActionAt *time.Time `json:"action_at"`
 
 	// Relationships
-	User model.User `gorm:"foreignKey:ActionBy" json:"user"`
+	User models.User `gorm:"foreignKey:ActionBy" json:"user"`
 }
 
 // TableName overrides the table name used by GORM
