@@ -1,5 +1,5 @@
 import React from "react";
-import { formatNumber, formatCurrency } from "../../../lib/utils";
+import { formatNumber, formatCurrency } from "../../lib/utils";
 
 const StockTransferTotalsCard = ({ totalQuantity, totalStockValue, lineCount }) => {
   return (

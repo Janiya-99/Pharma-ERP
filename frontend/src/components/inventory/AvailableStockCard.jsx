@@ -1,6 +1,6 @@
 import React from "react";
 import { Info } from "lucide-react";
-import { formatNumber, formatCurrency, formatDate } from "../../../lib/utils";
+import { formatNumber, formatCurrency, formatDate } from "../../lib/utils";
 
 const AvailableStockCard = ({ stockBalance, loading }) => {
   if (loading) {

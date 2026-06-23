@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { inventoryApi } from "../../../api/inventoryApi";
-import { formatDate } from "../../../lib/utils";
+import { inventoryApi } from "../../api/inventoryApi";
+import { formatDate } from "../../lib/utils";
 
 const StockTransferLineBatchSelect = ({ productId, value, onChange, error, isDisabled }) => {
   const [batches, setBatches] = useState([]);

@@ -109,6 +109,17 @@ export const inventoryApi = {
   deleteStockTransfer: (id) => apiClient.delete(`/inventory/stock-transfers/${id}`),
   submitStockTransfer: (id, payload) => apiClient.post(`/inventory/stock-transfers/${id}/submit`, payload),
   approveStockTransfer: (id, payload) => apiClient.post(`/inventory/stock-transfers/${id}/approve`, payload),
-  rejectStockTransfer: (id, payload) => apiClient.post(`/inventory/stock-transfers/${id}/reject`, payload),
-  postStockTransfer: (id) => apiClient.post(`/inventory/stock-transfers/${id}/post`),
+  rejectStockTransfer: (id, payload) => apiClient.put(`/inventory/stock-transfers/${id}/reject`, payload),
+  postStockTransfer: (id) => apiClient.put(`/inventory/stock-transfers/${id}/post`),
+
+  // Stock Adjustments
+  getStockAdjustments: (params) => apiClient.get("/inventory/stock-adjustments", { params }),
+  getStockAdjustmentById: (id) => apiClient.get(`/inventory/stock-adjustments/${id}`),
+  createStockAdjustment: (payload) => apiClient.post("/inventory/stock-adjustments", payload),
+  updateStockAdjustment: (id, payload) => apiClient.put(`/inventory/stock-adjustments/${id}`, payload),
+  deleteStockAdjustment: (id) => apiClient.delete(`/inventory/stock-adjustments/${id}`),
+  submitStockAdjustment: (id, payload) => apiClient.put(`/inventory/stock-adjustments/${id}/submit`, payload),
+  approveStockAdjustment: (id, payload) => apiClient.put(`/inventory/stock-adjustments/${id}/approve`, payload),
+  rejectStockAdjustment: (id, payload) => apiClient.put(`/inventory/stock-adjustments/${id}/reject`, payload),
+  postStockAdjustment: (id) => apiClient.put(`/inventory/stock-adjustments/${id}/post`),
 };

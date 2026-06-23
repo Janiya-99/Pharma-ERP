@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { inventoryApi } from "../../../api/inventoryApi";
+import { inventoryApi } from "../../api/inventoryApi";
 
 const GRNLineBatchSelect = ({ productId, value, onChange, error, isDisabled }) => {
   const [batches, setBatches] = useState([]);

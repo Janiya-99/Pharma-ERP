@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { inventoryApi } from "../../../api/inventoryApi";
+import { inventoryApi } from "../../api/inventoryApi";
 
 const GRNLineProductSelect = ({ value, onChange, error, isDisabled }) => {
   const [products, setProducts] = useState([]);
