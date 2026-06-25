@@ -6,7 +6,7 @@ import { SalesReturn } from "types/inventory";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Card, CardContent } from "components/ui/card";
-import { DataTable } from "components/ui/data-table";
+import DataTable from "components/common/DataTable";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +20,7 @@ import {
   SalesReturnConditionBadge,
 } from "components/inventory/SalesReturnBadges";
 import PermissionGuard from "auth/PermissionGuard";
-import { useAuth } from "auth/AuthProvider";
+import { useAuth } from "auth/AuthContext";
 
 const SalesReturnsPage: React.FC = () => {
   const [data, setData] = useState<SalesReturn[]>([]);

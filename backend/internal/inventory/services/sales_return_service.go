@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pixandco/erp-phrma/internal/auth/models"
 	"github.com/pixandco/erp-phrma/internal/inventory/dto"
 	inventoryModels "github.com/pixandco/erp-phrma/internal/inventory/models"
 	"github.com/pixandco/erp-phrma/internal/inventory/repositories"
-	"github.com/pixandco/erp-phrma/internal/system/services"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -17,20 +15,19 @@ import (
 type SalesReturnService interface {
 	ListSalesReturns(db *gorm.DB, companyID uint64, filter dto.SalesReturnFilter) ([]inventoryModels.SalesReturn, int64, error)
 	GetSalesReturnByID(db *gorm.DB, companyID, id uint64) (*inventoryModels.SalesReturn, error)
-	CreateSalesReturn(db *gorm.DB, authCtx *models.AuthContext, req dto.CreateSalesReturnRequest) (*inventoryModels.SalesReturn, error)
-	UpdateSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.UpdateSalesReturnRequest) (*inventoryModels.SalesReturn, error)
-	DeleteSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64) error
-	SubmitSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.SalesReturnActionRequest) error
-	ApproveSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.SalesReturnActionRequest) error
-	RejectSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.SalesReturnActionRequest) error
-	PostSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64) error
+	CreateSalesReturn(db *gorm.DB, companyID, userID uint64, req dto.CreateSalesReturnRequest) (*inventoryModels.SalesReturn, error)
+	UpdateSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.UpdateSalesReturnRequest) (*inventoryModels.SalesReturn, error)
+	DeleteSalesReturn(db *gorm.DB, companyID, userID, id uint64) error
+	SubmitSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.SalesReturnActionRequest) error
+	ApproveSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.SalesReturnActionRequest) error
+	RejectSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.SalesReturnActionRequest) error
+	PostSalesReturn(db *gorm.DB, companyID, userID, id uint64) error
 }
 
 type salesReturnService struct {
 	repo                repositories.SalesReturnRepository
 	stockMovementRepo   repositories.StockMovementRepository
 	stockMovementSvc    InventoryStockMovementService
-	auditLogService     services.AuditLogService
 	logger              *zap.Logger
 }
 
@@ -38,14 +35,12 @@ func NewSalesReturnService(
 	repo repositories.SalesReturnRepository,
 	stockMovementRepo repositories.StockMovementRepository,
 	stockMovementSvc InventoryStockMovementService,
-	auditLogService services.AuditLogService,
 	logger *zap.Logger,
 ) SalesReturnService {
 	return &salesReturnService{
 		repo:              repo,
 		stockMovementRepo: stockMovementRepo,
 		stockMovementSvc:  stockMovementSvc,
-		auditLogService:   auditLogService,
 		logger:            logger,
 	}
 }
@@ -102,7 +97,7 @@ func (s *salesReturnService) GenerateSalesReturnNumber(db *gorm.DB, companyID ui
 	return fmt.Sprintf("%s%04d", yearMonthPrefix, nextSequence), nil
 }
 
-func (s *salesReturnService) CreateSalesReturn(db *gorm.DB, authCtx *models.AuthContext, req dto.CreateSalesReturnRequest) (*inventoryModels.SalesReturn, error) {
+func (s *salesReturnService) CreateSalesReturn(db *gorm.DB, companyID, userID uint64, req dto.CreateSalesReturnRequest) (*inventoryModels.SalesReturn, error) {
 	warehouse, err := s.stockMovementRepo.FindWarehouseByID(db, req.WarehouseID)
 	if err != nil {
 		return nil, err
@@ -123,13 +118,13 @@ func (s *salesReturnService) CreateSalesReturn(db *gorm.DB, authCtx *models.Auth
 		return nil, errors.New("invalid sales return date format")
 	}
 
-	returnNumber, err := s.GenerateSalesReturnNumber(db, authCtx.CompanyID)
+	returnNumber, err := s.GenerateSalesReturnNumber(db, companyID)
 	if err != nil {
 		return nil, err
 	}
 
 	salesReturn := &inventoryModels.SalesReturn{
-		CompanyID:                authCtx.CompanyID,
+		CompanyID:                companyID,
 		BranchID:                 req.BranchID,
 		WarehouseID:              req.WarehouseID,
 		FinancialYearID:          req.FinancialYearID,
@@ -147,8 +142,8 @@ func (s *salesReturnService) CreateSalesReturn(db *gorm.DB, authCtx *models.Auth
 		ApprovalStatus:           "draft",
 		PostedStatus:             "unposted",
 		Status:                   "active",
-		CreatedBy:                authCtx.UserID,
-		UpdatedBy:                authCtx.UserID,
+		CreatedBy:                userID,
+		UpdatedBy:                userID,
 	}
 
 	var totalQty, subtotal, discount, tax, total float64
@@ -231,13 +226,11 @@ func (s *salesReturnService) CreateSalesReturn(db *gorm.DB, authCtx *models.Auth
 		return nil, err
 	}
 
-	s.auditLogService.LogAction(db, authCtx, "SALES_RETURN_CREATED", "inventory", "sales_returns", salesReturn.ID, nil, salesReturn)
-
 	return salesReturn, nil
 }
 
-func (s *salesReturnService) UpdateSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.UpdateSalesReturnRequest) (*inventoryModels.SalesReturn, error) {
-	existing, err := s.repo.FindSalesReturnByID(db, authCtx.CompanyID, id)
+func (s *salesReturnService) UpdateSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.UpdateSalesReturnRequest) (*inventoryModels.SalesReturn, error) {
+	existing, err := s.repo.FindSalesReturnByID(db, companyID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +265,7 @@ func (s *salesReturnService) UpdateSalesReturn(db *gorm.DB, authCtx *models.Auth
 	existing.ReturnReason = req.ReturnReason
 	existing.ReturnCondition = req.ReturnCondition
 	existing.Remarks = req.Remarks
-	existing.UpdatedBy = authCtx.UserID
+	existing.UpdatedBy = userID
 
 	var totalQty, subtotal, discount, tax, total float64
 	var newLines []inventoryModels.SalesReturnLine
@@ -355,13 +348,11 @@ func (s *salesReturnService) UpdateSalesReturn(db *gorm.DB, authCtx *models.Auth
 		return nil, err
 	}
 
-	s.auditLogService.LogAction(db, authCtx, "SALES_RETURN_UPDATED", "inventory", "sales_returns", existing.ID, nil, existing)
-
 	return existing, nil
 }
 
-func (s *salesReturnService) DeleteSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64) error {
-	existing, err := s.repo.FindSalesReturnByID(db, authCtx.CompanyID, id)
+func (s *salesReturnService) DeleteSalesReturn(db *gorm.DB, companyID, userID, id uint64) error {
+	existing, err := s.repo.FindSalesReturnByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -377,16 +368,15 @@ func (s *salesReturnService) DeleteSalesReturn(db *gorm.DB, authCtx *models.Auth
 		return errors.New("posted sales returns cannot be deleted")
 	}
 
-	if err := s.repo.SoftDeleteSalesReturn(db, authCtx.CompanyID, id, authCtx.UserID); err != nil {
+	if err := s.repo.SoftDeleteSalesReturn(db, companyID, id, userID); err != nil {
 		return err
 	}
 
-	s.auditLogService.LogAction(db, authCtx, "SALES_RETURN_DELETED", "inventory", "sales_returns", id, existing, nil)
 	return nil
 }
 
-func (s *salesReturnService) SubmitSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.SalesReturnActionRequest) error {
-	existing, err := s.repo.FindSalesReturnByID(db, authCtx.CompanyID, id)
+func (s *salesReturnService) SubmitSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.SalesReturnActionRequest) error {
+	existing, err := s.repo.FindSalesReturnByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -406,7 +396,7 @@ func (s *salesReturnService) SubmitSalesReturn(db *gorm.DB, authCtx *models.Auth
 
 	if err := s.repo.UpdateSalesReturnStatus(db, id, map[string]interface{}{
 		"approval_status": "pending",
-		"updated_by":      authCtx.UserID,
+		"updated_by":      userID,
 	}); err != nil {
 		return err
 	}
@@ -415,19 +405,18 @@ func (s *salesReturnService) SubmitSalesReturn(db *gorm.DB, authCtx *models.Auth
 		SalesReturnID: id,
 		Action:        "submitted",
 		Remarks:       req.Remarks,
-		ActionBy:      authCtx.UserID,
+		ActionBy:      userID,
 		ActionAt:      time.Now(),
 	}
 	if err := s.repo.CreateSalesReturnApprovalRecord(db, approval); err != nil {
 		return err
 	}
 
-	s.auditLogService.LogAction(db, authCtx, "SALES_RETURN_SUBMITTED", "inventory", "sales_returns", id, nil, nil)
 	return nil
 }
 
-func (s *salesReturnService) ApproveSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.SalesReturnActionRequest) error {
-	existing, err := s.repo.FindSalesReturnByID(db, authCtx.CompanyID, id)
+func (s *salesReturnService) ApproveSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.SalesReturnActionRequest) error {
+	existing, err := s.repo.FindSalesReturnByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -442,9 +431,9 @@ func (s *salesReturnService) ApproveSalesReturn(db *gorm.DB, authCtx *models.Aut
 	now := time.Now()
 	if err := s.repo.UpdateSalesReturnStatus(db, id, map[string]interface{}{
 		"approval_status": "approved",
-		"approved_by":     authCtx.UserID,
+		"approved_by":     userID,
 		"approved_at":     now,
-		"updated_by":      authCtx.UserID,
+		"updated_by":      userID,
 	}); err != nil {
 		return err
 	}
@@ -453,23 +442,22 @@ func (s *salesReturnService) ApproveSalesReturn(db *gorm.DB, authCtx *models.Aut
 		SalesReturnID: id,
 		Action:        "approved",
 		Remarks:       req.Remarks,
-		ActionBy:      authCtx.UserID,
+		ActionBy:      userID,
 		ActionAt:      now,
 	}
 	if err := s.repo.CreateSalesReturnApprovalRecord(db, approval); err != nil {
 		return err
 	}
 
-	s.auditLogService.LogAction(db, authCtx, "SALES_RETURN_APPROVED", "inventory", "sales_returns", id, nil, nil)
 	return nil
 }
 
-func (s *salesReturnService) RejectSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64, req dto.SalesReturnActionRequest) error {
+func (s *salesReturnService) RejectSalesReturn(db *gorm.DB, companyID, userID, id uint64, req dto.SalesReturnActionRequest) error {
 	if req.Remarks == "" {
 		return errors.New("remarks are required for rejection")
 	}
 
-	existing, err := s.repo.FindSalesReturnByID(db, authCtx.CompanyID, id)
+	existing, err := s.repo.FindSalesReturnByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -483,7 +471,7 @@ func (s *salesReturnService) RejectSalesReturn(db *gorm.DB, authCtx *models.Auth
 
 	if err := s.repo.UpdateSalesReturnStatus(db, id, map[string]interface{}{
 		"approval_status": "rejected",
-		"updated_by":      authCtx.UserID,
+		"updated_by":      userID,
 	}); err != nil {
 		return err
 	}
@@ -492,19 +480,18 @@ func (s *salesReturnService) RejectSalesReturn(db *gorm.DB, authCtx *models.Auth
 		SalesReturnID: id,
 		Action:        "rejected",
 		Remarks:       req.Remarks,
-		ActionBy:      authCtx.UserID,
+		ActionBy:      userID,
 		ActionAt:      time.Now(),
 	}
 	if err := s.repo.CreateSalesReturnApprovalRecord(db, approval); err != nil {
 		return err
 	}
 
-	s.auditLogService.LogAction(db, authCtx, "SALES_RETURN_REJECTED", "inventory", "sales_returns", id, nil, nil)
 	return nil
 }
 
-func (s *salesReturnService) PostSalesReturn(db *gorm.DB, authCtx *models.AuthContext, id uint64) error {
-	existing, err := s.repo.FindSalesReturnByID(db, authCtx.CompanyID, id)
+func (s *salesReturnService) PostSalesReturn(db *gorm.DB, companyID, userID, id uint64) error {
+	existing, err := s.repo.FindSalesReturnByID(db, companyID, id)
 	if err != nil {
 		return err
 	}
@@ -520,7 +507,7 @@ func (s *salesReturnService) PostSalesReturn(db *gorm.DB, authCtx *models.AuthCo
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
-		exists, err := s.repo.CheckSalesReturnLedgerExists(tx, authCtx.CompanyID, id)
+		exists, err := s.repo.CheckSalesReturnLedgerExists(tx, companyID, id)
 		if err != nil {
 			return err
 		}
@@ -549,7 +536,7 @@ func (s *salesReturnService) PostSalesReturn(db *gorm.DB, authCtx *models.AuthCo
 			}
 
 			stockInPayload := dto.StockInPayload{
-				CompanyID:           authCtx.CompanyID,
+				CompanyID:           companyID,
 				BranchID:            existing.BranchID,
 				WarehouseID:         existing.WarehouseID,
 				WarehouseLocationID: line.WarehouseLocationID,
@@ -562,7 +549,7 @@ func (s *salesReturnService) PostSalesReturn(db *gorm.DB, authCtx *models.AuthCo
 				Quantity:            line.ReturnQuantity,
 				UnitCost:            line.StockUnitCost,
 				Remarks:             fmt.Sprintf("Sales Return %s", existing.SalesReturnNumber),
-				CreatedBy:           authCtx.UserID,
+				CreatedBy:           userID,
 				AllowExpiredBatch:   allowExpired,
 				AllowBlockedBatch:   allowBlocked,
 				AllowRecalledBatch:  allowRecalled,
@@ -576,9 +563,9 @@ func (s *salesReturnService) PostSalesReturn(db *gorm.DB, authCtx *models.AuthCo
 		now := time.Now()
 		if err := s.repo.UpdateSalesReturnStatus(tx, id, map[string]interface{}{
 			"posted_status": "posted",
-			"posted_by":     authCtx.UserID,
+			"posted_by":     userID,
 			"posted_at":     now,
-			"updated_by":    authCtx.UserID,
+			"updated_by":    userID,
 		}); err != nil {
 			return err
 		}
@@ -587,14 +574,13 @@ func (s *salesReturnService) PostSalesReturn(db *gorm.DB, authCtx *models.AuthCo
 			SalesReturnID: id,
 			Action:        "posted",
 			Remarks:       "Posted to stock ledger",
-			ActionBy:      authCtx.UserID,
+			ActionBy:      userID,
 			ActionAt:      now,
 		}
 		if err := s.repo.CreateSalesReturnApprovalRecord(tx, approval); err != nil {
 			return err
 		}
 
-		s.auditLogService.LogAction(tx, authCtx, "SALES_RETURN_POSTED", "inventory", "sales_returns", id, nil, nil)
 		return nil
 	})
 }

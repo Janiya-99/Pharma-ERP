@@ -48,7 +48,7 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	purchaseReturnRepo := repositories.NewPurchaseReturnRepository()
 	purchaseReturnSvc := services.NewPurchaseReturnService(purchaseReturnRepo, stockMovementSvc)
 	salesReturnRepo := repositories.NewSalesReturnRepository()
-	salesReturnSvc := services.NewSalesReturnService(salesReturnRepo, stockMovementRepo, stockMovementSvc, invAuditLogger, logger)
+	salesReturnSvc := services.NewSalesReturnService(salesReturnRepo, stockMovementRepo, stockMovementSvc, logger)
 
 
 	// 3. Initialize Handlers
