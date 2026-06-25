@@ -66,6 +66,9 @@ import StockAdjustmentDetailsPage from "../pages/inventory/stock-adjustments/Sto
 import PurchaseReturnsPage from "../pages/inventory/purchase-returns/PurchaseReturnsPage";
 import PurchaseReturnFormPage from "../pages/inventory/purchase-returns/PurchaseReturnFormPage";
 import PurchaseReturnDetailsPage from "../pages/inventory/purchase-returns/PurchaseReturnDetailsPage";
+import SalesReturnsPage from "../pages/inventory/sales-returns/SalesReturnsPage";
+import SalesReturnFormPage from "../pages/inventory/sales-returns/SalesReturnFormPage";
+import SalesReturnDetailsPage from "../pages/inventory/sales-returns/SalesReturnDetailsPage";
 import OpeningStockEntriesPage from "../pages/inventory/opening-stock/OpeningStockEntriesPage";
 import OpeningStockEntryFormPage from "../pages/inventory/opening-stock/OpeningStockEntryFormPage";
 import OpeningStockEntryDetailsPage from "../pages/inventory/opening-stock/OpeningStockEntryDetailsPage";
@@ -158,6 +161,10 @@ const AppRoutes = () => {
           <Route path="/inventory/purchase-returns/create" element={<PurchaseReturnFormPage />} />
           <Route path="/inventory/purchase-returns/:id" element={<PurchaseReturnDetailsPage />} />
           <Route path="/inventory/purchase-returns/:id/edit" element={<PurchaseReturnFormPage />} />
+          <Route path="/inventory/sales-returns" element={<SalesReturnsPage />} />
+          <Route path="/inventory/sales-returns/create" element={<SalesReturnFormPage />} />
+          <Route path="/inventory/sales-returns/:id" element={<SalesReturnDetailsPage />} />
+          <Route path="/inventory/sales-returns/:id/edit" element={<SalesReturnFormPage />} />
           <Route path="/invoice-center/dashboard" element={<PlaceholderPage title="Invoice Center Dashboard" />} />
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>

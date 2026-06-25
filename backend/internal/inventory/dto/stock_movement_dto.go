@@ -17,6 +17,10 @@ type StockInPayload struct {
 	UnitCost            float64    `json:"unit_cost" validate:"gte=0"`
 	Remarks             string     `json:"remarks"`
 	CreatedBy           uint64     `json:"created_by" validate:"required"`
+
+	AllowExpiredBatch  bool `json:"allow_expired_batch"`
+	AllowBlockedBatch  bool `json:"allow_blocked_batch"`
+	AllowRecalledBatch bool `json:"allow_recalled_batch"`
 }
 
 type StockOutPayload struct {

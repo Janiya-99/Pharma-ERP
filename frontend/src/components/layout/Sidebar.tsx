@@ -76,6 +76,7 @@ const Sidebar = () => {
     { name: "Opening Stock", path: "/inventory/opening-stock", icon: FileCheck, permission: "inventory.opening_stock.view" },
     { name: "GRN / Goods Receipt", path: "/inventory/grns", icon: FileCheck, permission: "inventory.grn.view" },
     { name: "Purchase Returns", path: "/inventory/purchase-returns", icon: Archive, permission: "inventory.purchase_return.view" },
+    { name: "Sales Returns", path: "/inventory/sales-returns", icon: Archive, permission: "inventory.sales_return.view" },
     { name: "Stock Transfers", path: "/inventory/stock-transfers", icon: Truck, permission: "inventory.stock_transfer.view" },
     { name: "Stock Adjustments", path: "/inventory/stock-adjustments", icon: GitMerge, permission: "inventory.stock_adjustment.view" },
     { name: "Stock Balances", path: "/inventory/stock-balances", icon: Box, permission: "inventory.stock_balance.view" },

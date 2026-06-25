@@ -133,5 +133,16 @@ export const inventoryApi = {
   approvePurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/approve`, payload),
   rejectPurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/reject`, payload),
   postPurchaseReturn: (id: string | number) => apiClient.post(`/inventory/purchase-returns/${id}/post`),
+
+  // Sales Returns
+  getSalesReturns: (params: Record<string, unknown>) => apiClient.get("/inventory/sales-returns", { params }),
+  getSalesReturnById: (id: string | number) => apiClient.get(`/inventory/sales-returns/${id}`),
+  createSalesReturn: (payload: Record<string, unknown>) => apiClient.post("/inventory/sales-returns", payload),
+  updateSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/sales-returns/${id}`, payload),
+  deleteSalesReturn: (id: string | number) => apiClient.delete(`/inventory/sales-returns/${id}`),
+  submitSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/sales-returns/${id}/submit`, payload),
+  approveSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/sales-returns/${id}/approve`, payload),
+  rejectSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/sales-returns/${id}/reject`, payload),
+  postSalesReturn: (id: string | number) => apiClient.post(`/inventory/sales-returns/${id}/post`),
 };
 

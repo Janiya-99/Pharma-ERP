@@ -174,13 +174,24 @@ func (s *inventoryStockMovementService) validateStockInMovement(db *gorm.DB, pay
 		if batch == nil {
 			return nil, nil, errors.New("invalid product batch")
 		}
-		if batch.IsBlocked {
+		if batch.IsBlocked && !payload.AllowBlockedBatch {
 			return nil, nil, errors.New("product batch is blocked")
 		}
-		if batch.BatchStatus == "expired" || batch.BatchStatus == "recalled" || batch.BatchStatus == "disposed" || batch.BatchStatus == "inactive" {
+		
+		isExpiredStatus := batch.BatchStatus == "expired"
+		isRecalledStatus := batch.BatchStatus == "recalled"
+		
+		if batch.BatchStatus == "disposed" || batch.BatchStatus == "inactive" {
 			return nil, nil, errors.New("product batch is in invalid state for stock in")
 		}
-		if product.RequiresExpiryTracking && batch.ExpiryDate != nil && batch.ExpiryDate.Before(time.Now()) {
+		if isExpiredStatus && !payload.AllowExpiredBatch {
+			return nil, nil, errors.New("product batch is expired")
+		}
+		if isRecalledStatus && !payload.AllowRecalledBatch {
+			return nil, nil, errors.New("product batch is recalled")
+		}
+		
+		if product.RequiresExpiryTracking && batch.ExpiryDate != nil && batch.ExpiryDate.Before(time.Now()) && !payload.AllowExpiredBatch {
 			return nil, nil, errors.New("product batch is expired")
 		}
 	}
