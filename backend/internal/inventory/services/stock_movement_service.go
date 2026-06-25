@@ -278,6 +278,8 @@ func (s *inventoryStockMovementService) createStockOutLedgerEntry(db *gorm.DB, p
 		entry.MovementType = "transfer_out"
 	} else if payload.SourceType == "stock_adjustment" {
 		entry.MovementType = "adjustment_out"
+	} else if payload.SourceType == "purchase_return" {
+		entry.MovementType = "return_out"
 	}
 
 	return s.repo.CreateStockLedgerEntry(db, entry)

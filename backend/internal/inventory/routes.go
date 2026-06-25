@@ -45,6 +45,9 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	stockTransferSvc := services.NewStockTransferService(stockTransferRepo, stockMovementSvc, stockMovementRepo, invAuditLogger)
 	stockAdjRepo := repositories.NewStockAdjustmentRepository()
 	stockAdjService := services.NewStockAdjustmentService(stockAdjRepo, stockMovementRepo, stockMovementSvc, invAuditLogger)
+	purchaseReturnRepo := repositories.NewPurchaseReturnRepository()
+	purchaseReturnSvc := services.NewPurchaseReturnService(purchaseReturnRepo, stockMovementSvc)
+
 
 	// 3. Initialize Handlers
 	warehouseHdl := handlers.NewWarehouseHandler(warehouseSvc, logger)
@@ -63,7 +66,9 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	grnHdl := handlers.NewGRNHandler(grnSvc)
 	stockTransferHdl := handlers.NewStockTransferHandler(stockTransferSvc)
 	stockAdjHandler := handlers.NewStockAdjustmentHandler(stockAdjService)
+	purchaseReturnHandler := handlers.NewPurchaseReturnHandler(purchaseReturnSvc)
 	dashboardHdl := handlers.NewDashboardHandler(logger)
+
 
 	inventory := r.Group("")
 
@@ -239,5 +244,18 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 		stockAdjustments.POST("/:id/approve", middleware.RequirePermission("inventory.stock_adjustment.approve"), stockAdjHandler.ApproveStockAdjustment)
 		stockAdjustments.POST("/:id/reject", middleware.RequirePermission("inventory.stock_adjustment.reject"), stockAdjHandler.RejectStockAdjustment)
 		stockAdjustments.POST("/:id/post", middleware.RequirePermission("inventory.stock_adjustment.post"), stockAdjHandler.PostStockAdjustment)
+	}
+
+	purchaseReturns := inventory.Group("/purchase-returns")
+	{
+		purchaseReturns.GET("", middleware.RequirePermission("inventory.purchase_return.view"), purchaseReturnHandler.FetchAll)
+		purchaseReturns.GET("/:id", middleware.RequirePermission("inventory.purchase_return.view"), purchaseReturnHandler.FetchByID)
+		purchaseReturns.POST("", middleware.RequirePermission("inventory.purchase_return.create"), purchaseReturnHandler.Create)
+		purchaseReturns.PUT("/:id", middleware.RequirePermission("inventory.purchase_return.update"), purchaseReturnHandler.Update)
+		purchaseReturns.DELETE("/:id", middleware.RequirePermission("inventory.purchase_return.delete"), purchaseReturnHandler.Delete)
+		purchaseReturns.POST("/:id/submit", middleware.RequirePermission("inventory.purchase_return.submit"), purchaseReturnHandler.Submit)
+		purchaseReturns.POST("/:id/approve", middleware.RequirePermission("inventory.purchase_return.approve"), purchaseReturnHandler.Approve)
+		purchaseReturns.POST("/:id/reject", middleware.RequirePermission("inventory.purchase_return.reject"), purchaseReturnHandler.Reject)
+		purchaseReturns.POST("/:id/post", middleware.RequirePermission("inventory.purchase_return.post"), purchaseReturnHandler.Post)
 	}
 }

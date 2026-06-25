@@ -81,6 +81,15 @@ func SeedInventoryPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"Stock Adjustment", "inventory.stock_adjustment.approve", "Approve Stock Adjustment"},
 		{"Stock Adjustment", "inventory.stock_adjustment.reject", "Reject Stock Adjustment"},
 		{"Stock Adjustment", "inventory.stock_adjustment.post", "Post Stock Adjustment"},
+
+		{"Purchase Return", "inventory.purchase_return.view", "View Purchase Return"},
+		{"Purchase Return", "inventory.purchase_return.create", "Create Purchase Return"},
+		{"Purchase Return", "inventory.purchase_return.update", "Update Purchase Return"},
+		{"Purchase Return", "inventory.purchase_return.delete", "Delete Purchase Return"},
+		{"Purchase Return", "inventory.purchase_return.submit", "Submit Purchase Return"},
+		{"Purchase Return", "inventory.purchase_return.approve", "Approve Purchase Return"},
+		{"Purchase Return", "inventory.purchase_return.reject", "Reject Purchase Return"},
+		{"Purchase Return", "inventory.purchase_return.post", "Post Purchase Return"},
 	}
 
 	for _, p := range permissions {
@@ -150,7 +159,11 @@ func SeedInventoryPermissions(db *gorm.DB, logger *zap.Logger) error {
 			k == "inventory.stock_adjustment.view" ||
 			k == "inventory.stock_adjustment.create" ||
 			k == "inventory.stock_adjustment.update" ||
-			k == "inventory.stock_adjustment.submit"
+			k == "inventory.stock_adjustment.submit" ||
+			k == "inventory.purchase_return.create" ||
+			k == "inventory.purchase_return.update" ||
+			k == "inventory.purchase_return.delete" ||
+			k == "inventory.purchase_return.submit"
 	})
 
 	assignPermission("INVENTORY_VIEWER", func(k string) bool {
