@@ -54,6 +54,8 @@ func CompanyAuthMiddleware(resolver *database.CompanyResolver) gin.HandlerFunc {
 		c.Set("authContext", authCtx)
 		c.Set("companyDB", db)
 		c.Set("tokenString", tokenString)
+		c.Set("company_id", claims.CompanyID)
+		c.Set("user_id", claims.UserID)
 
 		c.Next()
 	}
