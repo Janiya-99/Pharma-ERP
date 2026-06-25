@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { inventoryApi } from "api/inventoryApi";
 import { MdSend } from "react-icons/md";
 
-const SubmitOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOpen?: boolean; onClose?: unknown; entryId?: string | number; onSuccess?: unknown }) => {
+const SubmitOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOpen?: boolean; onClose?: any; entryId?: string | number; onSuccess?: any }) => {
   const [remarks, setRemarks] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -15,9 +15,9 @@ const SubmitOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOp
     try {
       await inventoryApi.submitOpeningStockEntry(entryId, { remarks });
       toast.success("Opening Stock submitted for approval");
-      onSuccess();
-      onClose();
-    } catch (error) {
+      if (onSuccess) onSuccess();
+      if (onClose) onClose();
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to submit entry");
     } finally {
       setSubmitting(false);

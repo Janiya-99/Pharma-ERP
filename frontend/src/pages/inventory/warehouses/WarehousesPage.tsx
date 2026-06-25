@@ -86,7 +86,7 @@ const WarehousesPage = () => {
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Warehouses</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage {Title.toLowerCase()}</p>
+          <p className="text-sm text-gray-500 mt-1">Manage warehouses</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">

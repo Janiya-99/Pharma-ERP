@@ -141,23 +141,23 @@ const BranchesPage = () => {
       header: "Actions",
       cellClassName: "text-right",
       cell: (row: unknown) => (
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end gap-1">
           <PermissionGuard permission="control.branch.update">
             <button
               onClick={() => openEditModal(row)}
-              className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+              className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-150"
               title="Edit"
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 className="w-3.5 h-3.5" />
             </button>
           </PermissionGuard>
           <PermissionGuard permission="control.branch.delete">
             <button
               onClick={() => confirmDelete(row)}
-              className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+              className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
               title="Delete"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           </PermissionGuard>
         </div>
@@ -166,14 +166,14 @@ const BranchesPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="page-content">
       <PageHeader
         title="Branches"
         description="Manage company branches, warehouses, and distribution centers."
         action={
           <PermissionGuard permission="control.branch.create">
             <Button onClick={openCreateModal}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-3.5 h-3.5" />
               Create Branch
             </Button>
           </PermissionGuard>
@@ -182,42 +182,44 @@ const BranchesPage = () => {
 
       <FormError message={error} />
 
-      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6 flex flex-col sm:flex-row gap-4 shadow-sm">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-          <Input
-            placeholder="Search branches..."
-            name="search"
-            value={filters.search}
-            onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
-            className="max-w-md"
-          />
-          <Button type="submit" variant="secondary" className="px-3">
-            <Search className="w-4 h-4" />
+      <div className="filter-bar">
+        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search branches..."
+              name="search"
+              value={filters.search}
+              onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
+              className="input-premium pl-9"
+            />
+          </div>
+          <Button type="submit" variant="secondary" size="sm">
+            <Search className="w-3.5 h-3.5" />
           </Button>
         </form>
-        <div className="flex gap-4">
-          <select
-            name="branch_type"
-            value={filters.branch_type}
-            onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
-            <option value="">All Types</option>
-            <option value="Main Branch">Main Branch</option>
-            <option value="Warehouse">Warehouse</option>
-            <option value="Sales Branch">Sales Branch</option>
-          </select>
-          <select
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+        <select
+          name="branch_type"
+          value={filters.branch_type}
+          onChange={handleFilterChange}
+          className="select-premium"
+        >
+          <option value="">All Types</option>
+          <option value="Main Branch">Main Branch</option>
+          <option value="Warehouse">Warehouse</option>
+          <option value="Sales Branch">Sales Branch</option>
+        </select>
+        <select
+          name="status"
+          value={filters.status}
+          onChange={handleFilterChange}
+          className="select-premium"
+        >
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       <DataTable

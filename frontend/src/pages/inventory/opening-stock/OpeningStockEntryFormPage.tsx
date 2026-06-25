@@ -15,9 +15,9 @@ const OpeningStockEntryFormPage = () => {
   const isEdit = !!id;
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
-  const [warehouses, setWarehouses] = useState([]);
-  const [financialYears, setFinancialYears] = useState([]);
-  const [accountingPeriods, setAccountingPeriods] = useState([]);
+  const [warehouses, setWarehouses] = useState<any[]>([]);
+  const [financialYears, setFinancialYears] = useState<any[]>([]);
+  const [accountingPeriods, setAccountingPeriods] = useState<any[]>([]);
   
   const [formData, setFormData] = useState({
     branch_id: "",
@@ -29,8 +29,8 @@ const OpeningStockEntryFormPage = () => {
     accounting_period_id: "",
   });
 
-  const [lines, setLines] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [lines, setLines] = useState<any[]>([]);
+  const [errors, setErrors] = useState<any>({});
 
   useEffect(() => {
     fetchLookups();
@@ -42,8 +42,8 @@ const OpeningStockEntryFormPage = () => {
   const fetchLookups = async () => {
     try {
       const wRes = await inventoryApi.getWarehouses({ limit: 1000, status: "active" });
-      if (wRes.success !== false) {
-        setWarehouses(wRes.data?.data || wRes.data || []);
+      if ((wRes as any).success !== false) {
+        setWarehouses((wRes as any).data?.data || (wRes as any).data || []);
       }
       
       // Attempt to load financial years/periods if available (optional in inventory scope)
@@ -52,9 +52,9 @@ const OpeningStockEntryFormPage = () => {
          // mock call or if there's an API, replace below
          // const fRes = await api.getFinancialYears();
          // setFinancialYears(fRes.data);
-      } catch (e) {}
+      } catch (e: any) {}
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to fetch lookups", err);
     }
   };
@@ -62,7 +62,7 @@ const OpeningStockEntryFormPage = () => {
   const fetchEntryDetails = async () => {
     try {
       const res = await inventoryApi.getOpeningStockEntryById(id);
-      const data = res.data?.data || res.data;
+      const data = (res as any).data?.data || (res as any).data;
       if (data) {
         setFormData({
           branch_id: data.branch_id || "",
@@ -75,7 +75,7 @@ const OpeningStockEntryFormPage = () => {
         });
         
         // Map lines
-        setLines((data.lines || []).map((line: unknown) => ({
+        setLines((data.lines || []).map((line: any) => ({
           ...line,
           product_id: line.product_id,
           product: line.product,
@@ -83,9 +83,9 @@ const OpeningStockEntryFormPage = () => {
           batch: line.product_batch,
         })));
       }
-    } catch (err) {
+    } catch (err: any) {
       toast.error("Failed to load opening stock entry");
-      navigate("/admin/inventory/opening-stock");
+      navigate("/inventory/opening-stock");
     } finally {
       setLoading(false);
     }
@@ -94,7 +94,7 @@ const OpeningStockEntryFormPage = () => {
   const calculateTotals = () => {
     let totalQty = 0;
     let totalValue = 0;
-    lines.forEach((line: unknown) => {
+    lines.forEach((line: any) => {
       const qty = parseFloat(line.quantity) || 0;
       const cost = parseFloat(line.unit_cost) || 0;
       totalQty += qty;
@@ -104,7 +104,7 @@ const OpeningStockEntryFormPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: any = {};
     if (!formData.branch_id) newErrors.branch_id = "Branch is required";
     if (!formData.warehouse_id) newErrors.warehouse_id = "Warehouse is required";
     if (!formData.opening_stock_date) newErrors.opening_stock_date = "Date is required";
@@ -113,7 +113,7 @@ const OpeningStockEntryFormPage = () => {
       newErrors.lines = "At least one line item is required";
     }
 
-    lines.forEach((line: unknown, index: unknown) => {
+    lines.forEach((line: any, index: number) => {
       if (!line.product_id) {
         newErrors[`lines.${index}`] = { ...newErrors[`lines.${index}`], product_id: "Product is required" };
       }
@@ -151,7 +151,7 @@ const OpeningStockEntryFormPage = () => {
         warehouse_id: parseInt(formData.warehouse_id),
         financial_year_id: formData.financial_year_id ? parseInt(formData.financial_year_id) : undefined,
         accounting_period_id: formData.accounting_period_id ? parseInt(formData.accounting_period_id) : undefined,
-        lines: lines.map((line: unknown, idx: unknown) => ({
+        lines: lines.map((line: any, idx: number) => ({
           warehouse_location_id: line.warehouse_location_id ? parseInt(line.warehouse_location_id) : undefined,
           product_id: parseInt(line.product_id),
           product_batch_id: line.product_batch_id ? parseInt(line.product_batch_id) : undefined,
@@ -169,8 +169,8 @@ const OpeningStockEntryFormPage = () => {
         await inventoryApi.createOpeningStockEntry(payload);
         toast.success("Opening Stock entry created successfully");
       }
-      navigate("/admin/inventory/opening-stock");
-    } catch (error) {
+      navigate("/inventory/opening-stock");
+    } catch (error: any) {
       toast.error(error.response?.data?.message || error.response?.data?.errors || "Failed to save entry");
     } finally {
       setSaving(false);
@@ -186,7 +186,7 @@ const OpeningStockEntryFormPage = () => {
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate("/admin/inventory/opening-stock")}
+            onClick={() => navigate("/inventory/opening-stock")}
             className="p-2 bg-white dark:bg-navy-800 rounded-full shadow hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -226,7 +226,7 @@ const OpeningStockEntryFormPage = () => {
                   className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.branch_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
                 >
                   <option value="">Select Branch</option>
-                  {branches.map((b: unknown) => <option key={b.id} value={b.id}>{b.branch_name}</option>)}
+                  {branches.map((b: any) => <option key={b.id} value={b.id}>{b.branch_name}</option>)}
                 </select>
                 {errors.branch_id && <p className="text-xs text-red-500 mt-1">{errors.branch_id}</p>}
               </div>
@@ -242,8 +242,8 @@ const OpeningStockEntryFormPage = () => {
                 >
                   <option value="">Select Warehouse</option>
                   {warehouses
-                    .filter((w: unknown) => !formData.branch_id || w.branch_id === parseInt(formData.branch_id))
-                    .map((w: unknown) => <option key={w.id} value={w.id}>{w.warehouse_name}</option>)}
+                    .filter((w: any) => !formData.branch_id || w.branch_id === parseInt(formData.branch_id))
+                    .map((w: any) => <option key={w.id} value={w.id}>{w.warehouse_name}</option>)}
                 </select>
                 {errors.warehouse_id && <p className="text-xs text-red-500 mt-1">{errors.warehouse_id}</p>}
               </div>
@@ -320,7 +320,7 @@ const OpeningStockEntryFormPage = () => {
                   disabled={financialYears.length === 0}
                 >
                   <option value="">None selected</option>
-                  {financialYears.map((fy: unknown) => <option key={fy.id} value={fy.id}>{fy.year_name}</option>)}
+                  {financialYears.map((fy: any) => <option key={fy.id} value={fy.id}>{fy.year_name}</option>)}
                 </select>
                 {financialYears.length === 0 && <p className="text-xs text-amber-500 mt-1">Lookup unavailable in current scope</p>}
               </div>
@@ -336,7 +336,7 @@ const OpeningStockEntryFormPage = () => {
                   disabled={accountingPeriods.length === 0}
                 >
                   <option value="">None selected</option>
-                  {accountingPeriods.map((ap: unknown) => <option key={ap.id} value={ap.id}>{ap.period_name}</option>)}
+                  {accountingPeriods.map((ap: any) => <option key={ap.id} value={ap.id}>{ap.period_name}</option>)}
                 </select>
               </div>
             </div>

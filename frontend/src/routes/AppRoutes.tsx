@@ -63,6 +63,12 @@ import StockTransferDetailsPage from "../pages/inventory/stock-transfers/StockTr
 import StockAdjustmentsPage from "../pages/inventory/stock-adjustments/StockAdjustmentsPage";
 import StockAdjustmentFormPage from "../pages/inventory/stock-adjustments/StockAdjustmentFormPage";
 import StockAdjustmentDetailsPage from "../pages/inventory/stock-adjustments/StockAdjustmentDetailsPage";
+import OpeningStockEntriesPage from "../pages/inventory/opening-stock/OpeningStockEntriesPage";
+import OpeningStockEntryFormPage from "../pages/inventory/opening-stock/OpeningStockEntryFormPage";
+import OpeningStockEntryDetailsPage from "../pages/inventory/opening-stock/OpeningStockEntryDetailsPage";
+import GRNsPage from "../pages/inventory/grns/GRNsPage";
+import GRNFormPage from "../pages/inventory/grns/GRNFormPage";
+import GRNDetailsPage from "../pages/inventory/grns/GRNDetailsPage";
 
 const AppRoutes = () => {
   return (
@@ -129,6 +135,14 @@ const AppRoutes = () => {
           <Route path="/inventory/product-batches/:id/edit" element={<ProductBatchFormPage />} />
           <Route path="/inventory/stock-balances" element={<StockBalancesPage />} />
           <Route path="/inventory/stock-ledger" element={<StockLedgerPage />} />
+          <Route path="/inventory/opening-stock" element={<OpeningStockEntriesPage />} />
+          <Route path="/inventory/opening-stock/create" element={<OpeningStockEntryFormPage />} />
+          <Route path="/inventory/opening-stock/:id" element={<OpeningStockEntryDetailsPage />} />
+          <Route path="/inventory/opening-stock/:id/edit" element={<OpeningStockEntryFormPage />} />
+          <Route path="/inventory/grns" element={<GRNsPage />} />
+          <Route path="/inventory/grns/create" element={<GRNFormPage />} />
+          <Route path="/inventory/grns/:id" element={<GRNDetailsPage />} />
+          <Route path="/inventory/grns/:id/edit" element={<GRNFormPage />} />
           <Route path="/inventory/stock-transfers" element={<StockTransfersPage />} />
           <Route path="/inventory/stock-transfers/create" element={<StockTransferFormPage />} />
           <Route path="/inventory/stock-transfers/:id" element={<StockTransferDetailsPage />} />

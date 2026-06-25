@@ -220,7 +220,7 @@ const UsersPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="page-content">
       <PageHeader
         title="Users"
         description="Manage system users, access, and permissions."
@@ -236,64 +236,41 @@ const UsersPage = () => {
 
       <FormError message={error} />
 
-      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6 flex flex-col xl:flex-row gap-4 shadow-sm">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-          <Input
-            placeholder="Search users..."
-            name="search"
-            value={filters.search}
-            onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
-            className="w-full xl:max-w-md"
-          />
-          <Button type="submit" variant="secondary" className="px-3">
-            <Search className="w-4 h-4" />
+      <div className="filter-bar">
+        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              name="search"
+              value={filters.search}
+              onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
+              className="input-premium pl-9"
+            />
+          </div>
+          <Button type="submit" variant="secondary" size="sm">
+            <Search className="w-3.5 h-3.5" />
           </Button>
         </form>
-        
+
         <div className="flex flex-wrap gap-2">
-          <select
-            name="department_id"
-            value={filters.department_id}
-            onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
+          <select name="department_id" value={filters.department_id} onChange={handleFilterChange} className="select-premium">
             <option value="">All Departments</option>
-            {departments.map((d: unknown) => (
-              <option key={d.id} value={d.id}>{d.department_name}</option>
-            ))}
+            {departments.map((d: any) => <option key={d.id} value={d.id}>{d.department_name}</option>)}
           </select>
-
-          <select
-            name="designation_id"
-            value={filters.designation_id}
-            onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
+          <select name="designation_id" value={filters.designation_id} onChange={handleFilterChange} className="select-premium">
             <option value="">All Designations</option>
-            {designations.map((d: unknown) => (
-              <option key={d.id} value={d.id}>{d.designation_name}</option>
-            ))}
+            {designations.map((d: any) => <option key={d.id} value={d.id}>{d.designation_name}</option>)}
           </select>
-
-          <select
-            name="user_type"
-            value={filters.user_type}
-            onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
+          <select name="user_type" value={filters.user_type} onChange={handleFilterChange} className="select-premium">
             <option value="">All Types</option>
             <option value="super_admin">Super Admin</option>
             <option value="company_admin">Company Admin</option>
             <option value="company_user">Company User</option>
             <option value="viewer">Viewer</option>
           </select>
-
-          <select
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
-          >
+          <select name="status" value={filters.status} onChange={handleFilterChange} className="select-premium">
             <option value="">All Statuses</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 import { Edit, Trash2, Send, CheckCircle, XCircle, FileInput, MoreVertical, Eye } from "lucide-react";
-import Dropdown from "../../dropdown";
+import Dropdown from "../dropdown";
 
 const GRNActionButtons = ({ 
   grn, 
@@ -13,7 +13,7 @@ const GRNActionButtons = ({
   onPost,
   showView = false,
   isDropdown = false
-}: { grn?: unknown; onDelete?: unknown; onSubmit?: unknown; onApprove?: unknown; onReject?: unknown; onPost?: unknown; showView?: unknown; isDropdown?: boolean }) => {
+}: { grn?: any; onDelete?: (grn: any) => void; onSubmit?: (grn: any) => void; onApprove?: (grn: any) => void; onReject?: (grn: any) => void; onPost?: (grn: any) => void; showView?: boolean; isDropdown?: boolean }) => {
   const { hasPermission } = useAuth();
   
   if (!grn) return null;
@@ -45,7 +45,7 @@ const GRNActionButtons = ({
         <div className="flex flex-col">
           {showView && canView && (
             <Link
-              to={`/admin/inventory/grns/${grn.id}`}
+              to={`/inventory/grns/${grn.id}`}
               className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
             >
               <Eye className="w-4 h-4 text-brand-500" /> View Details
@@ -54,7 +54,7 @@ const GRNActionButtons = ({
 
           {canEdit && (
             <Link
-              to={`/admin/inventory/grns/${grn.id}/edit`}
+              to={`/inventory/grns/${grn.id}/edit`}
               className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
             >
               <Edit className="w-4 h-4 text-blue-500" /> Edit GRN
@@ -118,7 +118,7 @@ const GRNActionButtons = ({
     <div className="flex flex-wrap gap-2">
       {canEdit && (
         <Link
-          to={`/admin/inventory/grns/${grn.id}/edit`}
+          to={`/inventory/grns/${grn.id}/edit`}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50"
         >
           <Edit className="w-4 h-4" /> Edit

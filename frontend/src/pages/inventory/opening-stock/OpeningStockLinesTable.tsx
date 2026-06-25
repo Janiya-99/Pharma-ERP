@@ -4,8 +4,8 @@ import OpeningStockLineProductSelect from "../../../components/inventory/Opening
 import OpeningStockLineBatchSelect from "../../../components/inventory/OpeningStockLineBatchSelect";
 import { inventoryApi } from "api/inventoryApi";
 
-const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: unknown; setLines?: unknown; warehouseId?: string | number; errors?: unknown }) => {
-  const [locations, setLocations] = useState([]);
+const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: any; setLines?: any; warehouseId?: string | number; errors?: any }) => {
+  const [locations, setLocations] = useState<any[]>([]);
 
   useEffect(() => {
     if (warehouseId) {
@@ -13,15 +13,15 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
     } else {
       setLocations([]);
       // Clear locations from all lines if warehouse changes to empty
-      setLines(lines.map((line: unknown) => ({ ...line, warehouse_location_id: "" })));
+      setLines(lines.map((line: any) => ({ ...line, warehouse_location_id: "" })));
     }
   }, [warehouseId]);
 
   const fetchWarehouseLocations = async (wId: string | number) => {
     try {
       const res = await inventoryApi.getWarehouseLocations({ warehouse_id: wId, limit: 1000, status: "active" });
-      if (res.success !== false) {
-        setLocations(res.data?.data || res.data || []);
+      if ((res as any).success !== false) {
+        setLocations((res as any).data?.data || (res as any).data || []);
       }
     } catch (err) {
       console.error("Failed to fetch locations", err);
@@ -46,11 +46,11 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
     ]);
   };
 
-  const handleRemoveLine = (index: unknown) => {
-    setLines(lines.filter((_: unknown, i: unknown) => i !== index));
+  const handleRemoveLine = (index: number) => {
+    setLines(lines.filter((_: any, i: number) => i !== index));
   };
 
-  const handleDuplicateLine = (index: unknown) => {
+  const handleDuplicateLine = (index: number) => {
     const lineToCopy = lines[index];
     setLines([
       ...lines.slice(0, index + 1),
@@ -62,7 +62,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
     ]);
   };
 
-  const handleLineChange = (index: unknown, field: unknown, value: unknown, extraData: unknown = {}) => {
+  const handleLineChange = (index: number, field: string, value: any, extraData: any = {}) => {
     const newLines = [...lines];
     newLines[index][field] = value;
 
@@ -127,7 +127,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                 </td>
               </tr>
             ) : (
-              lines.map((line: unknown, index: unknown) => {
+              lines.map((line: any, index: number) => {
                 const lineErrors = errors[`lines.${index}`] || {};
                 
                 return (
@@ -135,7 +135,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                     <td className="px-4 py-3 align-top">
                       <OpeningStockLineProductSelect
                         value={line.product_id}
-                        onChange={(val: unknown, product: unknown) => handleLineChange(index, "product_id", val, { product })}
+                        onChange={(val: any, product: any) => handleLineChange(index, "product_id", val, { product })}
                         error={lineErrors.product_id}
                       />
                       {line.product && (
@@ -153,7 +153,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                       <OpeningStockLineBatchSelect
                         productId={line.product_id}
                         value={line.product_batch_id}
-                        onChange={(val: unknown, batch: unknown) => handleLineChange(index, "product_batch_id", val, { batch })}
+                        onChange={(val: any, batch: any) => handleLineChange(index, "product_batch_id", val, { batch })}
                         error={lineErrors.product_batch_id}
                         isDisabled={!line.product || !line.product.requires_batch_tracking}
                       />
@@ -165,7 +165,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${lineErrors.warehouse_location_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
                       >
                         <option value="">-- Optional --</option>
-                        {locations.map((loc: unknown) => (
+                        {locations.map((loc: any) => (
                           <option key={loc.id} value={loc.id}>{loc.location_name}</option>
                         ))}
                       </select>

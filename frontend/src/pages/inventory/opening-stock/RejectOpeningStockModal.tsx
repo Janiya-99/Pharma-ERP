@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { inventoryApi } from "api/inventoryApi";
 import { MdCancel } from "react-icons/md";
 
-const RejectOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOpen?: boolean; onClose?: unknown; entryId?: string | number; onSuccess?: unknown }) => {
+const RejectOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOpen?: boolean; onClose?: any; entryId?: string | number; onSuccess?: any }) => {
   const [remarks, setRemarks] = useState("");
   const [rejecting, setRejecting] = useState(false);
   const [error, setError] = useState("");
@@ -22,9 +22,9 @@ const RejectOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOp
     try {
       await inventoryApi.rejectOpeningStockEntry(entryId, { remarks });
       toast.success("Opening Stock rejected successfully");
-      onSuccess();
-      onClose();
-    } catch (err) {
+      if (onSuccess) onSuccess();
+      if (onClose) onClose();
+    } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to reject entry");
     } finally {
       setRejecting(false);

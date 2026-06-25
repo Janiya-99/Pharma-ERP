@@ -16,7 +16,7 @@ import { formatCurrency, formatNumber, formatDate, formatDateTime } from "lib/ut
 const OpeningStockEntryDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [entry, setEntry] = useState(null);
+  const [entry, setEntry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
@@ -32,10 +32,10 @@ const OpeningStockEntryDetailsPage = () => {
     setLoading(true);
     try {
       const res = await inventoryApi.getOpeningStockEntryById(id);
-      setEntry(res.data?.data || res.data);
-    } catch (error) {
+      setEntry((res as any).data?.data || (res as any).data);
+    } catch (error: any) {
       toast.error("Failed to load details");
-      navigate("/admin/inventory/opening-stock");
+      navigate("/inventory/opening-stock");
     } finally {
       setLoading(false);
     }
@@ -46,8 +46,8 @@ const OpeningStockEntryDetailsPage = () => {
       try {
         await inventoryApi.deleteOpeningStockEntry(id);
         toast.success("Entry deleted successfully");
-        navigate("/admin/inventory/opening-stock");
-      } catch (error) {
+        navigate("/inventory/opening-stock");
+      } catch (error: any) {
         toast.error(error.response?.data?.message || "Failed to delete");
       }
     }
@@ -61,7 +61,7 @@ const OpeningStockEntryDetailsPage = () => {
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate("/admin/inventory/opening-stock")}
+            onClick={() => navigate("/inventory/opening-stock")}
             className="p-2 bg-white dark:bg-navy-800 rounded-full shadow hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -85,14 +85,14 @@ const OpeningStockEntryDetailsPage = () => {
           {entry.posted_status === "posted" && (
             <div className="flex gap-2">
               <Link
-                to={`/admin/inventory/stock-balances?warehouse_id=${entry.warehouse_id}`}
+                to={`/inventory/stock-balances?warehouse_id=${entry.warehouse_id}`}
                 className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-navy-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-navy-600 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700 text-sm font-medium"
               >
                 <PackageSearch className="h-4 w-4" />
                 View Stock
               </Link>
               <Link
-                to={`/admin/inventory/stock-ledger?source_type=opening_stock&source_id=${entry.id}`}
+                to={`/inventory/stock-ledger?source_type=opening_stock&source_id=${entry.id}`}
                 className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-navy-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-navy-600 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700 text-sm font-medium"
               >
                 <ListTree className="h-4 w-4" />
@@ -172,7 +172,7 @@ const OpeningStockEntryDetailsPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
-                  {entry.lines?.map((line: unknown, idx: unknown) => (
+                  {entry.lines?.map((line: any, idx: number) => (
                     <tr key={line.id} className="hover:bg-gray-50 dark:hover:bg-navy-800/50">
                       <td className="px-4 py-3 text-gray-500">{line.line_order || idx + 1}</td>
                       <td className="px-4 py-3">
@@ -207,7 +207,7 @@ const OpeningStockEntryDetailsPage = () => {
               </div>
               <div className="p-6">
                 <div className="space-y-6">
-                  {entry.approvals.map((approval: unknown) => (
+                  {entry.approvals.map((approval: any) => (
                     <div key={approval.id} className="relative flex gap-4">
                       <div className="absolute left-2.5 top-8 -bottom-6 w-px bg-gray-200 dark:bg-navy-700 last:hidden" />
                       <div className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${

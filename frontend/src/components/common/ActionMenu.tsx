@@ -1,62 +1,120 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { MoreVertical } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 
-const ActionMenu = ({ actions, item }: { actions?: unknown; item?: unknown }) => {
+interface Action {
+  label: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  permission?: string;
+  danger?: boolean;
+  onClick: (item: unknown) => void;
+}
+
+const ActionMenu = ({ actions, item }: { actions?: Action[]; item?: unknown }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const { hasPermission } = useAuth();
 
+  const visibleActions = (actions || []).filter(
+    (action) => !action.permission || hasPermission(action.permission)
+  );
+
+  const updatePosition = useCallback(() => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const menuWidth = 192; // w-48
+    const menuHeight = visibleActions.length * 40 + 16;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceRight = window.innerWidth - rect.right;
+
+    let top = rect.bottom + 4;
+    let left = rect.right - menuWidth;
+
+    if (spaceBelow < menuHeight && rect.top > menuHeight) {
+      top = rect.top - menuHeight - 4;
+    }
+    if (spaceRight < menuWidth) {
+      left = rect.left - menuWidth + rect.width;
+    }
+    if (left < 8) left = 8;
+
+    setMenuPos({ top, left });
+  }, [visibleActions.length]);
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    updatePosition();
+    setIsOpen((prev) => !prev);
+  };
+
   useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    if (!isOpen) return;
+    const handleClose = (e: MouseEvent) => {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        buttonRef.current && !buttonRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const visibleActions = actions.filter(
-    (action: unknown) => !action.permission || hasPermission(action.permission)
-  );
+    const handleScroll = () => setIsOpen(false);
+    document.addEventListener("mousedown", handleClose);
+    document.addEventListener("scroll", handleScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClose);
+      document.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [isOpen]);
 
   if (visibleActions.length === 0) return null;
 
-  return (
-    <div className="relative inline-block text-left" ref={menuRef}>
-      <div>
+  const menu = isOpen ? (
+    <div
+      ref={menuRef}
+      style={{ top: menuPos.top, left: menuPos.left }}
+      className="fixed z-[9999] w-48 rounded-xl bg-white shadow-xl ring-1 ring-gray-200 py-1.5 animate-in fade-in-0 zoom-in-95 duration-100"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {visibleActions.map((action, index) => (
         <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          key={index}
+          onClick={() => {
+            setIsOpen(false);
+            action.onClick(item);
+          }}
+          className={`flex w-full items-center gap-2.5 px-3.5 py-2 text-sm font-medium transition-colors ${
+            action.danger
+              ? "text-red-600 hover:bg-red-50 hover:text-red-700"
+              : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+          }`}
         >
-          <MoreVertical className="w-5 h-5 text-gray-500" />
+          {action.icon && (
+            <action.icon className={`h-3.5 w-3.5 shrink-0 ${action.danger ? "text-red-500" : "text-gray-400"}`} />
+          )}
+          {action.label}
         </button>
-      </div>
+      ))}
+    </div>
+  ) : null;
 
-      {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-          <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-            {visibleActions.map((action: unknown, index: unknown) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setIsOpen(false);
-                  action.onClick(item);
-                }}
-                className={`flex w-full items-center px-4 py-2 text-sm text-left ${
-                  action.danger ? "text-red-700 hover:bg-red-50 hover:text-red-900" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                }`}
-                role="menuitem"
-              >
-                {action.icon && <action.icon className="mr-3 h-4 w-4" aria-hidden="true" />}
-                {action.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={handleOpen}
+        className={`flex items-center justify-center h-7 w-7 rounded-lg transition-all duration-150 ${
+          isOpen
+            ? "bg-gray-100 text-gray-700"
+            : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        }`}
+      >
+        <MoreVertical className="w-4 h-4" />
+      </button>
+      {typeof document !== "undefined" && createPortal(menu, document.body)}
     </div>
   );
 };

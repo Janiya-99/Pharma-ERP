@@ -13,7 +13,7 @@ import { formatCurrency, formatNumber, formatDate } from "../../../lib/utils";
 const OpeningStockEntriesPage = () => {
   const { hasPermission } = useAuth();
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
@@ -31,32 +31,32 @@ const OpeningStockEntriesPage = () => {
         limit: pagination.pageSize,
         search,
       });
-      if (response.data?.success || response.success !== false) {
-        const resData = response.data?.data || response.data || [];
-        const resTotal = response.data?.pagination?.total || response.pagination?.total || 0;
+      if ((response as any).data?.success) {
+        const resData = (response as any).data?.data || [];
+        const resTotal = (response as any).data?.pagination?.total || 0;
         setData(resData);
         setTotalRecords(resTotal);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to load opening stock entries");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (row: unknown) => {
+  const handleEdit = (row: any) => {
     if (row.approval_status === "draft" || row.approval_status === "rejected") {
-      navigate(`/admin/inventory/opening-stock/${row.id}/edit`);
+      navigate(`/inventory/opening-stock/${row.id}/edit`);
     } else {
       toast.error("Only draft or rejected entries can be edited");
     }
   };
 
-  const handleView = (row: unknown) => {
-    navigate(`/admin/inventory/opening-stock/${row.id}`);
+  const handleView = (row: any) => {
+    navigate(`/inventory/opening-stock/${row.id}`);
   };
 
-  const handleDelete = async (row: unknown) => {
+  const handleDelete = async (row: any) => {
     if (row.posted_status === "posted") {
       toast.error("Posted entries cannot be deleted");
       return;
@@ -71,7 +71,7 @@ const OpeningStockEntriesPage = () => {
         await inventoryApi.deleteOpeningStockEntry(row.id);
         toast.success("Entry deleted successfully");
         fetchData();
-      } catch (error) {
+      } catch (error: any) {
         toast.error(error.response?.data?.message || "Failed to delete entry");
       }
     }
@@ -79,13 +79,13 @@ const OpeningStockEntriesPage = () => {
 
   const columns = [
     { header: "Number", accessorKey: "opening_stock_number" },
-    { header: "Date", accessorKey: "opening_stock_date", cell: ({ row }: { row?: unknown }) => formatDate(row.original.opening_stock_date) },
-    { header: "Warehouse", accessorKey: "warehouse_id", cell: ({ row }: { row?: unknown }) => row.original.warehouse?.warehouse_name || row.original.warehouse_id },
+    { header: "Date", accessorKey: "opening_stock_date", cell: ({ row }: { row?: any }) => formatDate(row.original.opening_stock_date) },
+    { header: "Warehouse", accessorKey: "warehouse_id", cell: ({ row }: { row?: any }) => row.original.warehouse?.warehouse_name || row.original.warehouse_id },
     { header: "Reference", accessorKey: "reference_number" },
-    { header: "Total Qty", accessorKey: "total_quantity", cell: ({ row }: { row?: unknown }) => formatNumber(row.original.total_quantity, 3) },
-    { header: "Total Value", accessorKey: "total_stock_value", cell: ({ row }: { row?: unknown }) => formatCurrency(row.original.total_stock_value) },
-    { header: "Approval", accessorKey: "approval_status", cell: ({ row }: { row?: unknown }) => <OpeningStockStatusBadge status={row.original.approval_status} /> },
-    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row?: unknown }) => <InventoryPostedStatusBadge status={row.original.posted_status} /> },
+    { header: "Total Qty", accessorKey: "total_quantity", cell: ({ row }: { row?: any }) => formatNumber(row.original.total_quantity, 3) },
+    { header: "Total Value", accessorKey: "total_stock_value", cell: ({ row }: { row?: any }) => formatCurrency(row.original.total_stock_value) },
+    { header: "Approval", accessorKey: "approval_status", cell: ({ row }: { row?: any }) => <OpeningStockStatusBadge status={row.original.approval_status} /> },
+    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row?: any }) => <InventoryPostedStatusBadge status={row.original.posted_status} /> },
   ];
 
   return (
@@ -108,7 +108,7 @@ const OpeningStockEntriesPage = () => {
           </div>
           <PermissionGuard permission="inventory.opening_stock.create">
             <Link
-              to="/admin/inventory/opening-stock/create"
+              to="/inventory/opening-stock/create"
               className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium"
             >
               <Plus className="h-4 w-4" />

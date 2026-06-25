@@ -1,7 +1,27 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { login, getAuthContext, switchBranch, switchSoftware } from "../api/authApi";
 
-const AuthContext = createContext();
+export interface AuthContextType {
+  token: string | null;
+  user: any;
+  company: any;
+  activeBranch: any;
+  activeSoftware: any;
+  branches: any[];
+  softwareModules: any[];
+  permissions: string[];
+  loading: boolean;
+  isAuthenticated: boolean;
+  loginUser: (companyCode: any, email: any, password: any) => Promise<any>;
+  logoutUser: () => void;
+  refreshContext: () => Promise<void>;
+  switchActiveBranch: (branchId: string | number) => Promise<boolean>;
+  switchActiveSoftware: (softwareCode: any) => Promise<boolean>;
+  hasPermission: (permissionKey: any) => boolean;
+  hasAnyPermission: (permissionKeys: any[]) => boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const useAuth = () => useContext(AuthContext);
 

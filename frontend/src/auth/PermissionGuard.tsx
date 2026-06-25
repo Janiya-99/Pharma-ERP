@@ -6,6 +6,11 @@ const PermissionGuard = ({ permission, permissions, mode = "all", children, fall
 
   if (loading) return null;
 
+  // If no permission requirements specified, allow access
+  if (!permission && (!permissions || !Array.isArray(permissions) || permissions.length === 0)) {
+    return <>{children}</>;
+  }
+
   if (permission) {
     if (hasPermission(permission)) {
       return <>{children}</>;

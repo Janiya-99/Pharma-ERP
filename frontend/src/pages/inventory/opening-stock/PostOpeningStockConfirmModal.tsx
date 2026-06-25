@@ -4,7 +4,7 @@ import { inventoryApi } from "api/inventoryApi";
 import StockMovementWarning from "../../../components/inventory/StockMovementWarning";
 import { formatNumber, formatCurrency } from "lib/utils";
 
-const PostOpeningStockConfirmModal = ({ isOpen, onClose, entryId, entryInfo, onSuccess }: { isOpen?: boolean; onClose?: unknown; entryId?: string | number; entryInfo?: unknown; onSuccess?: unknown }) => {
+const PostOpeningStockConfirmModal = ({ isOpen, onClose, entryId, entryInfo, onSuccess }: { isOpen?: boolean; onClose?: any; entryId?: string | number; entryInfo?: any; onSuccess?: any }) => {
   const [posting, setPosting] = useState(false);
 
   if (!isOpen) return null;
@@ -14,9 +14,9 @@ const PostOpeningStockConfirmModal = ({ isOpen, onClose, entryId, entryInfo, onS
     try {
       await inventoryApi.postOpeningStockEntry(entryId);
       toast.success("Opening Stock posted successfully");
-      onSuccess();
-      onClose();
-    } catch (error) {
+      if (onSuccess) onSuccess();
+      if (onClose) onClose();
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to post entry");
     } finally {
       setPosting(false);

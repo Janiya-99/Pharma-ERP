@@ -1,26 +1,35 @@
 import React from "react";
 
-const StatusBadge = ({ status }: { status?: unknown }) => {
-  const getStatusConfig = (status: unknown) => {
-    switch (status?.toLowerCase()) {
+type StatusVariant = "active" | "inactive" | "suspended" | "locked" | "approved" | "rejected" | "pending" | "posted" | "draft" | string;
+
+const StatusBadge = ({ status }: { status?: StatusVariant }) => {
+  const getConfig = (s: string) => {
+    switch (s?.toLowerCase()) {
       case "active":
-        return { color: "bg-green-100 text-green-800", label: "Active" };
+      case "approved":
+      case "posted":
+        return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200";
       case "inactive":
-        return { color: "bg-gray-100 text-gray-800", label: "Inactive" };
+      case "draft":
+        return "bg-gray-100 text-gray-600 ring-1 ring-gray-200";
       case "suspended":
-        return { color: "bg-orange-100 text-orange-800", label: "Suspended" };
+      case "pending":
+        return "bg-amber-50 text-amber-700 ring-1 ring-amber-200";
       case "locked":
-        return { color: "bg-red-100 text-red-800", label: "Locked" };
+      case "rejected":
+        return "bg-red-50 text-red-700 ring-1 ring-red-200";
       default:
-        return { color: "bg-gray-100 text-gray-800", label: status || "Unknown" };
+        return "bg-gray-100 text-gray-600 ring-1 ring-gray-200";
     }
   };
 
-  const config = getStatusConfig(status);
+  const label = status
+    ? String(status).charAt(0).toUpperCase() + String(status).slice(1).toLowerCase()
+    : "Unknown";
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${config.color}`}>
-      {config.label}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-semibold tracking-wide ${getConfig(String(status))}`}>
+      {label}
     </span>
   );
 };

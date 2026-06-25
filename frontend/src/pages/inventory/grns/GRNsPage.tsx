@@ -31,36 +31,37 @@ const GRNsPage = () => {
         limit: pagination.pageSize,
         search,
       });
-      if (response.data?.success || response.success !== false) {
-        const resData = response.data?.data || response.data || [];
-        const resTotal = response.data?.pagination?.total || response.pagination?.total || 0;
+      const res = response as any;
+      if (res.data?.success || res.success !== false) {
+        const resData = res.data?.data || res.data || [];
+        const resTotal = res.data?.pagination?.total || res.pagination?.total || 0;
         setData(resData);
         setTotalRecords(resTotal);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to load GRNs");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (row: unknown) => {
+  const handleEdit = (row: any) => {
     if (row.posted_status === "posted") {
       toast.error("Posted GRNs cannot be edited");
       return;
     }
     if (row.approval_status === "draft" || row.approval_status === "rejected") {
-      navigate(`/admin/inventory/grns/${row.id}/edit`);
+      navigate(`/inventory/grns/${row.id}/edit`);
     } else {
       toast.error("Only draft or rejected GRNs can be edited");
     }
   };
 
-  const handleView = (row: unknown) => {
-    navigate(`/admin/inventory/grns/${row.id}`);
+  const handleView = (row: any) => {
+    navigate(`/inventory/grns/${row.id}`);
   };
 
-  const handleDelete = async (row: unknown) => {
+  const handleDelete = async (row: any) => {
     if (row.posted_status === "posted") {
       toast.error("Posted GRNs cannot be deleted");
       return;
@@ -75,7 +76,7 @@ const GRNsPage = () => {
         await inventoryApi.deleteGRN(row.id);
         toast.success("GRN deleted successfully");
         fetchData();
-      } catch (error) {
+      } catch (error: any) {
         toast.error(error.response?.data?.message || "Failed to delete GRN");
       }
     }
@@ -83,14 +84,14 @@ const GRNsPage = () => {
 
   const columns = [
     { header: "GRN Number", accessorKey: "grn_number" },
-    { header: "Date", accessorKey: "grn_date", cell: ({ row }: { row?: unknown }) => formatDate(row.original.grn_date) },
-    { header: "Supplier", accessorKey: "supplier_id", cell: ({ row }: { row?: unknown }) => row.original.supplier?.supplier_name || `Supplier #${row.original.supplier_id}` },
-    { header: "Warehouse", accessorKey: "warehouse_id", cell: ({ row }: { row?: unknown }) => row.original.warehouse?.warehouse_name || `Warehouse #${row.original.warehouse_id}` },
+    { header: "Date", accessorKey: "grn_date", cell: ({ row }: { row?: any }) => formatDate(row.original.grn_date) },
+    { header: "Supplier", accessorKey: "supplier_id", cell: ({ row }: { row?: any }) => row.original.supplier?.supplier_name || `Supplier #${row.original.supplier_id}` },
+    { header: "Warehouse", accessorKey: "warehouse_id", cell: ({ row }: { row?: any }) => row.original.warehouse?.warehouse_name || `Warehouse #${row.original.warehouse_id}` },
     { header: "Supp. Inv", accessorKey: "supplier_invoice_number" },
-    { header: "Total Stock", accessorKey: "total_stock_quantity", cell: ({ row }: { row?: unknown }) => formatNumber(row.original.total_stock_quantity, 3) },
-    { header: "Total Amount", accessorKey: "total_amount", cell: ({ row }: { row?: unknown }) => formatCurrency(row.original.total_amount) },
-    { header: "Approval", accessorKey: "approval_status", cell: ({ row }: { row?: unknown }) => <GRNStatusBadge status={row.original.approval_status} /> },
-    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row?: unknown }) => <GRNPostedStatusBadge status={row.original.posted_status} /> },
+    { header: "Total Stock", accessorKey: "total_stock_quantity", cell: ({ row }: { row?: any }) => formatNumber(row.original.total_stock_quantity, 3) },
+    { header: "Total Amount", accessorKey: "total_amount", cell: ({ row }: { row?: any }) => formatCurrency(row.original.total_amount) },
+    { header: "Approval", accessorKey: "approval_status", cell: ({ row }: { row?: any }) => <GRNStatusBadge status={row.original.approval_status} /> },
+    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row?: any }) => <GRNPostedStatusBadge status={row.original.posted_status} /> },
   ];
 
   return (
@@ -113,7 +114,7 @@ const GRNsPage = () => {
           </div>
           <PermissionGuard permission="inventory.grn.create">
             <Link
-              to="/admin/inventory/grns/create"
+              to="/inventory/grns/create"
               className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium"
             >
               <Plus className="h-4 w-4" />

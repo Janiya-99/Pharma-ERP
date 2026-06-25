@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 
 const OpeningStockActionButtons = ({ 
   entry, 
@@ -11,7 +11,7 @@ const OpeningStockActionButtons = ({
   onPost,
   showViewButton = false,
   className = "" 
-}: { entry?: unknown; onDelete?: unknown; onSubmit?: unknown; onApprove?: unknown; onReject?: unknown; onPost?: unknown; showViewButton?: unknown; className?: unknown }) => {
+}: { entry?: any; onDelete?: () => void; onSubmit?: () => void; onApprove?: () => void; onReject?: () => void; onPost?: () => void; showViewButton?: boolean; className?: string }) => {
   const { hasPermission } = useAuth();
   
   if (!entry) return null;
@@ -36,7 +36,7 @@ const OpeningStockActionButtons = ({
     <div className={`flex flex-wrap gap-2 ${className}`}>
       {showViewButton && hasPermission("inventory.opening_stock.view") && (
         <Link
-          to={`/admin/inventory/opening-stock/${entry.id}`}
+          to={`/inventory/opening-stock/${entry.id}`}
           className="btn-outline-primary"
         >
           View
@@ -45,7 +45,7 @@ const OpeningStockActionButtons = ({
 
       {canEdit && hasPermission("inventory.opening_stock.update") && (
         <Link
-          to={`/admin/inventory/opening-stock/${entry.id}/edit`}
+          to={`/inventory/opening-stock/${entry.id}/edit`}
           className="btn-outline-primary"
         >
           Edit

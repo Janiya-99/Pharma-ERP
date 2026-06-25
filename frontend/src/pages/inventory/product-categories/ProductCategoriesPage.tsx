@@ -27,7 +27,7 @@ const ProductCategoriesPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await inventoryApi.getProductCategorys({
+      const response = await inventoryApi.getProductCategories({
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
         search,
@@ -84,7 +84,7 @@ const ProductCategoriesPage = () => {
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Product Categories</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage {Title.toLowerCase()}</p>
+          <p className="text-sm text-gray-500 mt-1">Manage product categories</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-100 dark:bg-navy-700 p-1 rounded-xl">

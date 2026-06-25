@@ -34,25 +34,25 @@ const GRNDetailsPage = () => {
 
   const fetchGRNDetails = async () => {
     try {
-      const res = await inventoryApi.getGRNById(id);
+      const res: any = await inventoryApi.getGRNById(id);
       if (res.success !== false) {
         setGrn(res.data?.data || res.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       toast.error("Failed to load GRN details");
-      navigate("/admin/inventory/grns");
+      navigate("/inventory/grns");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (grnData: unknown) => {
+  const handleDelete = async (grnData: any) => {
     if (window.confirm("Are you sure you want to delete this GRN?")) {
       try {
         await inventoryApi.deleteGRN(grnData.id);
         toast.success("GRN deleted successfully");
-        navigate("/admin/inventory/grns");
-      } catch (err) {
+        navigate("/inventory/grns");
+      } catch (err: any) {
         toast.error(err.response?.data?.message || "Failed to delete GRN");
       }
     }
@@ -66,7 +66,7 @@ const GRNDetailsPage = () => {
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate("/admin/inventory/grns")}
+            onClick={() => navigate("/inventory/grns")}
             className="p-2 bg-white dark:bg-navy-800 rounded-full shadow hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -97,7 +97,7 @@ const GRNDetailsPage = () => {
 
           {hasPermission("inventory.stock_ledger.view") && grn.posted_status === "posted" && (
             <Link
-              to={`/admin/inventory/stock-ledger?source_type=grn&source_number=${grn.grn_number}`}
+              to={`/inventory/stock-ledger?source_type=grn&source_number=${grn.grn_number}`}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700 shadow-sm"
             >
               <ListChecks className="w-4 h-4" /> Stock Ledger
@@ -106,7 +106,7 @@ const GRNDetailsPage = () => {
 
           {hasPermission("inventory.stock_balance.view") && (
             <Link
-              to={`/admin/inventory/stock-balances?warehouse_id=${grn.warehouse_id}`}
+              to={`/inventory/stock-balances?warehouse_id=${grn.warehouse_id}`}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700 shadow-sm"
             >
               <Box className="w-4 h-4" /> Stock Balances

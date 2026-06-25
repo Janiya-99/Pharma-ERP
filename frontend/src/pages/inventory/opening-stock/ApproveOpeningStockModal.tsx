@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { inventoryApi } from "api/inventoryApi";
 import { MdCheckCircle } from "react-icons/md";
 
-const ApproveOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOpen?: boolean; onClose?: unknown; entryId?: string | number; onSuccess?: unknown }) => {
+const ApproveOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOpen?: boolean; onClose?: any; entryId?: string | number; onSuccess?: any }) => {
   const [remarks, setRemarks] = useState("");
   const [approving, setApproving] = useState(false);
 
@@ -15,9 +15,9 @@ const ApproveOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isO
     try {
       await inventoryApi.approveOpeningStockEntry(entryId, { remarks });
       toast.success("Opening Stock approved successfully");
-      onSuccess();
-      onClose();
-    } catch (error) {
+      if (onSuccess) onSuccess();
+      if (onClose) onClose();
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to approve entry");
     } finally {
       setApproving(false);
