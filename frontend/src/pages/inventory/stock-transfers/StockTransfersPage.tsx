@@ -7,9 +7,10 @@ import PermissionGuard from "../../../auth/PermissionGuard";
 import StockTransferStatusBadge from "../../../components/inventory/StockTransferStatusBadge";
 import StockTransferPostedStatusBadge from "../../../components/inventory/StockTransferPostedStatusBadge";
 import { formatNumber, formatDate } from "../../../lib/utils";
+import { StockTransfer, PaginatedData, ApiResponse } from "../../../types/inventory";
 
 const StockTransfersPage = () => {
-  const [transfers, setTransfers] = useState([]);
+  const [transfers, setTransfers] = useState<StockTransfer[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -26,7 +27,7 @@ const StockTransfersPage = () => {
   const fetchTransfers = async () => {
     try {
       setLoading(true);
-      const params = {
+      const params: Record<string, any> = {
         page,
         limit,
         search,
@@ -35,10 +36,19 @@ const StockTransfersPage = () => {
         params.approval_status = statusFilter;
       }
       
-      const res = await inventoryApi.getStockTransfers(params);
+      const res = await inventoryApi.getStockTransfers(params) as unknown as ApiResponse<PaginatedData<StockTransfer> | StockTransfer[]>;
       if (res.success !== false) {
-        setTransfers(res.data?.data || res.data || []);
-        setTotal(res.data?.total || 0);
+        // Handle both paginated and unpaginated responses
+        if (res.data && 'data' in res.data && Array.isArray(res.data.data)) {
+          setTransfers(res.data.data);
+          setTotal(res.data.total || 0);
+        } else if (Array.isArray(res.data)) {
+          setTransfers(res.data);
+          setTotal(res.data.length);
+        } else {
+          setTransfers([]);
+          setTotal(0);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch stock transfers", err);
@@ -48,17 +58,17 @@ const StockTransfersPage = () => {
   };
 
   const columns = [
-    { header: "Reference No", accessorKey: "reference_no", cell: ({ row }: { row?: unknown }) => (
+    { header: "Reference No", accessorKey: "reference_no", cell: ({ row }: { row: { original: StockTransfer } }) => (
       <span className="font-medium text-brand-600 dark:text-brand-400">
         {row.original.reference_no || "DRAFT"}
       </span>
     )},
-    { header: "Date", accessorKey: "transfer_date", cell: ({ row }: { row?: unknown }) => formatDate(row.original.transfer_date) },
-    { header: "Source", accessorKey: "source_warehouse_id", cell: ({ row }: { row?: unknown }) => row.original.source_warehouse?.warehouse_name },
-    { header: "Destination", accessorKey: "destination_warehouse_id", cell: ({ row }: { row?: unknown }) => row.original.destination_warehouse?.warehouse_name },
-    { header: "Total Qty", accessorKey: "total_quantity", cell: ({ row }: { row?: unknown }) => formatNumber(row.original.total_quantity, 3) },
-    { header: "Status", accessorKey: "approval_status", cell: ({ row }: { row?: unknown }) => <StockTransferStatusBadge status={row.original.approval_status} /> },
-    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row?: unknown }) => <StockTransferPostedStatusBadge status={row.original.posted_status} /> },
+    { header: "Date", accessorKey: "transfer_date", cell: ({ row }: { row: { original: StockTransfer } }) => formatDate(row.original.transfer_date) },
+    { header: "Source", accessorKey: "source_warehouse_id", cell: ({ row }: { row: { original: StockTransfer } }) => row.original.source_warehouse?.warehouse_name },
+    { header: "Destination", accessorKey: "destination_warehouse_id", cell: ({ row }: { row: { original: StockTransfer } }) => row.original.destination_warehouse?.warehouse_name },
+    { header: "Total Qty", accessorKey: "total_quantity", cell: ({ row }: { row: { original: StockTransfer } }) => formatNumber(row.original.total_quantity, 3) },
+    { header: "Status", accessorKey: "approval_status", cell: ({ row }: { row: { original: StockTransfer } }) => <StockTransferStatusBadge status={row.original.approval_status} /> },
+    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row: { original: StockTransfer } }) => <StockTransferPostedStatusBadge status={row.original.posted_status} /> },
   ];
 
   return (
@@ -91,7 +101,7 @@ const StockTransfersPage = () => {
               type="text"
               placeholder="Search reference..."
               value={search}
-              onChange={(e: any) => setSearch(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white"
             />
           </div>
@@ -99,7 +109,7 @@ const StockTransfersPage = () => {
             <Filter className="h-4 w-4 text-gray-400" />
             <select
               value={statusFilter}
-              onChange={(e: any) => setStatusFilter(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
               className="px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white outline-none"
             >
               <option value="all">All Statuses</option>
@@ -115,7 +125,7 @@ const StockTransfersPage = () => {
           columns={columns}
           data={transfers}
           loading={loading}
-          onRowClick={(row: unknown) => navigate(`/inventory/stock-transfers/${row.id}`)}
+          onRowClick={(row: StockTransfer) => navigate(`/inventory/stock-transfers/${row.id}`)}
           pagination={{
             page,
             limit,

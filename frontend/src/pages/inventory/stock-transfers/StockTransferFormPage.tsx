@@ -4,9 +4,10 @@ import { inventoryApi } from "../../../api/inventoryApi";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import StockTransferLinesTable from "./StockTransferLinesTable";
+import { StockTransfer, StockTransferLine, Warehouse } from "../../../types/inventory";
 
 const StockTransferFormPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditMode = !!id;
 
@@ -18,11 +19,11 @@ const StockTransferFormPage = () => {
     remarks: "",
   });
 
-  const [lines, setLines] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
+  const [lines, setLines] = useState<StockTransferLine[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
     fetchWarehouses();
@@ -48,7 +49,7 @@ const StockTransferFormPage = () => {
 
   const fetchWarehouses = async () => {
     try {
-      const res = await inventoryApi.getWarehouses({ limit: 1000, status: "active" });
+      const res = await inventoryApi.getWarehouses({ limit: 1000, status: "active" }) as any;
       if (res.success !== false) {
         setWarehouses(res.data?.data || res.data || []);
       }
@@ -58,7 +59,7 @@ const StockTransferFormPage = () => {
   const fetchTransfer = async () => {
     try {
       setLoading(true);
-      const res = await inventoryApi.getStockTransferById(id);
+      const res = await inventoryApi.getStockTransferById(id!) as any;
       if (res.success !== false) {
         const transfer = res.data;
         if (transfer.approval_status !== "draft" && transfer.approval_status !== "rejected") {
@@ -68,15 +69,15 @@ const StockTransferFormPage = () => {
         }
 
         setFormData({
-          source_warehouse_id: transfer.source_warehouse_id,
-          destination_warehouse_id: transfer.destination_warehouse_id,
+          source_warehouse_id: transfer.source_warehouse_id?.toString() || "",
+          destination_warehouse_id: transfer.destination_warehouse_id?.toString() || "",
           transfer_date: transfer.transfer_date ? transfer.transfer_date.split("T")[0] : "",
           reference_no: transfer.reference_no || "",
           remarks: transfer.remarks || "",
         });
 
         if (transfer.lines) {
-          setLines(transfer.lines.map((l: unknown, i: unknown) => ({
+          setLines(transfer.lines.map((l: any): StockTransferLine => ({
             id: l.id,
             product_id: l.product_id,
             product: l.product,
@@ -100,30 +101,26 @@ const StockTransferFormPage = () => {
     }
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: unknown) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors((prev: unknown) => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.source_warehouse_id) newErrors.source_warehouse_id = "Source warehouse is required";
     if (!formData.destination_warehouse_id) newErrors.destination_warehouse_id = "Destination warehouse is required";
     if (!formData.transfer_date) newErrors.transfer_date = "Transfer date is required";
-    if (formData.source_warehouse_id && formData.destination_warehouse_id && formData.source_warehouse_id === formData.destination_warehouse_id) {
-      // Must have different locations if same warehouse
-      // This is validated at line level but we can flag it here too if we want.
-    }
 
     if (lines.length === 0) {
       newErrors.lines = "At least one line item is required";
     }
 
-    lines.forEach((line: unknown, index: unknown) => {
+    lines.forEach((line, index) => {
       if (!line.product_id) newErrors[`lines.${index}.product_id`] = "Required";
       if (line.product?.requires_batch_tracking && !line.product_batch_id) {
         newErrors[`lines.${index}.product_batch_id`] = "Required";
@@ -131,10 +128,10 @@ const StockTransferFormPage = () => {
       if (!line.source_location_id) newErrors[`lines.${index}.source_location_id`] = "Required";
       if (!line.destination_location_id) newErrors[`lines.${index}.destination_location_id`] = "Required";
       
-      const qty = parseFloat(line.transfer_quantity || 0);
+      const qty = parseFloat(line.transfer_quantity as string || "0");
       if (qty <= 0) newErrors[`lines.${index}.transfer_quantity`] = "Must be > 0";
       
-      if (line.available_quantity !== null && qty > parseFloat(line.available_quantity)) {
+      if (line.available_quantity !== null && line.available_quantity !== undefined && qty > Number(line.available_quantity)) {
         newErrors[`lines.${index}.transfer_quantity`] = "Exceeds available stock";
       }
 
@@ -147,7 +144,7 @@ const StockTransferFormPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
       toast.error("Please fix the validation errors");
@@ -157,29 +154,29 @@ const StockTransferFormPage = () => {
     setSaving(true);
     try {
       const payload = {
-        source_warehouse_id: parseInt(formData.source_warehouse_id),
-        destination_warehouse_id: parseInt(formData.destination_warehouse_id),
+        source_warehouse_id: parseInt(formData.source_warehouse_id as string),
+        destination_warehouse_id: parseInt(formData.destination_warehouse_id as string),
         transfer_date: new Date(formData.transfer_date).toISOString(),
         reference_no: formData.reference_no,
         remarks: formData.remarks,
-        lines: lines.map((l: unknown) => ({
-          product_id: parseInt(l.product_id),
-          product_batch_id: l.product_batch_id ? parseInt(l.product_batch_id) : null,
-          source_location_id: parseInt(l.source_location_id),
-          destination_location_id: parseInt(l.destination_location_id),
-          transfer_quantity: parseFloat(l.transfer_quantity),
+        lines: lines.map((l) => ({
+          product_id: Number(l.product_id),
+          product_batch_id: l.product_batch_id ? Number(l.product_batch_id) : null,
+          source_location_id: Number(l.source_location_id),
+          destination_location_id: Number(l.destination_location_id),
+          transfer_quantity: parseFloat(l.transfer_quantity as string),
         })),
       };
 
       if (isEditMode) {
-        await inventoryApi.updateStockTransfer(id, payload);
+        await inventoryApi.updateStockTransfer(id!, payload);
         toast.success("Stock Transfer updated successfully");
       } else {
         await inventoryApi.createStockTransfer(payload);
         toast.success("Stock Transfer created successfully");
       }
       navigate("/inventory/stock-transfers");
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || "Operation failed");
     } finally {
       setSaving(false);
@@ -226,7 +223,7 @@ const StockTransferFormPage = () => {
                 }`}
               >
                 <option value="">Select Source...</option>
-                {warehouses.map((w: unknown) => (
+                {warehouses.map((w) => (
                   <option key={w.id} value={w.id}>{w.warehouse_name}</option>
                 ))}
               </select>
@@ -246,7 +243,7 @@ const StockTransferFormPage = () => {
                 }`}
               >
                 <option value="">Select Destination...</option>
-                {warehouses.map((w: unknown) => (
+                {warehouses.map((w) => (
                   <option key={w.id} value={w.id}>{w.warehouse_name}</option>
                 ))}
               </select>

@@ -5,17 +5,26 @@ import StockTransferLineBatchSelect from "../../../components/inventory/StockTra
 import TransferQuantityInput from "../../../components/inventory/TransferQuantityInput";
 import AvailableStockCard from "../../../components/inventory/AvailableStockCard";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { StockTransferLine, WarehouseLocation } from "../../../types/inventory";
 
-const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinationWarehouseId, errors = {} }: { lines?: unknown; setLines?: unknown; sourceWarehouseId?: string | number; destinationWarehouseId?: string | number; errors?: unknown }) => {
-  const [sourceLocations, setSourceLocations] = useState([]);
-  const [destinationLocations, setDestinationLocations] = useState([]);
+interface StockTransferLinesTableProps {
+  lines: StockTransferLine[];
+  setLines: (lines: StockTransferLine[]) => void;
+  sourceWarehouseId: string | number | null;
+  destinationWarehouseId: string | number | null;
+  errors?: Record<string, string>;
+}
+
+const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinationWarehouseId, errors = {} }: StockTransferLinesTableProps) => {
+  const [sourceLocations, setSourceLocations] = useState<WarehouseLocation[]>([]);
+  const [destinationLocations, setDestinationLocations] = useState<WarehouseLocation[]>([]);
 
   useEffect(() => {
     if (sourceWarehouseId) {
       fetchSourceLocations(sourceWarehouseId);
     } else {
       setSourceLocations([]);
-      setLines(lines.map((line: unknown) => ({ ...line, source_location_id: "" })));
+      setLines(lines.map((line) => ({ ...line, source_location_id: "" })));
     }
   }, [sourceWarehouseId]);
 
@@ -24,7 +33,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
       fetchDestinationLocations(destinationWarehouseId);
     } else {
       setDestinationLocations([]);
-      setLines(lines.map((line: unknown) => ({ ...line, destination_location_id: "" })));
+      setLines(lines.map((line) => ({ ...line, destination_location_id: "" })));
     }
   }, [destinationWarehouseId]);
 
@@ -65,11 +74,11 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
     ]);
   };
 
-  const handleRemoveLine = (index: unknown) => {
-    setLines(lines.filter((_: unknown, i: unknown) => i !== index));
+  const handleRemoveLine = (index: number) => {
+    setLines(lines.filter((_, i) => i !== index));
   };
 
-  const fetchAvailableStock = async (index: unknown, productId: string | number, batchId: string | number, locationId: string | number) => {
+  const fetchAvailableStock = async (index: number, productId: string | number | null, batchId: string | number | null, locationId: string | number) => {
     if (!productId || !locationId) {
       handleLineChange(index, "available_quantity", null);
       handleLineChange(index, "stock_balance_data", null);
@@ -102,7 +111,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
     }
   };
 
-  const handleLineChange = (index: unknown, field: unknown, value: unknown, extraData: unknown = {}) => {
+  const handleLineChange = (index: number, field: keyof StockTransferLine, value: any, extraData: any = {}) => {
     const newLines = [...lines];
     newLines[index][field] = value;
 
@@ -112,13 +121,13 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
       newLines[index].batch = null;
       
       // refetch stock if location is set
-      fetchAvailableStock(index, value, null, newLines[index].source_location_id);
+      fetchAvailableStock(index, value as number, null, newLines[index].source_location_id);
     }
 
     if (field === "product_batch_id") {
       newLines[index].batch = extraData.batch;
       // refetch stock
-      fetchAvailableStock(index, newLines[index].product_id, value, newLines[index].source_location_id);
+      fetchAvailableStock(index, newLines[index].product_id, value as number, newLines[index].source_location_id);
     }
 
     if (field === "source_location_id") {
@@ -163,21 +172,21 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                 </td>
               </tr>
             ) : (
-              lines.map((line: unknown, index: unknown) => {
-                const lineErrors = errors[`lines.${index}`] || {};
+              lines.map((line, index) => {
+                const lineErrors: any = errors[`lines.${index}`] || {};
                 
                 return (
                   <tr key={line.id || index} className="hover:bg-gray-50 dark:hover:bg-navy-800/50">
                     <td className="px-4 py-3 align-top space-y-3">
                       <StockTransferLineProductSelect
                         value={line.product_id}
-                        onChange={(val: unknown, product: unknown) => handleLineChange(index, "product_id", val, { product })}
+                        onChange={(val: any, product: any) => handleLineChange(index, "product_id", val, { product })}
                         error={lineErrors.product_id}
                       />
                       <StockTransferLineBatchSelect
                         productId={line.product_id}
                         value={line.product_batch_id}
-                        onChange={(val: unknown, batch: unknown) => handleLineChange(index, "product_batch_id", val, { batch })}
+                        onChange={(val: any, batch: any) => handleLineChange(index, "product_batch_id", val, { batch })}
                         error={lineErrors.product_batch_id}
                         isDisabled={!line.product || !line.product.requires_batch_tracking}
                       />
@@ -186,11 +195,11 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                     <td className="px-4 py-3 align-top">
                       <select
                         value={line.source_location_id || ""}
-                        onChange={(e: any) => handleLineChange(index, "source_location_id", e.target.value ? parseInt(e.target.value) : null)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleLineChange(index, "source_location_id", e.target.value ? parseInt(e.target.value) : "")}
                         className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${lineErrors.source_location_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
                       >
                         <option value="">-- Select Source Location --</option>
-                        {sourceLocations.map((loc: unknown) => (
+                        {sourceLocations.map((loc) => (
                           <option key={loc.id} value={loc.id}>{loc.location_name}</option>
                         ))}
                       </select>
@@ -200,11 +209,11 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                     <td className="px-4 py-3 align-top">
                       <select
                         value={line.destination_location_id || ""}
-                        onChange={(e: any) => handleLineChange(index, "destination_location_id", e.target.value ? parseInt(e.target.value) : null)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleLineChange(index, "destination_location_id", e.target.value ? parseInt(e.target.value) : "")}
                         className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${lineErrors.destination_location_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
                       >
                         <option value="">-- Select Dest. Location --</option>
-                        {destinationLocations.map((loc: unknown) => (
+                        {destinationLocations.map((loc) => (
                           <option key={loc.id} value={loc.id}>{loc.location_name}</option>
                         ))}
                       </select>
@@ -221,7 +230,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                     <td className="px-4 py-3 align-top">
                       <TransferQuantityInput
                         value={line.transfer_quantity}
-                        onChange={(val: unknown) => handleLineChange(index, "transfer_quantity", val)}
+                        onChange={(val: any) => handleLineChange(index, "transfer_quantity", val)}
                         availableQuantity={line.available_quantity}
                         error={lineErrors.transfer_quantity}
                       />

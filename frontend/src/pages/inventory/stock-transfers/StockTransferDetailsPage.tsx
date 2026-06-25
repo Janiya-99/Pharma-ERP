@@ -13,10 +13,12 @@ import RejectStockTransferModal from "./RejectStockTransferModal";
 import PostStockTransferConfirmModal from "./PostStockTransferConfirmModal";
 import { formatNumber, formatCurrency, formatDate, formatDateTime } from "../../../lib/utils";
 
+import { StockTransfer, ApiResponse } from "../../../types/inventory";
+
 const StockTransferDetailsPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [transfer, setTransfer] = useState(null);
+  const [transfer, setTransfer] = useState<StockTransfer | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Modal states
@@ -32,8 +34,8 @@ const StockTransferDetailsPage = () => {
   const fetchTransfer = async () => {
     try {
       setLoading(true);
-      const res = await inventoryApi.getStockTransferById(id);
-      if (res.success !== false) {
+      const res = await inventoryApi.getStockTransferById(id!) as unknown as ApiResponse<StockTransfer>;
+      if (res.success !== false && res.data) {
         setTransfer(res.data);
       }
     } catch (err) {
@@ -47,7 +49,7 @@ const StockTransferDetailsPage = () => {
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this stock transfer draft?")) return;
     try {
-      await inventoryApi.deleteStockTransfer(id);
+      await inventoryApi.deleteStockTransfer(id!);
       navigate("/inventory/stock-transfers");
     } catch (err) {
       console.error("Failed to delete", err);
@@ -132,7 +134,7 @@ const StockTransferDetailsPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
-                  {transfer.lines?.map((line: unknown) => (
+                  {transfer.lines?.map((line: any) => (
                     <tr key={line.id} className="hover:bg-gray-50 dark:hover:bg-navy-800/50">
                       <td className="px-6 py-4">
                         <div className="font-medium text-gray-900 dark:text-white">
@@ -174,7 +176,7 @@ const StockTransferDetailsPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Approval History</h3>
             <div className="space-y-4">
-              {transfer.approval_history?.map((appr: unknown, idx: unknown) => (
+              {(transfer as any).approval_history?.map((appr: any, idx: number) => (
                 <div key={idx} className="flex gap-4 p-4 rounded-lg bg-gray-50 dark:bg-navy-900/50 border border-gray-100 dark:border-navy-700">
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
@@ -200,7 +202,7 @@ const StockTransferDetailsPage = () => {
                   </div>
                 </div>
               ))}
-              {(!transfer.approval_history || transfer.approval_history.length === 0) && (
+              {(!(transfer as any).approval_history || (transfer as any).approval_history.length === 0) && (
                 <p className="text-sm text-gray-500 italic">No approval history yet.</p>
               )}
             </div>

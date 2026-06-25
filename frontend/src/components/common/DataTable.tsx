@@ -1,30 +1,31 @@
 import React from "react";
 import { Loader2, Inbox, ChevronLeft, ChevronRight } from "lucide-react";
 
-interface Column {
+export interface Column<TData = any> {
   header: string;
   accessor?: string;
   accessorKey?: string;
   id?: string;
-  cell?: (info: { row: { original: Record<string, unknown> } }) => React.ReactNode;
+  cell?: (info: { row: { original: TData } }) => React.ReactNode;
   cellClassName?: string;
   className?: string;
 }
 
-interface DataTableProps {
-  columns: Column[];
-  data: Record<string, unknown>[];
+export interface DataTableProps<TData = any> {
+  columns: Column<TData>[];
+  data: TData[];
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
-  pagination?: { pageIndex: number; pageSize: number };
-  onPaginationChange?: (p: { pageIndex: number; pageSize: number }) => void;
+  pagination?: any;
+  onPaginationChange?: any;
   pageCount?: number;
-  onEdit?: (row: Record<string, unknown>) => void;
-  onDelete?: (row: Record<string, unknown>) => void;
+  onEdit?: (row: TData) => void;
+  onDelete?: (row: TData) => void;
+  onRowClick?: (row: TData) => void;
 }
 
-const DataTable = ({
+function DataTable<TData = any>({
   columns,
   data,
   loading,
@@ -35,7 +36,8 @@ const DataTable = ({
   pageCount,
   onEdit,
   onDelete,
-}: DataTableProps) => {
+  onRowClick,
+}: DataTableProps<TData>) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm gap-3">
@@ -65,8 +67,8 @@ const DataTable = ({
   }
 
   // Resolve a dotted accessor path like "branch.branch_name"
-  const resolveAccessor = (row: Record<string, unknown>, key: string) => {
-    return key.split(".").reduce((obj: unknown, k: string) => (obj as Record<string, unknown>)?.[k], row);
+  const resolveAccessor = (row: any, key: string) => {
+    return key.split(".").reduce((obj: any, k: string) => obj?.[k], row);
   };
 
   // Determine whether we need an actions column
@@ -97,8 +99,9 @@ const DataTable = ({
           <tbody className="bg-white divide-y divide-gray-50">
             {data.map((row, rowIndex) => (
               <tr
-                key={(row as Record<string, unknown>).id as string || rowIndex}
-                className="hover:bg-indigo-50/30 transition-colors duration-100 group"
+                key={(row as any).id as string || rowIndex}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                className={`hover:bg-indigo-50/30 transition-colors duration-100 group ${onRowClick ? "cursor-pointer" : ""}`}
               >
                 {columns.map((col, colIndex) => {
                   const accessorPath = col.accessorKey || col.accessor;

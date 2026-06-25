@@ -3,7 +3,14 @@ import Modal from "../../../components/common/Modal";
 import { inventoryApi } from "../../../api/inventoryApi";
 import { toast } from "react-hot-toast";
 
-const RejectStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: { isOpen?: boolean; onClose?: unknown; transferId?: string | number; onSuccess?: unknown }) => {
+interface RejectStockTransferModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  transferId: string | number | undefined;
+  onSuccess: () => void;
+}
+
+const RejectStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: RejectStockTransferModalProps) => {
   const [remarks, setRemarks] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -19,12 +26,12 @@ const RejectStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: { 
     
     try {
       const res = await inventoryApi.rejectStockTransfer(transferId, { remarks });
-      if (res.success !== false) {
+      if (res.data?.success !== false) {
         toast.success("Stock Transfer rejected successfully");
         onSuccess();
         onClose();
       }
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to reject stock transfer");
     } finally {
       setSubmitting(false);
@@ -45,7 +52,7 @@ const RejectStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: { 
           <textarea
             rows={3}
             value={remarks}
-            onChange={(e: any) => {
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
               setRemarks(e.target.value);
               if (error) setError("");
             }}

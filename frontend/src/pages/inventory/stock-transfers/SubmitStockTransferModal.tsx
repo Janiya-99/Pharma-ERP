@@ -3,7 +3,14 @@ import Modal from "../../../components/common/Modal";
 import { inventoryApi } from "../../../api/inventoryApi";
 import { toast } from "react-hot-toast";
 
-const SubmitStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: { isOpen?: boolean; onClose?: unknown; transferId?: string | number; onSuccess?: unknown }) => {
+interface SubmitStockTransferModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  transferId: string | number | undefined;
+  onSuccess: () => void;
+}
+
+const SubmitStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: SubmitStockTransferModalProps) => {
   const [remarks, setRemarks] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -11,12 +18,12 @@ const SubmitStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: { 
     setSubmitting(true);
     try {
       const res = await inventoryApi.submitStockTransfer(transferId, { remarks });
-      if (res.success !== false) {
+      if (res.data?.success !== false) {
         toast.success("Stock Transfer submitted successfully");
         onSuccess();
         onClose();
       }
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to submit stock transfer");
     } finally {
       setSubmitting(false);
@@ -37,7 +44,7 @@ const SubmitStockTransferModal = ({ isOpen, onClose, transferId, onSuccess }: { 
           <textarea
             rows={3}
             value={remarks}
-            onChange={(e: any) => setRemarks(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRemarks(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white sm:text-sm"
             placeholder="Add any comments for the approver..."
           />
