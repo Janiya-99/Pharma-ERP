@@ -122,4 +122,16 @@ export const inventoryApi = {
   approveStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/approve`, payload),
   rejectStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/reject`, payload),
   postStockAdjustment: (id: string | number) => apiClient.post(`/inventory/stock-adjustments/${id}/post`),
+
+  // Purchase Returns
+  getPurchaseReturns: (params: Record<string, unknown>) => apiClient.get("/inventory/purchase-returns", { params }),
+  getPurchaseReturnById: (id: string | number) => apiClient.get(`/inventory/purchase-returns/${id}`),
+  createPurchaseReturn: (payload: Record<string, unknown>) => apiClient.post("/inventory/purchase-returns", payload),
+  updatePurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/purchase-returns/${id}`, payload),
+  deletePurchaseReturn: (id: string | number) => apiClient.delete(`/inventory/purchase-returns/${id}`),
+  submitPurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/submit`, payload),
+  approvePurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/approve`, payload),
+  rejectPurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/reject`, payload),
+  postPurchaseReturn: (id: string | number) => apiClient.post(`/inventory/purchase-returns/${id}/post`),
 };
+
