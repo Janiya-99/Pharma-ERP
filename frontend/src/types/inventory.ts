@@ -78,3 +78,56 @@ export interface PaginatedData<T> {
   limit?: number;
   total_pages?: number;
 }
+
+export interface StockAdjustmentLine {
+  id?: string | number;
+  product_id: number | null;
+  product?: Product | null;
+  product_batch_id?: number | null;
+  batch?: ProductBatch | null;
+  product_batch?: ProductBatch | null;
+  warehouse_location_id: number | string;
+  warehouse_location?: WarehouseLocation;
+  adjustment_direction: "in" | "out";
+  system_quantity?: number | string;
+  physical_quantity?: number | string;
+  quantity: number | string;
+  variance_quantity?: number | string;
+  unit_cost: number | string;
+  total_cost?: number;
+  line_reason?: string;
+  line_remarks?: string;
+  reason?: string;
+  stock_balance_loading?: boolean;
+  stock_balance_data?: StockBalance | null;
+}
+
+export interface StockAdjustment {
+  id: number;
+  adjustment_number: string;
+  adjustment_date: string;
+  branch_id?: number;
+  branch?: { id: number; branch_name: string };
+  warehouse_id: number;
+  warehouse?: Warehouse;
+  adjustment_type: string;
+  reason?: string;
+  remarks?: string;
+  reference_no?: string;
+  reference_number?: string;
+  approval_status: string;
+  posted_status: string;
+  total_quantity_in: number;
+  total_quantity_out: number;
+  total_stock_value: number;
+  lines?: StockAdjustmentLine[];
+  created_by?: number | string;
+  created_by_user?: { name: string };
+  created_at?: string;
+  approved_by?: number | string;
+  approved_by_user?: { name: string };
+  approved_at?: string;
+  posted_by?: number | string;
+  posted_by_user?: { name: string };
+  posted_at?: string;
+}

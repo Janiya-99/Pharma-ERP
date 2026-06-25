@@ -4,6 +4,7 @@ import StockAdjustmentLineProductSelect from "../../../components/inventory/Stoc
 import StockAdjustmentLineBatchSelect from "../../../components/inventory/StockAdjustmentLineBatchSelect";
 import WarehouseLocationSelect from "../../../components/inventory/WarehouseLocationSelect";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { formatCurrency } from "../../../lib/utils";
 
 const StockAdjustmentLinesTable = ({
   lines,
@@ -11,8 +12,14 @@ const StockAdjustmentLinesTable = ({
   warehouseId,
   adjustmentType,
   errors,
-}: { lines?: unknown; setLines?: unknown; warehouseId?: string | number; adjustmentType?: unknown; errors?: unknown }) => {
-  const [products, setProducts] = React.useState([]);
+}: {
+  lines: any[];
+  setLines: any;
+  warehouseId: number;
+  adjustmentType: string;
+  errors: Record<string, string>;
+}) => {
+  const [products, setProducts] = React.useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = React.useState(false);
 
   useEffect(() => {
@@ -50,18 +57,29 @@ const StockAdjustmentLinesTable = ({
         unit_cost: 0,
         stock_balance_loading: false,
         stock_balance_data: null,
-        reason: "",
+        line_reason: "",
+        line_remarks: "",
       },
     ]);
   };
 
-  const removeLine = (idToRemove: unknown) => {
-    setLines(lines.filter((line: unknown) => line.id !== idToRemove));
+  const removeLine = (idToRemove: string | number) => {
+    setLines(lines.filter((line: any) => line.id !== idToRemove));
   };
 
-  const updateLine = (id: string | number, field: unknown, value: unknown) => {
-    setLines((prevLines: unknown) =>
-      prevLines.map((line: unknown) => {
+  const duplicateLine = (line: any) => {
+    setLines([
+      ...lines,
+      {
+        ...line,
+        id: `temp-${Date.now()}`,
+      },
+    ]);
+  };
+
+  const updateLine = (id: string | number, field: string, value: any) => {
+    setLines((prevLines: any) =>
+      prevLines.map((line: any) => {
         if (line.id !== id) return line;
 
         const updatedLine = { ...line, [field]: value };
@@ -83,11 +101,11 @@ const StockAdjustmentLinesTable = ({
 
         // If product changes, reset dependent fields
         if (field === "product_id") {
-          const prod = products.find((p: unknown) => p.id === value);
+          const prod = products.find((p: any) => p.id === value);
           updatedLine.product = prod;
           updatedLine.product_batch_id = null;
           updatedLine.batch = null;
-          updatedLine.unit_cost = 0; // Might be updated by batch or stock balance
+          updatedLine.unit_cost = 0;
           updatedLine.system_quantity = 0;
           updatedLine.physical_quantity = "";
           updatedLine.variance_quantity = 0;
@@ -97,7 +115,7 @@ const StockAdjustmentLinesTable = ({
         // If batch changes, set batch obj
         if (field === "product_batch_id") {
           if (updatedLine.product?.batches) {
-            const batch = updatedLine.product.batches.find((b: unknown) => b.id === value);
+            const batch = updatedLine.product.batches.find((b: any) => b.id === value);
             updatedLine.batch = batch;
           } else {
             updatedLine.batch = null;
@@ -111,27 +129,32 @@ const StockAdjustmentLinesTable = ({
 
   // Trigger stock balance fetch when product, batch, or location changes
   useEffect(() => {
-    lines.forEach((line: unknown) => {
+    lines.forEach((line: any) => {
       const needsFetch =
         line.product_id &&
         line.warehouse_location_id &&
         (!line.product?.requires_batch_tracking || line.product_batch_id);
 
-      // Simple heuristic: if we have the identifiers but no stock data yet (and not loading), fetch it.
-      // This is a simplified approach. In a real app, you might want a more robust way to debounce and track fetch requests.
       if (needsFetch && !line.stock_balance_data && !line.stock_balance_loading) {
         fetchStockBalanceForLine(line.id, line.product_id, line.product_batch_id, line.warehouse_location_id);
       }
     });
   }, [lines, warehouseId]);
 
-  const fetchStockBalanceForLine = async (lineId: string | number, productId: string | number, batchId: string | number, locationId: string | number) => {
+  const fetchStockBalanceForLine = async (
+    lineId: string | number,
+    productId: string | number,
+    batchId: string | number,
+    locationId: string | number
+  ) => {
     if (!warehouseId || !productId || !locationId) return;
 
-    setLines((prev: unknown) => prev.map((l: unknown) => (l.id === lineId ? { ...l, stock_balance_loading: true } : l)));
+    setLines((prev: any) =>
+      prev.map((l: any) => (l.id === lineId ? { ...l, stock_balance_loading: true } : l))
+    );
 
     try {
-      const params = {
+      const params: Record<string, any> = {
         warehouse_id: warehouseId,
         warehouse_location_id: locationId,
         product_id: productId,
@@ -141,18 +164,17 @@ const StockAdjustmentLinesTable = ({
       const res = await inventoryApi.getStockBalances(params);
       const balances = res.data?.data || res.data || [];
       
-      // Since we filtered precisely, we should ideally get 0 or 1 result
       let foundBalance = null;
       if (balances.length > 0) {
         foundBalance = balances[0];
       }
 
-      setLines((prev: unknown) =>
-        prev.map((l: unknown) => {
+      setLines((prev: any) =>
+        prev.map((l: any) => {
           if (l.id !== lineId) return l;
           
-          const sysQty = foundBalance ? parseFloat(foundBalance.quantity_on_hand) : 0;
-          const avgCost = foundBalance ? parseFloat(foundBalance.average_cost) : 0;
+          const sysQty = foundBalance ? parseFloat(foundBalance.quantity_on_hand || foundBalance.quantity_available || 0) : 0;
+          const avgCost = foundBalance ? parseFloat(foundBalance.average_cost || 0) : 0;
           
           let variance = l.variance_quantity;
           let dir = l.adjustment_direction;
@@ -166,9 +188,9 @@ const StockAdjustmentLinesTable = ({
           return {
             ...l,
             stock_balance_loading: false,
-            stock_balance_data: foundBalance || { quantity_on_hand: 0, average_cost: 0 },
+            stock_balance_data: foundBalance || { quantity_on_hand: 0, average_cost: 0, quantity_available: 0 },
             system_quantity: sysQty,
-            unit_cost: avgCost, // Set cost from system if available
+            unit_cost: avgCost,
             variance_quantity: variance,
             adjustment_direction: dir,
           };
@@ -176,29 +198,45 @@ const StockAdjustmentLinesTable = ({
       );
     } catch (error) {
       console.error("Failed to fetch balance", error);
-      setLines((prev: unknown) => prev.map((l: unknown) => (l.id === lineId ? { ...l, stock_balance_loading: false } : l)));
+      setLines((prev: any) =>
+        prev.map((l: any) => (l.id === lineId ? { ...l, stock_balance_loading: false } : l))
+      );
     }
   };
-
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium text-gray-900 dark:text-white">Adjustment Lines</h4>
-        <button
-          type="button"
-          onClick={addLine}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 dark:bg-navy-700 dark:text-brand-400 dark:hover:bg-navy-600 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add Line
-        </button>
+        <div className="flex items-center gap-2">
+          {lines.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setLines([])}
+              className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 dark:bg-navy-700/50 dark:text-red-400 dark:hover:bg-navy-600 transition-colors"
+            >
+              Clear All
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={addLine}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 dark:bg-navy-700 dark:text-brand-400 dark:hover:bg-navy-600 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Line
+          </button>
+        </div>
       </div>
 
-      {errors.lines && <p className="text-sm text-red-500 flex items-center gap-1"><AlertCircle className="w-4 h-4"/> {errors.lines}</p>}
+      {errors.lines && (
+        <p className="text-sm text-red-500 flex items-center gap-1">
+          <AlertCircle className="w-4 h-4" /> {errors.lines}
+        </p>
+      )}
 
       <div className="border border-gray-200 dark:border-navy-700 rounded-xl overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[1200px]">
+        <table className="w-full text-left border-collapse min-w-[1500px]">
           <thead>
             <tr className="bg-gray-50 dark:bg-navy-800 border-b border-gray-200 dark:border-navy-700">
               <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-8">#</th>
@@ -220,24 +258,36 @@ const StockAdjustmentLinesTable = ({
                 </>
               )}
               
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-32">Unit Cost</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">Unit Cost</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">Total Cost</th>
               <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-40">Reason</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-12 text-center">Act</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-40">Remarks</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-20 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-navy-700">
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                <td colSpan={12} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                   No lines added. Click "Add Line" to begin.
                 </td>
               </tr>
             ) : (
-              lines.map((line: unknown, index: unknown) => {
+              lines.map((line: any, index: number) => {
                 const productError = errors[`lines.${index}.product_id`];
                 const batchError = errors[`lines.${index}.product_batch_id`];
                 const locError = errors[`lines.${index}.warehouse_location_id`];
                 const qtyError = errors[`lines.${index}.variance_quantity`] || errors[`lines.${index}.physical_quantity`];
+
+                const available = line.stock_balance_data?.quantity_available !== undefined
+                  ? parseFloat(line.stock_balance_data.quantity_available)
+                  : line.stock_balance_data?.quantity_on_hand ? parseFloat(line.stock_balance_data.quantity_on_hand) : 0;
+                const isOut = line.adjustment_direction === "out";
+                const absQty = Math.abs(parseFloat(line.variance_quantity || 0));
+                const qtyExceeded = isOut && absQty > available;
+                const qtyMatchesAvailable = isOut && absQty === available && available > 0;
+                
+                const totalCost = absQty * (line.unit_cost || 0);
 
                 return (
                   <tr key={line.id} className="bg-white dark:bg-navy-900 group">
@@ -246,7 +296,7 @@ const StockAdjustmentLinesTable = ({
                     <td className="px-4 py-3 align-top">
                       <StockAdjustmentLineProductSelect
                         value={line.product_id}
-                        onChange={(p: unknown) => updateLine(line.id, "product_id", p.id)}
+                        onChange={(p: any) => updateLine(line.id, "product_id", p.id)}
                         products={products}
                         error={productError}
                       />
@@ -256,7 +306,7 @@ const StockAdjustmentLinesTable = ({
                     <td className="px-4 py-3 align-top">
                       <StockAdjustmentLineBatchSelect
                         value={line.product_batch_id}
-                        onChange={(b: unknown) => updateLine(line.id, "product_batch_id", b.id)}
+                        onChange={(b: any) => updateLine(line.id, "product_batch_id", b.id)}
                         batches={line.product?.batches || []}
                         error={batchError}
                         disabled={!line.product || !line.product.requires_batch_tracking}
@@ -269,13 +319,11 @@ const StockAdjustmentLinesTable = ({
 
                     <td className="px-4 py-3 align-top">
                       <WarehouseLocationSelect
-                        warehouseId={warehouseId}
                         value={line.warehouse_location_id}
-                        onChange={(e: any) => updateLine(line.id, "warehouse_location_id", e.target.value)}
-                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
-                          locError ? "border-red-300 dark:border-red-500/50" : "border-gray-200 dark:border-navy-600"
-                        }`}
+                        onChange={(val: any) => updateLine(line.id, "warehouse_location_id", val)}
                         disabled={!warehouseId}
+                        error={!!locError}
+                        extraParams={{ warehouse_id: warehouseId }}
                       />
                       {locError && <span className="text-[10px] text-red-500 mt-1 block">{locError}</span>}
                     </td>
@@ -287,27 +335,37 @@ const StockAdjustmentLinesTable = ({
                              <span className="text-sm text-gray-400 animate-pulse">Loading...</span>
                            ) : (
                              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                               {line.system_quantity.toFixed(3)}
+                               {(line.system_quantity || 0).toFixed(3)}
                              </span>
                            )}
                         </td>
                         <td className="px-4 py-3 align-top">
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.001"
-                            value={line.physical_quantity}
-                            onChange={(e: any) => updateLine(line.id, "physical_quantity", e.target.value)}
-                            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
-                              qtyError ? "border-red-300" : "border-gray-200 dark:border-navy-600"
-                            }`}
-                            placeholder="Count..."
-                          />
-                          {qtyError && <span className="text-[10px] text-red-500 mt-1 block">{qtyError}</span>}
+                           <input
+                             type="number"
+                             min="0"
+                             step="0.001"
+                             value={line.physical_quantity}
+                             onChange={(e: any) => updateLine(line.id, "physical_quantity", e.target.value)}
+                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white outline-none ${
+                               qtyError ? "border-red-300" : "border-gray-200 dark:border-navy-600"
+                             }`}
+                             placeholder="Count..."
+                           />
+                           {qtyError && <span className="text-[10px] text-red-500 mt-1 block">{qtyError}</span>}
+                           {qtyExceeded && (
+                             <span className="text-[10px] text-red-500 mt-1 block">
+                               Exceeds stock ({available})
+                             </span>
+                           )}
+                           {qtyMatchesAvailable && (
+                             <span className="text-[10px] text-yellow-600 mt-1 block font-medium">
+                               Adjusting full stock
+                             </span>
+                           )}
                         </td>
                         <td className="px-4 py-3 align-top">
                           <span className={`text-sm font-bold ${line.variance_quantity > 0 ? 'text-green-600' : line.variance_quantity < 0 ? 'text-red-600' : 'text-gray-500'}`}>
-                            {line.variance_quantity > 0 ? '+' : ''}{line.variance_quantity.toFixed(3)}
+                            {line.variance_quantity > 0 ? '+' : ''}{(line.variance_quantity || 0).toFixed(3)}
                           </span>
                         </td>
                       </>
@@ -318,7 +376,7 @@ const StockAdjustmentLinesTable = ({
                              <span className="text-sm text-gray-400 animate-pulse">Loading...</span>
                            ) : (
                              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                               {line.system_quantity.toFixed(3)}
+                               {(line.system_quantity || 0).toFixed(3)}
                              </span>
                            )}
                         </td>
@@ -330,15 +388,24 @@ const StockAdjustmentLinesTable = ({
                             value={Math.abs(line.variance_quantity) || ""}
                             onChange={(e: any) => {
                                const val = parseFloat(e.target.value || 0);
-                               // Store variance with correct sign based on direction
                                updateLine(line.id, "variance_quantity", line.adjustment_direction === "in" ? val : -val);
                             }}
-                            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
+                            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white outline-none ${
                               qtyError ? "border-red-300" : "border-gray-200 dark:border-navy-600"
                             }`}
                             placeholder="Qty..."
                           />
                           {qtyError && <span className="text-[10px] text-red-500 mt-1 block">{qtyError}</span>}
+                          {qtyExceeded && (
+                            <span className="text-[10px] text-red-500 mt-1 block">
+                              Exceeds stock ({available})
+                            </span>
+                          )}
+                          {qtyMatchesAvailable && (
+                            <span className="text-[10px] text-yellow-600 mt-1 block font-medium">
+                              Adjusting full stock
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 align-top">
                           <select
@@ -349,8 +416,8 @@ const StockAdjustmentLinesTable = ({
                               const currentVal = Math.abs(line.variance_quantity || 0);
                               updateLine(line.id, "variance_quantity", dir === "in" ? currentVal : -currentVal);
                             }}
-                            disabled={adjustmentType === "positive" || adjustmentType === "negative"}
-                            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white dark:border-navy-600 disabled:opacity-60"
+                            disabled={adjustmentType === "positive" || adjustmentType === "negative" || adjustmentType === "damage" || adjustmentType === "expiry"}
+                            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white dark:border-navy-600 disabled:opacity-60 outline-none"
                           >
                             <option value="in">In (+)</option>
                             <option value="out">Out (-)</option>
@@ -366,27 +433,52 @@ const StockAdjustmentLinesTable = ({
                         step="0.01"
                         value={line.unit_cost}
                         onChange={(e: any) => updateLine(line.id, "unit_cost", parseFloat(e.target.value || 0))}
-                        disabled={line.adjustment_direction === "out"} // Often cost is fixed for OUT adjustments
-                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white dark:border-navy-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                        disabled={line.adjustment_direction === "out"}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white dark:border-navy-600 disabled:opacity-60 disabled:cursor-not-allowed outline-none"
                         placeholder="0.00"
+                      />
+                    </td>
+
+                    <td className="px-4 py-3 align-top text-sm font-medium text-gray-900 dark:text-white">
+                      {formatCurrency(totalCost)}
+                    </td>
+
+                    <td className="px-4 py-3 align-top">
+                      <input
+                        type="text"
+                        value={line.line_reason}
+                        onChange={(e: any) => updateLine(line.id, "line_reason", e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white dark:border-navy-600 outline-none"
+                        placeholder="Reason..."
                       />
                     </td>
 
                     <td className="px-4 py-3 align-top">
                       <input
                         type="text"
-                        value={line.reason}
-                        onChange={(e: any) => updateLine(line.id, "reason", e.target.value)}
-                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white dark:border-navy-600"
-                        placeholder="Optional reason..."
+                        value={line.line_remarks}
+                        onChange={(e: any) => updateLine(line.id, "line_remarks", e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white dark:border-navy-600 outline-none"
+                        placeholder="Remarks..."
                       />
                     </td>
 
-                    <td className="px-4 py-3 align-top text-center">
+                    <td className="px-4 py-3 align-top text-center flex items-center justify-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => duplicateLine(line)}
+                        className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded dark:hover:bg-navy-800 transition-colors"
+                        title="Duplicate Line"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                      </button>
                       <button
                         type="button"
                         onClick={() => removeLine(line.id)}
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded dark:hover:bg-red-900/20 transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded dark:hover:bg-navy-800 transition-colors"
                         title="Remove Line"
                       >
                         <Trash2 className="w-4 h-4" />

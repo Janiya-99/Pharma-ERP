@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { getBranches } from "../../../api/controlApi";
+import { useAuth } from "../../../auth/AuthContext";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import StockAdjustmentLinesTable from "./StockAdjustmentLinesTable";
@@ -8,24 +10,36 @@ import StockAdjustmentLinesTable from "./StockAdjustmentLinesTable";
 const StockAdjustmentFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { hasPermission } = useAuth();
   const isEditMode = !!id;
 
   const [formData, setFormData] = useState({
+    branch_id: "",
     warehouse_id: "",
     adjustment_type: "mixed",
     adjustment_date: new Date().toISOString().split("T")[0],
-    reference_no: "",
+    reference_number: "",
+    reason: "",
     remarks: "",
   });
 
-  const [lines, setLines] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
+  const [lines, setLines] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [warehouses, setWarehouses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetchWarehouses();
+    const requiredPermission = isEditMode ? "inventory.stock_adjustment.update" : "inventory.stock_adjustment.create";
+    if (!hasPermission(requiredPermission)) {
+      toast.error("You do not have permission to access this page");
+      navigate("/inventory/stock-adjustments");
+    }
+  }, [isEditMode, hasPermission]);
+
+  useEffect(() => {
+    fetchBranchesAndWarehouses();
     if (isEditMode) {
       fetchAdjustment();
     } else {
@@ -43,18 +57,27 @@ const StockAdjustmentFormPage = () => {
         unit_cost: 0,
         stock_balance_loading: false,
         stock_balance_data: null,
-        reason: "",
+        line_reason: "",
+        line_remarks: "",
       }]);
     }
   }, [id]);
 
-  const fetchWarehouses = async () => {
+  const fetchBranchesAndWarehouses = async () => {
     try {
-      const res = await inventoryApi.getWarehouses({ limit: 1000, status: "active" });
-      if (res.success !== false) {
-        setWarehouses(res.data?.data || res.data || []);
+      const [branchesRes, warehousesRes] = await Promise.all([
+        getBranches({ limit: 100 }),
+        inventoryApi.getWarehouses({ limit: 1000, status: "active" })
+      ]);
+      if (branchesRes.success !== false) {
+        setBranches(branchesRes.data?.data || branchesRes.data || []);
       }
-    } catch (err) {}
+      if (warehousesRes.success !== false) {
+        setWarehouses(warehousesRes.data?.data || warehousesRes.data || []);
+      }
+    } catch (err) {
+      console.error("Failed to load branches and warehouses", err);
+    }
   };
 
   const fetchAdjustment = async () => {
@@ -70,27 +93,30 @@ const StockAdjustmentFormPage = () => {
         }
 
         setFormData({
-          warehouse_id: adjustment.warehouse_id,
+          branch_id: String(adjustment.branch_id || adjustment.warehouse?.branch_id || ""),
+          warehouse_id: String(adjustment.warehouse_id),
           adjustment_type: adjustment.adjustment_type,
           adjustment_date: adjustment.adjustment_date ? adjustment.adjustment_date.split("T")[0] : "",
-          reference_no: adjustment.reference_no || "",
+          reference_number: adjustment.reference_number || adjustment.reference_no || "",
+          reason: adjustment.reason || "",
           remarks: adjustment.remarks || "",
         });
 
         if (adjustment.lines) {
-          setLines(adjustment.lines.map((l: unknown) => ({
+          setLines(adjustment.lines.map((l: any) => ({
             id: l.id,
             product_id: l.product_id,
             product: l.product,
             product_batch_id: l.product_batch_id,
-            batch: l.product_batch,
+            batch: l.product_batch || l.batch,
             warehouse_location_id: l.warehouse_location_id,
             adjustment_direction: l.adjustment_direction,
             system_quantity: parseFloat(l.system_quantity || 0),
             physical_quantity: l.physical_quantity !== null ? parseFloat(l.physical_quantity) : "",
-            variance_quantity: parseFloat(l.variance_quantity || 0),
+            variance_quantity: parseFloat(l.quantity !== undefined ? l.quantity : l.variance_quantity || 0),
             unit_cost: parseFloat(l.unit_cost || 0),
-            reason: l.reason || "",
+            line_reason: l.line_reason || l.reason || "",
+            line_remarks: l.line_remarks || l.remarks || "",
             stock_balance_loading: false,
             stock_balance_data: null,
           })));
@@ -107,16 +133,34 @@ const StockAdjustmentFormPage = () => {
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     
-    // When changing adjustment type, we might want to reset directions of existing lines
+    if (name === "branch_id") {
+      setFormData((prev) => ({ ...prev, branch_id: value, warehouse_id: "" }));
+      setLines((prev) => prev.map((l) => ({
+        ...l,
+        warehouse_location_id: "",
+        stock_balance_data: null,
+      })));
+      return;
+    }
+
+    if (name === "warehouse_id") {
+      setFormData((prev) => ({ ...prev, warehouse_id: value }));
+      setLines((prev) => prev.map((l) => ({
+        ...l,
+        warehouse_location_id: "",
+        stock_balance_data: null,
+      })));
+      return;
+    }
+
     if (name === "adjustment_type") {
-      setLines((prev: unknown) => prev.map((l: unknown) => {
+      setLines((prev) => prev.map((l) => {
         let dir = l.adjustment_direction;
         let vqty = Math.abs(l.variance_quantity || 0);
         
         if (value === "positive") dir = "in";
         else if (value === "negative" || value === "damage" || value === "expiry") dir = "out";
         else if (value === "physical_count") {
-           // physical count depends on physical_quantity vs system_quantity
            if (String(l.physical_quantity || "").trim() !== "") {
              const phys = parseFloat(l.physical_quantity);
              const variance = Number((phys - l.system_quantity).toFixed(3));
@@ -133,15 +177,16 @@ const StockAdjustmentFormPage = () => {
       }));
     }
 
-    setFormData((prev: unknown) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors((prev: unknown) => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, string> = {};
 
+    if (!formData.branch_id) newErrors.branch_id = "Branch is required";
     if (!formData.warehouse_id) newErrors.warehouse_id = "Warehouse is required";
     if (!formData.adjustment_type) newErrors.adjustment_type = "Adjustment type is required";
     if (!formData.adjustment_date) newErrors.adjustment_date = "Adjustment date is required";
@@ -150,7 +195,7 @@ const StockAdjustmentFormPage = () => {
       newErrors.lines = "At least one line item is required";
     }
 
-    lines.forEach((line: unknown, index: unknown) => {
+    lines.forEach((line: any, index: number) => {
       if (!line.product_id) newErrors[`lines.${index}.product_id`] = "Required";
       if (line.product?.requires_batch_tracking && !line.product_batch_id) {
         newErrors[`lines.${index}.product_batch_id`] = "Required";
@@ -167,10 +212,9 @@ const StockAdjustmentFormPage = () => {
         }
       }
 
-      // Check available stock if direction is out
       if (line.adjustment_direction === "out" && line.stock_balance_data) {
         const outQty = Math.abs(parseFloat(line.variance_quantity || 0));
-        const available = parseFloat(line.stock_balance_data.quantity_on_hand || 0); // System quantity is usually what we use as base for physical count or adjustment
+        const available = parseFloat(line.stock_balance_data.quantity_available !== undefined ? line.stock_balance_data.quantity_available : line.stock_balance_data.quantity_on_hand || 0);
         if (outQty > available) {
           newErrors[`lines.${index}.variance_quantity`] = `Exceeds stock (${available})`;
           newErrors[`lines.${index}.physical_quantity`] = `Exceeds stock (${available})`;
@@ -182,7 +226,7 @@ const StockAdjustmentFormPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
       toast.error("Please fix the validation errors");
@@ -192,21 +236,24 @@ const StockAdjustmentFormPage = () => {
     setSaving(true);
     try {
       const payload = {
+        branch_id: parseInt(formData.branch_id),
         warehouse_id: parseInt(formData.warehouse_id),
         adjustment_type: formData.adjustment_type,
         adjustment_date: new Date(formData.adjustment_date).toISOString(),
-        reference_no: formData.reference_no,
+        reference_number: formData.reference_number,
+        reason: formData.reason,
         remarks: formData.remarks,
-        lines: lines.map((l: unknown) => ({
+        lines: lines.map((l: any) => ({
           product_id: parseInt(l.product_id),
           product_batch_id: l.product_batch_id ? parseInt(l.product_batch_id) : null,
           warehouse_location_id: parseInt(l.warehouse_location_id),
           adjustment_direction: l.adjustment_direction,
           system_quantity: parseFloat(l.system_quantity || 0),
           physical_quantity: formData.adjustment_type === "physical_count" && String(l.physical_quantity).trim() !== "" ? parseFloat(l.physical_quantity) : null,
-          variance_quantity: parseFloat(l.variance_quantity || 0),
+          quantity: parseFloat(l.variance_quantity || 0),
           unit_cost: parseFloat(l.unit_cost || 0),
-          reason: l.reason || "",
+          line_reason: l.line_reason || "",
+          line_remarks: l.line_remarks || "",
         })),
       };
 
@@ -218,14 +265,18 @@ const StockAdjustmentFormPage = () => {
         toast.success("Stock adjustment created successfully");
       }
       navigate("/inventory/stock-adjustments");
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || "Operation failed");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  const filteredWarehouses = formData.branch_id
+    ? warehouses.filter((w: any) => String(w.branch_id) === String(formData.branch_id))
+    : warehouses;
+
+  if (loading) return <div className="p-6 text-gray-500">Loading...</div>;
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto pb-24">
@@ -254,18 +305,39 @@ const StockAdjustmentFormPage = () => {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Branch *
+              </label>
+              <select
+                name="branch_id"
+                value={formData.branch_id}
+                onChange={handleChange}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
+                  errors.branch_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"
+                }`}
+              >
+                <option value="">Select Branch...</option>
+                {branches.map((b: any) => (
+                  <option key={b.id} value={b.id}>{b.branch_name}</option>
+                ))}
+              </select>
+              {errors.branch_id && <p className="mt-1 text-sm text-red-500">{errors.branch_id}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Warehouse *
               </label>
               <select
                 name="warehouse_id"
                 value={formData.warehouse_id}
                 onChange={handleChange}
+                disabled={!formData.branch_id}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
                   errors.warehouse_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"
-                }`}
+                } ${!formData.branch_id ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 <option value="">Select Warehouse...</option>
-                {warehouses.map((w: unknown) => (
+                {filteredWarehouses.map((w: any) => (
                   <option key={w.id} value={w.id}>{w.warehouse_name}</option>
                 ))}
               </select>
@@ -313,15 +385,29 @@ const StockAdjustmentFormPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Reference No
+                Reference Number
               </label>
               <input
                 type="text"
-                name="reference_no"
-                value={formData.reference_no}
+                name="reference_number"
+                value={formData.reference_number}
                 onChange={handleChange}
                 placeholder="e.g. Audit #123"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Reason
+              </label>
+              <input
+                type="text"
+                name="reason"
+                value={formData.reason}
+                onChange={handleChange}
+                placeholder="e.g. Stock count variance"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
               />
             </div>
             
@@ -334,8 +420,8 @@ const StockAdjustmentFormPage = () => {
                 value={formData.remarks}
                 onChange={handleChange}
                 rows={2}
-                placeholder="Reason for adjustment..."
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white"
+                placeholder="Detailed remarks..."
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
               />
             </div>
           </div>
@@ -345,7 +431,7 @@ const StockAdjustmentFormPage = () => {
         <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
           {!formData.warehouse_id ? (
             <div className="text-center py-8 text-gray-500">
-              Please select a Warehouse to manage adjustment lines.
+              Please select a Branch and Warehouse to manage adjustment lines.
             </div>
           ) : (
             <StockAdjustmentLinesTable

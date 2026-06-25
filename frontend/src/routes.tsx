@@ -63,8 +63,12 @@ import WarehousesPage from "views/admin/inventory/WarehousesPage";
 import GRNsPage from "pages/inventory/grns/GRNsPage";
 import GRNFormPage from "pages/inventory/grns/GRNFormPage";
 import GRNDetailsPage from "pages/inventory/grns/GRNDetailsPage";
-import StockTransferPage from "views/admin/inventory/StockTransferPage";
-import StockAdjustmentPage from "views/admin/inventory/StockAdjustmentPage";
+import StockTransfersPage from "pages/inventory/stock-transfers/StockTransfersPage";
+import StockTransferFormPage from "pages/inventory/stock-transfers/StockTransferFormPage";
+import StockTransferDetailsPage from "pages/inventory/stock-transfers/StockTransferDetailsPage";
+import StockAdjustmentsPage from "pages/inventory/stock-adjustments/StockAdjustmentsPage";
+import StockAdjustmentFormPage from "pages/inventory/stock-adjustments/StockAdjustmentFormPage";
+import StockAdjustmentDetailsPage from "pages/inventory/stock-adjustments/StockAdjustmentDetailsPage";
 import StockLedgerPage from "views/admin/inventory/StockLedgerPage";
 import OpeningStockEntriesPage from "pages/inventory/opening-stock/OpeningStockEntriesPage";
 import OpeningStockEntryFormPage from "pages/inventory/opening-stock/OpeningStockEntryFormPage";
@@ -213,8 +217,14 @@ const routes: ERPRoute[] = [
       { name: "Create GRN", path: "inventory/grns/create", component: <GRNFormPage />, hide: true },
       { name: "Edit GRN", path: "inventory/grns/:id/edit", component: <GRNFormPage />, hide: true },
       { name: "GRN Details", path: "inventory/grns/:id", component: <GRNDetailsPage />, hide: true },
-      { name: "Stock Transfer", path: "inventory/stock-transfer", component: <StockTransferPage /> },
-      { name: "Stock Adjustment", path: "inventory/stock-adjustment", component: <StockAdjustmentPage /> },
+      { name: "Stock Transfers", path: "inventory/stock-transfers", component: <StockTransfersPage /> },
+      { name: "Create Stock Transfer", path: "inventory/stock-transfers/create", component: <StockTransferFormPage />, hide: true },
+      { name: "Edit Stock Transfer", path: "inventory/stock-transfers/:id/edit", component: <StockTransferFormPage />, hide: true },
+      { name: "Stock Transfer Details", path: "inventory/stock-transfers/:id", component: <StockTransferDetailsPage />, hide: true },
+      { name: "Stock Adjustments", path: "inventory/stock-adjustments", component: <StockAdjustmentsPage /> },
+      { name: "Create Stock Adjustment", path: "inventory/stock-adjustments/create", component: <StockAdjustmentFormPage />, hide: true },
+      { name: "Edit Stock Adjustment", path: "inventory/stock-adjustments/:id/edit", component: <StockAdjustmentFormPage />, hide: true },
+      { name: "Stock Adjustment Details", path: "inventory/stock-adjustments/:id", component: <StockAdjustmentDetailsPage />, hide: true },
       { name: "Stock Ledger", path: "inventory/stock-ledger", component: <StockLedgerPage /> },
       { name: "Opening Stock", path: "inventory/opening-stock", component: <OpeningStockEntriesPage /> },
       { name: "Create Opening Stock", path: "inventory/opening-stock/create", component: <OpeningStockEntryFormPage />, hide: true },

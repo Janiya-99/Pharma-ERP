@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Clock, MapPin, GitMerge, FileText } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { inventoryApi } from "../../../api/inventoryApi";
-import { formatDate } from "../../../lib/utils";
+import { formatDate, formatCurrency } from "../../../lib/utils";
+import { useAuth } from "../../../auth/AuthContext";
 import StockAdjustmentStatusBadge from "../../../components/inventory/StockAdjustmentStatusBadge";
 import StockAdjustmentTypeBadge from "../../../components/inventory/StockAdjustmentTypeBadge";
 import StockAdjustmentPostedStatusBadge from "../../../components/inventory/StockAdjustmentPostedStatusBadge";
@@ -19,14 +20,22 @@ import AdjustmentDirectionBadge from "../../../components/inventory/AdjustmentDi
 const StockAdjustmentDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { hasPermission } = useAuth();
 
-  const [adjustment, setAdjustment] = useState(null);
+  const [adjustment, setAdjustment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!hasPermission("inventory.stock_adjustment.view")) {
+      toast.error("You do not have permission to view stock adjustments");
+      navigate("/inventory/stock-adjustments");
+    }
+  }, [hasPermission]);
 
   useEffect(() => {
     fetchAdjustment();
@@ -53,14 +62,14 @@ const StockAdjustmentDetailsPage = () => {
         await inventoryApi.deleteStockAdjustment(adjustment.id);
         toast.success("Adjustment deleted successfully");
         navigate("/inventory/stock-adjustments");
-      } catch (error) {
+      } catch (error: any) {
         toast.error(error.response?.data?.message || "Failed to delete adjustment");
       }
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
-  if (!adjustment) return <div className="p-6">Adjustment not found</div>;
+  if (loading) return <div className="p-6 text-gray-500">Loading...</div>;
+  if (!adjustment) return <div className="p-6 text-red-500">Adjustment not found</div>;
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto pb-24">
@@ -105,7 +114,22 @@ const StockAdjustmentDetailsPage = () => {
         {/* Left Column: Details & Lines */}
         <div className="lg:col-span-2 space-y-6">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Branch Info */}
+            <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-5">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Branch</h3>
+                  <p className="font-semibold text-gray-900 dark:text-white truncate">
+                    {adjustment.branch?.branch_name || "—"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Warehouse Info */}
             <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-5">
               <div className="flex items-start gap-3">
@@ -114,8 +138,8 @@ const StockAdjustmentDetailsPage = () => {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Warehouse</h3>
-                  <p className="font-semibold text-gray-900 dark:text-white">
-                    {adjustment.warehouse?.warehouse_name || "Unknown"}
+                  <p className="font-semibold text-gray-900 dark:text-white truncate">
+                    {adjustment.warehouse?.warehouse_name || "—"}
                   </p>
                 </div>
               </div>
@@ -135,6 +159,21 @@ const StockAdjustmentDetailsPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Date Info */}
+            <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-5">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-600 dark:text-amber-400">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Adjustment Date</h3>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    {formatDate(adjustment.adjustment_date)}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <StockAdjustmentTotalsCard
@@ -144,31 +183,80 @@ const StockAdjustmentDetailsPage = () => {
              lineCount={adjustment.lines?.length || 0}
           />
 
-          {/* Remarks */}
-          {(adjustment.remarks || adjustment.reference_no) && (
-            <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-5">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Additional Details
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {adjustment.reference_no && (
-                  <div>
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Reference No</span>
-                    <p className="text-sm text-gray-900 dark:text-white">{adjustment.reference_no}</p>
-                  </div>
-                )}
-                {adjustment.remarks && (
-                  <div className="sm:col-span-2">
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Remarks</span>
-                    <p className="text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-navy-900 p-3 rounded-lg border border-gray-100 dark:border-navy-700">
-                      {adjustment.remarks}
-                    </p>
-                  </div>
-                )}
-              </div>
+          {/* Additional Details */}
+          <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-5">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Additional Details
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {adjustment.reference_number || adjustment.reference_no ? (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Reference Number</span>
+                  <p className="text-sm text-gray-900 dark:text-white font-medium">{adjustment.reference_number || adjustment.reference_no}</p>
+                </div>
+              ) : null}
+
+              {adjustment.reason && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Adjustment Reason</span>
+                  <p className="text-sm text-gray-900 dark:text-white font-medium">{adjustment.reason}</p>
+                </div>
+              )}
+
+              {adjustment.created_by_user?.name && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Created By</span>
+                  <p className="text-sm text-gray-900 dark:text-white">{adjustment.created_by_user.name}</p>
+                </div>
+              )}
+
+              {adjustment.approved_by_user?.name && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Approved By</span>
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    {adjustment.approved_by_user.name} {adjustment.approved_at ? `on ${formatDate(adjustment.approved_at)}` : ""}
+                  </p>
+                </div>
+              )}
+
+              {adjustment.posted_by_user?.name && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Posted By</span>
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    {adjustment.posted_by_user.name} {adjustment.posted_at ? `on ${formatDate(adjustment.posted_at)}` : ""}
+                  </p>
+                </div>
+              )}
+
+              {adjustment.remarks && (
+                <div className="sm:col-span-2 md:col-span-3">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 block mb-1">Remarks</span>
+                  <p className="text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-navy-900 p-3 rounded-lg border border-gray-100 dark:border-navy-700">
+                    {adjustment.remarks}
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Navigation links if posted */}
+            {adjustment.posted_status === "posted" && (
+              <div className="border-t border-gray-100 dark:border-navy-700 mt-6 pt-4 flex flex-wrap gap-3">
+                <Link
+                  to={`/inventory/stock-ledger?product_id=${adjustment.lines?.[0]?.product_id || ""}&warehouse_id=${adjustment.warehouse_id}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg dark:bg-navy-700 dark:text-brand-400 dark:hover:bg-navy-600 transition-colors border border-transparent dark:border-navy-600"
+                >
+                  View Stock Ledger
+                </Link>
+                <Link
+                  to={`/inventory/stock-balances?search=${adjustment.lines?.[0]?.product?.product_name || ""}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg dark:bg-navy-700 dark:text-brand-400 dark:hover:bg-navy-600 transition-colors border border-transparent dark:border-navy-600"
+                >
+                  View Stock Balances
+                </Link>
+              </div>
+            )}
+          </div>
 
           {/* Lines Table */}
           <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
@@ -176,7 +264,7 @@ const StockAdjustmentDetailsPage = () => {
               <h3 className="text-base font-semibold text-gray-900 dark:text-white">Adjustment Lines</h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse min-w-[1200px]">
                 <thead>
                   <tr className="bg-gray-50 dark:bg-navy-800/50 border-b border-gray-200 dark:border-navy-700">
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Product</th>
@@ -197,64 +285,86 @@ const StockAdjustmentDetailsPage = () => {
                       </>
                     )}
                     
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Unit Cost</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Total Cost</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Line Reason</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Line Remarks</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
-                  {adjustment.lines?.map((line: unknown) => (
-                    <tr key={line.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30 transition-colors">
-                      <td className="px-4 py-3">
-                        <p className="font-medium text-gray-900 dark:text-white">{line.product?.product_name}</p>
-                        <p className="text-xs text-gray-500">{line.product?.product_code}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        {line.product_batch ? (
+                  {adjustment.lines?.map((line: any) => {
+                    const absQty = Math.abs(parseFloat(line.variance_quantity !== undefined ? line.variance_quantity : line.quantity || 0));
+                    const totalCost = absQty * parseFloat(line.unit_cost || 0);
+
+                    return (
+                      <tr key={line.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30 transition-colors">
+                        <td className="px-4 py-3">
+                          <p className="font-medium text-gray-900 dark:text-white">{line.product?.product_name}</p>
+                          <p className="text-xs text-gray-500">{line.product?.product_code}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          {line.product_batch || line.batch ? (
+                            <>
+                              <p className="font-medium text-gray-900 dark:text-white">{(line.product_batch || line.batch).batch_number}</p>
+                              {(line.product_batch || line.batch).expiry_date && (
+                                <p className="text-xs text-gray-500">Exp: {formatDate((line.product_batch || line.batch).expiry_date)}</p>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-gray-400 text-sm">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {line.warehouse_location?.location_name || "-"}
+                          </span>
+                        </td>
+
+                        {adjustment.adjustment_type === "physical_count" ? (
                           <>
-                            <p className="font-medium text-gray-900 dark:text-white">{line.product_batch.batch_number}</p>
-                            {line.product_batch.expiry_date && (
-                              <p className="text-xs text-gray-500">Exp: {formatDate(line.product_batch.expiry_date)}</p>
-                            )}
+                             <td className="px-4 py-3 text-right">
+                              <span className="text-sm text-gray-500">{parseFloat(line.system_quantity || 0).toFixed(3)}</span>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                                {parseFloat(line.physical_quantity || 0).toFixed(3)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                               <VarianceQuantityBadge variance={line.variance_quantity !== undefined ? line.variance_quantity : line.quantity} />
+                            </td>
                           </>
                         ) : (
-                          <span className="text-gray-400 text-sm">-</span>
+                          <>
+                            <td className="px-4 py-3 text-right">
+                              <span className="text-sm text-gray-500">{parseFloat(line.system_quantity || 0).toFixed(3)}</span>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                {absQty.toFixed(3)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                               <AdjustmentDirectionBadge direction={line.adjustment_direction} />
+                            </td>
+                          </>
                         )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-sm text-gray-700 dark:text-gray-300">
-                          {line.warehouse_location?.location_name || "-"}
-                        </span>
-                      </td>
 
-                      {adjustment.adjustment_type === "physical_count" ? (
-                        <>
-                           <td className="px-4 py-3 text-right">
-                            <span className="text-sm text-gray-500">{parseFloat(line.system_quantity || 0).toFixed(3)}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                              {parseFloat(line.physical_quantity || 0).toFixed(3)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                             <VarianceQuantityBadge variance={line.variance_quantity} />
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          <td className="px-4 py-3 text-right">
-                            <span className="text-sm text-gray-500">{parseFloat(line.system_quantity || 0).toFixed(3)}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {Math.abs(parseFloat(line.variance_quantity || 0)).toFixed(3)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                             <AdjustmentDirectionBadge direction={line.adjustment_direction} />
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  ))}
+                        <td className="px-4 py-3 text-right">
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{formatCurrency(line.unit_cost || 0)}</span>
+                        </td>
+                        <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-white">
+                          {formatCurrency(totalCost)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                          {line.line_reason || line.reason || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                          {line.line_remarks || line.remarks || "—"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -268,7 +378,7 @@ const StockAdjustmentDetailsPage = () => {
             
             {adjustment.approvals && adjustment.approvals.length > 0 ? (
               <div className="space-y-4">
-                {adjustment.approvals.map((approval: unknown) => (
+                {adjustment.approvals.map((approval: any) => (
                   <div key={approval.id} className="relative pl-4 pb-4 border-l border-gray-200 dark:border-navy-600 last:border-0 last:pb-0">
                     <div className={`absolute -left-1.5 top-1.5 w-3 h-3 rounded-full ${
                       approval.action === "submitted" ? "bg-indigo-500" :

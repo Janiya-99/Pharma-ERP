@@ -118,8 +118,8 @@ export const inventoryApi = {
   createStockAdjustment: (payload: Record<string, unknown>) => apiClient.post("/inventory/stock-adjustments", payload),
   updateStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/stock-adjustments/${id}`, payload),
   deleteStockAdjustment: (id: string | number) => apiClient.delete(`/inventory/stock-adjustments/${id}`),
-  submitStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/stock-adjustments/${id}/submit`, payload),
-  approveStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/stock-adjustments/${id}/approve`, payload),
-  rejectStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/stock-adjustments/${id}/reject`, payload),
-  postStockAdjustment: (id: string | number) => apiClient.put(`/inventory/stock-adjustments/${id}/post`),
+  submitStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/submit`, payload),
+  approveStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/approve`, payload),
+  rejectStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/reject`, payload),
+  postStockAdjustment: (id: string | number) => apiClient.post(`/inventory/stock-adjustments/${id}/post`),
 };
