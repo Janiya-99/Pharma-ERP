@@ -1,1 +1,3 @@
 /backend/server
+.env
+.env.*!.env.example
