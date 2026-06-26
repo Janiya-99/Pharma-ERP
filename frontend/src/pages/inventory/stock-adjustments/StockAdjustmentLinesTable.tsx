@@ -31,7 +31,7 @@ const StockAdjustmentLinesTable = ({
       setLoadingProducts(true);
       const res = await inventoryApi.getProducts({ limit: 500, status: "active", with_batches: true });
       if (res.success !== false) {
-        setProducts(res.data?.data || res.data || []);
+        setProducts(Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []));
       }
     } catch (error) {
       console.error("Failed to load products", error);
@@ -162,7 +162,7 @@ const StockAdjustmentLinesTable = ({
       if (batchId) params.product_batch_id = batchId;
 
       const res = await inventoryApi.getStockBalances(params);
-      const balances = res.data?.data || res.data || [];
+      const balances = Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
       
       let foundBalance = null;
       if (balances.length > 0) {

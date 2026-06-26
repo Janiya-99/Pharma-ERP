@@ -51,7 +51,7 @@ const StockTransferFormPage = () => {
     try {
       const res = await inventoryApi.getWarehouses({ limit: 1000, status: "active" }) as any;
       if (res.success !== false) {
-        setWarehouses(res.data?.data || res.data || []);
+        setWarehouses(Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []));
       }
     } catch (err) {}
   };

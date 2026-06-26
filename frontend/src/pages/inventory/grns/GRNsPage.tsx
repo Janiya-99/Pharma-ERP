@@ -33,7 +33,9 @@ const GRNsPage = () => {
       });
       const res = response as any;
       if (res.data?.success || res.success !== false) {
-        const resData = res.data?.data || res.data || [];
+        let resData = [];
+        if (Array.isArray(res.data?.data)) resData = res.data.data;
+        else if (Array.isArray(res.data)) resData = res.data;
         const resTotal = res.data?.pagination?.total || res.pagination?.total || 0;
         setData(resData);
         setTotalRecords(resTotal);

@@ -42,7 +42,7 @@ const UserBranchAccessPage = () => {
   const fetchAllBranches = async () => {
     try {
       const res = await getBranches({ limit: 100 });
-      if (res.success) setAllBranches(res.data?.items || res.data || []);
+      if (res.success) setAllBranches(Array.isArray(res.data?.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error(err);
     }

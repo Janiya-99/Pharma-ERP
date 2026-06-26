@@ -7,15 +7,19 @@ import SignIn from "views/auth/SignIn";
 import Dashboard from "views/admin/dashboard";
 import LandingPage from "views/admin/landing";
 
-// Control Center
-import ControlCenterDashboard from "views/admin/control-center/ControlCenterDashboard";
-import CompanyPage from "views/admin/control-center/CompanyPage";
-import BranchPage from "views/admin/control-center/BranchPage";
-import UsersPage from "views/admin/control-center/UsersPage";
-import RolesPage from "views/admin/control-center/RolesPage";
-import DesignationsPage from "views/admin/control-center/DesignationsPage";
-import SettingsPage from "views/admin/control-center/SettingsPage";
-import AuditLogsPage from "views/admin/control-center/AuditLogsPage";
+// Control Center — new pages
+import SoftwareModulesPage from "pages/control-center/software-modules/SoftwareModulesPage";
+import SettingsPage from "pages/control-center/settings/SettingsPage";
+
+// Control Center — new pages
+import OrganizationSetupPage from "pages/control-center/organization/OrganizationSetupPage";
+import UsersPage from "pages/control-center/users/UsersPage";
+import UserCreatePage from "pages/control-center/users/UserCreatePage";
+import UserDetailsPage from "pages/control-center/users/UserDetailsPage";
+import RolesPermissionsPage from "pages/control-center/roles-permissions/RolesPermissionsPage";
+import AccessMatrixPage from "pages/control-center/access-matrix/AccessMatrixPage";
+import AuditLogsPage from "pages/control-center/logs/AuditLogsPage";
+import LoginLogsPage from "pages/control-center/logs/LoginLogsPage";
 
 // Finance
 import FinanceDashboard from "views/admin/finance/FinanceDashboard";
@@ -105,6 +109,9 @@ export type SubRoute = {
   name: string;
   path: string;
   component: JSX.Element;
+  section?: string;   // Section header label for grouping in sidebar
+  hide?: boolean;     // Hide from sidebar navigation
+  icon?: JSX.Element; // Optional icon for child items
 };
 
 export type ERPRoute = {
@@ -134,19 +141,50 @@ const routes: ERPRoute[] = [
     component: <Dashboard />,
   },
   {
-    name: "Control Center",
+    name: "Organization Setup",
     layout: "/admin",
-    path: "control-center",
+    path: "organization-setup",
+    icon: <MdOutlineAccountBalance className="h-5 w-5" />,
+    children: [
+      { name: "Company", path: "control-center/company", component: <OrganizationSetupPage /> },
+      { name: "Branches", path: "control-center/branches", component: <OrganizationSetupPage /> },
+      { name: "Departments", path: "control-center/departments", component: <OrganizationSetupPage /> },
+      { name: "Designations", path: "control-center/designations", component: <OrganizationSetupPage /> },
+    ],
+  },
+  {
+    name: "User & Access Center",
+    layout: "/admin",
+    path: "user-access-center",
+    icon: <MdOutlineVerifiedUser className="h-5 w-5" />,
+    children: [
+      { name: "Users", path: "control-center/users", component: <UsersPage /> },
+      { name: "Roles & Permissions", path: "control-center/roles-permissions", component: <RolesPermissionsPage /> },
+      { name: "Access Matrix", path: "control-center/access-matrix", component: <AccessMatrixPage /> },
+      // Hidden user routes
+      { name: "Create User", path: "control-center/users/create", component: <UserCreatePage />, hide: true },
+      { name: "Edit User", path: "control-center/users/:id/edit", component: <UserCreatePage />, hide: true },
+      { name: "User Details", path: "control-center/users/:id", component: <UserDetailsPage />, hide: true },
+    ],
+  },
+  {
+    name: "System Setup",
+    layout: "/admin",
+    path: "system-setup",
     icon: <MdOutlineAdminPanelSettings className="h-5 w-5" />,
     children: [
-      { name: "Dashboard", path: "control-center/dashboard", component: <ControlCenterDashboard /> },
-      { name: "Company", path: "control-center/company", component: <CompanyPage /> },
-      { name: "Branches", path: "control-center/branches", component: <BranchPage /> },
-      { name: "Users", path: "control-center/users", component: <UsersPage /> },
-      { name: "Roles & Permissions", path: "control-center/roles", component: <RolesPage /> },
-      { name: "Designations", path: "control-center/designations", component: <DesignationsPage /> },
+      { name: "Software Modules", path: "control-center/software-modules", component: <SoftwareModulesPage /> },
       { name: "Settings", path: "control-center/settings", component: <SettingsPage /> },
+    ],
+  },
+  {
+    name: "Audit & Security",
+    layout: "/admin",
+    path: "audit-security",
+    icon: <MdOutlineReceiptLong className="h-5 w-5" />,
+    children: [
       { name: "Audit Logs", path: "control-center/audit-logs", component: <AuditLogsPage /> },
+      { name: "Login Logs", path: "control-center/login-logs", component: <LoginLogsPage /> },
     ],
   },
   {
@@ -154,6 +192,7 @@ const routes: ERPRoute[] = [
     layout: "/admin",
     path: "finance",
     icon: <MdOutlineAccountBalance className="h-5 w-5" />,
+    secondary: true,
     children: [
       { name: "Dashboard", path: "finance/dashboard", component: <FinanceDashboard /> },
       { name: "Financial Years", path: "finance/financial-years", component: <FinancialYearsPage /> },
@@ -208,6 +247,7 @@ const routes: ERPRoute[] = [
     layout: "/admin",
     path: "inventory",
     icon: <MdInventory2 className="h-5 w-5" />,
+    secondary: true,
     children: [
       { name: "Dashboard", path: "inventory/dashboard", component: <InventoryDashboard /> },
       { name: "Products", path: "inventory/products", component: <ProductsPage /> },
@@ -237,6 +277,7 @@ const routes: ERPRoute[] = [
     layout: "/admin",
     path: "invoice-center",
     icon: <MdOutlineReceiptLong className="h-5 w-5" />,
+    secondary: true,
     children: [
       { name: "Dashboard", path: "invoice-center/dashboard", component: <InvoiceDashboard /> },
       { name: "Sales Orders", path: "invoice-center/sales-orders", component: <SalesOrdersPage /> },
@@ -251,6 +292,7 @@ const routes: ERPRoute[] = [
     layout: "/admin",
     path: "compliance",
     icon: <MdOutlineVerifiedUser className="h-5 w-5" />,
+    secondary: true,
     children: [
       { name: "Dashboard", path: "compliance/dashboard", component: <ComplianceDashboard /> },
       { name: "License Documents", path: "compliance/licenses", component: <LicenseDocumentsPage /> },

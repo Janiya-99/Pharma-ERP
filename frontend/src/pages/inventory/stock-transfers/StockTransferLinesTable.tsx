@@ -41,7 +41,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
     try {
       const res = await inventoryApi.getWarehouseLocations({ warehouse_id: wId, limit: 1000, status: "active" });
       if (res.success !== false) {
-        setSourceLocations(res.data?.data || res.data || []);
+        setSourceLocations(Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []));
       }
     } catch (err) {}
   };
@@ -50,7 +50,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
     try {
       const res = await inventoryApi.getWarehouseLocations({ warehouse_id: wId, limit: 1000, status: "active" });
       if (res.success !== false) {
-        setDestinationLocations(res.data?.data || res.data || []);
+        setDestinationLocations(Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []));
       }
     } catch (err) {}
   };

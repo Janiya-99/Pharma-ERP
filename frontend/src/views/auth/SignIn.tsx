@@ -19,8 +19,8 @@ export default function SignIn() {
   const { login, isLoading, error, clearError } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("kamali@pharmadist.lk");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("admin@omacx.com");
+  const [password, setPassword] = useState("Admin@12345");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

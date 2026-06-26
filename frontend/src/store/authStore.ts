@@ -60,7 +60,7 @@ export const useAuthStore = create<AuthState>()(
   login: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await axios.post(`${BASE_URL}/auth/login`, { email, password });
+      const res = await axios.post(`${BASE_URL}/auth/login`, { company_code: "OMACX", email, password });
       
       const { tokens, user: userData } = res.data.data;
       

@@ -1,43 +1,27 @@
-import React from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React from "react";
+import ReactApexChart from "react-apexcharts";
 
 type ChartProps = {
-	// using `interface` is also ok
-	[x: string]: any;
-};
-type ChartState = {
-	chartData: any[];
-	chartOptions: any;
+  chartData: any[];
+  chartOptions: any;
+  [x: string]: any;
 };
 
-class LineChart extends React.Component<ChartProps, ChartState> {
-	constructor(props: { chartData: any[]; chartOptions: any }) {
-		super(props);
+const LineAreaChart: React.FC<ChartProps> = (props) => {
+  const { chartData, chartOptions, ...rest } = props;
+  if (!chartData || !chartOptions || !Array.isArray(chartData)) {
+    return null;
+  }
+  return (
+    <ReactApexChart
+      options={chartOptions}
+      series={chartData}
+      type="area"
+      width="100%"
+      height="100%"
+      {...rest}
+    />
+  );
+};
 
-		this.state = {
-			chartData: [],
-			chartOptions: {}
-		};
-	}
-
-	componentDidMount() {
-		this.setState({
-			chartData: this.props.chartData,
-			chartOptions: this.props.chartOptions
-		});
-	}
-
-	render() {
-		return (
-			<ReactApexChart
-				options={this.state.chartOptions}
-				series={this.state.chartData}
-				type='area'
-				width='100%'
-				height='100%'
-			/>
-		);
-	}
-}
-
-export default LineChart;
+export default LineAreaChart;

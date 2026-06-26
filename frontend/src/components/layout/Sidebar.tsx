@@ -12,33 +12,59 @@ import { MdLocalPharmacy } from "react-icons/md";
 
 type MenuItem = {
   name: string;
-  path: string;
+  path?: string;
   icon: React.ComponentType<{ className?: string }>;
   permission?: string;
+  children?: {
+    name: string;
+    path: string;
+    permission?: string;
+  }[];
 };
 
 const Sidebar = () => {
   const { activeSoftware, user, activeBranch } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const location = useLocation();
 
   const controlCenterMenus: MenuItem[] = [
     { name: "Dashboard", path: "/control-center/dashboard", icon: LayoutDashboard },
-    { name: "Company Setup", path: "/control-center/company", icon: Building, permission: "control.company.view" },
-    { name: "Branches", path: "/control-center/branches", icon: MapPin, permission: "control.branch.view" },
-    { name: "Departments", path: "/control-center/departments", icon: Network, permission: "control.department.view" },
-    { name: "Designations", path: "/control-center/designations", icon: Users, permission: "control.designation.view" },
-    { name: "Users", path: "/control-center/users", icon: Users, permission: "control.user.view" },
-    { name: "User Branch Access", path: "/control-center/user-branch-access", icon: MapPin, permission: "control.access.branch.view" },
-    { name: "User Software Access", path: "/control-center/user-software-access", icon: LayoutDashboard, permission: "control.access.software.view" },
-    { name: "Roles", path: "/control-center/roles", icon: Shield, permission: "control.role.view" },
-    { name: "Software Modules", path: "/control-center/software-modules", icon: LayoutDashboard, permission: "control.permission.view" },
-    { name: "Permissions", path: "/control-center/permissions", icon: Key, permission: "control.permission.view" },
-    { name: "Role Permission Matrix", path: "/control-center/role-permission-matrix", icon: ShieldCheck, permission: "control.permission.assign" },
-    { name: "User Access Matrix", path: "/control-center/user-access-matrix", icon: ShieldCheck, permission: "control.access_matrix.view" },
-    { name: "Audit Logs", path: "/control-center/audit-logs", icon: FileCheck, permission: "control.audit.view" },
-    { name: "Login Logs", path: "/control-center/login-logs", icon: LogIn, permission: "control.login_logs.view" },
-    { name: "Settings", path: "/control-center/settings", icon: Settings },
+    {
+      name: "Organization Setup",
+      icon: Building,
+      children: [
+        { name: "Company", path: "/control-center/company", permission: "control.company.view" },
+        { name: "Branches", path: "/control-center/branches", permission: "control.branch.view" },
+        { name: "Departments", path: "/control-center/departments", permission: "control.department.view" },
+        { name: "Designations", path: "/control-center/designations", permission: "control.designation.view" },
+      ],
+    },
+    {
+      name: "User & Access Center",
+      icon: Shield,
+      children: [
+        { name: "Users", path: "/control-center/users", permission: "control.user.view" },
+        { name: "Roles & Permissions", path: "/control-center/roles-permissions", permission: "control.role.view" },
+        { name: "Access Matrix", path: "/control-center/access-matrix", permission: "control.access_matrix.view" },
+      ],
+    },
+    {
+      name: "System Setup",
+      icon: Settings,
+      children: [
+        { name: "Software Modules", path: "/control-center/software-modules", permission: "control.permission.view" },
+        { name: "Settings", path: "/control-center/settings" },
+      ],
+    },
+    {
+      name: "Audit & Security",
+      icon: FileCheck,
+      children: [
+        { name: "Audit Logs", path: "/control-center/audit-logs", permission: "control.audit.view" },
+        { name: "Login Logs", path: "/control-center/login-logs", permission: "control.login_logs.view" },
+      ],
+    },
   ];
 
   const financeMenus: MenuItem[] = [
@@ -92,6 +118,16 @@ const Sidebar = () => {
   };
 
   const menus = getMenus();
+  
+  React.useEffect(() => {
+    const match = menus.find(
+      (m) => m.children && m.children.some((c) => location.pathname.includes(c.path))
+    );
+    if (match) {
+      setOpenAccordion(match.name);
+    }
+  }, [location.pathname, activeSoftware]);
+
   const initials = (user?.name || user?.full_name || "U")
     .split(" ")
     .map((n: string) => n[0])
@@ -99,44 +135,115 @@ const Sidebar = () => {
     .toUpperCase()
     .slice(0, 2);
 
-  const renderMenu = (menu: MenuItem) => (
-    <PermissionGuard key={menu.path} permission={menu.permission}>
-      <NavLink
-        to={menu.path}
-        title={!isExpanded ? menu.name : undefined}
-        className={({ isActive }) =>
-          `relative flex items-center gap-3 rounded-xl transition-all duration-150 group ${
+  const renderMenu = (menu: MenuItem) => {
+    const hasChildren = !!menu.children && menu.children.length > 0;
+    const isAccordionOpen = openAccordion === menu.name;
+    const isActiveParent = hasChildren 
+      ? menu.children!.some((c) => location.pathname.includes(c.path))
+      : location.pathname.includes(menu.path || "");
+
+    if (!hasChildren) {
+      return (
+        <PermissionGuard key={menu.path} permission={menu.permission}>
+          <NavLink
+            to={menu.path || "#"}
+            title={!isExpanded ? menu.name : undefined}
+            className={({ isActive }) =>
+              `relative flex items-center gap-3 rounded-xl transition-all duration-150 group ${
+                isExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
+              } ${
+                isActive
+                  ? "bg-indigo-50 text-indigo-700 font-semibold"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <menu.icon
+                  className={`h-4 w-4 shrink-0 transition-colors ${
+                    isActive ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
+                  }`}
+                />
+                {isExpanded && (
+                  <span className={`text-[13px] font-medium truncate transition-colors ${
+                    isActive ? "text-indigo-700" : "text-gray-600 group-hover:text-gray-800"
+                  }`}>
+                    {menu.name}
+                  </span>
+                )}
+                {!isExpanded && isActive && (
+                  <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-indigo-600" />
+                )}
+              </>
+            )}
+          </NavLink>
+        </PermissionGuard>
+      );
+    }
+
+    // Accordion group
+    return (
+      <div key={menu.name} className="flex flex-col gap-0.5">
+        <button
+          onClick={() => {
+            if (!isExpanded) setIsExpanded(true);
+            setOpenAccordion(isAccordionOpen ? null : menu.name);
+          }}
+          className={`w-full relative flex items-center gap-3 rounded-xl transition-all duration-150 group ${
             isExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
           } ${
-            isActive
-              ? "bg-indigo-600 text-white shadow-sm shadow-indigo-300/50"
-              : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"
-          }`
-        }
-      >
-        {({ isActive }) => (
-          <>
-            <menu.icon
-              className={`h-4 w-4 shrink-0 transition-colors ${
-                isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600"
-              }`}
-            />
-            {isExpanded && (
-              <span className={`text-[13px] font-medium truncate transition-colors ${
-                isActive ? "text-white" : "text-gray-600 group-hover:text-gray-800"
-              }`}>
+            isActiveParent
+              ? "text-indigo-700 font-semibold bg-indigo-50/20"
+              : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+          }`}
+        >
+          <menu.icon
+            className={`h-4 w-4 shrink-0 transition-colors ${
+              isActiveParent ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
+            }`}
+          />
+          {isExpanded && (
+            <>
+              <span className="text-[13px] font-medium truncate flex-1 text-left">
                 {menu.name}
               </span>
-            )}
-            {/* Active dot when collapsed */}
-            {!isExpanded && isActive && (
-              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-white/70" />
-            )}
-          </>
+              <ChevronRight
+                className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${
+                  isAccordionOpen ? "rotate-90 text-indigo-600" : ""
+                }`}
+              />
+            </>
+          )}
+        </button>
+        {isExpanded && isAccordionOpen && (
+          <div className="pl-6 pr-1.5 mt-0.5 space-y-0.5 border-l border-gray-100 ml-5.5 flex flex-col gap-0.5">
+            {menu.children!.map((child) => (
+              <PermissionGuard key={child.path} permission={child.permission}>
+                <NavLink
+                  to={child.path}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150 ${
+                      isActive
+                        ? "bg-indigo-50 text-indigo-700 font-semibold"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-indigo-600" : "bg-gray-300"}`} />
+                      <span className="truncate">{child.name}</span>
+                    </>
+                  )}
+                </NavLink>
+              </PermissionGuard>
+            ))}
+          </div>
         )}
-      </NavLink>
-    </PermissionGuard>
-  );
+      </div>
+    );
+  };
 
   return (
     <div

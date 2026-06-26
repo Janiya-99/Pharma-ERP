@@ -23,7 +23,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
     try {
       const res = await inventoryApi.getWarehouseLocations({ warehouse_id: wId, limit: 1000, status: "active" });
       if (res.success !== false) {
-        setLocations(res.data?.data || res.data || []);
+        setLocations(Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []));
       }
     } catch (err) {
       console.error("Failed to fetch locations", err);

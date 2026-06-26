@@ -61,7 +61,7 @@ const AuditLogsPage = () => {
       setError(null);
       const res = await getAuditLogs(filters);
       if (res.success) {
-        setLogs(res.data.items || res.data || []);
+        setLogs(Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []));
         setPagination(res.meta || res.pagination);
       }
     } catch (err) {

@@ -114,7 +114,7 @@ export default function CompanyPage() {
           { key: "vat", label: "VAT No." },
           { key: "phone", label: "Phone" },
           { key: "email", label: "Email" },
-          { key: "status", label: "Status", render: (row: unknown) => <StatusBadge status={row.status} /> },
+          { key: "status", label: "Status", render: (row: any) => <StatusBadge status={row.status} /> },
         ]}
       />
 

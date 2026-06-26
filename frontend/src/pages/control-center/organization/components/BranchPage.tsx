@@ -7,8 +7,8 @@ import { toast } from "sonner";
 
 const branchFields: FormField[] = [
   { key: "name", label: "Branch Name", type: "text", required: true, placeholder: "e.g. Kandy Branch" },
-  { key: "code", label: "Branch Code", type: "text", required: true, placeholder: "e.g. KDY", validate: (v: unknown) => v && v.length > 5 ? "Code must be 5 characters or less" : null },
-  { key: "address", label: "Address", type: "textarea", span: 2, placeholder: "Full branch address" },
+  { key: "code", label: "Branch Code", type: "text", required: true, placeholder: "e.g. KDY", validate: (v: any) => v && v.length > 5 ? "Code must be 5 characters or less" : null },
+  { key: "address", label: "Address", type: "textarea", span: 2, placeholder: "Full company address" },
   { key: "phone", label: "Contact Number", type: "tel", placeholder: "+94 81 222 3344" },
   { key: "is_active", label: "Status", type: "select", options: [
     { label: "Active", value: "true" },
@@ -48,7 +48,6 @@ export default function BranchPage() {
   const handleSave = async (values: Record<string, any>) => {
     setSaving(true);
     try {
-      // Convert is_active to boolean
       const payload = { ...values, is_active: values.is_active === "true" || values.is_active === true };
       
       if (isEdit && selected) {
@@ -92,7 +91,7 @@ export default function BranchPage() {
           { key: "name", label: "Branch Name" },
           { key: "address", label: "Address" },
           { key: "phone", label: "Contact" },
-          { key: "status", label: "Status", render: (row: unknown) => <StatusBadge status={row.is_active ? "Active" : "Inactive"} /> },
+          { key: "status", label: "Status", render: (row: any) => <StatusBadge status={row.is_active ? "Active" : "Inactive"} /> },
         ]}
       />
 

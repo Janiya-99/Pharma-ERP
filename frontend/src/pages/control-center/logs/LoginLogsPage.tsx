@@ -51,7 +51,7 @@ const LoginLogsPage = () => {
       setError(null);
       const res = await getLoginLogs(filters);
       if (res.success) {
-        setLogs(res.data.items || res.data || []);
+        setLogs(Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []));
         setPagination(res.meta || res.pagination);
       }
     } catch (err) {
@@ -64,7 +64,7 @@ const LoginLogsPage = () => {
   const fetchUsers = async () => {
     try {
       const res = await getUsers({ limit: 100 });
-      if (res.success) setUsers(res.data.items || res.data || []);
+      if (res.success) setUsers(Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error("Failed to load users", err);
     }

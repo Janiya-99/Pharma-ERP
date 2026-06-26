@@ -42,7 +42,7 @@ const UserSoftwareAccessPage = () => {
   const fetchAllSoftware = async () => {
     try {
       const res = await getSoftwareModules();
-      if (res.success) setAllSoftware(res.data?.items || res.data || []);
+      if (res.success) setAllSoftware(Array.isArray(res.data?.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error(err);
     }
