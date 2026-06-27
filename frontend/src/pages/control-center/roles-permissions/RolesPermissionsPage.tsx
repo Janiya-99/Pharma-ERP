@@ -19,7 +19,9 @@ const RolesPermissionsPage = () => {
   const activeTab = searchParams.get("tab") || "roles";
 
   const setActiveTab = (tab: string) => {
-    setSearchParams({ tab });
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("tab", tab);
+    setSearchParams(newParams);
   };
 
   return (

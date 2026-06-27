@@ -54,12 +54,21 @@ const RolePermissionMatrixPage = () => {
   }, [selectedRole]);
 
   useEffect(() => {
-    // Update URL params
-    const params = new URLSearchParams();
-    if (selectedSoftware) params.set("software_id", selectedSoftware);
-    if (selectedRole) params.set("role_id", selectedRole);
-    setSearchParams(params, { replace: true });
-  }, [selectedSoftware, selectedRole, setSearchParams]);
+    const newParams = new URLSearchParams(searchParams);
+    if (selectedSoftware) {
+      newParams.set("software_id", selectedSoftware);
+    } else {
+      newParams.delete("software_id");
+    }
+    if (selectedRole) {
+      newParams.set("role_id", selectedRole);
+    } else {
+      newParams.delete("role_id");
+    }
+    if (newParams.toString() !== searchParams.toString()) {
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [selectedSoftware, selectedRole, searchParams, setSearchParams]);
 
   // Check for unsaved changes
   useEffect(() => {
@@ -79,8 +88,8 @@ const RolePermissionMatrixPage = () => {
       if (res.success) {
         setGroupedPermissions(res.data || []);
       }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load permissions for software");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to load permissions for software");
     } finally {
       setLoading(false);
     }
@@ -99,17 +108,17 @@ const RolePermissionMatrixPage = () => {
         setAssignedPermissionIds(ids);
         setInitialAssignedIds(ids);
       }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load role permissions");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to load role permissions");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGroupSelectionChange = (groupIds: unknown, groupName: unknown) => {
+  const handleGroupSelectionChange = (groupIds: any, groupName: any) => {
     const groupPermIds = groupedPermissions
-      .find((g: unknown) => g.permission_group === groupName)
-      ?.permissions.map((p: unknown) => p.id) || [];
+      .find((g: any) => g.permission_group === groupName)
+      ?.permissions.map((p: any) => p.id) || [];
       
     // Remove old ids for this group
     let newSelection = assignedPermissionIds.filter((id: string | number) => !groupPermIds.includes(id));
@@ -136,7 +145,7 @@ const RolePermissionMatrixPage = () => {
       } else {
         setError(res.message || "Failed to save permissions.");
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.message || "Failed to save permissions.");
     } finally {
       setSaving(false);
@@ -228,9 +237,9 @@ const RolePermissionMatrixPage = () => {
             </div>
           )}
 
-          {groupedPermissions.map((group: unknown, idx: unknown) => {
-            const groupPermIds = group.permissions.map((p: unknown) => p.id);
-            const selectedInGroup = assignedPermissionIds.filter((id: string | number) => groupPermIds.includes(id));
+          {groupedPermissions.map((group: any, idx: any) => {
+            const groupPermIds = group.permissions.map((p: any) => p.id);
+            const selectedInGroup = assignedPermissionIds.filter((id: any) => groupPermIds.includes(id));
 
             return (
               <PermissionCheckboxGroup
@@ -238,7 +247,7 @@ const RolePermissionMatrixPage = () => {
                 groupName={group.permission_group}
                 permissions={group.permissions}
                 selectedIds={selectedInGroup}
-                onSelectionChange={(newSelectedInGroup: unknown) => 
+                onSelectionChange={(newSelectedInGroup: any) => 
                   handleGroupSelectionChange(newSelectedInGroup, group.permission_group)
                 }
                 readOnly={!canAssign || saving}

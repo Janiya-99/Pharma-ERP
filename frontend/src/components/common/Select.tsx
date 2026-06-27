@@ -21,11 +21,23 @@ const Select = ({
   required = false,
   className = "",
   error,
-}: { label?: unknown; value?: unknown; onChange?: unknown; name?: unknown; options?: unknown; placeholder?: unknown; searchable?: unknown; disabled?: unknown; required?: unknown; className?: unknown; error?: unknown }) => {
+}: {
+  label?: any;
+  value?: any;
+  onChange?: (e: any) => void;
+  name?: any;
+  options?: any[];
+  placeholder?: string;
+  searchable?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  className?: string;
+  error?: any;
+}) => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSelectChange = (val: unknown) => {
+  const handleSelectChange = (val: any) => {
     if (onChange) {
       onChange({
         target: {
@@ -36,9 +48,9 @@ const Select = ({
     }
   };
 
-  const selectedOption = options.find((opt: unknown) => String(opt.value) === String(value));
+  const selectedOption = options.find((opt: any) => String(opt.value) === String(value));
   const filteredOptions = searchable
-    ? options.filter((opt: unknown) =>
+    ? options.filter((opt: any) =>
         String(opt.label).toLowerCase().includes(searchTerm.toLowerCase())
       )
     : options;
@@ -79,7 +91,7 @@ const Select = ({
                   No option found.
                 </div>
               ) : (
-                filteredOptions.map((opt: unknown) => (
+                filteredOptions.map((opt: any) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -121,7 +133,7 @@ const Select = ({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className="bg-white border border-gray-200 shadow-md rounded-md z-50 max-h-60 overflow-y-auto">
-          {options.map((opt: unknown) => (
+          {options.map((opt: any) => (
             <SelectItem
               key={opt.value}
               value={String(opt.value)}

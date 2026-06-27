@@ -1,28 +1,28 @@
 import React from "react";
 
-const PermissionCheckboxGroup = ({ groupName, permissions, selectedIds, onSelectionChange, readOnly = false }: { groupName?: unknown; permissions?: unknown; selectedIds?: unknown; onSelectionChange?: unknown; readOnly?: unknown }) => {
-  const allIds = permissions.map((p: unknown) => p.id);
-  const isAllSelected = allIds.every((id: string | number) => selectedIds.includes(id));
-  const isSomeSelected = allIds.some((id: string | number) => selectedIds.includes(id)) && !isAllSelected;
+const PermissionCheckboxGroup = ({ groupName, permissions, selectedIds, onSelectionChange, readOnly = false }: { groupName?: string; permissions?: any[]; selectedIds?: any[]; onSelectionChange?: (ids: any[]) => void; readOnly?: boolean }) => {
+  const allIds = permissions?.map((p: any) => p.id) || [];
+  const isAllSelected = allIds.every((id: string | number) => selectedIds?.includes(id));
+  const isSomeSelected = allIds.some((id: string | number) => selectedIds?.includes(id)) && !isAllSelected;
 
   const handleSelectAll = () => {
     if (readOnly) return;
     if (isAllSelected) {
       // Clear all in this group
-      onSelectionChange(selectedIds.filter((id: string | number) => !allIds.includes(id)));
+      onSelectionChange?.(selectedIds?.filter((id: string | number) => !allIds.includes(id)) || []);
     } else {
       // Select all in this group (merge without duplicates)
-      const newSelection = Array.from(new Set([...selectedIds, ...allIds]));
-      onSelectionChange(newSelection);
+      const newSelection = Array.from(new Set([...(selectedIds || []), ...allIds]));
+      onSelectionChange?.(newSelection);
     }
   };
 
   const handleCheckboxChange = (id: string | number) => {
     if (readOnly) return;
-    if (selectedIds.includes(id)) {
-      onSelectionChange(selectedIds.filter((selectedId: string | number) => selectedId !== id));
+    if (selectedIds?.includes(id)) {
+      onSelectionChange?.(selectedIds.filter((selectedId: string | number) => selectedId !== id));
     } else {
-      onSelectionChange([...selectedIds, id]);
+      onSelectionChange?.([...(selectedIds || []), id]);
     }
   };
 
@@ -30,7 +30,7 @@ const PermissionCheckboxGroup = ({ groupName, permissions, selectedIds, onSelect
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-4">
       <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex justify-between items-center">
         <h3 className="font-semibold text-gray-800 capitalize">
-          {groupName.replace(/_/g, " ")}
+          {groupName?.replace(/_/g, " ") || ""}
         </h3>
         {!readOnly && (
           <button
@@ -43,7 +43,7 @@ const PermissionCheckboxGroup = ({ groupName, permissions, selectedIds, onSelect
         )}
       </div>
       <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {permissions.map((permission: unknown) => (
+        {permissions?.map((permission: any) => (
           <label
             key={permission.id}
             className={`flex items-start gap-3 p-2 rounded hover:bg-gray-50 transition-colors ${readOnly ? "cursor-default" : "cursor-pointer"}`}

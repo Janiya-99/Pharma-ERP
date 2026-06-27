@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getBranches } from "../../api/controlApi";
 import { Loader2 } from "lucide-react";
 
-const BranchSelector = ({ value, onChange, disabled = false, required = false, className = "" }: { value?: unknown; onChange?: unknown; disabled?: unknown; required?: unknown; className?: unknown }) => {
+const BranchSelector = ({ value, onChange, disabled = false, required = false, className = "" }: { value?: any; onChange?: (value: any) => void; disabled?: boolean; required?: boolean; className?: string }) => {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +28,7 @@ const BranchSelector = ({ value, onChange, disabled = false, required = false, c
     <div className={`relative ${className}`}>
       <select
         value={value}
-        onChange={(e: any) => onChange(e.target.value)}
+        onChange={(e: any) => onChange?.(e.target.value)}
         disabled={disabled || loading}
         required={required}
         className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 disabled:bg-gray-100 disabled:text-gray-500 transition-colors appearance-none pr-10"

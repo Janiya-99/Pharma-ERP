@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getRolesBySoftware } from "../../api/controlApi";
 import Select from "./Select";
 
-const RoleSelector = ({ softwareId, value, onChange, disabled = false, required = false, className = "" }: { softwareId?: string | number; value?: unknown; onChange?: unknown; disabled?: unknown; required?: unknown; className?: unknown }) => {
+const RoleSelector = ({ softwareId, value, onChange, disabled = false, required = false, className = "" }: { softwareId?: string | number; value?: any; onChange?: (value: any) => void; disabled?: boolean; required?: boolean; className?: string }) => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -11,7 +11,7 @@ const RoleSelector = ({ softwareId, value, onChange, disabled = false, required 
       fetchRoles(softwareId);
     } else {
       setRoles([]);
-      onChange(""); // Clear selection if software is unselected
+      onChange?.(""); // Clear selection if software is unselected
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [softwareId]);
@@ -47,12 +47,12 @@ const RoleSelector = ({ softwareId, value, onChange, disabled = false, required 
     <Select
       name="role_id"
       value={value}
-      onChange={(e: any) => onChange(e.target.value)}
+      onChange={(e: any) => onChange?.(e.target.value)}
       disabled={disabled || loading || !softwareId}
       required={required}
       className={className}
       placeholder={loading ? "Loading roles..." : "Select Role"}
-      options={roles.map((r: unknown) => ({
+      options={roles.map((r: any) => ({
         value: r.id,
         label: `${r.role_name} ${r.is_system ? "(System)" : ""}`,
       }))}

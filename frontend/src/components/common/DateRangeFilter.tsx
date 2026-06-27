@@ -2,9 +2,9 @@ import React from "react";
 import Input from "./Input";
 import { X } from "lucide-react";
 
-const DateRangeFilter = ({ dateFrom, dateTo, onChange }: { dateFrom?: unknown; dateTo?: unknown; onChange?: unknown }) => {
+const DateRangeFilter = ({ dateFrom, dateTo, onChange }: { dateFrom?: any; dateTo?: any; onChange?: (dates: { dateFrom: any; dateTo: any }) => void }) => {
   const handleClear = () => {
-    onChange({ dateFrom: "", dateTo: "" });
+    onChange?.({ dateFrom: "", dateTo: "" });
   };
 
   const hasValues = dateFrom || dateTo;
@@ -17,7 +17,7 @@ const DateRangeFilter = ({ dateFrom, dateTo, onChange }: { dateFrom?: unknown; d
           type="date"
           name="dateFrom"
           value={dateFrom}
-          onChange={(e: any) => onChange({ dateFrom: e.target.value, dateTo })}
+          onChange={(e: any) => onChange?.({ dateFrom: e.target.value, dateTo })}
           className="w-full sm:w-40"
         />
       </div>
@@ -27,7 +27,7 @@ const DateRangeFilter = ({ dateFrom, dateTo, onChange }: { dateFrom?: unknown; d
           type="date"
           name="dateTo"
           value={dateTo}
-          onChange={(e: any) => onChange({ dateFrom, dateTo: e.target.value })}
+          onChange={(e: any) => onChange?.({ dateFrom, dateTo: e.target.value })}
           className="w-full sm:w-40"
         />
       </div>

@@ -6,7 +6,7 @@ import {
   SheetTitle,
 } from "../ui/sheet";
 
-const Modal = ({ isOpen, onClose, title, children, size = "md" }: { isOpen?: boolean; onClose?: unknown; title?: unknown; children?: React.ReactNode; size?: unknown }) => {
+const Modal = ({ isOpen, onClose, title, children, size = "md" }: { isOpen?: boolean; onClose?: () => void; title?: any; children?: React.ReactNode; size?: "sm" | "md" | "lg" | "xl" }) => {
   const sizes = {
     sm: "sm:max-w-md",
     md: "sm:max-w-lg",
@@ -17,7 +17,7 @@ const Modal = ({ isOpen, onClose, title, children, size = "md" }: { isOpen?: boo
   const sizeClass = sizes[size] || "sm:max-w-lg";
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open: unknown) => { if (!open) onClose(); }}>
+    <Sheet open={isOpen} onOpenChange={(open: any) => { if (!open) onClose?.(); }}>
       <SheetContent 
         side="right" 
         className={`${sizeClass} w-full h-full flex flex-col p-0 bg-white dark:bg-navy-800 border-l border-gray-100 dark:border-navy-700 shadow-2xl transition duration-300`}

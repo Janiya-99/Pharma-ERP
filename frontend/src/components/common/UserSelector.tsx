@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { getUsers } from "../../api/controlApi";
 
-const UserSelector = ({ onSelect, selectedUser }: { onSelect?: unknown; selectedUser?: unknown }) => {
+const UserSelector = ({ onSelect, selectedUser }: { onSelect?: (user: any) => void; selectedUser?: any }) => {
   const [searchTerm, setSearchTerm] = useState(selectedUser?.name || selectedUser?.full_name || "");
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,17 +59,17 @@ const UserSelector = ({ onSelect, selectedUser }: { onSelect?: unknown; selected
     return () => clearTimeout(timer);
   }, [searchTerm, isOpen]);
 
-  const handleSelect = (user: unknown) => {
-    setSearchTerm(user.name || user.full_name || "");
+  const handleSelect = (user: any) => {
+    setSearchTerm(user?.name || user?.full_name || "");
     setIsOpen(false);
-    onSelect(user);
+    onSelect?.(user);
   };
 
   const handleInputChange = (e: any) => {
     setSearchTerm(e.target.value);
     setIsOpen(true);
     if (!e.target.value) {
-      onSelect(null);
+      onSelect?.(null);
     }
   };
 
@@ -99,7 +99,7 @@ const UserSelector = ({ onSelect, selectedUser }: { onSelect?: unknown; selected
           {users.length === 0 && !isLoading ? (
             <div className="px-4 py-2 text-sm text-gray-500">No users found.</div>
           ) : (
-            users.map((user: unknown) => (
+            users.map((user: any) => (
               <div
                 key={user.id}
                 className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50"

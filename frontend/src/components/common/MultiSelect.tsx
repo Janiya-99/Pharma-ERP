@@ -8,7 +8,7 @@ const MultiSelect = ({
   placeholder = "Select options...",
   displayKey = "name",
   valueKey = "id"
-}: { options?: unknown; selectedValues?: unknown; onChange?: unknown; placeholder?: unknown; displayKey?: unknown; valueKey?: unknown }) => {
+}: { options?: any[]; selectedValues?: any[]; onChange?: (values: any[]) => void; placeholder?: string; displayKey?: string; valueKey?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
@@ -23,21 +23,21 @@ const MultiSelect = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelect = (option: unknown) => {
-    const isSelected = selectedValues.some((v: unknown) => v[valueKey] === option[valueKey]);
+  const handleSelect = (option: any) => {
+    const isSelected = selectedValues.some((v: any) => v[valueKey] === option[valueKey]);
     if (isSelected) {
-      onChange(selectedValues.filter((v: unknown) => v[valueKey] !== option[valueKey]));
+      onChange?.(selectedValues.filter((v: any) => v[valueKey] !== option[valueKey]));
     } else {
-      onChange([...selectedValues, option]);
+      onChange?.([...selectedValues, option]);
     }
   };
 
-  const handleRemove = (e: any, option: unknown) => {
+  const handleRemove = (e: any, option: any) => {
     e.stopPropagation();
-    onChange(selectedValues.filter((v: unknown) => v[valueKey] !== option[valueKey]));
+    onChange?.(selectedValues.filter((v: any) => v[valueKey] !== option[valueKey]));
   };
 
-  const filteredOptions = options.filter((option: unknown) => 
+  const filteredOptions = options.filter((option: any) => 
     option[displayKey]?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -51,7 +51,7 @@ const MultiSelect = ({
           <span className="text-gray-500 text-sm select-none">{placeholder}</span>
         )}
         
-        {selectedValues.map((selected: unknown) => (
+        {selectedValues.map((selected: any) => (
           <span 
             key={selected[valueKey]} 
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
@@ -88,8 +88,8 @@ const MultiSelect = ({
           {filteredOptions.length === 0 ? (
             <div className="px-4 py-2 text-sm text-gray-500">No options found.</div>
           ) : (
-            filteredOptions.map((option: unknown) => {
-              const isSelected = selectedValues.some((v: unknown) => v[valueKey] === option[valueKey]);
+            filteredOptions.map((option: any) => {
+              const isSelected = selectedValues.some((v: any) => v[valueKey] === option[valueKey]);
               return (
                 <div
                   key={option[valueKey]}
