@@ -105,7 +105,7 @@ const PermissionsPage = () => {
     {
       header: "Software",
       accessor: "software_id",
-      cell: (row: any) => row.software?.software_name || row.software_module?.software_name || "-",
+      cell: (row: any) => row.software_name || row.software?.software_name || row.software_module?.software_name || (row.software_code ? formatLabel(row.software_code) : "-"),
     },
     {
       header: "Permission Group",

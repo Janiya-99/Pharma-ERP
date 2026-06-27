@@ -86,7 +86,11 @@ const RolePermissionMatrixPage = () => {
       setError(null);
       const res = await getPermissionsGrouped({ software_id: softwareId, limit: 1000 });
       if (res.success) {
-        setGroupedPermissions(res.data || []);
+        const data = res.data || [];
+        const groups = Array.isArray(data) && data.length > 0 && Array.isArray((data[0] as any)?.groups)
+          ? (data[0] as any).groups
+          : (Array.isArray(data) ? data : []);
+        setGroupedPermissions(groups);
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to load permissions for software");
@@ -104,7 +108,7 @@ const RolePermissionMatrixPage = () => {
       if (res.success) {
         // Backend could return an array of objects or IDs. Assuming array of objects.
         const perms = Array.isArray(res.data.permissions) ? res.data.permissions : (Array.isArray(res.data) ? res.data : []);
-        const ids = perms.map((p: unknown) => p.id);
+        const ids = perms.map((p: any) => p.id);
         setAssignedPermissionIds(ids);
         setInitialAssignedIds(ids);
       }

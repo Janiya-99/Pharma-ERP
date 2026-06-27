@@ -23,6 +23,7 @@ import {
   getUserAccessMatrix,
   getUserBranches,
   getUserById,
+  getUserSoftware,
   getUsers,
   removeUserAccessMatrix,
   removeUserBranch,
@@ -283,21 +284,21 @@ const UserAccessPage = () => {
         ]);
 
         if (branchRes.status === "fulfilled") {
-          const branchList = normaliseList<BranchItem>(branchRes.value, "branches");
-          const branchIds = branchList.map((branch) => idKey(branch.id));
+          const branchList = normaliseList<any>(branchRes.value, "branches");
+          const branchIds = branchList.map((branch) => idKey(branch.branch_id || branch.id));
           setAssignedBranchIds(branchIds);
           setSelectedBranchIds(branchIds);
         }
 
         if (softwareRes.status === "fulfilled") {
-          const softwareList = normaliseList<SoftwareItem>(softwareRes.value, "software_modules");
-          const softwareIds = softwareList.map((software) => idKey(software.id));
+          const softwareList = normaliseList<any>(softwareRes.value, "software_modules");
+          const softwareIds = softwareList.map((software) => idKey(software.software_id || software.id));
           setAssignedSoftwareIds(softwareIds);
           setSelectedSoftwareIds(softwareIds);
         }
 
         if (matrixRes.status === "fulfilled") {
-          const matrixData = matrixRes.value?.data;
+          const matrixData = matrixRes.value?.data || matrixRes.value;
           const records = Array.isArray(matrixData) ? matrixData : matrixData?.access_matrix || [];
           setAccessRecords(records);
           const firstRoleId = records.find((record: AccessRecord) => record.role_id)?.role_id;

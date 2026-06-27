@@ -153,7 +153,7 @@ const RolesPage = () => {
     {
       header: "Software",
       accessor: "software_id",
-      cell: (row: any) => row.software?.software_name || row.software_module?.software_name || "-",
+      cell: (row: any) => row.software_name || row.software?.software_name || row.software_module?.software_name || (row.software_code ? row.software_code.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase()) : "-"),
     },
     {
       header: "Role Name",
