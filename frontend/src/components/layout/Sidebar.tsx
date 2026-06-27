@@ -3,11 +3,11 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import PermissionGuard from "../../auth/PermissionGuard";
 import {
-  LayoutDashboard, Building, MapPin, Shield,
-  FileCheck, Settings, BookOpen, Archive,
-  Package, Layers, Tags, Target, Beaker, Factory,
-  Truck, Box, GitMerge, ListChecks, ChevronRight, Pin, PinOff, LogOut, User,
-  Landmark, BarChart3, Building2
+  LayoutDashboard, Building, Shield,
+  FileCheck, Settings, BookOpen,
+  Package, Truck, ChevronRight, Pin, PinOff, LogOut, User,
+  Landmark, BarChart3, Building2, Warehouse, ClipboardList,
+  RotateCcw, Repeat
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
 import {
@@ -142,24 +142,63 @@ const Sidebar = () => {
 
   const inventoryMenus: MenuItem[] = [
     { name: "Dashboard", path: "/inventory/dashboard", icon: LayoutDashboard, permission: "inventory.dashboard.view" },
-    { name: "Warehouses", path: "/inventory/warehouses", icon: Building, permission: "inventory.warehouse.view" },
-    { name: "Warehouse Locations", path: "/inventory/warehouse-locations", icon: MapPin, permission: "inventory.warehouse.view" },
-    { name: "Product Categories", path: "/inventory/product-categories", icon: GitMerge, permission: "inventory.product_category.view" },
-    { name: "Product Units", path: "/inventory/product-units", icon: Target, permission: "inventory.product_master.view" },
-    { name: "Dosage Forms", path: "/inventory/dosage-forms", icon: Beaker, permission: "inventory.product_master.view" },
-    { name: "Generic Names", path: "/inventory/generic-names", icon: Tags, permission: "inventory.product_master.view" },
-    { name: "Manufacturers", path: "/inventory/manufacturers", icon: Factory, permission: "inventory.product_master.view" },
-    { name: "Suppliers", path: "/inventory/suppliers", icon: Truck, permission: "inventory.product_master.view" },
-    { name: "Products", path: "/inventory/products", icon: Package, permission: "inventory.product_master.view" },
-    { name: "Product Batches", path: "/inventory/product-batches", icon: Layers, permission: "inventory.product_batch.view" },
-    { name: "Opening Stock", path: "/inventory/opening-stock", icon: FileCheck, permission: "inventory.opening_stock.view" },
-    { name: "GRN / Goods Receipt", path: "/inventory/grns", icon: FileCheck, permission: "inventory.grn.view" },
-    { name: "Purchase Returns", path: "/inventory/purchase-returns", icon: Archive, permission: "inventory.purchase_return.view" },
-    { name: "Sales Returns", path: "/inventory/sales-returns", icon: Archive, permission: "inventory.sales_return.view" },
-    { name: "Stock Transfers", path: "/inventory/stock-transfers", icon: Truck, permission: "inventory.stock_transfer.view" },
-    { name: "Stock Adjustments", path: "/inventory/stock-adjustments", icon: GitMerge, permission: "inventory.stock_adjustment.view" },
-    { name: "Stock Balances", path: "/inventory/stock-balances", icon: Box, permission: "inventory.stock_balance.view" },
-    { name: "Stock Ledger", path: "/inventory/stock-ledger", icon: ListChecks, permission: "inventory.stock_ledger.view" },
+    {
+      name: "Product Master",
+      icon: Package,
+      children: [
+        { name: "Products", path: "/inventory/products", permission: "inventory.product_master.view" },
+        { name: "Product Batches", path: "/inventory/product-batches", permission: "inventory.product_batch.view" },
+      ],
+    },
+    {
+      name: "Warehouses",
+      icon: Warehouse,
+      children: [
+        { name: "Warehouses & Locations", path: "/inventory/warehouses", permission: "inventory.warehouse.view" },
+      ],
+    },
+    {
+      name: "Goods Receiving",
+      icon: ClipboardList,
+      children: [
+        { name: "GRN / Goods Receipt", path: "/inventory/grn", permission: "inventory.grn.view" },
+      ],
+    },
+    {
+      name: "Stock Movement",
+      icon: Repeat,
+      children: [
+        { name: "Opening Stock", path: "/inventory/stock/opening-stock", permission: "inventory.opening_stock.view" },
+        { name: "Stock Transfers", path: "/inventory/stock/transfers", permission: "inventory.stock_transfer.view" },
+        { name: "Stock Adjustments", path: "/inventory/stock/adjustments", permission: "inventory.stock_adjustment.view" },
+      ],
+    },
+    {
+      name: "Returns",
+      icon: RotateCcw,
+      children: [
+        { name: "Purchase Returns", path: "/inventory/returns/purchase-returns", permission: "inventory.purchase_return.view" },
+        { name: "Sales Returns", path: "/inventory/returns/sales-returns", permission: "inventory.sales_return.view" },
+      ],
+    },
+    {
+      name: "Reports",
+      icon: BarChart3,
+      children: [
+        { name: "Stock Balance", path: "/inventory/reports/stock-balance", permission: "inventory.stock_balance.view" },
+        { name: "Stock Ledger", path: "/inventory/reports/stock-ledger", permission: "inventory.stock_ledger.view" },
+        { name: "Expiry Report", path: "/inventory/reports/expiry-report", permission: "inventory.stock_balance.view" },
+        { name: "Batch Report", path: "/inventory/reports/batch-report", permission: "inventory.product_batch.view" },
+      ],
+    },
+    {
+      name: "Settings",
+      icon: Settings,
+      children: [
+        { name: "Product Setup", path: "/inventory/settings/product-setup", permission: "inventory.product_master.view" },
+        { name: "Suppliers", path: "/inventory/settings/suppliers", permission: "inventory.product_master.view" },
+      ],
+    },
   ];
 
   const getMenus = (): MenuItem[] => {

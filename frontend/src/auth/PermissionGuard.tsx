@@ -1,7 +1,21 @@
 import React from "react";
 import { useAuth } from "./AuthContext";
 
-const PermissionGuard = ({ permission, permissions, mode = "all", children, fallback = null }: { permission?: unknown; permissions?: unknown; mode?: unknown; children?: React.ReactNode; fallback?: unknown }) => {
+type PermissionGuardProps = {
+  permission?: string | null;
+  permissions?: string[] | null;
+  mode?: "all" | "any";
+  children?: React.ReactNode;
+  fallback?: React.ReactNode;
+};
+
+const PermissionGuard = ({
+  permission,
+  permissions,
+  mode = "all",
+  children,
+  fallback = null,
+}: PermissionGuardProps): React.ReactNode => {
   const { hasPermission, hasAnyPermission, loading } = useAuth();
 
   if (loading) return null;
@@ -18,7 +32,7 @@ const PermissionGuard = ({ permission, permissions, mode = "all", children, fall
   } else if (permissions && Array.isArray(permissions)) {
     if (mode === "any" && hasAnyPermission(permissions)) {
       return <>{children}</>;
-    } else if (mode === "all" && permissions.every(hasPermission)) {
+    } else if (mode === "all" && permissions.every((key) => hasPermission(key))) {
       return <>{children}</>;
     }
   }

@@ -59,39 +59,38 @@ import BankAccountsPage from "../pages/finance/banking/BankAccountsPage";
 import CashAccountsPage from "../pages/finance/banking/CashAccountsPage";
 
 // Inventory Module
-import InventoryDashboard from "../pages/inventory/dashboard/InventoryDashboard";
-import WarehousesPage from "../pages/inventory/warehouses/WarehousesPage";
-import WarehouseLocationsPage from "../pages/inventory/warehouse-locations/WarehouseLocationsPage";
-import ProductCategoriesPage from "../pages/inventory/product-categories/ProductCategoriesPage";
-import ProductUnitsPage from "../pages/inventory/product-units/ProductUnitsPage";
-import DosageFormsPage from "../pages/inventory/dosage-forms/DosageFormsPage";
-import GenericNamesPage from "../pages/inventory/generic-names/GenericNamesPage";
-import ManufacturersPage from "../pages/inventory/manufacturers/ManufacturersPage";
-import SuppliersPage from "../pages/inventory/suppliers/SuppliersPage";
-import ProductsPage from "../pages/inventory/products/ProductsPage";
+import {
+  BatchReportPage,
+  ExpiryReportPage,
+  GRNPage,
+  InventoryDashboardPage,
+  OpeningStockPage,
+  ProductBatchesPage,
+  ProductSetupPage,
+  ProductsPage,
+  PurchaseReturnsPage,
+  SalesReturnsPage,
+  StockAdjustmentsPage,
+  StockBalanceReportPage,
+  StockLedgerReportPage,
+  StockTransfersPage,
+  SuppliersPage,
+  WarehousesAndLocationsPage,
+} from "../pages/inventory/InventoryModule";
 import ProductFormPage from "../pages/inventory/products/ProductFormPage";
 import ProductDetailsPage from "../pages/inventory/products/ProductDetailsPage";
-import ProductBatchesPage from "../pages/inventory/product-batches/ProductBatchesPage";
 import ProductBatchFormPage from "../pages/inventory/product-batches/ProductBatchFormPage";
 import ProductBatchDetailsPage from "../pages/inventory/product-batches/ProductBatchDetailsPage";
-import StockBalancesPage from "../pages/inventory/stock-balances/StockBalancesPage";
-import StockLedgerPage from "../pages/inventory/stock-ledger/StockLedgerPage";
-import StockTransfersPage from "../pages/inventory/stock-transfers/StockTransfersPage";
 import StockTransferFormPage from "../pages/inventory/stock-transfers/StockTransferFormPage";
 import StockTransferDetailsPage from "../pages/inventory/stock-transfers/StockTransferDetailsPage";
-import StockAdjustmentsPage from "../pages/inventory/stock-adjustments/StockAdjustmentsPage";
 import StockAdjustmentFormPage from "../pages/inventory/stock-adjustments/StockAdjustmentFormPage";
 import StockAdjustmentDetailsPage from "../pages/inventory/stock-adjustments/StockAdjustmentDetailsPage";
-import PurchaseReturnsPage from "../pages/inventory/purchase-returns/PurchaseReturnsPage";
 import PurchaseReturnFormPage from "../pages/inventory/purchase-returns/PurchaseReturnFormPage";
 import PurchaseReturnDetailsPage from "../pages/inventory/purchase-returns/PurchaseReturnDetailsPage";
-import SalesReturnsPage from "../pages/inventory/sales-returns/SalesReturnsPage";
 import SalesReturnFormPage from "../pages/inventory/sales-returns/SalesReturnFormPage";
 import SalesReturnDetailsPage from "../pages/inventory/sales-returns/SalesReturnDetailsPage";
-import OpeningStockEntriesPage from "../pages/inventory/opening-stock/OpeningStockEntriesPage";
 import OpeningStockEntryFormPage from "../pages/inventory/opening-stock/OpeningStockEntryFormPage";
 import OpeningStockEntryDetailsPage from "../pages/inventory/opening-stock/OpeningStockEntryDetailsPage";
-import GRNsPage from "../pages/inventory/grns/GRNsPage";
 import GRNFormPage from "../pages/inventory/grns/GRNFormPage";
 import GRNDetailsPage from "../pages/inventory/grns/GRNDetailsPage";
 
@@ -199,15 +198,7 @@ const AppRoutes = () => {
           <Route path="/finance/reports/receipt-register" element={<ReceiptRegisterReportPage />} />
 
           {/* Inventory Module */}
-          <Route path="/inventory/dashboard" element={<InventoryDashboard />} />
-          <Route path="/inventory/warehouses" element={<WarehousesPage />} />
-          <Route path="/inventory/warehouse-locations" element={<WarehouseLocationsPage />} />
-          <Route path="/inventory/product-categories" element={<ProductCategoriesPage />} />
-          <Route path="/inventory/product-units" element={<ProductUnitsPage />} />
-          <Route path="/inventory/dosage-forms" element={<DosageFormsPage />} />
-          <Route path="/inventory/generic-names" element={<GenericNamesPage />} />
-          <Route path="/inventory/manufacturers" element={<ManufacturersPage />} />
-          <Route path="/inventory/suppliers" element={<SuppliersPage />} />
+          <Route path="/inventory/dashboard" element={<InventoryDashboardPage />} />
           <Route path="/inventory/products" element={<ProductsPage />} />
           <Route path="/inventory/products/create" element={<ProductFormPage />} />
           <Route path="/inventory/products/:id" element={<ProductDetailsPage />} />
@@ -216,32 +207,49 @@ const AppRoutes = () => {
           <Route path="/inventory/product-batches/create" element={<ProductBatchFormPage />} />
           <Route path="/inventory/product-batches/:id" element={<ProductBatchDetailsPage />} />
           <Route path="/inventory/product-batches/:id/edit" element={<ProductBatchFormPage />} />
-          <Route path="/inventory/stock-balances" element={<StockBalancesPage />} />
-          <Route path="/inventory/stock-ledger" element={<StockLedgerPage />} />
-          <Route path="/inventory/opening-stock" element={<OpeningStockEntriesPage />} />
-          <Route path="/inventory/opening-stock/create" element={<OpeningStockEntryFormPage />} />
-          <Route path="/inventory/opening-stock/:id" element={<OpeningStockEntryDetailsPage />} />
-          <Route path="/inventory/opening-stock/:id/edit" element={<OpeningStockEntryFormPage />} />
-          <Route path="/inventory/grns" element={<GRNsPage />} />
+          <Route path="/inventory/warehouses" element={<WarehousesAndLocationsPage />} />
+          <Route path="/inventory/grn" element={<GRNPage />} />
           <Route path="/inventory/grns/create" element={<GRNFormPage />} />
           <Route path="/inventory/grns/:id" element={<GRNDetailsPage />} />
           <Route path="/inventory/grns/:id/edit" element={<GRNFormPage />} />
-          <Route path="/inventory/stock-transfers" element={<StockTransfersPage />} />
+          <Route path="/inventory/stock/opening-stock" element={<OpeningStockPage />} />
+          <Route path="/inventory/stock/transfers" element={<StockTransfersPage />} />
+          <Route path="/inventory/stock/adjustments" element={<StockAdjustmentsPage />} />
           <Route path="/inventory/stock-transfers/create" element={<StockTransferFormPage />} />
           <Route path="/inventory/stock-transfers/:id" element={<StockTransferDetailsPage />} />
           <Route path="/inventory/stock-transfers/:id/edit" element={<StockTransferFormPage />} />
-          <Route path="/inventory/stock-adjustments" element={<StockAdjustmentsPage />} />
           <Route path="/inventory/stock-adjustments/create" element={<StockAdjustmentFormPage />} />
           <Route path="/inventory/stock-adjustments/:id" element={<StockAdjustmentDetailsPage />} />
           <Route path="/inventory/stock-adjustments/:id/edit" element={<StockAdjustmentFormPage />} />
-          <Route path="/inventory/purchase-returns" element={<PurchaseReturnsPage />} />
+          <Route path="/inventory/returns/purchase-returns" element={<PurchaseReturnsPage />} />
+          <Route path="/inventory/returns/sales-returns" element={<SalesReturnsPage />} />
           <Route path="/inventory/purchase-returns/create" element={<PurchaseReturnFormPage />} />
           <Route path="/inventory/purchase-returns/:id" element={<PurchaseReturnDetailsPage />} />
           <Route path="/inventory/purchase-returns/:id/edit" element={<PurchaseReturnFormPage />} />
-          <Route path="/inventory/sales-returns" element={<SalesReturnsPage />} />
           <Route path="/inventory/sales-returns/create" element={<SalesReturnFormPage />} />
           <Route path="/inventory/sales-returns/:id" element={<SalesReturnDetailsPage />} />
           <Route path="/inventory/sales-returns/:id/edit" element={<SalesReturnFormPage />} />
+          <Route path="/inventory/reports/stock-balance" element={<StockBalanceReportPage />} />
+          <Route path="/inventory/reports/stock-ledger" element={<StockLedgerReportPage />} />
+          <Route path="/inventory/reports/expiry-report" element={<ExpiryReportPage />} />
+          <Route path="/inventory/reports/batch-report" element={<BatchReportPage />} />
+          <Route path="/inventory/settings/product-setup" element={<ProductSetupPage />} />
+          <Route path="/inventory/settings/suppliers" element={<SuppliersPage />} />
+          <Route path="/inventory/warehouse-locations" element={<Navigate to="/inventory/warehouses" replace />} />
+          <Route path="/inventory/product-categories" element={<Navigate to="/inventory/settings/product-setup" replace />} />
+          <Route path="/inventory/product-units" element={<Navigate to="/inventory/settings/product-setup" replace />} />
+          <Route path="/inventory/dosage-forms" element={<Navigate to="/inventory/settings/product-setup" replace />} />
+          <Route path="/inventory/generic-names" element={<Navigate to="/inventory/settings/product-setup" replace />} />
+          <Route path="/inventory/manufacturers" element={<Navigate to="/inventory/settings/product-setup" replace />} />
+          <Route path="/inventory/suppliers" element={<Navigate to="/inventory/settings/suppliers" replace />} />
+          <Route path="/inventory/grns" element={<Navigate to="/inventory/grn" replace />} />
+          <Route path="/inventory/opening-stock" element={<Navigate to="/inventory/stock/opening-stock" replace />} />
+          <Route path="/inventory/stock-transfers" element={<Navigate to="/inventory/stock/transfers" replace />} />
+          <Route path="/inventory/stock-adjustments" element={<Navigate to="/inventory/stock/adjustments" replace />} />
+          <Route path="/inventory/purchase-returns" element={<Navigate to="/inventory/returns/purchase-returns" replace />} />
+          <Route path="/inventory/sales-returns" element={<Navigate to="/inventory/returns/sales-returns" replace />} />
+          <Route path="/inventory/stock-balances" element={<Navigate to="/inventory/reports/stock-balance" replace />} />
+          <Route path="/inventory/stock-ledger" element={<Navigate to="/inventory/reports/stock-ledger" replace />} />
           <Route path="/invoice-center/dashboard" element={<PlaceholderPage title="Invoice Center Dashboard" />} />
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>
