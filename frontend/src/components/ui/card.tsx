@@ -5,17 +5,14 @@ import { cn } from "@/lib/utils"
 function Card({
   className,
   size = "default",
-  style,
   ...props
 }: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
-  const cardSpacing = size === "sm" ? "12px" : "16px"
   return (
     <div
       data-slot="card"
       data-size={size}
-      style={{ "--card-spacing": cardSpacing, ...style } as React.CSSProperties}
       className={cn(
-        "group/card flex flex-col gap-[var(--card-spacing)] overflow-hidden rounded-xl bg-card py-[var(--card-spacing)] text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "group/card flex flex-col gap-[var(--card-spacing)] overflow-hidden rounded-xl glass-card py-[var(--card-spacing)] text-sm text-card-foreground [--card-spacing:1rem] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:0.75rem] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         className
       )}
       {...props}
@@ -41,7 +38,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-title"
       className={cn(
-        "text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
+        "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
         className
       )}
       {...props}

@@ -29,7 +29,7 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "group/calendar bg-background p-2 [--cell-radius:var(--radius)] [--cell-size:1.75rem] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
+        "group/calendar bg-background p-2 [--cell-radius:var(--radius-md)] [--cell-size:2.25rem] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
@@ -37,7 +37,7 @@ function Calendar({
       captionLayout={captionLayout}
       locale={locale}
       formatters={{
-        formatMonthDropdown: (date: unknown) =>
+        formatMonthDropdown: (date) =>
           date.toLocaleString(locale?.code, { month: "short" }),
         ...formatters,
       }}
@@ -103,8 +103,8 @@ function Calendar({
         day: cn(
           "group/day relative aspect-square h-full w-full rounded-[var(--cell-radius)] p-0 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-[var(--cell-radius)]",
           props.showWeekNumber
-            ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-[var(--cell-radius)]"
-            : "[&:first-child[data-selected=true]_button]:rounded-l-[var(--cell-radius)]",
+            ? "[& :nth-child(2)[data-selected=true]_button]:rounded-l-[var(--cell-radius)]"
+            : "[& :first-child[data-selected=true]_button]:rounded-l-[var(--cell-radius)]",
           defaultClassNames.day
         ),
         range_start: cn(
@@ -132,7 +132,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }: { className?: unknown; rootRef?: unknown; props?: unknown }) => {
+        Root: ({ className, rootRef, ...props }) => {
           return (
             <div
               data-slot="calendar"
@@ -142,7 +142,7 @@ function Calendar({
             />
           )
         },
-        Chevron: ({ className, orientation, ...props }: { className?: unknown; orientation?: unknown; props?: unknown }) => {
+        Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
               <ChevronLeftIcon className={cn("size-4", className)} {...props} />
@@ -159,10 +159,10 @@ function Calendar({
             <ChevronDownIcon className={cn("size-4", className)} {...props} />
           )
         },
-        DayButton: ({ ...props }: { props?: unknown }) => (
+        DayButton: ({ ...props }) => (
           <CalendarDayButton locale={locale} {...props} />
         ),
-        WeekNumber: ({ children, ...props }: { children?: React.ReactNode; props?: unknown }) => {
+        WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
               <div className="flex size-[var(--cell-size)] items-center justify-center text-center">

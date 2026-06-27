@@ -30,18 +30,18 @@ const Topbar = () => {
     .slice(0, 2);
 
   return (
-    <header className="flex items-center justify-between px-6 h-14 bg-white/80 backdrop-blur-sm border-b border-gray-100 shrink-0 z-10 sticky top-0">
+    <header className="flex items-center justify-between px-6 h-14 glass-header shrink-0 z-10 sticky top-0">
       {/* Left: Company + Breadcrumb */}
       <div className="flex items-center gap-4 min-w-0">
-        <div className="flex items-center gap-1.5 text-sm text-gray-400 min-w-0">
+        <div className="flex items-center gap-1.5 text-sm text-blueMono-800/70 min-w-0">
           {breadcrumbs.map((crumb, i) => (
             <React.Fragment key={i}>
-              {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-gray-300 shrink-0" />}
+              {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-blueMono-300/60 shrink-0" />}
               <span
                 className={`truncate ${
                   crumb.isLast
-                    ? "text-gray-800 font-semibold"
-                    : "text-gray-400"
+                    ? "text-blueMono-900 font-semibold"
+                    : "text-blueMono-800/70"
                 }`}
               >
                 {crumb.label}
@@ -60,22 +60,22 @@ const Topbar = () => {
       {/* Right: User info + Logout */}
       <div className="flex items-center gap-3 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-sm shadow-indigo-200">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold shadow-sm shadow-blueMono-900/30">
             {initials}
           </div>
           <div className="hidden sm:block text-right">
-            <p className="text-sm font-semibold text-gray-800 leading-none">
+            <p className="text-sm font-semibold text-blueMono-900 leading-none">
               {user?.name || user?.full_name || "User"}
             </p>
-            <p className="text-[10px] text-gray-400 mt-0.5 leading-none">
+            <p className="text-[10px] text-blueMono-700/80 mt-0.5 leading-none">
               {company?.company_name || "Pharma ERP"}
             </p>
           </div>
         </div>
-        <div className="w-px h-6 bg-gray-200 mx-1" />
+        <div className="w-px h-6 bg-white/40 mx-1" />
         <button
           onClick={logoutUser}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-blueMono-800 hover:text-red-700 hover:bg-white/30 rounded-lg transition-colors duration-150"
           title="Logout"
         >
           <LogOut className="w-3.5 h-3.5" />

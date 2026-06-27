@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Building, MapPin, Users, Network, Key, Shield, ShieldCheck,
   FileCheck, LogIn, Settings, Briefcase, Calculator, Archive, BookOpen,
   PieChart, FileText, Package, Layers, Tags, Target, Beaker, Factory,
-  Truck, Box, GitMerge, ListChecks, BarChart2, ChevronRight,
+  Truck, Box, GitMerge, ListChecks, BarChart2, ChevronRight, Pin, PinOff
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
 
@@ -25,7 +25,9 @@ type MenuItem = {
 const Sidebar = () => {
   const { activeSoftware, user, activeBranch } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const effectiveExpanded = isExpanded || isPinned;
   const location = useLocation();
 
   const controlCenterMenus: MenuItem[] = [
@@ -147,14 +149,14 @@ const Sidebar = () => {
         <PermissionGuard key={menu.path} permission={menu.permission}>
           <NavLink
             to={menu.path || "#"}
-            title={!isExpanded ? menu.name : undefined}
+            title={!effectiveExpanded ? menu.name : undefined}
             className={({ isActive }) =>
               `relative flex items-center gap-3 rounded-xl transition-all duration-150 group ${
-                isExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
+                effectiveExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
               } ${
                 isActive
-                  ? "bg-indigo-50 text-indigo-700 font-semibold"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                  ? "bg-blueMono-200/50 text-blueMono-900 font-semibold shadow-sm"
+                  : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
               }`
             }
           >
@@ -162,18 +164,18 @@ const Sidebar = () => {
               <>
                 <menu.icon
                   className={`h-4 w-4 shrink-0 transition-colors ${
-                    isActive ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
+                    isActive ? "text-blueMono-800" : "text-blueMono-700/80 group-hover:text-blueMono-900"
                   }`}
                 />
-                {isExpanded && (
+                {effectiveExpanded && (
                   <span className={`text-[13px] font-medium truncate transition-colors ${
-                    isActive ? "text-indigo-700" : "text-gray-600 group-hover:text-gray-800"
+                    isActive ? "text-blueMono-900" : "text-blueMono-900 group-hover:text-blueMono-900"
                   }`}>
                     {menu.name}
                   </span>
                 )}
-                {!isExpanded && isActive && (
-                  <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-indigo-600" />
+                {!effectiveExpanded && isActive && (
+                  <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-blueMono-700" />
                 )}
               </>
             )}
@@ -187,37 +189,37 @@ const Sidebar = () => {
       <div key={menu.name} className="flex flex-col gap-0.5">
         <button
           onClick={() => {
-            if (!isExpanded) setIsExpanded(true);
+            if (!effectiveExpanded) setIsExpanded(true);
             setOpenAccordion(isAccordionOpen ? null : menu.name);
           }}
           className={`w-full relative flex items-center gap-3 rounded-xl transition-all duration-150 group ${
-            isExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
+            effectiveExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
           } ${
             isActiveParent
-              ? "text-indigo-700 font-semibold bg-indigo-50/20"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+              ? "text-blueMono-900 font-semibold bg-blueMono-200/50 shadow-sm"
+              : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
           }`}
         >
           <menu.icon
             className={`h-4 w-4 shrink-0 transition-colors ${
-              isActiveParent ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
+              isActiveParent ? "text-blueMono-800" : "text-blueMono-700/80 group-hover:text-blueMono-900"
             }`}
           />
-          {isExpanded && (
+          {effectiveExpanded && (
             <>
               <span className="text-[13px] font-medium truncate flex-1 text-left">
                 {menu.name}
               </span>
               <ChevronRight
-                className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${
-                  isAccordionOpen ? "rotate-90 text-indigo-600" : ""
+                className={`h-3.5 w-3.5 text-blueMono-700/80 transition-transform duration-200 ${
+                  isAccordionOpen ? "rotate-90 text-blueMono-900" : ""
                 }`}
               />
             </>
           )}
         </button>
-        {isExpanded && isAccordionOpen && (
-          <div className="pl-6 pr-1.5 mt-0.5 space-y-0.5 border-l border-gray-100 ml-5.5 flex flex-col gap-0.5">
+        {effectiveExpanded && isAccordionOpen && (
+          <div className="pl-6 pr-1.5 mt-0.5 space-y-0.5 border-l border-white/30 ml-5.5 flex flex-col gap-0.5">
             {menu.children!.map((child) => (
               <PermissionGuard key={child.path} permission={child.permission}>
                 <NavLink
@@ -225,14 +227,14 @@ const Sidebar = () => {
                   className={({ isActive }) =>
                     `flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150 ${
                       isActive
-                        ? "bg-indigo-50 text-indigo-700 font-semibold"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                        ? "bg-blueMono-200/50 text-blueMono-900 font-semibold shadow-sm"
+                        : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-indigo-600" : "bg-gray-300"}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-blueMono-700" : "bg-blueMono-300/50"}`} />
                       <span className="truncate">{child.name}</span>
                     </>
                   )}
@@ -248,62 +250,73 @@ const Sidebar = () => {
   return (
     <div
       className={`relative z-30 h-full shrink-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-        isExpanded ? "w-60" : "w-[68px]"
+        effectiveExpanded ? "w-60" : "w-[68px]"
       }`}
       onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      onMouseLeave={() => {
+        if (!isPinned) setIsExpanded(false);
+      }}
     >
       <div
-        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-white border-r border-gray-100 shadow-[1px_0_20px_rgba(0,0,0,0.05)] h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
-          isExpanded ? "w-60" : "w-[68px]"
+        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col glass-sidebar h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
+          effectiveExpanded ? "w-60" : "w-[68px]"
         }`}
       >
         {/* Logo area */}
-        <div className={`flex items-center gap-3 pt-5 pb-4 shrink-0 border-b border-gray-100 transition-all duration-300 ${
-          isExpanded ? "px-5" : "justify-center px-2"
+        <div className={`flex items-center gap-3 pt-5 pb-4 shrink-0 border-b border-white/20 transition-all duration-300 ${
+          effectiveExpanded ? "px-5" : "justify-center px-2"
         }`}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 shadow-md shadow-indigo-300/40">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blueMono-700 shadow-md shadow-blueMono-900/30">
             <MdLocalPharmacy className="h-5 w-5 text-white" />
           </div>
-          {isExpanded && (
-            <div className="min-w-0 overflow-hidden">
-              <p className="text-[14px] font-bold text-gray-900 leading-tight tracking-tight truncate">
-                Pharma ERP
-              </p>
-              <p className="text-[10px] font-semibold text-indigo-500 uppercase tracking-[0.08em] truncate">
-                {activeSoftware?.software_name || "Platform"}
-              </p>
+          {effectiveExpanded && (
+            <div className="flex-1 min-w-0 overflow-hidden flex items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-[14px] font-bold text-blueMono-900 leading-tight tracking-tight truncate">
+                  Pharma ERP
+                </p>
+                <p className="text-[10px] font-semibold text-blueMono-600 uppercase tracking-[0.08em] truncate">
+                  {activeSoftware?.software_name || "Platform"}
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsPinned(!isPinned)}
+                className="text-blueMono-600 hover:text-blueMono-800 p-1.5 hover:bg-white/30 rounded-lg transition-colors"
+                title={isPinned ? "Unpin sidebar" : "Pin sidebar"}
+              >
+                {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+              </button>
             </div>
           )}
         </div>
 
         {/* Navigation */}
         <nav className={`flex-1 py-3 space-y-0.5 overflow-y-auto scrollbar-none transition-all duration-300 ${
-          isExpanded ? "px-3" : "px-2"
+          effectiveExpanded ? "px-3" : "px-2"
         }`}>
           {menus.map(renderMenu)}
         </nav>
 
         {/* User info at bottom */}
-        <div className={`shrink-0 border-t border-gray-100 transition-all duration-300 ${
-          isExpanded ? "px-4 py-3" : "px-2 py-3 flex justify-center"
+        <div className={`shrink-0 border-t border-white/20 transition-all duration-300 ${
+          effectiveExpanded ? "px-4 py-3" : "px-2 py-3 flex justify-center"
         }`}>
-          {isExpanded ? (
+          {effectiveExpanded ? (
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white text-xs font-bold">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold">
                 {initials}
               </div>
               <div className="min-w-0 overflow-hidden">
-                <p className="text-[12px] font-semibold text-gray-800 truncate leading-tight">
+                <p className="text-[12px] font-semibold text-blueMono-900 truncate leading-tight">
                   {user?.name || user?.full_name || "User"}
                 </p>
-                <p className="text-[10px] text-gray-400 truncate leading-tight">
+                <p className="text-[10px] text-blueMono-700/90 truncate leading-tight">
                   {activeBranch?.branch_name || activeBranch?.branch?.branch_name || "Head Office"}
                 </p>
               </div>
             </div>
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-sm">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold shadow-sm">
               {initials}
             </div>
           )}
