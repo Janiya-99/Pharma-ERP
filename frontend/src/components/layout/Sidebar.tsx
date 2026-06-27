@@ -81,57 +81,61 @@ const Sidebar = () => {
   const financeMenus: MenuItem[] = [
     { name: "Dashboard", path: "/finance/dashboard", icon: LayoutDashboard },
     {
-      name: "Setup",
+      name: "Accounting Setup",
       icon: Settings,
       children: [
-        { name: "Chart of Accounts", path: "/finance/chart-of-accounts" },
-        { name: "Account Groups", path: "/finance/account-groups" },
-        { name: "Opening Balances", path: "/finance/opening-balances" },
-        { name: "Financial Year", path: "/finance/financial-year" },
-        { name: "Tax Settings", path: "/finance/tax-settings" },
+        { name: "Chart of Accounts", path: "/finance/setup/chart-of-accounts" },
+        { name: "Account Groups", path: "/finance/setup/account-groups" },
+        { name: "Opening Balances", path: "/finance/setup/opening-balances" },
+        { name: "Financial Year", path: "/finance/setup/financial-year" },
+        { name: "Tax Settings", path: "/finance/setup/tax-settings" },
       ],
     },
     {
       name: "General Ledger",
       icon: BookOpen,
       children: [
-        { name: "Journal Entry", path: "/finance/journal-entry" },
-        { name: "Journal Register", path: "/finance/journal-register" },
-        { name: "Account Ledger", path: "/finance/account-ledger" },
-        { name: "Trial Balance", path: "/finance/trial-balance" },
-        { name: "General Ledger Report", path: "/finance/general-ledger-report" },
+        { name: "Journal Entry", path: "/finance/general-ledger/journal-entry" },
+        { name: "Journal Register", path: "/finance/general-ledger/journal-register" },
+        { name: "Account Ledger", path: "/finance/general-ledger/account-ledger" },
+        { name: "Trial Balance", path: "/finance/general-ledger/trial-balance" },
+        { name: "General Ledger Report", path: "/finance/general-ledger/general-ledger-report" },
       ],
     },
     {
       name: "Banking & Cash",
       icon: Landmark,
       children: [
-        { name: "Cash Book", path: "/finance/cash-book" },
-        { name: "Bank Book", path: "/finance/bank-book" },
-        { name: "Payment Register", path: "/finance/payment-register" },
-        { name: "Receipt Register", path: "/finance/receipt-register" },
-        { name: "Bank Reconciliation", path: "/finance/bank-reconciliation" },
+        { name: "Bank Accounts", path: "/finance/banking/bank-accounts" },
+        { name: "Cash Accounts", path: "/finance/banking/cash-accounts" },
+        { name: "Bank Book", path: "/finance/banking/bank-book" },
+        { name: "Cash Book", path: "/finance/banking/cash-book" },
+        { name: "Payment Vouchers", path: "/finance/banking/payment-vouchers" },
+        { name: "Receipt Vouchers", path: "/finance/banking/receipt-vouchers" },
+        { name: "Bank Reconciliation", path: "/finance/banking/bank-reconciliation" },
       ],
     },
     {
       name: "Reports",
       icon: BarChart3,
       children: [
-        { name: "Reports Dashboard", path: "/finance/reports" },
-        { name: "Profit and Loss", path: "/finance/profit-and-loss" },
-        { name: "Balance Sheet", path: "/finance/balance-sheet" },
-        { name: "Trial Balance", path: "/finance/trial-balance" },
-        { name: "Day Book", path: "/finance/day-book" },
+        { name: "Reports Dashboard", path: "/finance/reports/reports-dashboard" },
+        { name: "Profit and Loss", path: "/finance/reports/profit-and-loss" },
+        { name: "Balance Sheet", path: "/finance/reports/balance-sheet" },
+        { name: "Trial Balance", path: "/finance/reports/trial-balance" },
+        { name: "Day Book", path: "/finance/reports/day-book" },
+        { name: "Payment Register", path: "/finance/reports/payment-register" },
+        { name: "Receipt Register", path: "/finance/reports/receipt-register" },
       ],
     },
     {
       name: "Fixed Assets",
       icon: Building2,
       children: [
-        { name: "Fixed Asset Categories", path: "/finance/fixed-asset-categories" },
-        { name: "Fixed Assets", path: "/finance/fixed-assets" },
-        { name: "Depreciation Runs", path: "/finance/depreciation-runs" },
-        { name: "Asset Disposals", path: "/finance/asset-disposals" },
+        { name: "Fixed Asset Categories", path: "/finance/fixed-assets/categories" },
+        { name: "Fixed Assets", path: "/finance/fixed-assets/assets" },
+        { name: "Depreciation Runs", path: "/finance/fixed-assets/depreciation-runs" },
+        { name: "Asset Disposals", path: "/finance/fixed-assets/asset-disposals" },
       ],
     },
   ];
@@ -305,7 +309,7 @@ const Sidebar = () => {
       }}
     >
       <div
-        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-[#C1E8FF]/2 backdrop-blur-xl border-r border-[#7DA0CA]/30 shadow-soft h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
+        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-white border-r border-[#E5E7EB] shadow-soft h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
           effectiveExpanded ? "w-60" : "w-[68px]"
         }`}
       >

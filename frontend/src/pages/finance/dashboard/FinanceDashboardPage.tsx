@@ -86,10 +86,10 @@ const approvals = [
 ];
 
 const reportShortcuts = [
-  { title: "Trial Balance", path: "/finance/trial-balance", icon: BookOpen },
-  { title: "Profit and Loss", path: "/finance/profit-and-loss", icon: TrendingUp },
-  { title: "Balance Sheet", path: "/finance/balance-sheet", icon: Landmark },
-  { title: "Account Ledger", path: "/finance/account-ledger", icon: FileText },
+  { title: "Trial Balance", path: "/finance/reports/trial-balance", icon: BookOpen },
+  { title: "Profit and Loss", path: "/finance/reports/profit-and-loss", icon: TrendingUp },
+  { title: "Balance Sheet", path: "/finance/reports/balance-sheet", icon: Landmark },
+  { title: "Account Ledger", path: "/finance/general-ledger/account-ledger", icon: FileText },
 ];
 
 const statusBadge = (status: string) => {
@@ -112,11 +112,11 @@ const FinanceDashboardPage = () => {
   const navigate = useNavigate();
 
   const quickActions = [
-    { label: "Create Journal Entry", path: "/finance/journal-entry", icon: BookOpen },
-    { label: "Add Payment", path: "/finance/payment-register", icon: Wallet },
-    { label: "Add Receipt", path: "/finance/receipt-register", icon: Receipt },
-    { label: "Create Account", path: "/finance/chart-of-accounts", icon: Plus },
-    { label: "View Reports", path: "/finance/reports", icon: BarChart3 },
+    { label: "Create Journal Entry", path: "/finance/general-ledger/journal-entry", icon: BookOpen },
+    { label: "Add Payment", path: "/finance/banking/payment-vouchers", icon: Wallet },
+    { label: "Add Receipt", path: "/finance/banking/receipt-vouchers", icon: Receipt },
+    { label: "Create Account", path: "/finance/setup/chart-of-accounts", icon: Plus },
+    { label: "View Reports", path: "/finance/reports/reports-dashboard", icon: BarChart3 },
   ];
 
   return (

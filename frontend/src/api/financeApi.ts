@@ -74,6 +74,25 @@ export const financeApi = {
   createBankAccount: (payload: Record<string, unknown>) => apiClient.post("/finance/bank-accounts", payload),
   updateBankAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/finance/bank-accounts/${id}`, payload),
   deleteBankAccount: (id: string | number) => apiClient.delete(`/finance/bank-accounts/${id}`),
+  deactivateBankAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.patch(`/finance/bank-accounts/${id}/deactivate`, payload),
+
+  // Cash Accounts (backend route pending; frontend pages call this API directly when available)
+  getCashAccounts: (params: Record<string, unknown>) => apiClient.get("/finance/cash-accounts", { params }),
+  getCashAccountById: (id: string | number) => apiClient.get(`/finance/cash-accounts/${id}`),
+  createCashAccount: (payload: Record<string, unknown>) => apiClient.post("/finance/cash-accounts", payload),
+  updateCashAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/finance/cash-accounts/${id}`, payload),
+  deactivateCashAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.patch(`/finance/cash-accounts/${id}/deactivate`, payload),
+
+  // Account Groups and Tax Settings (backend route pending)
+  getAccountGroups: (params: Record<string, unknown>) => apiClient.get("/finance/account-groups", { params }),
+  getAccountGroupById: (id: string | number) => apiClient.get(`/finance/account-groups/${id}`),
+  createAccountGroup: (payload: Record<string, unknown>) => apiClient.post("/finance/account-groups", payload),
+  updateAccountGroup: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/finance/account-groups/${id}`, payload),
+  deactivateAccountGroup: (id: string | number, payload: Record<string, unknown>) => apiClient.patch(`/finance/account-groups/${id}/deactivate`, payload),
+  getTaxSettings: (params: Record<string, unknown>) => apiClient.get("/finance/tax-settings", { params }),
+  createTaxSetting: (payload: Record<string, unknown>) => apiClient.post("/finance/tax-settings", payload),
+  updateTaxSetting: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/finance/tax-settings/${id}`, payload),
+  deactivateTaxSetting: (id: string | number, payload: Record<string, unknown>) => apiClient.patch(`/finance/tax-settings/${id}/deactivate`, payload),
 
   // Cheque Books
   getChequeBooks: (params: Record<string, unknown>) => apiClient.get("/finance/cheque-books", { params }),

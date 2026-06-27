@@ -14,7 +14,7 @@ const FinanceReportsDashboard = () => {
     {
       title: "Account Ledger",
       description: "Detailed chronological record of all transactions for a specific account.",
-      path: "/finance/reports/account-ledger",
+      path: "/finance/general-ledger/account-ledger",
       permission: "finance.report.account_ledger.view",
       icon: <BookOpen className="h-6 w-6 text-blue-500" />
     },
@@ -28,7 +28,7 @@ const FinanceReportsDashboard = () => {
     {
       title: "Profit and Loss",
       description: "Financial performance summary showing revenues, costs, and expenses over a period.",
-      path: "/finance/reports/profit-loss",
+      path: "/finance/reports/profit-and-loss",
       permission: "finance.report.profit_loss.view",
       icon: <TrendingUp className="h-6 w-6 text-green-500" />
     },
@@ -42,14 +42,14 @@ const FinanceReportsDashboard = () => {
     {
       title: "Cash Book",
       description: "Daily record of all cash receipts and cash payments.",
-      path: "/finance/reports/cash-book",
+      path: "/finance/banking/cash-book",
       permission: "finance.report.cash_book.view",
       icon: <DollarSign className="h-6 w-6 text-emerald-500" />
     },
     {
       title: "Bank Book",
       description: "Record of all transactions for specific bank accounts.",
-      path: "/finance/reports/bank-book",
+      path: "/finance/banking/bank-book",
       permission: "finance.report.bank_book.view",
       icon: <Wallet className="h-6 w-6 text-cyan-500" />
     },
@@ -63,7 +63,7 @@ const FinanceReportsDashboard = () => {
     {
       title: "Journal Register",
       description: "Log of all manual journal entries with their approval and posting status.",
-      path: "/finance/reports/journal-register",
+      path: "/finance/general-ledger/journal-register",
       permission: "finance.report.journal_register.view",
       icon: <Archive className="h-6 w-6 text-indigo-500" />
     },
