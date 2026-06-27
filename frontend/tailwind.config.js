@@ -289,6 +289,14 @@ module.exports = {
       shadow: {
         500: "rgba(112, 144, 176, 0.08)",
       },
+      // Brand Blue Palette (#021024 → #C1E8FF)
+      bb: {
+        900: "#021024",  // darkest navy
+        700: "#052659",  // dark navy blue
+        500: "#5483B3",  // medium blue
+        300: "#7DA0CA",  // light blue
+        100: "#C1E8FF",  // very light blue
+      },
       pharmaDark: "#1D1238",
       pharmaPurple: "#7A5CFA",
       pharmaBgLight: "#F3F6FC",

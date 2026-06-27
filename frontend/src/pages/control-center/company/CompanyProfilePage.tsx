@@ -5,13 +5,13 @@ import { useAuth } from "../../../auth/AuthContext";
 import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import { toast } from "sonner";
-import { 
-  Save, 
-  Upload as UploadIcon, 
-  Globe, 
-  Mail, 
-  Phone, 
-  ShieldCheck, 
+import {
+  Save,
+  Upload as UploadIcon,
+  Globe,
+  Mail,
+  Phone,
+  ShieldCheck,
   Image as ImageIcon,
   Building2,
   X
@@ -166,7 +166,7 @@ const CompanyProfilePage = () => {
         address: formData.address,
         logo_url: formData.logo_url,
       };
-      
+
       const res = await updateCompanyProfile(payload);
       if (res.success) {
         setFormData(res.data);
@@ -243,7 +243,7 @@ const CompanyProfilePage = () => {
               </div>
 
               {/* Logo Preview */}
-              <div 
+              <div
                 onClick={() => {
                   if (formData.logo_url) {
                     setShowPreviewModal(true);
@@ -255,9 +255,9 @@ const CompanyProfilePage = () => {
               >
                 {formData.logo_url ? (
                   <>
-                    <img 
-                      src={formData.logo_url} 
-                      alt="Company Logo" 
+                    <img
+                      src={formData.logo_url}
+                      alt="Company Logo"
                       className="max-w-full max-h-full object-contain p-2 transition-transform duration-200 group-hover:scale-[1.02]"
                     />
                     <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-white text-xs font-semibold gap-1.5">
@@ -285,8 +285,8 @@ const CompanyProfilePage = () => {
                 Recommended size: 512x512px. Supported formats: PNG, JPG, SVG.
               </p>
 
-              <input 
-                type="file" 
+              <input
+                type="file"
                 ref={fileInputRef}
                 onChange={handleImageChange}
                 accept="image/*"
@@ -519,17 +519,17 @@ const CompanyProfilePage = () => {
             >
               <X className="h-5 w-5" />
             </button>
-            
+
             <h3 className="text-base font-bold text-slate-950 mb-4 self-start">Company Logo Preview</h3>
-            
+
             <div className="w-full h-[50vh] flex items-center justify-center overflow-hidden bg-slate-50 border border-slate-100 rounded-xl p-6">
-              <img 
-                src={formData.logo_url} 
-                alt="Full Company Logo" 
+              <img
+                src={formData.logo_url}
+                alt="Full Company Logo"
                 className="max-w-full max-h-full object-contain"
               />
             </div>
-            
+
             <div className="mt-6 flex justify-end w-full">
               <button
                 type="button"

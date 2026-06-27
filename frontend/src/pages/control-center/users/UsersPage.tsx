@@ -211,7 +211,7 @@ const UsersPage = () => {
     },
     {
       header: "Full Name",
-      accessor: "full_name",
+      accessor: "name",
       cellClassName: "font-semibold text-gray-900",
     },
     {
@@ -226,13 +226,13 @@ const UsersPage = () => {
     {
       header: "Designation",
       cell: (row: any) => {
-        return row.designation?.designation_name || row.designation_id || "—";
+        return row.designation || "—";
       },
     },
     {
       header: "Department",
       cell: (row: any) => {
-        return row.department?.department_name || row.department_id || "—";
+        return row.department || "—";
       },
     },
     {
