@@ -10,35 +10,35 @@ const DateRangeFilter = ({ dateFrom, dateTo, onChange }: { dateFrom?: unknown; d
   const hasValues = dateFrom || dateTo;
 
   return (
-    <div className="flex flex-col sm:flex-row items-end gap-2">
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Date From</label>
+    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 shadow-sm sm:flex-row sm:flex-wrap sm:items-end">
+      <div className="min-w-0">
+        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Date From</label>
         <Input
           type="date"
           name="dateFrom"
           value={dateFrom}
           onChange={(e: any) => onChange({ dateFrom: e.target.value, dateTo })}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-40"
         />
       </div>
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Date To</label>
+      <div className="min-w-0">
+        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Date To</label>
         <Input
           type="date"
           name="dateTo"
           value={dateTo}
           onChange={(e: any) => onChange({ dateFrom, dateTo: e.target.value })}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-40"
         />
       </div>
       {hasValues && (
         <button
           type="button"
           onClick={handleClear}
-          className="mb-1 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
           title="Clear Dates"
         >
-          <X className="w-5 h-5" />
+          <X className="h-4 w-4" />
         </button>
       )}
     </div>

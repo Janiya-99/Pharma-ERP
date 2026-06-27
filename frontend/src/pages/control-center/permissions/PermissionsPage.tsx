@@ -99,6 +99,8 @@ const PermissionsPage = () => {
     setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });
   };
 
+  const formatLabel = (value?: string) => (value ? value.replace(/_/g, " ") : "-");
+
   const columns = [
     {
       header: "Software",
@@ -108,7 +110,7 @@ const PermissionsPage = () => {
     {
       header: "Permission Group",
       accessor: "permission_group",
-      cell: (row: unknown) => <span className="capitalize">{row.permission_group.replace(/_/g, " ")}</span>,
+      cell: (row: unknown) => <span className="capitalize">{formatLabel(row.permission_group)}</span>,
     },
     {
       header: "Permission Name",
@@ -230,48 +232,70 @@ const PermissionsPage = () => {
             <div className="bg-white p-8 text-center rounded-lg border border-gray-200 text-gray-500">
               Loading permissions...
             </div>
-          ) : groupedPermissions.length === 0 ? (
+      ) : groupedPermissions.length === 0 ? (
             <div className="bg-white p-8 text-center rounded-lg border border-gray-200 text-gray-500">
               No permissions found
             </div>
           ) : (
-            groupedPermissions.map((group: unknown, idx: unknown) => (
-              <div key={idx} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-800 capitalize flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                    {group.permission_group.replace(/_/g, " ")}
-                  </h3>
-                  <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
-                    {group.permissions?.length || 0} Permissions
-                  </span>
+            groupedPermissions.map((softwareGroup: any, idx: number) => {
+              const permissionGroups = Array.isArray(softwareGroup?.groups) ? softwareGroup.groups : [];
+              const permissionCount = permissionGroups.reduce(
+                (count: number, group: any) => count + (Array.isArray(group?.permissions) ? group.permissions.length : 0),
+                0
+              );
+
+              return (
+                <div key={softwareGroup?.software_code || idx} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                  <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-800 capitalize flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      {formatLabel(softwareGroup?.software_code)}
+                    </h3>
+                    <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
+                      {permissionCount} Permissions
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-gray-200">
+                    {permissionGroups.map((group: any, groupIdx: number) => (
+                      <div key={`${softwareGroup?.software_code || idx}-${group?.permission_group || groupIdx}`} className="p-0">
+                        <div className="flex items-center justify-between px-4 py-3 bg-white">
+                          <h4 className="text-sm font-semibold text-gray-800 capitalize">
+                            {formatLabel(group?.permission_group)}
+                          </h4>
+                          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                            {Array.isArray(group?.permissions) ? group.permissions.length : 0} items
+                          </span>
+                        </div>
+
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-white">
+                            <tr>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Name</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Key</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Description</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-100">
+                            {(Array.isArray(group?.permissions) ? group.permissions : []).map((p: any) => (
+                              <tr key={p.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{p.permission_name}</td>
+                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
+                                  <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">{p.permission_key}</span>
+                                </td>
+                                <td className="px-6 py-3 text-sm text-gray-500">{p.description || "-"}</td>
+                                <td className="px-6 py-3 whitespace-nowrap"><StatusBadge status={p.status} /></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="p-0">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-white">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Key</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Description</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-100">
-                      {group.permissions?.map((p: unknown) => (
-                        <tr key={p.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{p.permission_name}</td>
-                          <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                            <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">{p.permission_key}</span>
-                          </td>
-                          <td className="px-6 py-3 text-sm text-gray-500">{p.description || "-"}</td>
-                          <td className="px-6 py-3 whitespace-nowrap"><StatusBadge status={p.status} /></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}

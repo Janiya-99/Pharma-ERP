@@ -3,10 +3,11 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import PermissionGuard from "../../auth/PermissionGuard";
 import {
-  LayoutDashboard, Building, MapPin, Users, Network, Key, Shield, ShieldCheck,
-  FileCheck, LogIn, Settings, Briefcase, Calculator, Archive, BookOpen,
-  PieChart, FileText, Package, Layers, Tags, Target, Beaker, Factory,
-  Truck, Box, GitMerge, ListChecks, BarChart2, ChevronRight, Pin, PinOff, LogOut, User
+  LayoutDashboard, Building, MapPin, Shield,
+  FileCheck, Settings, BookOpen, Archive,
+  Package, Layers, Tags, Target, Beaker, Factory,
+  Truck, Box, GitMerge, ListChecks, ChevronRight, Pin, PinOff, LogOut, User,
+  Landmark, BarChart3, Building2
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
 import {
@@ -79,22 +80,60 @@ const Sidebar = () => {
 
   const financeMenus: MenuItem[] = [
     { name: "Dashboard", path: "/finance/dashboard", icon: LayoutDashboard },
-    { name: "General Ledger", path: "/finance/general-ledger", icon: BookOpen, permission: "finance.general_ledger.view" },
-    { name: "Reports Dashboard", path: "/finance/reports", icon: PieChart, permission: "finance.report.view" },
-    { name: "Account Ledger", path: "/finance/reports/account-ledger", icon: FileText, permission: "finance.report.account_ledger.view" },
-    { name: "Trial Balance", path: "/finance/reports/trial-balance", icon: FileText, permission: "finance.report.trial_balance.view" },
-    { name: "Profit and Loss", path: "/finance/reports/profit-loss", icon: FileText, permission: "finance.report.profit_loss.view" },
-    { name: "Balance Sheet", path: "/finance/reports/balance-sheet", icon: FileText, permission: "finance.report.balance_sheet.view" },
-    { name: "Cash Book", path: "/finance/reports/cash-book", icon: FileText, permission: "finance.report.cash_book.view" },
-    { name: "Bank Book", path: "/finance/reports/bank-book", icon: FileText, permission: "finance.report.bank_book.view" },
-    { name: "Day Book", path: "/finance/reports/day-book", icon: FileText, permission: "finance.report.day_book.view" },
-    { name: "Journal Register", path: "/finance/reports/journal-register", icon: FileText, permission: "finance.report.journal_register.view" },
-    { name: "Payment Register", path: "/finance/reports/payment-register", icon: FileText, permission: "finance.report.payment_register.view" },
-    { name: "Receipt Register", path: "/finance/reports/receipt-register", icon: FileText, permission: "finance.report.receipt_register.view" },
-    { name: "Fixed Asset Categories", path: "/finance/fixed-asset-categories", icon: BarChart2, permission: "finance.fixed_asset_category.view" },
-    { name: "Fixed Assets", path: "/finance/fixed-assets", icon: Briefcase, permission: "finance.fixed_asset.view" },
-    { name: "Depreciation Runs", path: "/finance/fixed-asset-depreciation-runs", icon: Calculator, permission: "finance.fixed_asset_depreciation.view" },
-    { name: "Asset Disposals", path: "/finance/fixed-asset-disposals", icon: Archive, permission: "finance.fixed_asset_disposal.view" },
+    {
+      name: "Setup",
+      icon: Settings,
+      children: [
+        { name: "Chart of Accounts", path: "/finance/chart-of-accounts" },
+        { name: "Account Groups", path: "/finance/account-groups" },
+        { name: "Opening Balances", path: "/finance/opening-balances" },
+        { name: "Financial Year", path: "/finance/financial-year" },
+        { name: "Tax Settings", path: "/finance/tax-settings" },
+      ],
+    },
+    {
+      name: "General Ledger",
+      icon: BookOpen,
+      children: [
+        { name: "Journal Entry", path: "/finance/journal-entry" },
+        { name: "Journal Register", path: "/finance/journal-register" },
+        { name: "Account Ledger", path: "/finance/account-ledger" },
+        { name: "Trial Balance", path: "/finance/trial-balance" },
+        { name: "General Ledger Report", path: "/finance/general-ledger-report" },
+      ],
+    },
+    {
+      name: "Banking & Cash",
+      icon: Landmark,
+      children: [
+        { name: "Cash Book", path: "/finance/cash-book" },
+        { name: "Bank Book", path: "/finance/bank-book" },
+        { name: "Payment Register", path: "/finance/payment-register" },
+        { name: "Receipt Register", path: "/finance/receipt-register" },
+        { name: "Bank Reconciliation", path: "/finance/bank-reconciliation" },
+      ],
+    },
+    {
+      name: "Reports",
+      icon: BarChart3,
+      children: [
+        { name: "Reports Dashboard", path: "/finance/reports" },
+        { name: "Profit and Loss", path: "/finance/profit-and-loss" },
+        { name: "Balance Sheet", path: "/finance/balance-sheet" },
+        { name: "Trial Balance", path: "/finance/trial-balance" },
+        { name: "Day Book", path: "/finance/day-book" },
+      ],
+    },
+    {
+      name: "Fixed Assets",
+      icon: Building2,
+      children: [
+        { name: "Fixed Asset Categories", path: "/finance/fixed-asset-categories" },
+        { name: "Fixed Assets", path: "/finance/fixed-assets" },
+        { name: "Depreciation Runs", path: "/finance/depreciation-runs" },
+        { name: "Asset Disposals", path: "/finance/asset-disposals" },
+      ],
+    },
   ];
 
   const inventoryMenus: MenuItem[] = [

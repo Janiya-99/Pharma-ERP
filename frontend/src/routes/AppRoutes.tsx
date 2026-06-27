@@ -25,6 +25,9 @@ import AuditLogsPage from "../pages/control-center/logs/AuditLogsPage";
 import LoginLogsPage from "../pages/control-center/logs/LoginLogsPage";
 
 // Finance General Ledger & Reports
+import FinanceDashboardPage from "../pages/finance/dashboard/FinanceDashboardPage";
+import ChartOfAccountsPage from "../pages/finance/chart-of-accounts/ChartOfAccountsPage";
+import FinanceSetupPlaceholderPage from "../pages/finance/setup/FinanceSetupPlaceholderPage";
 import GeneralLedgerPage from "../pages/finance/general-ledger/GeneralLedgerPage";
 import FinanceReportsDashboard from "../pages/finance/reports/FinanceReportsDashboard";
 import AccountLedgerReportPage from "../pages/finance/reports/account-ledger/AccountLedgerReportPage";
@@ -102,10 +105,32 @@ const AppRoutes = () => {
           <Route path="/control-center/login-logs" element={<LoginLogsPage />} />
           <Route path="/control-center/settings" element={<PlaceholderPage title="Settings" />} />
 
-          {/* Module Placeholders */}
-          <Route path="/finance/dashboard" element={<PlaceholderPage title="Finance Dashboard" />} />
-          
-          {/* Finance General Ledger & Reports */}
+          {/* Finance Module */}
+          <Route path="/finance/dashboard" element={<FinanceDashboardPage />} />
+          <Route path="/finance/chart-of-accounts" element={<ChartOfAccountsPage />} />
+          <Route path="/finance/account-groups" element={<FinanceSetupPlaceholderPage title="Account Groups" description="Create and maintain account groups used to organize the chart of accounts and finance reports." />} />
+          <Route path="/finance/opening-balances" element={<FinanceSetupPlaceholderPage title="Opening Balances" description="Capture opening debit and credit balances before the company starts posting finance transactions." />} />
+          <Route path="/finance/financial-year" element={<FinanceSetupPlaceholderPage title="Financial Year" description="Configure financial years, accounting periods, and close controls for ledger reporting." />} />
+          <Route path="/finance/tax-settings" element={<FinanceSetupPlaceholderPage title="Tax Settings" description="Maintain tax accounts, rates, and posting defaults for purchases, sales, payments, and receipts." />} />
+          <Route path="/finance/journal-entry" element={<FinanceSetupPlaceholderPage eyebrow="General Ledger" title="Journal Entry" description="Create balanced debit and credit journal vouchers that post to the general ledger." />} />
+          <Route path="/finance/journal-register" element={<JournalRegisterReportPage />} />
+          <Route path="/finance/account-ledger" element={<AccountLedgerReportPage />} />
+          <Route path="/finance/trial-balance" element={<TrialBalanceReportPage />} />
+          <Route path="/finance/general-ledger-report" element={<GeneralLedgerPage />} />
+          <Route path="/finance/cash-book" element={<CashBookReportPage />} />
+          <Route path="/finance/bank-book" element={<BankBookReportPage />} />
+          <Route path="/finance/payment-register" element={<PaymentRegisterReportPage />} />
+          <Route path="/finance/receipt-register" element={<ReceiptRegisterReportPage />} />
+          <Route path="/finance/bank-reconciliation" element={<FinanceSetupPlaceholderPage eyebrow="Banking & Cash" title="Bank Reconciliation" description="Match bank statement lines with posted bank transactions and track reconciliation differences." />} />
+          <Route path="/finance/profit-and-loss" element={<ProfitLossReportPage />} />
+          <Route path="/finance/balance-sheet" element={<BalanceSheetReportPage />} />
+          <Route path="/finance/day-book" element={<DayBookReportPage />} />
+          <Route path="/finance/fixed-asset-categories" element={<FinanceSetupPlaceholderPage eyebrow="Fixed Assets" title="Fixed Asset Categories" description="Define asset categories, control accounts, and depreciation defaults for fixed assets." />} />
+          <Route path="/finance/fixed-assets" element={<FinanceSetupPlaceholderPage eyebrow="Fixed Assets" title="Fixed Assets" description="Register fixed assets and connect them to asset accounts and depreciation expense accounts." />} />
+          <Route path="/finance/depreciation-runs" element={<FinanceSetupPlaceholderPage eyebrow="Fixed Assets" title="Depreciation Runs" description="Prepare periodic depreciation runs for active fixed assets and review ledger impact before posting." />} />
+          <Route path="/finance/asset-disposals" element={<FinanceSetupPlaceholderPage eyebrow="Fixed Assets" title="Asset Disposals" description="Record asset sales, write-offs, and disposal gains or losses with supporting ledger entries." />} />
+
+          {/* Finance legacy report URLs */}
           <Route path="/finance/general-ledger" element={<GeneralLedgerPage />} />
           <Route path="/finance/reports" element={<FinanceReportsDashboard />} />
           <Route path="/finance/reports/account-ledger" element={<AccountLedgerReportPage />} />
@@ -116,7 +141,6 @@ const AppRoutes = () => {
           <Route path="/finance/reports/bank-book" element={<BankBookReportPage />} />
           <Route path="/finance/reports/day-book" element={<DayBookReportPage />} />
           <Route path="/finance/reports/journal-register" element={<JournalRegisterReportPage />} />
-          <Route path="/finance/reports/payment-register" element={<PaymentRegisterReportPage />} />
           <Route path="/finance/reports/payment-register" element={<PaymentRegisterReportPage />} />
           <Route path="/finance/reports/receipt-register" element={<ReceiptRegisterReportPage />} />
 

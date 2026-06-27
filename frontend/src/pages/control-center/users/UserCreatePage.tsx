@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, User, Building2, Shield, ChevronRight,
   Eye, EyeOff, Settings, Info, AlertCircle, Lock, Unlock,
+  Save, PlusCircle,
 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -47,6 +48,17 @@ const BLANK: FormData = {
   force_password_change: true, two_factor_enabled: false,
 };
 
+const listFromResponse = (res: any) => {
+  const data = res?.data ?? res;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.items)) return data.items;
+  if (Array.isArray(data?.data)) return data.data;
+  return [];
+};
+
+const labelFor = (item: any, keys: string[]) =>
+  keys.map((key) => item?.[key]).find(Boolean) || "Unnamed";
+
 /* ── Reusable mini components ─────────────────────────────── */
 
 const FieldWrap: React.FC<{
@@ -72,7 +84,20 @@ const inp = (err?: string) =>
    focus-visible:border-[#052659] ${err ? "border-red-400" : "border-[#7DA0CA]"}`;
 
 const selectTrigCls =
-  "h-10 rounded-xl border-[#7DA0CA] bg-white/70 text-[#021024] focus:ring-2 focus:ring-[#5483B3]/40 focus:border-[#052659]";
+  `h-10 w-full min-w-0 rounded-xl border-[#7DA0CA] bg-white px-3
+   text-sm font-medium text-[#021024] shadow-[0_1px_2px_rgba(5,38,89,0.06)]
+   transition-all duration-200 hover:border-[#5483B3] hover:bg-[#f8fbff]
+   focus:ring-2 focus:ring-[#5483B3]/30 focus:border-[#052659]
+   data-placeholder:text-[#7DA0CA]`;
+
+const selectContentCls =
+  `z-[100] max-h-72 w-[var(--radix-select-trigger-width)] min-w-[var(--radix-select-trigger-width)]
+   overflow-y-auto rounded-xl border border-[#7DA0CA]/35 bg-white p-1.5
+   shadow-[0_18px_48px_rgba(5,38,89,0.18)]`;
+
+const selectItemCls =
+  `rounded-lg px-2.5 py-2 text-sm text-[#052659]
+   focus:bg-[#C1E8FF]/45 focus:text-[#021024]`;
 
 const BrandToggle: React.FC<{
   id: string; checked: boolean; onChange: (v: boolean) => void;
@@ -163,16 +188,20 @@ const UserCreatePage: React.FC = () => {
   }, [id]);
 
   const fetchDropdowns = async () => {
-    try {
-      const [dR, dsR, bR] = await Promise.all([
-        getDepartments({ limit: 200 }),
-        getDesignations({ limit: 200 }),
-        getBranches({ limit: 200, status: "active" }),
-      ]);
-      if (dR.success) { const d = dR.data; setDepartments(Array.isArray(d) ? d : d?.items || []); }
-      if (dsR.success) { const d = dsR.data; setDesignations(Array.isArray(d) ? d : d?.items || []); }
-      if (bR.success) { const d = bR.data; setBranches(Array.isArray(d) ? d : d?.items || []); }
-    } catch (e) { console.error("Dropdown error:", e); }
+    const [dR, dsR, bR] = await Promise.allSettled([
+      getDepartments({ limit: 200 }),
+      getDesignations({ limit: 200 }),
+      getBranches({ limit: 200 }),
+    ]);
+
+    if (dR.status === "fulfilled") setDepartments(listFromResponse(dR.value));
+    else console.error("Department dropdown error:", dR.reason);
+
+    if (dsR.status === "fulfilled") setDesignations(listFromResponse(dsR.value));
+    else console.error("Designation dropdown error:", dsR.reason);
+
+    if (bR.status === "fulfilled") setBranches(listFromResponse(bR.value));
+    else console.error("Branch dropdown error:", bR.reason);
   };
 
   const fetchUser = async () => {
@@ -272,7 +301,7 @@ const UserCreatePage: React.FC = () => {
 
   /* ── loading ── */
   if (loading) return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(135deg,#C1E8FF 0%,#e8f4ff 50%,#f0f8ff 100%)" }}>
+    <div className="relative isolate min-h-screen bg-white">
       <div className="page-content space-y-6">
         {[1,2,3].map(i => <Skeleton key={i} className="h-48 w-full rounded-2xl bg-white/50" />)}
       </div>
@@ -280,7 +309,7 @@ const UserCreatePage: React.FC = () => {
   );
 
   if (loadError) return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(135deg,#C1E8FF 0%,#f0f8ff 100%)" }}>
+    <div className="relative isolate min-h-screen bg-white">
       <div className="page-content">
         <Alert variant="destructive">
           <AlertDescription>
@@ -295,11 +324,8 @@ const UserCreatePage: React.FC = () => {
      RENDER
   ───────────────────────────────────────────────────────────── */
   return (
-    <div
-      className="min-h-screen"
-      style={{ background: "linear-gradient(160deg,#C1E8FF 0%,#daeeff 30%,#eef6ff 60%,#f5faff 100%)" }}
-    >
-      <div className="page-content pb-28 space-y-6">
+    <div className="relative isolate min-h-screen bg-white">
+      <div className="page-content pb-10 space-y-6">
 
         {/* ── breadcrumbs ── */}
         <nav className="flex items-center gap-1.5 text-xs text-[#5483B3]">
@@ -389,10 +415,12 @@ const UserCreatePage: React.FC = () => {
                       <SelectTrigger className={selectTrigCls}>
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">— No department —</SelectItem>
+                      <SelectContent align="start" className={selectContentCls}>
+                        <SelectItem value="__none__" className={selectItemCls}>— No department —</SelectItem>
                         {departments.map((d: any) => (
-                          <SelectItem key={d.id} value={String(d.id)}>{d.name}</SelectItem>
+                          <SelectItem key={d.id} value={String(d.id)} className={selectItemCls}>
+                            {labelFor(d, ["department_name", "name"])}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -404,10 +432,12 @@ const UserCreatePage: React.FC = () => {
                       <SelectTrigger className={selectTrigCls}>
                         <SelectValue placeholder="Select designation" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">— No designation —</SelectItem>
+                      <SelectContent align="start" className={selectContentCls}>
+                        <SelectItem value="__none__" className={selectItemCls}>— No designation —</SelectItem>
                         {designations.map((d: any) => (
-                          <SelectItem key={d.id} value={String(d.id)}>{d.name}</SelectItem>
+                          <SelectItem key={d.id} value={String(d.id)} className={selectItemCls}>
+                            {labelFor(d, ["designation_name", "name"])}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -419,10 +449,12 @@ const UserCreatePage: React.FC = () => {
                       <SelectTrigger className={selectTrigCls}>
                         <SelectValue placeholder="Select branch" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">— No branch —</SelectItem>
+                      <SelectContent align="start" className={selectContentCls}>
+                        <SelectItem value="__none__" className={selectItemCls}>— No branch —</SelectItem>
                         {branches.map((b: any) => (
-                          <SelectItem key={b.id} value={String(b.id)}>{b.branch_name || b.name}</SelectItem>
+                          <SelectItem key={b.id} value={String(b.id)} className={selectItemCls}>
+                            {labelFor(b, ["branch_name", "name"])}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -433,11 +465,11 @@ const UserCreatePage: React.FC = () => {
                       <SelectTrigger className={`${selectTrigCls} ${errors.status ? "border-red-400" : ""}`}>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">✅ Active</SelectItem>
-                        <SelectItem value="inactive">⚪ Inactive</SelectItem>
-                        <SelectItem value="suspended">⚠️ Suspended</SelectItem>
-                        <SelectItem value="locked">🔒 Locked</SelectItem>
+                      <SelectContent align="start" className={selectContentCls}>
+                        <SelectItem value="active" className={selectItemCls}>✅ Active</SelectItem>
+                        <SelectItem value="inactive" className={selectItemCls}>⚪ Inactive</SelectItem>
+                        <SelectItem value="suspended" className={selectItemCls}>⚠️ Suspended</SelectItem>
+                        <SelectItem value="locked" className={selectItemCls}>🔒 Locked</SelectItem>
                       </SelectContent>
                     </Select>
                   </FieldWrap>
@@ -648,36 +680,42 @@ const UserCreatePage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ══ STICKY FOOTER ══ */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md
-        border-t border-[#C1E8FF] shadow-[0_-8px_32px_rgba(2,16,36,0.10)]">
-        <div className="page-content py-3.5 flex items-center justify-between gap-3">
-          <button type="button" disabled={saving}
-            onClick={() => navigate("/control-center/users")}
-            className="px-4 py-2 text-sm font-semibold text-[#5483B3] hover:text-[#052659] rounded-xl
-              hover:bg-[#C1E8FF]/50 transition-all">
-            ← Cancel
-          </button>
-          <div className="flex items-center gap-2">
-            {!isEdit && (
-              <button type="button" disabled={saving} onClick={() => handleSave(true)}
-                className="px-5 py-2.5 text-sm font-semibold text-[#052659]
-                  border-2 border-[#7DA0CA] rounded-xl bg-white hover:bg-[#C1E8FF]/50
-                  transition-all disabled:opacity-60">
-                {saving ? "Saving…" : "Save & Add Another"}
-              </button>
-            )}
-            <button type="button" disabled={saving} onClick={() => handleSave(false)}
-              className="px-7 py-2.5 text-sm font-black text-white rounded-xl
-                bg-gradient-to-r from-[#052659] to-[#5483B3]
-                shadow-[0_4px_16px_rgba(5,38,89,0.30)]
-                hover:shadow-[0_6px_24px_rgba(5,38,89,0.40)]
-                hover:from-[#021024] hover:to-[#052659]
-                transition-all duration-200 disabled:opacity-60">
-              {saving ? "Saving…" : isEdit ? "Update User" : "Save User"}
+        {/* Action bar */}
+        <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4
+          shadow-[0_18px_48px_rgba(15,23,42,0.10)]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <button type="button" disabled={saving}
+              onClick={() => navigate("/control-center/users")}
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+                text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-900
+                transition-all disabled:cursor-not-allowed disabled:opacity-60">
+              <ArrowLeft className="h-4 w-4" />
+              Cancel
             </button>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              {!isEdit && (
+                <button type="button" disabled={saving} onClick={() => handleSave(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#7DA0CA]/70
+                    bg-white px-5 py-2.5 text-sm font-bold text-[#052659] shadow-sm
+                    hover:-translate-y-0.5 hover:border-[#5483B3] hover:bg-[#f7fbff]
+                    hover:shadow-md transition-all disabled:translate-y-0 disabled:cursor-not-allowed
+                    disabled:opacity-60">
+                  <PlusCircle className="h-4 w-4" />
+                  {saving ? "Saving…" : "Save & Add Another"}
+                </button>
+              )}
+              <button type="button" disabled={saving} onClick={() => handleSave(false)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#052659]
+                  px-7 py-2.5 text-sm font-black text-white shadow-lg shadow-[#052659]/25
+                  hover:-translate-y-0.5 hover:bg-[#021024] hover:shadow-xl hover:shadow-[#052659]/30
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5483B3]/45
+                  focus-visible:ring-offset-2 active:translate-y-0 transition-all duration-200
+                  disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60">
+                <Save className="h-4 w-4" />
+                {saving ? "Saving…" : isEdit ? "Update User" : "Save User"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

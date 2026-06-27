@@ -4,24 +4,24 @@ const LogStatusBadge = ({ status }: { status?: unknown }) => {
   const getStatusConfig = (status: unknown) => {
     switch (status?.toLowerCase()) {
       case "success":
-        return { color: "bg-green-100 text-green-800", label: "Success" };
+        return { color: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Success" };
       case "failed":
-        return { color: "bg-red-100 text-red-800", label: "Failed" };
+        return { color: "bg-rose-50 text-rose-700 border-rose-200", label: "Failed" };
       case "locked":
-        return { color: "bg-orange-100 text-orange-800", label: "Locked" };
+        return { color: "bg-orange-50 text-orange-700 border-orange-200", label: "Locked" };
       case "suspended":
-        return { color: "bg-yellow-100 text-yellow-800", label: "Suspended" };
+        return { color: "bg-amber-50 text-amber-700 border-amber-200", label: "Suspended" };
       case "inactive":
-        return { color: "bg-gray-100 text-gray-800", label: "Inactive" };
+        return { color: "bg-slate-100 text-slate-600 border-slate-200", label: "Inactive" };
       default:
-        return { color: "bg-gray-100 text-gray-800", label: status || "Unknown" };
+        return { color: "bg-slate-100 text-slate-600 border-slate-200", label: status || "Unknown" };
     }
   };
 
   const config = getStatusConfig(status);
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${config.color}`}>
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize ${config.color}`}>
       {config.label}
     </span>
   );

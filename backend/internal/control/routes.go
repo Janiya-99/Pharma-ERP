@@ -13,6 +13,7 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	deptHandler := handlers.NewDepartmentHandler(logger)
 	desigHandler := handlers.NewDesignationHandler(logger)
 	moduleHandler := handlers.NewSoftwareModuleHandler(logger)
+	logHandler := handlers.NewLogHandler(logger)
 
 	// --- Company Profile ---
 	router.GET("/company", middleware.RequirePermission("control.company.view"), companyHandler.GetCompanyProfile)
@@ -41,6 +42,10 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 
 	// --- Software Modules ---
 	router.GET("/software-modules", middleware.RequirePermission("control.permission.view"), moduleHandler.List)
+
+	// --- Logs ---
+	router.GET("/audit-logs", middleware.RequirePermission("control.audit.view"), logHandler.ListAuditLogs)
+	router.GET("/login-logs", middleware.RequirePermission("control.login_logs.view"), logHandler.ListLoginLogs)
 
 	// --- Users ---
 	userHandler := handlers.NewUserHandler(logger)
