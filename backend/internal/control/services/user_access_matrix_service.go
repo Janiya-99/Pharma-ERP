@@ -85,13 +85,10 @@ func (s *UserAccessMatrixService) AssignUserAccessMatrix(userID uint64, req dto.
 			return nil, errors.New("user does not have access to one of the selected software modules")
 		}
 
-		// 3. Verify role exists and belongs to the selected software
+		// 3. Verify role exists
 		role, err := s.roleRepo.FindRoleByID(accessReq.RoleID)
 		if err != nil || role.Status != "active" {
 			return nil, errors.New("role not found or inactive")
-		}
-		if role.SoftwareID != accessReq.SoftwareID {
-			return nil, errors.New("role does not belong to the selected software module")
 		}
 
 		// 4. Create or Reactivate

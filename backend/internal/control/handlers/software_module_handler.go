@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pixandco/erp-phrma/internal/control/dto"
 	"github.com/pixandco/erp-phrma/internal/control/repositories"
 	"github.com/pixandco/erp-phrma/internal/control/services"
 	"go.uber.org/zap"
@@ -27,9 +28,10 @@ func (h *SoftwareModuleHandler) List(c *gin.Context) {
 
 	modules, err := service.ListActive()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse(err.Error(), nil))
 		return
 	}
 
-	c.JSON(http.StatusOK, modules)
+	c.JSON(http.StatusOK, dto.SuccessResponse("Software modules loaded successfully", modules))
 }
+

@@ -13,7 +13,7 @@ const AccessMatrixTable = ({ data, loading, onRemove }: { data?: Record<string, 
     {
       header: "Software Module",
       accessor: "software_name",
-      cell: (row: unknown) => row.software_name || row.software_module?.software_name || "Unknown Module"
+      cell: (row: any) => row.software_name || row.software?.software_name || row.software_module?.software_name || "Unknown Module"
     },
     {
       header: "Role",

@@ -45,7 +45,7 @@ const AuditLogDetailModal = ({ isOpen, onClose, log }: { isOpen?: boolean; onClo
               </div>
               <div className="rounded-xl border border-white/70 bg-white px-3 py-2 shadow-sm">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Software</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{log.software_module?.software_name || log.software_name || "-"}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{log.software?.software_name || log.software_module?.software_name || log.software_name || "-"}</p>
               </div>
               <div className="rounded-xl border border-white/70 bg-white px-3 py-2 shadow-sm">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">IP Address</p>

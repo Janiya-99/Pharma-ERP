@@ -123,7 +123,7 @@ const RolesPage = () => {
         label: "Manage Permissions",
         icon: Shield,
         permission: "control.permission.assign",
-        onClick: (r: unknown) => navigate(`/control-center/role-permission-matrix?software_id=${r.software_id}&role_id=${r.id}`),
+        onClick: (r: any) => navigate(`/control-center/roles-permissions?tab=matrix&software_id=${r.software_id}&role_id=${r.id}`),
       },
       {
         label: "Edit Role",
@@ -153,7 +153,7 @@ const RolesPage = () => {
     {
       header: "Software",
       accessor: "software_id",
-      cell: (row: unknown) => row.software_module?.software_name || "-",
+      cell: (row: any) => row.software?.software_name || row.software_module?.software_name || "-",
     },
     {
       header: "Role Name",

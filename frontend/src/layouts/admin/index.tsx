@@ -9,9 +9,12 @@ import type { ERPRoute } from "routes";
 function PageLoader() {
   return (
     <div className="flex h-full w-full items-center justify-center py-24">
-      <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
-        <p className="text-sm text-gray-400 font-medium">Loading...</p>
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative flex h-16 w-16 items-center justify-center">
+          <div className="absolute inset-0 rounded-full border-[3.5px] border-slate-100 border-t-blue-600 border-r-indigo-600 animate-spin shadow-[0_0_15px_rgba(37,99,235,0.2)]" />
+          <div className="absolute inset-2 rounded-full border-[2.5px] border-slate-50 border-b-blue-500 border-l-indigo-500 animate-[spin_2s_linear_infinite_reverse]" />
+        </div>
+        <p className="text-sm text-slate-500 font-semibold tracking-wide animate-pulse">Loading workspace...</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useSearchParams } from "react-router-dom";
 import { ShieldCheck, Key, Grid3X3 } from "lucide-react";
 import Breadcrumbs from "../../../components/common/Breadcrumbs";
 
@@ -14,7 +15,12 @@ const TABS = [
 ];
 
 const RolesPermissionsPage = () => {
-  const [activeTab, setActiveTab] = useState("roles");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "roles";
+
+  const setActiveTab = (tab: string) => {
+    setSearchParams({ tab });
+  };
 
   return (
     <div className="page-content">

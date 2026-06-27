@@ -196,7 +196,7 @@ const UserAccessMatrixPage = () => {
         onClose={() => setIsRemoveOpen(false)}
         onConfirm={handleRemove}
         title="Remove Access Record"
-        message={`Are you sure you want to remove the "${accessToRemove?.role_name || accessToRemove?.role?.role_name}" role from ${selectedUser?.name || selectedUser?.full_name} for branch "${accessToRemove?.branch_name || accessToRemove?.branch?.branch_name}" and module "${accessToRemove?.software_name || accessToRemove?.software_module?.software_name}"?`}
+        message={`Are you sure you want to remove the "${accessToRemove?.role_name || accessToRemove?.role?.role_name}" role from ${selectedUser?.name || selectedUser?.full_name} for branch "${accessToRemove?.branch_name || accessToRemove?.branch?.branch_name}" and module "${accessToRemove?.software_name || accessToRemove?.software?.software_name || accessToRemove?.software_module?.software_name}"?`}
         confirmText="Remove Access"
         isConfirming={removing}
       />

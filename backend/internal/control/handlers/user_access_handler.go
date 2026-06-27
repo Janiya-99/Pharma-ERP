@@ -59,7 +59,7 @@ func (h *UserAccessHandler) GetBranches(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, branches)
+	c.JSON(http.StatusOK, dto.SuccessResponse("User branches loaded successfully", branches))
 }
 
 func (h *UserAccessHandler) AssignBranches(c *gin.Context) {
@@ -130,7 +130,7 @@ func (h *UserAccessHandler) GetSoftware(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, software)
+	c.JSON(http.StatusOK, dto.SuccessResponse("User software modules loaded successfully", software))
 }
 
 func (h *UserAccessHandler) AssignSoftware(c *gin.Context) {

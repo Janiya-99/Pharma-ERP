@@ -240,7 +240,7 @@ const AuditLogsPage = () => {
     {
       header: "Software",
       accessor: "software_name",
-      cell: (row: any) => row.software_module?.software_name || row.software_name || "-",
+      cell: (row: any) => row.software?.software_name || row.software_module?.software_name || row.software_name || "-",
     },
     {
       header: "Action",

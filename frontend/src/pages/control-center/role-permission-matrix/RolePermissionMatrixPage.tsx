@@ -9,7 +9,7 @@ import SoftwareSelector from "../../../components/common/SoftwareSelector";
 import RoleSelector from "../../../components/common/RoleSelector";
 import PermissionCheckboxGroup from "../../../components/common/PermissionCheckboxGroup";
 import PermissionGuard from "../../../auth/PermissionGuard";
-import { Save, AlertTriangle, CheckCircle2, Layers } from "lucide-react";
+import { Save, AlertTriangle, CheckCircle2, Layers, Shield } from "lucide-react";
 
 const RolePermissionMatrixPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();

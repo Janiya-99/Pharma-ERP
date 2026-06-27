@@ -57,10 +57,6 @@ func (s *UserAccessMatrixService) ValidateUserBranchSoftwareRole(userID, branchI
 		return errors.New("role does not exist or is inactive")
 	}
 
-	// 5. Role must belong to the selected software_id
-	if role.SoftwareID != softwareID {
-		return errors.New("role does not belong to the selected software module")
-	}
 
 	// 6. User must already have branch access in user_branch_access
 	var uba models.UserBranchAccess

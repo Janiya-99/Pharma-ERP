@@ -20,9 +20,21 @@ const RoleSelector = ({ softwareId, value, onChange, disabled = false, required 
     try {
       setLoading(true);
       const res = await getRolesBySoftware(sId);
-      if (res.success) {
-        setRoles(res.data || []);
+      let combined = res.success ? (res.data || []) : [];
+      
+      // Control Center is module ID 1. If we are on another module, also fetch control center roles as global options
+      if (String(sId) !== "1") {
+        const ccRes = await getRolesBySoftware(1);
+        if (ccRes.success && ccRes.data) {
+          const seen = new Set(combined.map((r: any) => r.id));
+          ccRes.data.forEach((r: any) => {
+            if (!seen.has(r.id)) {
+              combined.push(r);
+            }
+          });
+        }
       }
+      setRoles(combined);
     } catch (err) {
       console.error("Failed to fetch roles", err);
       setRoles([]);
