@@ -115,6 +115,11 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"FINANCE", "Bank Account", "finance.bank_account.update", "Update Bank Account"},
 		{"FINANCE", "Bank Account", "finance.bank_account.delete", "Delete Bank Account"},
 
+		{"FINANCE", "Cash Account", "finance.cash_account.view", "View Cash Account"},
+		{"FINANCE", "Cash Account", "finance.cash_account.create", "Create Cash Account"},
+		{"FINANCE", "Cash Account", "finance.cash_account.update", "Update Cash Account"},
+		{"FINANCE", "Cash Account", "finance.cash_account.delete", "Deactivate Cash Account"},
+
 		{"FINANCE", "Cheque Book", "finance.cheque_book.view", "View Cheque Book"},
 		{"FINANCE", "Cheque Book", "finance.cheque_book.create", "Create Cheque Book"},
 		{"FINANCE", "Cheque Book", "finance.cheque_book.update", "Update Cheque Book"},

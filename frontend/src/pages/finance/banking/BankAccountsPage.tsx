@@ -1,22 +1,21 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import {
-  AlertCircle,
-  Banknote,
   BookOpen,
-  Building2,
-  CircleDollarSign,
-  CreditCard,
   Download,
   Edit,
   Eye,
   FileText,
   Landmark,
+  Loader2,
   MoreHorizontal,
   Plus,
   RefreshCcw,
   Search,
-  Wallet,
 } from "lucide-react";
+import { useAuth } from "../../../auth/AuthContext";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches } from "../../../api/controlApi";
 import { Alert, AlertDescription, AlertTitle } from "../../../components/ui/alert";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
@@ -62,342 +61,345 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import ERPConfirmDialog from "../../../components/erp/ERPConfirmDialog";
 
-type BankAccountStatus = "Active" | "Inactive";
-type AccountType = "Current Account" | "Savings Account" | "Overdraft Account" | "Loan Account" | "Fixed Deposit";
-type CurrencyCode = "LKR" | "USD";
+type ApiRecord = Record<string, any>;
 
 type BankAccount = {
-  id: string;
-  bankName: string;
-  branchName: string;
-  accountName: string;
-  accountNumber: string;
-  accountType: AccountType;
-  currency: CurrencyCode;
-  openingBalance: number;
-  openingBalanceDate: string;
-  currentBalance: number;
-  linkedLedgerAccount: string;
-  status: BankAccountStatus;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
+  id: number;
+  company_id?: number;
+  branch_id?: number | null;
+  chart_account_id: number;
+  bank_name: string;
+  bank_branch_name?: string;
+  account_name: string;
+  account_number: string;
+  swift_code?: string;
+  bank_code?: string;
+  branch_code?: string;
+  opening_balance?: number;
+  current_balance?: number;
+  is_default?: boolean;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+  chart_account?: {
+    id: number;
+    account_code: string;
+    account_name: string;
+  };
 };
 
 type BankAccountForm = {
-  bankName: string;
-  branchName: string;
-  accountName: string;
-  accountNumber: string;
-  accountType: AccountType | "";
-  currency: CurrencyCode;
-  openingBalance: string;
-  openingBalanceDate: string;
-  linkedLedgerAccount: string;
-  autoCreateLedger: boolean;
-  status: BankAccountStatus;
+  branch_id: string;
+  chart_account_id: string;
+  bank_name: string;
+  bank_branch_name: string;
+  account_name: string;
+  account_number: string;
+  account_type: string;
+  currency: string;
+  opening_balance: string;
+  opening_balance_date: string;
+  auto_create_ledger: boolean;
+  status: string;
   description: string;
+  swift_code: string;
+  bank_code: string;
+  branch_code: string;
+  is_default: boolean;
 };
-
-const ledgerAccounts = [
-  "1120 - Commercial Bank Current Account",
-  "1121 - Sampath Bank Savings Account",
-  "1122 - HNB USD Account",
-  "1123 - Bank of Ceylon Current Account",
-  "1124 - Nations Trust Bank Current Account",
-];
-
-const accountTypes: AccountType[] = [
-  "Current Account",
-  "Savings Account",
-  "Overdraft Account",
-  "Loan Account",
-  "Fixed Deposit",
-];
-
-const currencies: CurrencyCode[] = ["LKR", "USD"];
-
-const initialAccounts: BankAccount[] = [
-  {
-    id: "bank-1",
-    bankName: "Commercial Bank",
-    branchName: "Colombo 03",
-    accountName: "Commercial Bank - Current Account",
-    accountNumber: "1234567890",
-    accountType: "Current Account",
-    currency: "LKR",
-    openingBalance: 1850000,
-    openingBalanceDate: "2026-01-01",
-    currentBalance: 2450000,
-    linkedLedgerAccount: "1120 - Commercial Bank Current Account",
-    status: "Active",
-    description: "Primary operating bank account for OMACX Pharma Pvt Ltd.",
-    createdAt: "2026-01-02",
-    updatedAt: "2026-06-24",
-  },
-  {
-    id: "bank-2",
-    bankName: "Sampath Bank",
-    branchName: "Nugegoda",
-    accountName: "Sampath Bank - Savings Account",
-    accountNumber: "9876543210",
-    accountType: "Savings Account",
-    currency: "LKR",
-    openingBalance: 500000,
-    openingBalanceDate: "2026-01-01",
-    currentBalance: 850000,
-    linkedLedgerAccount: "1121 - Sampath Bank Savings Account",
-    status: "Active",
-    description: "Reserve savings account used for short-term cash parking.",
-    createdAt: "2026-01-05",
-    updatedAt: "2026-06-20",
-  },
-  {
-    id: "bank-3",
-    bankName: "HNB",
-    branchName: "World Trade Center",
-    accountName: "HNB - USD Account",
-    accountNumber: "5566778899",
-    accountType: "Current Account",
-    currency: "USD",
-    openingBalance: 9000,
-    openingBalanceDate: "2026-01-01",
-    currentBalance: 12500,
-    linkedLedgerAccount: "1122 - HNB USD Account",
-    status: "Active",
-    description: "USD account for import payments and foreign receipts.",
-    createdAt: "2026-01-08",
-    updatedAt: "2026-06-22",
-  },
-];
 
 const emptyForm: BankAccountForm = {
-  bankName: "",
-  branchName: "",
-  accountName: "",
-  accountNumber: "",
-  accountType: "",
+  branch_id: "",
+  chart_account_id: "",
+  bank_name: "",
+  bank_branch_name: "",
+  account_name: "",
+  account_number: "",
+  account_type: "current",
   currency: "LKR",
-  openingBalance: "0",
-  openingBalanceDate: "2026-01-01",
-  linkedLedgerAccount: "",
-  autoCreateLedger: true,
-  status: "Active",
+  opening_balance: "0",
+  opening_balance_date: new Date().toISOString().slice(0, 10),
+  auto_create_ledger: false,
+  status: "active",
   description: "",
+  swift_code: "",
+  bank_code: "",
+  branch_code: "",
+  is_default: false,
 };
 
-const money = (amount: number, currency: CurrencyCode) =>
+const accountTypeOptions = [
+  { value: "current", label: "Current Account" },
+  { value: "savings", label: "Savings Account" },
+  { value: "overdraft", label: "Overdraft Account" },
+  { value: "loan", label: "Loan Account" },
+  { value: "fixed_deposit", label: "Fixed Deposit" },
+];
+
+const money = (amount: number | string | undefined, currency = "LKR") =>
   new Intl.NumberFormat("en-LK", {
     style: "currency",
     currency,
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(Number(amount || 0));
 
-const titleCaseAccountName = (bankName: string, accountType: string) => {
-  const cleanedType = accountType.replace(" Account", "");
-  return [bankName.trim(), cleanedType].filter(Boolean).join(" ");
-};
-
-const makeLedgerAccount = (account: BankAccountForm, sequence: number) => {
-  const bankLabel = titleCaseAccountName(account.bankName || "New Bank", account.accountType || "Current Account");
-  return `${1120 + sequence} - ${bankLabel} Account`;
-};
-
-const statusBadge = (status: BankAccountStatus) => (
-  <Badge
-    variant="outline"
-    className={
-      status === "Active"
-        ? "border-green-200 bg-green-50 text-green-700"
-        : "border-slate-200 bg-slate-50 text-slate-600"
-    }
-  >
-    {status}
-  </Badge>
-);
-
-const bankIcon = (accountType: AccountType) => {
-  if (accountType === "Fixed Deposit") return <Banknote className="h-4 w-4 text-amber-600" />;
-  if (accountType === "Overdraft Account" || accountType === "Loan Account") {
-    return <CreditCard className="h-4 w-4 text-indigo-600" />;
-  }
-  return <Landmark className="h-4 w-4 text-blue-600" />;
-};
+const getErrorMessage = (error: any, fallback: string) =>
+  error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
 
 const BankAccountsPage = () => {
-  const [accounts, setAccounts] = useState<BankAccount[]>(initialAccounts);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [bankFilter, setBankFilter] = useState("all");
+  const { company, activeBranch, user } = useAuth();
+  const companyId = company?.id || company?.company_id;
+  const defaultBranchId = activeBranch?.id || activeBranch?.branch_id || activeBranch?.branch?.id || "";
+
+  const [accounts, setAccounts] = useState<BankAccount[]>([]);
+  const [branches, setBranches] = useState<ApiRecord[]>([]);
+  const [ledgerAccounts, setLedgerAccounts] = useState<ApiRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
-  const [selectedAccount, setSelectedAccount] = useState<BankAccount | null>(initialAccounts[0]);
+  const [selectedAccount, setSelectedAccount] = useState<BankAccount | null>(null);
+  const [accountToDeactivate, setAccountToDeactivate] = useState<BankAccount | null>(null);
   const [form, setForm] = useState<BankAccountForm>(emptyForm);
-  const [formError, setFormError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "all",
+    branch_id: "all",
+  });
 
-  const bankOptions = useMemo(() => Array.from(new Set(accounts.map((account) => account.bankName))).sort(), [accounts]);
+  const fetchAccounts = async () => {
+    if (!companyId) {
+      setLoading(false);
+      return;
+    }
 
-  const filteredAccounts = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return accounts.filter((account) => {
-      const matchesSearch =
-        !query ||
-        account.bankName.toLowerCase().includes(query) ||
-        account.accountName.toLowerCase().includes(query) ||
-        account.accountNumber.toLowerCase().includes(query) ||
-        account.linkedLedgerAccount.toLowerCase().includes(query);
-      const matchesStatus = statusFilter === "all" || account.status === statusFilter;
-      const matchesBank = bankFilter === "all" || account.bankName === bankFilter;
-      return matchesSearch && matchesStatus && matchesBank;
-    });
-  }, [accounts, bankFilter, search, statusFilter]);
+    setLoading(true);
+    try {
+      const res = await financeApi.getBankAccounts({
+        page: 1,
+        limit: 100,
+        search: filters.search,
+        status: filters.status === "all" ? "" : filters.status,
+        branch_id: filters.branch_id === "all" ? "" : filters.branch_id,
+        company_id: companyId,
+      });
+      setAccounts(res.data?.data || []);
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to load bank accounts"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const totals = useMemo(() => {
-    const activeAccounts = accounts.filter((account) => account.status === "Active");
-    return {
-      active: activeAccounts.length,
-      lkr: activeAccounts.filter((account) => account.currency === "LKR").reduce((sum, account) => sum + account.currentBalance, 0),
-      usd: activeAccounts.filter((account) => account.currency === "USD").reduce((sum, account) => sum + account.currentBalance, 0),
-    };
-  }, [accounts]);
+  const fetchLookups = async () => {
+    try {
+      const [branchesRes, accountsRes] = await Promise.all([
+        getBranches({ limit: 100 }),
+        financeApi.getChartOfAccounts({ limit: 1000, status: "active", is_bank_account: true, company_id: companyId }),
+      ]);
+
+      setBranches(branchesRes?.data || []);
+      setLedgerAccounts(accountsRes.data?.data || []);
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to load bank account lookups"));
+    }
+  };
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [companyId, filters.search, filters.status, filters.branch_id]);
+
+  useEffect(() => {
+    if (companyId) fetchLookups();
+  }, [companyId]);
+
+  const totalBalance = useMemo(
+    () => accounts.reduce((sum, account) => sum + Number(account.current_balance || 0), 0),
+    [accounts]
+  );
+
+  const setField = <K extends keyof BankAccountForm>(key: K, value: BankAccountForm[K]) => {
+    setForm((current) => ({ ...current, [key]: value }));
+    setErrors((current) => ({ ...current, [key]: "" }));
+  };
 
   const openCreateDialog = () => {
     setEditingAccount(null);
-    setForm(emptyForm);
-    setFormError("");
+    setForm({ ...emptyForm, branch_id: defaultBranchId ? String(defaultBranchId) : "" });
+    setErrors({});
     setDialogOpen(true);
   };
 
   const openEditDialog = (account: BankAccount) => {
     setEditingAccount(account);
     setForm({
-      bankName: account.bankName,
-      branchName: account.branchName,
-      accountName: account.accountName,
-      accountNumber: account.accountNumber,
-      accountType: account.accountType,
-      currency: account.currency,
-      openingBalance: String(account.openingBalance),
-      openingBalanceDate: account.openingBalanceDate,
-      linkedLedgerAccount: account.linkedLedgerAccount,
-      autoCreateLedger: false,
-      status: account.status,
-      description: account.description,
+      ...emptyForm,
+      branch_id: account.branch_id ? String(account.branch_id) : "",
+      chart_account_id: account.chart_account_id ? String(account.chart_account_id) : "",
+      bank_name: account.bank_name || "",
+      bank_branch_name: account.bank_branch_name || "",
+      account_name: account.account_name || "",
+      account_number: account.account_number || "",
+      opening_balance: String(account.opening_balance || 0),
+      status: account.status || "active",
+      swift_code: account.swift_code || "",
+      bank_code: account.bank_code || "",
+      branch_code: account.branch_code || "",
+      is_default: !!account.is_default,
     });
-    setFormError("");
+    setErrors({});
     setDialogOpen(true);
   };
 
-  const openDetails = (account: BankAccount) => {
+  const openDetails = async (account: BankAccount) => {
     setSelectedAccount(account);
     setDetailsOpen(true);
+    try {
+      const res = await financeApi.getBankAccountById(account.id);
+      if (res.data?.success) setSelectedAccount(res.data.data);
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to load bank account details"));
+    }
   };
 
-  const deactivateAccount = (accountId: string) => {
-    setAccounts((current) =>
-      current.map((account) =>
-        account.id === accountId
-          ? { ...account, status: "Inactive", updatedAt: "2026-06-27" }
-          : account
-      )
-    );
-    setSelectedAccount((current) =>
-      current?.id === accountId ? { ...current, status: "Inactive", updatedAt: "2026-06-27" } : current
-    );
+  const validate = () => {
+    const nextErrors: Record<string, string> = {};
+    if (!companyId) nextErrors.company_id = "Please select a company before saving.";
+    if (!form.bank_name.trim()) nextErrors.bank_name = "Bank Name is required.";
+    if (!form.account_name.trim()) nextErrors.account_name = "Account Name is required.";
+    if (!form.account_number.trim()) nextErrors.account_number = "Account Number is required.";
+    if (!form.account_type) nextErrors.account_type = "Account Type is required.";
+    if (!form.currency) nextErrors.currency = "Currency is required.";
+    if (!form.status) nextErrors.status = "Status is required.";
+    if (!form.auto_create_ledger && !form.chart_account_id) {
+      nextErrors.chart_account_id = "Linked Ledger Account is required unless Auto Create Ledger is enabled.";
+    }
+    if (Number.isNaN(Number(form.opening_balance)) || Number(form.opening_balance) < 0) {
+      nextErrors.opening_balance = "Opening Balance must be a non-negative number.";
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
-  const validateForm = () => {
-    if (!form.bankName.trim() || !form.accountName.trim() || !form.accountNumber.trim() || !form.accountType || !form.currency || !form.status) {
-      return "Bank Name, Account Name, Account Number, Account Type, Currency, and Status are required.";
-    }
-
-    const openingBalance = Number(form.openingBalance);
-    if (Number.isNaN(openingBalance)) {
-      return "Opening Balance must be numeric.";
-    }
-
-    const duplicate = accounts.some(
-      (account) =>
-        account.id !== editingAccount?.id &&
-        account.bankName.toLowerCase() === form.bankName.trim().toLowerCase() &&
-        account.accountNumber.trim() === form.accountNumber.trim()
-    );
-    if (duplicate) {
-      return "Account Number should be unique per bank.";
-    }
-
-    if (!form.autoCreateLedger && !form.linkedLedgerAccount) {
-      return "Select a linked ledger account or enable Auto Create Ledger.";
-    }
-
-    return "";
-  };
-
-  const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
+  const submitForm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const validationError = validateForm();
-    if (validationError) {
-      setFormError(validationError);
+    if (!validate()) return;
+
+    if (form.auto_create_ledger) {
+      setErrors({ chart_account_id: "Auto-create ledger is not available in the current backend route. Select an existing bank ledger account." });
+      toast.error("Select an existing bank ledger account until backend auto-create is available.");
       return;
     }
 
-    const openingBalance = Number(form.openingBalance);
-    const linkedLedgerAccount = form.autoCreateLedger
-      ? makeLedgerAccount(form, accounts.length + 1)
-      : form.linkedLedgerAccount;
-
-    if (editingAccount) {
-      setAccounts((current) =>
-        current.map((account) =>
-          account.id === editingAccount.id
-            ? {
-                ...account,
-                bankName: form.bankName.trim(),
-                branchName: form.branchName.trim(),
-                accountName: form.accountName.trim(),
-                accountNumber: form.accountNumber.trim(),
-                accountType: form.accountType as AccountType,
-                currency: form.currency,
-                openingBalance,
-                openingBalanceDate: form.openingBalanceDate,
-                linkedLedgerAccount,
-                status: form.status,
-                description: form.description.trim(),
-                updatedAt: "2026-06-27",
-              }
-            : account
-        )
-      );
-    } else {
-      const newAccount: BankAccount = {
-        id: `bank-${Date.now()}`,
-        bankName: form.bankName.trim(),
-        branchName: form.branchName.trim(),
-        accountName: form.accountName.trim(),
-        accountNumber: form.accountNumber.trim(),
-        accountType: form.accountType as AccountType,
+    setSubmitting(true);
+    try {
+      const payload = {
+        company_id: companyId,
+        branch_id: form.branch_id ? Number(form.branch_id) : undefined,
+        chart_account_id: Number(form.chart_account_id),
+        bank_name: form.bank_name.trim(),
+        bank_branch_name: form.bank_branch_name.trim(),
+        bank_branch: form.bank_branch_name.trim(),
+        account_name: form.account_name.trim(),
+        account_number: form.account_number.trim(),
+        account_type: form.account_type,
         currency: form.currency,
-        openingBalance,
-        openingBalanceDate: form.openingBalanceDate,
-        currentBalance: openingBalance,
-        linkedLedgerAccount,
+        opening_balance: Number(form.opening_balance || 0),
+        opening_balance_date: form.opening_balance_date,
+        linked_ledger_account_id: Number(form.chart_account_id),
+        auto_create_ledger: form.auto_create_ledger,
         status: form.status,
         description: form.description.trim(),
-        createdAt: "2026-06-27",
-        updatedAt: "2026-06-27",
+        swift_code: form.swift_code.trim(),
+        bank_code: form.bank_code.trim(),
+        branch_code: form.branch_code.trim(),
+        is_default: form.is_default,
+        created_by: user?.id,
+        updated_by: user?.id,
       };
-      setAccounts((current) => [newAccount, ...current]);
-      setSelectedAccount(newAccount);
-    }
 
-    setDialogOpen(false);
-    setFormError("");
+      if (editingAccount) {
+        await financeApi.updateBankAccount(editingAccount.id, payload);
+        toast.success("Bank account updated successfully");
+      } else {
+        await financeApi.createBankAccount(payload);
+        toast.success("Bank account created successfully");
+      }
+
+      setDialogOpen(false);
+      setEditingAccount(null);
+      setForm(emptyForm);
+      fetchAccounts();
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to save bank account"));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const details = selectedAccount;
+  const requestDeactivate = (account: BankAccount) => {
+    setAccountToDeactivate(account);
+    setConfirmOpen(true);
+  };
+
+  const confirmDeactivate = async () => {
+    if (!accountToDeactivate) return;
+
+    setDeactivating(true);
+    try {
+      try {
+        await financeApi.deactivateBankAccount(accountToDeactivate.id, {
+          company_id: companyId,
+          updated_by: user?.id,
+        });
+      } catch (error: any) {
+        if (error?.response?.status === 404 || error?.response?.status === 405) {
+          await financeApi.deleteBankAccount(accountToDeactivate.id);
+        } else {
+          throw error;
+        }
+      }
+      toast.success("Bank account deactivated successfully");
+      setConfirmOpen(false);
+      setAccountToDeactivate(null);
+      fetchAccounts();
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to deactivate bank account"));
+    } finally {
+      setDeactivating(false);
+    }
+  };
+
+  const statusBadge = (status: string) => (
+    <Badge
+      variant="outline"
+      className={
+        status === "active"
+          ? "border-green-200 bg-green-50 text-green-700"
+          : "border-slate-200 bg-slate-50 text-slate-600"
+      }
+    >
+      {status === "active" ? "Active" : "Inactive"}
+    </Badge>
+  );
+
+  if (!companyId) {
+    return (
+      <div className="min-h-full bg-[#F8FAFC] p-6">
+        <Alert variant="destructive">
+          <AlertTitle>Company context required</AlertTitle>
+          <AlertDescription>Please select a company before using Finance bank accounts.</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-full bg-[#F8FAFC] p-6 text-slate-900">
@@ -428,79 +430,60 @@ const BankAccountsPage = () => {
               <Landmark className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">Active Bank Accounts</p>
-              <p className="mt-1 text-2xl font-bold text-slate-900">{totals.active}</p>
+              <p className="text-sm font-medium text-slate-500">Bank Accounts</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">{accounts.length}</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-slate-200 bg-white shadow-sm">
+        <Card className="border border-slate-200 bg-white shadow-sm md:col-span-2">
           <CardContent className="flex items-center gap-4">
             <div className="rounded-xl bg-green-50 p-3 text-green-600">
-              <Wallet className="h-5 w-5" />
+              <FileText className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">LKR Bank Balance</p>
-              <p className="mt-1 text-2xl font-bold text-slate-900">{money(totals.lkr, "LKR")}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border border-slate-200 bg-white shadow-sm">
-          <CardContent className="flex items-center gap-4">
-            <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
-              <CircleDollarSign className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-500">USD Bank Balance</p>
-              <p className="mt-1 text-2xl font-bold text-slate-900">{money(totals.usd, "USD")}</p>
+              <p className="text-sm font-medium text-slate-500">Visible Current Balance</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">{money(totalBalance)}</p>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      <Alert className="mt-4 border-blue-100 bg-blue-50 text-blue-900">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Finance setup order</AlertTitle>
-        <AlertDescription>
-          Create Chart of Accounts first, then create Bank Accounts under Assets / Current Assets / Bank Accounts. Payment Vouchers reduce bank balances and Receipt Vouchers increase them.
-        </AlertDescription>
-      </Alert>
 
       <Card className="mt-4 border border-slate-200 bg-white shadow-sm">
         <CardHeader className="border-b border-slate-100">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <CardTitle>Company Bank Accounts</CardTitle>
-              <CardDescription>OMACX Pharma Pvt Ltd bank account master with linked ledger control accounts.</CardDescription>
+              <CardDescription>Accounts are linked to Chart of Accounts ledger records flagged as bank accounts.</CardDescription>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-2.5 top-2 h-4 w-4 text-slate-400" />
                 <Input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
+                  value={filters.search}
+                  onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
                   placeholder="Search accounts"
                   className="h-9 w-full border-slate-200 bg-white pl-8 sm:w-64"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={filters.status} onValueChange={(value) => setFilters((current) => ({ ...current, status: value }))}>
                 <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={bankFilter} onValueChange={setBankFilter}>
-                <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-48">
-                  <SelectValue placeholder="Bank" />
+              <Select value={filters.branch_id} onValueChange={(value) => setFilters((current) => ({ ...current, branch_id: value }))}>
+                <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-44">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Banks</SelectItem>
-                  {bankOptions.map((bank) => (
-                    <SelectItem key={bank} value={bank}>
-                      {bank}
+                  <SelectItem value="all">All Branches</SelectItem>
+                  {branches.map((branch) => (
+                    <SelectItem key={branch.id} value={String(branch.id)}>
+                      {branch.branch_name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -515,8 +498,6 @@ const BankAccountsPage = () => {
                 <TableHead>Bank Name</TableHead>
                 <TableHead>Account Name</TableHead>
                 <TableHead>Account Number</TableHead>
-                <TableHead>Account Type</TableHead>
-                <TableHead>Currency</TableHead>
                 <TableHead className="text-right">Current Balance</TableHead>
                 <TableHead>Linked Ledger Account</TableHead>
                 <TableHead>Status</TableHead>
@@ -524,65 +505,77 @@ const BankAccountsPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAccounts.map((account) => (
-                <TableRow key={account.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="rounded-lg bg-slate-50 p-2">{bankIcon(account.accountType)}</div>
-                      <div>
-                        <p className="font-semibold text-slate-900">{account.bankName}</p>
-                        <p className="text-xs text-slate-500">{account.branchName}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium text-slate-800">{account.accountName}</TableCell>
-                  <TableCell className="font-mono text-xs text-slate-600">{account.accountNumber}</TableCell>
-                  <TableCell>{account.accountType}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="border-slate-200 bg-white text-slate-700">
-                      {account.currency}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-semibold text-slate-900">{money(account.currentBalance, account.currency)}</TableCell>
-                  <TableCell className="max-w-[260px] truncate text-slate-600">{account.linkedLedgerAccount}</TableCell>
-                  <TableCell>{statusBadge(account.status)}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label={`Actions for ${account.accountName}`}>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => openDetails(account)}>
-                          <Eye className="h-4 w-4" />
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => openEditDialog(account)}>
-                          <Edit className="h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <BookOpen className="h-4 w-4" />
-                          View Bank Book
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <FileText className="h-4 w-4" />
-                          View Ledger
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-red-600 focus:text-red-600"
-                          onClick={() => deactivateAccount(account.id)}
-                        >
-                          <RefreshCcw className="h-4 w-4" />
-                          Deactivate
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-28 text-center text-slate-500">
+                    <Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />
+                    Loading bank accounts...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : accounts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-28 text-center text-slate-500">
+                    No bank accounts found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                accounts.map((account) => (
+                  <TableRow key={account.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-lg bg-blue-50 p-2 text-blue-600">
+                          <Landmark className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900">{account.bank_name}</p>
+                          <p className="text-xs text-slate-500">{account.bank_branch_name || "No branch name"}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium text-slate-800">{account.account_name}</TableCell>
+                    <TableCell className="font-mono text-xs text-slate-600">{account.account_number}</TableCell>
+                    <TableCell className="text-right font-semibold text-slate-900">{money(account.current_balance)}</TableCell>
+                    <TableCell className="max-w-[260px] truncate text-slate-600">
+                      {account.chart_account
+                        ? `${account.chart_account.account_code} - ${account.chart_account.account_name}`
+                        : `#${account.chart_account_id}`}
+                    </TableCell>
+                    <TableCell>{statusBadge(account.status)}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" aria-label={`Actions for ${account.account_name}`}>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => openDetails(account)}>
+                            <Eye className="h-4 w-4" />
+                            View
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEditDialog(account)}>
+                            <Edit className="h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <BookOpen className="h-4 w-4" />
+                            View Bank Book
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <FileText className="h-4 w-4" />
+                            View Ledger
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => requestDeactivate(account)}>
+                            <RefreshCcw className="h-4 w-4" />
+                            Deactivate
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -592,140 +585,132 @@ const BankAccountsPage = () => {
         <DialogContent className="max-h-[92vh] overflow-y-auto bg-white sm:max-w-4xl">
           <DialogHeader>
             <DialogTitle>{editingAccount ? "Edit Bank Account" : "Add Bank Account"}</DialogTitle>
-            <DialogDescription>
-              Bank accounts belong to Banking & Cash and must link to a ledger account from Chart of Accounts.
-            </DialogDescription>
+            <DialogDescription>Link each bank account to an active bank ledger account from Chart of Accounts.</DialogDescription>
           </DialogHeader>
-
-          {formError && (
+          {errors.company_id && (
             <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Check bank account details</AlertTitle>
-              <AlertDescription>{formError}</AlertDescription>
+              <AlertTitle>Company context required</AlertTitle>
+              <AlertDescription>{errors.company_id}</AlertDescription>
             </Alert>
           )}
-
           <form id="bank-account-form" onSubmit={submitForm} className="space-y-5">
-            <Tabs defaultValue="details">
-              <TabsList className="bg-slate-100">
-                <TabsTrigger value="details">Account Details</TabsTrigger>
-                <TabsTrigger value="ledger">Ledger Mapping</TabsTrigger>
-              </TabsList>
-              <TabsContent value="details" className="mt-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <Field label="Bank Name" required>
-                    <Input value={form.bankName} onChange={(event) => setForm({ ...form, bankName: event.target.value })} />
-                  </Field>
-                  <Field label="Branch Name">
-                    <Input value={form.branchName} onChange={(event) => setForm({ ...form, branchName: event.target.value })} />
-                  </Field>
-                  <Field label="Account Name" required>
-                    <Input value={form.accountName} onChange={(event) => setForm({ ...form, accountName: event.target.value })} />
-                  </Field>
-                  <Field label="Account Number" required>
-                    <Input value={form.accountNumber} onChange={(event) => setForm({ ...form, accountNumber: event.target.value })} />
-                  </Field>
-                  <Field label="Account Type" required>
-                    <Select value={form.accountType} onValueChange={(value) => setForm({ ...form, accountType: value as AccountType })}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select account type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {accountTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Currency" required>
-                    <Select value={form.currency} onValueChange={(value) => setForm({ ...form, currency: value as CurrencyCode })}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {currencies.map((currency) => (
-                          <SelectItem key={currency} value={currency}>
-                            {currency}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Opening Balance">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={form.openingBalance}
-                      onChange={(event) => setForm({ ...form, openingBalance: event.target.value })}
-                    />
-                  </Field>
-                  <Field label="Opening Balance Date">
-                    <Input type="date" value={form.openingBalanceDate} onChange={(event) => setForm({ ...form, openingBalanceDate: event.target.value })} />
-                  </Field>
-                  <Field label="Status" required>
-                    <Select value={form.status} onValueChange={(value) => setForm({ ...form, status: value as BankAccountStatus })}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Inactive">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Description">
-                    <Input value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
-                  </Field>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Field label="Bank Name" error={errors.bank_name} required>
+                <Input value={form.bank_name} onChange={(event) => setField("bank_name", event.target.value)} />
+              </Field>
+              <Field label="Branch Name">
+                <Input value={form.bank_branch_name} onChange={(event) => setField("bank_branch_name", event.target.value)} />
+              </Field>
+              <Field label="Account Name" error={errors.account_name} required>
+                <Input value={form.account_name} onChange={(event) => setField("account_name", event.target.value)} />
+              </Field>
+              <Field label="Account Number" error={errors.account_number} required>
+                <Input value={form.account_number} onChange={(event) => setField("account_number", event.target.value)} />
+              </Field>
+              <Field label="Branch">
+                <Select value={form.branch_id || "none"} onValueChange={(value) => setField("branch_id", value === "none" ? "" : value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Company Level</SelectItem>
+                    {branches.map((branch) => (
+                      <SelectItem key={branch.id} value={String(branch.id)}>
+                        {branch.branch_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Linked Ledger Account" error={errors.chart_account_id} required={!form.auto_create_ledger}>
+                <Select
+                  value={form.chart_account_id}
+                  onValueChange={(value) => setField("chart_account_id", value)}
+                  disabled={form.auto_create_ledger}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select bank ledger account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ledgerAccounts.map((account) => (
+                      <SelectItem key={account.id} value={String(account.id)}>
+                        {account.account_code} - {account.account_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="mt-1 text-xs text-slate-500">The backend requires this ledger to be flagged as a bank account.</p>
+              </Field>
+              <Field label="Account Type" error={errors.account_type} required>
+                <Select value={form.account_type} onValueChange={(value) => setField("account_type", value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accountTypeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Currency" error={errors.currency} required>
+                <Select value={form.currency} onValueChange={(value) => setField("currency", value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="LKR">LKR</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Opening Balance" error={errors.opening_balance}>
+                <Input type="number" min="0" step="0.01" value={form.opening_balance} onChange={(event) => setField("opening_balance", event.target.value)} />
+              </Field>
+              <Field label="Opening Balance Date">
+                <Input type="date" value={form.opening_balance_date} onChange={(event) => setField("opening_balance_date", event.target.value)} />
+              </Field>
+              <Field label="Status" error={errors.status} required>
+                <Select value={form.status} onValueChange={(value) => setField("status", value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div>
+                  <Label>Default Bank Account</Label>
+                  <p className="mt-1 text-xs text-slate-500">Marks this as the default bank account in Finance.</p>
                 </div>
-              </TabsContent>
-              <TabsContent value="ledger" className="mt-4 space-y-4">
-                <Alert className="border-slate-200 bg-slate-50">
-                  <Building2 className="h-4 w-4" />
-                  <AlertTitle>Ledger account path</AlertTitle>
-                  <AlertDescription>Auto-created bank ledgers are created under Assets / Current Assets / Bank Accounts.</AlertDescription>
-                </Alert>
-                <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4">
-                  <div>
-                    <Label>Auto Create Ledger</Label>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Generate a ledger such as 1120 - Commercial Bank Current Account.
-                    </p>
-                  </div>
-                  <Switch
-                    checked={form.autoCreateLedger}
-                    onCheckedChange={(checked) => setForm({ ...form, autoCreateLedger: checked })}
-                  />
-                </div>
-                <Field label="Linked Ledger Account">
-                  <Select
-                    value={form.linkedLedgerAccount}
-                    disabled={form.autoCreateLedger}
-                    onValueChange={(value) => setForm({ ...form, linkedLedgerAccount: value })}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={form.autoCreateLedger ? makeLedgerAccount(form, accounts.length + 1) : "Select ledger account"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ledgerAccounts.map((ledger) => (
-                        <SelectItem key={ledger} value={ledger}>
-                          {ledger}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </TabsContent>
-            </Tabs>
+                <Switch checked={form.is_default} onCheckedChange={(checked) => setField("is_default", checked)} />
+              </div>
+            </div>
+            <Separator />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <Field label="SWIFT Code">
+                <Input value={form.swift_code} onChange={(event) => setField("swift_code", event.target.value)} />
+              </Field>
+              <Field label="Bank Code">
+                <Input value={form.bank_code} onChange={(event) => setField("bank_code", event.target.value)} />
+              </Field>
+              <Field label="Branch Code">
+                <Input value={form.branch_code} onChange={(event) => setField("branch_code", event.target.value)} />
+              </Field>
+            </div>
           </form>
-
           <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => setDialogOpen(false)}>
+            <Button variant="outline" type="button" onClick={() => setDialogOpen(false)} disabled={submitting}>
               Cancel
             </Button>
-            <Button form="bank-account-form" type="submit" className="bg-indigo-600 text-white hover:bg-indigo-700">
-              {editingAccount ? "Save Changes" : "Add Bank Account"}
+            <Button form="bank-account-form" type="submit" className="bg-indigo-600 text-white hover:bg-indigo-700" disabled={submitting}>
+              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {editingAccount ? "Save Bank Account" : "Save Bank Account"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -733,35 +718,22 @@ const BankAccountsPage = () => {
 
       <Sheet open={detailsOpen} onOpenChange={setDetailsOpen}>
         <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-xl">
-          {details && (
+          {selectedAccount && (
             <>
               <SheetHeader className="border-b border-slate-100">
-                <SheetTitle>{details.accountName}</SheetTitle>
-                <SheetDescription>{details.bankName} / {details.accountNumber}</SheetDescription>
+                <SheetTitle>{selectedAccount.account_name}</SheetTitle>
+                <SheetDescription>{selectedAccount.bank_name} / {selectedAccount.account_number}</SheetDescription>
               </SheetHeader>
-              <div className="space-y-5 p-4">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-sm text-slate-500">Current Balance</p>
-                  <p className="mt-1 text-3xl font-bold text-slate-900">{money(details.currentBalance, details.currency)}</p>
-                  <div className="mt-3">{statusBadge(details.status)}</div>
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <Detail label="Bank Name" value={details.bankName} />
-                  <Detail label="Branch Name" value={details.branchName} />
-                  <Detail label="Account Name" value={details.accountName} />
-                  <Detail label="Account Number" value={details.accountNumber} />
-                  <Detail label="Account Type" value={details.accountType} />
-                  <Detail label="Currency" value={details.currency} />
-                  <Detail label="Opening Balance" value={money(details.openingBalance, details.currency)} />
-                  <Detail label="Opening Balance Date" value={details.openingBalanceDate} />
-                  <Detail label="Created Date" value={details.createdAt} />
-                  <Detail label="Last Updated Date" value={details.updatedAt} />
-                </div>
-                <Separator />
-                <Detail label="Linked Ledger Account" value={details.linkedLedgerAccount} />
-                <Detail label="Description" value={details.description || "No description"} />
+              <div className="space-y-4 p-4">
+                <Detail label="Current Balance" value={money(selectedAccount.current_balance)} />
+                <Detail label="Bank Name" value={selectedAccount.bank_name} />
+                <Detail label="Branch Name" value={selectedAccount.bank_branch_name || "-"} />
+                <Detail label="Linked Ledger Account" value={selectedAccount.chart_account ? `${selectedAccount.chart_account.account_code} - ${selectedAccount.chart_account.account_name}` : `#${selectedAccount.chart_account_id}`} />
+                <Detail label="Status" value={selectedAccount.status} />
+                <Detail label="Created Date" value={selectedAccount.created_at ? new Date(selectedAccount.created_at).toLocaleDateString() : "-"} />
+                <Detail label="Last Updated Date" value={selectedAccount.updated_at ? new Date(selectedAccount.updated_at).toLocaleDateString() : "-"} />
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" onClick={() => openEditDialog(details)}>
+                  <Button variant="outline" onClick={() => openEditDialog(selectedAccount)}>
                     <Edit className="h-4 w-4" />
                     Edit Account
                   </Button>
@@ -769,31 +741,45 @@ const BankAccountsPage = () => {
                     <BookOpen className="h-4 w-4" />
                     View Bank Book
                   </Button>
-                  <Button variant="outline">
-                    <FileText className="h-4 w-4" />
-                    View Ledger
-                  </Button>
-                  <Button className="bg-indigo-600 text-white hover:bg-indigo-700">
-                    <RefreshCcw className="h-4 w-4" />
-                    Reconcile
-                  </Button>
                 </div>
               </div>
             </>
           )}
         </SheetContent>
       </Sheet>
+
+      <ERPConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDeactivate}
+        title="Deactivate Bank Account"
+        message="Bank accounts with transactions cannot be removed. This action will deactivate or soft-delete the account according to backend safety rules."
+        confirmLabel="Deactivate"
+        confirmVariant="danger"
+        isLoading={deactivating}
+      />
     </div>
   );
 };
 
-const Field = ({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) => (
+const Field = ({
+  label,
+  required,
+  error,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}) => (
   <div className="space-y-2">
     <Label>
       {label}
       {required && <span className="text-red-600">*</span>}
     </Label>
     {children}
+    {error && <p className="text-xs font-medium text-red-600">{error}</p>}
   </div>
 );
 

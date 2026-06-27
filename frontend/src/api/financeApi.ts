@@ -27,6 +27,7 @@ export const financeApi = {
   createChartOfAccount: (payload: Record<string, unknown>) => apiClient.post("/finance/chart-of-accounts", payload),
   updateChartOfAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/finance/chart-of-accounts/${id}`, payload),
   deleteChartOfAccount: (id: string | number) => apiClient.delete(`/finance/chart-of-accounts/${id}`),
+  deactivateChartOfAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.patch(`/finance/chart-of-accounts/${id}/deactivate`, payload),
 
   // Opening Balances
   getOpeningBalances: (params: Record<string, unknown>) => apiClient.get("/finance/opening-balances", { params }),
@@ -190,8 +191,8 @@ export const financeApi = {
   getTrialBalanceReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/trial-balance", { params }),
   getProfitLossReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/profit-loss", { params }),
   getBalanceSheetReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/balance-sheet", { params }),
-  getCashBookReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/cash-book", { params }),
-  getBankBookReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/bank-book", { params }),
+  getCashBookReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/cash-bank-book", { params: { ...params, book_type: "cash" } }),
+  getBankBookReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/cash-bank-book", { params: { ...params, book_type: "bank" } }),
   getDayBookReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/day-book", { params }),
   getJournalRegisterReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/journal-register", { params }),
   getPaymentRegisterReport: (params: Record<string, unknown>) => apiClient.get("/finance/reports/payment-register", { params }),

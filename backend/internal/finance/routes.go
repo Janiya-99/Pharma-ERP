@@ -127,6 +127,18 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		ba.DELETE("/:id", middleware.RequirePermission("finance.bank_account.delete"), baHandler.DeleteBankAccount)
 	}
 
+	// Cash Accounts
+	cashHandler := handlers.NewCashAccountHandler(logger)
+	cash := finance.Group("/cash-accounts")
+	{
+		cash.GET("", middleware.RequirePermission("finance.cash_account.view"), cashHandler.ListCashAccounts)
+		cash.GET("/:id", middleware.RequirePermission("finance.cash_account.view"), cashHandler.GetCashAccountByID)
+		cash.POST("", middleware.RequirePermission("finance.cash_account.create"), cashHandler.CreateCashAccount)
+		cash.PUT("/:id", middleware.RequirePermission("finance.cash_account.update"), cashHandler.UpdateCashAccount)
+		cash.PATCH("/:id/deactivate", middleware.RequirePermission("finance.cash_account.delete"), cashHandler.DeactivateCashAccount)
+		cash.DELETE("/:id", middleware.RequirePermission("finance.cash_account.delete"), cashHandler.DeactivateCashAccount)
+	}
+
 	// Cheque Books
 	cbHandler := handlers.NewChequeBookHandler(logger)
 	cb := finance.Group("/cheque-books")

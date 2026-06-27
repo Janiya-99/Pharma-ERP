@@ -30,6 +30,7 @@ func RunFinanceMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.ReceiptVoucherLine{},
 		&models.ReceiptVoucherApproval{},
 		&models.BankAccount{},
+		&models.CashAccount{},
 		&models.ChequeBook{},
 		&models.ChequeLeaf{},
 		&models.BankTransaction{},
