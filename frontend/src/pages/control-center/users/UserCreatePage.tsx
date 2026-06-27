@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, User, Building2, Shield, ChevronRight,
   Eye, EyeOff, Settings, Info, AlertCircle, Lock, Unlock,
-  Save, PlusCircle,
+  Save, PlusCircle, ShieldCheck,
 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -265,13 +265,25 @@ const UserCreatePage: React.FC = () => {
     };
   };
 
-  const handleSave = async (another = false) => {
+  const getSavedUserId = (res: any) =>
+    res?.data?.id || res?.data?.user?.id || res?.data?.item?.id || res?.id || id;
+
+  const accessManagementPath = (userId?: string | number) =>
+    userId
+      ? `/control-center/user-access?userId=${encodeURIComponent(String(userId))}`
+      : "/control-center/user-access";
+
+  const handleSave = async (another = false, manageAccess = false) => {
     if (!validate()) { toast.error("Please fix the highlighted fields"); return; }
     setSaving(true);
     try {
       const res = isEdit ? await updateUser(id!, payload()) : await createUser(payload());
       if (!res.success) { toast.error(res.message || "Failed"); return; }
       toast.success(isEdit ? "User updated!" : "User created!");
+      if (manageAccess) {
+        navigate(accessManagementPath(getSavedUserId(res)));
+        return;
+      }
       if (another) { setForm({ ...BLANK }); setErrors({}); window.scrollTo(0, 0); }
       else navigate("/control-center/users");
     } catch (e: any) { toast.error(e?.response?.data?.message || "Failed"); }
@@ -650,11 +662,11 @@ const UserCreatePage: React.FC = () => {
                 </p>
               </div>
               <div className="bg-white/90 backdrop-blur-sm px-5 py-3.5">
-                <button type="button" onClick={() => navigate("/control-center/user-branch-access")}
+                <button type="button" onClick={() => navigate(accessManagementPath(id))}
                   className="w-full py-2.5 text-sm font-bold text-[#052659] rounded-xl
                     border-2 border-[#052659]/20 bg-[#C1E8FF]/50
                     hover:bg-[#C1E8FF] hover:border-[#052659]/40 transition-all duration-200">
-                  Open Access Management →
+                  {isEdit ? "Open This User's Access" : "Open User Access"}
                 </button>
               </div>
             </div>
@@ -705,6 +717,15 @@ const UserCreatePage: React.FC = () => {
                   {saving ? "Saving…" : "Save & Add Another"}
                 </button>
               )}
+              <button type="button" disabled={saving} onClick={() => handleSave(false, true)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#052659]/25
+                  bg-white px-5 py-2.5 text-sm font-bold text-[#052659] shadow-sm
+                  hover:-translate-y-0.5 hover:border-[#052659]/50 hover:bg-[#C1E8FF]/50
+                  hover:shadow-md transition-all disabled:translate-y-0 disabled:cursor-not-allowed
+                  disabled:opacity-60">
+                <ShieldCheck className="h-4 w-4" />
+                {saving ? "Saving..." : isEdit ? "Update & Manage Access" : "Save & Manage Access"}
+              </button>
               <button type="button" disabled={saving} onClick={() => handleSave(false)}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#052659]
                   px-7 py-2.5 text-sm font-black text-white shadow-lg shadow-[#052659]/25

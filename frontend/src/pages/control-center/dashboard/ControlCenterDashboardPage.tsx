@@ -243,7 +243,7 @@ const ControlCenterDashboardPage = () => {
               { label: "Add Branch", icon: MdDomainAdd, color: "text-indigo-600", bg: "group-hover:bg-indigo-50" },
               { label: "Assign Access", icon: MdVpnKey, color: "text-purple-600", bg: "group-hover:bg-purple-50" },
               { label: "Create Role", icon: MdOutlineVerifiedUser, color: "text-emerald-600", bg: "group-hover:bg-emerald-50" },
-              { label: "Access Matrix", icon: MdApps, color: "text-cyan-600", bg: "group-hover:bg-cyan-50" },
+              { label: "User Access", icon: MdApps, color: "text-cyan-600", bg: "group-hover:bg-cyan-50" },
               { label: "View Audit", icon: MdGavel, color: "text-slate-600", bg: "group-hover:bg-slate-50" },
             ].map((action, i) => (
               <button key={i} className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white/50 p-4 text-center transition-all hover:border-slate-200 hover:shadow-sm">
@@ -361,4 +361,3 @@ const ControlCenterDashboardPage = () => {
 };
 
 export default ControlCenterDashboardPage;
-

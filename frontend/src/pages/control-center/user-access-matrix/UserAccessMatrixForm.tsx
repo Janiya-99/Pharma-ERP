@@ -47,7 +47,7 @@ const UserAccessMatrixForm = ({ user, onSuccess }: { user?: unknown; onSuccess?:
       
     } catch (err) {
       console.error("Failed to fetch user access data", err);
-      setError("Failed to load user's branch and software access. Please ensure they are assigned first.");
+      setError("Failed to load this user's branch and software access. Assign branch and software access before adding a role.");
     } finally {
       setLoading(false);
     }
@@ -121,11 +121,11 @@ const UserAccessMatrixForm = ({ user, onSuccess }: { user?: unknown; onSuccess?:
         <div className="text-sm text-gray-500 py-4">Loading user's allowed branches and software...</div>
       ) : branches.length === 0 ? (
         <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100">
-          This user has no assigned branches. Please assign branch access first in the User Branch Access screen.
+          This user has no assigned branches. Assign branch access first, then return here to add roles.
         </div>
       ) : softwareModules.length === 0 ? (
         <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100">
-          This user has no assigned software modules. Please assign software access first in the User Software Access screen.
+          This user has no assigned software modules. Assign software access first, then return here to add roles.
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">

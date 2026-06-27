@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../../components/common/PageHeader";
 import UserSelector from "../../../components/common/UserSelector";
 import AccessMatrixTable from "../../../components/common/AccessMatrixTable";
@@ -6,10 +7,11 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import UserAccessMatrixForm from "./UserAccessMatrixForm";
-import { getUserAccessMatrix, removeUserAccessMatrix } from "../../../api/controlApi";
+import { getUserAccessMatrix, getUserById, removeUserAccessMatrix } from "../../../api/controlApi";
 import { Shield, CheckCircle2 } from "lucide-react";
 
 const UserAccessMatrixPage = () => {
+  const [searchParams] = useSearchParams();
   const [selectedUser, setSelectedUser] = useState(null);
   const [accessRecords, setAccessRecords] = useState([]);
   
@@ -20,6 +22,29 @@ const UserAccessMatrixPage = () => {
   const [isRemoveOpen, setIsRemoveOpen] = useState(false);
   const [accessToRemove, setAccessToRemove] = useState(null);
   const [removing, setRemoving] = useState(false);
+
+  useEffect(() => {
+    const userId = searchParams.get("userId");
+    if (!userId || selectedUser?.id?.toString() === userId) return;
+
+    const fetchLinkedUser = async () => {
+      try {
+        setLoading(true);
+        const res = await getUserById(userId);
+        if (res.success) {
+          setSelectedUser(res.data);
+        } else {
+          setError(res.message || "Unable to load the selected user.");
+        }
+      } catch (err) {
+        setError("Unable to load the selected user.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLinkedUser();
+  }, [searchParams, selectedUser]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -38,10 +63,13 @@ const UserAccessMatrixPage = () => {
       setError(null);
       const res = await getUserAccessMatrix(selectedUser.id);
       if (res.success) {
-        setAccessRecords(res.data || []);
+        const records = Array.isArray(res.data)
+          ? res.data
+          : res.data?.access_matrix || [];
+        setAccessRecords(records);
       }
     } catch (err) {
-      setError("Failed to fetch user access matrix.");
+      setError("Failed to fetch user access assignments.");
     } finally {
       setLoading(false);
     }
@@ -85,7 +113,7 @@ const UserAccessMatrixPage = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <PageHeader
-        title="User Access Matrix"
+        title="User Access"
         description="Assign exact roles to users across specific branches and software modules."
       />
 
@@ -139,7 +167,7 @@ const UserAccessMatrixPage = () => {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                   <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-gray-400" /> Current Access Matrix
+                    <Shield className="w-4 h-4 text-gray-400" /> Current Access
                   </h2>
                   <span className="text-xs bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-medium">
                     {accessRecords.length} Records
@@ -157,7 +185,7 @@ const UserAccessMatrixPage = () => {
             <div className="bg-white p-12 text-center rounded-lg border border-gray-200 shadow-sm text-gray-500 h-full flex flex-col justify-center items-center">
               <Shield className="w-12 h-12 text-gray-300 mb-4" />
               <p className="text-lg font-medium text-gray-900">No User Selected</p>
-              <p className="text-sm mt-1 max-w-sm">Please select a user from the list on the left to view or manage their role access matrix.</p>
+              <p className="text-sm mt-1 max-w-sm">Please select a user from the list on the left to view or manage their branch, software, and role access.</p>
             </div>
           )}
         </div>
@@ -168,7 +196,7 @@ const UserAccessMatrixPage = () => {
         onClose={() => setIsRemoveOpen(false)}
         onConfirm={handleRemove}
         title="Remove Access Record"
-        message={`Are you sure you want to remove the "${accessToRemove?.role?.role_name}" role from ${selectedUser?.name || selectedUser?.full_name} for branch "${accessToRemove?.branch?.branch_name}" and module "${accessToRemove?.software_module?.software_name}"?`}
+        message={`Are you sure you want to remove the "${accessToRemove?.role_name || accessToRemove?.role?.role_name}" role from ${selectedUser?.name || selectedUser?.full_name} for branch "${accessToRemove?.branch_name || accessToRemove?.branch?.branch_name}" and module "${accessToRemove?.software_name || accessToRemove?.software_module?.software_name}"?`}
         confirmText="Remove Access"
         isConfirming={removing}
       />

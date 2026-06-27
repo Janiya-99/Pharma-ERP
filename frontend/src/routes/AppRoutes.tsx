@@ -100,7 +100,9 @@ const AppRoutes = () => {
           <Route path="/control-center/user-branch-access" element={<UserBranchAccessPage />} />
           <Route path="/control-center/user-software-access" element={<UserSoftwareAccessPage />} />
           <Route path="/control-center/roles-permissions" element={<RolesPermissionsPage />} />
+          <Route path="/control-center/user-access" element={<AccessMatrixPage />} />
           <Route path="/control-center/access-matrix" element={<AccessMatrixPage />} />
+          <Route path="/control-center/user-access-management" element={<AccessMatrixPage />} />
           <Route path="/control-center/audit-logs" element={<AuditLogsPage />} />
           <Route path="/control-center/login-logs" element={<LoginLogsPage />} />
           <Route path="/control-center/settings" element={<PlaceholderPage title="Settings" />} />

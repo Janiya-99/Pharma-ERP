@@ -161,7 +161,7 @@ const routes: ERPRoute[] = [
     children: [
       { name: "Users", path: "control-center/users", component: <UsersPage /> },
       { name: "Roles & Permissions", path: "control-center/roles-permissions", component: <RolesPermissionsPage /> },
-      { name: "Access Matrix", path: "control-center/access-matrix", component: <AccessMatrixPage /> },
+      { name: "User Access", path: "control-center/user-access", component: <AccessMatrixPage /> },
       // Hidden user routes
       { name: "Create User", path: "control-center/users/create", component: <UserCreatePage />, hide: true },
       { name: "Edit User", path: "control-center/users/:id/edit", component: <UserCreatePage />, hide: true },

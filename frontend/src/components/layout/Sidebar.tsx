@@ -57,7 +57,7 @@ const Sidebar = () => {
       children: [
         { name: "Users", path: "/control-center/users", permission: "control.user.view" },
         { name: "Roles & Permissions", path: "/control-center/roles-permissions", permission: "control.role.view" },
-        { name: "Access Matrix", path: "/control-center/access-matrix", permission: "control.access_matrix.view" },
+        { name: "User Access", path: "/control-center/user-access", permission: "control.access_matrix.view" },
       ],
     },
     {

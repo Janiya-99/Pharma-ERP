@@ -8,19 +8,19 @@ const AccessMatrixTable = ({ data, loading, onRemove }: { data?: Record<string, 
     {
       header: "Branch",
       accessor: "branch_name",
-      cell: (row: unknown) => row.branch?.branch_name || "Unknown Branch"
+      cell: (row: unknown) => row.branch_name || row.branch?.branch_name || "Unknown Branch"
     },
     {
       header: "Software Module",
       accessor: "software_name",
-      cell: (row: unknown) => row.software_module?.software_name || "Unknown Module"
+      cell: (row: unknown) => row.software_name || row.software_module?.software_name || "Unknown Module"
     },
     {
       header: "Role",
       accessor: "role_name",
       cell: (row: unknown) => (
         <div>
-          <span className="font-medium text-gray-900">{row.role?.role_name || "Unknown Role"}</span>
+          <span className="font-medium text-gray-900">{row.role_name || row.role?.role_name || "Unknown Role"}</span>
           {row.role?.is_system && (
             <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
               System
@@ -62,8 +62,8 @@ const AccessMatrixTable = ({ data, loading, onRemove }: { data?: Record<string, 
       columns={columns}
       data={data}
       loading={loading}
-      emptyTitle="No access matrix records found"
-      emptyDescription="This user does not have any specific role access assigned yet."
+      emptyTitle="No access assignments found"
+      emptyDescription="This user does not have any branch, software, and role access assigned yet."
     />
   );
 };
