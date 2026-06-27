@@ -1,23 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getBranches, deleteBranch } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
 import Badge from "../../../components/common/Badge";
-import Input from "../../../components/common/Input";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import BranchFormModal from "./BranchFormModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
 
-const BranchesPage = () => {
-  const [branches, setBranches] = useState([]);
-  const [pagination, setPagination] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+interface Branch {
+  id: number;
+  branch_code: string;
+  branch_name: string;
+  branch_type: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  is_main_branch: boolean;
+  status: string;
+}
 
+const BranchesPage = () => {
   const [filters, setFilters] = useState({
     search: "",
     status: "",
@@ -27,38 +35,30 @@ const BranchesPage = () => {
   });
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [branchToDelete, setBranchToDelete] = useState(null);
+  const [branchToDelete, setBranchToDelete] = useState<Branch | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchBranches();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.page, filters.status, filters.branch_type]);
-
-  const fetchBranches = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const { data: queryData, isLoading, error, refetch } = useQuery({
+    queryKey: ["branches", filters],
+    queryFn: async () => {
       const res = await getBranches(filters);
-      if (res.success) {
-        setBranches(res.data);
-        setPagination(res.pagination);
+      if (res.success === false) {
+        throw new Error(res.message || "Failed to load branches");
       }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load branches");
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res;
+    },
+  });
+
+  const branches = queryData?.data || [];
+  const pagination = queryData?.pagination || null;
 
   const handleSearch = (e: any) => {
     e.preventDefault();
-    setFilters({ ...filters, page: 1 });
-    fetchBranches();
+    setFilters({ ...filters, search: searchVal, page: 1 });
   };
 
   const handleFilterChange = (e: any) => {
@@ -70,17 +70,17 @@ const BranchesPage = () => {
     setIsFormOpen(true);
   };
 
-  const openEditModal = (branch: unknown) => {
+  const openEditModal = (branch: any) => {
     setSelectedBranch(branch);
     setIsFormOpen(true);
   };
 
   const handleFormSuccess = () => {
     setIsFormOpen(false);
-    fetchBranches();
+    refetch();
   };
 
-  const confirmDelete = (branch: unknown) => {
+  const confirmDelete = (branch: any) => {
     setBranchToDelete(branch);
     setDeleteError(null);
     setIsDeleteOpen(true);
@@ -93,8 +93,8 @@ const BranchesPage = () => {
       setDeleteError(null);
       await deleteBranch(branchToDelete.id);
       setIsDeleteOpen(false);
-      fetchBranches();
-    } catch (err) {
+      refetch();
+    } catch (err: any) {
       setDeleteError(err.response?.data?.message || "Failed to delete branch");
     } finally {
       setIsDeleting(false);
@@ -131,33 +131,44 @@ const BranchesPage = () => {
     },
     {
       header: "Status",
-      cell: (row: unknown) => (
-        <Badge variant={row.status === "active" ? "success" : "default"}>
-          {row.status}
-        </Badge>
-      ),
+      cell: (row: any) => {
+        const status = (row.status || "active").toLowerCase();
+        let variant: "default" | "success" | "danger" | "warning" | "info" | "indigo" = "default";
+        if (status === "active" || status === "active ") {
+          variant = "success";
+        } else if (status === "suspended") {
+          variant = "warning";
+        } else if (status === "locked") {
+          variant = "danger";
+        }
+        return (
+          <Badge variant={variant}>
+            {status}
+          </Badge>
+        );
+      },
     },
     {
       header: "Actions",
       cellClassName: "text-right",
-      cell: (row: unknown) => (
+      cell: (row: any) => (
         <div className="flex justify-end gap-1">
           <PermissionGuard permission="control.branch.update">
             <button
               onClick={() => openEditModal(row)}
-              className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-150"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-green-600 bg-transparent hover:bg-green-50 hover:text-green-700 transition-all duration-200 hover:scale-105 active:scale-95"
               title="Edit"
             >
-              <Edit2 className="w-3.5 h-3.5" />
+              <Edit2 className="w-4 h-4" />
             </button>
           </PermissionGuard>
           <PermissionGuard permission="control.branch.delete">
             <button
               onClick={() => confirmDelete(row)}
-              className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-red-500 bg-transparent hover:bg-red-50 hover:text-red-600 transition-all duration-200 hover:scale-105 active:scale-95"
               title="Delete"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-4 h-4" />
             </button>
           </PermissionGuard>
         </div>
@@ -180,52 +191,58 @@ const BranchesPage = () => {
         }
       />
 
-      <FormError message={error} />
+      <FormError message={error instanceof Error ? error.message : null} />
 
       <div className="filter-bar">
-        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search branches..."
-              name="search"
-              value={filters.search}
-              onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
-              className="input-premium pl-9"
-            />
-          </div>
-          <Button type="submit" variant="secondary" size="sm">
-            <Search className="w-3.5 h-3.5" />
-          </Button>
-        </form>
-        <select
-          name="branch_type"
-          value={filters.branch_type}
-          onChange={handleFilterChange}
-          className="select-premium"
-        >
-          <option value="">All Types</option>
-          <option value="Main Branch">Main Branch</option>
-          <option value="Warehouse">Warehouse</option>
-          <option value="Sales Branch">Sales Branch</option>
-        </select>
-        <select
-          name="status"
-          value={filters.status}
-          onChange={handleFilterChange}
-          className="select-premium"
-        >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+        <div className="relative flex-1 max-w-sm min-w-0">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search branches..."
+            name="search"
+            value={filters.search}
+            onChange={(e: any) => setFilters({ ...filters, search: e.target.value, page: 1 })}
+            className="input-premium pl-9"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select
+            value={filters.branch_type || "all"}
+            onValueChange={(val) => setFilters({ ...filters, branch_type: val === "all" ? "" : val, page: 1 })}
+          >
+            <SelectTrigger className="w-[140px] h-[38px] bg-white border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-slate-100/50">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border-slate-200 rounded-xl">
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="Main Branch">Main Branch</SelectItem>
+              <SelectItem value="Warehouse">Warehouse</SelectItem>
+              <SelectItem value="Sales Branch">Sales Branch</SelectItem>
+              <SelectItem value="Distribution Center">Distribution Center</SelectItem>
+              <SelectItem value="Admin Office">Admin Office</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={filters.status || "all"}
+            onValueChange={(val) => setFilters({ ...filters, status: val === "all" ? "" : val, page: 1 })}
+          >
+            <SelectTrigger className="w-[140px] h-[38px] bg-white border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-slate-100/50">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border-slate-200 rounded-xl">
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <DataTable
         columns={columns}
         data={branches}
-        loading={loading}
+        loading={isLoading}
         emptyTitle="No branches found"
         emptyDescription="Try adjusting your search or filters."
       />
@@ -235,11 +252,12 @@ const BranchesPage = () => {
         onPageChange={(page: unknown) => setFilters({ ...filters, page })}
       />
 
-      <BranchFormModal
+       <BranchFormModal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         branch={selectedBranch}
         onSuccess={handleFormSuccess}
+        existingBranches={branches}
       />
 
       <ConfirmDialog

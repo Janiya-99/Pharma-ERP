@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   getUsers,
   deleteUser,
@@ -34,18 +35,25 @@ import {
   UserCog,
 } from "lucide-react";
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  status: string;
+  user_type?: string;
+  primary_role?: {
+    id: number;
+    role_name: string;
+  };
+  department?: {
+    id: number;
+    department_name: string;
+  };
+  last_login_at?: string;
+}
+
 const UsersPage = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [pagination, setPagination] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [departments, setDepartments] = useState([]);
-  const [designations, setDesignations] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [roles, setRoles] = useState([]);
-  const [softwareModules, setSoftwareModules] = useState([]);
 
   const [filters, setFilters] = useState({
     search: "",
@@ -59,42 +67,19 @@ const UsersPage = () => {
     limit: 10,
   });
 
+  const [searchVal, setSearchVal] = useState("");
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.page, filters.department_id, filters.designation_id, filters.status, filters.branch_id, filters.role_id, filters.software_id]);
-
-  useEffect(() => {
-    fetchDropdowns();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await getUsers(filters);
-      if (res.success) {
-        setUsers(res.data.items || res.data);
-        setPagination(res.meta || res.pagination);
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to load users");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDropdowns = async () => {
-    try {
+  const { data: dropdownsData } = useQuery({
+    queryKey: ["userDropdowns"],
+    queryFn: async () => {
       const [deptRes, desigRes, branchRes, rolesRes, softwareRes] = await Promise.all([
         getDepartments({ limit: 100 }),
         getDesignations({ limit: 100 }),
@@ -102,20 +87,39 @@ const UsersPage = () => {
         getRoles({ limit: 100 }),
         getSoftwareModules(),
       ]);
-      if (deptRes.success) setDepartments(deptRes.data.items || deptRes.data);
-      if (desigRes.success) setDesignations(desigRes.data.items || desigRes.data);
-      if (branchRes.success) setBranches(branchRes.data.items || branchRes.data);
-      if (rolesRes.success) setRoles(rolesRes.data.items || rolesRes.data);
-      if (softwareRes.success) setSoftwareModules(softwareRes.data.items || softwareRes.data || []);
-    } catch (err) {
-      console.error("Failed to fetch dropdowns", err);
-    }
-  };
+      return {
+        departments: deptRes.data?.items || deptRes.data || [],
+        designations: desigRes.data?.items || desigRes.data || [],
+        branches: branchRes.data?.items || branchRes.data || [],
+        roles: rolesRes.data?.items || rolesRes.data || [],
+        softwareModules: softwareRes.data?.items || softwareRes.data || [],
+      };
+    },
+  });
+
+  const departments = dropdownsData?.departments || [];
+  const designations = dropdownsData?.designations || [];
+  const branches = dropdownsData?.branches || [];
+  const roles = dropdownsData?.roles || [];
+  const softwareModules = dropdownsData?.softwareModules || [];
+
+  const { data: usersData, isLoading: usersLoading, error, refetch } = useQuery({
+    queryKey: ["users", filters],
+    queryFn: async () => {
+      const res = await getUsers(filters);
+      if (res.success === false) {
+        throw new Error(res.message || "Failed to load users");
+      }
+      return res;
+    },
+  });
+
+  const users = usersData?.data?.items || usersData?.data || [];
+  const pagination = usersData?.meta || usersData?.pagination || null;
 
   const handleSearch = (e: any) => {
     e.preventDefault();
-    setFilters({ ...filters, page: 1 });
-    fetchUsers();
+    setFilters({ ...filters, search: searchVal, page: 1 });
   };
 
   const handleFilterChange = (e: any) => {
@@ -288,7 +292,7 @@ const UsersPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={fetchUsers}>
+          <Button variant="secondary" size="sm" onClick={() => refetch()}>
             <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
             Refresh
           </Button>
@@ -305,7 +309,7 @@ const UsersPage = () => {
         </div>
       </div>
 
-      <FormError message={error} />
+      <FormError message={error instanceof Error ? error.message : null} />
 
       {/* Filter Bar */}
       <div className="filter-bar">
@@ -316,8 +320,8 @@ const UsersPage = () => {
               type="text"
               placeholder="Search by name, email, or code..."
               name="search"
-              value={filters.search}
-              onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
+              value={searchVal}
+              onChange={(e: any) => setSearchVal(e.target.value)}
               className="input-premium pl-9"
             />
           </div>
@@ -396,7 +400,7 @@ const UsersPage = () => {
       <DataTable
         columns={columns}
         data={users}
-        loading={loading}
+        loading={usersLoading}
         emptyTitle="No users found"
         emptyDescription="Try adjusting your filters or create a new user"
         onRowClick={(row: any) => navigate(`/control-center/users/${row.id}`)}

@@ -116,7 +116,7 @@ const ControlCenterDashboardPage = () => {
           { label: "Software Modules", value: "8", icon: MdApps, trend: "All systems operational", color: "text-cyan-600", bg: "bg-cyan-50" },
           { label: "Security Alerts", value: "3", icon: MdWarningAmber, trend: "Requires attention", color: "text-rose-600", bg: "bg-rose-50", alert: true },
         ].map((kpi, i) => (
-          <div key={i} className="relative overflow-hidden rounded-2xl border border-white bg-white/60 p-5 backdrop-blur-xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:bg-white/80">
+          <div key={i} className="relative overflow-hidden rounded-2xl p-5 shadow-embossed shadow-embossed-hover">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-semibold text-slate-500">{kpi.label}</span>
               <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${kpi.bg}`}>
@@ -131,7 +131,7 @@ const ControlCenterDashboardPage = () => {
 
       {/* Row 2 - Analytics */}
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="col-span-1 lg:col-span-2 rounded-2xl border border-white bg-white/60 p-6 backdrop-blur-xl shadow-sm">
+        <div className="col-span-1 lg:col-span-2 rounded-2xl p-6 shadow-embossed">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-800">User Activity Trend</h2>
             <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 border border-slate-200">
@@ -154,7 +154,7 @@ const ControlCenterDashboardPage = () => {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white bg-white/60 p-6 backdrop-blur-xl shadow-sm">
+        <div className="rounded-2xl p-6 shadow-embossed">
           <div className="mb-6">
             <h2 className="text-lg font-bold text-slate-800">Users by Module</h2>
           </div>
@@ -182,7 +182,7 @@ const ControlCenterDashboardPage = () => {
       {/* Row 3 - Operations */}
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Security Logs */}
-        <div className="rounded-2xl border border-white bg-white/60 p-6 backdrop-blur-xl shadow-sm flex flex-col">
+        <div className="rounded-2xl p-6 shadow-embossed flex flex-col">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <MdOutlineSecurity className="h-5 w-5 text-blue-600" />
@@ -209,7 +209,7 @@ const ControlCenterDashboardPage = () => {
         </div>
 
         {/* Audit Logs */}
-        <div className="rounded-2xl border border-white bg-white/60 p-6 backdrop-blur-xl shadow-sm flex flex-col">
+        <div className="rounded-2xl p-6 shadow-embossed flex flex-col">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <MdOutlinePolicy className="h-5 w-5 text-indigo-600" />
@@ -236,7 +236,7 @@ const ControlCenterDashboardPage = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="rounded-2xl border border-white bg-white/60 p-6 backdrop-blur-xl shadow-sm">
+        <div className="rounded-2xl p-6 shadow-embossed">
           <h2 className="mb-4 text-lg font-bold text-slate-800">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
@@ -261,7 +261,7 @@ const ControlCenterDashboardPage = () => {
       {/* Row 4 - Admin Insights & System Health */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Branch-wise Distribution */}
-        <div className="rounded-2xl border border-white bg-white/60 p-6 backdrop-blur-xl shadow-sm">
+        <div className="rounded-2xl p-6 shadow-embossed">
           <h2 className="mb-4 text-lg font-bold text-slate-800">Branch Users</h2>
           <div className="space-y-4">
             {[
@@ -286,7 +286,7 @@ const ControlCenterDashboardPage = () => {
         </div>
 
         {/* Role Distribution */}
-        <div className="rounded-2xl border border-white bg-white/60 p-6 backdrop-blur-xl shadow-sm">
+        <div className="rounded-2xl p-6 shadow-embossed">
           <h2 className="mb-4 text-lg font-bold text-slate-800">Role Distribution</h2>
           <div className="space-y-3">
             {[
@@ -306,28 +306,28 @@ const ControlCenterDashboardPage = () => {
         </div>
 
         {/* Pending Tasks / Alerts */}
-        <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-6 backdrop-blur-xl shadow-sm">
-          <h2 className="mb-4 text-lg font-bold text-slate-800">Pending Actions</h2>
+        <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-6 shadow-embossed">
+          <h2 className="mb-4 text-lg font-bold text-slate-850">Pending Actions</h2>
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-lg border border-rose-200 bg-white p-3 shadow-sm">
-              <span className="text-sm font-semibold text-rose-700">Locked Users</span>
+              <span className="text-sm font-semibold text-rose-750">Locked Users</span>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-700">3</span>
             </div>
             <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-white p-3 shadow-sm">
-              <span className="text-sm font-semibold text-amber-700">Users w/o Roles</span>
+              <span className="text-sm font-semibold text-amber-750">Users w/o Roles</span>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">12</span>
             </div>
             <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white p-3 shadow-sm">
-              <span className="text-sm font-semibold text-blue-700">Pending Approvals</span>
+              <span className="text-sm font-semibold text-blue-750">Pending Approvals</span>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">5</span>
             </div>
           </div>
         </div>
 
         {/* System Health */}
-        <div className="rounded-2xl border border-blue-100 bg-gradient-to-b from-blue-50/80 to-white/80 p-6 backdrop-blur-xl shadow-sm relative overflow-hidden">
+        <div className="rounded-2xl border border-blue-100 bg-gradient-to-b from-blue-50/80 to-white/80 p-6 shadow-embossed relative overflow-hidden">
           <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-blue-200 opacity-20 blur-2xl"></div>
-          <h2 className="mb-4 text-lg font-bold text-slate-800 flex items-center gap-2 relative z-10">
+          <h2 className="mb-4 text-lg font-bold text-slate-900 flex items-center gap-2 relative z-10">
             <MdCloudDone className="h-5 w-5 text-blue-500" />
             System Health
           </h2>

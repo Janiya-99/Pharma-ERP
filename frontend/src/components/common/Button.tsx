@@ -1,7 +1,7 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "danger" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "outline" | "danger" | "ghost" | "info";
 type ButtonSize = "xs" | "sm" | "md" | "lg";
 
 interface ButtonProps {
@@ -32,15 +32,17 @@ const Button = ({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-200 focus-visible:ring-indigo-500",
+      "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-sm shadow-green-100 focus-visible:ring-green-500",
     secondary:
       "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-400",
     outline:
       "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 shadow-sm focus-visible:ring-gray-400",
     danger:
-      "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm shadow-red-200 focus-visible:ring-red-500",
+      "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm shadow-red-100 focus-visible:ring-red-500",
     ghost:
       "bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800 focus-visible:ring-gray-400",
+    info:
+      "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm shadow-blue-100 focus-visible:ring-blue-500",
   };
 
   const sizes: Record<ButtonSize, string> = {

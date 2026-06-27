@@ -47,7 +47,7 @@ const Select = ({
     return (
       <div className={`flex flex-col gap-1 w-full ${className}`}>
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-semibold text-slate-950 mb-1.5">
             {label} {required && <span className="text-red-500">*</span>}
           </label>
         )}
@@ -55,12 +55,12 @@ const Select = ({
           <PopoverTrigger asChild disabled={disabled}>
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-[38px] transition-colors"
+              className="flex w-full items-center justify-between gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-left hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-100/50 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-colors shadow-sm"
             >
-              <span className={selectedOption ? "text-gray-900 truncate" : "text-gray-400 truncate"}>
+              <span className={selectedOption ? "text-slate-900 truncate" : "text-slate-400 truncate"}>
                 {selectedOption ? selectedOption.label : placeholder}
               </span>
-              <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+              <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="p-0 bg-white border border-gray-200 shadow-lg rounded-md z-50 w-[var(--radix-popover-trigger-width)]">
@@ -108,7 +108,7 @@ const Select = ({
   return (
     <div className={`flex flex-col gap-1 w-full ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-950 mb-1.5">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -117,7 +117,7 @@ const Select = ({
         onValueChange={handleSelectChange}
         disabled={disabled}
       >
-        <SelectTrigger className="w-full bg-white border border-gray-300 focus:ring-2 focus:ring-blue-900 rounded-md text-sm text-left py-2 px-3 flex justify-between items-center text-gray-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-[38px] transition-colors">
+        <SelectTrigger className="w-full bg-white border border-slate-200 focus:ring-2 focus:ring-slate-100/50 rounded-xl text-sm text-left py-2.5 px-3.5 flex justify-between items-center text-slate-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-colors shadow-sm">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className="bg-white border border-gray-200 shadow-md rounded-md z-50 max-h-60 overflow-y-auto">

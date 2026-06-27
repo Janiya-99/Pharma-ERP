@@ -8,7 +8,7 @@ const StatusBadge = ({ status }: { status?: StatusVariant }) => {
       case "active":
       case "approved":
       case "posted":
-        return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200";
+        return "bg-green-50 text-green-700 ring-1 ring-green-200";
       case "inactive":
       case "draft":
         return "bg-gray-100 text-gray-600 ring-1 ring-gray-200";

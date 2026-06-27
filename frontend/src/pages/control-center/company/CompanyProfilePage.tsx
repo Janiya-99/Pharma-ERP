@@ -1,37 +1,55 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getCompanyProfile, updateCompanyProfile } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
-import PageHeader from "../../../components/common/PageHeader";
 import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import { toast } from "sonner";
 import { 
   Save, 
   Upload as UploadIcon, 
-  Trash2, 
   Globe, 
   Mail, 
   Phone, 
-  Lock, 
-  CheckCircle2, 
   ShieldCheck, 
-  Undo,
   Image as ImageIcon,
   Building2,
   X
 } from "lucide-react";
+
+// Interface for strictly typed company profile response data
+interface CompanyProfile {
+  id?: number;
+  company_name: string;
+  company_code: string;
+  registration_number: string;
+  tax_number: string;
+  phone: string;
+  email: string;
+  website: string;
+  address: string;
+  logo_url: string;
+  status: string;
+  updated_at?: string;
+}
+
+const SkeletonField = () => (
+  <div className="space-y-2">
+    <div className="h-4 w-24 bg-slate-100 rounded-md animate-pulse"></div>
+    <div className="h-10 w-full bg-slate-50 border border-slate-100 rounded-xl animate-pulse"></div>
+  </div>
+);
 
 const CompanyProfilePage = () => {
   const { hasPermission, user } = useAuth();
   const canUpdate = hasPermission("control.company.update");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CompanyProfile>({
     company_name: "",
     company_code: "",
     registration_number: "",
@@ -44,64 +62,49 @@ const CompanyProfilePage = () => {
     status: "",
   });
 
-  const [originalData, setOriginalData] = useState({ ...formData });
+  const [originalData, setOriginalData] = useState<CompanyProfile>({ ...formData });
   const [lastSaved, setLastSaved] = useState<string>("Never");
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      setLoading(true);
+  const { data: profile, isLoading, error: queryError } = useQuery<CompanyProfile>({
+    queryKey: ["companyProfile"],
+    queryFn: async () => {
       const res = await getCompanyProfile();
-      
-      // Handle both wrapped success response {success: true, data: company}
-      // and raw company response directly:
       const data = res.data || res;
-      const isSuccess = res.success !== false && data && data.company_code;
-
-      if (isSuccess) {
-        setFormData({
-          company_name: data.company_name || "",
-          company_code: data.company_code || "",
-          registration_number: data.registration_number || "",
-          tax_number: data.tax_number || "",
-          phone: data.phone || "",
-          email: data.email || "",
-          website: data.website || "",
-          address: data.address || "",
-          logo_url: data.logo_url || "",
-          status: data.status || "",
-        });
-        setOriginalData({
-          company_name: data.company_name || "",
-          company_code: data.company_code || "",
-          registration_number: data.registration_number || "",
-          tax_number: data.tax_number || "",
-          phone: data.phone || "",
-          email: data.email || "",
-          website: data.website || "",
-          address: data.address || "",
-          logo_url: data.logo_url || "",
-          status: data.status || "",
-        });
-        if (data.updated_at) {
-          const date = new Date(data.updated_at);
-          setLastSaved(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-        }
-      } else {
-        setError(res.message || "Failed to load company profile data");
-        toast.error("Failed to load company profile: " + (res.message || "Invalid response format"));
+      if (res.success === false || !data || !data.company_code) {
+        throw new Error(res.message || "Failed to load company profile data");
       }
-    } catch (err: any) {
-      const errMsg = err.response?.data?.message || "Failed to load company profile";
-      setError(errMsg);
-      toast.error(errMsg);
-    } finally {
-      setLoading(false);
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (profile) {
+      const mapped = {
+        company_name: profile.company_name || "",
+        company_code: profile.company_code || "",
+        registration_number: profile.registration_number || "",
+        tax_number: profile.tax_number || "",
+        phone: profile.phone || "",
+        email: profile.email || "",
+        website: profile.website || "",
+        address: profile.address || "",
+        logo_url: profile.logo_url || "",
+        status: profile.status || "",
+      };
+      setFormData(mapped);
+      setOriginalData(mapped);
+      if (profile.updated_at) {
+        const date = new Date(profile.updated_at);
+        setLastSaved(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      }
     }
-  };
+  }, [profile]);
+
+  useEffect(() => {
+    if (queryError) {
+      setError(queryError instanceof Error ? queryError.message : "Failed to load company profile");
+    }
+  }, [queryError]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -198,11 +201,34 @@ const CompanyProfilePage = () => {
 
       <FormError message={error} />
 
-      {loading ? (
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-sm p-12 flex justify-center items-center h-80">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-9 h-9 border-4 border-slate-800 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-sm text-slate-500 font-medium">Loading profile data...</p>
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1 space-y-8 animate-pulse">
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col items-center">
+              <div className="w-full h-5 bg-slate-100 rounded mb-4"></div>
+              <div className="w-48 h-48 rounded-xl bg-slate-100 mb-4"></div>
+              <div className="w-full h-10 bg-slate-50 border border-slate-100 rounded-xl"></div>
+            </div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="w-32 h-5 bg-slate-100 rounded"></div>
+              <div className="w-full h-10 bg-slate-100 rounded-lg"></div>
+              <div className="w-full h-12 bg-slate-100 rounded-lg"></div>
+            </div>
+          </div>
+          <div className="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
+            <div className="w-48 h-5 bg-slate-100 rounded mb-4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <SkeletonField />
+              <SkeletonField />
+              <SkeletonField />
+              <SkeletonField />
+              <SkeletonField />
+              <SkeletonField />
+              <div className="md:col-span-2 space-y-2">
+                <div className="h-4 w-24 bg-slate-100 rounded-md"></div>
+                <div className="h-24 w-full bg-slate-50 border border-slate-100 rounded-xl"></div>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
@@ -496,7 +522,7 @@ const CompanyProfilePage = () => {
             
             <h3 className="text-base font-bold text-slate-950 mb-4 self-start">Company Logo Preview</h3>
             
-            <div className="w-full max-h-[60vh] flex items-center justify-center overflow-auto bg-slate-50 border border-slate-100 rounded-xl p-6">
+            <div className="w-full h-[50vh] flex items-center justify-center overflow-hidden bg-slate-50 border border-slate-100 rounded-xl p-6">
               <img 
                 src={formData.logo_url} 
                 alt="Full Company Logo" 

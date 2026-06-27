@@ -88,7 +88,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boo
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel
           </Button>
-          <Button type="submit" isLoading={loading}>
+          <Button type="submit" variant="info" isLoading={loading}>
             Reset Password
           </Button>
         </div>
