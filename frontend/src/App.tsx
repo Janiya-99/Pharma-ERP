@@ -7,7 +7,7 @@ const App = () => {
   return (
     <AuthProvider>
       <AppRoutes />
-      <Toaster />
+      <Toaster position="top-right" richColors />
     </AuthProvider>
   );
 };

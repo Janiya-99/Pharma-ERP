@@ -6,9 +6,17 @@ import {
   LayoutDashboard, Building, MapPin, Users, Network, Key, Shield, ShieldCheck,
   FileCheck, LogIn, Settings, Briefcase, Calculator, Archive, BookOpen,
   PieChart, FileText, Package, Layers, Tags, Target, Beaker, Factory,
-  Truck, Box, GitMerge, ListChecks, BarChart2, ChevronRight, Pin, PinOff
+  Truck, Box, GitMerge, ListChecks, BarChart2, ChevronRight, Pin, PinOff, LogOut, User
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 type MenuItem = {
   name: string;
@@ -227,7 +235,7 @@ const Sidebar = () => {
                   className={({ isActive }) =>
                     `flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150 ${
                       isActive
-                        ? "bg-blueMono-200/50 text-blueMono-900 font-semibold shadow-sm"
+                        ? "bg-white/40 text-blueMono-900 font-semibold shadow-sm"
                         : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
                     }`
                   }
@@ -258,7 +266,7 @@ const Sidebar = () => {
       }}
     >
       <div
-        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col glass-sidebar h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
+        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-white/40 backdrop-blur-xl border-r border-white/20 shadow-soft h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
           effectiveExpanded ? "w-60" : "w-[68px]"
         }`}
       >
@@ -298,29 +306,54 @@ const Sidebar = () => {
         </nav>
 
         {/* User info at bottom */}
-        <div className={`shrink-0 border-t border-white/20 transition-all duration-300 ${
-          effectiveExpanded ? "px-4 py-3" : "px-2 py-3 flex justify-center"
-        }`}>
-          {effectiveExpanded ? (
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold">
-                {initials}
-              </div>
-              <div className="min-w-0 overflow-hidden">
-                <p className="text-[12px] font-semibold text-blueMono-900 truncate leading-tight">
-                  {user?.name || user?.full_name || "User"}
-                </p>
-                <p className="text-[10px] text-blueMono-700/90 truncate leading-tight">
-                  {activeBranch?.branch_name || activeBranch?.branch?.branch_name || "Head Office"}
-                </p>
-              </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className={`mt-auto mb-5 border-t border-white/20 hover:bg-white/10 cursor-pointer transition-all duration-300 ${
+              effectiveExpanded ? "px-4 py-3" : "px-2 py-3 flex justify-center"
+            }`}>
+              {effectiveExpanded ? (
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold">
+                    {initials}
+                  </div>
+                  <div className="min-w-0 overflow-hidden">
+                    <p className="text-[12px] font-semibold text-blueMono-900 truncate leading-tight">
+                      {user?.name || user?.full_name || "User"}
+                    </p>
+                    <p className="text-[10px] text-blueMono-700/90 truncate leading-tight">
+                      {activeBranch?.branch_name || activeBranch?.branch?.branch_name || "Head Office"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold shadow-sm">
+                  {initials}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold shadow-sm">
-              {initials}
-            </div>
-          )}
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            side="top" 
+            align={effectiveExpanded ? "start" : "center"}
+            className="w-56 mb-2 border-white/20 bg-white/60 backdrop-blur-xl shadow-lg"
+          >
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/20" />
+            <DropdownMenuItem className="cursor-pointer hover:bg-white/40">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer hover:bg-white/40">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Preferences</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-white/20" />
+            <DropdownMenuItem className="cursor-pointer hover:bg-red-500/20 text-red-600 hover:text-red-700">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

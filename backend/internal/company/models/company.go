@@ -19,6 +19,7 @@ type Company struct {
 	Address string `gorm:"type:text" json:"address"`
 	Phone   string `gorm:"type:varchar(50)" json:"phone"`
 	Email   string `gorm:"type:varchar(150)" json:"email"`
+	Website string `gorm:"type:varchar(150)" json:"website"`
 	LogoURL string `gorm:"type:text" json:"logo_url"`
 
 	Status string `gorm:"type:varchar(30);default:active" json:"status"`

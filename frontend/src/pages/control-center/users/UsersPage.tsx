@@ -20,6 +20,7 @@ import StatusBadge from "../../../components/common/StatusBadge";
 import ActionMenu from "../../../components/common/ActionMenu";
 import ChangeUserStatusModal from "./ChangeUserStatusModal";
 import ResetPasswordModal from "./ResetPasswordModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import {
   Plus,
   Search,
@@ -157,19 +158,19 @@ const UsersPage = () => {
       label: "View Profile",
       icon: Eye,
       permission: "control.user.view",
-      onClick: (r: any) => navigate(`/admin/control-center/users/${r.id}`),
+      onClick: (r: any) => navigate(`/control-center/users/${r.id}`),
     },
     {
       label: "Edit User",
       icon: Edit2,
       permission: "control.user.update",
-      onClick: (r: any) => navigate(`/admin/control-center/users/${r.id}/edit`),
+      onClick: (r: any) => navigate(`/control-center/users/${r.id}/edit`),
     },
     {
       label: "Manage Access",
       icon: UserCog,
       permission: "control.user.update",
-      onClick: (r: any) => navigate(`/admin/control-center/users/${r.id}/edit`),
+      onClick: (r: any) => navigate(`/control-center/users/${r.id}/edit`),
     },
     {
       label: "Change Status",
@@ -273,7 +274,7 @@ const UsersPage = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: "Control Center", href: "/admin/control-center/users" },
+          { label: "Control Center", href: "/control-center/users" },
           { label: "User & Access Center" },
         ]}
       />
@@ -296,7 +297,7 @@ const UsersPage = () => {
             Export
           </Button>
           <PermissionGuard permission="control.user.create">
-            <Button onClick={() => navigate("/admin/control-center/users/create")}>
+            <Button onClick={() => navigate("/control-center/users/create")}>
               <Plus className="w-4 h-4 mr-1.5" />
               Create User
             </Button>
@@ -326,33 +327,68 @@ const UsersPage = () => {
         </form>
 
         <div className="flex flex-wrap gap-2">
-          <select name="branch_id" value={filters.branch_id} onChange={handleFilterChange} className="select-premium">
-            <option value="">All Branches</option>
-            {branches.map((b: any) => <option key={b.id} value={b.id}>{b.branch_name}</option>)}
-          </select>
-          <select name="software_id" value={filters.software_id} onChange={handleFilterChange} className="select-premium">
-            <option value="">All Modules</option>
-            {softwareModules.map((s: any) => <option key={s.id} value={s.id}>{s.software_name}</option>)}
-          </select>
-          <select name="role_id" value={filters.role_id} onChange={handleFilterChange} className="select-premium">
-            <option value="">All Roles</option>
-            {roles.map((r: any) => <option key={r.id} value={r.id}>{r.role_name || r.name}</option>)}
-          </select>
-          <select name="department_id" value={filters.department_id} onChange={handleFilterChange} className="select-premium">
-            <option value="">All Departments</option>
-            {departments.map((d: any) => <option key={d.id} value={d.id}>{d.department_name}</option>)}
-          </select>
-          <select name="designation_id" value={filters.designation_id} onChange={handleFilterChange} className="select-premium">
-            <option value="">All Designations</option>
-            {designations.map((d: any) => <option key={d.id} value={d.id}>{d.designation_name}</option>)}
-          </select>
-          <select name="status" value={filters.status} onChange={handleFilterChange} className="select-premium">
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-            <option value="locked">Locked</option>
-          </select>
+          <Select value={filters.branch_id || "all"} onValueChange={(val) => setFilters({ ...filters, branch_id: val === "all" ? "" : val, page: 1 })}>
+            <SelectTrigger className="w-[150px] h-[38px] bg-white border-gray-200">
+              <SelectValue placeholder="All Branches" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="all">All Branches</SelectItem>
+              {branches.map((b: any) => <SelectItem key={b.id} value={b.id.toString()}>{b.branch_name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filters.software_id || "all"} onValueChange={(val) => setFilters({ ...filters, software_id: val === "all" ? "" : val, page: 1 })}>
+            <SelectTrigger className="w-[150px] h-[38px] bg-white border-gray-200">
+              <SelectValue placeholder="All Modules" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="all">All Modules</SelectItem>
+              {softwareModules.map((s: any) => <SelectItem key={s.id} value={s.id.toString()}>{s.software_name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filters.role_id || "all"} onValueChange={(val) => setFilters({ ...filters, role_id: val === "all" ? "" : val, page: 1 })}>
+            <SelectTrigger className="w-[140px] h-[38px] bg-white border-gray-200">
+              <SelectValue placeholder="All Roles" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="all">All Roles</SelectItem>
+              {roles.map((r: any) => <SelectItem key={r.id} value={r.id.toString()}>{r.role_name || r.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filters.department_id || "all"} onValueChange={(val) => setFilters({ ...filters, department_id: val === "all" ? "" : val, page: 1 })}>
+            <SelectTrigger className="w-[160px] h-[38px] bg-white border-gray-200">
+              <SelectValue placeholder="All Departments" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="all">All Departments</SelectItem>
+              {departments.map((d: any) => <SelectItem key={d.id} value={d.id.toString()}>{d.department_name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filters.designation_id || "all"} onValueChange={(val) => setFilters({ ...filters, designation_id: val === "all" ? "" : val, page: 1 })}>
+            <SelectTrigger className="w-[160px] h-[38px] bg-white border-gray-200">
+              <SelectValue placeholder="All Designations" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="all">All Designations</SelectItem>
+              {designations.map((d: any) => <SelectItem key={d.id} value={d.id.toString()}>{d.designation_name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={filters.status || "all"} onValueChange={(val) => setFilters({ ...filters, status: val === "all" ? "" : val, page: 1 })}>
+            <SelectTrigger className="w-[130px] h-[38px] bg-white border-gray-200">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
+              <SelectItem value="locked">Locked</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -363,7 +399,7 @@ const UsersPage = () => {
         loading={loading}
         emptyTitle="No users found"
         emptyDescription="Try adjusting your filters or create a new user"
-        onRowClick={(row: any) => navigate(`/admin/control-center/users/${row.id}`)}
+        onRowClick={(row: any) => navigate(`/control-center/users/${row.id}`)}
       />
 
       <Pagination

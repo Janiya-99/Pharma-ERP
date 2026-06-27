@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import LoginPage from "../pages/auth/LoginPage";
-import ControlCenterDashboard from "../pages/control-center/ControlCenterDashboard";
+import ControlCenterDashboardPage from "../pages/control-center/dashboard/ControlCenterDashboardPage";
 import PlaceholderPage from "../pages/control-center/PlaceholderPage";
 
 import CompanyProfilePage from "../pages/control-center/company/CompanyProfilePage";
@@ -13,14 +13,13 @@ import DesignationsPage from "../pages/control-center/designations/DesignationsP
 import SoftwareModulesPage from "../pages/control-center/software-modules/SoftwareModulesPage";
 
 import UsersPage from "../pages/control-center/users/UsersPage";
+import UserCreatePage from "../pages/control-center/users/UserCreatePage";
 import UserDetailsPage from "../pages/control-center/users/UserDetailsPage";
 import UserBranchAccessPage from "../pages/control-center/user-access/UserBranchAccessPage";
 import UserSoftwareAccessPage from "../pages/control-center/user-access/UserSoftwareAccessPage";
 
-import RolesPage from "../pages/control-center/roles/RolesPage";
-import PermissionsPage from "../pages/control-center/permissions/PermissionsPage";
-import RolePermissionMatrixPage from "../pages/control-center/role-permission-matrix/RolePermissionMatrixPage";
-import UserAccessMatrixPage from "../pages/control-center/user-access-matrix/UserAccessMatrixPage";
+import RolesPermissionsPage from "../pages/control-center/roles-permissions/RolesPermissionsPage";
+import AccessMatrixPage from "../pages/control-center/access-matrix/AccessMatrixPage";
 
 import AuditLogsPage from "../pages/control-center/logs/AuditLogsPage";
 import LoginLogsPage from "../pages/control-center/logs/LoginLogsPage";
@@ -85,20 +84,20 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           {/* Control Center Routes */}
-          <Route path="/control-center/dashboard" element={<ControlCenterDashboard />} />
+          <Route path="/control-center/dashboard" element={<ControlCenterDashboardPage />} />
           <Route path="/control-center/company" element={<CompanyProfilePage />} />
           <Route path="/control-center/branches" element={<BranchesPage />} />
           <Route path="/control-center/departments" element={<DepartmentsPage />} />
           <Route path="/control-center/designations" element={<DesignationsPage />} />
           <Route path="/control-center/software-modules" element={<SoftwareModulesPage />} />
           <Route path="/control-center/users" element={<UsersPage />} />
+          <Route path="/control-center/users/create" element={<UserCreatePage />} />
+          <Route path="/control-center/users/:id/edit" element={<UserCreatePage />} />
           <Route path="/control-center/users/:id" element={<UserDetailsPage />} />
           <Route path="/control-center/user-branch-access" element={<UserBranchAccessPage />} />
           <Route path="/control-center/user-software-access" element={<UserSoftwareAccessPage />} />
-          <Route path="/control-center/roles" element={<RolesPage />} />
-          <Route path="/control-center/permissions" element={<PermissionsPage />} />
-          <Route path="/control-center/role-permission-matrix" element={<RolePermissionMatrixPage />} />
-          <Route path="/control-center/user-access-matrix" element={<UserAccessMatrixPage />} />
+          <Route path="/control-center/roles-permissions" element={<RolesPermissionsPage />} />
+          <Route path="/control-center/access-matrix" element={<AccessMatrixPage />} />
           <Route path="/control-center/audit-logs" element={<AuditLogsPage />} />
           <Route path="/control-center/login-logs" element={<LoginLogsPage />} />
           <Route path="/control-center/settings" element={<PlaceholderPage title="Settings" />} />

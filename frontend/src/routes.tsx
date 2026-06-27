@@ -12,6 +12,7 @@ import SoftwareModulesPage from "pages/control-center/software-modules/SoftwareM
 import SettingsPage from "pages/control-center/settings/SettingsPage";
 
 // Control Center — new pages
+import ControlCenterDashboardPage from "pages/control-center/dashboard/ControlCenterDashboardPage";
 import OrganizationSetupPage from "pages/control-center/organization/OrganizationSetupPage";
 import UsersPage from "pages/control-center/users/UsersPage";
 import UserCreatePage from "pages/control-center/users/UserCreatePage";
@@ -138,7 +139,7 @@ const routes: ERPRoute[] = [
     layout: "/admin",
     path: "dashboard",
     icon: <MdDashboard className="h-5 w-5" />,
-    component: <Dashboard />,
+    component: <ControlCenterDashboardPage />,
   },
   {
     name: "Organization Setup",

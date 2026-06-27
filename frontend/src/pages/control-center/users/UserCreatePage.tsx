@@ -242,7 +242,7 @@ const UserCreatePage = () => {
         setCurrentStep(0);
         window.scrollTo(0, 0);
       } else {
-        navigate("/admin/control-center/users");
+        navigate("/control-center/users");
       }
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Operation failed");
@@ -267,8 +267,8 @@ const UserCreatePage = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: "Control Center", href: "/admin/control-center/users" },
-          { label: "Users", href: "/admin/control-center/users" },
+          { label: "Control Center", href: "/control-center/users" },
+          { label: "Users", href: "/control-center/users" },
           { label: isEdit ? "Edit User" : "Create User" },
         ]}
       />
@@ -276,7 +276,7 @@ const UserCreatePage = () => {
       {/* Header */}
       <div className="flex items-center gap-3 mt-4 mb-6">
         <button
-          onClick={() => navigate("/admin/control-center/users")}
+          onClick={() => navigate("/control-center/users")}
           className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -329,7 +329,7 @@ const UserCreatePage = () => {
             onSave={() => handleSave(false)}
             onSaveAndCreate={() => handleSave(true)}
             onBack={handleBack}
-            onCancel={() => navigate("/admin/control-center/users")}
+            onCancel={() => navigate("/control-center/users")}
             saving={saving}
           />
         )}
@@ -340,7 +340,7 @@ const UserCreatePage = () => {
         <div className="flex items-center justify-between">
           <button
             type="button"
-            onClick={() => navigate("/admin/control-center/users")}
+            onClick={() => navigate("/control-center/users")}
             className="wizard-nav-btn wizard-nav-btn-ghost"
           >
             Cancel

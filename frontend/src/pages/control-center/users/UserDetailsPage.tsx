@@ -83,7 +83,7 @@ const UserDetailsPage = () => {
     return (
       <div className="page-content">
         <FormError message={error || "User not found"} />
-        <Button variant="secondary" onClick={() => navigate("/admin/control-center/users")}>
+        <Button variant="secondary" onClick={() => navigate("/control-center/users")}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Users
         </Button>
       </div>
@@ -95,8 +95,8 @@ const UserDetailsPage = () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: "Control Center", href: "/admin/control-center/users" },
-          { label: "Users", href: "/admin/control-center/users" },
+          { label: "Control Center", href: "/control-center/users" },
+          { label: "Users", href: "/control-center/users" },
           { label: loading ? "Loading..." : user?.full_name || "User Details" },
         ]}
       />
@@ -112,7 +112,7 @@ const UserDetailsPage = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4 mb-6">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate("/admin/control-center/users")}
+                onClick={() => navigate("/control-center/users")}
                 className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -135,7 +135,7 @@ const UserDetailsPage = () => {
               <PermissionGuard permission="control.user.update">
                 <Button
                   variant="secondary"
-                  onClick={() => navigate(`/admin/control-center/users/${id}/edit`)}
+                  onClick={() => navigate(`/control-center/users/${id}/edit`)}
                 >
                   <Edit2 className="w-4 h-4 mr-2" /> Edit User
                 </Button>
@@ -388,7 +388,7 @@ const UserDetailsPage = () => {
                     <h2 className="text-sm font-semibold text-gray-800">Audit History</h2>
                   </div>
                   <button
-                    onClick={() => navigate("/admin/control-center/audit-logs")}
+                    onClick={() => navigate("/control-center/audit-logs")}
                     className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
                   >
                     View All

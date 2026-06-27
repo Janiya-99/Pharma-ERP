@@ -35,6 +35,7 @@ func (s *CompanyService) UpdateCompanyProfile(req dto.UpdateCompanyProfileReques
 	company.Address = req.Address
 	company.Phone = req.Phone
 	company.Email = req.Email
+	company.Website = req.Website
 	company.LogoURL = req.LogoURL
 
 	if err := s.repo.Update(company); err != nil {
