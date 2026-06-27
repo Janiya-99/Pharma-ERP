@@ -51,6 +51,18 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		ac.DELETE("/:id", middleware.RequirePermission("finance.account_classification.delete"), acHandler.Delete)
 	}
 
+	// Account Groups
+	agHandler := handlers.NewAccountGroupHandler(logger)
+	ag := finance.Group("/account-groups")
+	{
+		ag.GET("", middleware.RequirePermission("finance.account_group.view"), agHandler.List)
+		ag.GET("/:id", middleware.RequirePermission("finance.account_group.view"), agHandler.Get)
+		ag.POST("", middleware.RequirePermission("finance.account_group.create"), agHandler.Create)
+		ag.PUT("/:id", middleware.RequirePermission("finance.account_group.update"), agHandler.Update)
+		ag.PATCH("/:id/deactivate", middleware.RequirePermission("finance.account_group.delete"), agHandler.Deactivate)
+		ag.DELETE("/:id", middleware.RequirePermission("finance.account_group.delete"), agHandler.Deactivate)
+	}
+
 	// Chart of Accounts
 	coa := finance.Group("/chart-of-accounts")
 	{
@@ -68,6 +80,17 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		ob.POST("", middleware.RequirePermission("finance.opening_balance.create"), obHandler.Create)
 		ob.PUT("/:id", middleware.RequirePermission("finance.opening_balance.update"), obHandler.Update)
 		ob.DELETE("/:id", middleware.RequirePermission("finance.opening_balance.delete"), obHandler.Delete)
+	}
+
+	// Tax Settings
+	taxHandler := handlers.NewTaxSettingHandler(logger)
+	tax := finance.Group("/tax-settings")
+	{
+		tax.GET("", middleware.RequirePermission("finance.tax_setting.view"), taxHandler.List)
+		tax.POST("", middleware.RequirePermission("finance.tax_setting.create"), taxHandler.Create)
+		tax.PUT("/:id", middleware.RequirePermission("finance.tax_setting.update"), taxHandler.Update)
+		tax.PATCH("/:id/deactivate", middleware.RequirePermission("finance.tax_setting.delete"), taxHandler.Deactivate)
+		tax.DELETE("/:id", middleware.RequirePermission("finance.tax_setting.delete"), taxHandler.Deactivate)
 	}
 
 	// Journal Entries

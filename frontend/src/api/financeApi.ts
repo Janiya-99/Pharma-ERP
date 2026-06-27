@@ -77,14 +77,14 @@ export const financeApi = {
   deleteBankAccount: (id: string | number) => apiClient.delete(`/finance/bank-accounts/${id}`),
   deactivateBankAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.patch(`/finance/bank-accounts/${id}/deactivate`, payload),
 
-  // Cash Accounts (backend route pending; frontend pages call this API directly when available)
+  // Cash Accounts
   getCashAccounts: (params: Record<string, unknown>) => apiClient.get("/finance/cash-accounts", { params }),
   getCashAccountById: (id: string | number) => apiClient.get(`/finance/cash-accounts/${id}`),
   createCashAccount: (payload: Record<string, unknown>) => apiClient.post("/finance/cash-accounts", payload),
   updateCashAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/finance/cash-accounts/${id}`, payload),
   deactivateCashAccount: (id: string | number, payload: Record<string, unknown>) => apiClient.patch(`/finance/cash-accounts/${id}/deactivate`, payload),
 
-  // Account Groups and Tax Settings (backend route pending)
+  // Account Groups and Tax Settings
   getAccountGroups: (params: Record<string, unknown>) => apiClient.get("/finance/account-groups", { params }),
   getAccountGroupById: (id: string | number) => apiClient.get(`/finance/account-groups/${id}`),
   createAccountGroup: (payload: Record<string, unknown>) => apiClient.post("/finance/account-groups", payload),
@@ -164,12 +164,12 @@ export const financeApi = {
   deleteFixedAsset: (id: string | number) => apiClient.delete(`/finance/fixed-assets/${id}`),
 
   // Fixed Asset Depreciation Runs
-  getFixedAssetDepreciationRuns: (params: Record<string, unknown>) => apiClient.get("/finance/fixed-asset-depreciation-runs", { params }),
-  getFixedAssetDepreciationRunById: (id: string | number) => apiClient.get(`/finance/fixed-asset-depreciation-runs/${id}`),
-  previewFixedAssetDepreciation: (payload: Record<string, unknown>) => apiClient.post("/finance/fixed-asset-depreciation-runs/preview", payload),
-  createFixedAssetDepreciationRun: (payload: Record<string, unknown>) => apiClient.post("/finance/fixed-asset-depreciation-runs", payload),
-  postFixedAssetDepreciationRun: (id: string | number) => apiClient.post(`/finance/fixed-asset-depreciation-runs/${id}/post`),
-  deleteFixedAssetDepreciationRun: (id: string | number) => apiClient.delete(`/finance/fixed-asset-depreciation-runs/${id}`),
+  getFixedAssetDepreciationRuns: (params: Record<string, unknown>) => apiClient.get("/finance/fixed-asset-depreciations", { params }),
+  getFixedAssetDepreciationRunById: (id: string | number) => apiClient.get(`/finance/fixed-asset-depreciations/${id}`),
+  previewFixedAssetDepreciation: (payload: Record<string, unknown>) => apiClient.post("/finance/fixed-asset-depreciations/preview", payload),
+  createFixedAssetDepreciationRun: (payload: Record<string, unknown>) => apiClient.post("/finance/fixed-asset-depreciations", payload),
+  postFixedAssetDepreciationRun: (id: string | number) => apiClient.post(`/finance/fixed-asset-depreciations/${id}/post`),
+  deleteFixedAssetDepreciationRun: (id: string | number) => apiClient.delete(`/finance/fixed-asset-depreciations/${id}`),
 
   // Fixed Asset Disposals
   getFixedAssetDisposals: (params: Record<string, unknown>) => apiClient.get("/finance/fixed-asset-disposals", { params }),
