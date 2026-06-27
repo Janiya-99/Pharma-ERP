@@ -266,7 +266,7 @@ const Sidebar = () => {
       }}
     >
       <div
-        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-white/40 backdrop-blur-xl border-r border-white/20 shadow-soft h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
+        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-[#C1E8FF]/2 backdrop-blur-xl border-r border-[#7DA0CA]/30 shadow-soft h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
           effectiveExpanded ? "w-60" : "w-[68px]"
         }`}
       >

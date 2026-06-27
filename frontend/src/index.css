@@ -275,9 +275,28 @@ input:checked.defaultCheckbox::before {
 
 /* Page content padding */
 .page-content {
-	padding: 1.5rem;
+	padding: 1.5rem 0.75rem;
 	max-width: 88rem;
 	margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+	.page-content {
+		padding: 1.5rem 1.25rem;
+	}
+}
+
+/* Override horizontal padding for other max-width content container wrappers to decrease margins */
+div[class*="max-w-7xl"], div[class*="max-w-6xl"] {
+	padding-left: 0.75rem !important;
+	padding-right: 0.75rem !important;
+}
+
+@media (min-width: 768px) {
+	div[class*="max-w-7xl"], div[class*="max-w-6xl"] {
+		padding-left: 1.25rem !important;
+		padding-right: 1.25rem !important;
+	}
 }
 
 /* Premium input styles */

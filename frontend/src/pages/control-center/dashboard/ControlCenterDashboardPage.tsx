@@ -54,7 +54,7 @@ const ControlCenterDashboardPage = () => {
   const [dateFilter, setDateFilter] = useState("This Week");
 
   return (
-    <div className="bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9] p-6 px-8 lg:px-10 xl:px-12 text-slate-800 font-sans min-h-full">
+    <div className="bg-white p-6 px-4 md:px-6 lg:px-8 text-slate-800 font-sans min-h-full">
       <div className="mx-auto max-w-[1600px]">
       {/* Top Area */}
       <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
