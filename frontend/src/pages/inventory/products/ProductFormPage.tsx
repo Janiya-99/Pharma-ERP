@@ -167,11 +167,11 @@ const ProductFormPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-medium mb-1">Product Code <span className="text-red-500">*</span></label>
-              <input type="text" name="product_code" value={formData.product_code} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="text" name="product_code" value={formData.product_code} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. PRD-9876" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Product Name <span className="text-red-500">*</span></label>
-              <input type="text" name="product_name" value={formData.product_name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="text" name="product_name" value={formData.product_name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. Paracetamol 500mg" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Product Type <span className="text-red-500">*</span></label>
@@ -219,19 +219,19 @@ const ProductFormPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Strength</label>
-              <input type="text" name="strength" value={formData.strength} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="text" name="strength" value={formData.strength} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 500mg" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Pack Size</label>
-              <input type="text" name="pack_size" value={formData.pack_size} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="text" name="pack_size" value={formData.pack_size} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 10x10 Blister Pack" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">NMRA Reg Number</label>
-              <input type="text" name="nmra_registration_number" value={formData.nmra_registration_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="text" name="nmra_registration_number" value={formData.nmra_registration_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. NMRA-REG-00123" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">NMRA Expiry Date</label>
-              <input type="date" name="nmra_expiry_date" value={formData.nmra_expiry_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="date" name="nmra_expiry_date" value={formData.nmra_expiry_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 2026-06-27" />
             </div>
           </div>
         </div>
@@ -263,11 +263,11 @@ const ProductFormPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Reorder Level</label>
-              <input type="number" step="0.001" name="reorder_level" value={formData.reorder_level} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="number" step="0.001" name="reorder_level" value={formData.reorder_level} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 100" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Reorder Quantity</label>
-              <input type="number" step="0.001" name="reorder_quantity" value={formData.reorder_quantity} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+              <input type="number" step="0.001" name="reorder_quantity" value={formData.reorder_quantity} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 500" />
             </div>
           </div>
         </div>

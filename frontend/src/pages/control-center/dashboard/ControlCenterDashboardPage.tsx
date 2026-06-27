@@ -54,8 +54,7 @@ const ControlCenterDashboardPage = () => {
   const [dateFilter, setDateFilter] = useState("This Week");
 
   return (
-    <div className="bg-white p-6 px-4 md:px-6 lg:px-8 text-slate-800 font-sans min-h-full">
-      <div className="mx-auto max-w-[1600px]">
+    <div className="page-content text-slate-800 font-sans min-h-full">
       {/* Top Area */}
       <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -356,7 +355,6 @@ const ControlCenterDashboardPage = () => {
              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Synced</span>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

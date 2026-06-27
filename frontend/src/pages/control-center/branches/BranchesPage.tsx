@@ -56,10 +56,6 @@ const BranchesPage = () => {
   const branches = queryData?.data || [];
   const pagination = queryData?.pagination || null;
 
-  const handleSearch = (e: any) => {
-    e.preventDefault();
-    setFilters({ ...filters, search: searchVal, page: 1 });
-  };
 
   const handleFilterChange = (e: any) => {
     setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });

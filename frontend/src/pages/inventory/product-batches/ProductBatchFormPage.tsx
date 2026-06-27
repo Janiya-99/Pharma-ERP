@@ -138,7 +138,7 @@ const ProductBatchFormPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Batch Number <span className="text-red-500">*</span></label>
-            <input type="text" name="batch_number" value={formData.batch_number} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+            <input type="text" name="batch_number" value={formData.batch_number} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. BAT-202606A" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Status</label>
@@ -152,13 +152,13 @@ const ProductBatchFormPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Manufacture Date</label>
-            <input type="date" name="manufacture_date" value={formData.manufacture_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+            <input type="date" name="manufacture_date" value={formData.manufacture_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 2026-06-27" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
               Expiry Date {productData?.requires_expiry_tracking && <span className="text-red-500">*</span>}
             </label>
-            <input type="date" name="expiry_date" value={formData.expiry_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+            <input type="date" name="expiry_date" value={formData.expiry_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 2028-06-27" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Supplier</label>
@@ -170,15 +170,15 @@ const ProductBatchFormPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Purchase Rate</label>
-            <input type="number" step="0.01" name="purchase_rate" value={formData.purchase_rate} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+            <input type="number" step="0.01" name="purchase_rate" value={formData.purchase_rate} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 150.00" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Selling Price</label>
-            <input type="number" step="0.01" name="selling_price" value={formData.selling_price} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+            <input type="number" step="0.01" name="selling_price" value={formData.selling_price} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 220.00" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">MRP</label>
-            <input type="number" step="0.01" name="mrp" value={formData.mrp} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" />
+            <input type="number" step="0.01" name="mrp" value={formData.mrp} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 250.00" />
           </div>
         </form>
       </div>

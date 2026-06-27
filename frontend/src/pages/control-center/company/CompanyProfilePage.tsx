@@ -191,7 +191,7 @@ const CompanyProfilePage = () => {
   const isDirty = JSON.stringify(formData) !== JSON.stringify(originalData);
 
   return (
-    <div className="py-8 px-4 md:px-6 max-w-7xl mx-auto space-y-8 font-sans pb-32 bg-white">
+    <div className="page-content space-y-8 font-sans pb-32">
       <div>
         <h1 className="text-3xl font-bold text-slate-950 tracking-tight">Company Profile</h1>
         <p className="text-slate-600 mt-1 max-w-3xl">

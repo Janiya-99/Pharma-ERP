@@ -225,22 +225,19 @@ const UsersPage = () => {
     },
     {
       header: "Designation",
-      cell: (info: any) => {
-        const row = info.row.original;
+      cell: (row: any) => {
         return row.designation?.designation_name || row.designation_id || "—";
       },
     },
     {
       header: "Department",
-      cell: (info: any) => {
-        const row = info.row.original;
+      cell: (row: any) => {
         return row.department?.department_name || row.department_id || "—";
       },
     },
     {
       header: "Primary Role",
-      cell: (info: any) => {
-        const row = info.row.original;
+      cell: (row: any) => {
         const role = row.primary_role || row.user_type;
         return (
           <span className="text-xs font-medium text-gray-600 capitalize">
@@ -251,12 +248,11 @@ const UsersPage = () => {
     },
     {
       header: "Status",
-      cell: (info: any) => <StatusBadge status={info.row.original.status} />,
+      cell: (row: any) => <StatusBadge status={row.status} />,
     },
     {
       header: "Last Login",
-      cell: (info: any) => {
-        const row = info.row.original;
+      cell: (row: any) => {
         if (!row.last_login_at) return <span className="text-xs text-gray-400">Never</span>;
         return (
           <span className="text-xs text-gray-500">
@@ -269,7 +265,7 @@ const UsersPage = () => {
       header: "",
       id: "actions",
       cellClassName: "text-right",
-      cell: (info: any) => <ActionMenu actions={getRowActions(info.row.original)} item={info.row.original} />,
+      cell: (row: any) => <ActionMenu actions={getRowActions(row)} item={row} />,
     },
   ];
 
