@@ -52,6 +52,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	creditNoteRepo := repositories.NewCreditNoteRepository()
 	debitNoteRepo := repositories.NewDebitNoteRepository()
 	stockMovementRepo := invrepositories.NewStockMovementRepository()
+	customerReceiptRepo := repositories.NewCustomerReceiptRepository()
 
 	// Initialize services
 	dashboardSvc := services.NewInvoiceDashboardService(dashboardRepo, logger)
@@ -64,6 +65,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	salesInvoiceSvc := services.NewSalesInvoiceService(salesInvoiceRepo, stockMovementSvc, auditSvc, logger)
 	creditNoteSvc := services.NewCreditNoteService(creditNoteRepo, auditSvc, logger)
 	debitNoteSvc := services.NewDebitNoteService(debitNoteRepo, auditSvc, logger)
+	customerReceiptSvc := services.NewCustomerReceiptService(customerReceiptRepo, salesInvoiceRepo, auditSvc)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -75,6 +77,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	salesInvoiceHdl := handlers.NewSalesInvoiceHandler(salesInvoiceSvc, logger)
 	creditNoteHdl := handlers.NewCreditNoteHandler(creditNoteSvc, logger)
 	debitNoteHdl := handlers.NewDebitNoteHandler(debitNoteSvc, logger)
+	customerReceiptHdl := handlers.NewCustomerReceiptHandler(customerReceiptSvc)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -174,5 +177,20 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		debitNotes.POST("/:id/reject", middleware.RequirePermission("invoice_center.debit_note.reject"), debitNoteHdl.Reject)
 		debitNotes.POST("/:id/post", middleware.RequirePermission("invoice_center.debit_note.post"), debitNoteHdl.Post)
 		debitNotes.POST("/:id/cancel", middleware.RequirePermission("invoice_center.debit_note.update"), debitNoteHdl.Cancel)
+	}
+
+	// Customer Receipt Routes
+	customerReceipts := r.Group("/customer-receipts")
+	{
+		customerReceipts.GET("", middleware.RequirePermission("invoice_center.customer_receipt.view"), customerReceiptHdl.ListCustomerReceipts)
+		customerReceipts.GET("/:id", middleware.RequirePermission("invoice_center.customer_receipt.view"), customerReceiptHdl.GetCustomerReceiptByID)
+		customerReceipts.POST("", middleware.RequirePermission("invoice_center.customer_receipt.create"), customerReceiptHdl.CreateCustomerReceipt)
+		customerReceipts.PUT("/:id", middleware.RequirePermission("invoice_center.customer_receipt.update"), customerReceiptHdl.UpdateCustomerReceipt)
+		customerReceipts.DELETE("/:id", middleware.RequirePermission("invoice_center.customer_receipt.delete"), customerReceiptHdl.DeleteCustomerReceipt)
+		customerReceipts.POST("/:id/submit", middleware.RequirePermission("invoice_center.customer_receipt.submit"), customerReceiptHdl.SubmitCustomerReceipt)
+		customerReceipts.POST("/:id/approve", middleware.RequirePermission("invoice_center.customer_receipt.approve"), customerReceiptHdl.ApproveCustomerReceipt)
+		customerReceipts.POST("/:id/reject", middleware.RequirePermission("invoice_center.customer_receipt.reject"), customerReceiptHdl.RejectCustomerReceipt)
+		customerReceipts.POST("/:id/post", middleware.RequirePermission("invoice_center.customer_receipt.post"), customerReceiptHdl.PostCustomerReceipt)
+		customerReceipts.POST("/:id/cancel", middleware.RequirePermission("invoice_center.customer_receipt.update"), customerReceiptHdl.CancelCustomerReceipt)
 	}
 }

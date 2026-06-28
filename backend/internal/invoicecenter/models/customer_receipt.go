@@ -20,6 +20,7 @@ type CustomerReceipt struct {
 	ChequeNumber       string                      `gorm:"type:varchar(100)" json:"cheque_number"`
 	ChequeDate         *time.Time                  `gorm:"type:date" json:"cheque_date"`
 	ReferenceNumber    string                      `gorm:"type:varchar(100)" json:"reference_number"`
+	BankReferenceNumber string                     `gorm:"type:varchar(100)" json:"bank_reference_number"`
 	ReceivedAmount     float64                     `gorm:"type:decimal(18,2);default:0" json:"received_amount"`
 	AllocatedAmount    float64                     `gorm:"type:decimal(18,2);default:0" json:"allocated_amount"`
 	UnallocatedAmount  float64                     `gorm:"type:decimal(18,2);default:0" json:"unallocated_amount"`
@@ -31,6 +32,10 @@ type CustomerReceipt struct {
 	PostedBy           *uint64                     `json:"posted_by"`
 	PostedAt           *time.Time                  `json:"posted_at"`
 	Status             string                      `gorm:"type:varchar(30);default:'active';index" json:"status"`
+	ReceiptStatus      string                      `gorm:"type:varchar(30);default:'active';index" json:"receipt_status"`
+	CancelledBy        *uint64                     `json:"cancelled_by"`
+	CancelledAt        *time.Time                  `json:"cancelled_at"`
+	CancelReason       string                      `gorm:"type:text" json:"cancel_reason"`
 	CreatedBy          *uint64                     `json:"created_by"`
 	UpdatedBy          *uint64                     `json:"updated_by"`
 	CreatedAt          time.Time                   `json:"created_at"`

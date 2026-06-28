@@ -36,6 +36,7 @@ func RunInvoiceCenterMigrations(companyDB *gorm.DB, loggers ...*zap.Logger) erro
 		&models.DebitNoteApproval{},
 		&models.CustomerReceipt{},
 		&models.CustomerReceiptAllocation{},
+		&models.CustomerReceiptApproval{},
 	)
 	if err != nil {
 		logger.Error("Invoice Center AutoMigrate failed", zap.Error(err))
