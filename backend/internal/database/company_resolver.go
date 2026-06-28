@@ -28,6 +28,18 @@ func NewCompanyResolver(platformDB *gorm.DB, logger *zap.Logger) *CompanyResolve
 	}
 }
 
+func (r *CompanyResolver) FindActiveCompanies() ([]models.PlatformCompany, error) {
+	var companies []models.PlatformCompany
+	err := r.platformDB.
+		Where("status = ? AND subscription_status = ?", "active", "active").
+		Order("id ASC").
+		Find(&companies).Error
+	if err != nil {
+		return nil, err
+	}
+	return companies, nil
+}
+
 // ResolveCompanyDB looks up the company in the platform DB and returns its connection.
 func (r *CompanyResolver) ResolveCompanyDB(companyCode string) (*gorm.DB, *models.PlatformCompany, error) {
 	var company models.PlatformCompany

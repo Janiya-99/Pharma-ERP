@@ -16,7 +16,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    companyCode: "",
     email: "",
     password: "",
   });
@@ -37,7 +36,7 @@ const LoginPage = () => {
     setError(null);
     setLoading(true);
 
-    const res = await loginUser(formData.companyCode, formData.email, formData.password);
+    const res = await loginUser(formData.email, formData.password);
 
     if (res.success) {
       navigate("/control-center/dashboard");
@@ -174,22 +173,6 @@ const LoginPage = () => {
               </div>
             )}
 
-            {/* Company Code Field */}
-            <div className="flex flex-col gap-2">
-              <label className="text-[13px] font-bold text-gray-700 tracking-wide">
-                Company Code
-              </label>
-              <input
-                type="text"
-                name="companyCode"
-                required
-                placeholder="e.g. OMACX"
-                value={formData.companyCode}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] font-medium leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 transition-all shadow-sm uppercase"
-              />
-            </div>
-
             {/* Email Field */}
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-gray-700 tracking-wide">
@@ -262,7 +245,7 @@ const LoginPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || !formData.email || !formData.password || !formData.companyCode}
+              disabled={loading || !formData.email || !formData.password}
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-brand-600 hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
             >
               {loading ? (

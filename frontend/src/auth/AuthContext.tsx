@@ -12,7 +12,7 @@ export interface AuthContextType {
   permissions: string[];
   loading: boolean;
   isAuthenticated: boolean;
-  loginUser: (companyCode: any, email: any, password: any) => Promise<any>;
+  loginUser: (email: any, password: any) => Promise<any>;
   logoutUser: () => void;
   refreshContext: () => Promise<void>;
   switchActiveBranch: (branchId: string | number) => Promise<boolean>;
@@ -75,9 +75,9 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     refreshContext();
   }, [refreshContext]);
 
-  const loginUser = async (companyCode: unknown, email: unknown, password: unknown) => {
+  const loginUser = async (email: unknown, password: unknown) => {
     try {
-      const res = await login({ company_code: companyCode, email, password });
+      const res = await login({ email, password });
       
       // Handle different token path structures
       const data = res.data || res;

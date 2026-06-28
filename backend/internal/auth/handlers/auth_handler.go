@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,8 @@ import (
 	"github.com/pixandco/erp-phrma/internal/company/models"
 	"github.com/pixandco/erp-phrma/internal/database"
 	"github.com/pixandco/erp-phrma/internal/middleware"
+	platformModels "github.com/pixandco/erp-phrma/internal/platform/models"
+	"github.com/pixandco/erp-phrma/internal/security"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +23,35 @@ func NewAuthHandler(resolver *database.CompanyResolver) *AuthHandler {
 	return &AuthHandler{resolver: resolver}
 }
 
+func (h *AuthHandler) resolveLoginCompany(req dto.LoginRequest) (*gorm.DB, *platformModels.PlatformCompany, error) {
+	if req.CompanyCode != "" {
+		return h.resolver.ResolveCompanyDB(req.CompanyCode)
+	}
+
+	companies, err := h.resolver.FindActiveCompanies()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for i := range companies {
+		company := companies[i]
+		db, err := h.resolver.GetOrCreateCompanyDBConnection(company)
+		if err != nil {
+			continue
+		}
+
+		var user models.User
+		if err := db.Where("email = ?", req.Email).First(&user).Error; err != nil {
+			continue
+		}
+		if security.CheckPasswordHash(req.Password, user.PasswordHash) {
+			return db, &company, nil
+		}
+	}
+
+	return nil, nil, errors.New("invalid credentials")
+}
+
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -27,8 +59,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// 1. Resolve Company DB
-	db, platformCompany, err := h.resolver.ResolveCompanyDB(req.CompanyCode)
+	// 1. Resolve Company DB from the submitted credentials.
+	db, platformCompany, err := h.resolveLoginCompany(req)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
 		return
