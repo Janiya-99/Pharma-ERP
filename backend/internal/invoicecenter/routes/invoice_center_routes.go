@@ -45,6 +45,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	addressRepo := repositories.NewCustomerAddressRepository()
 	contactRepo := repositories.NewCustomerContactRepository()
 	customerRepo := repositories.NewCustomerRepository()
+	salesOrderRepo := repositories.NewSalesOrderRepository()
 
 	// Initialize services
 	dashboardSvc := services.NewInvoiceDashboardService(dashboardRepo, logger)
@@ -52,6 +53,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	addressSvc := services.NewCustomerAddressService(addressRepo, auditSvc, logger)
 	contactSvc := services.NewCustomerContactService(contactRepo, auditSvc, logger)
 	customerSvc := services.NewCustomerService(customerRepo, categoryRepo, addressRepo, contactRepo, auditSvc, logger)
+	salesOrderSvc := services.NewSalesOrderService(salesOrderRepo, auditSvc, logger)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -59,6 +61,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	addressHdl := handlers.NewCustomerAddressHandler(addressSvc, logger)
 	contactHdl := handlers.NewCustomerContactHandler(contactSvc, logger)
 	customerHdl := handlers.NewCustomerHandler(customerSvc, logger)
+	salesOrderHdl := handlers.NewSalesOrderHandler(salesOrderSvc, logger)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -98,5 +101,20 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		customers.POST("/:customer_id/contacts", middleware.RequirePermission("invoice_center.customer.update"), contactHdl.Create)
 		customers.PUT("/:customer_id/contacts/:id", middleware.RequirePermission("invoice_center.customer.update"), contactHdl.Update)
 		customers.DELETE("/:customer_id/contacts/:id", middleware.RequirePermission("invoice_center.customer.update"), contactHdl.Delete)
+	}
+
+	// Sales Order Routes
+	salesOrders := r.Group("/sales-orders")
+	{
+		salesOrders.GET("", middleware.RequirePermission("invoice_center.sales_order.view"), salesOrderHdl.List)
+		salesOrders.GET("/:id", middleware.RequirePermission("invoice_center.sales_order.view"), salesOrderHdl.Get)
+		salesOrders.POST("", middleware.RequirePermission("invoice_center.sales_order.create"), salesOrderHdl.Create)
+		salesOrders.PUT("/:id", middleware.RequirePermission("invoice_center.sales_order.update"), salesOrderHdl.Update)
+		salesOrders.DELETE("/:id", middleware.RequirePermission("invoice_center.sales_order.delete"), salesOrderHdl.Delete)
+		salesOrders.POST("/:id/submit", middleware.RequirePermission("invoice_center.sales_order.submit"), salesOrderHdl.Submit)
+		salesOrders.POST("/:id/approve", middleware.RequirePermission("invoice_center.sales_order.approve"), salesOrderHdl.Approve)
+		salesOrders.POST("/:id/reject", middleware.RequirePermission("invoice_center.sales_order.reject"), salesOrderHdl.Reject)
+		salesOrders.POST("/:id/close", middleware.RequirePermission("invoice_center.sales_order.close"), salesOrderHdl.Close)
+		salesOrders.POST("/:id/cancel", middleware.RequirePermission("invoice_center.sales_order.cancel"), salesOrderHdl.Cancel)
 	}
 }

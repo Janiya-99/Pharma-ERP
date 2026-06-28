@@ -1557,16 +1557,7 @@ export function ProductBatchesPage() {
       setForm({ batch_status: "active", ...unwrapData(response) });
       setDrawer({ open: true, mode, id });
     } catch (error) {
-      const fieldErrors = backendValidationErrors(error, {
-        uniqueField: drawerType === "warehouse" ? "warehouse_code" : "location_code",
-        fields,
-      });
-      if (Object.keys(fieldErrors).length) {
-        setErrors(fieldErrors);
-        toast.error(Object.values(fieldErrors)[0]);
-      } else {
-        toast.error(getErrorMessage(error));
-      }
+      toast.error(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
@@ -1593,7 +1584,7 @@ export function ProductBatchesPage() {
       setDrawer((current) => ({ ...current, open: false }));
       await list.refresh();
     } catch (error) {
-      const fieldErrors = backendValidationErrors(error, { fields: config.fields });
+      const fieldErrors = backendValidationErrors(error, { uniqueField: "batch_number", fields });
       if (Object.keys(fieldErrors).length) {
         setErrors(fieldErrors);
         toast.error(Object.values(fieldErrors)[0]);

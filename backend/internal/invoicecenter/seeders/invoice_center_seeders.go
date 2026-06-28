@@ -42,6 +42,7 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"Sales Order", "invoice_center.sales_order.approve", "Approve Sales Order"},
 		{"Sales Order", "invoice_center.sales_order.reject", "Reject Sales Order"},
 		{"Sales Order", "invoice_center.sales_order.close", "Close Sales Order"},
+		{"Sales Order", "invoice_center.sales_order.cancel", "Cancel Sales Order"},
 
 		{"Sales Invoice", "invoice_center.sales_invoice.view", "View Sales Invoice"},
 		{"Sales Invoice", "invoice_center.sales_invoice.create", "Create Sales Invoice"},
@@ -155,6 +156,7 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 			k == "invoice_center.sales_order.create" ||
 			k == "invoice_center.sales_order.update" ||
 			k == "invoice_center.sales_order.submit" ||
+			k == "invoice_center.sales_order.cancel" ||
 			k == "invoice_center.sales_invoice.view" ||
 			k == "invoice_center.sales_invoice.create" ||
 			k == "invoice_center.sales_invoice.update" ||
@@ -181,6 +183,7 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 			k == "invoice_center.sales_order.approve" ||
 			k == "invoice_center.sales_order.reject" ||
 			k == "invoice_center.sales_order.close" ||
+			k == "invoice_center.sales_order.cancel" ||
 			k == "invoice_center.sales_invoice.view" ||
 			k == "invoice_center.sales_invoice.approve" ||
 			k == "invoice_center.sales_invoice.reject" ||

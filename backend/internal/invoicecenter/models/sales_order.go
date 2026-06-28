@@ -25,14 +25,21 @@ type SalesOrder struct {
 	ApprovalStatus          string         `gorm:"type:varchar(30);default:'draft';index" json:"approval_status"`
 	OrderStatus             string         `gorm:"type:varchar(30);default:'open';index" json:"order_status"`
 	Status                  string         `gorm:"type:varchar(30);default:'active';index" json:"status"`
+	ApprovedBy              *uint64        `json:"approved_by"`
+	ApprovedAt              *time.Time     `json:"approved_at"`
+	ClosedBy                *uint64        `json:"closed_by"`
+	ClosedAt                *time.Time     `json:"closed_at"`
+	CancelledBy             *uint64        `json:"cancelled_by"`
+	CancelledAt             *time.Time     `json:"cancelled_at"`
 	CreatedBy               *uint64        `json:"created_by"`
 	UpdatedBy               *uint64        `json:"updated_by"`
 	CreatedAt               time.Time      `json:"created_at"`
 	UpdatedAt               time.Time      `json:"updated_at"`
 	DeletedAt               gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Customer                Customer         `gorm:"foreignKey:CustomerID" json:"customer"`
-	Lines                   []SalesOrderLine `gorm:"foreignKey:SalesOrderID" json:"lines,omitempty"`
+	Customer  Customer             `gorm:"foreignKey:CustomerID" json:"customer"`
+	Lines     []SalesOrderLine     `gorm:"foreignKey:SalesOrderID" json:"lines,omitempty"`
+	Approvals []SalesOrderApproval `gorm:"foreignKey:SalesOrderID" json:"approvals,omitempty"`
 }
 
 func (SalesOrder) TableName() string {

@@ -24,6 +24,7 @@ func RunInvoiceCenterMigrations(companyDB *gorm.DB, loggers ...*zap.Logger) erro
 		&models.CustomerContact{},
 		&models.SalesOrder{},
 		&models.SalesOrderLine{},
+		&models.SalesOrderApproval{},
 		&models.SalesInvoice{},
 		&models.SalesInvoiceLine{},
 		&models.CreditNote{},
