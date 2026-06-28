@@ -107,6 +107,11 @@ type SetupConfig = {
   buildPayload: (form: ApiRecord, context: InventoryContextValue) => ApiRecord;
 };
 
+type UniqueFormConfig = {
+  uniqueField?: string;
+  fields: FieldConfig[];
+};
+
 type InventoryContextValue = {
   companyId?: number;
   branchId?: number;
@@ -190,24 +195,55 @@ const duplicateFieldError = (field: string, fields: FieldConfig[]) => {
   return `${label} already exists. Use a different ${label.toLowerCase()}.`;
 };
 
-const localDuplicateErrors = (config: SetupConfig, form: ApiRecord, rows: ApiRecord[], currentId?: string | number) => {
-  const field = config.uniqueField;
-  if (!field) return {};
-  const value = normalizeComparable(form[field]);
-  if (!value) return {};
-  const duplicate = rows.find((row) => normalizeComparable(row[field]) === value && String(getId(row) ?? "") !== String(currentId ?? ""));
-  return duplicate ? { [field]: duplicateFieldError(field, config.fields) } : {};
+const backendResponseMessages = (error: any) => {
+  const body = error?.response?.data;
+  const messages: string[] = [];
+  const collect = (value: any) => {
+    if (!value) return;
+    if (typeof value === "string") {
+      messages.push(value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(collect);
+      return;
+    }
+    if (typeof value === "object") {
+      Object.values(value).forEach(collect);
+    }
+  };
+  collect(body?.errors);
+  collect(body?.error);
+  collect(body?.message);
+  collect(error?.message);
+  return messages.length ? messages : [getErrorMessage(error)];
 };
 
-const backendFieldErrors = (error: any, config: SetupConfig) => {
-  const message = getErrorMessage(error);
-  const normalizedMessage = normalizeComparable(message);
-  const field = config.uniqueField;
-  if (!field || !normalizedMessage.includes("exists")) return {};
-  if (normalizedMessage.includes(field) || normalizedMessage.includes("code exists") || normalizedMessage.includes("already exists")) {
-    return { [field]: duplicateFieldError(field, config.fields) };
+const backendValidationErrors = (error: any, config: UniqueFormConfig) => {
+  const messages = backendResponseMessages(error);
+  const combined = normalizeComparable(messages.join(" "));
+  const errors: Record<string, string> = {};
+
+  for (const field of config.fields) {
+    const fieldKey = normalizeComparable(field.name);
+    const labelKey = normalizeComparable(field.label);
+    const normalizedField = fieldKey.replaceAll("_", " ");
+    const matchingMessage = messages.find((message) => {
+      const normalizedMessage = normalizeComparable(message);
+      return normalizedMessage.includes(fieldKey) || normalizedMessage.includes(labelKey) || normalizedMessage.includes(normalizedField);
+    });
+    if (matchingMessage) errors[field.name] = matchingMessage;
   }
-  return {};
+
+  const firstCodeField = config.fields.find((field) => field.name.endsWith("_code"))?.name;
+  const duplicateField = config.uniqueField || firstCodeField;
+  if (duplicateField && combined.includes("exists") && !errors[duplicateField]) {
+    if (combined.includes(duplicateField) || combined.includes("code exists") || combined.includes("already exists")) {
+      errors[duplicateField] = duplicateFieldError(duplicateField, config.fields);
+    }
+  }
+
+  return errors;
 };
 
 function StatusBadge({ status }: { status: unknown }) {
@@ -461,6 +497,7 @@ function ActionMenu({
   onPost,
   onHold,
   onRelease,
+  deactivateLabel = "Deactivate",
 }: {
   onView?: () => void;
   onEdit?: () => void;
@@ -468,6 +505,7 @@ function ActionMenu({
   onPost?: () => void;
   onHold?: () => void;
   onRelease?: () => void;
+  deactivateLabel?: string;
 }) {
   return (
     <DropdownMenu>
@@ -495,7 +533,7 @@ function ActionMenu({
         {onDeactivate ? (
           <DropdownMenuItem onClick={onDeactivate} className="text-red-600 focus:text-red-600">
             <Trash2 className="mr-2 h-4 w-4" />
-            Deactivate
+            {deactivateLabel}
           </DropdownMenuItem>
         ) : null}
       </DropdownMenuContent>
@@ -602,14 +640,17 @@ function DrawerForm({
   const readOnly = mode === "view";
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="max-w-full overflow-x-hidden overflow-y-auto border-slate-200 bg-white p-0 data-[side=right]:w-full data-[side=right]:max-w-full sm:data-[side=right]:w-[min(92vw,720px)] sm:data-[side=right]:max-w-[720px] lg:data-[side=right]:w-[50vw] lg:data-[side=right]:max-w-[50vw]">
-        <SheetHeader className="select-none border-b border-slate-200 px-6 py-5 sm:px-8">
+      <SheetContent
+        onInteractOutside={(event) => event.preventDefault()}
+        className="max-w-full overflow-hidden border-slate-200 bg-white p-0 data-[side=right]:w-full data-[side=right]:max-w-full sm:data-[side=right]:w-[min(92vw,720px)] sm:data-[side=right]:max-w-[720px] lg:data-[side=right]:w-[50vw] lg:data-[side=right]:max-w-[50vw]"
+      >
+        <SheetHeader className="shrink-0 select-none border-b border-slate-200 px-6 py-5 sm:px-8">
           <SheetTitle className="text-xl font-semibold tracking-normal text-slate-950">{title}</SheetTitle>
-          <SheetDescription className="max-w-2xl rounded-lg bg-blue-50 px-3 py-2 text-sm tracking-normal text-blue-700">
+          <SheetDescription className="max-w-2xl text-sm leading-5 tracking-normal text-slate-500">
             {description}
           </SheetDescription>
         </SheetHeader>
-        <div className="min-h-0 flex-1 px-6 py-6 sm:px-8">
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
           <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
             {fields.map((field) => (
               <FormField
@@ -623,7 +664,7 @@ function DrawerForm({
             ))}
           </div>
         </div>
-        <SheetFooter className="border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end sm:px-8">
+        <SheetFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4 sm:flex-row sm:justify-end sm:px-8">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
             Close
           </Button>
@@ -1051,6 +1092,7 @@ function BackendCrudPage({
   permissionContext,
   requireBranchForSubmit = false,
   addLabel = "Add New",
+  uniqueField,
 }: {
   title: string;
   description: string;
@@ -1070,6 +1112,7 @@ function BackendCrudPage({
   permissionContext: InventoryContextValue;
   requireBranchForSubmit?: boolean;
   addLabel?: string;
+  uniqueField?: string;
 }) {
   const [search, setSearch] = useState("");
   const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
@@ -1124,7 +1167,13 @@ function BackendCrudPage({
       setForm(defaults);
       await refresh();
     } catch (err) {
-      toast.error(getErrorMessage(err));
+      const fieldErrors = backendValidationErrors(err, { uniqueField, fields });
+      if (Object.keys(fieldErrors).length) {
+        setErrors(fieldErrors);
+        toast.error(Object.values(fieldErrors)[0]);
+      } else {
+        toast.error(getErrorMessage(err));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -1166,7 +1215,7 @@ function BackendCrudPage({
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
         title={drawer.mode === "create" ? addLabel : drawer.mode === "edit" ? `Update ${title}` : `${title} Details`}
-        description="This action is connected to the Go backend and refreshes the list after success."
+        description="Enter the details and save your changes."
         fields={fields}
         form={form}
         setForm={setForm}
@@ -1223,10 +1272,7 @@ export function ProductSetupPage() {
 
   const submit = async () => {
     if (!requireCompany(context)) return;
-    const nextErrors = {
-      ...validateForm(drawer.config.fields, form),
-      ...localDuplicateErrors(drawer.config, form, list.rows, drawer.id),
-    };
+    const nextErrors = validateForm(drawer.config.fields, form);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
     setSubmitting(true);
@@ -1242,7 +1288,7 @@ export function ProductSetupPage() {
       setDrawer((current) => ({ ...current, open: false }));
       await list.refresh();
     } catch (error) {
-      const fieldErrors = backendFieldErrors(error, drawer.config);
+      const fieldErrors = backendValidationErrors(error, drawer.config);
       if (Object.keys(fieldErrors).length) {
         setErrors(fieldErrors);
         toast.error(Object.values(fieldErrors)[0]);
@@ -1261,7 +1307,7 @@ export function ProductSetupPage() {
   };
 
   return (
-    <InventoryPage title="Product Setup" description="Manage product-related setup data in one backend-backed screen." icon={Settings}>
+    <InventoryPage title="Product Setup" description="Manage product-related setup data in one screen." icon={Settings}>
       <Card className="border border-slate-200 bg-white shadow-sm">
         <CardHeader className="border-b border-slate-200">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -1330,7 +1376,7 @@ export function ProductSetupPage() {
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
         title={drawer.mode === "create" ? `Add ${drawer.config.singular}` : drawer.mode === "edit" ? `Update ${drawer.config.singular}` : `${drawer.config.singular} Details`}
-        description="Setup records are loaded from and saved to the Go backend."
+        description="Enter the setup details and save your changes."
         fields={drawer.config.fields}
         form={form}
         setForm={setForm}
@@ -1384,6 +1430,7 @@ export function SuppliersPage() {
       deactivate={inventoryApi.deactivateSupplier}
       permissionContext={context}
       addLabel="Add Supplier"
+      uniqueField="supplier_code"
     />
   );
 }
@@ -1401,8 +1448,8 @@ export function ProductsPage() {
     { name: "base_unit_id", label: "Unit", type: "select", required: true, options: makeOptions(refs.units, ["unit_name"]) },
     { name: "manufacturer_id", label: "Manufacturer", type: "select", options: makeOptions(refs.manufacturers, ["manufacturer_name"]) },
     { name: "barcode", label: "Barcode" },
-    { name: "strength", label: "Strength" },
-    { name: "pack_size", label: "Pack Size" },
+    { name: "strength", label: "Strength", placeholder: "e.g. 500 mg, 250 mg/5 ml" },
+    { name: "pack_size", label: "Pack Size", placeholder: "e.g. 10 tablets, 100 ml" },
     { name: "product_type", label: "Product Type", type: "select", required: true, options: [{ label: "Medicine", value: "medicine" }, { label: "Medical Device", value: "medical_device" }, { label: "Other", value: "other" }] },
     { name: "requires_batch_tracking", label: "Batch Tracking Required", type: "switch" },
     { name: "requires_expiry_tracking", label: "Expiry Tracking Required", type: "switch" },
@@ -1475,6 +1522,7 @@ export function ProductsPage() {
       deactivate={inventoryApi.deactivateProduct}
       permissionContext={context}
       addLabel="Add Product"
+      uniqueField="product_code"
     />
   );
 }
@@ -1509,7 +1557,16 @@ export function ProductBatchesPage() {
       setForm({ batch_status: "active", ...unwrapData(response) });
       setDrawer({ open: true, mode, id });
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      const fieldErrors = backendValidationErrors(error, {
+        uniqueField: drawerType === "warehouse" ? "warehouse_code" : "location_code",
+        fields,
+      });
+      if (Object.keys(fieldErrors).length) {
+        setErrors(fieldErrors);
+        toast.error(Object.values(fieldErrors)[0]);
+      } else {
+        toast.error(getErrorMessage(error));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -1536,7 +1593,13 @@ export function ProductBatchesPage() {
       setDrawer((current) => ({ ...current, open: false }));
       await list.refresh();
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      const fieldErrors = backendValidationErrors(error, { fields: config.fields });
+      if (Object.keys(fieldErrors).length) {
+        setErrors(fieldErrors);
+        toast.error(Object.values(fieldErrors)[0]);
+      } else {
+        toast.error(getErrorMessage(error));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -1583,7 +1646,7 @@ export function ProductBatchesPage() {
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
         title={drawer.mode === "edit" ? "Update Batch" : "Batch Details"}
-        description="Limited batch edits are saved to the Go backend."
+        description="Update the batch details and save your changes."
         fields={fields}
         form={form}
         setForm={setForm}
@@ -1603,6 +1666,7 @@ export function WarehousesAndLocationsPage() {
   const [selected, setSelected] = useState<ApiRecord | null>(null);
   const locations = useBackendList(inventoryApi.getWarehouseLocations, { warehouse_id: getId(selected), company_id: context.companyId, limit: 1000 }, !!getId(selected));
   const [drawerType, setDrawerType] = useState<"warehouse" | "location" | null>(null);
+  const [warehouseDrawerRequest, setWarehouseDrawerRequest] = useState<{ row: ApiRecord; mode: DrawerMode; nonce: number } | null>(null);
 
   useEffect(() => {
     if (!selected && warehouses.rows.length) setSelected(warehouses.rows[0]);
@@ -1628,13 +1692,51 @@ export function WarehousesAndLocationsPage() {
     { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
   ];
 
+  const loadWarehouse = async (warehouse: ApiRecord) => {
+    const id = getId(warehouse);
+    if (!id) {
+      setSelected(warehouse);
+      return warehouse;
+    }
+    const response = await inventoryApi.getWarehouseById(id);
+    const data = unwrapData(response);
+    setSelected(data);
+    return data;
+  };
+
+  const openWarehouse = async (warehouse: ApiRecord, mode: DrawerMode) => {
+    try {
+      const data = await loadWarehouse(warehouse);
+      setWarehouseDrawerRequest({ row: data, mode, nonce: Date.now() });
+      setDrawerType("warehouse");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const deleteWarehouse = async (warehouse: ApiRecord) => {
+    const id = getId(warehouse);
+    if (!id || !window.confirm(`Delete ${nameOf(warehouse)}?`)) return;
+    const deletedSelected = String(id) === String(getId(selected || {}));
+    await runBackendAction(async () => {
+      await inventoryApi.deactivateWarehouse(id);
+      if (deletedSelected) setSelected(null);
+    }, "Warehouse deleted", warehouses.refresh);
+  };
+
   return (
     <InventoryPage
       title="Warehouses & Locations"
       description="Manage warehouses, branch stock locations, racks, shelves, and bins."
       icon={Warehouse}
       actions={
-        <Button onClick={() => setDrawerType("warehouse")} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+        <Button
+          onClick={() => {
+            setWarehouseDrawerRequest(null);
+            setDrawerType("warehouse");
+          }}
+          className="rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+        >
           <Plus className="h-4 w-4" />
           Add Warehouse
         </Button>
@@ -1648,15 +1750,13 @@ export function WarehousesAndLocationsPage() {
           <CardContent className="space-y-2">
             {warehouses.loading ? <Skeleton className="h-20 rounded-xl" /> : null}
             {warehouses.rows.map((warehouse) => (
-              <button
+              <div
                 key={getId(warehouse)}
-                onClick={async () => {
-                  setSelected(warehouse);
-                  const id = getId(warehouse);
-                  if (id) {
-                    const response = await inventoryApi.getWarehouseById(id);
-                    setSelected(unwrapData(response));
-                  }
+                role="button"
+                tabIndex={0}
+                onClick={() => loadWarehouse(warehouse)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") loadWarehouse(warehouse);
                 }}
                 className={`w-full rounded-xl border p-4 text-left transition ${getId(selected || {}) === getId(warehouse) ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
               >
@@ -1665,16 +1765,42 @@ export function WarehousesAndLocationsPage() {
                     <p className="font-semibold tracking-normal text-slate-950">{valueOf(warehouse, ["warehouse_name"])}</p>
                     <p className="mt-1 text-xs tracking-normal text-slate-500">{valueOf(warehouse, ["warehouse_code"])} | {valueOf(warehouse, ["branch.branch_name", "branch_id"])}</p>
                   </div>
-                  <StatusBadge status={warehouse.status} />
+                  <div className="flex items-start gap-2">
+                    <StatusBadge status={warehouse.status} />
+                    <div onClick={(event) => event.stopPropagation()}>
+                      <ActionMenu
+                        onView={() => openWarehouse(warehouse, "view")}
+                        onEdit={() => openWarehouse(warehouse, "edit")}
+                        onDeactivate={() => deleteWarehouse(warehouse)}
+                        deactivateLabel="Delete"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </button>
+              </div>
             ))}
           </CardContent>
         </Card>
         <div className="space-y-4">
           <Card className="border border-slate-200 bg-white shadow-sm">
-            <CardHeader>
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <CardTitle className="text-base font-semibold tracking-normal text-slate-950">{selected ? valueOf(selected, ["warehouse_name"]) : "Select a warehouse"}</CardTitle>
+              {selected ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button variant="outline" className="h-8 rounded-lg border-slate-200 px-3" onClick={() => openWarehouse(selected, "view")}>
+                    <Eye className="h-4 w-4" />
+                    View
+                  </Button>
+                  <Button variant="outline" className="h-8 rounded-lg border-slate-200 px-3" onClick={() => openWarehouse(selected, "edit")}>
+                    <Edit className="h-4 w-4" />
+                    Edit
+                  </Button>
+                  <Button variant="outline" className="h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => deleteWarehouse(selected)}>
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </Button>
+                </div>
+              ) : null}
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {selected ? (
@@ -1712,9 +1838,41 @@ export function WarehousesAndLocationsPage() {
             drawerType={drawerType}
             setDrawerType={setDrawerType}
             refreshWarehouses={warehouses.refresh}
+            warehouseRequest={warehouseDrawerRequest}
+            setSelectedWarehouse={setSelected}
           />
         </div>
       </div>
+      <Card className="border border-slate-200 bg-white shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Warehouse Table View</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DataGrid
+            loading={warehouses.loading}
+            error={warehouses.error}
+            data={warehouses.rows}
+            columns={[
+              { header: "Warehouse Code", render: (row) => valueOf(row, ["warehouse_code"]) },
+              { header: "Warehouse Name", render: (row) => valueOf(row, ["warehouse_name"]) },
+              { header: "Branch", render: (row) => valueOf(row, ["branch.branch_name", "branch_id"]) },
+              { header: "Type", render: (row) => valueOf(row, ["warehouse_type"]) },
+              { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+              {
+                header: "Actions",
+                render: (row) => (
+                  <ActionMenu
+                    onView={() => openWarehouse(row, "view")}
+                    onEdit={() => openWarehouse(row, "edit")}
+                    onDeactivate={() => deleteWarehouse(row)}
+                    deactivateLabel="Delete"
+                  />
+                ),
+              },
+            ]}
+          />
+        </CardContent>
+      </Card>
     </InventoryPage>
   );
 }
@@ -1728,6 +1886,8 @@ function LocationManager({
   drawerType,
   setDrawerType,
   refreshWarehouses,
+  warehouseRequest,
+  setSelectedWarehouse,
 }: {
   context: InventoryContextValue;
   selected: ApiRecord | null;
@@ -1737,6 +1897,8 @@ function LocationManager({
   drawerType: "warehouse" | "location" | null;
   setDrawerType: (type: "warehouse" | "location" | null) => void;
   refreshWarehouses: () => Promise<void>;
+  warehouseRequest: { row: ApiRecord; mode: DrawerMode; nonce: number } | null;
+  setSelectedWarehouse: (warehouse: ApiRecord | null) => void;
 }) {
   const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
   const [form, setForm] = useState<ApiRecord>({});
@@ -1746,14 +1908,28 @@ function LocationManager({
   useEffect(() => {
     if (!drawerType) return;
     if (drawerType === "warehouse") {
-      setForm({ warehouse_code: "", warehouse_name: "", warehouse_type: "primary", address: "", contact_person: "", contact_number: "", is_default: false, status: "active" });
-      setDrawer({ open: true, mode: "create" });
+      if (warehouseRequest) {
+        setForm({
+          warehouse_code: warehouseRequest.row.warehouse_code || "",
+          warehouse_name: warehouseRequest.row.warehouse_name || "",
+          warehouse_type: warehouseRequest.row.warehouse_type || "primary",
+          address: warehouseRequest.row.address || "",
+          contact_person: warehouseRequest.row.contact_person || "",
+          contact_number: warehouseRequest.row.contact_number || "",
+          is_default: !!warehouseRequest.row.is_default,
+          status: normalizeStatus(warehouseRequest.row.status),
+        });
+        setDrawer({ open: true, mode: warehouseRequest.mode, id: getId(warehouseRequest.row) });
+      } else {
+        setForm({ warehouse_code: "", warehouse_name: "", warehouse_type: "primary", address: "", contact_person: "", contact_number: "", is_default: false, status: "active" });
+        setDrawer({ open: true, mode: "create" });
+      }
     }
     if (drawerType === "location" && selected) {
       setForm({ location_code: "", location_name: "", rack: "", shelf: "", bin: "", storage_condition: "room_temperature", status: "active" });
       setDrawer({ open: true, mode: "create" });
     }
-  }, [drawerType]);
+  }, [drawerType, warehouseRequest?.nonce]);
 
   const fields = drawerType === "warehouse" ? warehouseFields : locationFields;
 
@@ -1771,8 +1947,8 @@ function LocationManager({
     try {
       if (drawerType === "warehouse") {
         const payload = compact({ ...form, company_id: context.companyId, branch_id: context.branchId, status: normalizeStatus(form.status) });
-        if (drawer.mode === "edit" && drawer.id) await inventoryApi.updateWarehouse(drawer.id, payload);
-        else await inventoryApi.createWarehouse(payload);
+        const response = drawer.mode === "edit" && drawer.id ? await inventoryApi.updateWarehouse(drawer.id, payload) : await inventoryApi.createWarehouse(payload);
+        setSelectedWarehouse(unwrapData(response));
         toast.success(drawer.mode === "edit" ? "Warehouse updated" : "Warehouse created");
         await refreshWarehouses();
       } else {
@@ -1817,7 +1993,7 @@ function LocationManager({
           { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
           {
             header: "Actions",
-            render: (row) => <ActionMenu onView={() => openLocation(row, "view")} onEdit={() => openLocation(row, "edit")} onDeactivate={() => deactivateLocation(row)} />,
+            render: (row) => <ActionMenu onView={() => openLocation(row, "view")} onEdit={() => openLocation(row, "edit")} onDeactivate={() => deactivateLocation(row)} deactivateLabel="Delete" />,
           },
         ]}
       />
@@ -1828,7 +2004,7 @@ function LocationManager({
           if (!open) setDrawerType(null);
         }}
         title={`${drawer.mode === "edit" ? "Update" : drawer.mode === "view" ? "View" : "Add"} ${drawerType === "warehouse" ? "Warehouse" : "Location"}`}
-        description="Warehouse and location actions are saved to the Go backend."
+        description="Enter the warehouse or location details and save your changes."
         fields={fields}
         form={form}
         setForm={setForm}
@@ -2189,7 +2365,7 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
         title={drawer.mode === "create" ? `New ${config.title}` : drawer.mode === "edit" ? `Update ${config.title}` : `${config.title} Details`}
-        description="Save Draft and Post both call the Go backend. Posting refreshes the list after success."
+        description="Save a draft or post the document. The list refreshes after success."
         fields={config.fields}
         form={form}
         setForm={setForm}

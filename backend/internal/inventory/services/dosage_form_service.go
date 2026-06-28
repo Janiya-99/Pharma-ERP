@@ -25,11 +25,15 @@ func (s *DosageFormService) GetByID(db *gorm.DB, companyID, id uint64) (*models.
 	return s.repo.GetDosageFormByID(db, companyID, id)
 }
 func (s *DosageFormService) Create(c *gin.Context, db *gorm.DB, companyID uint64, req dto.CreateDosageFormRequest) (*models.DosageForm, error) {
-	if e, _ := s.repo.GetDosageFormByCode(db, companyID, req.DosageFormCode); e != nil {
+	e, err := s.repo.GetDosageFormByCode(db, companyID, req.DosageFormCode)
+	if err != nil {
+		return nil, err
+	}
+	if e != nil {
 		return nil, errors.New("dosage_form_code exists")
 	}
 	m := &models.DosageForm{CompanyID: companyID, DosageFormCode: req.DosageFormCode, DosageFormName: req.DosageFormName, Description: req.Description, Status: req.Status}
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := s.repo.Create(tx, m); err != nil {
 			return err
 		}
@@ -44,7 +48,11 @@ func (s *DosageFormService) Update(c *gin.Context, db *gorm.DB, companyID, id ui
 		return nil, err
 	}
 	if m.DosageFormCode != req.DosageFormCode {
-		if e, _ := s.repo.GetDosageFormByCode(db, companyID, req.DosageFormCode); e != nil {
+		e, err := s.repo.GetDosageFormByCode(db, companyID, req.DosageFormCode)
+		if err != nil {
+			return nil, err
+		}
+		if e != nil {
 			return nil, errors.New("dosage_form_code exists")
 		}
 	}

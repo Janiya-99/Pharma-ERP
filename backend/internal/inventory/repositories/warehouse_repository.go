@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/pixandco/erp-phrma/internal/inventory/models"
 	"gorm.io/gorm"
 )
@@ -45,6 +47,9 @@ func (r *WarehouseRepository) GetByID(db *gorm.DB, companyID, id uint64) (*model
 func (r *WarehouseRepository) GetByCode(db *gorm.DB, companyID uint64, code string) (*models.Warehouse, error) {
 	var warehouse models.Warehouse
 	err := db.Where("company_id = ? AND warehouse_code = ?", companyID, code).First(&warehouse).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &warehouse, err
 }
 

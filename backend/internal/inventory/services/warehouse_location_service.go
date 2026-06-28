@@ -35,7 +35,10 @@ func (s *WarehouseLocationService) CreateWarehouseLocation(c *gin.Context, db *g
 		return nil, errors.New("valid active warehouse required")
 	}
 
-	existing, _ := s.repo.GetByCode(db, companyID, req.WarehouseID, req.LocationCode)
+	existing, err := s.repo.GetByCode(db, companyID, req.WarehouseID, req.LocationCode)
+	if err != nil {
+		return nil, err
+	}
 	if existing != nil {
 		return nil, errors.New("location_code already exists in this warehouse")
 	}
@@ -75,7 +78,10 @@ func (s *WarehouseLocationService) UpdateWarehouseLocation(c *gin.Context, db *g
 	}
 
 	if loc.LocationCode != req.LocationCode {
-		existing, _ := s.repo.GetByCode(db, companyID, loc.WarehouseID, req.LocationCode)
+		existing, err := s.repo.GetByCode(db, companyID, loc.WarehouseID, req.LocationCode)
+		if err != nil {
+			return nil, err
+		}
 		if existing != nil {
 			return nil, errors.New("location_code already exists in this warehouse")
 		}

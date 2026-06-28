@@ -29,7 +29,10 @@ func (s *WarehouseService) GetWarehouseByID(db *gorm.DB, companyID, id uint64) (
 }
 
 func (s *WarehouseService) CreateWarehouse(c *gin.Context, db *gorm.DB, companyID uint64, userID uint64, req dto.CreateWarehouseRequest) (*models.Warehouse, error) {
-	existing, _ := s.repo.GetByCode(db, companyID, req.WarehouseCode)
+	existing, err := s.repo.GetByCode(db, companyID, req.WarehouseCode)
+	if err != nil {
+		return nil, err
+	}
 	if existing != nil {
 		return nil, errors.New("warehouse_code already exists")
 	}
@@ -47,7 +50,7 @@ func (s *WarehouseService) CreateWarehouse(c *gin.Context, db *gorm.DB, companyI
 		Status:        req.Status,
 	}
 
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := s.repo.Create(tx, wh); err != nil {
 			return err
 		}
@@ -75,7 +78,10 @@ func (s *WarehouseService) UpdateWarehouse(c *gin.Context, db *gorm.DB, companyI
 	}
 
 	if wh.WarehouseCode != req.WarehouseCode {
-		existing, _ := s.repo.GetByCode(db, companyID, req.WarehouseCode)
+		existing, err := s.repo.GetByCode(db, companyID, req.WarehouseCode)
+		if err != nil {
+			return nil, err
+		}
 		if existing != nil {
 			return nil, errors.New("warehouse_code already exists")
 		}

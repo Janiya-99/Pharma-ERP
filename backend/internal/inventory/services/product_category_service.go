@@ -25,7 +25,10 @@ func (s *ProductCategoryService) GetByID(db *gorm.DB, companyID, id uint64) (*mo
 	return s.repo.GetCategoryByID(db, companyID, id)
 }
 func (s *ProductCategoryService) Create(c *gin.Context, db *gorm.DB, companyID uint64, req dto.CreateProductCategoryRequest) (*models.ProductCategory, error) {
-	existing, _ := s.repo.GetCategoryByCode(db, companyID, req.CategoryCode)
+	existing, err := s.repo.GetCategoryByCode(db, companyID, req.CategoryCode)
+	if err != nil {
+		return nil, err
+	}
 	if existing != nil {
 		return nil, errors.New("category_code already exists")
 	}
@@ -47,7 +50,7 @@ func (s *ProductCategoryService) Create(c *gin.Context, db *gorm.DB, companyID u
 		Description:  req.Description,
 		Status:       req.Status,
 	}
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := s.repo.Create(tx, m); err != nil {
 			return err
 		}
@@ -62,7 +65,11 @@ func (s *ProductCategoryService) Update(c *gin.Context, db *gorm.DB, companyID, 
 		return nil, err
 	}
 	if m.CategoryCode != req.CategoryCode {
-		if existing, _ := s.repo.GetCategoryByCode(db, companyID, req.CategoryCode); existing != nil {
+		existing, err := s.repo.GetCategoryByCode(db, companyID, req.CategoryCode)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
 			return nil, errors.New("category_code exists")
 		}
 	}

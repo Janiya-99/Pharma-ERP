@@ -94,6 +94,13 @@ import OpeningStockEntryDetailsPage from "../pages/inventory/opening-stock/Openi
 import GRNFormPage from "../pages/inventory/grns/GRNFormPage";
 import GRNDetailsPage from "../pages/inventory/grns/GRNDetailsPage";
 
+// Invoice Center Pages
+import InvoiceCenterDashboard from "../pages/invoice-center/dashboard/InvoiceCenterDashboard";
+import CustomerCategoriesPage from "../pages/invoice-center/customer-categories/CustomerCategoriesPage";
+import CustomersPage from "../pages/invoice-center/customers/CustomersPage";
+import CustomerFormPage from "../pages/invoice-center/customers/CustomerFormPage";
+import CustomerDetailsPage from "../pages/invoice-center/customers/CustomerDetailsPage";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -250,7 +257,15 @@ const AppRoutes = () => {
           <Route path="/inventory/sales-returns" element={<Navigate to="/inventory/returns/sales-returns" replace />} />
           <Route path="/inventory/stock-balances" element={<Navigate to="/inventory/reports/stock-balance" replace />} />
           <Route path="/inventory/stock-ledger" element={<Navigate to="/inventory/reports/stock-ledger" replace />} />
-          <Route path="/invoice-center/dashboard" element={<PlaceholderPage title="Invoice Center Dashboard" />} />
+          
+          {/* Invoice Center Routes */}
+          <Route path="/invoice-center/dashboard" element={<InvoiceCenterDashboard />} />
+          <Route path="/invoice-center/customer-categories" element={<CustomerCategoriesPage />} />
+          <Route path="/invoice-center/customers" element={<CustomersPage />} />
+          <Route path="/invoice-center/customers/create" element={<CustomerFormPage />} />
+          <Route path="/invoice-center/customers/:id" element={<CustomerDetailsPage />} />
+          <Route path="/invoice-center/customers/:id/edit" element={<CustomerFormPage />} />
+
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>
       </Route>

@@ -63,6 +63,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
 	{
+		dashboard.GET("", middleware.RequirePermission("invoice_center.dashboard.view"), dashboardHdl.GetSummary)
 		dashboard.GET("/summary", middleware.RequirePermission("invoice_center.dashboard.view"), dashboardHdl.GetSummary)
 	}
 

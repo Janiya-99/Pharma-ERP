@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/pixandco/erp-phrma/internal/inventory/models"
 	"gorm.io/gorm"
 )
@@ -56,6 +58,9 @@ func (r *ProductBatchRepository) GetByID(db *gorm.DB, companyID, id uint64) (*mo
 func (r *ProductBatchRepository) GetByNumber(db *gorm.DB, companyID, productID uint64, batchNumber string) (*models.ProductBatch, error) {
 	var batch models.ProductBatch
 	err := db.Where("company_id = ? AND product_id = ? AND batch_number = ?", companyID, productID, batchNumber).First(&batch).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &batch, err
 }
 

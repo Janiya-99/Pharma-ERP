@@ -25,11 +25,15 @@ func (s *ManufacturerService) GetByID(db *gorm.DB, companyID, id uint64) (*model
 	return s.repo.GetManufacturerByID(db, companyID, id)
 }
 func (s *ManufacturerService) Create(c *gin.Context, db *gorm.DB, companyID uint64, req dto.CreateManufacturerRequest) (*models.Manufacturer, error) {
-	if e, _ := s.repo.GetManufacturerByCode(db, companyID, req.ManufacturerCode); e != nil {
+	e, err := s.repo.GetManufacturerByCode(db, companyID, req.ManufacturerCode)
+	if err != nil {
+		return nil, err
+	}
+	if e != nil {
 		return nil, errors.New("code exists")
 	}
 	m := &models.Manufacturer{CompanyID: companyID, ManufacturerCode: req.ManufacturerCode, ManufacturerName: req.ManufacturerName, Country: req.Country, ContactPerson: req.ContactPerson, ContactNumber: req.ContactNumber, Email: req.Email, Address: req.Address, Status: req.Status}
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := s.repo.Create(tx, m); err != nil {
 			return err
 		}
@@ -44,7 +48,11 @@ func (s *ManufacturerService) Update(c *gin.Context, db *gorm.DB, companyID, id 
 		return nil, err
 	}
 	if m.ManufacturerCode != req.ManufacturerCode {
-		if e, _ := s.repo.GetManufacturerByCode(db, companyID, req.ManufacturerCode); e != nil {
+		e, err := s.repo.GetManufacturerByCode(db, companyID, req.ManufacturerCode)
+		if err != nil {
+			return nil, err
+		}
+		if e != nil {
 			return nil, errors.New("code exists")
 		}
 	}

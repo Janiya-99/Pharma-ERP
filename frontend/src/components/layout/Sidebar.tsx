@@ -7,7 +7,7 @@ import {
   FileCheck, Settings, BookOpen,
   Package, Truck, ChevronRight, Pin, PinOff, LogOut, User,
   Landmark, BarChart3, Building2, Warehouse, ClipboardList,
-  RotateCcw, Repeat
+  RotateCcw, Repeat, Users, FileText, CreditCard, Receipt
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
 import {
@@ -24,10 +24,12 @@ type MenuItem = {
   path?: string;
   icon: React.ComponentType<{ className?: string }>;
   permission?: string;
+  disabled?: boolean;
   children?: {
     name: string;
     path: string;
     permission?: string;
+    disabled?: boolean;
   }[];
 };
 
@@ -201,11 +203,47 @@ const Sidebar = () => {
     },
   ];
 
+  const invoiceCenterMenus: MenuItem[] = [
+    { name: "Invoice Center Dashboard", path: "/invoice-center/dashboard", icon: LayoutDashboard, permission: "invoice_center.dashboard.view" },
+    {
+      name: "Customer Management",
+      icon: Users,
+      children: [
+        { name: "Customer Categories", path: "/invoice-center/customer-categories", permission: "invoice_center.customer_category.view" },
+        { name: "Customers", path: "/invoice-center/customers", permission: "invoice_center.customer.view" },
+      ],
+    },
+    {
+      name: "Sales",
+      icon: FileText,
+      children: [
+        { name: "Sales Orders", path: "/invoice-center/sales-orders", permission: "invoice_center.sales_order.view", disabled: true },
+        { name: "Sales Invoices", path: "/invoice-center/sales-invoices", permission: "invoice_center.sales_invoice.view", disabled: true },
+      ],
+    },
+    {
+      name: "Adjustments",
+      icon: CreditCard,
+      children: [
+        { name: "Credit Notes", path: "/invoice-center/credit-notes", permission: "invoice_center.credit_note.view", disabled: true },
+        { name: "Debit Notes", path: "/invoice-center/debit-notes", permission: "invoice_center.debit_note.view", disabled: true },
+      ],
+    },
+    {
+      name: "Receipts",
+      icon: Receipt,
+      children: [
+        { name: "Customer Receipts", path: "/invoice-center/customer-receipts", permission: "invoice_center.customer_receipt.view", disabled: true },
+      ],
+    },
+  ];
+
   const getMenus = (): MenuItem[] => {
     const code = activeSoftware?.software_code;
     if (code === "CONTROL_CENTER") return controlCenterMenus;
     if (code === "FINANCE") return financeMenus;
     if (code === "INVENTORY") return inventoryMenus;
+    if (code === "INVOICE_CENTER") return invoiceCenterMenus;
     return [{ name: "Dashboard", path: `/${code?.toLowerCase().replace("_", "-")}/dashboard`, icon: LayoutDashboard }];
   };
 
@@ -310,27 +348,42 @@ const Sidebar = () => {
         </button>
         {effectiveExpanded && isAccordionOpen && (
           <div className="pl-6 pr-1.5 mt-0.5 space-y-0.5 border-l border-white/30 ml-5.5 flex flex-col gap-0.5">
-            {menu.children!.map((child) => (
-              <PermissionGuard key={child.path} permission={child.permission}>
-                <NavLink
-                  to={child.path}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150 ${
-                      isActive
-                        ? "bg-white/40 text-blueMono-900 font-semibold shadow-sm"
-                        : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
-                    }`
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-blueMono-700" : "bg-blueMono-300/50"}`} />
-                      <span className="truncate">{child.name}</span>
-                    </>
-                  )}
-                </NavLink>
-              </PermissionGuard>
-            ))}
+            {menu.children!.map((child) => {
+              if (child.disabled) {
+                return (
+                  <PermissionGuard key={child.path} permission={child.permission}>
+                    <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[12px] font-medium text-blueMono-800/40 cursor-not-allowed opacity-60">
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blueMono-300/30 shrink-0" />
+                        <span className="truncate">{child.name}</span>
+                      </div>
+                      <span className="text-[9px] bg-white/30 text-blueMono-800/60 px-1.5 py-0.5 rounded ml-1 shrink-0">Soon</span>
+                    </div>
+                  </PermissionGuard>
+                );
+              }
+              return (
+                <PermissionGuard key={child.path} permission={child.permission}>
+                  <NavLink
+                    to={child.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150 ${
+                        isActive
+                          ? "bg-white/40 text-blueMono-900 font-semibold shadow-sm"
+                          : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-blueMono-700" : "bg-blueMono-300/50"}`} />
+                        <span className="truncate">{child.name}</span>
+                      </>
+                    )}
+                  </NavLink>
+                </PermissionGuard>
+              );
+            })}
           </div>
         )}
       </div>

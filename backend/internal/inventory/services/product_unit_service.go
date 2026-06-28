@@ -25,11 +25,15 @@ func (s *ProductUnitService) GetByID(db *gorm.DB, companyID, id uint64) (*models
 	return s.repo.GetUnitByID(db, companyID, id)
 }
 func (s *ProductUnitService) Create(c *gin.Context, db *gorm.DB, companyID uint64, req dto.CreateProductUnitRequest) (*models.ProductUnit, error) {
-	if e, _ := s.repo.GetUnitByCode(db, companyID, req.UnitCode); e != nil {
+	e, err := s.repo.GetUnitByCode(db, companyID, req.UnitCode)
+	if err != nil {
+		return nil, err
+	}
+	if e != nil {
 		return nil, errors.New("unit_code exists")
 	}
 	m := &models.ProductUnit{CompanyID: companyID, UnitCode: req.UnitCode, UnitName: req.UnitName, Description: req.Description, Status: req.Status}
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := s.repo.Create(tx, m); err != nil {
 			return err
 		}
@@ -44,7 +48,11 @@ func (s *ProductUnitService) Update(c *gin.Context, db *gorm.DB, companyID, id u
 		return nil, err
 	}
 	if m.UnitCode != req.UnitCode {
-		if e, _ := s.repo.GetUnitByCode(db, companyID, req.UnitCode); e != nil {
+		e, err := s.repo.GetUnitByCode(db, companyID, req.UnitCode)
+		if err != nil {
+			return nil, err
+		}
+		if e != nil {
 			return nil, errors.New("unit_code exists")
 		}
 	}

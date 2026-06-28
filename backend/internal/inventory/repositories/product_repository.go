@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/pixandco/erp-phrma/internal/inventory/models"
 	"gorm.io/gorm"
 )
@@ -48,6 +50,9 @@ func (r *ProductRepository) GetByID(db *gorm.DB, companyID, id uint64) (*models.
 func (r *ProductRepository) GetByCode(db *gorm.DB, companyID uint64, code string) (*models.Product, error) {
 	var product models.Product
 	err := db.Where("company_id = ? AND product_code = ?", companyID, code).First(&product).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &product, err
 }
 
@@ -72,6 +77,9 @@ func (r *ProductRepository) GetBarcodes(db *gorm.DB, productID uint64) ([]models
 func (r *ProductRepository) GetBarcode(db *gorm.DB, companyID uint64, barcode string) (*models.ProductBarcode, error) {
 	var res models.ProductBarcode
 	err := db.Where("company_id = ? AND barcode = ?", companyID, barcode).First(&res).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &res, err
 }
 

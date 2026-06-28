@@ -30,9 +30,28 @@ func (r *InvoiceDashboardRepository) GetSummary(db *gorm.DB, companyID uint64) (
 		return nil, err
 	}
 
+	// Blocked Customers
+	if err := db.Model(&models.Customer{}).Where("company_id = ? AND status = ?", companyID, "blocked").Count(&summary.BlockedCustomers).Error; err != nil {
+		return nil, err
+	}
+
+	// On Hold Customers
+	if err := db.Model(&models.Customer{}).Where("company_id = ? AND status = ?", companyID, "on_hold").Count(&summary.OnHoldCustomers).Error; err != nil {
+		return nil, err
+	}
+
 	// Customers Over Credit Limit
 	if err := db.Model(&models.Customer{}).Where("company_id = ? AND credit_limit > 0 AND current_balance > credit_limit", companyID).Count(&summary.CustomersOverCreditLimit).Error; err != nil {
 		return nil, err
+	}
+
+	// Total Credit Limit
+	var totalCredit *float64
+	if err := db.Model(&models.Customer{}).Where("company_id = ?", companyID).Select("SUM(credit_limit)").Scan(&totalCredit).Error; err != nil {
+		return nil, err
+	}
+	if totalCredit != nil {
+		summary.TotalCreditLimit = *totalCredit
 	}
 
 	// Total Customer Balance

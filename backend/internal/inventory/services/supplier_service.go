@@ -25,11 +25,15 @@ func (s *SupplierService) GetByID(db *gorm.DB, companyID, id uint64) (*models.Su
 	return s.repo.GetSupplierByID(db, companyID, id)
 }
 func (s *SupplierService) Create(c *gin.Context, db *gorm.DB, companyID uint64, req dto.CreateSupplierRequest) (*models.Supplier, error) {
-	if e, _ := s.repo.GetSupplierByCode(db, companyID, req.SupplierCode); e != nil {
+	e, err := s.repo.GetSupplierByCode(db, companyID, req.SupplierCode)
+	if err != nil {
+		return nil, err
+	}
+	if e != nil {
 		return nil, errors.New("code exists")
 	}
 	m := &models.Supplier{CompanyID: companyID, SupplierCode: req.SupplierCode, SupplierName: req.SupplierName, ContactPerson: req.ContactPerson, ContactNumber: req.ContactNumber, Email: req.Email, Address: req.Address, TaxRegistrationNumber: req.TaxRegistrationNumber, PaymentTermsDays: req.PaymentTermsDays, PayableAccountID: req.PayableAccountID, Status: req.Status}
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := s.repo.Create(tx, m); err != nil {
 			return err
 		}
@@ -44,7 +48,11 @@ func (s *SupplierService) Update(c *gin.Context, db *gorm.DB, companyID, id uint
 		return nil, err
 	}
 	if m.SupplierCode != req.SupplierCode {
-		if e, _ := s.repo.GetSupplierByCode(db, companyID, req.SupplierCode); e != nil {
+		e, err := s.repo.GetSupplierByCode(db, companyID, req.SupplierCode)
+		if err != nil {
+			return nil, err
+		}
+		if e != nil {
 			return nil, errors.New("code exists")
 		}
 	}

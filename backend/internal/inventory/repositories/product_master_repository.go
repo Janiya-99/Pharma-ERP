@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/pixandco/erp-phrma/internal/inventory/models"
 	"gorm.io/gorm"
 )
@@ -38,6 +40,9 @@ func (r *ProductMasterRepository) GetCategoryByID(db *gorm.DB, companyID, id uin
 func (r *ProductMasterRepository) GetCategoryByCode(db *gorm.DB, companyID uint64, code string) (*models.ProductCategory, error) {
 	var res models.ProductCategory
 	err := db.Where("company_id = ? AND category_code = ?", companyID, code).First(&res).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &res, err
 }
 
@@ -61,6 +66,9 @@ func (r *ProductMasterRepository) GetUnitByID(db *gorm.DB, companyID, id uint64)
 func (r *ProductMasterRepository) GetUnitByCode(db *gorm.DB, companyID uint64, code string) (*models.ProductUnit, error) {
 	var res models.ProductUnit
 	err := db.Where("company_id = ? AND unit_code = ?", companyID, code).First(&res).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &res, err
 }
 
@@ -84,6 +92,9 @@ func (r *ProductMasterRepository) GetDosageFormByID(db *gorm.DB, companyID, id u
 func (r *ProductMasterRepository) GetDosageFormByCode(db *gorm.DB, companyID uint64, code string) (*models.DosageForm, error) {
 	var res models.DosageForm
 	err := db.Where("company_id = ? AND dosage_form_code = ?", companyID, code).First(&res).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &res, err
 }
 
@@ -107,6 +118,9 @@ func (r *ProductMasterRepository) GetGenericNameByID(db *gorm.DB, companyID, id 
 func (r *ProductMasterRepository) GetGenericNameByCode(db *gorm.DB, companyID uint64, code string) (*models.GenericName, error) {
 	var res models.GenericName
 	err := db.Where("company_id = ? AND generic_code = ?", companyID, code).First(&res).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &res, err
 }
 
@@ -130,6 +144,9 @@ func (r *ProductMasterRepository) GetManufacturerByID(db *gorm.DB, companyID, id
 func (r *ProductMasterRepository) GetManufacturerByCode(db *gorm.DB, companyID uint64, code string) (*models.Manufacturer, error) {
 	var res models.Manufacturer
 	err := db.Where("company_id = ? AND manufacturer_code = ?", companyID, code).First(&res).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &res, err
 }
 
@@ -153,6 +170,9 @@ func (r *ProductMasterRepository) GetSupplierByID(db *gorm.DB, companyID, id uin
 func (r *ProductMasterRepository) GetSupplierByCode(db *gorm.DB, companyID uint64, code string) (*models.Supplier, error) {
 	var res models.Supplier
 	err := db.Where("company_id = ? AND supplier_code = ?", companyID, code).First(&res).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return &res, err
 }
 

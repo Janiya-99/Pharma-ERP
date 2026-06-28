@@ -34,13 +34,21 @@ func (s *ProductService) GetProductByID(db *gorm.DB, companyID, id uint64) (*mod
 }
 
 func (s *ProductService) CreateProduct(c *gin.Context, db *gorm.DB, companyID uint64, req dto.CreateProductRequest) (*models.Product, error) {
-	if existing, _ := s.repo.GetByCode(db, companyID, req.ProductCode); existing != nil {
+	existing, err := s.repo.GetByCode(db, companyID, req.ProductCode)
+	if err != nil {
+		return nil, err
+	}
+	if existing != nil {
 		return nil, errors.New("product_code already exists")
 	}
 
 	var barcodeModels []models.ProductBarcode
 	for _, b := range req.Barcodes {
-		if eb, _ := s.repo.GetBarcode(db, companyID, b.Barcode); eb != nil {
+		eb, err := s.repo.GetBarcode(db, companyID, b.Barcode)
+		if err != nil {
+			return nil, err
+		}
+		if eb != nil {
 			return nil, errors.New("barcode already exists: " + b.Barcode)
 		}
 		barcodeModels = append(barcodeModels, models.ProductBarcode{
@@ -77,7 +85,7 @@ func (s *ProductService) CreateProduct(c *gin.Context, db *gorm.DB, companyID ui
 		Status:                   req.Status,
 	}
 
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := s.repo.Create(tx, p); err != nil {
 			return err
 		}
@@ -106,7 +114,11 @@ func (s *ProductService) UpdateProduct(c *gin.Context, db *gorm.DB, companyID, i
 	}
 
 	if p.ProductCode != req.ProductCode {
-		if existing, _ := s.repo.GetByCode(db, companyID, req.ProductCode); existing != nil {
+		existing, err := s.repo.GetByCode(db, companyID, req.ProductCode)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
 			return nil, errors.New("product_code already exists")
 		}
 	}
@@ -148,7 +160,11 @@ func (s *ProductService) UpdateProduct(c *gin.Context, db *gorm.DB, companyID, i
 
 	var barcodeModels []models.ProductBarcode
 	for _, b := range req.Barcodes {
-		if eb, _ := s.repo.GetBarcode(db, companyID, b.Barcode); eb != nil && eb.ProductID != id {
+		eb, err := s.repo.GetBarcode(db, companyID, b.Barcode)
+		if err != nil {
+			return nil, err
+		}
+		if eb != nil && eb.ProductID != id {
 			return nil, errors.New("barcode already belongs to another product: " + b.Barcode)
 		}
 		barcodeModels = append(barcodeModels, models.ProductBarcode{

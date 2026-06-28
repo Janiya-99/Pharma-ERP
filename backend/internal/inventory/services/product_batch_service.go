@@ -47,7 +47,11 @@ func (s *ProductBatchService) CreateProductBatch(c *gin.Context, db *gorm.DB, co
 		return nil, errors.New("product not found")
 	}
 
-	if existing, _ := s.repo.GetByNumber(db, companyID, req.ProductID, req.BatchNumber); existing != nil {
+	existing, err := s.repo.GetByNumber(db, companyID, req.ProductID, req.BatchNumber)
+	if err != nil {
+		return nil, err
+	}
+	if existing != nil {
 		return nil, errors.New("batch_number already exists for this product")
 	}
 
@@ -101,7 +105,11 @@ func (s *ProductBatchService) UpdateProductBatch(c *gin.Context, db *gorm.DB, co
 	p, _ := s.productRepo.GetByID(db, companyID, batch.ProductID)
 
 	if batch.BatchNumber != req.BatchNumber {
-		if existing, _ := s.repo.GetByNumber(db, companyID, batch.ProductID, req.BatchNumber); existing != nil {
+		existing, err := s.repo.GetByNumber(db, companyID, batch.ProductID, req.BatchNumber)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
 			return nil, errors.New("batch_number already exists for this product")
 		}
 		hasLedger, _ := s.stockRepo.CheckBatchHasLedger(db, id)
