@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
 import { ERPFormModal, FormField } from "components/erp/ERPFormModal";
 import { ERPDetailPanel, DetailField } from "components/erp/ERPDetailPanel";
@@ -6,69 +6,18 @@ import api from "lib/api";
 import { toast } from "sonner";
 
 const companyFields: FormField[] = [
-  {
-    key: "name",
-    label: "Company Name",
-    type: "text",
-    required: true,
-    placeholder: "e.g. PharmaDist Lanka",
-  },
-  {
-    key: "legalName",
-    label: "Legal Name",
-    type: "text",
-    required: true,
-    placeholder: "Full legal entity name",
-  },
-  {
-    key: "regNo",
-    label: "Registration No.",
-    type: "text",
-    required: true,
-    placeholder: "e.g. PV00123456",
-  },
-  {
-    key: "tin",
-    label: "TIN Number",
-    type: "text",
-    placeholder: "Tax ID Number",
-  },
-  {
-    key: "vat",
-    label: "VAT Number",
-    type: "text",
-    placeholder: "VAT Registration No.",
-  },
-  {
-    key: "address",
-    label: "Address",
-    type: "textarea",
-    span: 2,
-    placeholder: "Full company address",
-  },
-  {
-    key: "phone",
-    label: "Phone",
-    type: "tel",
-    required: true,
-    placeholder: "+94 11 234 5678",
-  },
-  {
-    key: "email",
-    label: "Email",
-    type: "email",
-    required: true,
-    placeholder: "info@company.lk",
-  },
-  {
-    key: "status",
-    label: "Status",
-    type: "select",
-    options: [
-      { label: "Active", value: "Active" },
-      { label: "Inactive", value: "Inactive" },
-    ],
-  },
+  { key: "name", label: "Company Name", type: "text", required: true, placeholder: "e.g. PharmaDist Lanka" },
+  { key: "legalName", label: "Legal Name", type: "text", required: true, placeholder: "Full legal entity name" },
+  { key: "regNo", label: "Registration No.", type: "text", required: true, placeholder: "e.g. PV00123456" },
+  { key: "tin", label: "TIN Number", type: "text", placeholder: "Tax ID Number" },
+  { key: "vat", label: "VAT Number", type: "text", placeholder: "VAT Registration No." },
+  { key: "address", label: "Address", type: "textarea", span: 2, placeholder: "Full company address" },
+  { key: "phone", label: "Phone", type: "tel", required: true, placeholder: "+94 11 234 5678" },
+  { key: "email", label: "Email", type: "email", required: true, placeholder: "info@company.lk" },
+  { key: "status", label: "Status", type: "select", options: [
+    { label: "Active", value: "Active" },
+    { label: "Inactive", value: "Inactive" },
+  ]},
 ];
 
 export default function CompanyPage() {
@@ -114,7 +63,7 @@ export default function CompanyPage() {
     setShowDetail(true);
   };
 
-  const handleSave = async (values: Record<string, any>, isDraft: boolean) => {
+  const handleSave = async (values: Record<string, any>) => {
     setSaving(true);
     try {
       if (isEdit && selected) {
@@ -134,19 +83,17 @@ export default function CompanyPage() {
     }
   };
 
-  const detailFields: DetailField[] = selected
-    ? [
-        { label: "Company Name", value: selected.name },
-        { label: "Legal Name", value: selected.legalName },
-        { label: "Registration No.", value: selected.regNo },
-        { label: "TIN", value: selected.tin },
-        { label: "VAT No.", value: selected.vat },
-        { label: "Status", value: <StatusBadge status={selected.status} /> },
-        { label: "Address", value: selected.address, span: 2 },
-        { label: "Phone", value: selected.phone },
-        { label: "Email", value: selected.email },
-      ]
-    : [];
+  const detailFields: DetailField[] = selected ? [
+    { label: "Company Name", value: selected.name },
+    { label: "Legal Name", value: selected.legalName },
+    { label: "Registration No.", value: selected.regNo },
+    { label: "TIN", value: selected.tin },
+    { label: "VAT No.", value: selected.vat },
+    { label: "Status", value: <StatusBadge status={selected.status} /> },
+    { label: "Address", value: selected.address, span: 2 },
+    { label: "Phone", value: selected.phone },
+    { label: "Email", value: selected.email },
+  ] : [];
 
   return (
     <>
@@ -167,11 +114,7 @@ export default function CompanyPage() {
           { key: "vat", label: "VAT No." },
           { key: "phone", label: "Phone" },
           { key: "email", label: "Email" },
-          {
-            key: "status",
-            label: "Status",
-            render: (row: any) => <StatusBadge status={row.status} />,
-          },
+          { key: "status", label: "Status", render: (row: any) => <StatusBadge status={row.status} /> },
         ]}
       />
 

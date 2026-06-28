@@ -1,28 +1,18 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 
-const OpeningStockActionButtons = ({
-  entry,
-  onDelete,
-  onSubmit,
-  onApprove,
-  onReject,
+const OpeningStockActionButtons = ({ 
+  entry, 
+  onDelete, 
+  onSubmit, 
+  onApprove, 
+  onReject, 
   onPost,
   showViewButton = false,
-  className = "",
-}: {
-  entry?: any;
-  onDelete?: () => void;
-  onSubmit?: () => void;
-  onApprove?: () => void;
-  onReject?: () => void;
-  onPost?: () => void;
-  showViewButton?: boolean;
-  className?: string;
-}) => {
+  className = "" 
+}: { entry?: any; onDelete?: () => void; onSubmit?: () => void; onApprove?: () => void; onReject?: () => void; onPost?: () => void; showViewButton?: boolean; className?: string }) => {
   const { hasPermission } = useAuth();
-
+  
   if (!entry) return null;
 
   const status = entry.approval_status?.toLowerCase();
@@ -32,7 +22,7 @@ const OpeningStockActionButtons = ({
   const isPending = status === "pending";
   const isApproved = status === "approved";
   const isUnposted = postedStatus === "unposted";
-
+  
   // Calculate visibility based on business rules
   const canEdit = isDraftOrRejected;
   const canDelete = isDraftOrRejected;
@@ -80,10 +70,7 @@ const OpeningStockActionButtons = ({
       )}
 
       {canPost && hasPermission("inventory.opening_stock.post") && (
-        <button
-          onClick={onPost}
-          className="btn-primary bg-indigo-600 text-white hover:bg-indigo-700"
-        >
+        <button onClick={onPost} className="btn-primary bg-indigo-600 hover:bg-indigo-700 text-white">
           Post Stock
         </button>
       )}

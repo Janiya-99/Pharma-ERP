@@ -1,20 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Send } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
 import Modal from "../../../components/common/Modal";
 
-const SubmitGRNModal = ({
-  isOpen,
-  onClose,
-  grnId,
-  onSuccess,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  grnId?: string | number;
-  onSuccess?: unknown;
-}) => {
+const SubmitGRNModal = ({ isOpen, onClose, grnId, onSuccess }: { isOpen?: boolean; onClose?: unknown; grnId?: string | number; onSuccess?: unknown }) => {
   const [remarks, setRemarks] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -36,38 +26,37 @@ const SubmitGRNModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Submit Goods Receipt Note">
       <div className="p-4">
-        <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-          Are you sure you want to submit this GRN for approval? Once submitted,
-          it cannot be edited unless rejected.
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+          Are you sure you want to submit this GRN for approval? Once submitted, it cannot be edited unless rejected.
         </p>
 
         <div className="mb-4">
-          <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             Remarks (Optional)
           </label>
           <textarea
             value={remarks}
             onChange={(e: any) => setRemarks(e.target.value)}
             rows={3}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+            className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
             placeholder="Add any notes..."
           />
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
             disabled={submitting}
-            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700 disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex items-center gap-2 rounded-xl bg-yellow-100 px-4 py-2 text-sm font-medium text-yellow-700 hover:bg-yellow-200 disabled:opacity-50 dark:bg-yellow-900 dark:text-yellow-100 dark:hover:bg-yellow-800"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-700 bg-yellow-100 rounded-xl hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-100 dark:hover:bg-yellow-800 disabled:opacity-50"
           >
-            <Send className="h-4 w-4" />
+            <Send className="w-4 h-4" />
             {submitting ? "Submitting..." : "Submit"}
           </button>
         </div>

@@ -2,15 +2,9 @@
  * ERPFormModal — Reusable modal dialog for Add/Edit forms across all modules.
  * Supports field validation, draft/submit modes, and disabled fields for posted records.
  */
-import React, { useState, useEffect } from "react";
-import { MdClose, MdSave, MdSend } from "react-icons/md";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "components/ui/select";
+import { useState, useEffect } from "react";
+import { MdSave, MdSend } from "react-icons/md";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "components/ui/popover";
 import { Calendar } from "components/ui/calendar";
 import { Button } from "components/ui/button";
@@ -25,15 +19,7 @@ import {
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
-export type FieldType =
-  | "text"
-  | "email"
-  | "tel"
-  | "number"
-  | "select"
-  | "textarea"
-  | "date"
-  | "password";
+export type FieldType = "text" | "email" | "tel" | "number" | "select" | "textarea" | "date" | "password";
 
 export type FormField = {
   key: string;
@@ -109,11 +95,7 @@ export function ERPFormModal({
     let error = "";
     if (field.required && (!value || String(value).trim() === "")) {
       error = `${field.label} is required`;
-    } else if (
-      field.type === "email" &&
-      value &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-    ) {
+    } else if (field.type === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       error = "Invalid email format";
     } else if (field.type === "number" && value && isNaN(Number(value))) {
       error = "Must be a number";
@@ -139,11 +121,7 @@ export function ERPFormModal({
       if (field.required && (!value || String(value).trim() === "")) {
         error = `${field.label} is required`;
         allValid = false;
-      } else if (
-        field.type === "email" &&
-        value &&
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-      ) {
+      } else if (field.type === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
         error = "Invalid email format";
         allValid = false;
       } else if (field.validate) {
@@ -168,25 +146,18 @@ export function ERPFormModal({
 
   return (
     <Sheet open={open} onOpenChange={(val: unknown) => !val && onClose()}>
-      <SheetContent
-        side="right"
-        className="flex w-[400px] flex-col border-none bg-gray-50 p-0 shadow-2xl dark:bg-navy-900 sm:w-[540px] sm:max-w-none"
-      >
+      <SheetContent side="right" className="w-[400px] sm:w-[540px] sm:max-w-none p-0 flex flex-col bg-gray-50 dark:bg-navy-900 border-none shadow-2xl">
         {/* Header */}
-        <SheetHeader className="border-b border-gray-100 bg-white px-6 py-5 text-left dark:border-navy-700 dark:bg-navy-800">
-          <SheetTitle className="text-lg font-bold text-navy-700 dark:text-white">
-            {title}
-          </SheetTitle>
+        <SheetHeader className="px-6 py-5 bg-white dark:bg-navy-800 border-b border-gray-100 dark:border-navy-700 text-left">
+          <SheetTitle className="text-lg font-bold text-navy-700 dark:text-white">{title}</SheetTitle>
           {subtitle && (
-            <SheetDescription className="mt-0.5 text-[12px] text-gray-400">
-              {subtitle}
-            </SheetDescription>
+            <SheetDescription className="text-[12px] text-gray-400 mt-0.5">{subtitle}</SheetDescription>
           )}
         </SheetHeader>
 
         {/* Posted notice */}
         {isPosted && (
-          <div className="mx-6 mt-4 shrink-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5">
+          <div className="mx-6 mt-4 px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-200 shrink-0">
             <p className="text-[12px] font-semibold text-amber-700">
               This record has been posted and cannot be edited.
             </p>
@@ -195,49 +166,31 @@ export function ERPFormModal({
 
         {/* Form Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
-          <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
             {fields.map((field: unknown) => (
               <div
                 key={field.key}
                 className={field.span === 2 ? "sm:col-span-2" : ""}
               >
-                <label className="mb-2 block text-[13px] font-bold text-navy-700 dark:text-white">
+                <label className="block text-[13px] font-bold text-navy-700 dark:text-white mb-2">
                   {field.label}
                   {field.required && (
-                    <span className="ml-0.5 text-red-500">*</span>
+                    <span className="text-red-500 ml-0.5">*</span>
                   )}
                 </label>
 
                 {field.type === "select" ? (
                   <Select
-                    value={
-                      values[field.key] !== undefined &&
-                      values[field.key] !== null &&
-                      values[field.key] !== ""
-                        ? String(values[field.key])
-                        : undefined
-                    }
-                    onValueChange={(val: unknown) => {
-                      handleChange(field.key, val);
-                      setTouched((prev: unknown) => ({
-                        ...prev,
-                        [field.key]: true,
-                      }));
-                    }}
+                    value={values[field.key] !== undefined && values[field.key] !== null && values[field.key] !== "" ? String(values[field.key]) : undefined}
+                    onValueChange={(val: unknown) => { handleChange(field.key, val); setTouched((prev: unknown) => ({...prev, [field.key]: true})); }}
                     disabled={isPosted || field.disabled}
                   >
-                    <SelectTrigger
-                      className={`h-[44px] w-full rounded-xl border bg-white px-4 text-sm text-navy-700 focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:disabled:bg-white/5 ${
-                        errors[field.key] && touched[field.key]
-                          ? "border-red-300 focus:ring-red-50 dark:focus:ring-red-500/20"
-                          : "border-gray-200 shadow-sm focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20"
-                      }`}
-                    >
-                      <SelectValue
-                        placeholder={
-                          field.placeholder || `Select ${field.label}`
-                        }
-                      />
+                    <SelectTrigger className={`w-full rounded-xl border px-4 h-[44px] text-sm text-navy-700 dark:text-white bg-white dark:bg-navy-900 dark:border-white/10 focus:ring-2 focus:ring-offset-0 disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
+                      errors[field.key] && touched[field.key]
+                        ? "border-red-300 focus:ring-red-50 dark:focus:ring-red-500/20"
+                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
+                    }`}>
+                      <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
                     </SelectTrigger>
                     <SelectContent>
                       {field.options?.map((opt: unknown) => (
@@ -253,43 +206,26 @@ export function ERPFormModal({
                       <Button
                         variant={"outline"}
                         disabled={isPosted || field.disabled}
-                        className={`h-[44px] w-full justify-start rounded-xl border bg-white px-4 text-left font-normal text-navy-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:hover:bg-white/5 dark:disabled:bg-white/5 ${
-                          !values[field.key] &&
-                          "text-gray-400 dark:text-gray-500"
+                        className={`w-full justify-start text-left font-normal h-[44px] rounded-xl border px-4 bg-white dark:bg-navy-900 dark:border-white/10 text-navy-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
+                          !values[field.key] && "text-gray-400 dark:text-gray-500"
                         } ${
                           errors[field.key] && touched[field.key]
                             ? "border-red-300 focus:ring-red-50 dark:focus:ring-red-500/20"
-                            : "border-gray-200 shadow-sm focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20"
+                            : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
                         }`}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {values[field.key] ? (
-                          format(new Date(values[field.key]), "PPP")
-                        ) : (
-                          <span>{field.placeholder || "Pick a date"}</span>
-                        )}
+                        {values[field.key] ? format(new Date(values[field.key]), "PPP") : <span>{field.placeholder || "Pick a date"}</span>}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent
-                      className="z-[105] w-auto p-0"
-                      align="start"
-                    >
+                    <PopoverContent className="w-auto p-0 z-[105]" align="start">
                       <Calendar
                         mode="single"
-                        selected={
-                          values[field.key]
-                            ? new Date(values[field.key])
-                            : undefined
-                        }
+                        selected={values[field.key] ? new Date(values[field.key]) : undefined}
                         onSelect={(date: unknown) => {
-                          const dateString = date
-                            ? format(date, "yyyy-MM-dd")
-                            : "";
+                          const dateString = date ? format(date, "yyyy-MM-dd") : "";
                           handleChange(field.key, dateString);
-                          setTouched((prev: unknown) => ({
-                            ...prev,
-                            [field.key]: true,
-                          }));
+                          setTouched((prev: unknown) => ({...prev, [field.key]: true}));
                         }}
                         initialFocus
                       />
@@ -298,33 +234,29 @@ export function ERPFormModal({
                 ) : field.type === "textarea" ? (
                   <textarea
                     value={values[field.key] || ""}
-                    onChange={(e: any) =>
-                      handleChange(field.key, e.target.value)
-                    }
+                    onChange={(e: any) => handleChange(field.key, e.target.value)}
                     onBlur={() => handleBlur(field.key)}
                     disabled={isPosted || field.disabled}
                     placeholder={field.placeholder}
                     rows={3}
-                    className={`w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm text-navy-700 transition-all placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:placeholder:text-gray-500 dark:disabled:bg-white/5 ${
+                    className={`w-full rounded-xl border px-4 py-3 text-sm text-navy-700 dark:text-white bg-white dark:bg-navy-900 dark:border-white/10 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition-all resize-none disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
                       errors[field.key] && touched[field.key]
                         ? "border-red-300 focus:border-red-400 focus:ring-red-50 dark:focus:ring-red-500/20"
-                        : "border-gray-200 shadow-sm focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20"
+                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
                     }`}
                   />
                 ) : (
                   <input
                     type={field.type}
                     value={values[field.key] || ""}
-                    onChange={(e: any) =>
-                      handleChange(field.key, e.target.value)
-                    }
+                    onChange={(e: any) => handleChange(field.key, e.target.value)}
                     onBlur={() => handleBlur(field.key)}
                     disabled={isPosted || field.disabled}
                     placeholder={field.placeholder}
-                    className={`h-[44px] w-full rounded-xl border bg-white px-4 text-sm text-navy-700 transition-all placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:placeholder:text-gray-500 dark:disabled:bg-white/5 ${
+                    className={`w-full rounded-xl border px-4 h-[44px] text-sm text-navy-700 dark:text-white bg-white dark:bg-navy-900 dark:border-white/10 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition-all disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
                       errors[field.key] && touched[field.key]
                         ? "border-red-300 focus:border-red-400 focus:ring-red-50 dark:focus:ring-red-500/20"
-                        : "border-gray-200 shadow-sm focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20"
+                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
                     }`}
                   />
                 )}
@@ -342,10 +274,10 @@ export function ERPFormModal({
 
         {/* Footer */}
         {!isPosted && (
-          <SheetFooter className="mt-0 shrink-0 flex-row gap-2 border-t border-gray-100 bg-white px-6 py-4 dark:border-navy-700 dark:bg-navy-800 sm:justify-end">
+          <SheetFooter className="flex-row sm:justify-end gap-2 px-6 py-4 bg-white dark:bg-navy-800 border-t border-gray-100 dark:border-navy-700 mt-0 shrink-0">
             <button
               onClick={onClose}
-              className="rounded-xl px-4 py-2.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50"
+              className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
@@ -353,7 +285,7 @@ export function ERPFormModal({
               <button
                 onClick={() => handleSubmit(true)}
                 disabled={isLoading}
-                className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <MdSave size={16} />
                 Save Draft
@@ -362,7 +294,7 @@ export function ERPFormModal({
             <button
               onClick={() => handleSubmit(false)}
               disabled={isLoading}
-              className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-200 transition-colors hover:bg-brand-600 disabled:opacity-50"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-brand-500 text-sm font-semibold text-white hover:bg-brand-600 transition-colors shadow-sm shadow-brand-200 disabled:opacity-50"
             >
               {isLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />

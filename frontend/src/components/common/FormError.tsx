@@ -1,11 +1,10 @@
-import React from "react";
 import { AlertCircle } from "lucide-react";
 
 const FormError = ({ message }: { message?: unknown }) => {
   if (!message) return null;
 
   return (
-    <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4">
+    <div className="rounded-md bg-red-50 p-4 mb-4 border border-red-200">
       <div className="flex">
         <div className="flex-shrink-0">
           <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />

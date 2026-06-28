@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -69,14 +68,7 @@ import { Textarea } from "@/components/ui/textarea";
 type ApiRecord = Record<string, any>;
 type StatusTone = "success" | "warning" | "danger" | "info" | "neutral";
 type DrawerMode = "create" | "edit" | "view";
-type FieldType =
-  | "text"
-  | "number"
-  | "date"
-  | "email"
-  | "textarea"
-  | "select"
-  | "switch";
+type FieldType = "text" | "number" | "date" | "email" | "textarea" | "select" | "switch";
 
 type Option = {
   label: string;
@@ -134,33 +126,15 @@ const toneClasses: Record<StatusTone, string> = {
 
 const statusTone = (status: unknown): StatusTone => {
   const value = String(status || "").toLowerCase();
-  if (
-    ["active", "posted", "approved", "available", "good"].some((word) =>
-      value.includes(word)
-    )
-  )
-    return "success";
-  if (
-    ["draft", "pending", "low", "soon", "hold", "blocked", "submitted"].some(
-      (word) => value.includes(word)
-    )
-  )
-    return "warning";
-  if (
-    ["inactive", "expired", "rejected", "deleted", "out"].some((word) =>
-      value.includes(word)
-    )
-  )
-    return "danger";
-  if (["transfer", "grn", "open"].some((word) => value.includes(word)))
-    return "info";
+  if (["active", "posted", "approved", "available", "good"].some((word) => value.includes(word))) return "success";
+  if (["draft", "pending", "low", "soon", "hold", "blocked", "submitted"].some((word) => value.includes(word))) return "warning";
+  if (["inactive", "expired", "rejected", "deleted", "out"].some((word) => value.includes(word))) return "danger";
+  if (["transfer", "grn", "open"].some((word) => value.includes(word))) return "info";
   return "neutral";
 };
 
-const normalizeStatus = (value: unknown) =>
-  String(value || "active").toLowerCase();
-const normalizeDate = (value: unknown) =>
-  value ? String(value).slice(0, 10) : "";
+const normalizeStatus = (value: unknown) => String(value || "active").toLowerCase();
+const normalizeDate = (value: unknown) => (value ? String(value).slice(0, 10) : "");
 const toNumber = (value: unknown) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -170,63 +144,23 @@ const toNullableNumber = (value: unknown) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 };
 const compact = (payload: ApiRecord) =>
-  Object.fromEntries(
-    Object.entries(payload).filter(
-      ([, value]) => value !== "" && value !== undefined
-    )
-  );
+  Object.fromEntries(Object.entries(payload).filter(([, value]) => value !== "" && value !== undefined));
 
 const getId = (row?: ApiRecord) => row?.id ?? row?.ID;
 const getNested = (row: ApiRecord, path: string) =>
-  path
-    .split(".")
-    .reduce<any>(
-      (current, key) => (current == null ? undefined : current[key]),
-      row
-    );
+  path.split(".").reduce<any>((current, key) => (current == null ? undefined : current[key]), row);
 const valueOf = (row: ApiRecord, paths: string[], fallback = "—") => {
   for (const path of paths) {
     const value = getNested(row, path);
-    if (value !== undefined && value !== null && value !== "")
-      return String(value);
+    if (value !== undefined && value !== null && value !== "") return String(value);
   }
   return fallback;
 };
 const nameOf = (row?: ApiRecord) =>
-  row
-    ? valueOf(
-        row,
-        [
-          "name",
-          "product_name",
-          "warehouse_name",
-          "supplier_name",
-          "category_name",
-          "unit_name",
-          "dosage_form_name",
-          "generic_name",
-          "manufacturer_name",
-          "batch_number",
-          "grn_number",
-          "opening_stock_number",
-          "transfer_number",
-          "adjustment_number",
-          "purchase_return_number",
-          "sales_return_number",
-        ],
-        "Record"
-      )
-    : "Record";
-const makeOptions = (
-  rows: ApiRecord[],
-  labelPaths: string[],
-  valuePath = "id"
-) =>
+  row ? valueOf(row, ["name", "product_name", "warehouse_name", "supplier_name", "category_name", "unit_name", "dosage_form_name", "generic_name", "manufacturer_name", "batch_number", "grn_number", "opening_stock_number", "transfer_number", "adjustment_number", "purchase_return_number", "sales_return_number"], "Record") : "Record";
+const makeOptions = (rows: ApiRecord[], labelPaths: string[], valuePath = "id") =>
   rows
-    .map((row) => ({
-      label: valueOf(row, labelPaths),
-      value: String(getNested(row, valuePath) ?? ""),
-    }))
+    .map((row) => ({ label: valueOf(row, labelPaths), value: String(getNested(row, valuePath) ?? "") }))
     .filter((option) => option.value);
 
 const unwrapBody = (response: any) => response?.data ?? response;
@@ -244,25 +178,16 @@ const unwrapList = (response: any): ApiRecord[] => {
 
 const getErrorMessage = (error: any) => {
   const status = error?.response?.status;
-  if (status === 403)
-    return "You do not have permission to perform this action.";
+  if (status === 403) return "You do not have permission to perform this action.";
   if (status === 404) return "Record not found.";
   if (status >= 500) return "Something went wrong. Please try again.";
-  return (
-    error?.response?.data?.message ||
-    error?.message ||
-    "Something went wrong. Please try again."
-  );
+  return error?.response?.data?.message || error?.message || "Something went wrong. Please try again.";
 };
 
-const normalizeComparable = (value: unknown) =>
-  String(value ?? "")
-    .trim()
-    .toLowerCase();
+const normalizeComparable = (value: unknown) => String(value ?? "").trim().toLowerCase();
 
 const fieldLabel = (fields: FieldConfig[], name: string) =>
-  fields.find((field) => field.name === name)?.label ||
-  name.replaceAll("_", " ");
+  fields.find((field) => field.name === name)?.label || name.replaceAll("_", " ");
 
 const duplicateFieldError = (field: string, fields: FieldConfig[]) => {
   const label = fieldLabel(fields, field);
@@ -304,33 +229,16 @@ const backendValidationErrors = (error: any, config: UniqueFormConfig) => {
     const normalizedField = fieldKey.replaceAll("_", " ");
     const matchingMessage = messages.find((message) => {
       const normalizedMessage = normalizeComparable(message);
-      return (
-        normalizedMessage.includes(fieldKey) ||
-        normalizedMessage.includes(labelKey) ||
-        normalizedMessage.includes(normalizedField)
-      );
+      return normalizedMessage.includes(fieldKey) || normalizedMessage.includes(labelKey) || normalizedMessage.includes(normalizedField);
     });
     if (matchingMessage) errors[field.name] = matchingMessage;
   }
 
-  const firstCodeField = config.fields.find((field) =>
-    field.name.endsWith("_code")
-  )?.name;
+  const firstCodeField = config.fields.find((field) => field.name.endsWith("_code"))?.name;
   const duplicateField = config.uniqueField || firstCodeField;
-  if (
-    duplicateField &&
-    combined.includes("exists") &&
-    !errors[duplicateField]
-  ) {
-    if (
-      combined.includes(duplicateField) ||
-      combined.includes("code exists") ||
-      combined.includes("already exists")
-    ) {
-      errors[duplicateField] = duplicateFieldError(
-        duplicateField,
-        config.fields
-      );
+  if (duplicateField && combined.includes("exists") && !errors[duplicateField]) {
+    if (combined.includes(duplicateField) || combined.includes("code exists") || combined.includes("already exists")) {
+      errors[duplicateField] = duplicateFieldError(duplicateField, config.fields);
     }
   }
 
@@ -357,7 +265,7 @@ function useInventoryContext(): InventoryContextValue {
 function useBackendList(
   loader: (params: ApiRecord) => Promise<any>,
   params: ApiRecord = {},
-  enabled = true
+  enabled = true,
 ) {
   const [rows, setRows] = useState<ApiRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -389,7 +297,7 @@ function useBackendList(
 function useBackendRecord(
   loader: (params: ApiRecord) => Promise<any>,
   params: ApiRecord = {},
-  enabled = true
+  enabled = true,
 ) {
   const [record, setRecord] = useState<ApiRecord>({});
   const [loading, setLoading] = useState(false);
@@ -438,7 +346,7 @@ function requireBranch(context: InventoryContextValue) {
 async function runBackendAction(
   action: () => Promise<any>,
   successMessage: string,
-  refresh?: () => Promise<void> | void
+  refresh?: () => Promise<void> | void,
 ) {
   try {
     await action();
@@ -465,27 +373,21 @@ function InventoryPage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="text-slate-900 min-h-full bg-[#F8FAFC] px-4 py-5 sm:px-6 lg:px-8">
+    <div className="min-h-full bg-[#F8FAFC] px-4 py-5 text-slate-900 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             {Icon ? (
-              <div className="border-slate-200 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-white text-blue-600 shadow-sm">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-blue-600 shadow-sm">
                 <Icon className="h-5 w-5" />
               </div>
             ) : null}
             <div>
-              <h1 className="text-slate-950 text-2xl font-semibold tracking-normal">
-                {title}
-              </h1>
-              <p className="text-slate-500 mt-1 max-w-3xl text-sm tracking-normal">
-                {description}
-              </p>
+              <h1 className="text-2xl font-semibold tracking-normal text-slate-950">{title}</h1>
+              <p className="mt-1 max-w-3xl text-sm tracking-normal text-slate-500">{description}</p>
             </div>
           </div>
-          {actions ? (
-            <div className="flex flex-wrap items-center gap-2">{actions}</div>
-          ) : null}
+          {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
         </div>
         {children}
       </div>
@@ -503,14 +405,14 @@ function SearchToolbar({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="border-slate-200 flex flex-col gap-3 rounded-xl border bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <div className="relative min-w-0 flex-1 sm:max-w-sm">
-        <Search className="text-slate-400 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search"
-          className="border-slate-200 h-9 rounded-lg bg-white pl-9 tracking-normal"
+          className="h-9 rounded-lg border-slate-200 bg-white pl-9 tracking-normal"
         />
       </div>
       <div className="flex flex-wrap items-center gap-2">{children}</div>
@@ -552,15 +454,12 @@ function DataGrid({
   }
 
   return (
-    <div className="border-slate-200 overflow-hidden rounded-xl border bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <Table>
         <TableHeader>
           <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
             {columns.map((column) => (
-              <TableHead
-                key={column.header}
-                className="text-slate-500 px-4 text-xs font-semibold uppercase tracking-normal"
-              >
+              <TableHead key={column.header} className="px-4 text-xs font-semibold uppercase tracking-normal text-slate-500">
                 {column.header}
               </TableHead>
             ))}
@@ -569,24 +468,15 @@ function DataGrid({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="text-slate-500 h-24 text-center text-sm"
-              >
+              <TableCell colSpan={columns.length} className="h-24 text-center text-sm text-slate-500">
                 {emptyText}
               </TableCell>
             </TableRow>
           ) : (
             data.map((row, index) => (
-              <TableRow
-                key={getId(row) || index}
-                className="hover:bg-blue-50/30"
-              >
+              <TableRow key={getId(row) || index} className="hover:bg-blue-50/30">
                 {columns.map((column) => (
-                  <TableCell
-                    key={column.header}
-                    className="text-slate-700 px-4 py-3 text-sm tracking-normal"
-                  >
+                  <TableCell key={column.header} className="px-4 py-3 text-sm tracking-normal text-slate-700">
                     {column.render(row)}
                   </TableCell>
                 ))}
@@ -636,20 +526,11 @@ function ActionMenu({
             Edit
           </DropdownMenuItem>
         ) : null}
-        {onPost ? (
-          <DropdownMenuItem onClick={onPost}>Post</DropdownMenuItem>
-        ) : null}
-        {onHold ? (
-          <DropdownMenuItem onClick={onHold}>Hold Batch</DropdownMenuItem>
-        ) : null}
-        {onRelease ? (
-          <DropdownMenuItem onClick={onRelease}>Release Batch</DropdownMenuItem>
-        ) : null}
+        {onPost ? <DropdownMenuItem onClick={onPost}>Post</DropdownMenuItem> : null}
+        {onHold ? <DropdownMenuItem onClick={onHold}>Hold Batch</DropdownMenuItem> : null}
+        {onRelease ? <DropdownMenuItem onClick={onRelease}>Release Batch</DropdownMenuItem> : null}
         {onDeactivate ? (
-          <DropdownMenuItem
-            onClick={onDeactivate}
-            className="text-red-600 focus:text-red-600"
-          >
+          <DropdownMenuItem onClick={onDeactivate} className="text-red-600 focus:text-red-600">
             <Trash2 className="mr-2 h-4 w-4" />
             {deactivateLabel}
           </DropdownMenuItem>
@@ -674,13 +555,8 @@ function FormField({
 }) {
   const id = `field-${field.name}`;
   return (
-    <div
-      className={`min-w-0 space-y-1.5 ${field.colSpan ? "sm:col-span-2" : ""}`}
-    >
-      <Label
-        htmlFor={id}
-        className="text-slate-600 text-xs font-medium tracking-normal"
-      >
+    <div className={`min-w-0 space-y-1.5 ${field.colSpan ? "sm:col-span-2" : ""}`}>
+      <Label htmlFor={id} className="text-xs font-medium tracking-normal text-slate-600">
         {field.label}
         {field.required ? <span className="text-red-500"> *</span> : null}
       </Label>
@@ -691,7 +567,7 @@ function FormField({
           disabled={disabled}
           placeholder={field.placeholder || field.label}
           onChange={(event) => onChange(field.name, event.target.value)}
-          className="border-slate-200 min-h-20 w-full rounded-lg tracking-normal"
+          className="min-h-20 w-full rounded-lg border-slate-200 tracking-normal"
         />
       ) : field.type === "select" ? (
         <Select
@@ -699,13 +575,8 @@ function FormField({
           disabled={disabled}
           onValueChange={(selected) => onChange(field.name, selected)}
         >
-          <SelectTrigger
-            id={id}
-            className="border-slate-200 h-9 w-full min-w-0 overflow-hidden rounded-lg tracking-normal [&>span]:truncate"
-          >
-            <SelectValue
-              placeholder={field.placeholder || `Select ${field.label}`}
-            />
+          <SelectTrigger id={id} className="h-9 w-full min-w-0 overflow-hidden rounded-lg border-slate-200 tracking-normal [&>span]:truncate">
+            <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
           </SelectTrigger>
           <SelectContent>
             {(field.options || []).map((option) => (
@@ -716,15 +587,9 @@ function FormField({
           </SelectContent>
         </Select>
       ) : field.type === "switch" ? (
-        <div className="border-slate-200 flex h-9 items-center justify-between rounded-lg border px-3">
-          <span className="text-slate-600 text-sm">
-            {value ? "Enabled" : "Disabled"}
-          </span>
-          <Switch
-            checked={!!value}
-            disabled={disabled}
-            onCheckedChange={(checked) => onChange(field.name, checked)}
-          />
+        <div className="flex h-9 items-center justify-between rounded-lg border border-slate-200 px-3">
+          <span className="text-sm text-slate-600">{value ? "Enabled" : "Disabled"}</span>
+          <Switch checked={!!value} disabled={disabled} onCheckedChange={(checked) => onChange(field.name, checked)} />
         </div>
       ) : (
         <Input
@@ -733,13 +598,8 @@ function FormField({
           value={value ?? ""}
           disabled={disabled}
           placeholder={field.placeholder || field.label}
-          onChange={(event) =>
-            onChange(
-              field.name,
-              field.type === "number" ? event.target.value : event.target.value
-            )
-          }
-          className="border-slate-200 h-9 w-full rounded-lg tracking-normal"
+          onChange={(event) => onChange(field.name, field.type === "number" ? event.target.value : event.target.value)}
+          className="h-9 w-full rounded-lg border-slate-200 tracking-normal"
         />
       )}
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
@@ -781,13 +641,11 @@ function DrawerForm({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         onInteractOutside={(event) => event.preventDefault()}
-        className="border-slate-200 max-w-full overflow-hidden bg-white p-0 data-[side=right]:w-full data-[side=right]:max-w-full sm:data-[side=right]:w-[min(92vw,720px)] sm:data-[side=right]:max-w-[720px] lg:data-[side=right]:w-[50vw] lg:data-[side=right]:max-w-[50vw]"
+        className="max-w-full overflow-hidden border-slate-200 bg-white p-0 data-[side=right]:w-full data-[side=right]:max-w-full sm:data-[side=right]:w-[min(92vw,720px)] sm:data-[side=right]:max-w-[720px] lg:data-[side=right]:w-[50vw] lg:data-[side=right]:max-w-[50vw]"
       >
-        <SheetHeader className="border-slate-200 shrink-0 select-none border-b px-6 py-5 sm:px-8">
-          <SheetTitle className="text-slate-950 text-xl font-semibold tracking-normal">
-            {title}
-          </SheetTitle>
-          <SheetDescription className="text-slate-500 max-w-2xl text-sm leading-5 tracking-normal">
+        <SheetHeader className="shrink-0 select-none border-b border-slate-200 px-6 py-5 sm:px-8">
+          <SheetTitle className="text-xl font-semibold tracking-normal text-slate-950">{title}</SheetTitle>
+          <SheetDescription className="max-w-2xl text-sm leading-5 tracking-normal text-slate-500">
             {description}
           </SheetDescription>
         </SheetHeader>
@@ -805,23 +663,13 @@ function DrawerForm({
             ))}
           </div>
         </div>
-        <SheetFooter className="border-slate-200 shrink-0 border-t bg-white px-6 py-4 sm:flex-row sm:justify-end sm:px-8">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={submitting}
-          >
+        <SheetFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4 sm:flex-row sm:justify-end sm:px-8">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
             Close
           </Button>
           {secondaryAction}
           {readOnly ? null : (
-            <Button
-              type="button"
-              onClick={onSubmit}
-              disabled={submitting}
-              className="bg-blue-600 text-white hover:bg-blue-700"
-            >
+            <Button type="button" onClick={onSubmit} disabled={submitting} className="bg-blue-600 text-white hover:bg-blue-700">
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {primaryLabel}
             </Button>
@@ -835,26 +683,13 @@ function DrawerForm({
 function validateForm(fields: FieldConfig[], form: ApiRecord) {
   const errors: Record<string, string> = {};
   for (const field of fields) {
-    if (
-      field.required &&
-      (form[field.name] === undefined ||
-        form[field.name] === null ||
-        form[field.name] === "")
-    ) {
+    if (field.required && (form[field.name] === undefined || form[field.name] === null || form[field.name] === "")) {
       errors[field.name] = `${field.label} is required`;
     }
-    if (
-      field.type === "email" &&
-      form[field.name] &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form[field.name]))
-    ) {
+    if (field.type === "email" && form[field.name] && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form[field.name]))) {
       errors[field.name] = "Enter a valid email address";
     }
-    if (
-      field.type === "number" &&
-      form[field.name] !== "" &&
-      Number(form[field.name]) < 0
-    ) {
+    if (field.type === "number" && form[field.name] !== "" && Number(form[field.name]) < 0) {
       errors[field.name] = `${field.label} cannot be negative`;
     }
   }
@@ -878,11 +713,7 @@ function useReferenceData() {
 
   const refresh = useCallback(async () => {
     if (!context.companyId) return;
-    const params = {
-      limit: 1000,
-      company_id: context.companyId,
-      branch_id: context.branchId,
-    };
+    const params = { limit: 1000, company_id: context.companyId, branch_id: context.branchId };
     try {
       const [
         categories,
@@ -945,22 +776,14 @@ function KpiCard({
   tone?: StatusTone;
 }) {
   return (
-    <Card className="border-slate-200 border bg-white shadow-sm">
+    <Card className="border border-slate-200 bg-white shadow-sm">
       <CardContent className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-slate-500 text-sm font-medium tracking-normal">
-            {title}
-          </p>
-          <p className="text-slate-950 mt-2 text-2xl font-semibold tracking-normal">
-            {value}
-          </p>
-          <p className="text-slate-500 mt-1 text-xs tracking-normal">
-            {subtext}
-          </p>
+          <p className="text-sm font-medium tracking-normal text-slate-500">{title}</p>
+          <p className="mt-2 text-2xl font-semibold tracking-normal text-slate-950">{value}</p>
+          <p className="mt-1 text-xs tracking-normal text-slate-500">{subtext}</p>
         </div>
-        <div
-          className={`flex h-11 w-11 items-center justify-center rounded-xl border ${toneClasses[tone]}`}
-        >
+        <div className={`flex h-11 w-11 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>
           <Icon className="h-5 w-5" />
         </div>
       </CardContent>
@@ -970,52 +793,32 @@ function KpiCard({
 
 export function InventoryDashboardPage() {
   const context = useInventoryContext();
-  const dashboard = useBackendRecord(
-    inventoryApi.getInventoryDashboard,
-    {
-      company_id: context.companyId,
-      branch_id: context.branchId,
-    },
-    !!context.companyId
-  );
-  const lowStock = useBackendList(
-    inventoryApi.getStockBalances,
-    {
-      company_id: context.companyId,
-      branch_id: context.branchId,
-      low_stock_only: true,
-      limit: 5,
-    },
-    !!context.companyId
-  );
-  const expiring = useBackendList(
-    inventoryApi.getExpiryReport,
-    {
-      company_id: context.companyId,
-      branch_id: context.branchId,
-      days: 90,
-      limit: 5,
-    },
-    !!context.companyId
-  );
-  const movements = useBackendList(
-    inventoryApi.getStockLedgerEntries,
-    {
-      company_id: context.companyId,
-      branch_id: context.branchId,
-      limit: 5,
-    },
-    !!context.companyId
-  );
-  const grns = useBackendList(
-    inventoryApi.getGRNs,
-    {
-      company_id: context.companyId,
-      branch_id: context.branchId,
-      limit: 5,
-    },
-    !!context.companyId
-  );
+  const dashboard = useBackendRecord(inventoryApi.getInventoryDashboard, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+  }, !!context.companyId);
+  const lowStock = useBackendList(inventoryApi.getStockBalances, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    low_stock_only: true,
+    limit: 5,
+  }, !!context.companyId);
+  const expiring = useBackendList(inventoryApi.getExpiryReport, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    days: 90,
+    limit: 5,
+  }, !!context.companyId);
+  const movements = useBackendList(inventoryApi.getStockLedgerEntries, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    limit: 5,
+  }, !!context.companyId);
+  const grns = useBackendList(inventoryApi.getGRNs, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    limit: 5,
+  }, !!context.companyId);
 
   const data = dashboard.record || {};
 
@@ -1025,18 +828,7 @@ export function InventoryDashboardPage() {
       description="Monitor stock levels, batches, expiry risks, warehouse activity, and inventory movements."
       icon={BarChart3}
       actions={
-        <Button
-          variant="outline"
-          onClick={() =>
-            Promise.all([
-              dashboard.refresh(),
-              lowStock.refresh(),
-              expiring.refresh(),
-              movements.refresh(),
-              grns.refresh(),
-            ])
-          }
-        >
+        <Button variant="outline" onClick={() => Promise.all([dashboard.refresh(), lowStock.refresh(), expiring.refresh(), movements.refresh(), grns.refresh()])}>
           Refresh
         </Button>
       }
@@ -1050,116 +842,32 @@ export function InventoryDashboardPage() {
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
         {dashboard.loading ? (
-          Array.from({ length: 6 }).map((_, index) => (
-            <Skeleton key={index} className="h-32 rounded-xl" />
-          ))
+          Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="h-32 rounded-xl" />)
         ) : (
           <>
-            <KpiCard
-              title="Total Products"
-              value={data.total_products ?? 0}
-              subtext={`${data.active_products ?? 0} active products`}
-              icon={Package}
-              tone="info"
-            />
-            <KpiCard
-              title="Total Stock Value"
-              value={`Rs. ${Number(
-                data.total_stock_value || 0
-              ).toLocaleString()}`}
-              subtext="Backend stock valuation"
-              icon={BarChart3}
-              tone="success"
-            />
-            <KpiCard
-              title="Low Stock Items"
-              value={data.low_stock_products ?? lowStock.rows.length}
-              subtext="Below reorder level"
-              icon={AlertTriangle}
-              tone="warning"
-            />
-            <KpiCard
-              title="Out of Stock Items"
-              value={data.out_of_stock_items ?? 0}
-              subtext="Requires replenishment"
-              icon={Boxes}
-              tone="danger"
-            />
-            <KpiCard
-              title="Expiring Soon"
-              value={data.near_expiry_batches ?? expiring.rows.length}
-              subtext="Near expiry batches"
-              icon={CalendarClock}
-              tone="warning"
-            />
-            <KpiCard
-              title="Active Batches"
-              value={data.total_batches ?? 0}
-              subtext={`${data.blocked_batches ?? 0} blocked`}
-              icon={ClipboardList}
-              tone="neutral"
-            />
+            <KpiCard title="Total Products" value={data.total_products ?? 0} subtext={`${data.active_products ?? 0} active products`} icon={Package} tone="info" />
+            <KpiCard title="Total Stock Value" value={`Rs. ${Number(data.total_stock_value || 0).toLocaleString()}`} subtext="Backend stock valuation" icon={BarChart3} tone="success" />
+            <KpiCard title="Low Stock Items" value={data.low_stock_products ?? lowStock.rows.length} subtext="Below reorder level" icon={AlertTriangle} tone="warning" />
+            <KpiCard title="Out of Stock Items" value={data.out_of_stock_items ?? 0} subtext="Requires replenishment" icon={Boxes} tone="danger" />
+            <KpiCard title="Expiring Soon" value={data.near_expiry_batches ?? expiring.rows.length} subtext="Near expiry batches" icon={CalendarClock} tone="warning" />
+            <KpiCard title="Active Batches" value={data.total_batches ?? 0} subtext={`${data.blocked_batches ?? 0} blocked`} icon={ClipboardList} tone="neutral" />
           </>
         )}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-4">
-        <KpiCard
-          title="Expired Batches"
-          value={data.expired_batches ?? 0}
-          subtext="Past expiry"
-          icon={AlertTriangle}
-          tone="danger"
-        />
-        <KpiCard
-          title="Recent GRNs"
-          value={grns.rows.length}
-          subtext="Latest receipts"
-          icon={Truck}
-          tone="info"
-        />
-        <KpiCard
-          title="Recent Movements"
-          value={movements.rows.length}
-          subtext="Ledger entries"
-          icon={Repeat}
-          tone="neutral"
-        />
-        <KpiCard
-          title="Warehouses"
-          value={data.total_warehouses ?? 0}
-          subtext="Inventory locations"
-          icon={Warehouse}
-          tone="success"
-        />
+        <KpiCard title="Expired Batches" value={data.expired_batches ?? 0} subtext="Past expiry" icon={AlertTriangle} tone="danger" />
+        <KpiCard title="Recent GRNs" value={grns.rows.length} subtext="Latest receipts" icon={Truck} tone="info" />
+        <KpiCard title="Recent Movements" value={movements.rows.length} subtext="Ledger entries" icon={Repeat} tone="neutral" />
+        <KpiCard title="Warehouses" value={data.total_warehouses ?? 0} subtext="Inventory locations" icon={Warehouse} tone="success" />
       </div>
 
       <Tabs defaultValue="low-stock" className="gap-4">
-        <TabsList className="border-slate-200 inline-flex h-10 w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border bg-white p-1 shadow-sm">
-          <TabsTrigger
-            className="data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
-            value="low-stock"
-          >
-            Low Stock
-          </TabsTrigger>
-          <TabsTrigger
-            className="data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
-            value="expiry"
-          >
-            Expiring Batches
-          </TabsTrigger>
-          <TabsTrigger
-            className="data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
-            value="movements"
-          >
-            Recent Movements
-          </TabsTrigger>
-          <TabsTrigger
-            className="data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
-            value="grns"
-          >
-            Recent GRNs
-          </TabsTrigger>
+        <TabsList className="inline-flex h-10 w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="low-stock">Low Stock</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="expiry">Expiring Batches</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="movements">Recent Movements</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="grns">Recent GRNs</TabsTrigger>
         </TabsList>
         <TabsContent value="low-stock">
           <DataGrid
@@ -1167,31 +875,11 @@ export function InventoryDashboardPage() {
             error={lowStock.error}
             data={lowStock.rows}
             columns={[
-              {
-                header: "Product",
-                render: (row) =>
-                  valueOf(row, ["product.product_name", "product_name"]),
-              },
-              {
-                header: "Batch",
-                render: (row) =>
-                  valueOf(row, ["product_batch.batch_number", "batch_number"]),
-              },
-              {
-                header: "Warehouse",
-                render: (row) =>
-                  valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]),
-              },
-              {
-                header: "Available",
-                render: (row) => valueOf(row, ["quantity_available"]),
-              },
-              {
-                header: "Status",
-                render: (row) => (
-                  <StatusBadge status={valueOf(row, ["status"], "low stock")} />
-                ),
-              },
+              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+              { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+              { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
+              { header: "Available", render: (row) => valueOf(row, ["quantity_available"]) },
+              { header: "Status", render: (row) => <StatusBadge status={valueOf(row, ["status"], "low stock")} /> },
             ]}
           />
         </TabsContent>
@@ -1201,43 +889,11 @@ export function InventoryDashboardPage() {
             error={expiring.error}
             data={expiring.rows}
             columns={[
-              {
-                header: "Product",
-                render: (row) =>
-                  valueOf(row, ["product.product_name", "product_name"]),
-              },
-              {
-                header: "Batch",
-                render: (row) =>
-                  valueOf(row, ["batch_number", "product_batch.batch_number"]),
-              },
-              {
-                header: "Expiry",
-                render: (row) =>
-                  normalizeDate(
-                    valueOf(
-                      row,
-                      ["expiry_date", "product_batch.expiry_date"],
-                      ""
-                    )
-                  ) || "—",
-              },
-              {
-                header: "Purchase Rate",
-                render: (row) => valueOf(row, ["purchase_rate"], "—"),
-              },
-              {
-                header: "Status",
-                render: (row) => (
-                  <StatusBadge
-                    status={
-                      row.is_blocked
-                        ? "On Hold"
-                        : row.batch_status || row.status
-                    }
-                  />
-                ),
-              },
+              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+              { header: "Batch", render: (row) => valueOf(row, ["batch_number", "product_batch.batch_number"]) },
+              { header: "Expiry", render: (row) => normalizeDate(valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")) || "—" },
+              { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"], "—") },
+              { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
             ]}
           />
         </TabsContent>
@@ -1247,35 +903,12 @@ export function InventoryDashboardPage() {
             error={movements.error}
             data={movements.rows}
             columns={[
-              {
-                header: "Date",
-                render: (row) =>
-                  normalizeDate(
-                    valueOf(row, ["transaction_date", "created_at"], "")
-                  ),
-              },
-              {
-                header: "Movement Type",
-                render: (row) => valueOf(row, ["movement_type", "source_type"]),
-              },
-              {
-                header: "Product",
-                render: (row) =>
-                  valueOf(row, ["product.product_name", "product_name"]),
-              },
-              {
-                header: "In",
-                render: (row) => valueOf(row, ["quantity_in"], "0"),
-              },
-              {
-                header: "Out",
-                render: (row) => valueOf(row, ["quantity_out"], "0"),
-              },
-              {
-                header: "Balance",
-                render: (row) =>
-                  valueOf(row, ["balance_quantity", "running_balance"], "—"),
-              },
+              { header: "Date", render: (row) => normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")) },
+              { header: "Movement Type", render: (row) => valueOf(row, ["movement_type", "source_type"]) },
+              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+              { header: "In", render: (row) => valueOf(row, ["quantity_in"], "0") },
+              { header: "Out", render: (row) => valueOf(row, ["quantity_out"], "0") },
+              { header: "Balance", render: (row) => valueOf(row, ["balance_quantity", "running_balance"], "—") },
             ]}
           />
         </TabsContent>
@@ -1285,36 +918,11 @@ export function InventoryDashboardPage() {
             error={grns.error}
             data={grns.rows}
             columns={[
-              {
-                header: "GRN No",
-                render: (row) => valueOf(row, ["grn_number"]),
-              },
-              {
-                header: "Date",
-                render: (row) => normalizeDate(valueOf(row, ["grn_date"], "")),
-              },
-              {
-                header: "Supplier",
-                render: (row) =>
-                  valueOf(row, [
-                    "supplier.supplier_name",
-                    "supplier_name",
-                    "supplier_id",
-                  ]),
-              },
-              {
-                header: "Quantity",
-                render: (row) =>
-                  valueOf(row, ["total_quantity", "total_stock_quantity"]),
-              },
-              {
-                header: "Posted",
-                render: (row) => (
-                  <StatusBadge
-                    status={valueOf(row, ["posted_status"], "draft")}
-                  />
-                ),
-              },
+              { header: "GRN No", render: (row) => valueOf(row, ["grn_number"]) },
+              { header: "Date", render: (row) => normalizeDate(valueOf(row, ["grn_date"], "")) },
+              { header: "Supplier", render: (row) => valueOf(row, ["supplier.supplier_name", "supplier_name", "supplier_id"]) },
+              { header: "Quantity", render: (row) => valueOf(row, ["total_quantity", "total_stock_quantity"]) },
+              { header: "Posted", render: (row) => <StatusBadge status={valueOf(row, ["posted_status"], "draft")} /> },
             ]}
           />
         </TabsContent>
@@ -1335,45 +943,21 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       create: inventoryApi.createProductCategory,
       update: inventoryApi.updateProductCategory,
       deactivate: inventoryApi.deactivateProductCategory,
-      defaults: {
-        category_code: "",
-        category_name: "",
-        description: "",
-        level: 1,
-        status: "active",
-      },
+      defaults: { category_code: "", category_name: "", description: "", level: 1, status: "active" },
       fields: [
         { name: "category_code", label: "Category Code", required: true },
         { name: "category_name", label: "Category Name", required: true },
         { name: "description", label: "Description" },
         { name: "level", label: "Level", type: "number", required: true },
-        {
-          name: "status",
-          label: "Status",
-          type: "select",
-          required: true,
-          options: statusOptions,
-        },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
       ],
       columns: [
         { header: "Code", render: (row) => valueOf(row, ["category_code"]) },
         { header: "Name", render: (row) => valueOf(row, ["category_name"]) },
-        {
-          header: "Description",
-          render: (row) => valueOf(row, ["description"]),
-        },
-        {
-          header: "Status",
-          render: (row) => <StatusBadge status={row.status} />,
-        },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
       ],
-      buildPayload: (form) =>
-        compact({
-          ...form,
-          company_id: context.companyId,
-          level: toNumber(form.level) || 1,
-          status: normalizeStatus(form.status),
-        }),
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, level: toNumber(form.level) || 1, status: normalizeStatus(form.status) }),
     },
     {
       key: "units",
@@ -1385,42 +969,20 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       create: inventoryApi.createProductUnit,
       update: inventoryApi.updateProductUnit,
       deactivate: inventoryApi.deactivateProductUnit,
-      defaults: {
-        unit_code: "",
-        unit_name: "",
-        description: "",
-        status: "active",
-      },
+      defaults: { unit_code: "", unit_name: "", description: "", status: "active" },
       fields: [
         { name: "unit_code", label: "Unit Code", required: true },
         { name: "unit_name", label: "Unit Name", required: true },
         { name: "description", label: "Description" },
-        {
-          name: "status",
-          label: "Status",
-          type: "select",
-          required: true,
-          options: statusOptions,
-        },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
       ],
       columns: [
         { header: "Code", render: (row) => valueOf(row, ["unit_code"]) },
         { header: "Name", render: (row) => valueOf(row, ["unit_name"]) },
-        {
-          header: "Description",
-          render: (row) => valueOf(row, ["description"]),
-        },
-        {
-          header: "Status",
-          render: (row) => <StatusBadge status={row.status} />,
-        },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
       ],
-      buildPayload: (form) =>
-        compact({
-          ...form,
-          company_id: context.companyId,
-          status: normalizeStatus(form.status),
-        }),
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
     },
     {
       key: "dosageForms",
@@ -1432,42 +994,20 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       create: inventoryApi.createDosageForm,
       update: inventoryApi.updateDosageForm,
       deactivate: inventoryApi.deactivateDosageForm,
-      defaults: {
-        dosage_form_code: "",
-        dosage_form_name: "",
-        description: "",
-        status: "active",
-      },
+      defaults: { dosage_form_code: "", dosage_form_name: "", description: "", status: "active" },
       fields: [
         { name: "dosage_form_code", label: "Dosage Form Code", required: true },
         { name: "dosage_form_name", label: "Dosage Form Name", required: true },
         { name: "description", label: "Description" },
-        {
-          name: "status",
-          label: "Status",
-          type: "select",
-          required: true,
-          options: statusOptions,
-        },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
       ],
       columns: [
         { header: "Code", render: (row) => valueOf(row, ["dosage_form_code"]) },
         { header: "Name", render: (row) => valueOf(row, ["dosage_form_name"]) },
-        {
-          header: "Description",
-          render: (row) => valueOf(row, ["description"]),
-        },
-        {
-          header: "Status",
-          render: (row) => <StatusBadge status={row.status} />,
-        },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
       ],
-      buildPayload: (form) =>
-        compact({
-          ...form,
-          company_id: context.companyId,
-          status: normalizeStatus(form.status),
-        }),
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
     },
     {
       key: "genericNames",
@@ -1479,42 +1019,20 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       create: inventoryApi.createGenericName,
       update: inventoryApi.updateGenericName,
       deactivate: inventoryApi.deactivateGenericName,
-      defaults: {
-        generic_code: "",
-        generic_name: "",
-        description: "",
-        status: "active",
-      },
+      defaults: { generic_code: "", generic_name: "", description: "", status: "active" },
       fields: [
         { name: "generic_code", label: "Generic Code", required: true },
         { name: "generic_name", label: "Generic Name", required: true },
         { name: "description", label: "Description" },
-        {
-          name: "status",
-          label: "Status",
-          type: "select",
-          required: true,
-          options: statusOptions,
-        },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
       ],
       columns: [
         { header: "Code", render: (row) => valueOf(row, ["generic_code"]) },
         { header: "Name", render: (row) => valueOf(row, ["generic_name"]) },
-        {
-          header: "Description",
-          render: (row) => valueOf(row, ["description"]),
-        },
-        {
-          header: "Status",
-          render: (row) => <StatusBadge status={row.status} />,
-        },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
       ],
-      buildPayload: (form) =>
-        compact({
-          ...form,
-          company_id: context.companyId,
-          status: normalizeStatus(form.status),
-        }),
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
     },
     {
       key: "manufacturers",
@@ -1526,62 +1044,25 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       create: inventoryApi.createManufacturer,
       update: inventoryApi.updateManufacturer,
       deactivate: inventoryApi.deactivateManufacturer,
-      defaults: {
-        manufacturer_code: "",
-        manufacturer_name: "",
-        country: "",
-        contact_person: "",
-        contact_number: "",
-        email: "",
-        address: "",
-        status: "active",
-      },
+      defaults: { manufacturer_code: "", manufacturer_name: "", country: "", contact_person: "", contact_number: "", email: "", address: "", status: "active" },
       fields: [
-        {
-          name: "manufacturer_code",
-          label: "Manufacturer Code",
-          required: true,
-        },
-        {
-          name: "manufacturer_name",
-          label: "Manufacturer Name",
-          required: true,
-        },
+        { name: "manufacturer_code", label: "Manufacturer Code", required: true },
+        { name: "manufacturer_name", label: "Manufacturer Name", required: true },
         { name: "country", label: "Country" },
         { name: "contact_person", label: "Contact Person" },
         { name: "contact_number", label: "Contact Number" },
         { name: "email", label: "Email", type: "email" },
         { name: "address", label: "Address", type: "textarea", colSpan: true },
-        {
-          name: "status",
-          label: "Status",
-          type: "select",
-          required: true,
-          options: statusOptions,
-        },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
       ],
       columns: [
-        {
-          header: "Code",
-          render: (row) => valueOf(row, ["manufacturer_code"]),
-        },
-        {
-          header: "Name",
-          render: (row) => valueOf(row, ["manufacturer_name"]),
-        },
+        { header: "Code", render: (row) => valueOf(row, ["manufacturer_code"]) },
+        { header: "Name", render: (row) => valueOf(row, ["manufacturer_name"]) },
         { header: "Country", render: (row) => valueOf(row, ["country"]) },
         { header: "Email", render: (row) => valueOf(row, ["email"]) },
-        {
-          header: "Status",
-          render: (row) => <StatusBadge status={row.status} />,
-        },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
       ],
-      buildPayload: (form) =>
-        compact({
-          ...form,
-          company_id: context.companyId,
-          status: normalizeStatus(form.status),
-        }),
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
     },
   ];
 }
@@ -1633,21 +1114,14 @@ function BackendCrudPage({
   uniqueField?: string;
 }) {
   const [search, setSearch] = useState("");
-  const [drawer, setDrawer] = useState<{
-    open: boolean;
-    mode: DrawerMode;
-    id?: string | number;
-  }>({ open: false, mode: "create" });
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
   const [form, setForm] = useState<ApiRecord>(defaults);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
   const filtered = useMemo(
-    () =>
-      rows.filter((row) =>
-        JSON.stringify(row).toLowerCase().includes(search.toLowerCase())
-      ),
-    [rows, search]
+    () => rows.filter((row) => JSON.stringify(row).toLowerCase().includes(search.toLowerCase())),
+    [rows, search],
   );
 
   const openCreate = () => {
@@ -1707,20 +1181,13 @@ function BackendCrudPage({
   const deactivateRecord = async (row: ApiRecord) => {
     const id = getId(row);
     if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
-    await runBackendAction(
-      () => deactivate(id),
-      `${nameOf(row)} deactivated`,
-      refresh
-    );
+    await runBackendAction(() => deactivate(id), `${nameOf(row)} deactivated`, refresh);
   };
 
   return (
     <InventoryPage title={title} description={description} icon={icon}>
       <SearchToolbar search={search} setSearch={setSearch}>
-        <Button
-          onClick={openCreate}
-          className="rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-        >
+        <Button onClick={openCreate} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
           <Plus className="h-4 w-4" />
           {addLabel}
         </Button>
@@ -1746,13 +1213,7 @@ function BackendCrudPage({
       <DrawerForm
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
-        title={
-          drawer.mode === "create"
-            ? addLabel
-            : drawer.mode === "edit"
-            ? `Update ${title}`
-            : `${title} Details`
-        }
+        title={drawer.mode === "create" ? addLabel : drawer.mode === "edit" ? `Update ${title}` : `${title} Details`}
         description="Enter the details and save your changes."
         fields={fields}
         form={form}
@@ -1769,18 +1230,10 @@ function BackendCrudPage({
 
 export function ProductSetupPage() {
   const context = useInventoryContext();
-  const configs = useMemo(
-    () => setupConfigs(context),
-    [context.companyId, context.branchId]
-  );
+  const configs = useMemo(() => setupConfigs(context), [context.companyId, context.branchId]);
   const [activeTab, setActiveTab] = useState(configs[0].key);
   const [search, setSearch] = useState("");
-  const [drawer, setDrawer] = useState<{
-    open: boolean;
-    mode: DrawerMode;
-    id?: string | number;
-    config: SetupConfig;
-  }>({
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number; config: SetupConfig }>({
     open: false,
     mode: "create",
     config: configs[0],
@@ -1788,13 +1241,8 @@ export function ProductSetupPage() {
   const [form, setForm] = useState<ApiRecord>(configs[0].defaults);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const activeConfig =
-    configs.find((config) => config.key === activeTab) || configs[0];
-  const list = useBackendList(
-    activeConfig.list,
-    { company_id: context.companyId, limit: 1000, search },
-    !!context.companyId
-  );
+  const activeConfig = configs.find((config) => config.key === activeTab) || configs[0];
+  const list = useBackendList(activeConfig.list, { company_id: context.companyId, limit: 1000, search }, !!context.companyId);
 
   useEffect(() => {
     setForm(activeConfig.defaults);
@@ -1854,45 +1302,31 @@ export function ProductSetupPage() {
   const deactivateSetup = async (config: SetupConfig, row: ApiRecord) => {
     const id = getId(row);
     if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
-    await runBackendAction(
-      () => config.deactivate(id),
-      `${config.singular} deactivated`,
-      list.refresh
-    );
+    await runBackendAction(() => config.deactivate(id), `${config.singular} deactivated`, list.refresh);
   };
 
   return (
-    <InventoryPage
-      title="Product Setup"
-      description="Manage product-related setup data in one screen."
-      icon={Settings}
-    >
-      <Card className="border-slate-200 border bg-white shadow-sm">
-        <CardHeader className="border-slate-200 border-b">
+    <InventoryPage title="Product Setup" description="Manage product-related setup data in one screen." icon={Settings}>
+      <Card className="border border-slate-200 bg-white shadow-sm">
+        <CardHeader className="border-b border-slate-200">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <CardTitle className="text-slate-950 text-base font-semibold tracking-normal">
-                Setup Library
-              </CardTitle>
-              <p className="text-slate-500 mt-1 text-sm tracking-normal">
-                Maintain product categories, units, dosage forms, generic names,
-                and manufacturers.
+              <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Setup Library</CardTitle>
+              <p className="mt-1 text-sm tracking-normal text-slate-500">
+                Maintain product categories, units, dosage forms, generic names, and manufacturers.
               </p>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <div className="relative min-w-0 sm:w-72">
-                <Search className="text-slate-400 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder={`Search ${activeConfig.label.toLowerCase()}`}
-                  className="border-slate-200 h-9 w-full rounded-lg bg-white pl-9 tracking-normal"
+                  className="h-9 w-full rounded-lg border-slate-200 bg-white pl-9 tracking-normal"
                 />
               </div>
-              <Button
-                onClick={() => openSetup("create")}
-                className="h-9 rounded-lg bg-blue-600 px-3 text-white hover:bg-blue-700"
-              >
+              <Button onClick={() => openSetup("create")} className="h-9 rounded-lg bg-blue-600 px-3 text-white hover:bg-blue-700">
                 <Plus className="h-4 w-4" />
                 Add {activeConfig.singular}
               </Button>
@@ -1900,17 +1334,13 @@ export function ProductSetupPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="flex flex-col gap-4"
-          >
-            <TabsList className="border-slate-200 bg-slate-50 inline-flex h-auto w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border p-1">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col gap-4">
+            <TabsList className="inline-flex h-auto w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
               {configs.map((config) => (
                 <TabsTrigger
                   key={config.key}
                   value={config.key}
-                  className="data-active:bg-white data-active:text-blue-700 data-active:shadow-sm h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+                  className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-white data-active:text-blue-700 data-active:shadow-sm"
                 >
                   {config.label}
                 </TabsTrigger>
@@ -1944,13 +1374,7 @@ export function ProductSetupPage() {
       <DrawerForm
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
-        title={
-          drawer.mode === "create"
-            ? `Add ${drawer.config.singular}`
-            : drawer.mode === "edit"
-            ? `Update ${drawer.config.singular}`
-            : `${drawer.config.singular} Details`
-        }
+        title={drawer.mode === "create" ? `Add ${drawer.config.singular}` : drawer.mode === "edit" ? `Update ${drawer.config.singular}` : `${drawer.config.singular} Details`}
         description="Enter the setup details and save your changes."
         fields={drawer.config.fields}
         form={form}
@@ -1967,11 +1391,7 @@ export function ProductSetupPage() {
 
 export function SuppliersPage() {
   const context = useInventoryContext();
-  const list = useBackendList(
-    inventoryApi.getSuppliers,
-    { company_id: context.companyId, limit: 1000 },
-    !!context.companyId
-  );
+  const list = useBackendList(inventoryApi.getSuppliers, { company_id: context.companyId, limit: 1000 }, !!context.companyId);
   const fields: FieldConfig[] = [
     { name: "supplier_code", label: "Supplier Code", required: true },
     { name: "supplier_name", label: "Supplier Name", required: true },
@@ -1980,13 +1400,7 @@ export function SuppliersPage() {
     { name: "email", label: "Email", type: "email" },
     { name: "payment_terms_days", label: "Payment Terms Days", type: "number" },
     { name: "address", label: "Address", type: "textarea", colSpan: true },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      required: true,
-      options: statusOptions,
-    },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
   ];
 
   return (
@@ -2000,46 +1414,15 @@ export function SuppliersPage() {
       refresh={list.refresh}
       fields={fields}
       columns={[
-        {
-          header: "Supplier Code",
-          render: (row) => valueOf(row, ["supplier_code"]),
-        },
-        {
-          header: "Supplier Name",
-          render: (row) => valueOf(row, ["supplier_name"]),
-        },
-        {
-          header: "Contact Person",
-          render: (row) => valueOf(row, ["contact_person"]),
-        },
-        {
-          header: "Phone",
-          render: (row) => valueOf(row, ["contact_number", "phone"]),
-        },
+        { header: "Supplier Code", render: (row) => valueOf(row, ["supplier_code"]) },
+        { header: "Supplier Name", render: (row) => valueOf(row, ["supplier_name"]) },
+        { header: "Contact Person", render: (row) => valueOf(row, ["contact_person"]) },
+        { header: "Phone", render: (row) => valueOf(row, ["contact_number", "phone"]) },
         { header: "Email", render: (row) => valueOf(row, ["email"]) },
-        {
-          header: "Status",
-          render: (row) => <StatusBadge status={row.status} />,
-        },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
       ]}
-      defaults={{
-        supplier_code: "",
-        supplier_name: "",
-        contact_person: "",
-        contact_number: "",
-        email: "",
-        address: "",
-        payment_terms_days: 0,
-        status: "active",
-      }}
-      buildPayload={(form, ctx) =>
-        compact({
-          ...form,
-          company_id: ctx.companyId,
-          payment_terms_days: toNumber(form.payment_terms_days),
-          status: normalizeStatus(form.status),
-        })
-      }
+      defaults={{ supplier_code: "", supplier_name: "", contact_person: "", contact_number: "", email: "", address: "", payment_terms_days: 0, status: "active" }}
+      buildPayload={(form, ctx) => compact({ ...form, company_id: ctx.companyId, payment_terms_days: toNumber(form.payment_terms_days), status: normalizeStatus(form.status) })}
       create={inventoryApi.createSupplier}
       update={inventoryApi.updateSupplier}
       get={inventoryApi.getSupplierById}
@@ -2054,97 +1437,25 @@ export function SuppliersPage() {
 export function ProductsPage() {
   const context = useInventoryContext();
   const { refs, refresh: refreshRefs } = useReferenceData();
-  const list = useBackendList(
-    inventoryApi.getProducts,
-    { company_id: context.companyId, limit: 1000 },
-    !!context.companyId
-  );
+  const list = useBackendList(inventoryApi.getProducts, { company_id: context.companyId, limit: 1000 }, !!context.companyId);
   const fields: FieldConfig[] = [
     { name: "product_code", label: "Product Code", required: true },
     { name: "product_name", label: "Product Name", required: true },
-    {
-      name: "generic_name_id",
-      label: "Generic Name",
-      type: "select",
-      options: makeOptions(refs.genericNames, ["generic_name"]),
-    },
-    {
-      name: "product_category_id",
-      label: "Category",
-      type: "select",
-      required: true,
-      options: makeOptions(refs.categories, ["category_name"]),
-    },
-    {
-      name: "dosage_form_id",
-      label: "Dosage Form",
-      type: "select",
-      options: makeOptions(refs.dosageForms, ["dosage_form_name"]),
-    },
-    {
-      name: "base_unit_id",
-      label: "Unit",
-      type: "select",
-      required: true,
-      options: makeOptions(refs.units, ["unit_name"]),
-    },
-    {
-      name: "manufacturer_id",
-      label: "Manufacturer",
-      type: "select",
-      options: makeOptions(refs.manufacturers, ["manufacturer_name"]),
-    },
+    { name: "generic_name_id", label: "Generic Name", type: "select", options: makeOptions(refs.genericNames, ["generic_name"]) },
+    { name: "product_category_id", label: "Category", type: "select", required: true, options: makeOptions(refs.categories, ["category_name"]) },
+    { name: "dosage_form_id", label: "Dosage Form", type: "select", options: makeOptions(refs.dosageForms, ["dosage_form_name"]) },
+    { name: "base_unit_id", label: "Unit", type: "select", required: true, options: makeOptions(refs.units, ["unit_name"]) },
+    { name: "manufacturer_id", label: "Manufacturer", type: "select", options: makeOptions(refs.manufacturers, ["manufacturer_name"]) },
     { name: "barcode", label: "Barcode" },
-    {
-      name: "strength",
-      label: "Strength",
-      placeholder: "e.g. 500 mg, 250 mg/5 ml",
-    },
-    {
-      name: "pack_size",
-      label: "Pack Size",
-      placeholder: "e.g. 10 tablets, 100 ml",
-    },
-    {
-      name: "product_type",
-      label: "Product Type",
-      type: "select",
-      required: true,
-      options: [
-        { label: "Medicine", value: "medicine" },
-        { label: "Medical Device", value: "medical_device" },
-        { label: "Other", value: "other" },
-      ],
-    },
-    {
-      name: "requires_batch_tracking",
-      label: "Batch Tracking Required",
-      type: "switch",
-    },
-    {
-      name: "requires_expiry_tracking",
-      label: "Expiry Tracking Required",
-      type: "switch",
-    },
-    {
-      name: "storage_condition",
-      label: "Storage Condition",
-      type: "select",
-      options: [
-        { label: "Room Temperature", value: "room_temperature" },
-        { label: "Cold Storage", value: "cold_storage" },
-        { label: "Controlled", value: "controlled" },
-      ],
-    },
+    { name: "strength", label: "Strength", placeholder: "e.g. 500 mg, 250 mg/5 ml" },
+    { name: "pack_size", label: "Pack Size", placeholder: "e.g. 10 tablets, 100 ml" },
+    { name: "product_type", label: "Product Type", type: "select", required: true, options: [{ label: "Medicine", value: "medicine" }, { label: "Medical Device", value: "medical_device" }, { label: "Other", value: "other" }] },
+    { name: "requires_batch_tracking", label: "Batch Tracking Required", type: "switch" },
+    { name: "requires_expiry_tracking", label: "Expiry Tracking Required", type: "switch" },
+    { name: "storage_condition", label: "Storage Condition", type: "select", options: [{ label: "Room Temperature", value: "room_temperature" }, { label: "Cold Storage", value: "cold_storage" }, { label: "Controlled", value: "controlled" }] },
     { name: "reorder_level", label: "Reorder Level", type: "number" },
     { name: "reorder_quantity", label: "Reorder Quantity", type: "number" },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      required: true,
-      options: statusOptions,
-    },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
   ];
   const defaults = {
     product_code: "",
@@ -2180,49 +1491,13 @@ export function ProductsPage() {
       }}
       fields={fields}
       columns={[
-        {
-          header: "Product Code",
-          render: (row) => valueOf(row, ["product_code"]),
-        },
-        {
-          header: "Product Name",
-          render: (row) => valueOf(row, ["product_name"]),
-        },
-        {
-          header: "Generic Name",
-          render: (row) =>
-            valueOf(row, ["generic_name.generic_name", "generic_name"]),
-        },
-        {
-          header: "Category",
-          render: (row) =>
-            valueOf(row, [
-              "product_category.category_name",
-              "category.category_name",
-              "category_name",
-            ]),
-        },
-        {
-          header: "Unit",
-          render: (row) =>
-            valueOf(row, [
-              "base_unit.unit_name",
-              "unit.unit_name",
-              "unit_name",
-            ]),
-        },
-        {
-          header: "Manufacturer",
-          render: (row) =>
-            valueOf(row, [
-              "manufacturer.manufacturer_name",
-              "manufacturer_name",
-            ]),
-        },
-        {
-          header: "Status",
-          render: (row) => <StatusBadge status={row.status} />,
-        },
+        { header: "Product Code", render: (row) => valueOf(row, ["product_code"]) },
+        { header: "Product Name", render: (row) => valueOf(row, ["product_name"]) },
+        { header: "Generic Name", render: (row) => valueOf(row, ["generic_name.generic_name", "generic_name"]) },
+        { header: "Category", render: (row) => valueOf(row, ["product_category.category_name", "category.category_name", "category_name"]) },
+        { header: "Unit", render: (row) => valueOf(row, ["base_unit.unit_name", "unit.unit_name", "unit_name"]) },
+        { header: "Manufacturer", render: (row) => valueOf(row, ["manufacturer.manufacturer_name", "manufacturer_name"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
       ]}
       defaults={defaults}
       buildPayload={(form, ctx) =>
@@ -2237,9 +1512,7 @@ export function ProductsPage() {
           reorder_level: toNumber(form.reorder_level),
           reorder_quantity: toNumber(form.reorder_quantity),
           status: normalizeStatus(form.status),
-          barcodes: form.barcode
-            ? [{ barcode: form.barcode, barcode_type: "primary" }]
-            : [],
+          barcodes: form.barcode ? [{ barcode: form.barcode, barcode_type: "primary" }] : [],
         })
       }
       create={inventoryApi.createProduct}
@@ -2256,16 +1529,8 @@ export function ProductsPage() {
 export function ProductBatchesPage() {
   const context = useInventoryContext();
   const { refs } = useReferenceData();
-  const list = useBackendList(
-    inventoryApi.getProductBatches,
-    { company_id: context.companyId, limit: 1000 },
-    !!context.companyId
-  );
-  const [drawer, setDrawer] = useState<{
-    open: boolean;
-    mode: DrawerMode;
-    id?: string | number;
-  }>({ open: false, mode: "view" });
+  const list = useBackendList(inventoryApi.getProductBatches, { company_id: context.companyId, limit: 1000 }, !!context.companyId);
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "view" });
   const [form, setForm] = useState<ApiRecord>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -2273,28 +1538,12 @@ export function ProductBatchesPage() {
     { name: "batch_number", label: "Batch Number", required: true },
     { name: "manufacture_date", label: "Manufacture Date", type: "date" },
     { name: "expiry_date", label: "Expiry Date", type: "date" },
-    {
-      name: "supplier_id",
-      label: "Supplier",
-      type: "select",
-      options: makeOptions(refs.suppliers, ["supplier_name"]),
-    },
-    {
-      name: "manufacturer_id",
-      label: "Manufacturer",
-      type: "select",
-      options: makeOptions(refs.manufacturers, ["manufacturer_name"]),
-    },
+    { name: "supplier_id", label: "Supplier", type: "select", options: makeOptions(refs.suppliers, ["supplier_name"]) },
+    { name: "manufacturer_id", label: "Manufacturer", type: "select", options: makeOptions(refs.manufacturers, ["manufacturer_name"]) },
     { name: "purchase_rate", label: "Purchase Rate", type: "number" },
     { name: "selling_price", label: "Selling Price", type: "number" },
     { name: "mrp", label: "MRP", type: "number" },
-    {
-      name: "batch_status",
-      label: "Status",
-      type: "select",
-      required: true,
-      options: statusOptions,
-    },
+    { name: "batch_status", label: "Status", type: "select", required: true, options: statusOptions },
   ];
 
   const openBatch = async (row: ApiRecord, mode: DrawerMode) => {
@@ -2319,28 +1568,22 @@ export function ProductBatchesPage() {
     if (Object.keys(nextErrors).length || !drawer.id) return;
     setSubmitting(true);
     try {
-      await inventoryApi.updateProductBatch(
-        drawer.id,
-        compact({
-          batch_number: form.batch_number,
-          manufacture_date: form.manufacture_date || null,
-          expiry_date: form.expiry_date || null,
-          supplier_id: toNullableNumber(form.supplier_id),
-          manufacturer_id: toNullableNumber(form.manufacturer_id),
-          purchase_rate: toNumber(form.purchase_rate),
-          selling_price: toNumber(form.selling_price),
-          mrp: toNumber(form.mrp),
-          batch_status: normalizeStatus(form.batch_status),
-        })
-      );
+      await inventoryApi.updateProductBatch(drawer.id, compact({
+        batch_number: form.batch_number,
+        manufacture_date: form.manufacture_date || null,
+        expiry_date: form.expiry_date || null,
+        supplier_id: toNullableNumber(form.supplier_id),
+        manufacturer_id: toNullableNumber(form.manufacturer_id),
+        purchase_rate: toNumber(form.purchase_rate),
+        selling_price: toNumber(form.selling_price),
+        mrp: toNumber(form.mrp),
+        batch_status: normalizeStatus(form.batch_status),
+      }));
       toast.success("Batch updated");
       setDrawer((current) => ({ ...current, open: false }));
       await list.refresh();
     } catch (error) {
-      const fieldErrors = backendValidationErrors(error, {
-        uniqueField: "batch_number",
-        fields,
-      });
+      const fieldErrors = backendValidationErrors(error, { uniqueField: "batch_number", fields });
       if (Object.keys(fieldErrors).length) {
         setErrors(fieldErrors);
         toast.error(Object.values(fieldErrors)[0]);
@@ -2355,68 +1598,27 @@ export function ProductBatchesPage() {
   const holdBatch = async (row: ApiRecord) => {
     const id = getId(row);
     if (!id || !window.confirm(`Hold batch ${nameOf(row)}?`)) return;
-    await runBackendAction(
-      () =>
-        inventoryApi.holdProductBatch(id, {
-          block_reason: "Held from inventory module",
-        }),
-      "Batch held",
-      list.refresh
-    );
+    await runBackendAction(() => inventoryApi.holdProductBatch(id, { block_reason: "Held from inventory module" }), "Batch held", list.refresh);
   };
 
   const releaseBatch = async (row: ApiRecord) => {
     const id = getId(row);
     if (!id || !window.confirm(`Release batch ${nameOf(row)}?`)) return;
-    await runBackendAction(
-      () => inventoryApi.releaseProductBatch(id),
-      "Batch released",
-      list.refresh
-    );
+    await runBackendAction(() => inventoryApi.releaseProductBatch(id), "Batch released", list.refresh);
   };
 
   return (
-    <InventoryPage
-      title="Product Batches"
-      description="View and manage product batch records created by GRNs."
-      icon={Boxes}
-    >
+    <InventoryPage title="Product Batches" description="View and manage product batch records created by GRNs." icon={Boxes}>
       <DataGrid
         loading={list.loading}
         error={list.error}
         data={list.rows}
         columns={[
-          {
-            header: "Product",
-            render: (row) =>
-              valueOf(row, [
-                "product.product_name",
-                "product_name",
-                "product_id",
-              ]),
-          },
-          {
-            header: "Batch Number",
-            render: (row) => valueOf(row, ["batch_number"]),
-          },
-          {
-            header: "Manufacture Date",
-            render: (row) => normalizeDate(row.manufacture_date) || "—",
-          },
-          {
-            header: "Expiry Date",
-            render: (row) => normalizeDate(row.expiry_date) || "—",
-          },
-          {
-            header: "Status",
-            render: (row) => (
-              <StatusBadge
-                status={
-                  row.is_blocked ? "On Hold" : row.batch_status || row.status
-                }
-              />
-            ),
-          },
+          { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name", "product_id"]) },
+          { header: "Batch Number", render: (row) => valueOf(row, ["batch_number"]) },
+          { header: "Manufacture Date", render: (row) => normalizeDate(row.manufacture_date) || "—" },
+          { header: "Expiry Date", render: (row) => normalizeDate(row.expiry_date) || "—" },
+          { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
           {
             header: "Actions",
             render: (row) => (
@@ -2450,29 +1652,11 @@ export function ProductBatchesPage() {
 
 export function WarehousesAndLocationsPage() {
   const context = useInventoryContext();
-  const warehouses = useBackendList(
-    inventoryApi.getWarehouses,
-    { company_id: context.companyId, branch_id: context.branchId, limit: 1000 },
-    !!context.companyId
-  );
+  const warehouses = useBackendList(inventoryApi.getWarehouses, { company_id: context.companyId, branch_id: context.branchId, limit: 1000 }, !!context.companyId);
   const [selected, setSelected] = useState<ApiRecord | null>(null);
-  const locations = useBackendList(
-    inventoryApi.getWarehouseLocations,
-    {
-      warehouse_id: getId(selected),
-      company_id: context.companyId,
-      limit: 1000,
-    },
-    !!getId(selected)
-  );
-  const [drawerType, setDrawerType] = useState<"warehouse" | "location" | null>(
-    null
-  );
-  const [warehouseDrawerRequest, setWarehouseDrawerRequest] = useState<{
-    row: ApiRecord;
-    mode: DrawerMode;
-    nonce: number;
-  } | null>(null);
+  const locations = useBackendList(inventoryApi.getWarehouseLocations, { warehouse_id: getId(selected), company_id: context.companyId, limit: 1000 }, !!getId(selected));
+  const [drawerType, setDrawerType] = useState<"warehouse" | "location" | null>(null);
+  const [warehouseDrawerRequest, setWarehouseDrawerRequest] = useState<{ row: ApiRecord; mode: DrawerMode; nonce: number } | null>(null);
 
   useEffect(() => {
     if (!selected && warehouses.rows.length) setSelected(warehouses.rows[0]);
@@ -2481,29 +1665,12 @@ export function WarehousesAndLocationsPage() {
   const warehouseFields: FieldConfig[] = [
     { name: "warehouse_code", label: "Warehouse Code", required: true },
     { name: "warehouse_name", label: "Warehouse Name", required: true },
-    {
-      name: "warehouse_type",
-      label: "Warehouse Type",
-      type: "select",
-      required: true,
-      options: [
-        { label: "Primary", value: "primary" },
-        { label: "Branch", value: "branch" },
-        { label: "Cold Storage", value: "cold_storage" },
-        { label: "Quarantine", value: "quarantine" },
-      ],
-    },
+    { name: "warehouse_type", label: "Warehouse Type", type: "select", required: true, options: [{ label: "Primary", value: "primary" }, { label: "Branch", value: "branch" }, { label: "Cold Storage", value: "cold_storage" }, { label: "Quarantine", value: "quarantine" }] },
     { name: "address", label: "Address" },
     { name: "contact_person", label: "Responsible Person" },
     { name: "contact_number", label: "Contact Number" },
     { name: "is_default", label: "Default Warehouse", type: "switch" },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      required: true,
-      options: statusOptions,
-    },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
   ];
   const locationFields: FieldConfig[] = [
     { name: "location_code", label: "Location Code", required: true },
@@ -2511,24 +1678,8 @@ export function WarehousesAndLocationsPage() {
     { name: "rack", label: "Rack" },
     { name: "shelf", label: "Shelf" },
     { name: "bin", label: "Bin" },
-    {
-      name: "storage_condition",
-      label: "Storage Condition",
-      type: "select",
-      required: true,
-      options: [
-        { label: "Room Temperature", value: "room_temperature" },
-        { label: "Cold Storage", value: "cold_storage" },
-        { label: "Controlled", value: "controlled" },
-      ],
-    },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      required: true,
-      options: statusOptions,
-    },
+    { name: "storage_condition", label: "Storage Condition", type: "select", required: true, options: [{ label: "Room Temperature", value: "room_temperature" }, { label: "Cold Storage", value: "cold_storage" }, { label: "Controlled", value: "controlled" }] },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
   ];
 
   const loadWarehouse = async (warehouse: ApiRecord) => {
@@ -2557,14 +1708,10 @@ export function WarehousesAndLocationsPage() {
     const id = getId(warehouse);
     if (!id || !window.confirm(`Delete ${nameOf(warehouse)}?`)) return;
     const deletedSelected = String(id) === String(getId(selected || {}));
-    await runBackendAction(
-      async () => {
-        await inventoryApi.deactivateWarehouse(id);
-        if (deletedSelected) setSelected(null);
-      },
-      "Warehouse deleted",
-      warehouses.refresh
-    );
+    await runBackendAction(async () => {
+      await inventoryApi.deactivateWarehouse(id);
+      if (deletedSelected) setSelected(null);
+    }, "Warehouse deleted", warehouses.refresh);
   };
 
   return (
@@ -2586,16 +1733,12 @@ export function WarehousesAndLocationsPage() {
       }
     >
       <div className="grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
-        <Card className="border-slate-200 border bg-white shadow-sm">
+        <Card className="border border-slate-200 bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-950 text-base font-semibold tracking-normal">
-              Warehouse List
-            </CardTitle>
+            <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Warehouse List</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {warehouses.loading ? (
-              <Skeleton className="h-20 rounded-xl" />
-            ) : null}
+            {warehouses.loading ? <Skeleton className="h-20 rounded-xl" /> : null}
             {warehouses.rows.map((warehouse) => (
               <div
                 key={getId(warehouse)}
@@ -2603,24 +1746,14 @@ export function WarehousesAndLocationsPage() {
                 tabIndex={0}
                 onClick={() => loadWarehouse(warehouse)}
                 onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ")
-                    loadWarehouse(warehouse);
+                  if (event.key === "Enter" || event.key === " ") loadWarehouse(warehouse);
                 }}
-                className={`w-full rounded-xl border p-4 text-left transition ${
-                  getId(selected || {}) === getId(warehouse)
-                    ? "border-blue-200 bg-blue-50"
-                    : "border-slate-200 hover:bg-slate-50 bg-white"
-                }`}
+                className={`w-full rounded-xl border p-4 text-left transition ${getId(selected || {}) === getId(warehouse) ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-slate-950 font-semibold tracking-normal">
-                      {valueOf(warehouse, ["warehouse_name"])}
-                    </p>
-                    <p className="text-slate-500 mt-1 text-xs tracking-normal">
-                      {valueOf(warehouse, ["warehouse_code"])} |{" "}
-                      {valueOf(warehouse, ["branch.branch_name", "branch_id"])}
-                    </p>
+                    <p className="font-semibold tracking-normal text-slate-950">{valueOf(warehouse, ["warehouse_name"])}</p>
+                    <p className="mt-1 text-xs tracking-normal text-slate-500">{valueOf(warehouse, ["warehouse_code"])} | {valueOf(warehouse, ["branch.branch_name", "branch_id"])}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <StatusBadge status={warehouse.status} />
@@ -2639,36 +1772,20 @@ export function WarehousesAndLocationsPage() {
           </CardContent>
         </Card>
         <div className="space-y-4">
-          <Card className="border-slate-200 border bg-white shadow-sm">
+          <Card className="border border-slate-200 bg-white shadow-sm">
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <CardTitle className="text-slate-950 text-base font-semibold tracking-normal">
-                {selected
-                  ? valueOf(selected, ["warehouse_name"])
-                  : "Select a warehouse"}
-              </CardTitle>
+              <CardTitle className="text-base font-semibold tracking-normal text-slate-950">{selected ? valueOf(selected, ["warehouse_name"]) : "Select a warehouse"}</CardTitle>
               {selected ? (
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    variant="outline"
-                    className="border-slate-200 h-8 rounded-lg px-3"
-                    onClick={() => openWarehouse(selected, "view")}
-                  >
+                  <Button variant="outline" className="h-8 rounded-lg border-slate-200 px-3" onClick={() => openWarehouse(selected, "view")}>
                     <Eye className="h-4 w-4" />
                     View
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="border-slate-200 h-8 rounded-lg px-3"
-                    onClick={() => openWarehouse(selected, "edit")}
-                  >
+                  <Button variant="outline" className="h-8 rounded-lg border-slate-200 px-3" onClick={() => openWarehouse(selected, "edit")}>
                     <Edit className="h-4 w-4" />
                     Edit
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 hover:text-red-700"
-                    onClick={() => deleteWarehouse(selected)}
-                  >
+                  <Button variant="outline" className="h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => deleteWarehouse(selected)}>
                     <Trash2 className="h-4 w-4" />
                     Delete
                   </Button>
@@ -2679,45 +1796,25 @@ export function WarehousesAndLocationsPage() {
               {selected ? (
                 [
                   ["Warehouse Code", valueOf(selected, ["warehouse_code"])],
-                  [
-                    "Branch",
-                    valueOf(selected, ["branch.branch_name", "branch_id"]),
-                  ],
+                  ["Branch", valueOf(selected, ["branch.branch_name", "branch_id"])],
                   ["Warehouse Type", valueOf(selected, ["warehouse_type"])],
                   ["Address", valueOf(selected, ["address"])],
                   ["Responsible Person", valueOf(selected, ["contact_person"])],
-                  [
-                    "Status",
-                    <StatusBadge key="status" status={selected.status} />,
-                  ],
+                  ["Status", <StatusBadge key="status" status={selected.status} />],
                 ].map(([label, value]) => (
-                  <div
-                    key={String(label)}
-                    className="border-slate-200 rounded-xl border p-3"
-                  >
-                    <p className="text-slate-500 text-xs font-medium tracking-normal">
-                      {label}
-                    </p>
-                    <div className="text-slate-950 mt-1 text-sm font-semibold tracking-normal">
-                      {value}
-                    </div>
+                  <div key={String(label)} className="rounded-xl border border-slate-200 p-3">
+                    <p className="text-xs font-medium tracking-normal text-slate-500">{label}</p>
+                    <div className="mt-1 text-sm font-semibold tracking-normal text-slate-950">{value}</div>
                   </div>
                 ))
               ) : (
-                <p className="text-slate-500 text-sm">No warehouse selected.</p>
+                <p className="text-sm text-slate-500">No warehouse selected.</p>
               )}
             </CardContent>
           </Card>
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-slate-950 text-base font-semibold tracking-normal">
-              Internal Locations
-            </h2>
-            <Button
-              onClick={() => setDrawerType("location")}
-              variant="outline"
-              className="border-slate-200 rounded-lg"
-              disabled={!selected}
-            >
+            <h2 className="text-base font-semibold tracking-normal text-slate-950">Internal Locations</h2>
+            <Button onClick={() => setDrawerType("location")} variant="outline" className="rounded-lg border-slate-200" disabled={!selected}>
               <Plus className="h-4 w-4" />
               Add Location
             </Button>
@@ -2736,11 +1833,9 @@ export function WarehousesAndLocationsPage() {
           />
         </div>
       </div>
-      <Card className="border-slate-200 border bg-white shadow-sm">
+      <Card className="border border-slate-200 bg-white shadow-sm">
         <CardHeader>
-          <CardTitle className="text-slate-950 text-base font-semibold tracking-normal">
-            Warehouse Table View
-          </CardTitle>
+          <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Warehouse Table View</CardTitle>
         </CardHeader>
         <CardContent>
           <DataGrid
@@ -2748,27 +1843,11 @@ export function WarehousesAndLocationsPage() {
             error={warehouses.error}
             data={warehouses.rows}
             columns={[
-              {
-                header: "Warehouse Code",
-                render: (row) => valueOf(row, ["warehouse_code"]),
-              },
-              {
-                header: "Warehouse Name",
-                render: (row) => valueOf(row, ["warehouse_name"]),
-              },
-              {
-                header: "Branch",
-                render: (row) =>
-                  valueOf(row, ["branch.branch_name", "branch_id"]),
-              },
-              {
-                header: "Type",
-                render: (row) => valueOf(row, ["warehouse_type"]),
-              },
-              {
-                header: "Status",
-                render: (row) => <StatusBadge status={row.status} />,
-              },
+              { header: "Warehouse Code", render: (row) => valueOf(row, ["warehouse_code"]) },
+              { header: "Warehouse Name", render: (row) => valueOf(row, ["warehouse_name"]) },
+              { header: "Branch", render: (row) => valueOf(row, ["branch.branch_name", "branch_id"]) },
+              { header: "Type", render: (row) => valueOf(row, ["warehouse_type"]) },
+              { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
               {
                 header: "Actions",
                 render: (row) => (
@@ -2811,11 +1890,7 @@ function LocationManager({
   warehouseRequest: { row: ApiRecord; mode: DrawerMode; nonce: number } | null;
   setSelectedWarehouse: (warehouse: ApiRecord | null) => void;
 }) {
-  const [drawer, setDrawer] = useState<{
-    open: boolean;
-    mode: DrawerMode;
-    id?: string | number;
-  }>({ open: false, mode: "create" });
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
   const [form, setForm] = useState<ApiRecord>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -2834,35 +1909,14 @@ function LocationManager({
           is_default: !!warehouseRequest.row.is_default,
           status: normalizeStatus(warehouseRequest.row.status),
         });
-        setDrawer({
-          open: true,
-          mode: warehouseRequest.mode,
-          id: getId(warehouseRequest.row),
-        });
+        setDrawer({ open: true, mode: warehouseRequest.mode, id: getId(warehouseRequest.row) });
       } else {
-        setForm({
-          warehouse_code: "",
-          warehouse_name: "",
-          warehouse_type: "primary",
-          address: "",
-          contact_person: "",
-          contact_number: "",
-          is_default: false,
-          status: "active",
-        });
+        setForm({ warehouse_code: "", warehouse_name: "", warehouse_type: "primary", address: "", contact_person: "", contact_number: "", is_default: false, status: "active" });
         setDrawer({ open: true, mode: "create" });
       }
     }
     if (drawerType === "location" && selected) {
-      setForm({
-        location_code: "",
-        location_name: "",
-        rack: "",
-        shelf: "",
-        bin: "",
-        storage_condition: "room_temperature",
-        status: "active",
-      });
+      setForm({ location_code: "", location_name: "", rack: "", shelf: "", bin: "", storage_condition: "room_temperature", status: "active" });
       setDrawer({ open: true, mode: "create" });
     }
   }, [drawerType, warehouseRequest?.nonce]);
@@ -2882,34 +1936,16 @@ function LocationManager({
     setSubmitting(true);
     try {
       if (drawerType === "warehouse") {
-        const payload = compact({
-          ...form,
-          company_id: context.companyId,
-          branch_id: context.branchId,
-          status: normalizeStatus(form.status),
-        });
-        const response =
-          drawer.mode === "edit" && drawer.id
-            ? await inventoryApi.updateWarehouse(drawer.id, payload)
-            : await inventoryApi.createWarehouse(payload);
+        const payload = compact({ ...form, company_id: context.companyId, branch_id: context.branchId, status: normalizeStatus(form.status) });
+        const response = drawer.mode === "edit" && drawer.id ? await inventoryApi.updateWarehouse(drawer.id, payload) : await inventoryApi.createWarehouse(payload);
         setSelectedWarehouse(unwrapData(response));
-        toast.success(
-          drawer.mode === "edit" ? "Warehouse updated" : "Warehouse created"
-        );
+        toast.success(drawer.mode === "edit" ? "Warehouse updated" : "Warehouse created");
         await refreshWarehouses();
       } else {
-        const payload = compact({
-          ...form,
-          company_id: context.companyId,
-          warehouse_id: getId(selected || {}),
-          status: normalizeStatus(form.status),
-        });
-        if (drawer.mode === "edit" && drawer.id)
-          await inventoryApi.updateWarehouseLocation(drawer.id, payload);
+        const payload = compact({ ...form, company_id: context.companyId, warehouse_id: getId(selected || {}), status: normalizeStatus(form.status) });
+        if (drawer.mode === "edit" && drawer.id) await inventoryApi.updateWarehouseLocation(drawer.id, payload);
         else await inventoryApi.createWarehouseLocation(payload);
-        toast.success(
-          drawer.mode === "edit" ? "Location updated" : "Location created"
-        );
+        toast.success(drawer.mode === "edit" ? "Location updated" : "Location created");
         await locations.refresh();
       }
       setDrawer((current) => ({ ...current, open: false }));
@@ -2922,26 +1958,14 @@ function LocationManager({
 
   const openLocation = async (row: ApiRecord, mode: DrawerMode) => {
     setDrawerType("location");
-    setForm({
-      location_code: row.location_code,
-      location_name: row.location_name,
-      rack: row.rack,
-      shelf: row.shelf,
-      bin: row.bin,
-      storage_condition: row.storage_condition || "room_temperature",
-      status: normalizeStatus(row.status),
-    });
+    setForm({ location_code: row.location_code, location_name: row.location_name, rack: row.rack, shelf: row.shelf, bin: row.bin, storage_condition: row.storage_condition || "room_temperature", status: normalizeStatus(row.status) });
     setDrawer({ open: true, mode, id: getId(row) });
   };
 
   const deactivateLocation = async (row: ApiRecord) => {
     const id = getId(row);
     if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
-    await runBackendAction(
-      () => inventoryApi.deactivateWarehouseLocation(id),
-      "Location deactivated",
-      locations.refresh
-    );
+    await runBackendAction(() => inventoryApi.deactivateWarehouseLocation(id), "Location deactivated", locations.refresh);
   };
 
   return (
@@ -2951,31 +1975,15 @@ function LocationManager({
         error={locations.error}
         data={locations.rows}
         columns={[
-          {
-            header: "Location Code",
-            render: (row) => valueOf(row, ["location_code"]),
-          },
-          {
-            header: "Location Name",
-            render: (row) => valueOf(row, ["location_name"]),
-          },
+          { header: "Location Code", render: (row) => valueOf(row, ["location_code"]) },
+          { header: "Location Name", render: (row) => valueOf(row, ["location_name"]) },
           { header: "Rack", render: (row) => valueOf(row, ["rack"]) },
           { header: "Shelf", render: (row) => valueOf(row, ["shelf"]) },
           { header: "Bin", render: (row) => valueOf(row, ["bin"]) },
-          {
-            header: "Status",
-            render: (row) => <StatusBadge status={row.status} />,
-          },
+          { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
           {
             header: "Actions",
-            render: (row) => (
-              <ActionMenu
-                onView={() => openLocation(row, "view")}
-                onEdit={() => openLocation(row, "edit")}
-                onDeactivate={() => deactivateLocation(row)}
-                deactivateLabel="Delete"
-              />
-            ),
+            render: (row) => <ActionMenu onView={() => openLocation(row, "view")} onEdit={() => openLocation(row, "edit")} onDeactivate={() => deactivateLocation(row)} deactivateLabel="Delete" />,
           },
         ]}
       />
@@ -2985,13 +1993,7 @@ function LocationManager({
           setDrawer((current) => ({ ...current, open }));
           if (!open) setDrawerType(null);
         }}
-        title={`${
-          drawer.mode === "edit"
-            ? "Update"
-            : drawer.mode === "view"
-            ? "View"
-            : "Add"
-        } ${drawerType === "warehouse" ? "Warehouse" : "Location"}`}
+        title={`${drawer.mode === "edit" ? "Update" : drawer.mode === "view" ? "View" : "Add"} ${drawerType === "warehouse" ? "Warehouse" : "Location"}`}
         description="Enter the warehouse or location details and save your changes."
         fields={fields}
         form={form}
@@ -3006,38 +2008,17 @@ function LocationManager({
   );
 }
 
-type WorkflowKind =
-  | "opening"
-  | "grn"
-  | "transfer"
-  | "adjustment"
-  | "purchaseReturn"
-  | "salesReturn";
+type WorkflowKind = "opening" | "grn" | "transfer" | "adjustment" | "purchaseReturn" | "salesReturn";
 
-function workflowConfig(
-  kind: WorkflowKind,
-  refs: ReturnType<typeof useReferenceData>["refs"],
-  context: InventoryContextValue
-) {
+function workflowConfig(kind: WorkflowKind, refs: ReturnType<typeof useReferenceData>["refs"], context: InventoryContextValue) {
   const productOptions = makeOptions(refs.products, ["product_name"]);
   const warehouseOptions = makeOptions(refs.warehouses, ["warehouse_name"]);
   const batchOptions = makeOptions(refs.batches, ["batch_number"]);
   const supplierOptions = makeOptions(refs.suppliers, ["supplier_name"]);
   const grnOptions = makeOptions(refs.grns, ["grn_number"]);
   const baseLineFields: FieldConfig[] = [
-    {
-      name: "product_id",
-      label: "Product",
-      type: "select",
-      required: true,
-      options: productOptions,
-    },
-    {
-      name: "product_batch_id",
-      label: "Batch",
-      type: "select",
-      options: batchOptions,
-    },
+    { name: "product_id", label: "Product", type: "select", required: true, options: productOptions },
+    { name: "product_batch_id", label: "Batch", type: "select", options: batchOptions },
     { name: "quantity", label: "Quantity", type: "number", required: true },
     { name: "remarks", label: "Line Remarks" },
   ];
@@ -3055,57 +2036,27 @@ function workflowConfig(
       numberPath: "opening_stock_number",
       datePath: "opening_stock_date",
       fields: [
-        {
-          name: "opening_stock_date",
-          label: "Opening Date",
-          type: "date",
-          required: true,
-        },
-        {
-          name: "warehouse_id",
-          label: "Warehouse",
-          type: "select",
-          required: true,
-          options: warehouseOptions,
-        },
+        { name: "opening_stock_date", label: "Opening Date", type: "date", required: true },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
         { name: "reference_number", label: "Reference Number" },
         { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
         ...baseLineFields,
         { name: "unit_cost", label: "Cost Price", type: "number" },
       ],
-      defaults: {
-        opening_stock_date: "",
-        warehouse_id: "",
-        reference_number: "",
-        remarks: "",
-        product_id: "",
-        product_batch_id: "",
-        quantity: 1,
-        unit_cost: 0,
-      },
-      payload: (form: ApiRecord) =>
-        compact({
-          company_id: context.companyId,
-          branch_id: context.branchId,
-          opening_stock_date: form.opening_stock_date,
-          warehouse_id: toNumber(form.warehouse_id),
-          reference_number: form.reference_number,
-          remarks: form.remarks,
-          lines: [
-            {
-              product_id: toNumber(form.product_id),
-              product_batch_id: toNullableNumber(form.product_batch_id),
-              quantity: toNumber(form.quantity),
-              unit_cost: toNumber(form.unit_cost),
-              line_remarks: form.remarks,
-            },
-          ],
-        }),
+      defaults: { opening_stock_date: "", warehouse_id: "", reference_number: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1, unit_cost: 0 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        opening_stock_date: form.opening_stock_date,
+        warehouse_id: toNumber(form.warehouse_id),
+        reference_number: form.reference_number,
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), quantity: toNumber(form.quantity), unit_cost: toNumber(form.unit_cost), line_remarks: form.remarks }],
+      }),
     },
     grn: {
       title: "GRN / Goods Receipt",
-      description:
-        "Receive supplier stock, record batches, and update inventory.",
+      description: "Receive supplier stock, record batches, and update inventory.",
       icon: ClipboardList,
       list: inventoryApi.getGRNs,
       get: inventoryApi.getGRNById,
@@ -3117,82 +2068,41 @@ function workflowConfig(
       datePath: "grn_date",
       fields: [
         { name: "grn_date", label: "GRN Date", type: "date", required: true },
-        {
-          name: "supplier_id",
-          label: "Supplier",
-          type: "select",
-          required: true,
-          options: supplierOptions,
-        },
-        {
-          name: "warehouse_id",
-          label: "Warehouse",
-          type: "select",
-          required: true,
-          options: warehouseOptions,
-        },
+        { name: "supplier_id", label: "Supplier", type: "select", required: true, options: supplierOptions },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
         { name: "purchase_order_number", label: "Purchase Order Number" },
         { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
-        {
-          name: "product_id",
-          label: "Product",
-          type: "select",
-          required: true,
-          options: productOptions,
-        },
+        { name: "product_id", label: "Product", type: "select", required: true, options: productOptions },
         { name: "batch_number", label: "Batch Number" },
         { name: "manufacture_date", label: "Manufacture Date", type: "date" },
         { name: "expiry_date", label: "Expiry Date", type: "date" },
-        {
-          name: "quantity_received",
-          label: "Quantity",
-          type: "number",
-          required: true,
-        },
+        { name: "quantity_received", label: "Quantity", type: "number", required: true },
         { name: "free_quantity", label: "Free Quantity", type: "number" },
         { name: "unit_cost", label: "Purchase Price", type: "number" },
         { name: "selling_price", label: "Selling Price", type: "number" },
         { name: "tax_amount", label: "Tax Amount", type: "number" },
       ],
-      defaults: {
-        grn_date: "",
-        supplier_id: "",
-        warehouse_id: "",
-        purchase_order_number: "",
-        remarks: "",
-        product_id: "",
-        batch_number: "",
-        manufacture_date: "",
-        expiry_date: "",
-        quantity_received: 1,
-        free_quantity: 0,
-        unit_cost: 0,
-        selling_price: 0,
-        tax_amount: 0,
-      },
-      payload: (form: ApiRecord) =>
-        compact({
-          company_id: context.companyId,
-          branch_id: context.branchId,
-          supplier_id: toNumber(form.supplier_id),
-          warehouse_id: toNumber(form.warehouse_id),
-          grn_date: form.grn_date,
-          purchase_order_number: form.purchase_order_number,
-          remarks: form.remarks,
-          lines: [
-            {
-              product_id: toNumber(form.product_id),
-              batch_number: form.batch_number,
-              manufacture_date: form.manufacture_date,
-              expiry_date: form.expiry_date,
-              quantity_received: toNumber(form.quantity_received),
-              free_quantity: toNumber(form.free_quantity),
-              unit_cost: toNumber(form.unit_cost),
-              selling_price: toNumber(form.selling_price),
-              tax_amount: toNumber(form.tax_amount),
-            },
-          ],
-        }),
+      defaults: { grn_date: "", supplier_id: "", warehouse_id: "", purchase_order_number: "", remarks: "", product_id: "", batch_number: "", manufacture_date: "", expiry_date: "", quantity_received: 1, free_quantity: 0, unit_cost: 0, selling_price: 0, tax_amount: 0 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        supplier_id: toNumber(form.supplier_id),
+        warehouse_id: toNumber(form.warehouse_id),
+        grn_date: form.grn_date,
+        purchase_order_number: form.purchase_order_number,
+        remarks: form.remarks,
+        lines: [{
+          product_id: toNumber(form.product_id),
+          batch_number: form.batch_number,
+          manufacture_date: form.manufacture_date,
+          expiry_date: form.expiry_date,
+          quantity_received: toNumber(form.quantity_received),
+          free_quantity: toNumber(form.free_quantity),
+          unit_cost: toNumber(form.unit_cost),
+          selling_price: toNumber(form.selling_price),
+          tax_amount: toNumber(form.tax_amount),
+        }],
+      }),
     },
     transfer: {
       title: "Stock Transfers",
@@ -3207,63 +2117,28 @@ function workflowConfig(
       numberPath: "transfer_number",
       datePath: "transfer_date",
       fields: [
-        {
-          name: "transfer_date",
-          label: "Transfer Date",
-          type: "date",
-          required: true,
-        },
-        {
-          name: "from_warehouse_id",
-          label: "From Warehouse",
-          type: "select",
-          required: true,
-          options: warehouseOptions,
-        },
-        {
-          name: "to_warehouse_id",
-          label: "To Warehouse",
-          type: "select",
-          required: true,
-          options: warehouseOptions,
-        },
+        { name: "transfer_date", label: "Transfer Date", type: "date", required: true },
+        { name: "from_warehouse_id", label: "From Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "to_warehouse_id", label: "To Warehouse", type: "select", required: true, options: warehouseOptions },
         { name: "reference_number", label: "Reference Number" },
         { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
         ...baseLineFields,
       ],
-      defaults: {
-        transfer_date: "",
-        from_warehouse_id: "",
-        to_warehouse_id: "",
-        reference_number: "",
-        remarks: "",
-        product_id: "",
-        product_batch_id: "",
-        quantity: 1,
-      },
-      payload: (form: ApiRecord) =>
-        compact({
-          company_id: context.companyId,
-          branch_id: context.branchId,
-          transfer_date: form.transfer_date,
-          from_warehouse_id: toNumber(form.from_warehouse_id),
-          to_warehouse_id: toNumber(form.to_warehouse_id),
-          reference_number: form.reference_number,
-          remarks: form.remarks,
-          lines: [
-            {
-              product_id: toNumber(form.product_id),
-              product_batch_id: toNullableNumber(form.product_batch_id),
-              quantity: toNumber(form.quantity),
-              line_remarks: form.remarks,
-            },
-          ],
-        }),
+      defaults: { transfer_date: "", from_warehouse_id: "", to_warehouse_id: "", reference_number: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        transfer_date: form.transfer_date,
+        from_warehouse_id: toNumber(form.from_warehouse_id),
+        to_warehouse_id: toNumber(form.to_warehouse_id),
+        reference_number: form.reference_number,
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), quantity: toNumber(form.quantity), line_remarks: form.remarks }],
+      }),
     },
     adjustment: {
       title: "Stock Adjustments",
-      description:
-        "Correct stock differences for damage, expiry, and physical count variance.",
+      description: "Correct stock differences for damage, expiry, and physical count variance.",
       icon: SlidersHorizontal,
       list: inventoryApi.getStockAdjustments,
       get: inventoryApi.getStockAdjustmentById,
@@ -3274,70 +2149,31 @@ function workflowConfig(
       numberPath: "adjustment_number",
       datePath: "adjustment_date",
       fields: [
-        {
-          name: "adjustment_date",
-          label: "Adjustment Date",
-          type: "date",
-          required: true,
-        },
-        {
-          name: "warehouse_id",
-          label: "Warehouse",
-          type: "select",
-          required: true,
-          options: warehouseOptions,
-        },
-        {
-          name: "adjustment_type",
-          label: "Adjustment Type",
-          type: "select",
-          required: true,
-          options: [
-            "increase",
-            "decrease",
-            "damage",
-            "expiry",
-            "correction",
-          ].map((value) => ({ label: value, value })),
-        },
+        { name: "adjustment_date", label: "Adjustment Date", type: "date", required: true },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "adjustment_type", label: "Adjustment Type", type: "select", required: true, options: ["increase", "decrease", "damage", "expiry", "correction"].map((value) => ({ label: value, value })) },
         { name: "reason", label: "Reason" },
         { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
         ...baseLineFields,
       ],
-      defaults: {
-        adjustment_date: "",
-        warehouse_id: "",
-        adjustment_type: "increase",
-        reason: "",
-        remarks: "",
-        product_id: "",
-        product_batch_id: "",
-        quantity: 1,
-      },
-      payload: (form: ApiRecord) =>
-        compact({
-          company_id: context.companyId,
-          branch_id: context.branchId,
-          adjustment_date: form.adjustment_date,
-          warehouse_id: toNumber(form.warehouse_id),
-          adjustment_type: form.adjustment_type,
-          reason: form.reason,
-          remarks: form.remarks,
-          lines: [
-            {
-              product_id: toNumber(form.product_id),
-              product_batch_id: toNullableNumber(form.product_batch_id),
-              adjustment_direction: ["decrease", "damage", "expiry"].includes(
-                String(form.adjustment_type)
-              )
-                ? "out"
-                : "in",
-              quantity: toNumber(form.quantity),
-              line_reason: form.reason,
-              line_remarks: form.remarks,
-            },
-          ],
-        }),
+      defaults: { adjustment_date: "", warehouse_id: "", adjustment_type: "increase", reason: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        adjustment_date: form.adjustment_date,
+        warehouse_id: toNumber(form.warehouse_id),
+        adjustment_type: form.adjustment_type,
+        reason: form.reason,
+        remarks: form.remarks,
+        lines: [{
+          product_id: toNumber(form.product_id),
+          product_batch_id: toNullableNumber(form.product_batch_id),
+          adjustment_direction: ["decrease", "damage", "expiry"].includes(String(form.adjustment_type)) ? "out" : "in",
+          quantity: toNumber(form.quantity),
+          line_reason: form.reason,
+          line_remarks: form.remarks,
+        }],
+      }),
     },
     purchaseReturn: {
       title: "Purchase Returns",
@@ -3352,64 +2188,24 @@ function workflowConfig(
       numberPath: "purchase_return_number",
       datePath: "return_date",
       fields: [
-        {
-          name: "return_date",
-          label: "Return Date",
-          type: "date",
-          required: true,
-        },
-        {
-          name: "supplier_id",
-          label: "Supplier",
-          type: "select",
-          required: true,
-          options: supplierOptions,
-        },
-        {
-          name: "warehouse_id",
-          label: "Warehouse",
-          type: "select",
-          required: true,
-          options: warehouseOptions,
-        },
-        {
-          name: "goods_receipt_note_id",
-          label: "Related GRN",
-          type: "select",
-          options: grnOptions,
-        },
+        { name: "return_date", label: "Return Date", type: "date", required: true },
+        { name: "supplier_id", label: "Supplier", type: "select", required: true, options: supplierOptions },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "goods_receipt_note_id", label: "Related GRN", type: "select", options: grnOptions },
         { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
         ...baseLineFields,
       ],
-      defaults: {
-        return_date: "",
-        supplier_id: "",
-        warehouse_id: "",
-        goods_receipt_note_id: "",
-        remarks: "",
-        product_id: "",
-        product_batch_id: "",
-        quantity: 1,
-      },
-      payload: (form: ApiRecord) =>
-        compact({
-          company_id: context.companyId,
-          branch_id: context.branchId,
-          return_date: form.return_date,
-          supplier_id: toNumber(form.supplier_id),
-          warehouse_id: toNumber(form.warehouse_id),
-          goods_receipt_note_id: toNullableNumber(form.goods_receipt_note_id),
-          remarks: form.remarks,
-          lines: [
-            {
-              product_id: toNumber(form.product_id),
-              product_batch_id: toNullableNumber(form.product_batch_id),
-              return_quantity: toNumber(form.quantity),
-              return_reason: form.remarks,
-              line_remarks: form.remarks,
-            },
-          ],
-        }),
+      defaults: { return_date: "", supplier_id: "", warehouse_id: "", goods_receipt_note_id: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        return_date: form.return_date,
+        supplier_id: toNumber(form.supplier_id),
+        warehouse_id: toNumber(form.warehouse_id),
+        goods_receipt_note_id: toNullableNumber(form.goods_receipt_note_id),
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), return_quantity: toNumber(form.quantity), return_reason: form.remarks, line_remarks: form.remarks }],
+      }),
     },
     salesReturn: {
       title: "Sales Returns",
@@ -3424,69 +2220,28 @@ function workflowConfig(
       numberPath: "sales_return_number",
       datePath: "sales_return_date",
       fields: [
-        {
-          name: "sales_return_date",
-          label: "Return Date",
-          type: "date",
-          required: true,
-        },
+        { name: "sales_return_date", label: "Return Date", type: "date", required: true },
         { name: "customer_name", label: "Customer" },
         { name: "sales_invoice_number", label: "Related Invoice" },
-        {
-          name: "warehouse_id",
-          label: "Warehouse",
-          type: "select",
-          required: true,
-          options: warehouseOptions,
-        },
-        {
-          name: "return_condition",
-          label: "Condition",
-          type: "select",
-          required: true,
-          options: ["good", "damaged", "expired"].map((value) => ({
-            label: value,
-            value,
-          })),
-        },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "return_condition", label: "Condition", type: "select", required: true, options: ["good", "damaged", "expired"].map((value) => ({ label: value, value })) },
         { name: "return_reason", label: "Reason", required: true },
         { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
         ...baseLineFields,
       ],
-      defaults: {
-        sales_return_date: "",
-        customer_name: "",
-        sales_invoice_number: "",
-        warehouse_id: "",
-        return_condition: "good",
-        return_reason: "",
-        remarks: "",
-        product_id: "",
-        product_batch_id: "",
-        quantity: 1,
-      },
-      payload: (form: ApiRecord) =>
-        compact({
-          company_id: context.companyId,
-          branch_id: context.branchId,
-          sales_return_date: form.sales_return_date,
-          customer_name: form.customer_name,
-          sales_invoice_number: form.sales_invoice_number,
-          warehouse_id: toNumber(form.warehouse_id),
-          return_condition: form.return_condition,
-          return_reason: form.return_reason,
-          remarks: form.remarks,
-          lines: [
-            {
-              product_id: toNumber(form.product_id),
-              product_batch_id: toNullableNumber(form.product_batch_id),
-              return_quantity: toNumber(form.quantity),
-              return_condition: form.return_condition,
-              return_reason: form.return_reason,
-              line_remarks: form.remarks,
-            },
-          ],
-        }),
+      defaults: { sales_return_date: "", customer_name: "", sales_invoice_number: "", warehouse_id: "", return_condition: "good", return_reason: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        sales_return_date: form.sales_return_date,
+        customer_name: form.customer_name,
+        sales_invoice_number: form.sales_invoice_number,
+        warehouse_id: toNumber(form.warehouse_id),
+        return_condition: form.return_condition,
+        return_reason: form.return_reason,
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), return_quantity: toNumber(form.quantity), return_condition: form.return_condition, return_reason: form.return_reason, line_remarks: form.remarks }],
+      }),
     },
   } as const;
   return configs[kind];
@@ -3496,16 +2251,8 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
   const context = useInventoryContext();
   const references = useReferenceData();
   const config = workflowConfig(kind, references.refs, context);
-  const list = useBackendList(
-    config.list,
-    { company_id: context.companyId, branch_id: context.branchId, limit: 1000 },
-    !!context.companyId
-  );
-  const [drawer, setDrawer] = useState<{
-    open: boolean;
-    mode: DrawerMode;
-    id?: string | number;
-  }>({ open: false, mode: "create" });
+  const list = useBackendList(config.list, { company_id: context.companyId, branch_id: context.branchId, limit: 1000 }, !!context.companyId);
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
   const [form, setForm] = useState<ApiRecord>(config.defaults);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -3533,42 +2280,26 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
 
   const save = async (postAfterSave = false) => {
     if (!requireCompany(context) || !requireBranch(context)) return;
-    if (
-      kind === "transfer" &&
-      form.from_warehouse_id &&
-      form.to_warehouse_id &&
-      form.from_warehouse_id === form.to_warehouse_id
-    ) {
-      setErrors({
-        to_warehouse_id: "From and To warehouse cannot be the same",
-      });
+    if (kind === "transfer" && form.from_warehouse_id && form.to_warehouse_id && form.from_warehouse_id === form.to_warehouse_id) {
+      setErrors({ to_warehouse_id: "From and To warehouse cannot be the same" });
       return;
     }
     const nextErrors = validateForm(config.fields, form);
-    if (toNumber(form.quantity) <= 0)
-      nextErrors.quantity = "Quantity must be greater than 0";
+    if (toNumber(form.quantity) <= 0) nextErrors.quantity = "Quantity must be greater than 0";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
     setSubmitting(true);
     try {
       const payload = config.payload(form);
-      const response =
-        drawer.mode === "edit" && drawer.id
-          ? await config.update(drawer.id, payload)
-          : await config.create(payload);
+      const response = drawer.mode === "edit" && drawer.id ? await config.update(drawer.id, payload) : await config.create(payload);
       const saved = unwrapData(response);
       const savedId = drawer.id || getId(saved);
       if (postAfterSave) {
-        if (!savedId)
-          throw new Error("Backend did not return a record id to post.");
+        if (!savedId) throw new Error("Backend did not return a record id to post.");
         await config.post(savedId);
         toast.success(`${config.title} posted`);
       } else {
-        toast.success(
-          drawer.mode === "edit"
-            ? `${config.title} updated`
-            : `${config.title} saved`
-        );
+        toast.success(drawer.mode === "edit" ? `${config.title} updated` : `${config.title} saved`);
       }
       setDrawer((current) => ({ ...current, open: false }));
       await list.refresh();
@@ -3582,21 +2313,13 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
   const postRecord = async (row: ApiRecord) => {
     const id = getId(row);
     if (!id || !window.confirm(`Post ${nameOf(row)}?`)) return;
-    await runBackendAction(
-      () => config.post(id),
-      `${config.title} posted`,
-      list.refresh
-    );
+    await runBackendAction(() => config.post(id), `${config.title} posted`, list.refresh);
   };
 
   const cancelRecord = async (row: ApiRecord) => {
     const id = getId(row);
     if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
-    await runBackendAction(
-      () => config.cancel(id, { remarks: "Cancelled from inventory module" }),
-      `${config.title} deactivated`,
-      list.refresh
-    );
+    await runBackendAction(() => config.cancel(id, { remarks: "Cancelled from inventory module" }), `${config.title} deactivated`, list.refresh);
   };
 
   return (
@@ -3605,10 +2328,7 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
       description={config.description}
       icon={config.icon}
       actions={
-        <Button
-          onClick={openCreate}
-          className="rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-        >
+        <Button onClick={openCreate} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
           <Plus className="h-4 w-4" />
           New
         </Button>
@@ -3619,66 +2339,22 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
         error={list.error}
         data={list.rows}
         columns={[
-          {
-            header: "Number",
-            render: (row) =>
-              valueOf(row, [config.numberPath, "reference_number", "id"]),
-          },
-          {
-            header: "Date",
-            render: (row) => normalizeDate(valueOf(row, [config.datePath], "")),
-          },
-          {
-            header: "Warehouse",
-            render: (row) =>
-              valueOf(row, [
-                "warehouse.warehouse_name",
-                "warehouse_name",
-                "warehouse_id",
-                "from_warehouse_id",
-              ]),
-          },
-          {
-            header: "Quantity",
-            render: (row) => valueOf(row, ["total_quantity", "quantity"], "—"),
-          },
-          {
-            header: "Approval",
-            render: (row) => (
-              <StatusBadge
-                status={valueOf(row, ["approval_status"], "draft")}
-              />
-            ),
-          },
-          {
-            header: "Posted",
-            render: (row) => (
-              <StatusBadge status={valueOf(row, ["posted_status"], "draft")} />
-            ),
-          },
+          { header: "Number", render: (row) => valueOf(row, [config.numberPath, "reference_number", "id"]) },
+          { header: "Date", render: (row) => normalizeDate(valueOf(row, [config.datePath], "")) },
+          { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name", "warehouse_id", "from_warehouse_id"]) },
+          { header: "Quantity", render: (row) => valueOf(row, ["total_quantity", "quantity"], "—") },
+          { header: "Approval", render: (row) => <StatusBadge status={valueOf(row, ["approval_status"], "draft")} /> },
+          { header: "Posted", render: (row) => <StatusBadge status={valueOf(row, ["posted_status"], "draft")} /> },
           {
             header: "Actions",
-            render: (row) => (
-              <ActionMenu
-                onView={() => openRecord(row, "view")}
-                onEdit={() => openRecord(row, "edit")}
-                onPost={() => postRecord(row)}
-                onDeactivate={() => cancelRecord(row)}
-              />
-            ),
+            render: (row) => <ActionMenu onView={() => openRecord(row, "view")} onEdit={() => openRecord(row, "edit")} onPost={() => postRecord(row)} onDeactivate={() => cancelRecord(row)} />,
           },
         ]}
       />
       <DrawerForm
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
-        title={
-          drawer.mode === "create"
-            ? `New ${config.title}`
-            : drawer.mode === "edit"
-            ? `Update ${config.title}`
-            : `${config.title} Details`
-        }
+        title={drawer.mode === "create" ? `New ${config.title}` : drawer.mode === "edit" ? `Update ${config.title}` : `${config.title} Details`}
         description="Save a draft or post the document. The list refreshes after success."
         fields={config.fields}
         form={form}
@@ -3690,12 +2366,7 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
         primaryLabel={drawer.mode === "edit" ? "Update Draft" : "Save Draft"}
         secondaryAction={
           drawer.mode === "view" ? null : (
-            <Button
-              type="button"
-              variant="outline"
-              disabled={submitting}
-              onClick={() => save(true)}
-            >
+            <Button type="button" variant="outline" disabled={submitting} onClick={() => save(true)}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               Post
             </Button>
@@ -3747,32 +2418,14 @@ function ReportPage({
 }) {
   const context = useInventoryContext();
   const references = useReferenceData();
-  const [filters, setFilters] = useState<ApiRecord>({
-    warehouse_id: "",
-    product_id: "",
-    status: "",
-  });
-  const params = {
-    company_id: context.companyId,
-    branch_id: context.branchId,
-    ...extraParams,
-    ...compact(filters),
-  };
+  const [filters, setFilters] = useState<ApiRecord>({ warehouse_id: "", product_id: "", status: "" });
+  const params = { company_id: context.companyId, branch_id: context.branchId, ...extraParams, ...compact(filters) };
   const report = useBackendList(loader, params, !!context.companyId);
-  const warehouseOptions = [
-    { label: "All Warehouses", value: "all" },
-    ...makeOptions(references.refs.warehouses, ["warehouse_name"]),
-  ];
-  const productOptions = [
-    { label: "All Products", value: "all" },
-    ...makeOptions(references.refs.products, ["product_name"]),
-  ];
+  const warehouseOptions = [{ label: "All Warehouses", value: "all" }, ...makeOptions(references.refs.warehouses, ["warehouse_name"])];
+  const productOptions = [{ label: "All Products", value: "all" }, ...makeOptions(references.refs.products, ["product_name"])];
 
   const setFilter = (name: string, value: string) => {
-    setFilters((current) => ({
-      ...current,
-      [name]: value === "all" ? "" : value,
-    }));
+    setFilters((current) => ({ ...current, [name]: value === "all" ? "" : value }));
   };
 
   return (
@@ -3780,51 +2433,29 @@ function ReportPage({
       title={title}
       description={description}
       icon={icon}
-      actions={
-        <Button variant="outline" onClick={report.refresh}>
-          Refresh
-        </Button>
-      }
+      actions={<Button variant="outline" onClick={report.refresh}>Refresh</Button>}
     >
-      <Card className="border-slate-200 border bg-white shadow-sm">
+      <Card className="border border-slate-200 bg-white shadow-sm">
         <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-1.5">
-            <Label className="text-slate-600 text-xs font-medium">
-              Warehouse
-            </Label>
-            <Select
-              value={filters.warehouse_id || "all"}
-              onValueChange={(value) => setFilter("warehouse_id", value)}
-            >
-              <SelectTrigger className="border-slate-200 h-9 w-full rounded-lg">
+            <Label className="text-xs font-medium text-slate-600">Warehouse</Label>
+            <Select value={filters.warehouse_id || "all"} onValueChange={(value) => setFilter("warehouse_id", value)}>
+              <SelectTrigger className="h-9 w-full rounded-lg border-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {warehouseOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
+                {warehouseOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-slate-600 text-xs font-medium">
-              Product
-            </Label>
-            <Select
-              value={filters.product_id || "all"}
-              onValueChange={(value) => setFilter("product_id", value)}
-            >
-              <SelectTrigger className="border-slate-200 h-9 w-full rounded-lg">
+            <Label className="text-xs font-medium text-slate-600">Product</Label>
+            <Select value={filters.product_id || "all"} onValueChange={(value) => setFilter("product_id", value)}>
+              <SelectTrigger className="h-9 w-full rounded-lg border-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {productOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
+                {productOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -3840,12 +2471,7 @@ function ReportPage({
           />
         </CardContent>
       </Card>
-      <DataGrid
-        loading={report.loading}
-        error={report.error}
-        data={report.rows}
-        columns={columns}
-      />
+      <DataGrid loading={report.loading} error={report.error} data={report.rows} columns={columns} />
     </InventoryPage>
   );
 }
@@ -3857,37 +2483,13 @@ export function StockBalanceReportPage() {
       description="Current available, reserved, and valued stock by product, batch, and warehouse."
       loader={inventoryApi.getStockBalances}
       columns={[
-        {
-          header: "Product",
-          render: (row) =>
-            valueOf(row, ["product.product_name", "product_name"]),
-        },
-        {
-          header: "Batch",
-          render: (row) =>
-            valueOf(row, ["product_batch.batch_number", "batch_number"]),
-        },
-        {
-          header: "Warehouse",
-          render: (row) =>
-            valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]),
-        },
-        {
-          header: "On Hand",
-          render: (row) => valueOf(row, ["quantity_on_hand"]),
-        },
-        {
-          header: "Available",
-          render: (row) => valueOf(row, ["quantity_available"]),
-        },
-        {
-          header: "Allocated",
-          render: (row) => valueOf(row, ["quantity_allocated"]),
-        },
-        {
-          header: "Stock Value",
-          render: (row) => valueOf(row, ["total_stock_value", "stock_value"]),
-        },
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+        { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
+        { header: "On Hand", render: (row) => valueOf(row, ["quantity_on_hand"]) },
+        { header: "Available", render: (row) => valueOf(row, ["quantity_available"]) },
+        { header: "Allocated", render: (row) => valueOf(row, ["quantity_allocated"]) },
+        { header: "Stock Value", render: (row) => valueOf(row, ["total_stock_value", "stock_value"]) },
       ]}
     />
   );
@@ -3900,42 +2502,14 @@ export function StockLedgerReportPage() {
       description="Every stock movement with references, in quantities, out quantities, and running balance."
       loader={inventoryApi.getStockLedgerEntries}
       columns={[
-        {
-          header: "Date",
-          render: (row) =>
-            normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")),
-        },
-        {
-          header: "Product",
-          render: (row) =>
-            valueOf(row, ["product.product_name", "product_name"]),
-        },
-        {
-          header: "Batch",
-          render: (row) =>
-            valueOf(row, ["product_batch.batch_number", "batch_number"]),
-        },
-        {
-          header: "Movement Type",
-          render: (row) => valueOf(row, ["movement_type", "source_type"]),
-        },
-        {
-          header: "Reference",
-          render: (row) => valueOf(row, ["reference_number", "source_number"]),
-        },
-        {
-          header: "In Qty",
-          render: (row) => valueOf(row, ["quantity_in"], "0"),
-        },
-        {
-          header: "Out Qty",
-          render: (row) => valueOf(row, ["quantity_out"], "0"),
-        },
-        {
-          header: "Balance",
-          render: (row) =>
-            valueOf(row, ["balance_quantity", "running_balance"]),
-        },
+        { header: "Date", render: (row) => normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")) },
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+        { header: "Movement Type", render: (row) => valueOf(row, ["movement_type", "source_type"]) },
+        { header: "Reference", render: (row) => valueOf(row, ["reference_number", "source_number"]) },
+        { header: "In Qty", render: (row) => valueOf(row, ["quantity_in"], "0") },
+        { header: "Out Qty", render: (row) => valueOf(row, ["quantity_out"], "0") },
+        { header: "Balance", render: (row) => valueOf(row, ["balance_quantity", "running_balance"]) },
       ]}
     />
   );
@@ -3949,43 +2523,12 @@ export function ExpiryReportPage() {
       loader={inventoryApi.getExpiryReport}
       extraParams={{ days: 90 }}
       columns={[
-        {
-          header: "Product",
-          render: (row) =>
-            valueOf(row, ["product.product_name", "product_name"]),
-        },
-        {
-          header: "Batch",
-          render: (row) =>
-            valueOf(row, ["batch_number", "product_batch.batch_number"]),
-        },
-        {
-          header: "Expiry Date",
-          render: (row) =>
-            normalizeDate(
-              valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")
-            ),
-        },
-        {
-          header: "Purchase Rate",
-          render: (row) => valueOf(row, ["purchase_rate"], "—"),
-        },
-        {
-          header: "Selling Price",
-          render: (row) => valueOf(row, ["selling_price"], "—"),
-        },
-        {
-          header: "Status",
-          render: (row) => (
-            <StatusBadge
-              status={
-                row.is_blocked
-                  ? "On Hold"
-                  : row.batch_status || row.status || "monitor"
-              }
-            />
-          ),
-        },
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+        { header: "Batch", render: (row) => valueOf(row, ["batch_number", "product_batch.batch_number"]) },
+        { header: "Expiry Date", render: (row) => normalizeDate(valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")) },
+        { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"], "—") },
+        { header: "Selling Price", render: (row) => valueOf(row, ["selling_price"], "—") },
+        { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status || "monitor"} /> },
       ]}
     />
   );
@@ -3998,45 +2541,13 @@ export function BatchReportPage() {
       description="Batch movement summary with received quantity, sold quantity, balance, and status."
       loader={inventoryApi.getBatchReport}
       columns={[
-        {
-          header: "Product",
-          render: (row) =>
-            valueOf(row, [
-              "product.product_name",
-              "product_name",
-              "product_id",
-            ]),
-        },
-        {
-          header: "Batch Number",
-          render: (row) => valueOf(row, ["batch_number"]),
-        },
-        {
-          header: "Manufacture Date",
-          render: (row) => normalizeDate(row.manufacture_date) || "—",
-        },
-        {
-          header: "Expiry Date",
-          render: (row) => normalizeDate(row.expiry_date) || "—",
-        },
-        {
-          header: "Purchase Rate",
-          render: (row) => valueOf(row, ["purchase_rate"]),
-        },
-        {
-          header: "Selling Price",
-          render: (row) => valueOf(row, ["selling_price"]),
-        },
-        {
-          header: "Status",
-          render: (row) => (
-            <StatusBadge
-              status={
-                row.is_blocked ? "On Hold" : row.batch_status || row.status
-              }
-            />
-          ),
-        },
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name", "product_id"]) },
+        { header: "Batch Number", render: (row) => valueOf(row, ["batch_number"]) },
+        { header: "Manufacture Date", render: (row) => normalizeDate(row.manufacture_date) || "—" },
+        { header: "Expiry Date", render: (row) => normalizeDate(row.expiry_date) || "—" },
+        { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"]) },
+        { header: "Selling Price", render: (row) => valueOf(row, ["selling_price"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
       ]}
     />
   );

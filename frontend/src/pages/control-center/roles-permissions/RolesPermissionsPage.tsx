@@ -1,4 +1,3 @@
-import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { ShieldCheck, Key, Grid3X3 } from "lucide-react";
 import Breadcrumbs from "../../../components/common/Breadcrumbs";
@@ -10,16 +9,8 @@ import RolePermissionMatrixPage from "../role-permission-matrix/RolePermissionMa
 
 const TABS = [
   { key: "roles", label: "Roles", icon: <ShieldCheck className="h-4 w-4" /> },
-  {
-    key: "permissions",
-    label: "Permissions",
-    icon: <Key className="h-4 w-4" />,
-  },
-  {
-    key: "matrix",
-    label: "Role Permission Matrix",
-    icon: <Grid3X3 className="h-4 w-4" />,
-  },
+  { key: "permissions", label: "Permissions", icon: <Key className="h-4 w-4" /> },
+  { key: "matrix", label: "Role Permission Matrix", icon: <Grid3X3 className="h-4 w-4" /> },
 ];
 
 const RolesPermissionsPage = () => {
@@ -43,36 +34,27 @@ const RolesPermissionsPage = () => {
       />
 
       {/* Header */}
-      <div className="mb-6 mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-gray-900">
-            Roles & Permissions
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Define roles, manage permissions, and configure the role-permission
-            matrix
+          <h1 className="text-xl font-bold text-gray-900 tracking-tight">Roles & Permissions</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Define roles, manage permissions, and configure the role-permission matrix
           </p>
         </div>
       </div>
 
       {/* Tab Navigation */}
       <div className="card-premium mb-6">
-        <div className="flex items-center gap-1 overflow-x-auto p-1.5">
+        <div className="flex items-center gap-1 p-1.5 overflow-x-auto">
           {TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`tab-premium flex items-center gap-2 whitespace-nowrap ${
-                activeTab === tab.key
-                  ? "tab-premium-active"
-                  : "tab-premium-default"
+                activeTab === tab.key ? "tab-premium-active" : "tab-premium-default"
               }`}
             >
-              <span
-                className={
-                  activeTab === tab.key ? "text-indigo-600" : "text-gray-400"
-                }
-              >
+              <span className={activeTab === tab.key ? "text-indigo-600" : "text-gray-400"}>
                 {tab.icon}
               </span>
               {tab.label}

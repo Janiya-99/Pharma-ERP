@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Boxes } from "lucide-react";
 import SoftwareModuleCard from "../../../../components/common/SoftwareModuleCard";
 import { getSoftwareModules } from "../../../../api/controlApi";
@@ -8,10 +8,7 @@ interface StepSoftwareAccessProps {
   onChange: (field: string, value: any) => void;
 }
 
-const StepSoftwareAccess = ({
-  formData,
-  onChange,
-}: StepSoftwareAccessProps) => {
+const StepSoftwareAccess = ({ formData, onChange }: StepSoftwareAccessProps) => {
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,8 +30,7 @@ const StepSoftwareAccess = ({
     }
   };
 
-  const selectedModuleIds: (string | number)[] =
-    formData.software_modules || [];
+  const selectedModuleIds: (string | number)[] = formData.software_modules || [];
 
   const toggleModule = (mod: any) => {
     const isSelected = selectedModuleIds.includes(mod.id);
@@ -62,17 +58,14 @@ const StepSoftwareAccess = ({
     <div className="card-premium">
       <div className="card-premium-header">
         <div>
-          <h3 className="text-base font-semibold text-gray-900">
-            Software Access
-          </h3>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <h3 className="text-base font-semibold text-gray-900">Software Access</h3>
+          <p className="text-xs text-gray-500 mt-0.5">
             Select which software modules this user can access
           </p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-400">
-            {selectedModuleIds.length} module
-            {selectedModuleIds.length !== 1 ? "s" : ""} selected
+            {selectedModuleIds.length} module{selectedModuleIds.length !== 1 ? "s" : ""} selected
           </span>
         </div>
       </div>
@@ -83,14 +76,12 @@ const StepSoftwareAccess = ({
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
           </div>
         ) : modules.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 py-12">
+          <div className="flex flex-col items-center justify-center py-12 gap-2">
             <Boxes className="h-8 w-8 text-gray-300" />
-            <p className="text-sm text-gray-500">
-              No software modules configured
-            </p>
+            <p className="text-sm text-gray-500">No software modules configured</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {modules.map((mod) => (
               <SoftwareModuleCard
                 key={mod.id}

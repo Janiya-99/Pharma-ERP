@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { financeApi } from "api/financeApi";
 import DataTable from "components/erp/DataTable";
 import PermissionGuard from "components/erp/PermissionGuard";
@@ -15,7 +15,7 @@ export default function ChartOfAccountsPage() {
   const [limit, setLimit] = useState(10);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
-
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -54,9 +54,7 @@ export default function ChartOfAccountsPage() {
   };
 
   const handleDelete = async (record: any) => {
-    if (
-      window.confirm(`Are you sure you want to delete ${record.account_name}?`)
-    ) {
+    if (window.confirm(`Are you sure you want to delete ${record.account_name}?`)) {
       try {
         const res = await financeApi.deleteChartOfAccount(record.id);
         if (res.data.success) {
@@ -72,51 +70,46 @@ export default function ChartOfAccountsPage() {
   const columns = [
     { header: "Account Code", accessor: "account_code" },
     { header: "Account Name", accessor: "account_name" },
-    {
-      header: "Classification",
+    { 
+      header: "Classification", 
       accessor: "classification",
-      render: (val: any) => val?.name || "N/A",
+      render: (val: any) => val?.name || "N/A"
     },
-    {
-      header: "Currency",
+    { 
+      header: "Currency", 
       accessor: "currency",
-      render: (val: string) => <span className="font-mono text-sm">{val}</span>,
+      render: (val: string) => (
+        <span className="font-mono text-sm">{val}</span>
+      )
     },
-    {
-      header: "Status",
+    { 
+      header: "Status", 
       accessor: "status",
       render: (val: string) => (
-        <span
-          className={`rounded-full px-2 py-1 text-xs font-semibold ${
-            val === "active"
-              ? "bg-green-100 text-green-800"
-              : "bg-gray-100 text-gray-800"
-          }`}
-        >
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+          val === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+        }`}>
           {val}
         </span>
-      ),
+      )
     },
   ];
 
   return (
     <div className="py-5">
-      <FinancePageHeader
-        title="Chart of Accounts"
+      <FinancePageHeader 
+        title="Chart of Accounts" 
         description="Manage your chart of accounts for financial tracking"
         action={
           <PermissionGuard permission="finance.chart_of_account.create">
-            <Button
-              onClick={handleCreate}
-              className="bg-brand-500 text-white hover:bg-brand-600"
-            >
+            <Button onClick={handleCreate} className="bg-brand-500 hover:bg-brand-600 text-white">
               <Plus className="mr-2 h-4 w-4" /> New Account
             </Button>
           </PermissionGuard>
         }
       />
 
-      <div className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
         <DataTable
           columns={columns}
           data={data}
@@ -129,19 +122,19 @@ export default function ChartOfAccountsPage() {
           onSearch={setSearch}
           searchPlaceholder="Search accounts by code or name..."
           actions={(record: unknown) => (
-            <div className="flex justify-end space-x-2">
+            <div className="flex space-x-2 justify-end">
               <PermissionGuard permission="finance.chart_of_account.update">
-                <button
+                <button 
                   onClick={() => handleEdit(record)}
-                  className="text-sm font-medium text-brand-500 transition-colors hover:text-brand-600"
+                  className="text-brand-500 hover:text-brand-600 font-medium text-sm transition-colors"
                 >
                   Edit
                 </button>
               </PermissionGuard>
               <PermissionGuard permission="finance.chart_of_account.delete">
-                <button
+                <button 
                   onClick={() => handleDelete(record)}
-                  className="text-sm font-medium text-red-500 transition-colors hover:text-red-600"
+                  className="text-red-500 hover:text-red-600 font-medium text-sm transition-colors"
                 >
                   Delete
                 </button>

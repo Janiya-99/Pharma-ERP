@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -38,9 +38,7 @@ const OpeningStockEntriesPage = () => {
         setTotalRecords(resTotal);
       }
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Failed to load opening stock entries"
-      );
+      toast.error(error.response?.data?.message || "Failed to load opening stock entries");
     } finally {
       setLoading(false);
     }
@@ -68,11 +66,7 @@ const OpeningStockEntriesPage = () => {
       return;
     }
 
-    if (
-      window.confirm(
-        "Are you sure you want to delete this opening stock entry?"
-      )
-    ) {
+    if (window.confirm("Are you sure you want to delete this opening stock entry?")) {
       try {
         await inventoryApi.deleteOpeningStockEntry(row.id);
         toast.success("Entry deleted successfully");
@@ -85,73 +79,37 @@ const OpeningStockEntriesPage = () => {
 
   const columns = [
     { header: "Number", accessorKey: "opening_stock_number" },
-    {
-      header: "Date",
-      accessorKey: "opening_stock_date",
-      cell: ({ row }: { row?: any }) =>
-        formatDate(row.original.opening_stock_date),
-    },
-    {
-      header: "Warehouse",
-      accessorKey: "warehouse_id",
-      cell: ({ row }: { row?: any }) =>
-        row.original.warehouse?.warehouse_name || row.original.warehouse_id,
-    },
+    { header: "Date", accessorKey: "opening_stock_date", cell: ({ row }: { row?: any }) => formatDate(row.original.opening_stock_date) },
+    { header: "Warehouse", accessorKey: "warehouse_id", cell: ({ row }: { row?: any }) => row.original.warehouse?.warehouse_name || row.original.warehouse_id },
     { header: "Reference", accessorKey: "reference_number" },
-    {
-      header: "Total Qty",
-      accessorKey: "total_quantity",
-      cell: ({ row }: { row?: any }) =>
-        formatNumber(row.original.total_quantity, 3),
-    },
-    {
-      header: "Total Value",
-      accessorKey: "total_stock_value",
-      cell: ({ row }: { row?: any }) =>
-        formatCurrency(row.original.total_stock_value),
-    },
-    {
-      header: "Approval",
-      accessorKey: "approval_status",
-      cell: ({ row }: { row?: any }) => (
-        <OpeningStockStatusBadge status={row.original.approval_status} />
-      ),
-    },
-    {
-      header: "Posted",
-      accessorKey: "posted_status",
-      cell: ({ row }: { row?: any }) => (
-        <InventoryPostedStatusBadge status={row.original.posted_status} />
-      ),
-    },
+    { header: "Total Qty", accessorKey: "total_quantity", cell: ({ row }: { row?: any }) => formatNumber(row.original.total_quantity, 3) },
+    { header: "Total Value", accessorKey: "total_stock_value", cell: ({ row }: { row?: any }) => formatCurrency(row.original.total_stock_value) },
+    { header: "Approval", accessorKey: "approval_status", cell: ({ row }: { row?: any }) => <OpeningStockStatusBadge status={row.original.approval_status} /> },
+    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row?: any }) => <InventoryPostedStatusBadge status={row.original.posted_status} /> },
   ];
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
-            Opening Stock
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage initial inventory uploads
-          </p>
+          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Opening Stock</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage initial inventory uploads</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search..."
               value={search}
               onChange={(e: any) => setSearch(e.target.value)}
-              className="rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
+              className="pl-9 pr-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
             />
           </div>
           <PermissionGuard permission="inventory.opening_stock.create">
             <Link
               to="/inventory/opening-stock/create"
-              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-600"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium"
             >
               <Plus className="h-4 w-4" />
               Add New
@@ -160,7 +118,7 @@ const OpeningStockEntriesPage = () => {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+      <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
         <DataTable
           columns={columns}
           data={data}
@@ -168,21 +126,9 @@ const OpeningStockEntriesPage = () => {
           pagination={pagination}
           onPaginationChange={setPagination}
           pageCount={Math.ceil(totalRecords / pagination.pageSize)}
-          onEdit={
-            hasPermission("inventory.opening_stock.update")
-              ? handleEdit
-              : undefined
-          }
-          onDelete={
-            hasPermission("inventory.opening_stock.delete")
-              ? handleDelete
-              : undefined
-          }
-          onView={
-            hasPermission("inventory.opening_stock.view")
-              ? handleView
-              : undefined
-          }
+          onEdit={hasPermission("inventory.opening_stock.update") ? handleEdit : undefined}
+          onDelete={hasPermission("inventory.opening_stock.delete") ? handleDelete : undefined}
+          onView={hasPermission("inventory.opening_stock.view") ? handleView : undefined}
         />
       </div>
     </div>

@@ -1,4 +1,3 @@
-import React from "react";
 import Badge from "../common/Badge";
 
 const WarehouseTypeBadge = ({ type }: { type?: unknown }) => {

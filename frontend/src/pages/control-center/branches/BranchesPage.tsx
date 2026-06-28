@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getBranches, deleteBranch } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
@@ -10,13 +10,7 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import BranchFormModal from "./BranchFormModal";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
 
 interface Branch {
@@ -48,12 +42,7 @@ const BranchesPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const {
-    data: queryData,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
+  const { data: queryData, isLoading, error, refetch } = useQuery({
     queryKey: ["branches", filters],
     queryFn: async () => {
       const res = await getBranches(filters);
@@ -67,9 +56,7 @@ const BranchesPage = () => {
   const branches = queryData?.data || [];
   const pagination = queryData?.pagination || null;
 
-  const handleFilterChange = (e: any) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });
-  };
+
 
   const openCreateModal = () => {
     setSelectedBranch(null);
@@ -133,24 +120,13 @@ const BranchesPage = () => {
     },
     {
       header: "Main",
-      cell: (row: unknown) =>
-        row.is_main_branch ? (
-          <Badge variant="info">Yes</Badge>
-        ) : (
-          <span className="text-gray-400">-</span>
-        ),
+      cell: (row: unknown) => row.is_main_branch ? <Badge variant="info">Yes</Badge> : <span className="text-gray-400">-</span>,
     },
     {
       header: "Status",
       cell: (row: any) => {
         const status = (row.status || "active").toLowerCase();
-        let variant:
-          | "default"
-          | "success"
-          | "danger"
-          | "warning"
-          | "info"
-          | "indigo" = "default";
+        let variant: "default" | "success" | "danger" | "warning" | "info" | "indigo" = "default";
         if (status === "active" || status === "active ") {
           variant = "success";
         } else if (status === "suspended") {
@@ -158,7 +134,11 @@ const BranchesPage = () => {
         } else if (status === "locked") {
           variant = "danger";
         }
-        return <Badge variant={variant}>{status}</Badge>;
+        return (
+          <Badge variant={variant}>
+            {status}
+          </Badge>
+        );
       },
     },
     {
@@ -169,19 +149,19 @@ const BranchesPage = () => {
           <PermissionGuard permission="control.branch.update">
             <button
               onClick={() => openEditModal(row)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-transparent text-green-600 transition-all duration-200 hover:scale-105 hover:bg-green-50 hover:text-green-700 active:scale-95"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-green-600 bg-transparent hover:bg-green-50 hover:text-green-700 transition-all duration-200 hover:scale-105 active:scale-95"
               title="Edit"
             >
-              <Edit2 className="h-4 w-4" />
+              <Edit2 className="w-4 h-4" />
             </button>
           </PermissionGuard>
           <PermissionGuard permission="control.branch.delete">
             <button
               onClick={() => confirmDelete(row)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-transparent text-red-500 transition-all duration-200 hover:scale-105 hover:bg-red-50 hover:text-red-600 active:scale-95"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-red-500 bg-transparent hover:bg-red-50 hover:text-red-600 transition-all duration-200 hover:scale-105 active:scale-95"
               title="Delete"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="w-4 h-4" />
             </button>
           </PermissionGuard>
         </div>
@@ -197,7 +177,7 @@ const BranchesPage = () => {
         action={
           <PermissionGuard permission="control.branch.create">
             <Button onClick={openCreateModal}>
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="w-3.5 h-3.5" />
               Create Branch
             </Button>
           </PermissionGuard>
@@ -207,59 +187,43 @@ const BranchesPage = () => {
       <FormError message={error instanceof Error ? error.message : null} />
 
       <div className="filter-bar">
-        <div className="relative min-w-0 max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+        <div className="relative flex-1 max-w-sm min-w-0">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
           <input
             type="text"
             placeholder="Search branches..."
             name="search"
             value={filters.search}
-            onChange={(e: any) =>
-              setFilters({ ...filters, search: e.target.value, page: 1 })
-            }
+            onChange={(e: any) => setFilters({ ...filters, search: e.target.value, page: 1 })}
             className="input-premium pl-9"
           />
         </div>
         <div className="flex gap-2">
           <Select
             value={filters.branch_type || "all"}
-            onValueChange={(val) =>
-              setFilters({
-                ...filters,
-                branch_type: val === "all" ? "" : val,
-                page: 1,
-              })
-            }
+            onValueChange={(val) => setFilters({ ...filters, branch_type: val === "all" ? "" : val, page: 1 })}
           >
-            <SelectTrigger className="border-slate-200 focus:ring-slate-100/50 h-[38px] w-[140px] rounded-xl bg-white shadow-sm focus:ring-2">
+            <SelectTrigger className="w-[140px] h-[38px] bg-white border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-slate-100/50">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
-            <SelectContent className="border-slate-200 rounded-xl bg-white">
+            <SelectContent className="bg-white border-slate-200 rounded-xl">
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="Main Branch">Main Branch</SelectItem>
               <SelectItem value="Warehouse">Warehouse</SelectItem>
               <SelectItem value="Sales Branch">Sales Branch</SelectItem>
-              <SelectItem value="Distribution Center">
-                Distribution Center
-              </SelectItem>
+              <SelectItem value="Distribution Center">Distribution Center</SelectItem>
               <SelectItem value="Admin Office">Admin Office</SelectItem>
             </SelectContent>
           </Select>
 
           <Select
             value={filters.status || "all"}
-            onValueChange={(val) =>
-              setFilters({
-                ...filters,
-                status: val === "all" ? "" : val,
-                page: 1,
-              })
-            }
+            onValueChange={(val) => setFilters({ ...filters, status: val === "all" ? "" : val, page: 1 })}
           >
-            <SelectTrigger className="border-slate-200 focus:ring-slate-100/50 h-[38px] w-[140px] rounded-xl bg-white shadow-sm focus:ring-2">
+            <SelectTrigger className="w-[140px] h-[38px] bg-white border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-slate-100/50">
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
-            <SelectContent className="border-slate-200 rounded-xl bg-white">
+            <SelectContent className="bg-white border-slate-200 rounded-xl">
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="inactive">Inactive</SelectItem>
@@ -281,7 +245,7 @@ const BranchesPage = () => {
         onPageChange={(page: unknown) => setFilters({ ...filters, page })}
       />
 
-      <BranchFormModal
+       <BranchFormModal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         branch={selectedBranch}

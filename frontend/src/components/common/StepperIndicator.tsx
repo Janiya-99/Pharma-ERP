@@ -12,31 +12,23 @@ interface StepperIndicatorProps {
   onStepClick?: (step: number) => void;
 }
 
-const StepperIndicator = ({
-  steps,
-  currentStep,
-  onStepClick,
-}: StepperIndicatorProps) => {
+const StepperIndicator = ({ steps, currentStep, onStepClick }: StepperIndicatorProps) => {
   return (
-    <div className="card-premium mb-6 p-6">
+    <div className="card-premium p-6 mb-6">
       <div className="flex items-center">
         {steps.map((step, index) => {
           const isCompleted = index < currentStep;
           const isActive = index === currentStep;
-          const isPending = index > currentStep;
 
           return (
             <React.Fragment key={index}>
               {/* Step circle + label */}
               <div
-                className={`flex shrink-0 flex-col items-center gap-1.5 ${
-                  onStepClick && (isCompleted || isActive)
-                    ? "cursor-pointer"
-                    : ""
+                className={`flex flex-col items-center gap-1.5 shrink-0 ${
+                  onStepClick && (isCompleted || isActive) ? "cursor-pointer" : ""
                 }`}
                 onClick={() => {
-                  if (onStepClick && (isCompleted || isActive))
-                    onStepClick(index);
+                  if (onStepClick && (isCompleted || isActive)) onStepClick(index);
                 }}
               >
                 <div
@@ -57,9 +49,9 @@ const StepperIndicator = ({
                   )}
                 </div>
                 <span
-                  className={`hidden whitespace-nowrap text-[11px] font-medium sm:block ${
+                  className={`text-[11px] font-medium whitespace-nowrap hidden sm:block ${
                     isActive
-                      ? "font-semibold text-indigo-700"
+                      ? "text-indigo-700 font-semibold"
                       : isCompleted
                       ? "text-indigo-500"
                       : "text-gray-400"
@@ -73,9 +65,7 @@ const StepperIndicator = ({
               {index < steps.length - 1 && (
                 <div
                   className={`step-connector ${
-                    index < currentStep
-                      ? "step-connector-completed"
-                      : "step-connector-pending"
+                    index < currentStep ? "step-connector-completed" : "step-connector-pending"
                   }`}
                 />
               )}

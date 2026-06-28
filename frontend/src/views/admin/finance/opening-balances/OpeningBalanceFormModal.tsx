@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ERPFormModal from "components/erp/ERPFormModal";
 import { financeApi } from "api/financeApi";
 import { toast } from "react-hot-toast";
@@ -106,9 +106,7 @@ export default function OpeningBalanceFormModal({
     const credit = parseFloat(values.credit_balance || 0);
 
     if (debit > 0 && credit > 0) {
-      toast.error(
-        "An account cannot have both debit and credit balances simultaneously"
-      );
+      toast.error("An account cannot have both debit and credit balances simultaneously");
       return;
     }
 
@@ -137,9 +135,7 @@ export default function OpeningBalanceFormModal({
         onOpenChange(false);
       }
     } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || "Failed to save opening balance"
-      );
+      toast.error(err.response?.data?.message || "Failed to save opening balance");
     } finally {
       setLoading(false);
     }
@@ -161,12 +157,7 @@ export default function OpeningBalanceFormModal({
               base_currency: record.base_currency || "LKR",
               exchange_rate: record.exchange_rate?.toString() || "1",
             }
-          : {
-              debit_balance: "0",
-              credit_balance: "0",
-              base_currency: "LKR",
-              exchange_rate: "1",
-            }
+          : { debit_balance: "0", credit_balance: "0", base_currency: "LKR", exchange_rate: "1" }
       }
       onSubmit={handleSubmit}
       loading={loading}

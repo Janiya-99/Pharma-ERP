@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { financeApi } from "../../../../api/financeApi";
 import BankAccountSelect from "../../../../components/finance/BankAccountSelect";
@@ -17,9 +17,9 @@ export default function ChequeBookFormPage() {
     cheque_book_number: "",
     start_leaf_number: "",
     number_of_leaves: 50,
-    issued_date: new Date().toISOString().split("T")[0],
+    issued_date: new Date().toISOString().split('T')[0],
     remarks: "",
-    status: "active",
+    status: "active"
   });
 
   useEffect(() => {
@@ -39,9 +39,9 @@ export default function ChequeBookFormPage() {
           cheque_book_number: book.cheque_book_number || "",
           start_leaf_number: book.start_leaf_number || "",
           number_of_leaves: book.total_leaves || 50,
-          issued_date: book.issued_date ? book.issued_date.split("T")[0] : "",
+          issued_date: book.issued_date ? book.issued_date.split('T')[0] : "",
           remarks: book.remarks || "",
-          status: book.status || "active",
+          status: book.status || "active"
         });
       }
     } catch (error) {
@@ -55,7 +55,7 @@ export default function ChequeBookFormPage() {
     const { name, value, type } = e.target;
     setFormData((prev: unknown) => ({
       ...prev,
-      [name]: type === "number" ? parseInt(value) : value,
+      [name]: type === "number" ? parseInt(value) : value
     }));
   };
 
@@ -86,9 +86,7 @@ export default function ChequeBookFormPage() {
       }
       history.push("/admin/finance/cheque-books");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to save cheque book"
-      );
+      toast.error(error.response?.data?.message || "Failed to save cheque book");
     } finally {
       setSaving(false);
     }
@@ -97,83 +95,66 @@ export default function ChequeBookFormPage() {
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
   return (
-    <div className="mx-auto h-full max-w-3xl overflow-y-auto py-4">
-      <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-        <div className="mb-6 flex items-center justify-between border-b pb-4 dark:border-navy-700">
+    <div className="py-4 max-w-3xl mx-auto h-full overflow-y-auto">
+      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+        <div className="flex items-center justify-between mb-6 border-b pb-4 dark:border-navy-700">
           <div>
             <h2 className="text-xl font-bold text-navy-700 dark:text-white">
               {isEdit ? "Edit Cheque Book" : "Create Cheque Book"}
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
-              {isEdit
-                ? "Update cheque book details. Note: You cannot modify leaves once created."
+            <p className="text-sm text-gray-500 mt-1">
+              {isEdit 
+                ? "Update cheque book details. Note: You cannot modify leaves once created." 
                 : "Create a new cheque book. Cheque leaves will be automatically generated."}
             </p>
           </div>
           <button
             type="button"
             onClick={() => history.push("/admin/finance/cheque-books")}
-            className="rounded-md border px-4 py-2 text-gray-600 hover:bg-gray-50"
+            className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
           >
             Cancel
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Bank Account *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Account *</label>
               <BankAccountSelect
                 value={formData.bank_account_id}
-                onChange={(val: unknown) =>
-                  setFormData((prev: unknown) => ({
-                    ...prev,
-                    bank_account_id: val,
-                  }))
-                }
+                onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, bank_account_id: val }))}
                 disabled={isEdit}
               />
-              {isEdit && (
-                <p className="mt-1 text-xs text-gray-500">
-                  Bank account cannot be changed after creation.
-                </p>
-              )}
+              {isEdit && <p className="text-xs text-gray-500 mt-1">Bank account cannot be changed after creation.</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Cheque Book Number *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cheque Book Number *</label>
               <input
                 type="text"
                 name="cheque_book_number"
                 value={formData.cheque_book_number}
                 onChange={handleChange}
                 required
-                className="w-full rounded-md border px-3 py-2"
+                className="w-full px-3 py-2 border rounded-md"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Issued Date *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Issued Date *</label>
               <input
                 type="date"
                 name="issued_date"
                 value={formData.issued_date}
                 onChange={handleChange}
                 required
-                className="w-full rounded-md border px-3 py-2"
+                className="w-full px-3 py-2 border rounded-md"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Start Leaf Number *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Leaf Number *</label>
               <input
                 type="text"
                 name="start_leaf_number"
@@ -181,20 +162,14 @@ export default function ChequeBookFormPage() {
                 onChange={handleChange}
                 required
                 disabled={isEdit}
-                className="w-full rounded-md border px-3 py-2 disabled:bg-gray-50 disabled:text-gray-500"
+                className="w-full px-3 py-2 border rounded-md disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="e.g. 000001"
               />
-              {isEdit && (
-                <p className="mt-1 text-xs text-gray-500">
-                  Cannot be changed after generation.
-                </p>
-              )}
+              {isEdit && <p className="text-xs text-gray-500 mt-1">Cannot be changed after generation.</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Number of Leaves *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Number of Leaves *</label>
               <input
                 type="number"
                 min="1"
@@ -204,25 +179,19 @@ export default function ChequeBookFormPage() {
                 onChange={handleChange}
                 required
                 disabled={isEdit}
-                className="w-full rounded-md border px-3 py-2 disabled:bg-gray-50 disabled:text-gray-500"
+                className="w-full px-3 py-2 border rounded-md disabled:bg-gray-50 disabled:text-gray-500"
               />
-              {isEdit && (
-                <p className="mt-1 text-xs text-gray-500">
-                  Cannot be changed after generation.
-                </p>
-              )}
+              {isEdit && <p className="text-xs text-gray-500 mt-1">Cannot be changed after generation.</p>}
             </div>
 
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Status *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
                 required
-                className="w-full rounded-md border px-3 py-2"
+                className="w-full px-3 py-2 border rounded-md"
               >
                 <option value="active">Active</option>
                 <option value="completed">Completed</option>
@@ -231,31 +200,25 @@ export default function ChequeBookFormPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Remarks
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remarks</label>
               <textarea
                 name="remarks"
                 value={formData.remarks}
                 onChange={handleChange}
                 rows="3"
-                className="w-full rounded-md border px-3 py-2"
+                className="w-full px-3 py-2 border rounded-md"
                 placeholder="Any additional notes about this cheque book"
               ></textarea>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t pt-6 dark:border-navy-700">
+          <div className="flex justify-end gap-3 pt-6 border-t dark:border-navy-700">
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-brand-500 px-6 py-2 text-white hover:bg-brand-600 disabled:opacity-50"
+              className="px-6 py-2 bg-brand-500 text-white rounded-md hover:bg-brand-600 disabled:opacity-50"
             >
-              {saving
-                ? "Saving..."
-                : isEdit
-                ? "Update Cheque Book"
-                : "Generate Cheque Book"}
+              {saving ? "Saving..." : isEdit ? "Update Cheque Book" : "Generate Cheque Book"}
             </button>
           </div>
         </form>

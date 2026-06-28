@@ -1,10 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getRoles,
-  deleteRole,
-  getSoftwareModules,
-} from "../../../api/controlApi";
+import { getRoles, deleteRole, getSoftwareModules } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
@@ -127,10 +123,7 @@ const RolesPage = () => {
         label: "Manage Permissions",
         icon: Shield,
         permission: "control.permission.assign",
-        onClick: (r: any) =>
-          navigate(
-            `/control-center/roles-permissions?tab=matrix&software_id=${r.software_id}&role_id=${r.id}`
-          ),
+        onClick: (r: any) => navigate(`/control-center/roles-permissions?tab=matrix&software_id=${r.software_id}&role_id=${r.id}`),
       },
       {
         label: "Edit Role",
@@ -140,7 +133,7 @@ const RolesPage = () => {
           setSelectedRole(r);
           setIsFormOpen(true);
         },
-      },
+      }
     ];
 
     if (!row.is_system) {
@@ -160,16 +153,7 @@ const RolesPage = () => {
     {
       header: "Software",
       accessor: "software_id",
-      cell: (row: any) =>
-        row.software_name ||
-        row.software?.software_name ||
-        row.software_module?.software_name ||
-        (row.software_code
-          ? row.software_code
-              .replace(/_/g, " ")
-              .toLowerCase()
-              .replace(/\b\w/g, (c: string) => c.toUpperCase())
-          : "-"),
+      cell: (row: any) => row.software_name || row.software?.software_name || row.software_module?.software_name || (row.software_code ? row.software_code.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase()) : "-"),
     },
     {
       header: "Role Name",
@@ -179,12 +163,12 @@ const RolesPage = () => {
         <div className="flex items-center gap-2">
           {row.role_name}
           {row.is_system && (
-            <span className="inline-flex items-center rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
               System
             </span>
           )}
         </div>
-      ),
+      )
     },
     {
       header: "Role Code",
@@ -193,11 +177,7 @@ const RolesPage = () => {
     {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => (
-        <span className="block max-w-xs truncate text-gray-500">
-          {row.description || "-"}
-        </span>
-      ),
+      cell: (row: unknown) => <span className="text-gray-500 truncate block max-w-xs">{row.description || "-"}</span>,
     },
     {
       header: "Status",
@@ -206,21 +186,19 @@ const RolesPage = () => {
     {
       header: "Actions",
       cellClassName: "text-right",
-      cell: (row: unknown) => (
-        <ActionMenu actions={getRowActions(row)} item={row} />
-      ),
+      cell: (row: unknown) => <ActionMenu actions={getRowActions(row)} item={row} />,
     },
   ];
 
   return (
-    <div className="mx-auto max-w-7xl p-6">
+    <div className="p-6 max-w-7xl mx-auto">
       <PageHeader
         title="Roles"
         description="Manage system roles and their properties."
         action={
           <PermissionGuard permission="control.role.create">
             <Button onClick={openCreateModal}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="w-4 h-4 mr-2" />
               Create Role
             </Button>
           </PermissionGuard>
@@ -229,22 +207,20 @@ const RolesPage = () => {
 
       <FormError message={error} />
 
-      <div className="mb-6 flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:flex-row">
-        <form onSubmit={handleSearch} className="flex flex-1 gap-2">
+      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6 flex flex-col sm:flex-row gap-4 shadow-sm">
+        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
           <Input
             placeholder="Search roles..."
             name="search"
             value={filters.search}
-            onChange={(e: any) =>
-              setFilters({ ...filters, search: e.target.value })
-            }
+            onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
             className="w-full sm:max-w-md"
           />
           <Button type="submit" variant="secondary" className="px-3">
-            <Search className="h-4 w-4" />
+            <Search className="w-4 h-4" />
           </Button>
         </form>
-
+        
         <div className="flex flex-wrap gap-2">
           <select
             name="software_id"
@@ -254,9 +230,7 @@ const RolesPage = () => {
           >
             <option value="">All Software Modules</option>
             {softwareModules.map((s: unknown) => (
-              <option key={s.id} value={s.id}>
-                {s.software_name}
-              </option>
+              <option key={s.id} value={s.id}>{s.software_name}</option>
             ))}
           </select>
 

@@ -4,11 +4,7 @@ import { inventoryApi } from "../../../api/inventoryApi";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import StockTransferLinesTable from "./StockTransferLinesTable";
-import {
-  StockTransfer,
-  StockTransferLine,
-  Warehouse,
-} from "../../../types/inventory";
+import { StockTransferLine, Warehouse } from "../../../types/inventory";
 
 const StockTransferFormPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,38 +31,27 @@ const StockTransferFormPage = () => {
       fetchTransfer();
     } else {
       // Add one empty line by default
-      setLines([
-        {
-          id: `temp-${Date.now()}`,
-          product_id: null,
-          product: null,
-          product_batch_id: null,
-          batch: null,
-          source_location_id: "",
-          destination_location_id: "",
-          transfer_quantity: 0,
-          available_quantity: null,
-          stock_balance_loading: false,
-          stock_balance_data: null,
-        },
-      ]);
+      setLines([{
+        id: `temp-${Date.now()}`,
+        product_id: null,
+        product: null,
+        product_batch_id: null,
+        batch: null,
+        source_location_id: "",
+        destination_location_id: "",
+        transfer_quantity: 0,
+        available_quantity: null,
+        stock_balance_loading: false,
+        stock_balance_data: null,
+      }]);
     }
   }, [id]);
 
   const fetchWarehouses = async () => {
     try {
-      const res = (await inventoryApi.getWarehouses({
-        limit: 1000,
-        status: "active",
-      })) as any;
+      const res = await inventoryApi.getWarehouses({ limit: 1000, status: "active" }) as any;
       if (res.success !== false) {
-        setWarehouses(
-          Array.isArray(res.data?.data)
-            ? res.data.data
-            : Array.isArray(res.data)
-            ? res.data
-            : []
-        );
+        setWarehouses(Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []));
       }
     } catch (err) {}
   };
@@ -74,13 +59,10 @@ const StockTransferFormPage = () => {
   const fetchTransfer = async () => {
     try {
       setLoading(true);
-      const res = (await inventoryApi.getStockTransferById(id!)) as any;
+      const res = await inventoryApi.getStockTransferById(id!) as any;
       if (res.success !== false) {
         const transfer = res.data;
-        if (
-          transfer.approval_status !== "draft" &&
-          transfer.approval_status !== "rejected"
-        ) {
+        if (transfer.approval_status !== "draft" && transfer.approval_status !== "rejected") {
           toast.error("Only draft or rejected transfers can be edited");
           navigate("/inventory/stock-transfers");
           return;
@@ -88,34 +70,27 @@ const StockTransferFormPage = () => {
 
         setFormData({
           source_warehouse_id: transfer.source_warehouse_id?.toString() || "",
-          destination_warehouse_id:
-            transfer.destination_warehouse_id?.toString() || "",
-          transfer_date: transfer.transfer_date
-            ? transfer.transfer_date.split("T")[0]
-            : "",
+          destination_warehouse_id: transfer.destination_warehouse_id?.toString() || "",
+          transfer_date: transfer.transfer_date ? transfer.transfer_date.split("T")[0] : "",
           reference_no: transfer.reference_no || "",
           remarks: transfer.remarks || "",
         });
 
         if (transfer.lines) {
-          setLines(
-            transfer.lines.map(
-              (l: any): StockTransferLine => ({
-                id: l.id,
-                product_id: l.product_id,
-                product: l.product,
-                product_batch_id: l.product_batch_id,
-                batch: l.product_batch,
-                source_location_id: l.source_location_id,
-                destination_location_id: l.destination_location_id,
-                transfer_quantity: parseFloat(l.transfer_quantity),
-                available_quantity: null,
-                stock_balance_loading: false,
-                stock_balance_data: null,
-                // we will fetch available stock for each line shortly
-              })
-            )
-          );
+          setLines(transfer.lines.map((l: any): StockTransferLine => ({
+            id: l.id,
+            product_id: l.product_id,
+            product: l.product,
+            product_batch_id: l.product_batch_id,
+            batch: l.product_batch,
+            source_location_id: l.source_location_id,
+            destination_location_id: l.destination_location_id,
+            transfer_quantity: parseFloat(l.transfer_quantity),
+            available_quantity: null,
+            stock_balance_loading: false,
+            stock_balance_data: null,
+            // we will fetch available stock for each line shortly
+          })));
         }
       }
     } catch (err) {
@@ -126,11 +101,7 @@ const StockTransferFormPage = () => {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
@@ -141,12 +112,9 @@ const StockTransferFormPage = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.source_warehouse_id)
-      newErrors.source_warehouse_id = "Source warehouse is required";
-    if (!formData.destination_warehouse_id)
-      newErrors.destination_warehouse_id = "Destination warehouse is required";
-    if (!formData.transfer_date)
-      newErrors.transfer_date = "Transfer date is required";
+    if (!formData.source_warehouse_id) newErrors.source_warehouse_id = "Source warehouse is required";
+    if (!formData.destination_warehouse_id) newErrors.destination_warehouse_id = "Destination warehouse is required";
+    if (!formData.transfer_date) newErrors.transfer_date = "Transfer date is required";
 
     if (lines.length === 0) {
       newErrors.lines = "At least one line item is required";
@@ -157,30 +125,18 @@ const StockTransferFormPage = () => {
       if (line.product?.requires_batch_tracking && !line.product_batch_id) {
         newErrors[`lines.${index}.product_batch_id`] = "Required";
       }
-      if (!line.source_location_id)
-        newErrors[`lines.${index}.source_location_id`] = "Required";
-      if (!line.destination_location_id)
-        newErrors[`lines.${index}.destination_location_id`] = "Required";
-
-      const qty = parseFloat((line.transfer_quantity as string) || "0");
-      if (qty <= 0)
-        newErrors[`lines.${index}.transfer_quantity`] = "Must be > 0";
-
-      if (
-        line.available_quantity !== null &&
-        line.available_quantity !== undefined &&
-        qty > Number(line.available_quantity)
-      ) {
-        newErrors[`lines.${index}.transfer_quantity`] =
-          "Exceeds available stock";
+      if (!line.source_location_id) newErrors[`lines.${index}.source_location_id`] = "Required";
+      if (!line.destination_location_id) newErrors[`lines.${index}.destination_location_id`] = "Required";
+      
+      const qty = parseFloat(line.transfer_quantity as string || "0");
+      if (qty <= 0) newErrors[`lines.${index}.transfer_quantity`] = "Must be > 0";
+      
+      if (line.available_quantity !== null && line.available_quantity !== undefined && qty > Number(line.available_quantity)) {
+        newErrors[`lines.${index}.transfer_quantity`] = "Exceeds available stock";
       }
 
-      if (
-        formData.source_warehouse_id === formData.destination_warehouse_id &&
-        line.source_location_id === line.destination_location_id
-      ) {
-        newErrors[`lines.${index}.destination_location_id`] =
-          "Must differ from source location";
+      if (formData.source_warehouse_id === formData.destination_warehouse_id && line.source_location_id === line.destination_location_id) {
+        newErrors[`lines.${index}.destination_location_id`] = "Must differ from source location";
       }
     });
 
@@ -199,17 +155,13 @@ const StockTransferFormPage = () => {
     try {
       const payload = {
         source_warehouse_id: parseInt(formData.source_warehouse_id as string),
-        destination_warehouse_id: parseInt(
-          formData.destination_warehouse_id as string
-        ),
+        destination_warehouse_id: parseInt(formData.destination_warehouse_id as string),
         transfer_date: new Date(formData.transfer_date).toISOString(),
         reference_no: formData.reference_no,
         remarks: formData.remarks,
         lines: lines.map((l) => ({
           product_id: Number(l.product_id),
-          product_batch_id: l.product_batch_id
-            ? Number(l.product_batch_id)
-            : null,
+          product_batch_id: l.product_batch_id ? Number(l.product_batch_id) : null,
           source_location_id: Number(l.source_location_id),
           destination_location_id: Number(l.destination_location_id),
           transfer_quantity: parseFloat(l.transfer_quantity as string),
@@ -234,11 +186,11 @@ const StockTransferFormPage = () => {
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="mx-auto max-w-[1600px] p-6">
-      <div className="mb-6 flex items-center gap-4">
+    <div className="p-6 max-w-[1600px] mx-auto">
+      <div className="flex items-center gap-4 mb-6">
         <button
           onClick={() => navigate("/inventory/stock-transfers")}
-          className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 hover:text-gray-700 dark:border-navy-700 dark:bg-navy-800 dark:hover:text-gray-300"
+          className="p-2 text-gray-500 hover:text-gray-700 bg-white border border-gray-200 rounded-lg dark:bg-navy-800 dark:border-navy-700 dark:hover:text-gray-300"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -246,79 +198,60 @@ const StockTransferFormPage = () => {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {isEditMode ? "Edit Stock Transfer" : "New Stock Transfer"}
           </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {isEditMode
-              ? "Update draft transfer details"
-              : "Create a new stock transfer draft"}
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {isEditMode ? "Update draft transfer details" : "Create a new stock transfer draft"}
           </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Header Section */}
-        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-            Transfer Details
-          </h3>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Transfer Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Source Warehouse *
               </label>
               <select
                 name="source_warehouse_id"
                 value={formData.source_warehouse_id}
                 onChange={handleChange}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
-                  errors.source_warehouse_id
-                    ? "border-red-500"
-                    : "border-gray-200 dark:border-navy-600"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
+                  errors.source_warehouse_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"
                 }`}
               >
                 <option value="">Select Source...</option>
                 {warehouses.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.warehouse_name}
-                  </option>
+                  <option key={w.id} value={w.id}>{w.warehouse_name}</option>
                 ))}
               </select>
-              {errors.source_warehouse_id && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.source_warehouse_id}
-                </p>
-              )}
+              {errors.source_warehouse_id && <p className="mt-1 text-sm text-red-500">{errors.source_warehouse_id}</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Destination Warehouse *
               </label>
               <select
                 name="destination_warehouse_id"
                 value={formData.destination_warehouse_id}
                 onChange={handleChange}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
-                  errors.destination_warehouse_id
-                    ? "border-red-500"
-                    : "border-gray-200 dark:border-navy-600"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
+                  errors.destination_warehouse_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"
                 }`}
               >
                 <option value="">Select Destination...</option>
                 {warehouses.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.warehouse_name}
-                  </option>
+                  <option key={w.id} value={w.id}>{w.warehouse_name}</option>
                 ))}
               </select>
-              {errors.destination_warehouse_id && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.destination_warehouse_id}
-                </p>
-              )}
+              {errors.destination_warehouse_id && <p className="mt-1 text-sm text-red-500">{errors.destination_warehouse_id}</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Transfer Date *
               </label>
               <input
@@ -326,21 +259,15 @@ const StockTransferFormPage = () => {
                 name="transfer_date"
                 value={formData.transfer_date}
                 onChange={handleChange}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
-                  errors.transfer_date
-                    ? "border-red-500"
-                    : "border-gray-200 dark:border-navy-600"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
+                  errors.transfer_date ? "border-red-500" : "border-gray-200 dark:border-navy-600"
                 }`}
               />
-              {errors.transfer_date && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.transfer_date}
-                </p>
-              )}
+              {errors.transfer_date && <p className="mt-1 text-sm text-red-500">{errors.transfer_date}</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Reference No
               </label>
               <input
@@ -349,12 +276,12 @@ const StockTransferFormPage = () => {
                 value={formData.reference_no}
                 onChange={handleChange}
                 placeholder="Optional external ref"
-                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white"
               />
             </div>
-
+            
             <div className="md:col-span-2 lg:col-span-4">
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Remarks
               </label>
               <textarea
@@ -363,28 +290,24 @@ const StockTransferFormPage = () => {
                 onChange={handleChange}
                 rows={2}
                 placeholder="Internal notes..."
-                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white"
               />
             </div>
           </div>
         </div>
 
         {/* Lines Section */}
-        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-          {!formData.source_warehouse_id ||
-          !formData.destination_warehouse_id ? (
-            <div className="py-8 text-center text-gray-500">
-              Please select Source and Destination warehouses to manage transfer
-              lines.
+        <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          {!formData.source_warehouse_id || !formData.destination_warehouse_id ? (
+            <div className="text-center py-8 text-gray-500">
+              Please select Source and Destination warehouses to manage transfer lines.
             </div>
           ) : (
             <StockTransferLinesTable
               lines={lines}
               setLines={setLines}
               sourceWarehouseId={parseInt(formData.source_warehouse_id)}
-              destinationWarehouseId={parseInt(
-                formData.destination_warehouse_id
-              )}
+              destinationWarehouseId={parseInt(formData.destination_warehouse_id)}
               errors={errors}
             />
           )}
@@ -395,16 +318,16 @@ const StockTransferFormPage = () => {
           <button
             type="button"
             onClick={() => navigate("/inventory/stock-transfers")}
-            className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-200 dark:hover:bg-navy-700"
+            className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm shadow-brand-500/20 hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-brand-500/20"
           >
-            <Save className="h-5 w-5" />
+            <Save className="w-5 h-5" />
             {saving ? "Saving..." : "Save Draft"}
           </button>
         </div>

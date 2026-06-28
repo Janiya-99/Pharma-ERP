@@ -1,26 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Select from "react-select";
 import { inventoryApi } from "../../api/inventoryApi";
 
-const WarehouseLocationSelect = ({
-  value,
-  onChange,
-  placeholder = "Select...",
-  disabled = false,
-  error = false,
-  isMulti = false,
-  isClearable = true,
-  extraParams = {},
-}: {
-  value?: unknown;
-  onChange?: unknown;
-  placeholder?: unknown;
-  disabled?: unknown;
-  error?: unknown;
-  isMulti?: boolean;
-  isClearable?: boolean;
-  extraParams?: unknown;
-}) => {
+const WarehouseLocationSelect = ({ value, onChange, placeholder = "Select...", disabled = false, error = false, isMulti = false, isClearable = true, extraParams = {} }: { value?: unknown; onChange?: unknown; placeholder?: unknown; disabled?: unknown; error?: unknown; isMulti?: boolean; isClearable?: boolean; extraParams?: unknown }) => {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -31,11 +13,7 @@ const WarehouseLocationSelect = ({
   const fetchOptions = async () => {
     setLoading(true);
     try {
-      const response = await inventoryApi.getWarehouseLocations({
-        limit: 1000,
-        status: "active",
-        ...extraParams,
-      });
+      const response = await inventoryApi.getWarehouseLocations({ limit: 1000, status: "active", ...extraParams });
       if (response.data?.success) {
         const data = response.data.data;
         const mappedOptions = data.map((item: unknown) => ({
@@ -53,9 +31,7 @@ const WarehouseLocationSelect = ({
   };
 
   const selectedValue = isMulti
-    ? options.filter((opt: unknown) =>
-        Array.isArray(value) ? value.includes(opt.value) : false
-      )
+    ? options.filter((opt: unknown) => (Array.isArray(value) ? value.includes(opt.value) : false))
     : options.find((opt: unknown) => opt.value === value) || null;
 
   const handleChange = (selected: unknown) => {
@@ -72,33 +48,20 @@ const WarehouseLocationSelect = ({
       minHeight: "42px",
       borderRadius: "0.5rem",
       borderColor: error ? "#ef4444" : state.isFocused ? "#3b82f6" : "#e5e7eb",
-      boxShadow: state.isFocused
-        ? error
-          ? "0 0 0 1px #ef4444"
-          : "0 0 0 1px #3b82f6"
-        : "none",
+      boxShadow: state.isFocused ? (error ? "0 0 0 1px #ef4444" : "0 0 0 1px #3b82f6") : "none",
       "&:hover": {
-        borderColor: error
-          ? "#ef4444"
-          : state.isFocused
-          ? "#3b82f6"
-          : "#d1d5db",
+        borderColor: error ? "#ef4444" : state.isFocused ? "#3b82f6" : "#d1d5db",
       },
     }),
     menu: (base: unknown) => ({
       ...base,
       zIndex: 50,
       borderRadius: "0.5rem",
-      boxShadow:
-        "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
     }),
     option: (base: unknown, state: unknown) => ({
       ...base,
-      backgroundColor: state.isSelected
-        ? "#eff6ff"
-        : state.isFocused
-        ? "#f9fafb"
-        : "white",
+      backgroundColor: state.isSelected ? "#eff6ff" : state.isFocused ? "#f9fafb" : "white",
       color: state.isSelected ? "#1e40af" : "#374151",
       "&:active": {
         backgroundColor: "#eff6ff",

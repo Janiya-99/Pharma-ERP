@@ -1,27 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import {
-  Edit,
-  Eye,
-  FileText,
-  FolderTree,
-  Loader2,
-  MoreHorizontal,
-  Plus,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { Edit, Eye, FolderTree, Loader2, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
 import { useAuth } from "../../../auth/AuthContext";
 import { financeApi } from "../../../api/financeApi";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -122,10 +106,7 @@ const emptyForm: AccountForm = {
 const accountTypes = ["asset", "liability", "equity", "income", "expense"];
 
 const getErrorMessage = (error: any, fallback: string) =>
-  error?.response?.data?.message ||
-  error?.response?.data?.error ||
-  error?.message ||
-  fallback;
+  error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
 
 const money = (amount: number | string | undefined) =>
   new Intl.NumberFormat("en-LK", {
@@ -137,11 +118,7 @@ const money = (amount: number | string | undefined) =>
 const ChartOfAccountsPage = () => {
   const { company, activeBranch, user } = useAuth();
   const companyId = company?.id || company?.company_id;
-  const defaultBranchId =
-    activeBranch?.id ||
-    activeBranch?.branch_id ||
-    activeBranch?.branch?.id ||
-    "";
+  const defaultBranchId = activeBranch?.id || activeBranch?.branch_id || activeBranch?.branch?.id || "";
 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [classifications, setClassifications] = useState<ApiRecord[]>([]);
@@ -153,15 +130,10 @@ const ChartOfAccountsPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [accountToDeactivate, setAccountToDeactivate] =
-    useState<Account | null>(null);
+  const [accountToDeactivate, setAccountToDeactivate] = useState<Account | null>(null);
   const [form, setForm] = useState<AccountForm>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [filters, setFilters] = useState({
-    search: "",
-    account_type: "all",
-    status: "all",
-  });
+  const [filters, setFilters] = useState({ search: "", account_type: "all", status: "all" });
 
   const fetchAccounts = async () => {
     if (!companyId) {
@@ -176,8 +148,7 @@ const ChartOfAccountsPage = () => {
         limit: 500,
         company_id: companyId,
         search: filters.search,
-        account_type:
-          filters.account_type === "all" ? "" : filters.account_type,
+        account_type: filters.account_type === "all" ? "" : filters.account_type,
         status: filters.status === "all" ? "" : filters.status,
       });
       setAccounts(res.data?.data || []);
@@ -190,16 +161,10 @@ const ChartOfAccountsPage = () => {
 
   const fetchClassifications = async () => {
     try {
-      const res = await financeApi.getAccountClassifications({
-        limit: 1000,
-        status: "active",
-        company_id: companyId,
-      });
+      const res = await financeApi.getAccountClassifications({ limit: 1000, status: "active", company_id: companyId });
       setClassifications(res.data?.data || []);
     } catch (error) {
-      toast.error(
-        getErrorMessage(error, "Failed to load account classifications")
-      );
+      toast.error(getErrorMessage(error, "Failed to load account classifications"));
     }
   };
 
@@ -211,15 +176,9 @@ const ChartOfAccountsPage = () => {
     if (companyId) fetchClassifications();
   }, [companyId]);
 
-  const rootAccounts = useMemo(
-    () => accounts.filter((account) => !account.parent_account_id),
-    [accounts]
-  );
+  const rootAccounts = useMemo(() => accounts.filter((account) => !account.parent_account_id), [accounts]);
 
-  const setField = <K extends keyof AccountForm>(
-    key: K,
-    value: AccountForm[K]
-  ) => {
+  const setField = <K extends keyof AccountForm>(key: K, value: AccountForm[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: "" }));
   };
@@ -236,12 +195,8 @@ const ChartOfAccountsPage = () => {
     setForm({
       account_code: account.account_code || "",
       account_name: account.account_name || "",
-      account_classification_id: account.account_classification_id
-        ? String(account.account_classification_id)
-        : "",
-      parent_account_id: account.parent_account_id
-        ? String(account.parent_account_id)
-        : "",
+      account_classification_id: account.account_classification_id ? String(account.account_classification_id) : "",
+      parent_account_id: account.parent_account_id ? String(account.parent_account_id) : "",
       account_level: String(account.account_level || 1),
       account_type: account.account_type || "asset",
       normal_balance: account.normal_balance || "debit",
@@ -268,36 +223,20 @@ const ChartOfAccountsPage = () => {
 
   const validate = () => {
     const nextErrors: Record<string, string> = {};
-    if (!companyId)
-      nextErrors.company_id = "Please select a company before saving.";
-    if (!form.account_code.trim())
-      nextErrors.account_code = "Account Code is required.";
-    if (!form.account_name.trim())
-      nextErrors.account_name = "Account Name is required.";
-    if (!form.account_classification_id)
-      nextErrors.account_classification_id = "Classification is required.";
-    if (!form.account_type)
-      nextErrors.account_type = "Account Type is required.";
-    if (!form.normal_balance)
-      nextErrors.normal_balance = "Normal Balance is required.";
+    if (!companyId) nextErrors.company_id = "Please select a company before saving.";
+    if (!form.account_code.trim()) nextErrors.account_code = "Account Code is required.";
+    if (!form.account_name.trim()) nextErrors.account_name = "Account Name is required.";
+    if (!form.account_classification_id) nextErrors.account_classification_id = "Classification is required.";
+    if (!form.account_type) nextErrors.account_type = "Account Type is required.";
+    if (!form.normal_balance) nextErrors.normal_balance = "Normal Balance is required.";
     if (!form.status) nextErrors.status = "Status is required.";
-    if (
-      form.parent_account_id &&
-      editingAccount &&
-      Number(form.parent_account_id) === editingAccount.id
-    ) {
-      nextErrors.parent_account_id =
-        "Parent account cannot be the same account.";
+    if (form.parent_account_id && editingAccount && Number(form.parent_account_id) === editingAccount.id) {
+      nextErrors.parent_account_id = "Parent account cannot be the same account.";
     }
-    if (
-      (form.is_bank_account || form.is_cash_account) &&
-      form.account_type !== "asset"
-    ) {
-      nextErrors.account_type =
-        "Bank and Cash flags can only be used for Asset accounts.";
+    if ((form.is_bank_account || form.is_cash_account) && form.account_type !== "asset") {
+      nextErrors.account_type = "Bank and Cash flags can only be used for Asset accounts.";
     }
-    if (Number.isNaN(Number(form.opening_balance)))
-      nextErrors.opening_balance = "Opening Balance must be numeric.";
+    if (Number.isNaN(Number(form.opening_balance))) nextErrors.opening_balance = "Opening Balance must be numeric.";
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -314,9 +253,7 @@ const ChartOfAccountsPage = () => {
         account_code: form.account_code.trim(),
         account_name: form.account_name.trim(),
         account_classification_id: Number(form.account_classification_id),
-        parent_account_id: form.parent_account_id
-          ? Number(form.parent_account_id)
-          : undefined,
+        parent_account_id: form.parent_account_id ? Number(form.parent_account_id) : undefined,
         account_level: Number(form.account_level || 1),
         account_type: form.account_type,
         normal_balance: form.normal_balance,
@@ -363,11 +300,7 @@ const ChartOfAccountsPage = () => {
           updated_by: user?.id,
         });
       } catch (error: any) {
-        if (
-          error?.response?.status === 404 ||
-          error?.response?.status === 405 ||
-          !financeApi.deactivateChartOfAccount
-        ) {
+        if (error?.response?.status === 404 || error?.response?.status === 405 || !financeApi.deactivateChartOfAccount) {
           await financeApi.deleteChartOfAccount(accountToDeactivate.id);
         } else {
           throw error;
@@ -398,94 +331,67 @@ const ChartOfAccountsPage = () => {
   );
 
   return (
-    <div className="text-slate-900 min-h-full bg-[#F8FAFC] p-6">
+    <div className="min-h-full bg-[#F8FAFC] p-6 text-slate-900">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
-            Finance / Accounting Setup
-          </p>
-          <h1 className="text-slate-900 mt-1 text-3xl font-bold tracking-tight">
-            Chart of Accounts
-          </h1>
-          <p className="text-slate-500 mt-2 max-w-3xl text-sm">
-            Create, organize, and maintain ledger accounts used by journals,
-            vouchers, bank accounts, cash accounts, and reports.
+          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Finance / Accounting Setup</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Chart of Accounts</h1>
+          <p className="mt-2 max-w-3xl text-sm text-slate-500">
+            Create, organize, and maintain ledger accounts used by journals, vouchers, bank accounts, cash accounts, and reports.
           </p>
         </div>
-        <Button
-          onClick={openCreateDialog}
-          className="bg-indigo-600 text-white hover:bg-indigo-700"
-        >
+        <Button onClick={openCreateDialog} className="bg-indigo-600 text-white hover:bg-indigo-700">
           <Plus className="h-4 w-4" />
           Create Account
         </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
-        <Card className="border-slate-200 border bg-white shadow-sm">
-          <CardHeader className="border-slate-100 border-b">
+        <Card className="border border-slate-200 bg-white shadow-sm">
+          <CardHeader className="border-b border-slate-100">
             <CardTitle className="flex items-center gap-2">
               <FolderTree className="h-4 w-4 text-indigo-600" />
               Account Tree
             </CardTitle>
-            <CardDescription>
-              Root accounts loaded from the API.
-            </CardDescription>
+            <CardDescription>Root accounts loaded from the API.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {rootAccounts.length === 0 ? (
-              <p className="text-slate-500 text-sm">No root accounts found.</p>
+              <p className="text-sm text-slate-500">No root accounts found.</p>
             ) : (
               rootAccounts.map((account) => (
                 <button
                   key={account.id}
                   onClick={() => openDetails(account)}
-                  className="border-slate-200 hover:bg-slate-50 flex w-full items-center justify-between rounded-lg border bg-white px-3 py-2 text-left text-sm"
+                  className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm hover:bg-slate-50"
                 >
-                  <span className="text-slate-800 truncate font-medium">
-                    {account.account_code} - {account.account_name}
-                  </span>
-                  <Eye className="text-slate-400 h-3.5 w-3.5" />
+                  <span className="truncate font-medium text-slate-800">{account.account_code} - {account.account_name}</span>
+                  <Eye className="h-3.5 w-3.5 text-slate-400" />
                 </button>
               ))
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 border bg-white shadow-sm">
-          <CardHeader className="border-slate-100 border-b">
+        <Card className="border border-slate-200 bg-white shadow-sm">
+          <CardHeader className="border-b border-slate-100">
             <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <CardTitle>Ledger Accounts</CardTitle>
-                <CardDescription>
-                  Search, filter, create, edit, view, and deactivate accounts.
-                </CardDescription>
+                <CardDescription>Search, filter, create, edit, view, and deactivate accounts.</CardDescription>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="relative">
-                  <Search className="text-slate-400 pointer-events-none absolute left-2.5 top-2 h-4 w-4" />
+                  <Search className="pointer-events-none absolute left-2.5 top-2 h-4 w-4 text-slate-400" />
                   <Input
                     value={filters.search}
-                    onChange={(event) =>
-                      setFilters((current) => ({
-                        ...current,
-                        search: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
                     placeholder="Search accounts"
-                    className="border-slate-200 h-9 w-full bg-white pl-8 sm:w-64"
+                    className="h-9 w-full border-slate-200 bg-white pl-8 sm:w-64"
                   />
                 </div>
-                <Select
-                  value={filters.account_type}
-                  onValueChange={(value) =>
-                    setFilters((current) => ({
-                      ...current,
-                      account_type: value,
-                    }))
-                  }
-                >
-                  <SelectTrigger className="border-slate-200 h-9 w-full bg-white sm:w-40">
+                <Select value={filters.account_type} onValueChange={(value) => setFilters((current) => ({ ...current, account_type: value }))}>
+                  <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -497,13 +403,8 @@ const ChartOfAccountsPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select
-                  value={filters.status}
-                  onValueChange={(value) =>
-                    setFilters((current) => ({ ...current, status: value }))
-                  }
-                >
-                  <SelectTrigger className="border-slate-200 h-9 w-full bg-white sm:w-40">
+                <Select value={filters.status} onValueChange={(value) => setFilters((current) => ({ ...current, status: value }))}>
+                  <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -531,78 +432,47 @@ const ChartOfAccountsPage = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-slate-500 h-28 text-center"
-                    >
+                    <TableCell colSpan={7} className="h-28 text-center text-slate-500">
                       <Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />
                       Loading chart of accounts...
                     </TableCell>
                   </TableRow>
                 ) : accounts.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-slate-500 h-28 text-center"
-                    >
-                      No accounts found.
-                    </TableCell>
+                    <TableCell colSpan={7} className="h-28 text-center text-slate-500">No accounts found.</TableCell>
                   </TableRow>
                 ) : (
                   accounts.map((account) => (
                     <TableRow key={account.id}>
-                      <TableCell className="text-slate-600 font-mono text-xs">
-                        {account.account_code}
-                      </TableCell>
+                      <TableCell className="font-mono text-xs text-slate-600">{account.account_code}</TableCell>
                       <TableCell>
-                        <p className="text-slate-900 font-semibold">
-                          {account.account_name}
-                        </p>
-                        <p className="text-slate-500 text-xs">
-                          {account.classification?.name ||
-                            account.account_classification?.name ||
-                            "Unclassified"}
+                        <p className="font-semibold text-slate-900">{account.account_name}</p>
+                        <p className="text-xs text-slate-500">
+                          {account.classification?.name || account.account_classification?.name || "Unclassified"}
                         </p>
                       </TableCell>
-                      <TableCell className="capitalize">
-                        {account.account_type || "-"}
-                      </TableCell>
-                      <TableCell className="capitalize">
-                        {account.normal_balance || "-"}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold">
-                        {money(account.current_balance)}
-                      </TableCell>
+                      <TableCell className="capitalize">{account.account_type || "-"}</TableCell>
+                      <TableCell className="capitalize">{account.normal_balance || "-"}</TableCell>
+                      <TableCell className="text-right font-semibold">{money(account.current_balance)}</TableCell>
                       <TableCell>{statusBadge(account.status)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Actions for ${account.account_name}`}
-                            >
+                            <Button variant="ghost" size="icon" aria-label={`Actions for ${account.account_name}`}>
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-44">
-                            <DropdownMenuItem
-                              onClick={() => openDetails(account)}
-                            >
+                            <DropdownMenuItem onClick={() => openDetails(account)}>
                               <Eye className="h-4 w-4" />
                               View
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openEditDialog(account)}
-                            >
+                            <DropdownMenuItem onClick={() => openEditDialog(account)}>
                               <Edit className="h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-red-600 focus:text-red-600"
-                              onClick={() => requestDeactivate(account)}
-                            >
+                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => requestDeactivate(account)}>
                               <Trash2 className="h-4 w-4" />
                               Deactivate
                             </DropdownMenuItem>
@@ -621,44 +491,19 @@ const ChartOfAccountsPage = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-h-[92vh] overflow-y-auto bg-white sm:max-w-4xl">
           <DialogHeader>
-            <DialogTitle>
-              {editingAccount ? "Update Account" : "Create Account"}
-            </DialogTitle>
-            <DialogDescription>
-              Accounts with transactions should be deactivated instead of
-              deleted.
-            </DialogDescription>
+            <DialogTitle>{editingAccount ? "Update Account" : "Create Account"}</DialogTitle>
+            <DialogDescription>Accounts with transactions should be deactivated instead of deleted.</DialogDescription>
           </DialogHeader>
           <form id="account-form" onSubmit={submitForm} className="space-y-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Account Code" error={errors.account_code} required>
-                <Input
-                  value={form.account_code}
-                  onChange={(event) =>
-                    setField("account_code", event.target.value)
-                  }
-                  disabled={!!editingAccount}
-                />
+                <Input value={form.account_code} onChange={(event) => setField("account_code", event.target.value)} disabled={!!editingAccount} />
               </Field>
               <Field label="Account Name" error={errors.account_name} required>
-                <Input
-                  value={form.account_name}
-                  onChange={(event) =>
-                    setField("account_name", event.target.value)
-                  }
-                />
+                <Input value={form.account_name} onChange={(event) => setField("account_name", event.target.value)} />
               </Field>
-              <Field
-                label="Classification"
-                error={errors.account_classification_id}
-                required
-              >
-                <Select
-                  value={form.account_classification_id}
-                  onValueChange={(value) =>
-                    setField("account_classification_id", value)
-                  }
-                >
+              <Field label="Classification" error={errors.account_classification_id} required>
+                <Select value={form.account_classification_id} onValueChange={(value) => setField("account_classification_id", value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select classification" />
                   </SelectTrigger>
@@ -672,12 +517,7 @@ const ChartOfAccountsPage = () => {
                 </Select>
               </Field>
               <Field label="Parent Account" error={errors.parent_account_id}>
-                <Select
-                  value={form.parent_account_id || "none"}
-                  onValueChange={(value) =>
-                    setField("parent_account_id", value === "none" ? "" : value)
-                  }
-                >
+                <Select value={form.parent_account_id || "none"} onValueChange={(value) => setField("parent_account_id", value === "none" ? "" : value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -694,10 +534,7 @@ const ChartOfAccountsPage = () => {
                 </Select>
               </Field>
               <Field label="Account Type" error={errors.account_type} required>
-                <Select
-                  value={form.account_type}
-                  onValueChange={(value) => setField("account_type", value)}
-                >
+                <Select value={form.account_type} onValueChange={(value) => setField("account_type", value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -710,15 +547,8 @@ const ChartOfAccountsPage = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field
-                label="Normal Balance"
-                error={errors.normal_balance}
-                required
-              >
-                <Select
-                  value={form.normal_balance}
-                  onValueChange={(value) => setField("normal_balance", value)}
-                >
+              <Field label="Normal Balance" error={errors.normal_balance} required>
+                <Select value={form.normal_balance} onValueChange={(value) => setField("normal_balance", value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -729,21 +559,10 @@ const ChartOfAccountsPage = () => {
                 </Select>
               </Field>
               <Field label="Opening Balance" error={errors.opening_balance}>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={form.opening_balance}
-                  onChange={(event) =>
-                    setField("opening_balance", event.target.value)
-                  }
-                  disabled={!!editingAccount}
-                />
+                <Input type="number" step="0.01" value={form.opening_balance} onChange={(event) => setField("opening_balance", event.target.value)} disabled={!!editingAccount} />
               </Field>
               <Field label="Status" error={errors.status} required>
-                <Select
-                  value={form.status}
-                  onValueChange={(value) => setField("status", value)}
-                >
+                <Select value={form.status} onValueChange={(value) => setField("status", value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -755,38 +574,16 @@ const ChartOfAccountsPage = () => {
               </Field>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <Toggle
-                label="Allow control posting"
-                checked={form.is_control_account}
-                onChange={(checked) => setField("is_control_account", checked)}
-              />
-              <Toggle
-                label="Bank account ledger"
-                checked={form.is_bank_account}
-                onChange={(checked) => setField("is_bank_account", checked)}
-              />
-              <Toggle
-                label="Cash account ledger"
-                checked={form.is_cash_account}
-                onChange={(checked) => setField("is_cash_account", checked)}
-              />
+              <Toggle label="Allow control posting" checked={form.is_control_account} onChange={(checked) => setField("is_control_account", checked)} />
+              <Toggle label="Bank account ledger" checked={form.is_bank_account} onChange={(checked) => setField("is_bank_account", checked)} />
+              <Toggle label="Cash account ledger" checked={form.is_cash_account} onChange={(checked) => setField("is_cash_account", checked)} />
             </div>
           </form>
           <DialogFooter>
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => setDialogOpen(false)}
-              disabled={submitting}
-            >
+            <Button variant="outline" type="button" onClick={() => setDialogOpen(false)} disabled={submitting}>
               Cancel
             </Button>
-            <Button
-              form="account-form"
-              type="submit"
-              className="bg-indigo-600 text-white hover:bg-indigo-700"
-              disabled={submitting}
-            >
+            <Button form="account-form" type="submit" className="bg-indigo-600 text-white hover:bg-indigo-700" disabled={submitting}>
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {editingAccount ? "Update Account" : "Create Account"}
             </Button>
@@ -798,52 +595,22 @@ const ChartOfAccountsPage = () => {
         <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-xl">
           {selectedAccount && (
             <>
-              <SheetHeader className="border-slate-100 border-b">
-                <SheetTitle>
-                  {selectedAccount.account_code} -{" "}
-                  {selectedAccount.account_name}
-                </SheetTitle>
-                <SheetDescription>
-                  {selectedAccount.account_type || "Ledger account"}
-                </SheetDescription>
+              <SheetHeader className="border-b border-slate-100">
+                <SheetTitle>{selectedAccount.account_code} - {selectedAccount.account_name}</SheetTitle>
+                <SheetDescription>{selectedAccount.account_type || "Ledger account"}</SheetDescription>
               </SheetHeader>
               <div className="space-y-4 p-4">
-                <Detail
-                  label="Classification"
-                  value={
-                    selectedAccount.classification?.name ||
-                    selectedAccount.account_classification?.name ||
-                    "-"
-                  }
-                />
-                <Detail
-                  label="Normal Balance"
-                  value={selectedAccount.normal_balance || "-"}
-                />
-                <Detail
-                  label="Opening Balance"
-                  value={money(selectedAccount.opening_balance)}
-                />
-                <Detail
-                  label="Current Balance"
-                  value={money(selectedAccount.current_balance)}
-                />
+                <Detail label="Classification" value={selectedAccount.classification?.name || selectedAccount.account_classification?.name || "-"} />
+                <Detail label="Normal Balance" value={selectedAccount.normal_balance || "-"} />
+                <Detail label="Opening Balance" value={money(selectedAccount.opening_balance)} />
+                <Detail label="Current Balance" value={money(selectedAccount.current_balance)} />
                 <Detail label="Status" value={selectedAccount.status} />
                 <div className="flex flex-wrap gap-2">
-                  {selectedAccount.is_bank_account && (
-                    <Badge variant="outline">Bank Ledger</Badge>
-                  )}
-                  {selectedAccount.is_cash_account && (
-                    <Badge variant="outline">Cash Ledger</Badge>
-                  )}
-                  {selectedAccount.is_control_account && (
-                    <Badge variant="outline">Control Account</Badge>
-                  )}
+                  {selectedAccount.is_bank_account && <Badge variant="outline">Bank Ledger</Badge>}
+                  {selectedAccount.is_cash_account && <Badge variant="outline">Cash Ledger</Badge>}
+                  {selectedAccount.is_control_account && <Badge variant="outline">Control Account</Badge>}
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => openEditDialog(selectedAccount)}
-                >
+                <Button variant="outline" onClick={() => openEditDialog(selectedAccount)}>
                   <Edit className="h-4 w-4" />
                   Edit Account
                 </Button>
@@ -888,27 +655,17 @@ const Field = ({
   </div>
 );
 
-const Toggle = ({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) => (
-  <div className="border-slate-200 bg-slate-50 flex items-center justify-between rounded-xl border p-4">
+const Toggle = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) => (
+  <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
     <Label>{label}</Label>
     <Switch checked={checked} onCheckedChange={onChange} />
   </div>
 );
 
 const Detail = ({ label, value }: { label: string; value: string }) => (
-  <div className="border-slate-200 rounded-xl border bg-white p-3">
-    <p className="text-slate-500 text-xs font-medium uppercase tracking-wide">
-      {label}
-    </p>
-    <p className="text-slate-900 mt-1 text-sm font-semibold">{value}</p>
+  <div className="rounded-xl border border-slate-200 bg-white p-3">
+    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
+    <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
   </div>
 );
 

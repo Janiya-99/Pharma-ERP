@@ -1,4 +1,3 @@
-import React from "react";
 import Badge from "../common/Badge";
 
 const ExpiryStatusBadge = ({ status }: { status?: unknown }) => {
@@ -8,10 +7,7 @@ const ExpiryStatusBadge = ({ status }: { status?: unknown }) => {
     expired: { label: "Expired", variant: "danger" },
   };
 
-  const config = statusMap[status] || {
-    label: status || "Unknown",
-    variant: "gray",
-  };
+  const config = statusMap[status] || { label: status || "Unknown", variant: "gray" };
 
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };

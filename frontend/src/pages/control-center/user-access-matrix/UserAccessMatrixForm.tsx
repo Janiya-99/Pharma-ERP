@@ -1,29 +1,19 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Button from "../../../components/common/Button";
 import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import RoleSelector from "../../../components/common/RoleSelector";
-import {
-  getUserBranches,
-  getUserSoftware,
-  assignUserAccessMatrix,
-} from "../../../api/controlApi";
+import { getUserBranches, getUserSoftware, assignUserAccessMatrix } from "../../../api/controlApi";
 import { Plus } from "lucide-react";
 
-const UserAccessMatrixForm = ({
-  user,
-  onSuccess,
-}: {
-  user?: unknown;
-  onSuccess?: unknown;
-}) => {
+const UserAccessMatrixForm = ({ user, onSuccess }: { user?: unknown; onSuccess?: unknown }) => {
   const [branches, setBranches] = useState([]);
   const [softwareModules, setSoftwareModules] = useState([]);
-
+  
   const [formData, setFormData] = useState({
     branch_id: "",
     software_id: "",
-    role_id: "",
+    role_id: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -37,7 +27,7 @@ const UserAccessMatrixForm = ({
       setFormData({
         branch_id: "",
         software_id: "",
-        role_id: "",
+        role_id: ""
       });
       setError(null);
     }
@@ -49,17 +39,15 @@ const UserAccessMatrixForm = ({
       setLoading(true);
       const [branchRes, softwareRes] = await Promise.all([
         getUserBranches(user.id),
-        getUserSoftware(user.id),
+        getUserSoftware(user.id)
       ]);
 
       if (branchRes.success) setBranches(branchRes.data.branches || []);
-      if (softwareRes.success)
-        setSoftwareModules(softwareRes.data.software_modules || []);
+      if (softwareRes.success) setSoftwareModules(softwareRes.data.software_modules || []);
+      
     } catch (err) {
       console.error("Failed to fetch user access data", err);
-      setError(
-        "Failed to load this user's branch and software access. Assign branch and software access before adding a role."
-      );
+      setError("Failed to load this user's branch and software access. Assign branch and software access before adding a role.");
     } finally {
       setLoading(false);
     }
@@ -71,7 +59,7 @@ const UserAccessMatrixForm = ({
       ...prev,
       [name]: value,
       // Reset role if software changes
-      ...(name === "software_id" ? { role_id: "" } : {}),
+      ...(name === 'software_id' ? { role_id: '' } : {})
     }));
   };
 
@@ -84,7 +72,7 @@ const UserAccessMatrixForm = ({
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
+    
     const validationError = validate();
     if (validationError) {
       setError(validationError);
@@ -99,9 +87,9 @@ const UserAccessMatrixForm = ({
         {
           branch_id: parseInt(formData.branch_id, 10),
           software_id: parseInt(formData.software_id, 10),
-          role_id: parseInt(formData.role_id, 10),
-        },
-      ],
+          role_id: parseInt(formData.role_id, 10)
+        }
+      ]
     };
 
     try {
@@ -110,11 +98,9 @@ const UserAccessMatrixForm = ({
         setFormData({
           branch_id: "",
           software_id: "",
-          role_id: "",
+          role_id: ""
         });
-        onSuccess(
-          "Role successfully assigned to user for the selected branch and software."
-        );
+        onSuccess("Role successfully assigned to user for the selected branch and software.");
       } else {
         setError(res.message || "Failed to assign access.");
       }
@@ -126,30 +112,24 @@ const UserAccessMatrixForm = ({
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-700">
-        Add Access Assignment
-      </h2>
-
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+      <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Add Access Assignment</h2>
+      
       <FormError message={error} />
-
+      
       {loading ? (
-        <div className="py-4 text-sm text-gray-500">
-          Loading user's allowed branches and software...
-        </div>
+        <div className="text-sm text-gray-500 py-4">Loading user's allowed branches and software...</div>
       ) : branches.length === 0 ? (
-        <div className="rounded-md border border-red-100 bg-red-50 p-3 text-sm text-red-600">
-          This user has no assigned branches. Assign branch access first, then
-          return here to add roles.
+        <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100">
+          This user has no assigned branches. Assign branch access first, then return here to add roles.
         </div>
       ) : softwareModules.length === 0 ? (
-        <div className="rounded-md border border-red-100 bg-red-50 p-3 text-sm text-red-600">
-          This user has no assigned software modules. Assign software access
-          first, then return here to add roles.
+        <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100">
+          This user has no assigned software modules. Assign software access first, then return here to add roles.
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <Select
               label="Branch"
               name="branch_id"
@@ -157,10 +137,7 @@ const UserAccessMatrixForm = ({
               onChange={handleChange}
               searchable={true}
               placeholder="Select Branch"
-              options={branches.map((b: unknown) => ({
-                value: b.id,
-                label: b.branch_name,
-              }))}
+              options={branches.map((b: unknown) => ({ value: b.id, label: b.branch_name }))}
             />
 
             <Select
@@ -170,22 +147,15 @@ const UserAccessMatrixForm = ({
               onChange={handleChange}
               searchable={true}
               placeholder="Select Software"
-              options={softwareModules.map((s: unknown) => ({
-                value: s.id,
-                label: s.software_name,
-              }))}
+              options={softwareModules.map((s: unknown) => ({ value: s.id, label: s.software_name }))}
             />
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700">
-                Role *
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Role *</label>
               <RoleSelector
                 softwareId={formData.software_id}
                 value={formData.role_id}
-                onChange={(val: unknown) =>
-                  setFormData((prev: unknown) => ({ ...prev, role_id: val }))
-                }
+                onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, role_id: val }))}
                 disabled={!formData.software_id}
                 required
               />
@@ -194,7 +164,7 @@ const UserAccessMatrixForm = ({
 
           <div className="flex justify-end pt-2">
             <Button type="submit" isLoading={submitting}>
-              <Plus className="mr-2 h-4 w-4" /> Add Assignment
+              <Plus className="w-4 h-4 mr-2" /> Add Assignment
             </Button>
           </div>
         </form>

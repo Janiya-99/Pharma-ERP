@@ -1,13 +1,5 @@
-import React from "react";
 import { useAuth } from "../../auth/AuthContext";
-import {
-  MdEdit,
-  MdDelete,
-  MdSend,
-  MdCheckCircle,
-  MdCancel,
-  MdLibraryAddCheck,
-} from "react-icons/md";
+import { MdEdit, MdDelete, MdSend, MdCheckCircle, MdCancel, MdLibraryAddCheck } from "react-icons/md";
 
 const PettyCashActionButtons = ({
   approvalStatus,
@@ -19,28 +11,12 @@ const PettyCashActionButtons = ({
   onApprove,
   onReject,
   onPost,
-}: {
-  approvalStatus?: unknown;
-  postedStatus?: unknown;
-  permissions?: unknown;
-  onEdit?: unknown;
-  onDelete?: unknown;
-  onSubmit?: unknown;
-  onApprove?: unknown;
-  onReject?: unknown;
-  onPost?: unknown;
-}) => {
+}: { approvalStatus?: unknown; postedStatus?: unknown; permissions?: unknown; onEdit?: unknown; onDelete?: unknown; onSubmit?: unknown; onApprove?: unknown; onReject?: unknown; onPost?: unknown }) => {
   const { hasPermission } = useAuth();
 
-  const showEdit =
-    (approvalStatus === "draft" || approvalStatus === "rejected") &&
-    postedStatus === "unposted";
-  const showDelete =
-    (approvalStatus === "draft" || approvalStatus === "rejected") &&
-    postedStatus === "unposted";
-  const showSubmit =
-    (approvalStatus === "draft" || approvalStatus === "rejected") &&
-    postedStatus === "unposted";
+  const showEdit = (approvalStatus === "draft" || approvalStatus === "rejected") && postedStatus === "unposted";
+  const showDelete = (approvalStatus === "draft" || approvalStatus === "rejected") && postedStatus === "unposted";
+  const showSubmit = (approvalStatus === "draft" || approvalStatus === "rejected") && postedStatus === "unposted";
   const showApprove = approvalStatus === "pending";
   const showReject = approvalStatus === "pending";
   const showPost = approvalStatus === "approved" && postedStatus === "unposted";

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Select as ShadcnSelect,
   SelectContent,
@@ -48,9 +48,7 @@ const Select = ({
     }
   };
 
-  const selectedOption = options.find(
-    (opt: any) => String(opt.value) === String(value)
-  );
+  const selectedOption = options.find((opt: any) => String(opt.value) === String(value));
   const filteredOptions = searchable
     ? options.filter((opt: any) =>
         String(opt.label).toLowerCase().includes(searchTerm.toLowerCase())
@@ -59,9 +57,9 @@ const Select = ({
 
   if (searchable) {
     return (
-      <div className={`flex w-full flex-col gap-1 ${className}`}>
+      <div className={`flex flex-col gap-1 w-full ${className}`}>
         {label && (
-          <label className="text-slate-950 mb-1.5 block text-xs font-semibold">
+          <label className="block text-xs font-semibold text-slate-950 mb-1.5">
             {label} {required && <span className="text-red-500">*</span>}
           </label>
         )}
@@ -69,22 +67,16 @@ const Select = ({
           <PopoverTrigger asChild disabled={disabled}>
             <button
               type="button"
-              className="border-slate-200 hover:bg-slate-50 focus:ring-slate-100/50 flex h-10 w-full items-center justify-between gap-1.5 rounded-xl border bg-white px-3.5 py-2.5 text-left text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+              className="flex w-full items-center justify-between gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-left hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-100/50 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-colors shadow-sm"
             >
-              <span
-                className={
-                  selectedOption
-                    ? "text-slate-900 truncate"
-                    : "text-slate-400 truncate"
-                }
-              >
+              <span className={selectedOption ? "text-slate-900 truncate" : "text-slate-400 truncate"}>
                 {selectedOption ? selectedOption.label : placeholder}
               </span>
-              <ChevronDown className="text-slate-400 h-4 w-4 shrink-0" />
+              <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="z-50 w-[var(--radix-popover-trigger-width)] rounded-md border border-gray-200 bg-white p-0 shadow-lg">
-            <div className="flex items-center border-b border-gray-100 bg-gray-50/50 px-3 py-2">
+          <PopoverContent className="p-0 bg-white border border-gray-200 shadow-lg rounded-md z-50 w-[var(--radix-popover-trigger-width)]">
+            <div className="flex items-center border-b border-gray-100 px-3 py-2 bg-gray-50/50">
               <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
               <input
                 className="flex w-full bg-transparent text-sm outline-none placeholder:text-gray-400 disabled:cursor-not-allowed"
@@ -108,11 +100,11 @@ const Select = ({
                       setOpen(false);
                       setSearchTerm("");
                     }}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"
+                    className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors"
                   >
                     <span className="truncate">{opt.label}</span>
                     {String(value) === String(opt.value) && (
-                      <Check className="h-4 w-4 shrink-0 text-blue-600" />
+                      <Check className="h-4 w-4 text-blue-600 shrink-0" />
                     )}
                   </button>
                 ))
@@ -120,15 +112,15 @@ const Select = ({
             </div>
           </PopoverContent>
         </Popover>
-        {error && <p className="mt-0.5 text-xs text-red-500">{error}</p>}
+        {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
       </div>
     );
   }
 
   return (
-    <div className={`flex w-full flex-col gap-1 ${className}`}>
+    <div className={`flex flex-col gap-1 w-full ${className}`}>
       {label && (
-        <label className="text-slate-950 mb-1.5 block text-xs font-semibold">
+        <label className="block text-xs font-semibold text-slate-950 mb-1.5">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -137,22 +129,22 @@ const Select = ({
         onValueChange={handleSelectChange}
         disabled={disabled}
       >
-        <SelectTrigger className="border-slate-200 focus:ring-slate-100/50 text-slate-900 flex h-10 w-full items-center justify-between rounded-xl border bg-white px-3.5 py-2.5 text-left text-sm shadow-sm transition-colors focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500">
+        <SelectTrigger className="w-full bg-white border border-slate-200 focus:ring-2 focus:ring-slate-100/50 rounded-xl text-sm text-left py-2.5 px-3.5 flex justify-between items-center text-slate-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-colors shadow-sm">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className="z-50 max-h-60 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-md">
+        <SelectContent className="bg-white border border-gray-200 shadow-md rounded-md z-50 max-h-60 overflow-y-auto">
           {options.map((opt: any) => (
             <SelectItem
               key={opt.value}
               value={String(opt.value)}
-              className="cursor-pointer text-gray-900 hover:bg-blue-50 focus:bg-blue-50"
+              className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer text-gray-900"
             >
               {opt.label}
             </SelectItem>
           ))}
         </SelectContent>
       </ShadcnSelect>
-      {error && <p className="mt-0.5 text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
     </div>
   );
 };

@@ -1,26 +1,2 @@
-import React from "react";
-import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
-import { warehouses } from "variables/mockData";
-export default function WarehousesPage() {
-  return (
-    <ERPListPage
-      title="Warehouses"
-      subtitle="Manage warehouse locations and bin structures"
-      searchKey="name"
-      data={warehouses}
-      onAdd={() => {}}
-      addLabel="Add Warehouse"
-      columns={[
-        { key: "code", label: "Code" },
-        { key: "name", label: "Warehouse" },
-        { key: "branch", label: "Branch" },
-        { key: "address", label: "Address" },
-        {
-          key: "status",
-          label: "Status",
-          render: (r: unknown) => <StatusBadge status={r.status} />,
-        },
-      ]}
-    />
-  );
-}
+ import { ERPListPage, StatusBadge } from "components/erp/ERPListPage"; import { warehouses } from "variables/mockData";
+export default function WarehousesPage() { return <ERPListPage title="Warehouses" subtitle="Manage warehouse locations and bin structures" searchKey="name" data={warehouses} onAdd={() => {}} addLabel="Add Warehouse" columns={[ { key: "code", label: "Code" }, { key: "name", label: "Warehouse" }, { key: "branch", label: "Branch" }, { key: "address", label: "Address" }, { key: "status", label: "Status", render: (r: unknown) => <StatusBadge status={r.status} /> } ]} />; }

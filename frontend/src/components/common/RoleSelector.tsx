@@ -1,22 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getRolesBySoftware } from "../../api/controlApi";
 import Select from "./Select";
 
-const RoleSelector = ({
-  softwareId,
-  value,
-  onChange,
-  disabled = false,
-  required = false,
-  className = "",
-}: {
-  softwareId?: string | number;
-  value?: any;
-  onChange?: (value: any) => void;
-  disabled?: boolean;
-  required?: boolean;
-  className?: string;
-}) => {
+const RoleSelector = ({ softwareId, value, onChange, disabled = false, required = false, className = "" }: { softwareId?: string | number; value?: any; onChange?: (value: any) => void; disabled?: boolean; required?: boolean; className?: string }) => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -34,8 +20,8 @@ const RoleSelector = ({
     try {
       setLoading(true);
       const res = await getRolesBySoftware(sId);
-      let combined = res.success ? res.data || [] : [];
-
+      let combined = res.success ? (res.data || []) : [];
+      
       // Control Center is module ID 1. If we are on another module, also fetch control center roles as global options
       if (String(sId) !== "1") {
         const ccRes = await getRolesBySoftware(1);

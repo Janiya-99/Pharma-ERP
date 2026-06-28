@@ -4,32 +4,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { useAuth } from "../../../auth/AuthContext";
 import { Button } from "../../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card";
-import { Separator } from "../../../components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Skeleton } from "../../../components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../../components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { toast } from "sonner";
 import type { CreditNote } from "../../../types/invoice-center";
-import {
-  CreditNoteApprovalStatusBadge,
+import { 
+  CreditNoteApprovalStatusBadge, 
   CreditNotePostedStatusBadge,
   CreditNoteTypeBadge,
   CreditNoteActionButtons,
   CreditNoteTotalsCard,
   CreditNoteCustomerBalanceCard,
-  CreditNoteInvoiceLinkCard,
+  CreditNoteInvoiceLinkCard
 } from "../../../components/invoice-center";
 import {
   SubmitCreditNoteModal,
@@ -37,7 +24,7 @@ import {
   RejectCreditNoteModal,
   PostCreditNoteConfirmModal,
   CancelCreditNoteModal,
-  DeleteCreditNoteConfirmModal,
+  DeleteCreditNoteConfirmModal
 } from "./modals";
 
 const CreditNoteDetailsPage: React.FC = () => {
@@ -62,9 +49,7 @@ const CreditNoteDetailsPage: React.FC = () => {
       const res = await invoiceCenterApi.getCreditNoteById(id);
       setCreditNote(res.data.data);
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || "Failed to fetch credit note."
-      );
+      toast.error(err?.response?.data?.message || "Failed to fetch credit note.");
     } finally {
       setLoading(false);
     }
@@ -83,37 +68,22 @@ const CreditNoteDetailsPage: React.FC = () => {
   }
 
   if (loading) {
-    return (
-      <div className="p-8">
-        <Skeleton className="h-96 w-full" />
-      </div>
-    );
+    return <div className="p-8"><Skeleton className="h-96 w-full" /></div>;
   }
 
   if (!creditNote) {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        Credit Note not found.
-      </div>
-    );
+    return <div className="p-8 text-center text-gray-500">Credit Note not found.</div>;
   }
 
   const formatMoney = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", {
-      style: "currency",
-      currency: "LKR",
-    }).format(amount);
+    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
   };
 
   return (
     <div className="space-y-6 pb-20">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate("/invoice-center/credit-notes")}
-          >
+          <Button variant="outline" size="icon" onClick={() => navigate("/invoice-center/credit-notes")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -125,9 +95,7 @@ const CreditNoteDetailsPage: React.FC = () => {
         <CreditNoteActionButtons
           approvalStatus={creditNote.approval_status}
           postedStatus={creditNote.posted_status}
-          onEdit={() =>
-            navigate(`/invoice-center/credit-notes/${creditNote.id}/edit`)
-          }
+          onEdit={() => navigate(`/invoice-center/credit-notes/${creditNote.id}/edit`)}
           onDelete={() => setIsDeleteOpen(true)}
           onSubmit={() => setIsSubmitOpen(true)}
           onApprove={() => setIsApproveOpen(true)}
@@ -137,37 +105,29 @@ const CreditNoteDetailsPage: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="space-y-6 md:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>Credit Note Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                 <div>
                   <div className="text-gray-500">Date</div>
-                  <div className="font-medium">
-                    {new Date(creditNote.credit_note_date).toLocaleDateString()}
-                  </div>
+                  <div className="font-medium">{new Date(creditNote.credit_note_date).toLocaleDateString()}</div>
                 </div>
                 <div>
                   <div className="text-gray-500">Type</div>
-                  <div className="font-medium">
-                    <CreditNoteTypeBadge type={creditNote.credit_note_type} />
-                  </div>
+                  <div className="font-medium"><CreditNoteTypeBadge type={creditNote.credit_note_type} /></div>
                 </div>
                 <div>
                   <div className="text-gray-500">Branch</div>
-                  <div className="font-medium">
-                    {creditNote.branch?.branch_name || "-"}
-                  </div>
+                  <div className="font-medium">{creditNote.branch?.branch_name || "-"}</div>
                 </div>
                 <div>
                   <div className="text-gray-500">Reference Number</div>
-                  <div className="font-medium">
-                    {creditNote.reference_number || "-"}
-                  </div>
+                  <div className="font-medium">{creditNote.reference_number || "-"}</div>
                 </div>
                 <div className="col-span-2">
                   <div className="text-gray-500">Reason</div>
@@ -204,38 +164,25 @@ const CreditNoteDetailsPage: React.FC = () => {
                     {creditNote.lines && creditNote.lines.length > 0 ? (
                       creditNote.lines.map((line, index) => (
                         <TableRow key={line.id || index}>
-                          <TableCell className="text-center text-sm text-gray-500">
+                          <TableCell className="text-center text-gray-500 text-sm">
                             {index + 1}
                           </TableCell>
                           <TableCell>
                             {line.product_name || `Product #${line.product_id}`}
                           </TableCell>
-                          <TableCell className="text-right">
-                            {line.quantity}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatMoney(line.unit_price)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatMoney(line.discount_amount)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatMoney(line.tax_amount)}
-                          </TableCell>
+                          <TableCell className="text-right">{line.quantity}</TableCell>
+                          <TableCell className="text-right">{formatMoney(line.unit_price)}</TableCell>
+                          <TableCell className="text-right">{formatMoney(line.discount_amount)}</TableCell>
+                          <TableCell className="text-right">{formatMoney(line.tax_amount)}</TableCell>
                           <TableCell className="text-right font-medium">
                             {formatMoney(line.line_total)}
                           </TableCell>
-                          <TableCell className="text-sm text-gray-500">
-                            {line.description || "-"}
-                          </TableCell>
+                          <TableCell className="text-sm text-gray-500">{line.description || "-"}</TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell
-                          colSpan={8}
-                          className="py-8 text-center text-gray-500"
-                        >
+                        <TableCell colSpan={8} className="text-center text-gray-500 py-8">
                           No line items found.
                         </TableCell>
                       </TableRow>
@@ -245,8 +192,8 @@ const CreditNoteDetailsPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-
-          <div className="mt-4 flex justify-end">
+          
+          <div className="flex justify-end mt-4">
             <div className="w-full md:w-1/2 lg:w-1/3">
               <CreditNoteTotalsCard
                 subtotal={creditNote.subtotal_amount}
@@ -265,17 +212,13 @@ const CreditNoteDetailsPage: React.FC = () => {
               <CardTitle>Status Overview</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">Approval</span>
-                <CreditNoteApprovalStatusBadge
-                  status={creditNote.approval_status}
-                />
+                <CreditNoteApprovalStatusBadge status={creditNote.approval_status} />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">Posting</span>
-                <CreditNotePostedStatusBadge
-                  status={creditNote.posted_status}
-                />
+                <CreditNotePostedStatusBadge status={creditNote.posted_status} />
               </div>
             </CardContent>
           </Card>
@@ -300,23 +243,13 @@ const CreditNoteDetailsPage: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {creditNote.approvals.map((approval) => (
-                <div
-                  key={approval.id}
-                  className="flex flex-col justify-between border-b pb-2 text-sm last:border-0 last:pb-0 md:flex-row"
-                >
+                <div key={approval.id} className="text-sm flex flex-col md:flex-row justify-between border-b pb-2 last:border-0 last:pb-0">
                   <div>
-                    <span className="font-semibold capitalize">
-                      {approval.action}
-                    </span>
-                    {approval.remarks && (
-                      <span className="ml-2 text-gray-500">
-                        - {approval.remarks}
-                      </span>
-                    )}
+                    <span className="font-semibold capitalize">{approval.action}</span>
+                    {approval.remarks && <span className="text-gray-500 ml-2">- {approval.remarks}</span>}
                   </div>
-                  <div className="mt-1 text-xs text-gray-400 md:mt-0">
-                    {new Date(approval.action_at).toLocaleString()} by User{" "}
-                    {approval.action_by}
+                  <div className="text-gray-400 mt-1 md:mt-0 text-xs">
+                    {new Date(approval.action_at).toLocaleString()} by User {approval.action_by}
                   </div>
                 </div>
               ))}
@@ -326,59 +259,59 @@ const CreditNoteDetailsPage: React.FC = () => {
       )}
 
       {/* Workflow Modals */}
-      <SubmitCreditNoteModal
-        isOpen={isSubmitOpen}
-        onClose={() => setIsSubmitOpen(false)}
+      <SubmitCreditNoteModal 
+        isOpen={isSubmitOpen} 
+        onClose={() => setIsSubmitOpen(false)} 
         onConfirm={async (remarks) => {
           await invoiceCenterApi.submitCreditNote(creditNote.id, { remarks });
           toast.success("Credit note submitted successfully.");
           fetchCreditNote();
-        }}
+        }} 
       />
-      <ApproveCreditNoteModal
-        isOpen={isApproveOpen}
-        onClose={() => setIsApproveOpen(false)}
+      <ApproveCreditNoteModal 
+        isOpen={isApproveOpen} 
+        onClose={() => setIsApproveOpen(false)} 
         onConfirm={async (remarks) => {
           await invoiceCenterApi.approveCreditNote(creditNote.id, { remarks });
           toast.success("Credit note approved successfully.");
           fetchCreditNote();
-        }}
+        }} 
       />
-      <RejectCreditNoteModal
-        isOpen={isRejectOpen}
-        onClose={() => setIsRejectOpen(false)}
+      <RejectCreditNoteModal 
+        isOpen={isRejectOpen} 
+        onClose={() => setIsRejectOpen(false)} 
         onConfirm={async (remarks) => {
           await invoiceCenterApi.rejectCreditNote(creditNote.id, { remarks });
           toast.success("Credit note rejected successfully.");
           fetchCreditNote();
-        }}
+        }} 
       />
-      <PostCreditNoteConfirmModal
-        isOpen={isPostOpen}
-        onClose={() => setIsPostOpen(false)}
+      <PostCreditNoteConfirmModal 
+        isOpen={isPostOpen} 
+        onClose={() => setIsPostOpen(false)} 
         onConfirm={async () => {
           await invoiceCenterApi.postCreditNote(creditNote.id);
           toast.success("Credit note posted successfully.");
           fetchCreditNote();
-        }}
+        }} 
       />
-      <CancelCreditNoteModal
-        isOpen={isCancelOpen}
-        onClose={() => setIsCancelOpen(false)}
+      <CancelCreditNoteModal 
+        isOpen={isCancelOpen} 
+        onClose={() => setIsCancelOpen(false)} 
         onConfirm={async (remarks) => {
           await invoiceCenterApi.cancelCreditNote(creditNote.id, { remarks });
           toast.success("Credit note cancelled successfully.");
           fetchCreditNote();
-        }}
+        }} 
       />
-      <DeleteCreditNoteConfirmModal
-        isOpen={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
+      <DeleteCreditNoteConfirmModal 
+        isOpen={isDeleteOpen} 
+        onClose={() => setIsDeleteOpen(false)} 
         onConfirm={async () => {
           await invoiceCenterApi.deleteCreditNote(creditNote.id);
           toast.success("Credit note deleted successfully.");
           navigate("/invoice-center/credit-notes");
-        }}
+        }} 
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Plus, Trash, Search } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
@@ -66,23 +66,15 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
   };
 
   const currentAllocatedTotal = useMemo(() => {
-    return allocations.reduce(
-      (sum, alloc) => sum + (Number(alloc.allocated_amount) || 0),
-      0
-    );
+    return allocations.reduce((sum, alloc) => sum + (Number(alloc.allocated_amount) || 0), 0);
   }, [allocations]);
 
-  const remainingToAllocate = Math.max(
-    0,
-    receiptAmount - currentAllocatedTotal
-  );
+  const remainingToAllocate = Math.max(0, receiptAmount - currentAllocatedTotal);
 
   const handleAddAllocation = () => {
     if (!selectedInvoiceId) return;
 
-    const invoice = invoices.find(
-      (inv) => inv.id === Number(selectedInvoiceId)
-    );
+    const invoice = invoices.find((inv) => inv.id === Number(selectedInvoiceId));
     if (!invoice) return;
 
     // Check if already allocated
@@ -93,10 +85,7 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
 
     // Auto-calculate default allocation amount
     // Allocate the minimum between (remaining receipt amount) and (invoice balance)
-    const suggestedAllocation = Math.min(
-      remainingToAllocate,
-      invoice.balance_amount || 0
-    );
+    const suggestedAllocation = Math.min(remainingToAllocate, invoice.balance_amount || 0);
 
     const newAllocation: Allocation = {
       id: Date.now(), // temporary UI id
@@ -124,10 +113,10 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
     if (readOnly) return;
     const newAllocations = [...allocations];
     const val = parseFloat(value);
-
+    
     // Allow empty string while typing, otherwise use 0
     newAllocations[index].allocated_amount = isNaN(val) ? (value as any) : val;
-
+    
     onAllocationsChange(newAllocations);
   };
 
@@ -135,17 +124,13 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
     if (readOnly) return;
     const newAllocations = [...allocations];
     const alloc = newAllocations[index];
-
+    
     let val = Number(alloc.allocated_amount) || 0;
-
+    
     // Cannot allocate more than the invoice balance
     if (val > alloc.balance_amount) {
       val = alloc.balance_amount;
-      toast.warning(
-        `Cannot allocate more than the invoice balance (${formatCurrency(
-          alloc.balance_amount
-        )}). Adjusted automatically.`
-      );
+      toast.warning(`Cannot allocate more than the invoice balance (${formatCurrency(alloc.balance_amount)}). Adjusted automatically.`);
     }
 
     newAllocations[index].allocated_amount = val;
@@ -155,25 +140,20 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
   return (
     <div className="space-y-4">
       {!readOnly && (
-        <div className="flex items-end gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
+        <div className="flex items-end gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
           <div className="flex-1">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Add Invoice to Allocation
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">Add Invoice to Allocation</label>
             <div className="relative">
               <select
-                className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white"
                 value={selectedInvoiceId}
-                onChange={(e) =>
-                  setSelectedInvoiceId(Number(e.target.value) || "")
-                }
+                onChange={(e) => setSelectedInvoiceId(Number(e.target.value) || "")}
                 disabled={!customerId || loading}
               >
                 <option value="">Select an invoice to allocate...</option>
                 {invoices.map((inv) => (
                   <option key={inv.id} value={inv.id}>
-                    {inv.invoice_number} ({formatDate(inv.invoice_date)}) -
-                    Balance: {formatCurrency(inv.balance_amount)}
+                    {inv.invoice_number} ({formatDate(inv.invoice_date)}) - Balance: {formatCurrency(inv.balance_amount)}
                   </option>
                 ))}
               </select>
@@ -185,79 +165,56 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
             disabled={!selectedInvoiceId || remainingToAllocate <= 0}
             className="shrink-0"
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="h-4 w-4 mr-2" />
             Add Allocation
           </Button>
         </div>
       )}
 
-      {remainingToAllocate <= 0 &&
-        !readOnly &&
-        receiptAmount > 0 &&
-        selectedInvoiceId && (
-          <p className="px-2 text-sm font-medium text-orange-600">
-            Receipt amount is fully allocated. Increase receipt amount to
-            allocate more invoices.
-          </p>
-        )}
+      {remainingToAllocate <= 0 && !readOnly && receiptAmount > 0 && selectedInvoiceId && (
+        <p className="text-sm text-orange-600 font-medium px-2">
+          Receipt amount is fully allocated. Increase receipt amount to allocate more invoices.
+        </p>
+      )}
 
-      <div className="overflow-hidden rounded-md border border-gray-200">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 font-medium text-gray-500">
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-gray-50 text-gray-500 font-medium">
             <tr>
               <th className="px-4 py-3">Invoice #</th>
               <th className="px-4 py-3">Date</th>
               <th className="px-4 py-3 text-right">Invoice Total</th>
               <th className="px-4 py-3 text-right">Balance</th>
-              <th className="w-48 px-4 py-3 text-right">Allocated Amount</th>
-              {!readOnly && <th className="w-16 px-4 py-3 text-center"></th>}
+              <th className="px-4 py-3 text-right w-48">Allocated Amount</th>
+              {!readOnly && <th className="px-4 py-3 w-16 text-center"></th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
             {allocations.length === 0 ? (
               <tr>
-                <td
-                  colSpan={readOnly ? 5 : 6}
-                  className="px-4 py-8 text-center text-gray-500"
-                >
+                <td colSpan={readOnly ? 5 : 6} className="px-4 py-8 text-center text-gray-500">
                   No invoices allocated yet.
                 </td>
               </tr>
             ) : (
               allocations.map((alloc, idx) => (
                 <tr key={alloc.id || idx}>
-                  <td className="px-4 py-3 font-medium text-brand-600">
-                    {alloc.invoice_number}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {formatDate(alloc.invoice_date)}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {formatCurrency(alloc.total_amount)}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {formatCurrency(alloc.balance_amount)}
-                  </td>
+                  <td className="px-4 py-3 font-medium text-brand-600">{alloc.invoice_number}</td>
+                  <td className="px-4 py-3 text-gray-500">{formatDate(alloc.invoice_date)}</td>
+                  <td className="px-4 py-3 text-right">{formatCurrency(alloc.total_amount)}</td>
+                  <td className="px-4 py-3 text-right">{formatCurrency(alloc.balance_amount)}</td>
                   <td className="px-4 py-3 text-right">
                     {readOnly ? (
-                      <span className="font-medium text-green-700">
-                        {formatCurrency(alloc.allocated_amount)}
-                      </span>
+                      <span className="font-medium text-green-700">{formatCurrency(alloc.allocated_amount)}</span>
                     ) : (
                       <Input
                         type="number"
                         min="0"
                         step="0.01"
                         max={alloc.balance_amount}
-                        className="h-8 w-full text-right"
-                        value={
-                          alloc.allocated_amount === 0
-                            ? ""
-                            : alloc.allocated_amount
-                        }
-                        onChange={(e) =>
-                          handleAllocatedAmountChange(idx, e.target.value)
-                        }
+                        className="w-full text-right h-8"
+                        value={alloc.allocated_amount === 0 ? "" : alloc.allocated_amount}
+                        onChange={(e) => handleAllocatedAmountChange(idx, e.target.value)}
                         onBlur={() => validateAllocatedAmountOnBlur(idx)}
                       />
                     )}
@@ -268,7 +225,7 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-700"
+                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
                         onClick={() => handleRemoveAllocation(idx)}
                       >
                         <Trash className="h-4 w-4" />
@@ -282,12 +239,8 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
           {allocations.length > 0 && (
             <tfoot className="bg-gray-50 font-medium">
               <tr>
-                <td colSpan={4} className="px-4 py-3 text-right">
-                  Total Allocated:
-                </td>
-                <td className="px-4 py-3 text-right text-green-700">
-                  {formatCurrency(currentAllocatedTotal)}
-                </td>
+                <td colSpan={4} className="px-4 py-3 text-right">Total Allocated:</td>
+                <td className="px-4 py-3 text-right text-green-700">{formatCurrency(currentAllocatedTotal)}</td>
                 {!readOnly && <td></td>}
               </tr>
             </tfoot>

@@ -1,25 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { MdAdd, MdDelete, MdClear } from "react-icons/md";
 import { financeApi } from "../../../api/financeApi";
 
-const PettyCashLinesTable = ({
-  lines,
-  onChange,
-  readOnly,
-}: {
-  lines?: unknown;
-  onChange?: unknown;
-  readOnly?: unknown;
-}) => {
+const PettyCashLinesTable = ({ lines, onChange, readOnly }: { lines?: unknown; onChange?: unknown; readOnly?: unknown }) => {
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await financeApi.getChartOfAccounts({
-          limit: 1000,
-          status: "active",
-        });
+        const response = await financeApi.getChartOfAccounts({ limit: 1000, status: 'active' });
         if (response.data?.success) {
           setAccounts(response.data.data);
         }
@@ -52,24 +41,22 @@ const PettyCashLinesTable = ({
   };
 
   const formatCurrency = (amount: unknown) => {
-    return new Intl.NumberFormat("en-LK", {
-      style: "decimal",
+    return new Intl.NumberFormat('en-LK', {
+      style: 'decimal',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount || 0);
   };
 
   return (
-    <div className="mt-4 w-full">
-      <div className="mb-2 flex items-center justify-between">
-        <h4 className="text-lg font-bold text-navy-700 dark:text-white">
-          Voucher Lines
-        </h4>
+    <div className="w-full mt-4">
+      <div className="flex justify-between items-center mb-2">
+        <h4 className="text-lg font-bold text-navy-700 dark:text-white">Voucher Lines</h4>
         {!readOnly && (
           <button
             type="button"
             onClick={handleAddLine}
-            className="flex items-center gap-1 rounded-md bg-brand-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-600"
+            className="flex items-center gap-1 bg-brand-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-brand-600 transition-colors"
           >
             <MdAdd className="h-4 w-4" /> Add Line
           </button>
@@ -80,70 +67,35 @@ const PettyCashLinesTable = ({
         <table className="min-w-full divide-y divide-gray-200 dark:divide-navy-700">
           <thead className="bg-gray-50 dark:bg-navy-800">
             <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                Account
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                Line Description
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                Amount (LKR)
-              </th>
-              {!readOnly && (
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-                >
-                  Actions
-                </th>
-              )}
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Account</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Line Description</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Amount (LKR)</th>
+              {!readOnly && <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Actions</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white dark:divide-navy-700 dark:bg-navy-900">
+          <tbody className="bg-white divide-y divide-gray-200 dark:bg-navy-900 dark:divide-navy-700">
             {lines.length === 0 ? (
               <tr>
-                <td
-                  colSpan={readOnly ? 3 : 4}
-                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
-                >
-                  No line items found.{" "}
-                  {!readOnly && "Click 'Add Line' to start."}
+                <td colSpan={readOnly ? 3 : 4} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                  No line items found. {!readOnly && "Click 'Add Line' to start."}
                 </td>
               </tr>
             ) : (
               lines.map((line: unknown, index: unknown) => (
                 <tr key={index}>
-                  <td className="whitespace-nowrap px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {readOnly ? (
                       <span className="text-sm text-gray-900 dark:text-white">
-                        {line.account?.account_code} -{" "}
-                        {line.account?.account_name}
+                        {line.account?.account_code} - {line.account?.account_name}
                       </span>
                     ) : (
                       <select
                         value={line.account_id || ""}
-                        onChange={(e: any) =>
-                          handleChange(
-                            index,
-                            "account_id",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-brand-500 focus:outline-none focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-800 dark:text-white"
+                        onChange={(e: any) => handleChange(index, "account_id", Number(e.target.value))}
+                        className="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-brand-500 focus:border-brand-500 rounded-md dark:bg-navy-800 dark:border-navy-600 dark:text-white"
                         required
                       >
-                        <option value="" disabled>
-                          Select Account
-                        </option>
+                        <option value="" disabled>Select Account</option>
                         {accounts.map((account: unknown) => (
                           <option key={account.id} value={account.id}>
                             {account.account_code} - {account.account_name}
@@ -152,59 +104,43 @@ const PettyCashLinesTable = ({
                       </select>
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {readOnly ? (
-                      <span className="text-sm text-gray-900 dark:text-white">
-                        {line.line_description}
-                      </span>
+                      <span className="text-sm text-gray-900 dark:text-white">{line.line_description}</span>
                     ) : (
                       <input
                         type="text"
                         value={line.line_description || ""}
-                        onChange={(e: any) =>
-                          handleChange(
-                            index,
-                            "line_description",
-                            e.target.value
-                          )
-                        }
-                        className="block w-full rounded-md border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-800 dark:text-white"
+                        onChange={(e: any) => handleChange(index, "line_description", e.target.value)}
+                        className="block w-full px-3 py-2 text-sm border-gray-300 focus:ring-brand-500 focus:border-brand-500 rounded-md dark:bg-navy-800 dark:border-navy-600 dark:text-white"
                         placeholder="Description"
                         required
                       />
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right">
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
                     {readOnly ? (
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {formatCurrency(line.amount)}
-                      </span>
+                      <span className="text-sm text-gray-900 dark:text-white font-medium">{formatCurrency(line.amount)}</span>
                     ) : (
                       <input
                         type="number"
                         min="0"
                         step="0.01"
                         value={line.amount || ""}
-                        onChange={(e: any) =>
-                          handleChange(
-                            index,
-                            "amount",
-                            parseFloat(e.target.value)
-                          )
-                        }
-                        className="block w-full rounded-md border-gray-300 px-3 py-2 text-right text-sm focus:border-brand-500 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-800 dark:text-white"
+                        onChange={(e: any) => handleChange(index, "amount", parseFloat(e.target.value))}
+                        className="block w-full px-3 py-2 text-sm border-gray-300 focus:ring-brand-500 focus:border-brand-500 rounded-md dark:bg-navy-800 dark:border-navy-600 dark:text-white text-right"
                         placeholder="0.00"
                         required
                       />
                     )}
                   </td>
                   {!readOnly && (
-                    <td className="whitespace-nowrap px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="flex justify-center items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleClearLine(index)}
-                          className="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-orange-50 hover:text-orange-500 dark:hover:bg-navy-800"
+                          className="p-1.5 text-gray-500 hover:text-orange-500 hover:bg-orange-50 rounded-md transition-colors dark:hover:bg-navy-800"
                           title="Clear Line"
                         >
                           <MdClear className="h-5 w-5" />
@@ -212,7 +148,7 @@ const PettyCashLinesTable = ({
                         <button
                           type="button"
                           onClick={() => handleRemoveLine(index)}
-                          className="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-navy-800"
+                          className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors dark:hover:bg-navy-800"
                           title="Remove Line"
                         >
                           <MdDelete className="h-5 w-5" />

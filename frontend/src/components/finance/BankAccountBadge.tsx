@@ -1,4 +1,3 @@
-import React from "react";
 
 const BankAccountBadge = ({ isDefault }: { isDefault?: boolean }) => {
   if (isDefault) {

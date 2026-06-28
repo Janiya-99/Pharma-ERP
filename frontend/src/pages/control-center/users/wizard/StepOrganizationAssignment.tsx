@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Search, MapPin } from "lucide-react";
 import BranchCard from "../../../../components/common/BranchCard";
 import ToggleSwitch from "../../../../components/common/ToggleSwitch";
@@ -9,10 +9,7 @@ interface StepOrganizationAssignmentProps {
   onChange: (field: string, value: any) => void;
 }
 
-const StepOrganizationAssignment = ({
-  formData,
-  onChange,
-}: StepOrganizationAssignmentProps) => {
+const StepOrganizationAssignment = ({ formData, onChange }: StepOrganizationAssignmentProps) => {
   const [allBranches, setAllBranches] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -35,8 +32,7 @@ const StepOrganizationAssignment = ({
     }
   };
 
-  const selectedBranchIds: (string | number)[] =
-    formData.assigned_branches || [];
+  const selectedBranchIds: (string | number)[] = formData.assigned_branches || [];
 
   const toggleBranch = (branch: any) => {
     const isSelected = selectedBranchIds.includes(branch.id);
@@ -64,10 +60,7 @@ const StepOrganizationAssignment = ({
   const handleAllBranches = (checked: boolean) => {
     onChange("allow_all_branches", checked);
     if (checked) {
-      onChange(
-        "assigned_branches",
-        allBranches.map((b) => b.id)
-      );
+      onChange("assigned_branches", allBranches.map((b) => b.id));
       if (!formData.primary_branch_id && allBranches.length > 0) {
         onChange("primary_branch_id", allBranches[0].id);
       }
@@ -85,12 +78,8 @@ const StepOrganizationAssignment = ({
     <div className="card-premium">
       <div className="card-premium-header">
         <div>
-          <h3 className="text-base font-semibold text-gray-900">
-            Organization Assignment
-          </h3>
-          <p className="mt-0.5 text-xs text-gray-500">
-            Assign the user to branches within your organization
-          </p>
+          <h3 className="text-base font-semibold text-gray-900">Organization Assignment</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Assign the user to branches within your organization</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-400">
@@ -101,7 +90,7 @@ const StepOrganizationAssignment = ({
 
       <div className="card-premium-body">
         {/* Allow all branches toggle */}
-        <div className="mb-5 rounded-xl border border-gray-100 bg-gray-50 p-4">
+        <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 mb-5">
           <ToggleSwitch
             checked={formData.allow_all_branches || false}
             onChange={handleAllBranches}
@@ -111,8 +100,8 @@ const StepOrganizationAssignment = ({
         </div>
 
         {/* Search */}
-        <div className="relative mb-5 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+        <div className="relative max-w-sm mb-5">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
           <input
             type="text"
             placeholder="Search branches..."
@@ -128,7 +117,7 @@ const StepOrganizationAssignment = ({
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filteredBranches.map((branch) => (
               <BranchCard
                 key={branch.id}
@@ -143,7 +132,7 @@ const StepOrganizationAssignment = ({
         )}
 
         {!loading && filteredBranches.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2 py-12">
+          <div className="flex flex-col items-center justify-center py-12 gap-2">
             <MapPin className="h-8 w-8 text-gray-300" />
             <p className="text-sm text-gray-500">No branches found</p>
           </div>

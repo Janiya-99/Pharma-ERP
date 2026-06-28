@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { financeApi } from "api/financeApi";
 import DataTable from "components/erp/DataTable";
 import PermissionGuard from "components/erp/PermissionGuard";
@@ -15,7 +15,7 @@ export default function AccountClassificationsPage() {
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"table" | "tree">("tree");
   const [search, setSearch] = useState("");
-
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -64,9 +64,7 @@ export default function AccountClassificationsPage() {
           fetchClassifications();
         }
       } catch (err: any) {
-        toast.error(
-          err.response?.data?.message || "Failed to delete classification"
-        );
+        toast.error(err.response?.data?.message || "Failed to delete classification");
       }
     }
   };
@@ -76,51 +74,38 @@ export default function AccountClassificationsPage() {
     { header: "Name", accessor: "name" },
     { header: "Level", accessor: "level" },
     { header: "Normal Balance", accessor: "normal_balance" },
-    {
-      header: "Status",
+    { 
+      header: "Status", 
       accessor: "status",
       render: (val: string) => (
-        <span
-          className={`rounded-full px-2 py-1 text-xs font-semibold ${
-            val === "active"
-              ? "bg-green-100 text-green-800"
-              : "bg-gray-100 text-gray-800"
-          }`}
-        >
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+          val === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+        }`}>
           {val}
         </span>
-      ),
+      )
     },
   ];
 
   return (
     <div className="py-5">
-      <FinancePageHeader
-        title="Account Classifications"
+      <FinancePageHeader 
+        title="Account Classifications" 
         description="Manage the hierarchical classification of accounts"
         action={
           <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              onClick={() =>
-                setViewMode(viewMode === "tree" ? "table" : "tree")
-              }
+            <Button 
+              variant="outline" 
+              onClick={() => setViewMode(viewMode === "tree" ? "table" : "tree")}
             >
               {viewMode === "tree" ? (
-                <>
-                  <List className="mr-2 h-4 w-4" /> Table View
-                </>
+                <><List className="mr-2 h-4 w-4" /> Table View</>
               ) : (
-                <>
-                  <Network className="mr-2 h-4 w-4" /> Tree View
-                </>
+                <><Network className="mr-2 h-4 w-4" /> Tree View</>
               )}
             </Button>
             <PermissionGuard permission="finance.account_classification.create">
-              <Button
-                onClick={handleCreate}
-                className="bg-brand-500 text-white hover:bg-brand-600"
-              >
+              <Button onClick={handleCreate} className="bg-brand-500 hover:bg-brand-600 text-white">
                 <Plus className="mr-2 h-4 w-4" /> New Classification
               </Button>
             </PermissionGuard>
@@ -128,10 +113,10 @@ export default function AccountClassificationsPage() {
         }
       />
 
-      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-4">
         {viewMode === "tree" ? (
-          <AccountClassificationTree
-            data={treeData}
+          <AccountClassificationTree 
+            data={treeData} 
             loading={loading}
             onEdit={handleEdit}
             onDelete={handleDelete}
@@ -144,19 +129,19 @@ export default function AccountClassificationsPage() {
             onSearch={setSearch}
             searchPlaceholder="Search classifications..."
             actions={(record: unknown) => (
-              <div className="flex justify-end space-x-2">
+              <div className="flex space-x-2 justify-end">
                 <PermissionGuard permission="finance.account_classification.update">
-                  <button
+                  <button 
                     onClick={() => handleEdit(record)}
-                    className="text-sm font-medium text-brand-500 transition-colors hover:text-brand-600"
+                    className="text-brand-500 hover:text-brand-600 font-medium text-sm transition-colors"
                   >
                     Edit
                   </button>
                 </PermissionGuard>
                 <PermissionGuard permission="finance.account_classification.delete">
-                  <button
+                  <button 
                     onClick={() => handleDelete(record)}
-                    className="text-sm font-medium text-red-500 transition-colors hover:text-red-600"
+                    className="text-red-500 hover:text-red-600 font-medium text-sm transition-colors"
                   >
                     Delete
                   </button>

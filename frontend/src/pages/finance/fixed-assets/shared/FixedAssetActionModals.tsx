@@ -1,43 +1,29 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Modal from "../../components/common/Modal";
 
-export const PostDepreciationConfirmModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  loading,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  onConfirm?: unknown;
-  loading?: unknown;
-}) => {
+export const PostDepreciationConfirmModal = ({ isOpen, onClose, onConfirm, loading }: { isOpen?: boolean; onClose?: unknown; onConfirm?: unknown; loading?: unknown }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Post Depreciation Run">
-      <div className="mb-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-700/30 dark:bg-yellow-900/20">
-        <h4 className="mb-2 text-sm font-bold text-yellow-800 dark:text-yellow-500">
-          Warning
-        </h4>
+      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-700/30 mb-6">
+        <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-500 mb-2">Warning</h4>
         <p className="text-sm text-yellow-700 dark:text-yellow-600">
-          Posting depreciation will irrevocably update the asset's accumulated
-          depreciation, net book value, and chart of account balances. This
-          action cannot be reversed.
+          Posting depreciation will irrevocably update the asset's accumulated depreciation, net book value, and chart of account balances. This action cannot be reversed.
         </p>
       </div>
-      <p className="mb-6 text-sm text-gray-700 dark:text-gray-300">
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
         Are you sure you want to post this depreciation run?
       </p>
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
           disabled={loading}
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
-          className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-brand-600 disabled:opacity-50"
+          className="px-4 py-2 text-sm font-bold text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 disabled:opacity-50"
           disabled={loading}
         >
           {loading ? "Posting..." : "Confirm Post"}
@@ -47,42 +33,29 @@ export const PostDepreciationConfirmModal = ({
   );
 };
 
-export const PostDisposalConfirmModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  loading,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  onConfirm?: unknown;
-  loading?: unknown;
-}) => {
+export const PostDisposalConfirmModal = ({ isOpen, onClose, onConfirm, loading }: { isOpen?: boolean; onClose?: unknown; onConfirm?: unknown; loading?: unknown }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Post Asset Disposal">
-      <div className="mb-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-700/30 dark:bg-yellow-900/20">
-        <h4 className="mb-2 text-sm font-bold text-yellow-800 dark:text-yellow-500">
-          Warning
-        </h4>
+      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-700/30 mb-6">
+        <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-500 mb-2">Warning</h4>
         <p className="text-sm text-yellow-700 dark:text-yellow-600">
-          Posting this disposal will update the asset status and chart of
-          account balances. This cannot be edited after posting.
+          Posting this disposal will update the asset status and chart of account balances. This cannot be edited after posting.
         </p>
       </div>
-      <p className="mb-6 text-sm text-gray-700 dark:text-gray-300">
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
         Are you sure you want to post this disposal?
       </p>
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
           disabled={loading}
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
-          className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-brand-600 disabled:opacity-50"
+          className="px-4 py-2 text-sm font-bold text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 disabled:opacity-50"
           disabled={loading}
         >
           {loading ? "Posting..." : "Confirm Post"}
@@ -92,25 +65,7 @@ export const PostDisposalConfirmModal = ({
   );
 };
 
-export const ActionDisposalModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  loading,
-  title,
-  actionLabel,
-  colorClass,
-  requireRemarks,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  onConfirm?: unknown;
-  loading?: unknown;
-  title?: unknown;
-  actionLabel?: unknown;
-  colorClass?: unknown;
-  requireRemarks?: unknown;
-}) => {
+export const ActionDisposalModal = ({ isOpen, onClose, onConfirm, loading, title, actionLabel, colorClass, requireRemarks }: { isOpen?: boolean; onClose?: unknown; onConfirm?: unknown; loading?: unknown; title?: unknown; actionLabel?: unknown; colorClass?: unknown; requireRemarks?: unknown }) => {
   const [remarks, setRemarks] = useState("");
 
   const handleConfirm = () => {
@@ -120,11 +75,11 @@ export const ActionDisposalModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="mb-6">
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Remarks {requireRemarks && <span className="text-red-500">*</span>}
         </label>
         <textarea
-          className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-800 dark:text-white`}
+          className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-800 dark:border-navy-600 dark:text-white transition-all`}
           rows="3"
           placeholder="Enter remarks..."
           value={remarks}
@@ -134,14 +89,14 @@ export const ActionDisposalModal = ({
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
           disabled={loading}
         >
           Cancel
         </button>
         <button
           onClick={handleConfirm}
-          className={`rounded-xl px-4 py-2 text-sm font-bold text-white transition-all disabled:opacity-50 ${colorClass}`}
+          className={`px-4 py-2 text-sm font-bold text-white transition-all rounded-xl disabled:opacity-50 ${colorClass}`}
           disabled={loading || (requireRemarks && !remarks.trim())}
         >
           {loading ? "Processing..." : actionLabel}

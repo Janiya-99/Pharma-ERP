@@ -1,16 +1,5 @@
-import React from "react";
 
-type StatusVariant =
-  | "active"
-  | "inactive"
-  | "suspended"
-  | "locked"
-  | "approved"
-  | "rejected"
-  | "pending"
-  | "posted"
-  | "draft"
-  | string;
+type StatusVariant = "active" | "inactive" | "suspended" | "locked" | "approved" | "rejected" | "pending" | "posted" | "draft" | string;
 
 const StatusBadge = ({ status }: { status?: StatusVariant }) => {
   const getConfig = (s: string) => {
@@ -34,16 +23,11 @@ const StatusBadge = ({ status }: { status?: StatusVariant }) => {
   };
 
   const label = status
-    ? String(status).charAt(0).toUpperCase() +
-      String(status).slice(1).toLowerCase()
+    ? String(status).charAt(0).toUpperCase() + String(status).slice(1).toLowerCase()
     : "Unknown";
 
   return (
-    <span
-      className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[11px] font-semibold tracking-wide ${getConfig(
-        String(status)
-      )}`}
-    >
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-semibold tracking-wide ${getConfig(String(status))}`}>
       {label}
     </span>
   );

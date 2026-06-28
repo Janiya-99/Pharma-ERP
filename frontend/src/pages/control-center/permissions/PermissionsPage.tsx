@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  getPermissions,
-  getPermissionsGrouped,
-  getSoftwareModules,
-} from "../../../api/controlApi";
+import { useState, useEffect } from "react";
+import { getPermissions, getPermissionsGrouped, getSoftwareModules } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
@@ -20,7 +16,7 @@ const PermissionsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [softwareModules, setSoftwareModules] = useState([]);
-
+  
   const [viewMode, setViewMode] = useState("flat"); // "flat" or "grouped"
 
   const [filters, setFilters] = useState({
@@ -43,13 +39,7 @@ const PermissionsPage = () => {
       fetchGroupedPermissions();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    filters.page,
-    filters.software_id,
-    filters.permission_group,
-    filters.status,
-    viewMode,
-  ]);
+  }, [filters.page, filters.software_id, filters.permission_group, filters.status, viewMode]);
 
   const fetchSoftwareModules = async () => {
     try {
@@ -89,9 +79,7 @@ const PermissionsPage = () => {
         setGroupedPermissions(res.data || []);
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Failed to load grouped permissions"
-      );
+      setError(err.response?.data?.message || "Failed to load grouped permissions");
     } finally {
       setLoading(false);
     }
@@ -111,25 +99,18 @@ const PermissionsPage = () => {
     setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });
   };
 
-  const formatLabel = (value?: string) =>
-    value ? value.replace(/_/g, " ") : "-";
+  const formatLabel = (value?: string) => (value ? value.replace(/_/g, " ") : "-");
 
   const columns = [
     {
       header: "Software",
       accessor: "software_id",
-      cell: (row: any) =>
-        row.software_name ||
-        row.software?.software_name ||
-        row.software_module?.software_name ||
-        (row.software_code ? formatLabel(row.software_code) : "-"),
+      cell: (row: any) => row.software_name || row.software?.software_name || row.software_module?.software_name || (row.software_code ? formatLabel(row.software_code) : "-"),
     },
     {
       header: "Permission Group",
       accessor: "permission_group",
-      cell: (row: unknown) => (
-        <span className="capitalize">{formatLabel(row.permission_group)}</span>
-      ),
+      cell: (row: unknown) => <span className="capitalize">{formatLabel(row.permission_group)}</span>,
     },
     {
       header: "Permission Name",
@@ -139,20 +120,12 @@ const PermissionsPage = () => {
     {
       header: "Permission Key",
       accessor: "permission_key",
-      cell: (row: unknown) => (
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-700">
-          {row.permission_key}
-        </span>
-      ),
+      cell: (row: unknown) => <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">{row.permission_key}</span>,
     },
     {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => (
-        <span className="block max-w-xs truncate text-gray-500">
-          {row.description || "-"}
-        </span>
-      ),
+      cell: (row: unknown) => <span className="text-gray-500 truncate block max-w-xs">{row.description || "-"}</span>,
     },
     {
       header: "Status",
@@ -161,7 +134,7 @@ const PermissionsPage = () => {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl p-6">
+    <div className="p-6 max-w-7xl mx-auto">
       <PageHeader
         title="Permissions"
         description="View system permissions. Permissions are system-seeded and read-only."
@@ -169,23 +142,21 @@ const PermissionsPage = () => {
 
       <FormError message={error} />
 
-      <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm xl:flex-row xl:items-center">
-        <form onSubmit={handleSearch} className="flex w-full flex-1 gap-2">
+      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6 flex flex-col xl:flex-row gap-4 shadow-sm items-start xl:items-center justify-between">
+        <form onSubmit={handleSearch} className="flex-1 flex gap-2 w-full">
           <Input
             placeholder="Search permissions..."
             name="search"
             value={filters.search}
-            onChange={(e: any) =>
-              setFilters({ ...filters, search: e.target.value })
-            }
+            onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
             className="w-full xl:max-w-md"
           />
           <Button type="submit" variant="secondary" className="px-3">
-            <Search className="h-4 w-4" />
+            <Search className="w-4 h-4" />
           </Button>
         </form>
-
-        <div className="flex w-full flex-wrap gap-2 xl:w-auto">
+        
+        <div className="flex flex-wrap gap-2 w-full xl:w-auto">
           <select
             name="software_id"
             value={filters.software_id}
@@ -194,9 +165,7 @@ const PermissionsPage = () => {
           >
             <option value="">All Software Modules</option>
             {softwareModules.map((s: unknown) => (
-              <option key={s.id} value={s.id}>
-                {s.software_name}
-              </option>
+              <option key={s.id} value={s.id}>{s.software_name}</option>
             ))}
           </select>
 
@@ -220,29 +189,25 @@ const PermissionsPage = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-
-          <div className="mx-1 hidden border-l border-gray-300 xl:block"></div>
-
-          <div className="flex rounded-md border border-gray-200 bg-gray-100 p-1">
+          
+          <div className="border-l border-gray-300 mx-1 hidden xl:block"></div>
+          
+          <div className="flex bg-gray-100 rounded-md p-1 border border-gray-200">
             <button
               onClick={() => setViewMode("flat")}
-              className={`flex items-center rounded px-3 py-1 text-sm font-medium transition-colors ${
-                viewMode === "flat"
-                  ? "bg-white text-blue-700 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+              className={`px-3 py-1 text-sm font-medium rounded flex items-center transition-colors ${
+                viewMode === "flat" ? "bg-white text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <LayoutList className="mr-1.5 h-4 w-4" /> List
+              <LayoutList className="w-4 h-4 mr-1.5" /> List
             </button>
             <button
               onClick={() => setViewMode("grouped")}
-              className={`flex items-center rounded px-3 py-1 text-sm font-medium transition-colors ${
-                viewMode === "grouped"
-                  ? "bg-white text-blue-700 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+              className={`px-3 py-1 text-sm font-medium rounded flex items-center transition-colors ${
+                viewMode === "grouped" ? "bg-white text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <Layers className="mr-1.5 h-4 w-4" /> Grouped
+              <Layers className="w-4 h-4 mr-1.5" /> Grouped
             </button>
           </div>
         </div>
@@ -264,99 +229,63 @@ const PermissionsPage = () => {
       ) : (
         <div className="space-y-6">
           {loading ? (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-500">
+            <div className="bg-white p-8 text-center rounded-lg border border-gray-200 text-gray-500">
               Loading permissions...
             </div>
-          ) : groupedPermissions.length === 0 ? (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-500">
+      ) : groupedPermissions.length === 0 ? (
+            <div className="bg-white p-8 text-center rounded-lg border border-gray-200 text-gray-500">
               No permissions found
             </div>
           ) : (
             groupedPermissions.map((softwareGroup: any, idx: number) => {
-              const permissionGroups = Array.isArray(softwareGroup?.groups)
-                ? softwareGroup.groups
-                : [];
+              const permissionGroups = Array.isArray(softwareGroup?.groups) ? softwareGroup.groups : [];
               const permissionCount = permissionGroups.reduce(
-                (count: number, group: any) =>
-                  count +
-                  (Array.isArray(group?.permissions)
-                    ? group.permissions.length
-                    : 0),
+                (count: number, group: any) => count + (Array.isArray(group?.permissions) ? group.permissions.length : 0),
                 0
               );
 
               return (
-                <div
-                  key={softwareGroup?.software_code || idx}
-                  className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
-                >
-                  <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-3">
-                    <h3 className="flex items-center gap-2 font-semibold capitalize text-gray-800">
-                      <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+                <div key={softwareGroup?.software_code || idx} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                  <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-800 capitalize flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                       {formatLabel(softwareGroup?.software_code)}
                     </h3>
-                    <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-500">
+                    <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
                       {permissionCount} Permissions
                     </span>
                   </div>
 
                   <div className="divide-y divide-gray-200">
                     {permissionGroups.map((group: any, groupIdx: number) => (
-                      <div
-                        key={`${softwareGroup?.software_code || idx}-${
-                          group?.permission_group || groupIdx
-                        }`}
-                        className="p-0"
-                      >
-                        <div className="flex items-center justify-between bg-white px-4 py-3">
-                          <h4 className="text-sm font-semibold capitalize text-gray-800">
+                      <div key={`${softwareGroup?.software_code || idx}-${group?.permission_group || groupIdx}`} className="p-0">
+                        <div className="flex items-center justify-between px-4 py-3 bg-white">
+                          <h4 className="text-sm font-semibold text-gray-800 capitalize">
                             {formatLabel(group?.permission_group)}
                           </h4>
-                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
-                            {Array.isArray(group?.permissions)
-                              ? group.permissions.length
-                              : 0}{" "}
-                            items
+                          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                            {Array.isArray(group?.permissions) ? group.permissions.length : 0} items
                           </span>
                         </div>
 
                         <table className="min-w-full divide-y divide-gray-200">
                           <thead className="bg-white">
                             <tr>
-                              <th className="w-1/4 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Name
-                              </th>
-                              <th className="w-1/4 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Key
-                              </th>
-                              <th className="w-1/3 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Description
-                              </th>
-                              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Status
-                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Name</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Key</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Description</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-100 bg-white">
-                            {(Array.isArray(group?.permissions)
-                              ? group.permissions
-                              : []
-                            ).map((p: any) => (
+                          <tbody className="bg-white divide-y divide-gray-100">
+                            {(Array.isArray(group?.permissions) ? group.permissions : []).map((p: any) => (
                               <tr key={p.id} className="hover:bg-gray-50">
-                                <td className="whitespace-nowrap px-6 py-3 text-sm font-medium text-gray-900">
-                                  {p.permission_name}
+                                <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{p.permission_name}</td>
+                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
+                                  <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">{p.permission_key}</span>
                                 </td>
-                                <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-500">
-                                  <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs">
-                                    {p.permission_key}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-3 text-sm text-gray-500">
-                                  {p.description || "-"}
-                                </td>
-                                <td className="whitespace-nowrap px-6 py-3">
-                                  <StatusBadge status={p.status} />
-                                </td>
+                                <td className="px-6 py-3 text-sm text-gray-500">{p.description || "-"}</td>
+                                <td className="px-6 py-3 whitespace-nowrap"><StatusBadge status={p.status} /></td>
                               </tr>
                             ))}
                           </tbody>

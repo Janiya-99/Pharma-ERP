@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Modal from "../../../components/common/Modal";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
@@ -8,17 +8,7 @@ import { createDesignation, updateDesignation } from "../../../api/controlApi";
 
 import { toast } from "sonner";
 
-const DesignationFormModal = ({
-  isOpen,
-  onClose,
-  designation = null,
-  onSuccess,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  designation?: unknown;
-  onSuccess?: unknown;
-}) => {
+const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }: { isOpen?: boolean; onClose?: unknown; designation?: unknown; onSuccess?: unknown }) => {
   const isEdit = !!designation;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -84,7 +74,7 @@ const DesignationFormModal = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
-
+        
         <Input
           label="Designation Name *"
           name="designation_name"
@@ -93,11 +83,9 @@ const DesignationFormModal = ({
           required
           placeholder="e.g. Finance Manager"
         />
-
+        
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Description
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea
             name="description"
             value={formData.description}

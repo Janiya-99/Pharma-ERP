@@ -1,21 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Modal from "../../../components/common/Modal";
 import Button from "../../../components/common/Button";
 import Input from "../../../components/common/Input";
 import FormError from "../../../components/common/FormError";
 import { resetUserPassword } from "../../../api/controlApi";
 
-const ResetPasswordModal = ({
-  isOpen,
-  onClose,
-  user,
-  onSuccess,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  user?: unknown;
-  onSuccess?: unknown;
-}) => {
+const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boolean; onClose?: unknown; user?: unknown; onSuccess?: unknown }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,7 +29,7 @@ const ResetPasswordModal = ({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!user) return;
-
+    
     const validationError = validate();
     if (validationError) {
       setError(validationError);
@@ -64,11 +54,15 @@ const ResetPasswordModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Reset Password" size="md">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Reset Password"
+      size="md"
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="mb-4 rounded-md bg-orange-50 p-3 text-sm text-orange-800">
-          Resetting password for:{" "}
-          <span className="font-semibold">{user?.full_name}</span>
+        <div className="bg-orange-50 p-3 rounded-md mb-4 text-sm text-orange-800">
+          Resetting password for: <span className="font-semibold">{user?.full_name}</span>
         </div>
 
         <FormError message={error} />
@@ -90,7 +84,7 @@ const ResetPasswordModal = ({
           required
         />
 
-        <div className="mt-6 flex justify-end space-x-3 border-t border-gray-200 pt-4">
+        <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel
           </Button>

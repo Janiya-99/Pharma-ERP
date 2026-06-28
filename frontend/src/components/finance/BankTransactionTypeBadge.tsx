@@ -1,4 +1,3 @@
-import React from "react";
 
 const BankTransactionTypeBadge = ({ type }: { type?: unknown }) => {
   const getBadgeClass = (type: unknown) => {
@@ -20,16 +19,10 @@ const BankTransactionTypeBadge = ({ type }: { type?: unknown }) => {
     }
   };
 
-  const formattedType = type
-    ? type.replace(/_/g, " ").replace(/\b\w/g, (l: unknown) => l.toUpperCase())
-    : "Unknown";
+  const formattedType = type ? type.replace(/_/g, " ").replace(/\b\w/g, (l: unknown) => l.toUpperCase()) : "Unknown";
 
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getBadgeClass(
-        type
-      )}`}
-    >
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getBadgeClass(type)}`}>
       {formattedType}
     </span>
   );

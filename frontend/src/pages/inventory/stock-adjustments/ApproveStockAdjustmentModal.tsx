@@ -1,20 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { CheckCircle } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
 import Modal from "../../../components/common/Modal";
 
-const ApproveStockAdjustmentModal = ({
-  isOpen,
-  onClose,
-  adjustment,
-  onSuccess,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  adjustment?: unknown;
-  onSuccess?: unknown;
-}) => {
+const ApproveStockAdjustmentModal = ({ isOpen, onClose, adjustment, onSuccess }: { isOpen?: boolean; onClose?: unknown; adjustment?: unknown; onSuccess?: unknown }) => {
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,9 +18,7 @@ const ApproveStockAdjustmentModal = ({
       onSuccess();
       onClose();
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to approve stock adjustment"
-      );
+      toast.error(error.response?.data?.message || "Failed to approve stock adjustment");
     } finally {
       setLoading(false);
     }
@@ -47,17 +35,16 @@ const ApproveStockAdjustmentModal = ({
     >
       <form onSubmit={handleApprove} className="p-6">
         <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-          Are you sure you want to approve stock adjustment{" "}
-          <strong>{adjustment.adjustment_number}</strong>?
+          Are you sure you want to approve stock adjustment <strong>{adjustment.adjustment_number}</strong>?
         </div>
         <div className="mb-6">
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Remarks (Optional)
           </label>
           <textarea
             value={remarks}
             onChange={(e: any) => setRemarks(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white border-gray-200 dark:border-navy-600"
             rows={3}
             placeholder="Add approval notes..."
           />
@@ -66,14 +53,14 @@ const ApproveStockAdjustmentModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
             {loading ? "Approving..." : "Approve"}
           </button>

@@ -1,20 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Select from "react-select";
 import { inventoryApi } from "../../api/inventoryApi";
 
-const GRNLineBatchSelect = ({
-  productId,
-  value,
-  onChange,
-  error,
-  isDisabled,
-}: {
-  productId?: string | number;
-  value?: unknown;
-  onChange?: unknown;
-  error?: unknown;
-  isDisabled?: boolean;
-}) => {
+const GRNLineBatchSelect = ({ productId, value, onChange, error, isDisabled }: { productId?: string | number; value?: unknown; onChange?: unknown; error?: unknown; isDisabled?: boolean }) => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -30,10 +18,7 @@ const GRNLineBatchSelect = ({
   const fetchBatches = async (pid: string | number) => {
     try {
       setLoading(true);
-      const res = await inventoryApi.getProductBatches({
-        product_id: pid,
-        limit: 100,
-      });
+      const res = await inventoryApi.getProductBatches({ product_id: pid, limit: 100 });
       if (res.success !== false) {
         setBatches(res.data?.data || res.data || []);
       }
@@ -46,33 +31,25 @@ const GRNLineBatchSelect = ({
 
   const options = batches.map((b: unknown) => ({
     value: b.id,
-    label: `${b.batch_number} (Exp: ${
-      b.expiry_date ? new Date(b.expiry_date).toLocaleDateString() : "N/A"
-    })`,
+    label: `${b.batch_number} (Exp: ${b.expiry_date ? new Date(b.expiry_date).toLocaleDateString() : "N/A"})`,
     batch: b,
     isDisabled: b.is_blocked,
   }));
 
-  const selectedOption =
-    options.find((opt: unknown) => opt.value === value) || null;
+  const selectedOption = options.find((opt: unknown) => opt.value === value) || null;
 
   return (
     <div className="w-full min-w-[180px]">
       <Select
         value={selectedOption}
-        onChange={(selected: unknown) =>
-          onChange(
-            selected ? selected.value : null,
-            selected ? selected.batch : null
-          )
-        }
+        onChange={(selected: unknown) => onChange(selected ? selected.value : null, selected ? selected.batch : null)}
         options={options}
         isLoading={loading}
         isDisabled={isDisabled || !productId}
         isClearable
         placeholder="Select Batch"
         classNamePrefix="react-select"
-        className={`text-sm ${error ? "rounded border-red-500" : ""}`}
+        className={`text-sm ${error ? "border-red-500 rounded" : ""}`}
         isOptionDisabled={(option: unknown) => option.isDisabled}
         styles={{
           control: (base: unknown) => ({
@@ -84,7 +61,7 @@ const GRNLineBatchSelect = ({
           }),
         }}
       />
-      {error && <p className="mt-1 text-[10px] text-red-500">{error}</p>}
+      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
     </div>
   );
 };

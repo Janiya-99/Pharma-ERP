@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import PageHeader from "../../../components/common/PageHeader";
 import UserSelector from "../../../components/common/UserSelector";
 import MultiSelect from "../../../components/common/MultiSelect";
@@ -6,13 +6,7 @@ import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import PermissionGuard from "../../../auth/PermissionGuard";
-import {
-  getBranches,
-  getUserBranches,
-  assignUserBranches,
-  removeUserBranch,
-  updateUser,
-} from "../../../api/controlApi";
+import { getBranches, getUserBranches, assignUserBranches, removeUserBranch, updateUser } from "../../../api/controlApi";
 import { MapPin, Shield, Trash2, CheckCircle2 } from "lucide-react";
 
 const UserBranchAccessPage = () => {
@@ -20,7 +14,7 @@ const UserBranchAccessPage = () => {
   const [allBranches, setAllBranches] = useState([]);
   const [assignedBranches, setAssignedBranches] = useState([]);
   const [selectedBranchesToAssign, setSelectedBranchesToAssign] = useState([]);
-
+  
   const [loading, setLoading] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [error, setError] = useState(null);
@@ -48,14 +42,7 @@ const UserBranchAccessPage = () => {
   const fetchAllBranches = async () => {
     try {
       const res = await getBranches({ limit: 100 });
-      if (res.success)
-        setAllBranches(
-          Array.isArray(res.data?.items)
-            ? res.data.items
-            : Array.isArray(res.data)
-            ? res.data
-            : []
-        );
+      if (res.success) setAllBranches(Array.isArray(res.data?.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error(err);
     }
@@ -77,18 +64,15 @@ const UserBranchAccessPage = () => {
 
   const handleAssign = async () => {
     if (selectedBranchesToAssign.length === 0) return;
-
+    
     setAssigning(true);
     setError(null);
     setSuccessMsg(null);
 
     try {
-      const branches = selectedBranchesToAssign.map((b: unknown) => ({
-        branch_id: b.id,
-        is_default: false,
-      }));
+      const branches = selectedBranchesToAssign.map((b: unknown) => ({ branch_id: b.id, is_default: false }));
       const res = await assignUserBranches(selectedUser.id, { branches });
-
+      
       if (res.success) {
         setSuccessMsg("Branches assigned successfully.");
         setSelectedBranchesToAssign([]);
@@ -110,7 +94,7 @@ const UserBranchAccessPage = () => {
 
   const handleRemove = async () => {
     if (!branchToRemove) return;
-
+    
     setRemoving(true);
     setError(null);
     setSuccessMsg(null);
@@ -121,7 +105,7 @@ const UserBranchAccessPage = () => {
         setSuccessMsg("Branch removed successfully.");
         setIsRemoveOpen(false);
         fetchUserBranches();
-
+        
         // If they removed their default branch, clear it
         if (selectedUser.default_branch_id === branchToRemove.id) {
           const updatedUser = { ...selectedUser, default_branch_id: null };
@@ -141,7 +125,7 @@ const UserBranchAccessPage = () => {
     try {
       setError(null);
       setSuccessMsg(null);
-
+      
       const payload = {
         employee_code: selectedUser.employee_code,
         name: selectedUser.name || selectedUser.full_name,
@@ -152,9 +136,9 @@ const UserBranchAccessPage = () => {
         designation_id: selectedUser.designation_id,
         user_type: selectedUser.user_type,
         status: selectedUser.status,
-        default_branch_id: branchId,
+        default_branch_id: branchId
       };
-
+      
       const res = await updateUser(selectedUser.id, payload);
       if (res.success) {
         setSelectedUser({ ...selectedUser, default_branch_id: branchId });
@@ -172,7 +156,7 @@ const UserBranchAccessPage = () => {
   );
 
   return (
-    <div className="mx-auto max-w-7xl p-6">
+    <div className="p-6 max-w-7xl mx-auto">
       <PageHeader
         title="User Branch Access"
         description="Assign or remove branch access for users."
@@ -180,76 +164,55 @@ const UserBranchAccessPage = () => {
 
       <FormError message={error} />
       {successMsg && (
-        <div className="mb-6 flex items-center rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-          <CheckCircle2 className="mr-2 h-5 w-5 text-green-500" />
+        <div className="mb-6 bg-green-50 text-green-800 p-3 rounded-md text-sm border border-green-200 flex items-center">
+          <CheckCircle2 className="w-5 h-5 mr-2 text-green-500" />
           {successMsg}
         </div>
       )}
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column: User Selection */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-1">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-700">
-            1. Select User
-          </h2>
-          <UserSelector
-            selectedUser={selectedUser}
-            onSelect={setSelectedUser}
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 lg:col-span-1">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">1. Select User</h2>
+          <UserSelector 
+            selectedUser={selectedUser} 
+            onSelect={setSelectedUser} 
           />
-
+          
           {selectedUser && (
-            <div className="mt-6 border-t border-gray-100 pt-4">
+            <div className="mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
-                  {(selectedUser.name || selectedUser.full_name || "U").charAt(
-                    0
-                  )}
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                  {(selectedUser.name || selectedUser.full_name || "U").charAt(0)}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">
-                    {selectedUser.name || selectedUser.full_name}
-                  </p>
+                  <p className="font-semibold text-gray-900">{selectedUser.name || selectedUser.full_name}</p>
                   <p className="text-xs text-gray-500">{selectedUser.email}</p>
                 </div>
               </div>
               <div className="mt-4 space-y-2 text-sm text-gray-600">
-                <p>
-                  <span className="font-medium text-gray-700">Code:</span>{" "}
-                  {selectedUser.employee_code || "N/A"}
-                </p>
-                <p>
-                  <span className="font-medium text-gray-700">Type:</span>{" "}
-                  <span className="capitalize">
-                    {(selectedUser.user_type || "").replace("_", " ")}
-                  </span>
-                </p>
+                <p><span className="font-medium text-gray-700">Code:</span> {selectedUser.employee_code || "N/A"}</p>
+                <p><span className="font-medium text-gray-700">Type:</span> <span className="capitalize">{(selectedUser.user_type || "").replace("_", " ")}</span></p>
               </div>
             </div>
           )}
         </div>
 
         {/* Right Column: Access Assignment */}
-        <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-700">
-              <Shield className="h-4 w-4 text-gray-400" /> 2. Assign Branches
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-gray-400" /> 2. Assign Branches
             </h2>
-
+            
             {!selectedUser ? (
-              <div className="py-8 text-center text-sm text-gray-400">
+              <div className="text-center py-8 text-gray-400 text-sm">
                 Please select a user first to assign branches.
               </div>
             ) : (
-              <PermissionGuard
-                permission="control.access.branch.assign"
-                fallback={
-                  <p className="text-sm italic text-gray-500">
-                    You don't have permission to assign branches.
-                  </p>
-                }
-              >
-                <div className="flex flex-col items-end gap-3 sm:flex-row">
-                  <div className="w-full flex-1">
+              <PermissionGuard permission="control.access.branch.assign" fallback={<p className="text-sm text-gray-500 italic">You don't have permission to assign branches.</p>}>
+                <div className="flex flex-col sm:flex-row gap-3 items-end">
+                  <div className="flex-1 w-full">
                     <MultiSelect
                       options={availableBranchesToAssign}
                       selectedValues={selectedBranchesToAssign}
@@ -259,8 +222,8 @@ const UserBranchAccessPage = () => {
                       valueKey="id"
                     />
                   </div>
-                  <Button
-                    onClick={handleAssign}
+                  <Button 
+                    onClick={handleAssign} 
                     disabled={selectedBranchesToAssign.length === 0}
                     isLoading={assigning}
                   >
@@ -272,51 +235,39 @@ const UserBranchAccessPage = () => {
           </div>
 
           {selectedUser && (
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-              <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/50 px-5 py-4">
-                <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-700">
-                  <MapPin className="h-4 w-4 text-gray-400" /> Current
-                  Assignments
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-gray-400" /> Current Assignments
                 </h2>
-                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                <span className="text-xs bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-medium">
                   {assignedBranches.length} Branches
                 </span>
               </div>
-
+              
               <div className="p-0">
                 {loading ? (
-                  <div className="py-8 text-center text-sm text-gray-400">
-                    Loading branches...
-                  </div>
+                  <div className="text-center py-8 text-gray-400 text-sm">Loading branches...</div>
                 ) : assignedBranches.length === 0 ? (
-                  <div className="py-8 text-center text-sm text-gray-400">
-                    This user has no branches assigned.
-                  </div>
+                  <div className="text-center py-8 text-gray-400 text-sm">This user has no branches assigned.</div>
                 ) : (
                   <ul className="divide-y divide-gray-100">
                     {assignedBranches.map((branch: unknown) => (
-                      <li
-                        key={branch.id}
-                        className="flex flex-col justify-between gap-4 p-4 transition-colors hover:bg-gray-50 sm:flex-row sm:items-center"
-                      >
+                      <li key={branch.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 transition-colors">
                         <div>
-                          <p className="flex items-center gap-2 font-medium text-gray-900">
+                          <p className="font-medium text-gray-900 flex items-center gap-2">
                             {branch.branch_name}
                             {selectedUser.default_branch_id === branch.id && (
-                              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                                Default Branch
-                              </span>
+                              <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Default Branch</span>
                             )}
                           </p>
-                          <p className="mt-1 text-xs text-gray-500">
-                            {branch.branch_code}
-                          </p>
+                          <p className="text-xs text-gray-500 mt-1">{branch.branch_code}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <PermissionGuard permission="control.user.update">
                             {selectedUser.default_branch_id !== branch.id && (
-                              <Button
-                                variant="secondary"
+                              <Button 
+                                variant="secondary" 
                                 size="sm"
                                 onClick={() => setDefaultBranch(branch.id)}
                               >
@@ -328,10 +279,10 @@ const UserBranchAccessPage = () => {
                           <PermissionGuard permission="control.access.branch.remove">
                             <button
                               onClick={() => confirmRemove(branch)}
-                              className="rounded-md p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                               title="Remove Access"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </PermissionGuard>
                         </div>
@@ -350,9 +301,7 @@ const UserBranchAccessPage = () => {
         onClose={() => setIsRemoveOpen(false)}
         onConfirm={handleRemove}
         title="Remove Branch Access"
-        message={`Are you sure you want to remove access to "${
-          branchToRemove?.branch_name
-        }" for ${selectedUser?.name || selectedUser?.full_name}?`}
+        message={`Are you sure you want to remove access to "${branchToRemove?.branch_name}" for ${selectedUser?.name || selectedUser?.full_name}?`}
         confirmText="Remove Access"
         isConfirming={removing}
       />

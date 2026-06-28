@@ -1,4 +1,3 @@
-import React from "react";
 import Input from "../../../../components/common/Input";
 import ToggleSwitch from "../../../../components/common/ToggleSwitch";
 
@@ -8,11 +7,7 @@ interface StepLoginSecurityProps {
   isEdit?: boolean;
 }
 
-const StepLoginSecurity = ({
-  formData,
-  onChange,
-  isEdit,
-}: StepLoginSecurityProps) => {
+const StepLoginSecurity = ({ formData, onChange, isEdit }: StepLoginSecurityProps) => {
   const handleChange = (e: any) => {
     onChange(e.target.name, e.target.value);
   };
@@ -21,18 +16,14 @@ const StepLoginSecurity = ({
     <div className="card-premium">
       <div className="card-premium-header">
         <div>
-          <h3 className="text-base font-semibold text-gray-900">
-            Login & Security
-          </h3>
-          <p className="mt-0.5 text-xs text-gray-500">
-            Configure login credentials and security settings
-          </p>
+          <h3 className="text-base font-semibold text-gray-900">Login & Security</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Configure login credentials and security settings</p>
         </div>
       </div>
 
       <div className="card-premium-body space-y-6">
         {/* Login toggle */}
-        <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+        <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
           <ToggleSwitch
             checked={formData.login_enabled !== false}
             onChange={(v) => onChange("login_enabled", v)}
@@ -44,10 +35,8 @@ const StepLoginSecurity = ({
         {/* Password */}
         {!isEdit && (
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-gray-700">
-              Password
-            </h4>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">Password</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Password *"
                 type="password"
@@ -69,10 +58,9 @@ const StepLoginSecurity = ({
         )}
 
         {isEdit && (
-          <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
-            <p className="text-sm font-medium text-amber-700">
-              To reset this user's password, use the "Reset Password" action
-              from the user profile page.
+          <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+            <p className="text-sm text-amber-700 font-medium">
+              To reset this user's password, use the "Reset Password" action from the user profile page.
             </p>
           </div>
         )}
@@ -81,11 +69,9 @@ const StepLoginSecurity = ({
 
         {/* Security toggles */}
         <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-gray-700">
-            Security Options
-          </h4>
+          <h4 className="text-sm font-semibold text-gray-700">Security Options</h4>
 
-          <div className="space-y-4 rounded-xl border border-gray-100 p-4">
+          <div className="p-4 rounded-xl border border-gray-100 space-y-4">
             <ToggleSwitch
               checked={formData.force_password_change || false}
               onChange={(v) => onChange("force_password_change", v)}
@@ -108,11 +94,9 @@ const StepLoginSecurity = ({
 
         {/* Advanced */}
         <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-gray-700">
-            Advanced Settings
-          </h4>
+          <h4 className="text-sm font-semibold text-gray-700">Advanced Settings</h4>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Account Expiry Date"
               type="date"
@@ -138,7 +122,7 @@ const StepLoginSecurity = ({
             onChange={handleChange}
             placeholder="Comma-separated IPs, e.g. 192.168.1.1, 10.0.0.0/24"
           />
-          <p className="-mt-2 text-[11px] text-gray-400">
+          <p className="text-[11px] text-gray-400 -mt-2">
             Leave blank to allow login from any IP address
           </p>
         </div>

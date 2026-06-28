@@ -3,7 +3,7 @@
  * Shows key-value pairs, status badge, and action buttons.
  */
 import React from "react";
-import { MdClose, MdEdit, MdDelete, MdCheck, MdBlock } from "react-icons/md";
+import { MdEdit, MdDelete, MdCheck, MdBlock } from "react-icons/md";
 import {
   Sheet,
   SheetContent,
@@ -48,32 +48,25 @@ export function ERPDetailPanel({
 }: ERPDetailPanelProps) {
   return (
     <Sheet open={open} onOpenChange={(val: unknown) => !val && onClose()}>
-      <SheetContent
-        side="right"
-        className="flex w-[400px] flex-col border-none bg-white p-0 shadow-2xl sm:w-[500px] sm:max-w-none"
-      >
+      <SheetContent side="right" className="w-[400px] sm:w-[500px] sm:max-w-none p-0 flex flex-col bg-white border-none shadow-2xl">
         {/* Header */}
-        <SheetHeader className="border-b border-gray-100 px-6 py-4 text-left">
+        <SheetHeader className="px-6 py-4 border-b border-gray-100 text-left">
           <div className="flex items-center gap-2">
-            <SheetTitle className="truncate text-lg font-bold text-navy-700">
-              {title}
-            </SheetTitle>
+            <SheetTitle className="text-lg font-bold text-navy-700 truncate">{title}</SheetTitle>
             {status && <StatusBadge status={status} />}
           </div>
           {subtitle && (
-            <SheetDescription className="mt-0.5 text-[12px] text-gray-400">
-              {subtitle}
-            </SheetDescription>
+            <SheetDescription className="text-[12px] text-gray-400 mt-0.5">{subtitle}</SheetDescription>
           )}
         </SheetHeader>
 
         {/* Action buttons */}
         {(onEdit || onDelete || onApprove || onReject) && (
-          <div className="flex items-center gap-2 border-b border-gray-50 px-6 py-3">
+          <div className="flex items-center gap-2 px-6 py-3 border-b border-gray-50">
             {onEdit && (
               <button
                 onClick={onEdit}
-                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors"
               >
                 <MdEdit size={16} /> Edit
               </button>
@@ -81,7 +74,7 @@ export function ERPDetailPanel({
             {onApprove && (
               <button
                 onClick={onApprove}
-                className="flex items-center gap-1.5 rounded-lg border border-green-200 px-3 py-2 text-[13px] font-medium text-green-600 transition-colors hover:bg-green-50"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium text-green-600 border border-green-200 hover:bg-green-50 transition-colors"
               >
                 <MdCheck size={16} /> Approve
               </button>
@@ -89,7 +82,7 @@ export function ERPDetailPanel({
             {onReject && (
               <button
                 onClick={onReject}
-                className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-[13px] font-medium text-red-500 transition-colors hover:bg-red-50"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium text-red-500 border border-red-200 hover:bg-red-50 transition-colors"
               >
                 <MdBlock size={16} /> Reject
               </button>
@@ -97,7 +90,7 @@ export function ERPDetailPanel({
             {onDelete && (
               <button
                 onClick={onDelete}
-                className="ml-auto flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium text-red-500 transition-colors hover:bg-red-50"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium text-red-500 hover:bg-red-50 transition-colors ml-auto"
               >
                 <MdDelete size={16} /> Delete
               </button>
@@ -109,8 +102,11 @@ export function ERPDetailPanel({
         <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="grid grid-cols-2 gap-x-4 gap-y-4">
             {fields.map((field: unknown, i: unknown) => (
-              <div key={i} className={field.span === 2 ? "col-span-2" : ""}>
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+              <div
+                key={i}
+                className={field.span === 2 ? "col-span-2" : ""}
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
                   {field.label}
                 </p>
                 <div className="text-[13px] font-medium text-navy-700">

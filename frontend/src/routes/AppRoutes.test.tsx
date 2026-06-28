@@ -1,13 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import AppRoutes from "./AppRoutes";
 import { AuthProvider } from "../auth/AuthContext";
 import { describe, it, expect, vi } from "vitest";
 
 // Mock matchMedia for jsdom
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation(query => ({
     matches: false,
     media: query,
     onchange: null,
@@ -43,7 +43,7 @@ describe("AppRoutes Smoke Tests", () => {
     );
     expect(document.body).toBeDefined();
   });
-
+  
   it("renders the inventory dashboard without crashing", () => {
     render(
       <MemoryRouter initialEntries={["/inventory/dashboard"]}>

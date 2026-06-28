@@ -1,40 +1,30 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Modal from "../../../components/common/Modal";
 import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
-import ProductCategorySelect from "../../../components/inventory/ProductCategorySelect";
 import WarehouseSelect from "../../../components/inventory/WarehouseSelect";
 
-const WarehouseLocationFormModal = ({
-  isOpen,
-  onClose,
-  onSave,
-  initialData,
-}: {
-  isOpen?: boolean;
-  onClose?: unknown;
-  onSave?: unknown;
-  initialData?: unknown;
-}) => {
+const WarehouseLocationFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpen?: boolean; onClose?: unknown; onSave?: unknown; initialData?: unknown }) => {
   const [loading, setLoading] = useState(false);
   const { branches } = useAuth();
-
+  
   const [formData, setFormData] = useState({
-    warehouse_id: "",
-    location_code: "",
-    location_name: "",
-    rack: "",
-    shelf: "",
-    bin: "",
-    storage_condition: "",
-    status: "active",
+        warehouse_id: "",
+        location_code: "",
+        location_name: "",
+        rack: "",
+        shelf: "",
+        bin: "",
+        storage_condition: "",
+        status: "active",
+
   });
 
   useEffect(() => {
     if (initialData) {
       setFormData({
-        ...initialData,
+        ...initialData
       });
     } else {
       setFormData({
@@ -46,6 +36,7 @@ const WarehouseLocationFormModal = ({
         bin: "",
         storage_condition: "",
         status: "active",
+
       });
     }
   }, [initialData, isOpen]);
@@ -88,13 +79,11 @@ const WarehouseLocationFormModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={
-        initialData ? "Edit Warehouse Location" : "Create Warehouse Location"
-      }
+      title={initialData ? "Edit Warehouse Location" : "Create Warehouse Location"}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Warehouse <span className="text-red-500">*</span>
           </label>
           <WarehouseSelect
@@ -103,7 +92,7 @@ const WarehouseLocationFormModal = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Location Code <span className="text-red-500">*</span>
           </label>
           <input
@@ -111,107 +100,99 @@ const WarehouseLocationFormModal = ({
             name="location_code"
             value={formData.location_code || ""}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
-            required
+            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white" required
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Location Name
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Location Name 
           </label>
           <input
             type="text"
             name="location_name"
             value={formData.location_name || ""}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Rack
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Rack 
           </label>
           <input
             type="text"
             name="rack"
             value={formData.rack || ""}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Shelf
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Shelf 
           </label>
           <input
             type="text"
             name="shelf"
             value={formData.shelf || ""}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Bin
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Bin 
           </label>
           <input
             type="text"
             name="bin"
             value={formData.bin || ""}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Storage Condition <span className="text-red-500">*</span>
           </label>
           <select
             name="storage_condition"
             value={formData.storage_condition}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
-            required
+            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white" required
           >
             <option value="">Select...</option>
-            <option value="normal">Normal</option>
-            <option value="cool">Cool</option>
-            <option value="cold_chain">Cold Chain</option>
-            <option value="controlled_drug">Controlled Drug</option>
-            <option value="hazardous">Hazardous</option>
-            <option value="quarantine">Quarantine</option>
+            <option value="normal">Normal</option><option value="cool">Cool</option><option value="cold_chain">Cold Chain</option><option value="controlled_drug">Controlled Drug</option><option value="hazardous">Hazardous</option><option value="quarantine">Quarantine</option>
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Status <span className="text-red-500">*</span>
           </label>
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
-            required
+            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white" required
           >
             <option value="">Select...</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="active">Active</option><option value="inactive">Inactive</option>
           </select>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-navy-600">
+
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-navy-600 mt-6">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-navy-600 dark:text-gray-300 dark:hover:bg-navy-500"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-navy-600 dark:text-gray-300 dark:hover:bg-navy-500 rounded-xl transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-xl disabled:opacity-50 transition-colors"
           >
             {loading ? "Saving..." : "Save"}
           </button>

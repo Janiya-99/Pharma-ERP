@@ -1,4 +1,3 @@
-import React from "react";
 import { MdModeEditOutline } from "react-icons/md";
 import image1 from "assets/img/profile/image1.png";
 import image2 from "assets/img/profile/image2.png";

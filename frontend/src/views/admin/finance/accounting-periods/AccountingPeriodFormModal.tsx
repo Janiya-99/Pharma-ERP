@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ERPFormModal from "components/erp/ERPFormModal";
 import { financeApi } from "api/financeApi";
 import { toast } from "react-hot-toast";
@@ -110,9 +110,7 @@ export default function AccountingPeriodFormModal({
         onOpenChange(false);
       }
     } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || "Failed to save accounting period"
-      );
+      toast.error(err.response?.data?.message || "Failed to save accounting period");
     } finally {
       setLoading(false);
     }

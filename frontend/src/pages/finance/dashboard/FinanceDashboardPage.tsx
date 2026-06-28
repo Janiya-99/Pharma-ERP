@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -47,12 +46,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 
 const money = (amount: number) =>
   new Intl.NumberFormat("en-LK", {
@@ -62,161 +56,39 @@ const money = (amount: number) =>
   }).format(amount);
 
 const kpis = [
-  {
-    label: "Cash Balance",
-    value: 1865000,
-    trend: "+8.2%",
-    icon: Wallet,
-    tone: "text-emerald-600",
-  },
-  {
-    label: "Bank Balance",
-    value: 12845000,
-    trend: "+4.7%",
-    icon: Landmark,
-    tone: "text-blue-600",
-  },
-  {
-    label: "Accounts Receivable",
-    value: 5470000,
-    trend: "12 invoices",
-    icon: Receipt,
-    tone: "text-indigo-600",
-  },
-  {
-    label: "Accounts Payable",
-    value: 2915000,
-    trend: "9 bills",
-    icon: FileText,
-    tone: "text-orange-600",
-  },
-  {
-    label: "Monthly Revenue",
-    value: 18490000,
-    trend: "+15.4%",
-    icon: TrendingUp,
-    tone: "text-green-600",
-  },
-  {
-    label: "Monthly Expenses",
-    value: 11260000,
-    trend: "-3.1%",
-    icon: TrendingDown,
-    tone: "text-red-600",
-  },
+  { label: "Cash Balance", value: 1865000, trend: "+8.2%", icon: Wallet, tone: "text-emerald-600" },
+  { label: "Bank Balance", value: 12845000, trend: "+4.7%", icon: Landmark, tone: "text-blue-600" },
+  { label: "Accounts Receivable", value: 5470000, trend: "12 invoices", icon: Receipt, tone: "text-indigo-600" },
+  { label: "Accounts Payable", value: 2915000, trend: "9 bills", icon: FileText, tone: "text-orange-600" },
+  { label: "Monthly Revenue", value: 18490000, trend: "+15.4%", icon: TrendingUp, tone: "text-green-600" },
+  { label: "Monthly Expenses", value: 11260000, trend: "-3.1%", icon: TrendingDown, tone: "text-red-600" },
 ];
 
 const summaryCards = [
-  {
-    label: "Gross Profit",
-    value: 7230000,
-    note: "39.1% margin",
-    icon: BarChart3,
-  },
-  {
-    label: "Net Profit",
-    value: 4810000,
-    note: "26.0% margin",
-    icon: BadgeDollarSign,
-  },
-  {
-    label: "Pending Payments",
-    value: 1290000,
-    note: "6 awaiting approval",
-    icon: ClipboardCheck,
-  },
-  {
-    label: "Pending Receipts",
-    value: 2145000,
-    note: "8 due this week",
-    icon: CircleDollarSign,
-  },
+  { label: "Gross Profit", value: 7230000, note: "39.1% margin", icon: BarChart3 },
+  { label: "Net Profit", value: 4810000, note: "26.0% margin", icon: BadgeDollarSign },
+  { label: "Pending Payments", value: 1290000, note: "6 awaiting approval", icon: ClipboardCheck },
+  { label: "Pending Receipts", value: 2145000, note: "8 due this week", icon: CircleDollarSign },
 ];
 
 const transactions = [
-  {
-    date: "2026-06-26",
-    voucher: "JV-2026-0041",
-    type: "Journal",
-    account: "Sales Revenue",
-    debit: 0,
-    credit: 1245000,
-    status: "Posted",
-  },
-  {
-    date: "2026-06-26",
-    voucher: "PV-2026-0188",
-    type: "Payment",
-    account: "Accounts Payable",
-    debit: 480000,
-    credit: 0,
-    status: "Approved",
-  },
-  {
-    date: "2026-06-25",
-    voucher: "RV-2026-0204",
-    type: "Receipt",
-    account: "Bank Account",
-    debit: 760000,
-    credit: 0,
-    status: "Posted",
-  },
-  {
-    date: "2026-06-24",
-    voucher: "JV-2026-0039",
-    type: "Journal",
-    account: "Rent Expense",
-    debit: 185000,
-    credit: 0,
-    status: "Draft",
-  },
+  { date: "2026-06-26", voucher: "JV-2026-0041", type: "Journal", account: "Sales Revenue", debit: 0, credit: 1245000, status: "Posted" },
+  { date: "2026-06-26", voucher: "PV-2026-0188", type: "Payment", account: "Accounts Payable", debit: 480000, credit: 0, status: "Approved" },
+  { date: "2026-06-25", voucher: "RV-2026-0204", type: "Receipt", account: "Bank Account", debit: 760000, credit: 0, status: "Posted" },
+  { date: "2026-06-24", voucher: "JV-2026-0039", type: "Journal", account: "Rent Expense", debit: 185000, credit: 0, status: "Draft" },
 ];
 
 const approvals = [
-  {
-    date: "2026-06-27",
-    type: "Payment Voucher",
-    createdBy: "Nimali Perera",
-    amount: 620000,
-    status: "Pending",
-  },
-  {
-    date: "2026-06-27",
-    type: "Journal Entry",
-    createdBy: "Kasun Silva",
-    amount: 410000,
-    status: "Review",
-  },
-  {
-    date: "2026-06-26",
-    type: "Receipt Voucher",
-    createdBy: "Amara Dias",
-    amount: 955000,
-    status: "Pending",
-  },
+  { date: "2026-06-27", type: "Payment Voucher", createdBy: "Nimali Perera", amount: 620000, status: "Pending" },
+  { date: "2026-06-27", type: "Journal Entry", createdBy: "Kasun Silva", amount: 410000, status: "Review" },
+  { date: "2026-06-26", type: "Receipt Voucher", createdBy: "Amara Dias", amount: 955000, status: "Pending" },
 ];
 
 const reportShortcuts = [
-  {
-    title: "Trial Balance",
-    path: "/finance/reports/trial-balance",
-    icon: BookOpen,
-  },
-  {
-    title: "Profit and Loss",
-    path: "/finance/reports/profit-and-loss",
-    icon: TrendingUp,
-  },
-  {
-    title: "Balance Sheet",
-    path: "/finance/reports/balance-sheet",
-    icon: Landmark,
-  },
-  {
-    title: "Account Ledger",
-    path: "/finance/general-ledger/account-ledger",
-    icon: FileText,
-  },
+  { title: "Trial Balance", path: "/finance/reports/trial-balance", icon: BookOpen },
+  { title: "Profit and Loss", path: "/finance/reports/profit-and-loss", icon: TrendingUp },
+  { title: "Balance Sheet", path: "/finance/reports/balance-sheet", icon: Landmark },
+  { title: "Account Ledger", path: "/finance/general-ledger/account-ledger", icon: FileText },
 ];
 
 const statusBadge = (status: string) => {
@@ -239,51 +111,26 @@ const FinanceDashboardPage = () => {
   const navigate = useNavigate();
 
   const quickActions = [
-    {
-      label: "Create Journal Entry",
-      path: "/finance/general-ledger/journal-entry",
-      icon: BookOpen,
-    },
-    {
-      label: "Add Payment",
-      path: "/finance/banking/payment-vouchers",
-      icon: Wallet,
-    },
-    {
-      label: "Add Receipt",
-      path: "/finance/banking/receipt-vouchers",
-      icon: Receipt,
-    },
-    {
-      label: "Create Account",
-      path: "/finance/setup/chart-of-accounts",
-      icon: Plus,
-    },
-    {
-      label: "View Reports",
-      path: "/finance/reports/reports-dashboard",
-      icon: BarChart3,
-    },
+    { label: "Create Journal Entry", path: "/finance/general-ledger/journal-entry", icon: BookOpen },
+    { label: "Add Payment", path: "/finance/banking/payment-vouchers", icon: Wallet },
+    { label: "Add Receipt", path: "/finance/banking/receipt-vouchers", icon: Receipt },
+    { label: "Create Account", path: "/finance/setup/chart-of-accounts", icon: Plus },
+    { label: "View Reports", path: "/finance/reports/reports-dashboard", icon: BarChart3 },
   ];
 
   return (
-    <div className="text-slate-900 min-h-full bg-[#F8FAFC] p-6">
+    <div className="min-h-full bg-[#F8FAFC] p-6 text-slate-900">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
-            OMACX Pharma Pvt Ltd
-          </p>
-          <h1 className="text-slate-900 mt-1 text-3xl font-bold tracking-tight">
-            Finance Dashboard
-          </h1>
-          <p className="text-slate-500 mt-2 max-w-3xl text-sm">
-            Monitor financial performance, cash flow, receivables, payables, and
-            accounting activity.
+          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">OMACX Pharma Pvt Ltd</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Finance Dashboard</h1>
+          <p className="mt-2 max-w-3xl text-sm text-slate-500">
+            Monitor financial performance, cash flow, receivables, payables, and accounting activity.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Select defaultValue="this-month">
-            <SelectTrigger className="border-slate-200 w-[160px] bg-white">
+            <SelectTrigger className="w-[160px] border-slate-200 bg-white">
               <SelectValue placeholder="Period" />
             </SelectTrigger>
             <SelectContent>
@@ -293,10 +140,7 @@ const FinanceDashboardPage = () => {
               <SelectItem value="this-quarter">This quarter</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            onClick={() => navigate("/finance/journal-entry")}
-            className="bg-indigo-600 text-white hover:bg-indigo-700"
-          >
+          <Button onClick={() => navigate("/finance/journal-entry")} className="bg-indigo-600 text-white hover:bg-indigo-700">
             <Plus className="h-4 w-4" />
             New Entry
           </Button>
@@ -305,29 +149,19 @@ const FinanceDashboardPage = () => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
         {kpis.map((item) => (
-          <Card
-            key={item.label}
-            className="border-slate-200 border bg-white shadow-sm"
-          >
+          <Card key={item.label} className="border border-slate-200 bg-white shadow-sm">
             <CardContent className="space-y-3 pt-1">
               <div className="flex items-center justify-between">
-                <div className="bg-slate-50 rounded-xl p-2">
+                <div className="rounded-xl bg-slate-50 p-2">
                   <item.icon className={`h-5 w-5 ${item.tone}`} />
                 </div>
-                <Badge
-                  variant="outline"
-                  className="border-slate-200 text-slate-500"
-                >
+                <Badge variant="outline" className="border-slate-200 text-slate-500">
                   {item.trend}
                 </Badge>
               </div>
               <div>
-                <p className="text-slate-500 text-xs font-medium">
-                  {item.label}
-                </p>
-                <p className="text-slate-900 mt-1 text-xl font-bold">
-                  {money(item.value)}
-                </p>
+                <p className="text-xs font-medium text-slate-500">{item.label}</p>
+                <p className="mt-1 text-xl font-bold text-slate-900">{money(item.value)}</p>
               </div>
             </CardContent>
           </Card>
@@ -336,22 +170,15 @@ const FinanceDashboardPage = () => {
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-4">
         {summaryCards.map((item) => (
-          <Card
-            key={item.label}
-            className="border-slate-200 border bg-white shadow-sm"
-          >
+          <Card key={item.label} className="border border-slate-200 bg-white shadow-sm">
             <CardContent className="flex items-center gap-4 pt-1">
               <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
                 <item.icon className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-slate-500 text-sm font-medium">
-                  {item.label}
-                </p>
-                <p className="text-slate-900 mt-1 text-2xl font-bold">
-                  {money(item.value)}
-                </p>
-                <p className="text-slate-500 mt-1 text-xs">{item.note}</p>
+                <p className="text-sm font-medium text-slate-500">{item.label}</p>
+                <p className="mt-1 text-2xl font-bold text-slate-900">{money(item.value)}</p>
+                <p className="mt-1 text-xs text-slate-500">{item.note}</p>
               </div>
             </CardContent>
           </Card>
@@ -359,19 +186,15 @@ const FinanceDashboardPage = () => {
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[1fr_360px]">
-        <Card className="border-slate-200 border bg-white shadow-sm">
-          <CardHeader className="border-slate-100 border-b">
+        <Card className="border border-slate-200 bg-white shadow-sm">
+          <CardHeader className="border-b border-slate-100">
             <CardTitle>Accounting Activity</CardTitle>
-            <CardDescription>
-              Recent vouchers and approvals across the finance workflow.
-            </CardDescription>
+            <CardDescription>Recent vouchers and approvals across the finance workflow.</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <Tabs defaultValue="transactions" className="gap-4">
-              <TabsList className="bg-slate-100 mt-3">
-                <TabsTrigger value="transactions">
-                  Recent Transactions
-                </TabsTrigger>
+              <TabsList className="mt-3 bg-slate-100">
+                <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
                 <TabsTrigger value="approvals">Pending Approvals</TabsTrigger>
               </TabsList>
               <TabsContent value="transactions">
@@ -391,17 +214,11 @@ const FinanceDashboardPage = () => {
                     {transactions.map((row) => (
                       <TableRow key={row.voucher}>
                         <TableCell>{row.date}</TableCell>
-                        <TableCell className="text-slate-900 font-medium">
-                          {row.voucher}
-                        </TableCell>
+                        <TableCell className="font-medium text-slate-900">{row.voucher}</TableCell>
                         <TableCell>{row.type}</TableCell>
                         <TableCell>{row.account}</TableCell>
-                        <TableCell className="text-right">
-                          {row.debit ? money(row.debit) : "-"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {row.credit ? money(row.credit) : "-"}
-                        </TableCell>
+                        <TableCell className="text-right">{row.debit ? money(row.debit) : "-"}</TableCell>
+                        <TableCell className="text-right">{row.credit ? money(row.credit) : "-"}</TableCell>
                         <TableCell>{statusBadge(row.status)}</TableCell>
                       </TableRow>
                     ))}
@@ -424,18 +241,12 @@ const FinanceDashboardPage = () => {
                     {approvals.map((row) => (
                       <TableRow key={`${row.type}-${row.createdBy}`}>
                         <TableCell>{row.date}</TableCell>
-                        <TableCell className="text-slate-900 font-medium">
-                          {row.type}
-                        </TableCell>
+                        <TableCell className="font-medium text-slate-900">{row.type}</TableCell>
                         <TableCell>{row.createdBy}</TableCell>
-                        <TableCell className="text-right">
-                          {money(row.amount)}
-                        </TableCell>
+                        <TableCell className="text-right">{money(row.amount)}</TableCell>
                         <TableCell>{statusBadge(row.status)}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="outline" size="sm">
-                            Review
-                          </Button>
+                          <Button variant="outline" size="sm">Review</Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -447,7 +258,7 @@ const FinanceDashboardPage = () => {
         </Card>
 
         <div className="space-y-4">
-          <Card className="border-slate-200 border bg-white shadow-sm">
+          <Card className="border border-slate-200 bg-white shadow-sm">
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
               <CardDescription>Common accounting tasks.</CardDescription>
@@ -457,50 +268,40 @@ const FinanceDashboardPage = () => {
                 <Button
                   key={action.label}
                   variant="outline"
-                  className="border-slate-200 h-10 justify-between bg-white"
+                  className="h-10 justify-between border-slate-200 bg-white"
                   onClick={() => navigate(action.path)}
                 >
                   <span className="flex items-center gap-2">
                     <action.icon className="h-4 w-4 text-indigo-600" />
                     {action.label}
                   </span>
-                  <ArrowRight className="text-slate-400 h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 text-slate-400" />
                 </Button>
               ))}
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200 border bg-white shadow-sm">
-            <CardHeader className="border-slate-100 border-b">
+          <Card className="border border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
               <CardTitle>Cash Flow Summary</CardTitle>
-              <CardDescription>
-                June movement across cash and bank accounts.
-              </CardDescription>
+              <CardDescription>June movement across cash and bank accounts.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 text-sm">Cash In</span>
-                <span className="font-semibold text-green-600">
-                  {money(9245000)}
-                </span>
+                <span className="text-sm text-slate-500">Cash In</span>
+                <span className="font-semibold text-green-600">{money(9245000)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 text-sm">Cash Out</span>
-                <span className="font-semibold text-red-600">
-                  {money(6120000)}
-                </span>
+                <span className="text-sm text-slate-500">Cash Out</span>
+                <span className="font-semibold text-red-600">{money(6120000)}</span>
               </div>
-              <div className="border-slate-100 flex items-center justify-between border-t pt-3">
-                <span className="text-slate-900 text-sm font-medium">
-                  Net Movement
-                </span>
-                <span className="text-slate-900 font-bold">
-                  {money(3125000)}
-                </span>
+              <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+                <span className="text-sm font-medium text-slate-900">Net Movement</span>
+                <span className="font-bold text-slate-900">{money(3125000)}</span>
               </div>
               <div className="space-y-2">
-                <Skeleton className="bg-slate-100 h-2 w-full" />
-                <Skeleton className="bg-slate-100 h-2 w-8/12" />
+                <Skeleton className="h-2 w-full bg-slate-100" />
+                <Skeleton className="h-2 w-8/12 bg-slate-100" />
               </div>
             </CardContent>
           </Card>
@@ -509,34 +310,25 @@ const FinanceDashboardPage = () => {
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {reportShortcuts.map((report) => (
-          <Card
-            key={report.title}
-            className="border-slate-200 border bg-white shadow-sm"
-          >
+          <Card key={report.title} className="border border-slate-200 bg-white shadow-sm">
             <CardContent className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-3">
-                <div className="bg-slate-50 text-slate-700 rounded-xl p-3">
+                <div className="rounded-xl bg-slate-50 p-3 text-slate-700">
                   <report.icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-slate-900 font-semibold">{report.title}</p>
-                  <p className="text-slate-500 text-xs">Open report</p>
+                  <p className="font-semibold text-slate-900">{report.title}</p>
+                  <p className="text-xs text-slate-500">Open report</p>
                 </div>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`${report.title} actions`}
-                  >
+                  <Button variant="ghost" size="icon" aria-label={`${report.title} actions`}>
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40 bg-white">
-                  <DropdownMenuItem onClick={() => navigate(report.path)}>
-                    View
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate(report.path)}>View</DropdownMenuItem>
                   <DropdownMenuItem>Export PDF</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

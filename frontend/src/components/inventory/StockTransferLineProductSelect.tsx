@@ -1,18 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Select from "react-select";
 import { inventoryApi } from "../../api/inventoryApi";
 
-const StockTransferLineProductSelect = ({
-  value,
-  onChange,
-  error,
-  isDisabled,
-}: {
-  value?: unknown;
-  onChange?: unknown;
-  error?: unknown;
-  isDisabled?: boolean;
-}) => {
+const StockTransferLineProductSelect = ({ value, onChange, error, isDisabled }: { value?: unknown; onChange?: unknown; error?: unknown; isDisabled?: boolean }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -23,10 +13,7 @@ const StockTransferLineProductSelect = ({
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await inventoryApi.getProducts({
-        limit: 1000,
-        status: "active",
-      });
+      const res = await inventoryApi.getProducts({ limit: 1000, status: "active" });
       if (res.success !== false) {
         setProducts(res.data?.data || res.data || []);
       }
@@ -43,26 +30,20 @@ const StockTransferLineProductSelect = ({
     product: p,
   }));
 
-  const selectedOption =
-    options.find((opt: unknown) => opt.value === value) || null;
+  const selectedOption = options.find((opt: unknown) => opt.value === value) || null;
 
   return (
     <div className="w-full min-w-[200px]">
       <Select
         value={selectedOption}
-        onChange={(selected: unknown) =>
-          onChange(
-            selected ? selected.value : null,
-            selected ? selected.product : null
-          )
-        }
+        onChange={(selected: unknown) => onChange(selected ? selected.value : null, selected ? selected.product : null)}
         options={options}
         isLoading={loading}
         isDisabled={isDisabled}
         isClearable
         placeholder="Select Product"
         classNamePrefix="react-select"
-        className={`text-sm ${error ? "rounded border-red-500" : ""}`}
+        className={`text-sm ${error ? "border-red-500 rounded" : ""}`}
         styles={{
           control: (base: unknown) => ({
             ...base,
@@ -73,7 +54,7 @@ const StockTransferLineProductSelect = ({
           }),
         }}
       />
-      {error && <p className="mt-1 text-[10px] text-red-500">{error}</p>}
+      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
     </div>
   );
 };

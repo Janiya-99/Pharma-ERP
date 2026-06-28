@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getDesignations, deleteDesignation } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
 import DataTable from "../../../components/common/DataTable";
@@ -90,9 +90,7 @@ const DesignationsPage = () => {
       setIsDeleteOpen(false);
       fetchDesignations();
     } catch (err) {
-      setDeleteError(
-        err.response?.data?.message || "Failed to delete designation"
-      );
+      setDeleteError(err.response?.data?.message || "Failed to delete designation");
     } finally {
       setIsDeleting(false);
     }
@@ -107,11 +105,7 @@ const DesignationsPage = () => {
     {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => (
-        <span className="block max-w-xs truncate text-gray-500">
-          {row.description || "-"}
-        </span>
-      ),
+      cell: (row: unknown) => <span className="text-gray-500 truncate block max-w-xs">{row.description || "-"}</span>,
     },
     {
       header: "Status",
@@ -129,19 +123,19 @@ const DesignationsPage = () => {
           <PermissionGuard permission="control.designation.update">
             <button
               onClick={() => openEditModal(row)}
-              className="rounded p-1 text-blue-600 hover:bg-blue-50 hover:text-blue-900"
+              className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
               title="Edit"
             >
-              <Edit2 className="h-4 w-4" />
+              <Edit2 className="w-4 h-4" />
             </button>
           </PermissionGuard>
           <PermissionGuard permission="control.designation.delete">
             <button
               onClick={() => confirmDelete(row)}
-              className="rounded p-1 text-red-600 hover:bg-red-50 hover:text-red-900"
+              className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
               title="Delete"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="w-4 h-4" />
             </button>
           </PermissionGuard>
         </div>
@@ -150,14 +144,14 @@ const DesignationsPage = () => {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl p-6">
+    <div className="p-6 max-w-7xl mx-auto">
       <PageHeader
         title="Designations"
         description="Manage company job titles and designations."
         action={
           <PermissionGuard permission="control.designation.create">
             <Button onClick={openCreateModal}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="w-4 h-4 mr-2" />
               Create Designation
             </Button>
           </PermissionGuard>
@@ -166,27 +160,23 @@ const DesignationsPage = () => {
 
       <FormError message={error} />
 
-      <div className="mb-6 flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:flex-row">
-        <form onSubmit={handleSearch} className="flex flex-1 gap-2">
+      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6 flex flex-col sm:flex-row gap-4 shadow-sm">
+        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
           <Input
             placeholder="Search designations..."
             name="search"
             value={filters.search}
-            onChange={(e: any) =>
-              setFilters({ ...filters, search: e.target.value })
-            }
+            onChange={(e: any) => setFilters({ ...filters, search: e.target.value })}
             className="max-w-md"
           />
           <Button type="submit" variant="secondary" className="px-3">
-            <Search className="h-4 w-4" />
+            <Search className="w-4 h-4" />
           </Button>
         </form>
         <select
           name="status"
           value={filters.status}
-          onChange={(e: any) =>
-            setFilters({ ...filters, status: e.target.value, page: 1 })
-          }
+          onChange={(e: any) => setFilters({ ...filters, status: e.target.value, page: 1 })}
           className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
         >
           <option value="">All Statuses</option>

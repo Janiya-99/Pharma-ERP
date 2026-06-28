@@ -1,4 +1,3 @@
-import React from "react";
 
 const ReconciliationStatusBadge = ({ status }: { status?: unknown }) => {
   const getBadgeClass = (status: unknown) => {
@@ -14,16 +13,10 @@ const ReconciliationStatusBadge = ({ status }: { status?: unknown }) => {
     }
   };
 
-  const formattedStatus = status
-    ? status.charAt(0).toUpperCase() + status.slice(1)
-    : "Unknown";
+  const formattedStatus = status ? status.charAt(0).toUpperCase() + status.slice(1) : "Unknown";
 
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getBadgeClass(
-        status
-      )}`}
-    >
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getBadgeClass(status)}`}>
       {formattedStatus}
     </span>
   );

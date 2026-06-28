@@ -1,7 +1,6 @@
 /**
  * ERPConfirmDialog — Reusable confirmation dialog for delete/cancel/post actions.
  */
-import React from "react";
 import { MdWarning } from "react-icons/md";
 
 type ERPConfirmDialogProps = {
@@ -39,27 +38,27 @@ export function ERPConfirmDialog({
         className="absolute inset-0 bg-navy-900/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative mx-4 w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
-        <div className="mb-4 flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-500">
+      <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl mx-4 p-6">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500 shrink-0">
             <MdWarning size={22} />
           </div>
           <div>
             <h3 className="text-[15px] font-bold text-navy-700">{title}</h3>
-            <p className="mt-1 text-[13px] text-gray-400">{message}</p>
+            <p className="text-[13px] text-gray-400 mt-1">{message}</p>
           </div>
         </div>
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="rounded-xl px-4 py-2.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50"
+            className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className={`rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${btnColors[confirmVariant]}`}
+            className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-50 ${btnColors[confirmVariant]}`}
           >
             {isLoading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />

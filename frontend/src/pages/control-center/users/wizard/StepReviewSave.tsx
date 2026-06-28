@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   User,
   Building2,
@@ -32,12 +32,8 @@ const StepReviewSave = ({
   onCancel,
   saving,
 }: StepReviewSaveProps) => {
-  const [branchNames, setBranchNames] = useState<
-    Record<string | number, string>
-  >({});
-  const [moduleNames, setModuleNames] = useState<
-    Record<string | number, string>
-  >({});
+  const [branchNames, setBranchNames] = useState<Record<string | number, string>>({});
+  const [moduleNames, setModuleNames] = useState<Record<string | number, string>>({});
 
   useEffect(() => {
     loadNames();
@@ -68,8 +64,7 @@ const StepReviewSave = ({
     }
   };
 
-  const assignedBranches: (string | number)[] =
-    formData.assigned_branches || [];
+  const assignedBranches: (string | number)[] = formData.assigned_branches || [];
   const assignedModules: (string | number)[] = formData.software_modules || [];
   const roleAssignments: Record<string, any> = formData.role_assignments || {};
 
@@ -78,14 +73,9 @@ const StepReviewSave = ({
   if (!formData.first_name?.trim()) issues.push("First name is required");
   if (!formData.email?.trim()) issues.push("Email is required");
   if (!isEdit && !formData.password) issues.push("Password is required");
-  if (
-    !isEdit &&
-    formData.password &&
-    formData.password !== formData.confirm_password
-  )
+  if (!isEdit && formData.password && formData.password !== formData.confirm_password)
     issues.push("Passwords do not match");
-  if (assignedBranches.length === 0)
-    issues.push("At least one branch should be assigned");
+  if (assignedBranches.length === 0) issues.push("At least one branch should be assigned");
 
   return (
     <div className="space-y-5">
@@ -93,18 +83,13 @@ const StepReviewSave = ({
       {issues.length > 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+            <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-amber-800">
-                Please Review
-              </p>
+              <p className="text-sm font-semibold text-amber-800">Please Review</p>
               <ul className="mt-1.5 space-y-1">
                 {issues.map((issue, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-center gap-1.5 text-xs text-amber-700"
-                  >
-                    <span className="h-1 w-1 shrink-0 rounded-full bg-amber-400" />
+                  <li key={idx} className="text-xs text-amber-700 flex items-center gap-1.5">
+                    <span className="h-1 w-1 rounded-full bg-amber-400 shrink-0" />
                     {issue}
                   </li>
                 ))}
@@ -119,37 +104,26 @@ const StepReviewSave = ({
         <div className="card-premium-header">
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-indigo-500" />
-            <h3 className="text-sm font-semibold text-gray-800">
-              Basic User Details
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-800">Basic User Details</h3>
           </div>
         </div>
         <div className="card-premium-body">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6">
             <div>
-              <p className="mb-0.5 text-[11px] uppercase tracking-wide text-gray-400">
-                Name
-              </p>
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
               <p className="text-sm font-medium text-gray-800">
                 {formData.first_name} {formData.last_name}
               </p>
             </div>
             <div>
-              <p className="mb-0.5 text-[11px] uppercase tracking-wide text-gray-400">
-                Display Name
-              </p>
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Display Name</p>
               <p className="text-sm font-medium text-gray-800">
-                {formData.display_name ||
-                  `${formData.first_name} ${formData.last_name}`}
+                {formData.display_name || `${formData.first_name} ${formData.last_name}`}
               </p>
             </div>
             <div>
-              <p className="mb-0.5 text-[11px] uppercase tracking-wide text-gray-400">
-                Employee Code
-              </p>
-              <p className="text-sm font-medium text-gray-800">
-                {formData.employee_code || "—"}
-              </p>
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Employee Code</p>
+              <p className="text-sm font-medium text-gray-800">{formData.employee_code || "—"}</p>
             </div>
             <div className="flex items-center gap-1.5">
               <Mail className="h-3.5 w-3.5 text-gray-400" />
@@ -160,16 +134,8 @@ const StepReviewSave = ({
               <p className="text-sm text-gray-700">{formData.phone || "—"}</p>
             </div>
             <div>
-              <p className="mb-0.5 text-[11px] uppercase tracking-wide text-gray-400">
-                Status
-              </p>
-              <span
-                className={`badge-status ${
-                  formData.status === "active"
-                    ? "badge-active"
-                    : "badge-inactive"
-                }`}
-              >
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Status</p>
+              <span className={`badge-status ${formData.status === "active" ? "badge-active" : "badge-inactive"}`}>
                 {formData.status || "active"}
               </span>
             </div>
@@ -182,34 +148,28 @@ const StepReviewSave = ({
         <div className="card-premium-header">
           <div className="flex items-center gap-2">
             <Building2 className="h-4 w-4 text-indigo-500" />
-            <h3 className="text-sm font-semibold text-gray-800">
-              Branch Access
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-800">Branch Access</h3>
           </div>
-          <span className="text-xs text-gray-400">
-            {assignedBranches.length} branches
-          </span>
+          <span className="text-xs text-gray-400">{assignedBranches.length} branches</span>
         </div>
         <div className="card-premium-body">
           {assignedBranches.length === 0 ? (
-            <p className="text-sm italic text-gray-400">No branches assigned</p>
+            <p className="text-sm text-gray-400 italic">No branches assigned</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {assignedBranches.map((id) => (
                 <span
                   key={id}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${
                     formData.primary_branch_id === id
-                      ? "border border-indigo-200 bg-indigo-100 text-indigo-700"
-                      : "border border-gray-200 bg-gray-50 text-gray-600"
+                      ? "bg-indigo-100 text-indigo-700 border border-indigo-200"
+                      : "bg-gray-50 text-gray-600 border border-gray-200"
                   }`}
                 >
                   <MapPin className="h-3 w-3" />
                   {branchNames[id] || `Branch ${id}`}
                   {formData.primary_branch_id === id && (
-                    <span className="ml-1 text-[9px] font-bold uppercase tracking-wide text-indigo-500">
-                      Primary
-                    </span>
+                    <span className="text-[9px] uppercase tracking-wide font-bold ml-1 text-indigo-500">Primary</span>
                   )}
                 </span>
               ))}
@@ -223,35 +183,27 @@ const StepReviewSave = ({
         <div className="card-premium-header">
           <div className="flex items-center gap-2">
             <Boxes className="h-4 w-4 text-indigo-500" />
-            <h3 className="text-sm font-semibold text-gray-800">
-              Software Access
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-800">Software Access</h3>
           </div>
-          <span className="text-xs text-gray-400">
-            {assignedModules.length} modules
-          </span>
+          <span className="text-xs text-gray-400">{assignedModules.length} modules</span>
         </div>
         <div className="card-premium-body">
           {assignedModules.length === 0 ? (
-            <p className="text-sm italic text-gray-400">
-              No software modules assigned
-            </p>
+            <p className="text-sm text-gray-400 italic">No software modules assigned</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {assignedModules.map((id) => (
                 <span
                   key={id}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${
                     formData.default_software_id === id
-                      ? "border border-indigo-200 bg-indigo-100 text-indigo-700"
-                      : "border border-gray-200 bg-gray-50 text-gray-600"
+                      ? "bg-indigo-100 text-indigo-700 border border-indigo-200"
+                      : "bg-gray-50 text-gray-600 border border-gray-200"
                   }`}
                 >
                   {moduleNames[id] || `Module ${id}`}
                   {formData.default_software_id === id && (
-                    <span className="ml-1 text-[9px] font-bold uppercase tracking-wide text-indigo-500">
-                      Default
-                    </span>
+                    <span className="text-[9px] uppercase tracking-wide font-bold ml-1 text-indigo-500">Default</span>
                   )}
                 </span>
               ))}
@@ -270,28 +222,21 @@ const StepReviewSave = ({
         </div>
         <div className="card-premium-body">
           {Object.keys(roleAssignments).length === 0 ? (
-            <p className="text-sm italic text-gray-400">No roles assigned</p>
+            <p className="text-sm text-gray-400 italic">No roles assigned</p>
           ) : (
             <div className="space-y-2">
-              {Object.entries(roleAssignments).map(
-                ([moduleId, assignment]: [string, any]) => (
-                  <div
-                    key={moduleId}
-                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2"
-                  >
-                    <span className="text-xs text-gray-500">
-                      {moduleNames[moduleId] || `Module ${moduleId}`}
-                    </span>
-                    <span className="text-gray-300">→</span>
-                    <span className="text-xs font-medium text-gray-700">
-                      {assignment.role_name || `Role ID: ${assignment.role_id}`}
-                    </span>
-                    <span className="ml-auto text-[10px] text-gray-400">
-                      {assignment.permissionCount || 0} permissions
-                    </span>
-                  </div>
-                )
-              )}
+              {Object.entries(roleAssignments).map(([moduleId, assignment]: [string, any]) => (
+                <div key={moduleId} className="flex items-center gap-3 py-2 px-3 rounded-lg bg-gray-50">
+                  <span className="text-xs text-gray-500">{moduleNames[moduleId] || `Module ${moduleId}`}</span>
+                  <span className="text-gray-300">→</span>
+                  <span className="text-xs font-medium text-gray-700">
+                    {assignment.role_name || `Role ID: ${assignment.role_id}`}
+                  </span>
+                  <span className="text-[10px] text-gray-400 ml-auto">
+                    {assignment.permissionCount || 0} permissions
+                  </span>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -306,46 +251,22 @@ const StepReviewSave = ({
           </div>
         </div>
         <div className="card-premium-body">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <p className="mb-0.5 text-[11px] uppercase tracking-wide text-gray-400">
-                Login
-              </p>
-              <span
-                className={`badge-status ${
-                  formData.login_enabled !== false
-                    ? "badge-active"
-                    : "badge-inactive"
-                }`}
-              >
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Login</p>
+              <span className={`badge-status ${formData.login_enabled !== false ? "badge-active" : "badge-inactive"}`}>
                 {formData.login_enabled !== false ? "Enabled" : "Disabled"}
               </span>
             </div>
             <div>
-              <p className="mb-0.5 text-[11px] uppercase tracking-wide text-gray-400">
-                2FA
-              </p>
-              <span
-                className={`badge-status ${
-                  formData.two_factor_enabled
-                    ? "badge-active"
-                    : "badge-inactive"
-                }`}
-              >
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">2FA</p>
+              <span className={`badge-status ${formData.two_factor_enabled ? "badge-active" : "badge-inactive"}`}>
                 {formData.two_factor_enabled ? "Enabled" : "Disabled"}
               </span>
             </div>
             <div>
-              <p className="mb-0.5 text-[11px] uppercase tracking-wide text-gray-400">
-                Force Password Change
-              </p>
-              <span
-                className={`badge-status ${
-                  formData.force_password_change
-                    ? "badge-active"
-                    : "badge-inactive"
-                }`}
-              >
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Force Password Change</p>
+              <span className={`badge-status ${formData.force_password_change ? "badge-active" : "badge-inactive"}`}>
                 {formData.force_password_change ? "Yes" : "No"}
               </span>
             </div>
@@ -355,19 +276,11 @@ const StepReviewSave = ({
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="wizard-nav-btn wizard-nav-btn-ghost"
-        >
+        <button type="button" onClick={onCancel} className="wizard-nav-btn wizard-nav-btn-ghost">
           Cancel
         </button>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="wizard-nav-btn wizard-nav-btn-secondary"
-          >
+          <button type="button" onClick={onBack} className="wizard-nav-btn wizard-nav-btn-secondary">
             Back
           </button>
           {!isEdit && (

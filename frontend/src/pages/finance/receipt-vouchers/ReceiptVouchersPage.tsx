@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { financeApi } from "../../../../api/financeApi";
 import { useAuth } from "../../../../auth/AuthContext";
@@ -18,10 +18,10 @@ import PostVoucherConfirmModal from "../shared/PostVoucherConfirmModal";
 export default function ReceiptVouchersPage() {
   const history = useHistory();
   const { hasPermission, activeSoftware } = useAuth();
-
+  
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
   const [filters, setFilters] = useState({
     financial_year_id: "",
     accounting_period_id: "",
@@ -31,28 +31,20 @@ export default function ReceiptVouchersPage() {
     posted_status: "",
     receipt_date_from: "",
     receipt_date_to: "",
-    search: "",
+    search: ""
   });
 
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-  });
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
 
   const [modalState, setModalState] = useState({
     type: null, // "submit", "approve", "reject", "post"
-    voucher: null,
+    voucher: null
   });
 
   const fetchVouchers = async () => {
     setLoading(true);
     try {
-      const params = {
-        ...filters,
-        page: pagination.page,
-        limit: pagination.limit,
-      };
+      const params = { ...filters, page: pagination.page, limit: pagination.limit };
       const res = await financeApi.getReceiptVouchers(params);
       if (res.data?.success) {
         setVouchers(res.data.data);
@@ -77,16 +69,12 @@ export default function ReceiptVouchersPage() {
     if (action === "edit") {
       history.push(`/admin/finance/receipt-vouchers/${voucher.id}/edit`);
     } else if (action === "delete") {
-      if (
-        window.confirm("Are you sure you want to delete this receipt voucher?")
-      ) {
+      if (window.confirm("Are you sure you want to delete this receipt voucher?")) {
         try {
           await financeApi.deleteReceiptVoucher(voucher.id);
           fetchVouchers();
         } catch (err) {
-          alert(
-            "Failed to delete: " + (err.response?.data?.message || err.message)
-          );
+          alert("Failed to delete: " + (err.response?.data?.message || err.message));
         }
       }
     } else {
@@ -95,60 +83,36 @@ export default function ReceiptVouchersPage() {
   };
 
   if (activeSoftware?.software_code !== "FINANCE") {
-    return (
-      <div className="p-8 text-center font-medium text-red-500">
-        Please switch to Finance module to access this page.
-      </div>
-    );
+    return <div className="p-8 text-center text-red-500 font-medium">Please switch to Finance module to access this page.</div>;
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 py-4">
+    <div className="flex flex-col gap-4 py-4 h-full">
       <FinancePageHeader
         title="Receipt Vouchers"
         subtitle="Manage incoming receipts and approvals"
-        onAdd={
-          hasPermission("finance.receipt.create")
-            ? () => history.push("/admin/finance/receipt-vouchers/create")
-            : undefined
-        }
+        onAdd={hasPermission("finance.receipt.create") ? () => history.push("/admin/finance/receipt-vouchers/create") : undefined}
         addLabel="Create Receipt Voucher"
       />
 
       {/* Filters Section */}
-      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+      <div className="bg-white dark:bg-navy-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <FinancialYearSelect
             value={filters.financial_year_id}
-            onChange={(val: unknown) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                financial_year_id: val,
-                accounting_period_id: "",
-              }))
-            }
+            onChange={(val: unknown) => setFilters((prev: unknown) => ({ ...prev, financial_year_id: val, accounting_period_id: "" }))}
             placeholder="All Financial Years"
           />
           <AccountingPeriodSelect
             financialYearId={filters.financial_year_id}
             value={filters.accounting_period_id}
-            onChange={(val: unknown) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                accounting_period_id: val,
-              }))
-            }
+            onChange={(val: unknown) => setFilters((prev: unknown) => ({ ...prev, accounting_period_id: val }))}
             placeholder="All Accounting Periods"
           />
           <select
             value={filters.receipt_type}
-            onChange={(e: any) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                receipt_type: e.target.value,
-              }))
-            }
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, receipt_type: e.target.value }))}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
           >
             <option value="">All Receipt Types</option>
             <option value="customer_receipt">Customer Receipt</option>
@@ -157,13 +121,8 @@ export default function ReceiptVouchersPage() {
           </select>
           <select
             value={filters.receipt_method}
-            onChange={(e: any) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                receipt_method: e.target.value,
-              }))
-            }
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, receipt_method: e.target.value }))}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
           >
             <option value="">All Receipt Methods</option>
             <option value="cash">Cash</option>
@@ -174,13 +133,8 @@ export default function ReceiptVouchersPage() {
           </select>
           <select
             value={filters.approval_status}
-            onChange={(e: any) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                approval_status: e.target.value,
-              }))
-            }
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, approval_status: e.target.value }))}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
           >
             <option value="">All Approval Statuses</option>
             <option value="draft">Draft</option>
@@ -191,13 +145,8 @@ export default function ReceiptVouchersPage() {
           </select>
           <select
             value={filters.posted_status}
-            onChange={(e: any) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                posted_status: e.target.value,
-              }))
-            }
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, posted_status: e.target.value }))}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
           >
             <option value="">All Posted Statuses</option>
             <option value="unposted">Unposted</option>
@@ -206,47 +155,32 @@ export default function ReceiptVouchersPage() {
           <input
             type="date"
             value={filters.receipt_date_from}
-            onChange={(e: any) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                receipt_date_from: e.target.value,
-              }))
-            }
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, receipt_date_from: e.target.value }))}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
             title="Receipt Date From"
           />
           <input
             type="date"
             value={filters.receipt_date_to}
-            onChange={(e: any) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                receipt_date_to: e.target.value,
-              }))
-            }
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, receipt_date_to: e.target.value }))}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
             title="Receipt Date To"
           />
           <input
             type="text"
             placeholder="Search Reference..."
             value={filters.search}
-            onChange={(e: any) =>
-              setFilters((prev: unknown) => ({
-                ...prev,
-                search: e.target.value,
-              }))
-            }
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
           />
         </div>
       </div>
 
       {/* Table Section */}
-      <div className="flex-1 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+      <div className="flex-1 bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-gray-200 bg-gray-50 font-semibold text-gray-500 dark:border-navy-700 dark:bg-navy-700/50 dark:text-gray-300">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
               <tr>
                 <th className="px-4 py-3">Voucher Number</th>
                 <th className="px-4 py-3">Receipt Date</th>
@@ -262,69 +196,38 @@ export default function ReceiptVouchersPage() {
             <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
               {loading ? (
                 <tr>
-                  <td
-                    colSpan="9"
-                    className="px-4 py-8 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">Loading...</td>
                 </tr>
               ) : vouchers.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan="9"
-                    className="px-4 py-8 text-center text-gray-500"
-                  >
-                    No receipt vouchers found.
-                  </td>
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">No receipt vouchers found.</td>
                 </tr>
               ) : (
                 vouchers.map((voucher: unknown) => (
-                  <tr
-                    key={voucher.id}
-                    className="hover:bg-gray-50 dark:hover:bg-navy-700/30"
-                  >
+                  <tr key={voucher.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30">
                     <td className="px-4 py-3 font-medium text-navy-700">
-                      <button
-                        onClick={() =>
-                          history.push(
-                            `/admin/finance/receipt-vouchers/${voucher.id}`
-                          )
-                        }
+                      <button 
+                        onClick={() => history.push(`/admin/finance/receipt-vouchers/${voucher.id}`)}
                         className="text-brand-500 hover:underline"
                       >
                         {voucher.receipt_voucher_number}
                       </button>
                     </td>
-                    <td className="px-4 py-3">
-                      {new Date(voucher.receipt_date).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 capitalize">
-                      {voucher.receipt_type?.replace(/_/g, " ")}
-                    </td>
+                    <td className="px-4 py-3">{new Date(voucher.receipt_date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 capitalize">{voucher.receipt_type?.replace(/_/g, " ")}</td>
                     <td className="px-4 py-3">
                       <PaymentMethodBadge method={voucher.receipt_method} />
                     </td>
-                    <td className="px-4 py-3">
-                      {voucher.reference_number || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <MoneyDisplay amount={voucher.total_amount} />
-                    </td>
+                    <td className="px-4 py-3">{voucher.reference_number || "-"}</td>
+                    <td className="px-4 py-3 text-right"><MoneyDisplay amount={voucher.total_amount} /></td>
                     <td className="px-4 py-3 text-center">
                       <VoucherStatusBadge status={voucher.approval_status} />
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <VoucherPostedStatusBadge
-                        status={voucher.posted_status}
-                      />
+                      <VoucherPostedStatusBadge status={voucher.posted_status} />
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <VoucherActionButtons
-                        voucher={voucher}
-                        type="receipt"
-                        onAction={handleAction}
-                      />
+                      <VoucherActionButtons voucher={voucher} type="receipt" onAction={handleAction} />
                     </td>
                   </tr>
                 ))
@@ -332,35 +235,23 @@ export default function ReceiptVouchersPage() {
             </tbody>
           </table>
         </div>
-
+        
         {/* Pagination Controls */}
-        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3 dark:border-navy-700">
-          <span className="text-gray-500">
-            Total Records: {pagination.total}
-          </span>
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-navy-700">
+          <span className="text-gray-500">Total Records: {pagination.total}</span>
           <div className="flex gap-2">
             <button
               disabled={pagination.page <= 1}
-              onClick={() =>
-                setPagination((prev: unknown) => ({
-                  ...prev,
-                  page: prev.page - 1,
-                }))
-              }
-              className="rounded border px-3 py-1 disabled:opacity-50"
+              onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page - 1 }))}
+              className="px-3 py-1 border rounded disabled:opacity-50"
             >
               Previous
             </button>
             <span className="px-3 py-1">Page {pagination.page}</span>
             <button
               disabled={vouchers.length < pagination.limit}
-              onClick={() =>
-                setPagination((prev: unknown) => ({
-                  ...prev,
-                  page: prev.page + 1,
-                }))
-              }
-              className="rounded border px-3 py-1 disabled:opacity-50"
+              onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page + 1 }))}
+              className="px-3 py-1 border rounded disabled:opacity-50"
             >
               Next
             </button>

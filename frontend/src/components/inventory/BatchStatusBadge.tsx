@@ -1,4 +1,3 @@
-import React from "react";
 import Badge from "../common/Badge";
 
 const BatchStatusBadge = ({ status }: { status?: unknown }) => {
@@ -12,10 +11,7 @@ const BatchStatusBadge = ({ status }: { status?: unknown }) => {
     inactive: { label: "Inactive", variant: "gray" },
   };
 
-  const config = statusMap[status] || {
-    label: status || "Unknown",
-    variant: "gray",
-  };
+  const config = statusMap[status] || { label: status || "Unknown", variant: "gray" };
 
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };

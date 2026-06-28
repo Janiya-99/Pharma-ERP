@@ -1,4 +1,3 @@
-import React from "react";
 
 const StockTransferPostedStatusBadge = ({ status }: { status?: unknown }) => {
   const getBadgeStyle = () => {
@@ -18,9 +17,7 @@ const StockTransferPostedStatusBadge = ({ status }: { status?: unknown }) => {
   };
 
   return (
-    <span
-      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getBadgeStyle()}`}
-    >
+    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${getBadgeStyle()}`}>
       {getLabel()}
     </span>
   );
