@@ -49,6 +49,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	customerRepo := repositories.NewCustomerRepository()
 	salesOrderRepo := repositories.NewSalesOrderRepository()
 	salesInvoiceRepo := repositories.NewSalesInvoiceRepository()
+	creditNoteRepo := repositories.NewCreditNoteRepository()
 	stockMovementRepo := invrepositories.NewStockMovementRepository()
 
 	// Initialize services
@@ -60,6 +61,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	salesOrderSvc := services.NewSalesOrderService(salesOrderRepo, auditSvc, logger)
 	stockMovementSvc := invservices.NewInventoryStockMovementService(stockMovementRepo)
 	salesInvoiceSvc := services.NewSalesInvoiceService(salesInvoiceRepo, stockMovementSvc, auditSvc, logger)
+	creditNoteSvc := services.NewCreditNoteService(creditNoteRepo, auditSvc, logger)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -69,6 +71,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	customerHdl := handlers.NewCustomerHandler(customerSvc, logger)
 	salesOrderHdl := handlers.NewSalesOrderHandler(salesOrderSvc, logger)
 	salesInvoiceHdl := handlers.NewSalesInvoiceHandler(salesInvoiceSvc, logger)
+	creditNoteHdl := handlers.NewCreditNoteHandler(creditNoteSvc, logger)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -138,5 +141,20 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		salesInvoices.POST("/:id/reject", middleware.RequirePermission("invoice_center.sales_invoice.reject"), salesInvoiceHdl.Reject)
 		salesInvoices.POST("/:id/post", middleware.RequirePermission("invoice_center.sales_invoice.post"), salesInvoiceHdl.Post)
 		salesInvoices.POST("/:id/cancel", middleware.RequirePermission("invoice_center.sales_invoice.update"), salesInvoiceHdl.Cancel)
+	}
+
+	// Credit Note Routes
+	creditNotes := r.Group("/credit-notes")
+	{
+		creditNotes.GET("", middleware.RequirePermission("invoice_center.credit_note.view"), creditNoteHdl.List)
+		creditNotes.GET("/:id", middleware.RequirePermission("invoice_center.credit_note.view"), creditNoteHdl.Get)
+		creditNotes.POST("", middleware.RequirePermission("invoice_center.credit_note.create"), creditNoteHdl.Create)
+		creditNotes.PUT("/:id", middleware.RequirePermission("invoice_center.credit_note.update"), creditNoteHdl.Update)
+		creditNotes.DELETE("/:id", middleware.RequirePermission("invoice_center.credit_note.delete"), creditNoteHdl.Delete)
+		creditNotes.POST("/:id/submit", middleware.RequirePermission("invoice_center.credit_note.submit"), creditNoteHdl.Submit)
+		creditNotes.POST("/:id/approve", middleware.RequirePermission("invoice_center.credit_note.approve"), creditNoteHdl.Approve)
+		creditNotes.POST("/:id/reject", middleware.RequirePermission("invoice_center.credit_note.reject"), creditNoteHdl.Reject)
+		creditNotes.POST("/:id/post", middleware.RequirePermission("invoice_center.credit_note.post"), creditNoteHdl.Post)
+		creditNotes.POST("/:id/cancel", middleware.RequirePermission("invoice_center.credit_note.update"), creditNoteHdl.Cancel)
 	}
 }

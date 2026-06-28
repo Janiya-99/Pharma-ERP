@@ -30,6 +30,9 @@ type CreditNote struct {
 	PostedStatus       string           `gorm:"type:varchar(30);default:'unposted';index" json:"posted_status"`
 	PostedBy           *uint64          `json:"posted_by"`
 	PostedAt           *time.Time       `json:"posted_at"`
+	CancelledBy        *uint64          `json:"cancelled_by"`
+	CancelledAt        *time.Time       `json:"cancelled_at"`
+	CancelReason       string           `gorm:"type:text" json:"cancel_reason"`
 	Status             string           `gorm:"type:varchar(30);default:'active';index" json:"status"`
 	CreatedBy          *uint64          `json:"created_by"`
 	UpdatedBy          *uint64          `json:"updated_by"`
@@ -37,9 +40,10 @@ type CreditNote struct {
 	UpdatedAt          time.Time        `json:"updated_at"`
 	DeletedAt          gorm.DeletedAt   `gorm:"index" json:"-"`
 
-	Customer           Customer         `gorm:"foreignKey:CustomerID" json:"customer"`
-	SalesInvoice       *SalesInvoice    `gorm:"foreignKey:SalesInvoiceID" json:"sales_invoice,omitempty"`
-	Lines              []CreditNoteLine `gorm:"foreignKey:CreditNoteID" json:"lines,omitempty"`
+	Customer           Customer             `gorm:"foreignKey:CustomerID" json:"customer"`
+	SalesInvoice       *SalesInvoice        `gorm:"foreignKey:SalesInvoiceID" json:"sales_invoice,omitempty"`
+	Lines              []CreditNoteLine     `gorm:"foreignKey:CreditNoteID" json:"lines,omitempty"`
+	Approvals          []CreditNoteApproval `gorm:"foreignKey:CreditNoteID" json:"approvals,omitempty"`
 }
 
 func (CreditNote) TableName() string {
