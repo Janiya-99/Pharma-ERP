@@ -82,6 +82,18 @@ export const invoiceCenterApi = {
   rejectDebitNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/debit-notes/${id}/reject`, payload),
   postDebitNote: (id: number | string) => apiClient.post(`/invoice-center/debit-notes/${id}/post`),
   cancelDebitNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/debit-notes/${id}/cancel`, payload),
+
+  // ---- Customer Receipts ----
+  getCustomerReceipts: (params: any = {}) => apiClient.get("/invoice-center/customer-receipts", { params }),
+  getCustomerReceiptById: (id: number | string) => apiClient.get(`/invoice-center/customer-receipts/${id}`),
+  createCustomerReceipt: (payload: any) => apiClient.post("/invoice-center/customer-receipts", payload),
+  updateCustomerReceipt: (id: number | string, payload: any) => apiClient.put(`/invoice-center/customer-receipts/${id}`, payload),
+  deleteCustomerReceipt: (id: number | string) => apiClient.delete(`/invoice-center/customer-receipts/${id}`),
+  submitCustomerReceipt: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/customer-receipts/${id}/submit`, payload),
+  approveCustomerReceipt: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/customer-receipts/${id}/approve`, payload),
+  rejectCustomerReceipt: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/customer-receipts/${id}/reject`, payload),
+  postCustomerReceipt: (id: number | string) => apiClient.post(`/invoice-center/customer-receipts/${id}/post`),
+  cancelCustomerReceipt: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/customer-receipts/${id}/cancel`, payload),
 };
 
 export default invoiceCenterApi;

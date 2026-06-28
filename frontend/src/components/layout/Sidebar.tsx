@@ -233,7 +233,7 @@ const Sidebar = () => {
       name: "Receipts",
       icon: Receipt,
       children: [
-        { name: "Customer Receipts", path: "/invoice-center/customer-receipts", permission: "invoice_center.customer_receipt.view", disabled: true },
+        { name: "Customer Receipts", path: "/invoice-center/customer-receipts", permission: "invoice_center.customer_receipt.view" },
       ],
     },
   ];

@@ -85,7 +85,9 @@ import SalesOrdersPage from "views/admin/invoice-center/SalesOrdersPage";
 import InvoicesPage from "views/admin/invoice-center/InvoicesPage";
 import CreditNotesPage from "views/admin/invoice-center/CreditNotesPage";
 import DebitNotesPage from "views/admin/invoice-center/DebitNotesPage";
-import CustomerReceiptsPage from "views/admin/invoice-center/CustomerReceiptsPage";
+import CustomerReceiptsPage from "pages/invoice-center/customer-receipts/CustomerReceiptsPage";
+import CustomerReceiptFormPage from "pages/invoice-center/customer-receipts/CustomerReceiptFormPage";
+import CustomerReceiptDetailsPage from "pages/invoice-center/customer-receipts/CustomerReceiptDetailsPage";
 
 // Compliance Center
 import ComplianceDashboard from "views/admin/compliance/ComplianceDashboard";
@@ -285,7 +287,10 @@ const routes: ERPRoute[] = [
       { name: "Invoices", path: "invoice-center/invoices", component: <InvoicesPage /> },
       { name: "Credit Notes", path: "invoice-center/credit-notes", component: <CreditNotesPage /> },
       { name: "Debit Notes", path: "invoice-center/debit-notes", component: <DebitNotesPage /> },
-      { name: "Customer Receipts", path: "invoice-center/receipts", component: <CustomerReceiptsPage /> },
+      { name: "Customer Receipts", path: "invoice-center/customer-receipts", component: <CustomerReceiptsPage /> },
+      { name: "Create Customer Receipt", path: "invoice-center/customer-receipts/create", component: <CustomerReceiptFormPage />, hide: true },
+      { name: "Edit Customer Receipt", path: "invoice-center/customer-receipts/:id/edit", component: <CustomerReceiptFormPage />, hide: true },
+      { name: "Customer Receipt Details", path: "invoice-center/customer-receipts/:id", component: <CustomerReceiptDetailsPage />, hide: true },
     ],
   },
   {

@@ -560,3 +560,111 @@ export interface PaginatedResponse<T> {
     total_pages: number;
   };
 }
+
+// ---- Customer Receipts --------------------------------------
+export type CustomerReceiptApprovalStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type CustomerReceiptPostedStatus = 'unposted' | 'posted';
+export type CustomerReceiptStatus = 'active' | 'cancelled';
+
+export type CustomerReceiptPaymentMethod =
+  | 'cash'
+  | 'bank_transfer'
+  | 'cheque'
+  | 'card'
+  | 'online'
+  | 'other';
+
+export interface CustomerReceipt {
+  id: number;
+  receipt_number: string;
+  receipt_date: string;
+  branch_id: number;
+  customer_id: number;
+  payment_method: CustomerReceiptPaymentMethod;
+  reference_number?: string | null;
+  bank_reference_number?: string | null;
+  cheque_number?: string | null;
+  cheque_date?: string | null;
+  remarks?: string | null;
+  receipt_amount: number;
+  allocated_amount: number;
+  unallocated_amount: number;
+  approval_status: CustomerReceiptApprovalStatus;
+  posted_status: CustomerReceiptPostedStatus;
+  receipt_status: CustomerReceiptStatus;
+  created_by?: number;
+  created_at?: string;
+  approved_by?: number | null;
+  approved_at?: string | null;
+  posted_by?: number | null;
+  posted_at?: string | null;
+  cancelled_by?: number | null;
+  cancelled_at?: string | null;
+  cancel_reason?: string | null;
+  allocations?: CustomerReceiptAllocation[];
+  approvals?: CustomerReceiptApproval[];
+}
+
+export interface CustomerReceiptAllocation {
+  id?: number;
+  customer_receipt_id?: number;
+  sales_invoice_id: number;
+  allocated_amount: number;
+  remarks?: string | null;
+}
+
+export interface CustomerReceiptApproval {
+  id: number;
+  customer_receipt_id: number;
+  action: string;
+  remarks?: string | null;
+  action_by: number;
+  action_at: string;
+}
+
+export interface CustomerReceiptListParams {
+  branch_id?: number;
+  customer_id?: number;
+  payment_method?: CustomerReceiptPaymentMethod;
+  approval_status?: CustomerReceiptApprovalStatus;
+  posted_status?: CustomerReceiptPostedStatus;
+  receipt_status?: CustomerReceiptStatus;
+  receipt_date_from?: string;
+  receipt_date_to?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface CreateCustomerReceiptPayload {
+  branch_id: number;
+  customer_id: number;
+  financial_year_id?: number | null;
+  accounting_period_id?: number | null;
+  receipt_date: string;
+  payment_method: CustomerReceiptPaymentMethod;
+  reference_number?: string | null;
+  bank_reference_number?: string | null;
+  cheque_number?: string | null;
+  cheque_date?: string | null;
+  remarks?: string | null;
+  receipt_amount: number;
+  allocations?: CustomerReceiptAllocationPayload[];
+}
+
+export interface UpdateCustomerReceiptPayload extends CreateCustomerReceiptPayload {}
+
+export interface CustomerReceiptAllocationPayload {
+  sales_invoice_id: number;
+  allocated_amount: number;
+  remarks?: string | null;
+}
+
+export interface CustomerReceiptImpactPreview {
+  receipt_amount: number;
+  allocated_amount: number;
+  unallocated_amount: number;
+  customer_current_balance: number;
+  customer_balance_after_receipt: number;
+  allocation_count: number;
+}
