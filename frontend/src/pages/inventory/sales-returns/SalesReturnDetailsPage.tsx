@@ -119,6 +119,19 @@ const SalesReturnDetailsPage: React.FC = () => {
     }
   };
 
+  const handleGenerateCreditNote = async () => {
+    setActionLoading(true);
+    try {
+      await inventoryApi.generateSalesReturnCreditNote(id!);
+      await fetchDetails();
+      alert("Credit note generated successfully.");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Failed to generate credit note.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (loading) return <div className="p-6">Loading details...</div>;
   if (!data) return <div className="p-6">Sales return not found.</div>;
 
@@ -146,16 +159,23 @@ const SalesReturnDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        <SalesReturnActionButtons
-          salesReturn={data}
-          isSubmitting={actionLoading}
-          onEdit={() => navigate(`/inventory/sales-returns/${data.id}/edit`)}
-          onDelete={handleDelete}
-          onSubmit={() => setIsSubmitModalOpen(true)}
-          onApprove={() => setIsApproveModalOpen(true)}
-          onReject={() => setIsRejectModalOpen(true)}
-          onPost={() => setIsPostModalOpen(true)}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          {data.posted_status === "posted" && !data.credit_note_id && (
+            <Button type="button" variant="outline" disabled={actionLoading} onClick={handleGenerateCreditNote}>
+              Generate Credit Note
+            </Button>
+          )}
+          <SalesReturnActionButtons
+            salesReturn={data}
+            isSubmitting={actionLoading}
+            onEdit={() => navigate(`/inventory/sales-returns/${data.id}/edit`)}
+            onDelete={handleDelete}
+            onSubmit={() => setIsSubmitModalOpen(true)}
+            onApprove={() => setIsApproveModalOpen(true)}
+            onReject={() => setIsRejectModalOpen(true)}
+            onPost={() => setIsPostModalOpen(true)}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

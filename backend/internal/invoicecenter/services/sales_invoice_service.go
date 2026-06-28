@@ -196,9 +196,11 @@ func (s *SalesInvoiceService) ValidateSalesInvoiceLines(db *gorm.DB, companyID u
 		} else if line.SalesOrderLineID != nil {
 			return nil, errors.New("sales order line cannot be provided without sales_order_id")
 		}
-		if _, err := s.repo.ValidateStockAvailability(db, companyID, req.WarehouseID, line.WarehouseLocationID, line.ProductID, line.ProductBatchID, line.Quantity); err != nil {
+		balance, err := s.repo.ValidateStockAvailability(db, companyID, req.WarehouseID, line.WarehouseLocationID, line.ProductID, line.ProductBatchID, line.Quantity)
+		if err != nil {
 			return nil, err
 		}
+		stockUnitCost := balance.AverageCost
 
 		lines = append(lines, models.SalesInvoiceLine{
 			SalesOrderLineID:    line.SalesOrderLineID,
@@ -210,6 +212,8 @@ func (s *SalesInvoiceService) ValidateSalesInvoiceLines(db *gorm.DB, companyID u
 			DiscountAmount:      line.DiscountAmount,
 			TaxAmount:           line.TaxAmount,
 			LineTotal:           s.CalculateSalesInvoiceLineTotals(line.Quantity, line.UnitPrice, line.DiscountAmount, line.TaxAmount),
+			StockUnitCost:       stockUnitCost,
+			StockTotalCost:      stockUnitCost * line.Quantity,
 			LineRemarks:         line.LineRemarks,
 			LineOrder:           idx + 1,
 		})
@@ -708,6 +712,7 @@ func (s *SalesInvoiceService) PostSalesInvoiceStockMovements(db *gorm.DB, compan
 			ProductID:           line.ProductID,
 			ProductBatchID:      line.ProductBatchID,
 			TransactionDate:     time.Now(),
+			SourceModule:        "INVOICE_CENTER",
 			SourceType:          "sales_invoice",
 			SourceID:            invoice.ID,
 			SourceNumber:        invoice.InvoiceNumber,

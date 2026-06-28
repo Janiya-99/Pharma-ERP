@@ -3,6 +3,10 @@ import type {
   SalesOrderListParams,
   CreateSalesOrderPayload,
   UpdateSalesOrderPayload,
+  SalesInvoiceListParams,
+  CreateSalesInvoicePayload,
+  UpdateSalesInvoicePayload,
+  WorkflowActionPayload,
 } from "../types/invoice-center";
 import type {
   DashboardSummaryReportParams,
@@ -140,26 +144,50 @@ export const invoiceCenterApi = {
     apiClient.post(`/invoice-center/sales-orders/${id}/cancel`, payload),
 
   // ---- Sales Invoices ----
-  getSalesInvoices: (params: any = {}) =>
+  getSalesInvoices: (params: SalesInvoiceListParams = {}) =>
     apiClient.get("/invoice-center/sales-invoices", { params }),
   getSalesInvoiceById: (id: number | string) =>
     apiClient.get(`/invoice-center/sales-invoices/${id}`),
-  createSalesInvoice: (payload: any) =>
+  createSalesInvoice: (payload: CreateSalesInvoicePayload) =>
     apiClient.post("/invoice-center/sales-invoices", payload),
-  updateSalesInvoice: (id: number | string, payload: any) =>
-    apiClient.put(`/invoice-center/sales-invoices/${id}`, payload),
+  updateSalesInvoice: (
+    id: number | string,
+    payload: UpdateSalesInvoicePayload
+  ) => apiClient.put(`/invoice-center/sales-invoices/${id}`, payload),
   deleteSalesInvoice: (id: number | string) =>
     apiClient.delete(`/invoice-center/sales-invoices/${id}`),
-  submitSalesInvoice: (id: number | string, payload: { remarks?: string }) =>
-    apiClient.post(`/invoice-center/sales-invoices/${id}/submit`, payload),
-  approveSalesInvoice: (id: number | string, payload: { remarks?: string }) =>
-    apiClient.post(`/invoice-center/sales-invoices/${id}/approve`, payload),
-  rejectSalesInvoice: (id: number | string, payload: { remarks?: string }) =>
-    apiClient.post(`/invoice-center/sales-invoices/${id}/reject`, payload),
+  submitSalesInvoice: (
+    id: number | string,
+    payload: WorkflowActionPayload
+  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/submit`, payload),
+  approveSalesInvoice: (
+    id: number | string,
+    payload: WorkflowActionPayload
+  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/approve`, payload),
+  rejectSalesInvoice: (
+    id: number | string,
+    payload: WorkflowActionPayload
+  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/reject`, payload),
   postSalesInvoice: (id: number | string) =>
     apiClient.post(`/invoice-center/sales-invoices/${id}/post`),
-  cancelSalesInvoice: (id: number | string, payload: { remarks?: string }) =>
-    apiClient.post(`/invoice-center/sales-invoices/${id}/cancel`, payload),
+  cancelSalesInvoice: (
+    id: number | string,
+    payload: WorkflowActionPayload
+  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/cancel`, payload),
+
+  // ---- Invoice Center-safe lookup fallbacks ----
+  getWarehouseLookups: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/lookups/warehouses", { params }),
+  getWarehouseLocationLookups: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/lookups/warehouse-locations", { params }),
+  getProductLookups: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/lookups/products", { params }),
+  getProductBatchLookups: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/lookups/product-batches", { params }),
+  getStockBalanceLookups: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/lookups/stock-availability", { params }),
+  getInvoiceStockAvailability: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/lookups/stock-availability", { params }),
 
   // ---- Credit Notes ----
   getCreditNotes: (params: any = {}) =>
@@ -251,6 +279,22 @@ export const invoiceCenterApi = {
     apiClient.post(
       `/invoice-center/finance-posting/customer-receipt/${id}/post`
     ),
+
+  // ---- Print Formats ----
+  getPrintFormats: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/print-formats", { params }),
+  getPrintFormatById: (id: number | string) =>
+    apiClient.get(`/invoice-center/print-formats/${id}`),
+  createPrintFormat: (payload: Record<string, unknown>) =>
+    apiClient.post("/invoice-center/print-formats", payload),
+  updatePrintFormat: (id: number | string, payload: Record<string, unknown>) =>
+    apiClient.put(`/invoice-center/print-formats/${id}`, payload),
+  deletePrintFormat: (id: number | string) =>
+    apiClient.delete(`/invoice-center/print-formats/${id}`),
+  setDefaultPrintFormat: (id: number | string) =>
+    apiClient.post(`/invoice-center/print-formats/${id}/set-default`),
+  getDefaultPrintFormat: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/print-formats/default", { params }),
 
   // ---- Reports ----
   getInvoiceCenterDashboardSummary: (

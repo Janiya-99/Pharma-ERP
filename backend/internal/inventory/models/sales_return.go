@@ -12,6 +12,9 @@ type SalesReturn struct {
 	CompanyID          uint64  `gorm:"not null;index:idx_company_sales_return_number,unique" json:"company_id"`
 	BranchID           uint64  `gorm:"not null;index" json:"branch_id"`
 	WarehouseID        uint64  `gorm:"not null;index" json:"warehouse_id"`
+	CustomerID         *uint64 `gorm:"index" json:"customer_id"`
+	SalesInvoiceID     *uint64 `gorm:"index" json:"sales_invoice_id"`
+	CreditNoteID       *uint64 `gorm:"index" json:"credit_note_id"`
 	FinancialYearID    *uint64 `json:"financial_year_id"`
 	AccountingPeriodID *uint64 `json:"accounting_period_id"`
 

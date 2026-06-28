@@ -341,4 +341,6 @@ export const inventoryApi = {
     apiClient.post(`/inventory/sales-returns/${id}/reject`, payload),
   postSalesReturn: (id: string | number) =>
     apiClient.post(`/inventory/sales-returns/${id}/post`),
+  generateSalesReturnCreditNote: (id: string | number) =>
+    apiClient.post(`/inventory/sales-returns/${id}/generate-credit-note`),
 };

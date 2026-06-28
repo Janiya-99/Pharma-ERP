@@ -5,6 +5,8 @@ import "time"
 type CreateSalesReturnRequest struct {
 	BranchID                 uint64                   `json:"branch_id" validate:"required"`
 	WarehouseID              uint64                   `json:"warehouse_id" validate:"required"`
+	CustomerID               *uint64                  `json:"customer_id"`
+	SalesInvoiceID           *uint64                  `json:"sales_invoice_id"`
 	FinancialYearID          *uint64                  `json:"financial_year_id"`
 	AccountingPeriodID       *uint64                  `json:"accounting_period_id"`
 	SalesReturnDate          string                   `json:"sales_return_date" validate:"required"`
@@ -21,6 +23,8 @@ type CreateSalesReturnRequest struct {
 
 type UpdateSalesReturnRequest struct {
 	SalesReturnDate          string                   `json:"sales_return_date" validate:"required"`
+	CustomerID               *uint64                  `json:"customer_id"`
+	SalesInvoiceID           *uint64                  `json:"sales_invoice_id"`
 	CustomerName             string                   `json:"customer_name"`
 	CustomerContactNumber    string                   `json:"customer_contact_number"`
 	SalesInvoiceNumber       string                   `json:"sales_invoice_number"`
@@ -34,6 +38,7 @@ type UpdateSalesReturnRequest struct {
 
 type SalesReturnLineRequest struct {
 	WarehouseLocationID *uint64 `json:"warehouse_location_id"`
+	SalesInvoiceLineID  *uint64 `json:"sales_invoice_line_id"`
 	ProductID           uint64  `json:"product_id" validate:"required"`
 	ProductBatchID      *uint64 `json:"product_batch_id"`
 	ReturnQuantity      float64 `json:"return_quantity" validate:"required,gt=0"`

@@ -271,5 +271,6 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 		salesReturns.POST("/:id/approve", middleware.RequirePermission("inventory.sales_return.approve"), salesReturnHandler.ApproveSalesReturn)
 		salesReturns.POST("/:id/reject", middleware.RequirePermission("inventory.sales_return.reject"), salesReturnHandler.RejectSalesReturn)
 		salesReturns.POST("/:id/post", middleware.RequirePermission("inventory.sales_return.post"), salesReturnHandler.PostSalesReturn)
+		salesReturns.POST("/:id/generate-credit-note", middleware.RequirePermission("inventory.sales_return.post"), salesReturnHandler.GenerateCreditNote)
 	}
 }

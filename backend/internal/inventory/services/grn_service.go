@@ -506,6 +506,7 @@ func (s *grnService) PostGRN(db *gorm.DB, companyID, id, userID uint64) error {
 				ProductID:           line.ProductID,
 				ProductBatchID:      resolvedBatchID,
 				TransactionDate:     grn.GRNDate,
+				SourceModule:        "INVENTORY",
 				SourceType:          "grn",
 				SourceID:            grn.ID,
 				SourceNumber:        grn.GRNNumber,

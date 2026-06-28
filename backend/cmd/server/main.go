@@ -120,6 +120,7 @@ func main() {
 		grnCtrl,
 		authService,
 		cfg,
+		platformDB,
 		logger,
 	)
 

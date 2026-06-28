@@ -208,3 +208,62 @@ export interface PurchaseReturn {
   posted_by_user?: { name: string };
   posted_at?: string;
 }
+
+export interface SalesReturnLine {
+  id?: string | number;
+  sales_return_id?: number;
+  sales_invoice_line_id?: number | string | null;
+  product_id: number | null;
+  product?: Product | null;
+  product_batch_id?: number | null;
+  product_batch?: ProductBatch | null;
+  warehouse_location_id?: number | string | null;
+  warehouse_location?: WarehouseLocation | null;
+  return_quantity: number | string;
+  unit_price: number | string;
+  discount_amount?: number | string;
+  tax_amount?: number | string;
+  line_total?: number;
+  stock_unit_cost?: number | string;
+  stock_total_cost?: number | string;
+  return_reason?: string;
+  return_condition?: string;
+  line_remarks?: string;
+}
+
+export interface SalesReturn {
+  id: number;
+  sales_return_number: string;
+  sales_return_date: string;
+  company_id: number;
+  branch_id: number;
+  warehouse_id: number;
+  warehouse?: Warehouse;
+  customer_id?: number | null;
+  sales_invoice_id?: number | null;
+  credit_note_id?: number | null;
+  customer_name?: string;
+  customer_contact_number?: string;
+  sales_invoice_number?: string;
+  customer_credit_note_number?: string;
+  reference_number?: string;
+  return_reason: string;
+  return_condition: string;
+  remarks?: string;
+  total_quantity: number;
+  subtotal_amount: number;
+  discount_amount: number;
+  tax_amount: number;
+  total_amount: number;
+  approval_status: string;
+  posted_status: string;
+  status?: string;
+  lines?: SalesReturnLine[];
+  approvals?: Array<{ id: number; action: string; remarks?: string; action_by: number; action_at: string }>;
+  created_by?: number;
+  created_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+  posted_by?: number;
+  posted_at?: string;
+}

@@ -84,6 +84,28 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"Finance Posting", "invoice_center.finance_settings.update", "Update Finance Settings"},
 		{"Finance Posting", "invoice_center.finance_posting.view", "View Finance Postings"},
 		{"Finance Posting", "invoice_center.finance_posting.post", "Post to Finance"},
+
+		{"Inventory Lookups", "invoice_center.lookup.inventory.view", "View Inventory Lookups"},
+
+		{"Print Formats", "invoice_center.print_format.view", "View Print Formats"},
+		{"Print Formats", "invoice_center.print_format.create", "Create Print Formats"},
+		{"Print Formats", "invoice_center.print_format.update", "Update Print Formats"},
+		{"Print Formats", "invoice_center.print_format.delete", "Delete Print Formats"},
+		{"Print Formats", "invoice_center.print_format.set_default", "Set Default Print Format"},
+
+		{"Reports", "invoice_center.report.customer_balance", "View Customer Balance Report"},
+		{"Reports", "invoice_center.report.customer_statement", "View Customer Statement Report"},
+		{"Reports", "invoice_center.report.customer_aging", "View Customer Aging Report"},
+		{"Reports", "invoice_center.report.sales_order_register", "View Sales Order Register"},
+		{"Reports", "invoice_center.report.sales_invoice_register", "View Sales Invoice Register"},
+		{"Reports", "invoice_center.report.credit_note_register", "View Credit Note Register"},
+		{"Reports", "invoice_center.report.debit_note_register", "View Debit Note Register"},
+		{"Reports", "invoice_center.report.customer_receipt_register", "View Customer Receipt Register"},
+		{"Reports", "invoice_center.report.outstanding_invoices", "View Outstanding Invoices"},
+		{"Reports", "invoice_center.report.sales_by_customer", "View Sales by Customer"},
+		{"Reports", "invoice_center.report.sales_by_product", "View Sales by Product"},
+		{"Reports", "invoice_center.report.collection_summary", "View Collection Summary"},
+		{"Reports", "invoice_center.report.finance_posting_status", "View Finance Posting Status"},
 	}
 
 	for _, p := range permissions {

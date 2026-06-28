@@ -56,6 +56,8 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	financeSettingRepo := repositories.NewInvoiceCenterFinanceSettingRepository()
 	financePostingRepo := repositories.NewInvoiceCenterFinancePostingRepository()
 	reportRepo := repositories.NewInvoiceCenterReportRepository()
+	lookupRepo := repositories.NewInventoryLookupRepository()
+	printFormatRepo := repositories.NewPrintFormatRepository()
 
 	// Initialize services
 	dashboardSvc := services.NewInvoiceDashboardService(dashboardRepo, logger)
@@ -81,6 +83,8 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		logger,
 	)
 	reportSvc := services.NewInvoiceCenterReportService(reportRepo)
+	lookupSvc := services.NewInventoryLookupService(lookupRepo)
+	printFormatSvc := services.NewPrintFormatService(printFormatRepo)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -96,6 +100,8 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	financeSettingHdl := handlers.NewInvoiceCenterFinanceSettingHandler(financeSettingSvc)
 	financePostingHdl := handlers.NewInvoiceCenterFinancePostingHandler(financePostingSvc)
 	reportHdl := handlers.NewInvoiceCenterReportHandler(reportSvc)
+	lookupHdl := handlers.NewInventoryLookupHandler(lookupSvc)
+	printFormatHdl := handlers.NewPrintFormatHandler(printFormatSvc)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -229,6 +235,28 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		financePosting.POST("/credit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostCreditNoteToFinance)
 		financePosting.POST("/debit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostDebitNoteToFinance)
 		financePosting.POST("/customer-receipt/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostCustomerReceiptToFinance)
+	}
+
+	// Invoice Center-safe Inventory Lookups
+	lookups := r.Group("/lookups")
+	{
+		lookups.GET("/products", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.Products)
+		lookups.GET("/product-batches", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.ProductBatches)
+		lookups.GET("/stock-availability", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.StockAvailability)
+		lookups.GET("/warehouses", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.Warehouses)
+		lookups.GET("/warehouse-locations", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.WarehouseLocations)
+	}
+
+	// Print Format Designer Routes
+	printFormats := r.Group("/print-formats")
+	{
+		printFormats.GET("", middleware.RequirePermission("invoice_center.print_format.view"), printFormatHdl.List)
+		printFormats.GET("/default", middleware.RequirePermission("invoice_center.print_format.view"), printFormatHdl.Default)
+		printFormats.GET("/:id", middleware.RequirePermission("invoice_center.print_format.view"), printFormatHdl.Get)
+		printFormats.POST("", middleware.RequirePermission("invoice_center.print_format.create"), printFormatHdl.Create)
+		printFormats.PUT("/:id", middleware.RequirePermission("invoice_center.print_format.update"), printFormatHdl.Update)
+		printFormats.DELETE("/:id", middleware.RequirePermission("invoice_center.print_format.delete"), printFormatHdl.Delete)
+		printFormats.POST("/:id/set-default", middleware.RequirePermission("invoice_center.print_format.set_default"), printFormatHdl.SetDefault)
 	}
 
 	// Reports Routes

@@ -15,8 +15,10 @@ import (
 	inventoryModule "github.com/pixandco/erp-phrma/internal/inventory"
 	invoiceCenterRoutes "github.com/pixandco/erp-phrma/internal/invoicecenter/routes"
 	"github.com/pixandco/erp-phrma/internal/middleware"
+	platformAdmin "github.com/pixandco/erp-phrma/internal/platform/admin"
 	"github.com/pixandco/erp-phrma/internal/service"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // Setup configures the Gin engine with middlewares and routes.
@@ -37,6 +39,7 @@ func Setup(
 	grnCtrl *controller.GRNController,
 	authService *service.AuthService,
 	cfg *config.Config,
+	platformDB *gorm.DB,
 	logger *zap.Logger,
 ) *gin.Engine {
 	r := gin.Default()
@@ -65,6 +68,10 @@ func Setup(
 	// API Version 1 group
 	v1 := r.Group("/api/v1")
 	{
+		// Platform Admin routes
+		platformAdminGrp := v1.Group("/platform-admin")
+		platformAdmin.SetupRoutes(platformAdminGrp, platformDB, logger)
+
 		// Health check — returns service name from config
 		v1.GET("/health", func(c *gin.Context) {
 			c.JSON(200, gin.H{

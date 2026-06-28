@@ -412,3 +412,40 @@ func (h *SalesReturnHandler) PostSalesReturn(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Sales return posted successfully"})
 }
+
+func (h *SalesReturnHandler) GenerateCreditNote(c *gin.Context) {
+	companyIDRaw, exists := c.Get("company_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Company context missing"})
+		return
+	}
+	companyID := companyIDRaw.(uint64)
+
+	userIDRaw, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "User context missing"})
+		return
+	}
+	userID := userIDRaw.(uint64)
+
+	companyDB, exists := c.Get("companyDB")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database connection missing"})
+		return
+	}
+	db := companyDB.(*gorm.DB)
+
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID format"})
+		return
+	}
+
+	creditNote, err := h.svc.GenerateCreditNote(db, companyID, userID, id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Failed to generate credit note", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Credit note generated successfully", "data": creditNote})
+}

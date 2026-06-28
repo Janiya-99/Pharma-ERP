@@ -19,6 +19,33 @@ func RunPlatformMigrations(db *gorm.DB, logger *zap.Logger) error {
 		&models.PlatformCompany{},
 		&models.SoftwareCatalog{},
 		&models.CompanySoftwareSubscription{},
+		&models.PlatformAdminUser{},
+		&models.PlatformRole{},
+		&models.PlatformPermission{},
+		&models.PlatformUserRole{},
+		&models.PlatformAuditLog{},
+		&models.PlatformLoginLog{},
+		&models.TenantCompany{},
+		&models.TenantCompanyDatabase{},
+		&models.TenantCompanyContact{},
+		&models.TenantCompanyBillingProfile{},
+		&models.TenantCompanyFirstUser{},
+		&models.TenantCompanySubscription{},
+		&models.TenantCompanyModule{},
+		&models.SubscriptionPlan{},
+		&models.SubscriptionPlanModule{},
+		&models.SubscriptionInvoice{},
+		&models.SubscriptionPayment{},
+		&models.ErpModule{},
+		&models.ErpFeature{},
+		&models.ErpVersion{},
+		&models.FeatureFlag{},
+		&models.SystemEmailSetting{},
+		&models.SystemPaymentGatewaySetting{},
+		&models.SystemBrandingSetting{},
+		&models.SystemBackupSetting{},
+		&models.SupportTicket{},
+		&models.SupportTicketMessage{},
 	)
 	if err != nil {
 		logger.Error("Platform AutoMigrate failed", zap.Error(err))
@@ -36,6 +63,11 @@ func RunPlatformMigrations(db *gorm.DB, logger *zap.Logger) error {
 
 	if err := seeders.SeedPlatformCompanies(db, logger); err != nil {
 		logger.Error("Platform company seeder failed", zap.Error(err))
+		return err
+	}
+
+	if err := seeders.SeedPlatformAdminData(db, logger); err != nil {
+		logger.Error("Platform admin data seeder failed", zap.Error(err))
 		return err
 	}
 

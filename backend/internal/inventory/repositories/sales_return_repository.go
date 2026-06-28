@@ -19,6 +19,7 @@ type SalesReturnRepository interface {
 	CreateSalesReturnApprovalRecord(db *gorm.DB, approval *models.SalesReturnApproval) error
 	GetLastSalesReturnNumber(db *gorm.DB, companyID uint64, yearMonthPrefix string) (string, error)
 	CheckSalesReturnLedgerExists(db *gorm.DB, companyID, returnID uint64) (bool, error)
+	LinkCreditNote(db *gorm.DB, companyID, returnID, creditNoteID uint64) error
 }
 
 type salesReturnRepository struct{}
@@ -167,4 +168,10 @@ func (r *salesReturnRepository) CheckSalesReturnLedgerExists(db *gorm.DB, compan
 		Where("company_id = ? AND source_type = ? AND source_id = ?", companyID, "sales_return", returnID).
 		Count(&count).Error
 	return count > 0, err
+}
+
+func (r *salesReturnRepository) LinkCreditNote(db *gorm.DB, companyID, returnID, creditNoteID uint64) error {
+	return db.Model(&models.SalesReturn{}).
+		Where("company_id = ? AND id = ?", companyID, returnID).
+		Update("credit_note_id", creditNoteID).Error
 }

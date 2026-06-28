@@ -57,6 +57,7 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
 
   const handleProductChange = (index: number, val: string) => {
     setValue(`lines.${index}.product_id`, val, { shouldValidate: true });
+    setValue(`lines.${index}.product_batch_id`, "", { shouldValidate: true });
   };
 
   const handleBatchChange = (index: number, val: string) => {
@@ -148,6 +149,12 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
                     <SalesInvoiceLineBatchSelect
                       value={watch(`lines.${index}.product_batch_id`)}
                       onChange={(val) => handleBatchChange(index, val)}
+                      productId={watch(`lines.${index}.product_id`)}
+                      onBatchSelected={(batch) => {
+                        if (batch.selling_price) {
+                          setValue(`lines.${index}.unit_price`, Number(batch.selling_price), { shouldValidate: true });
+                        }
+                      }}
                     />
                   </TableCell>
                   <TableCell>

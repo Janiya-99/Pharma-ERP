@@ -8,6 +8,7 @@ type SalesReturnLine struct {
 	ID uint64 `gorm:"primaryKey;autoIncrement" json:"id"`
 
 	SalesReturnID       uint64  `gorm:"not null;index" json:"sales_return_id"`
+	SalesInvoiceLineID  *uint64 `gorm:"index" json:"sales_invoice_line_id"`
 	WarehouseLocationID *uint64 `json:"warehouse_location_id"`
 	ProductID           uint64  `gorm:"not null;index" json:"product_id"`
 	ProductBatchID      *uint64 `json:"product_batch_id"`
@@ -19,7 +20,8 @@ type SalesReturnLine struct {
 	TaxAmount      float64 `gorm:"type:decimal(18,2);default:0" json:"tax_amount"`
 	LineTotal      float64 `gorm:"type:decimal(18,2);default:0" json:"line_total"`
 
-	StockUnitCost float64 `gorm:"type:decimal(18,2);default:0" json:"stock_unit_cost"`
+	StockUnitCost  float64 `gorm:"type:decimal(18,2);default:0" json:"stock_unit_cost"`
+	StockTotalCost float64 `gorm:"type:decimal(18,2);default:0" json:"stock_total_cost"`
 
 	ReturnReason    string `gorm:"type:varchar(100)" json:"return_reason"`
 	ReturnCondition string `gorm:"type:varchar(50)" json:"return_condition"`

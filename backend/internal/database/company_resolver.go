@@ -44,12 +44,8 @@ func (r *CompanyResolver) FindActiveCompanies() ([]models.PlatformCompany, error
 func (r *CompanyResolver) ResolveCompanyDB(companyCode string) (*gorm.DB, *models.PlatformCompany, error) {
 	var company models.PlatformCompany
 
-	// 1. Find platform company by company_code and ensure valid status
-	err := r.platformDB.Where(
-		"company_code = ? AND status = ? AND subscription_status = ?",
-		companyCode, "active", "active",
-	).First(&company).Error
-
+	// 1. Find platform company by company_code first
+	err := r.platformDB.Where("company_code = ?", companyCode).First(&company).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil, errors.New("invalid company or inactive subscription")
@@ -57,7 +53,21 @@ func (r *CompanyResolver) ResolveCompanyDB(companyCode string) (*gorm.DB, *model
 		return nil, nil, err
 	}
 
-	// 2. Get or create the company DB connection
+	// 2. Validate company status to show explicit messages
+	if company.Status == "suspended" {
+		return nil, nil, errors.New("Company account is suspended. Please contact support.")
+	}
+	if company.Status == "expired" || company.SubscriptionStatus == "expired" {
+		return nil, nil, errors.New("Company license has expired. Please contact billing.")
+	}
+	if company.Status == "cancelled" || company.SubscriptionStatus == "cancelled" {
+		return nil, nil, errors.New("Company account is inactive. Please contact support.")
+	}
+	if company.Status != "active" || company.SubscriptionStatus != "active" {
+		return nil, nil, errors.New("Company subscription is not active.")
+	}
+
+	// 3. Get or create the company DB connection
 	db, err := r.GetOrCreateCompanyDBConnection(company)
 	if err != nil {
 		return nil, nil, err

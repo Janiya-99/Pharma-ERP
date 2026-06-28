@@ -7,7 +7,7 @@ import {
   FileCheck, Settings, BookOpen,
   Package, ChevronRight, Pin, PinOff, LogOut, User,
   Landmark, BarChart3, Building2, Warehouse, ClipboardList,
-  RotateCcw, Repeat, Users, FileText, CreditCard, Receipt
+  RotateCcw, Repeat, Users, FileText, Receipt, Printer
 } from "lucide-react";
 import { MdLocalPharmacy } from "react-icons/md";
 import {
@@ -206,11 +206,11 @@ const Sidebar = () => {
   const invoiceCenterMenus: MenuItem[] = [
     { name: "Invoice Center Dashboard", path: "/invoice-center/dashboard", icon: LayoutDashboard, permission: "invoice_center.dashboard.view" },
     {
-      name: "Customer Management",
+      name: "Customers",
       icon: Users,
       children: [
-        { name: "Customer Categories", path: "/invoice-center/customer-categories", permission: "invoice_center.customer_category.view" },
         { name: "Customers", path: "/invoice-center/customers", permission: "invoice_center.customer.view" },
+        { name: "Customer Categories", path: "/invoice-center/customer-categories", permission: "invoice_center.customer_category.view" },
       ],
     },
     {
@@ -218,13 +218,15 @@ const Sidebar = () => {
       icon: FileText,
       children: [
         { name: "Sales Orders", path: "/invoice-center/sales-orders", permission: "invoice_center.sales_order.view" },
+        { name: "Proforma Invoices", path: "/invoice-center/proforma-invoices", permission: "invoice_center.sales_invoice.view", disabled: true },
         { name: "Sales Invoices", path: "/invoice-center/sales-invoices", permission: "invoice_center.sales_invoice.view" },
       ],
     },
     {
-      name: "Adjustments",
-      icon: CreditCard,
+      name: "Returns",
+      icon: RotateCcw,
       children: [
+        { name: "Sales Returns", path: "/inventory/returns/sales-returns", permission: "inventory.sales_return.view" },
         { name: "Credit Notes", path: "/invoice-center/credit-notes", permission: "invoice_center.credit_note.view" },
         { name: "Debit Notes", path: "/invoice-center/debit-notes", permission: "invoice_center.debit_note.view" },
       ],
@@ -234,6 +236,15 @@ const Sidebar = () => {
       icon: Receipt,
       children: [
         { name: "Customer Receipts", path: "/invoice-center/customer-receipts", permission: "invoice_center.customer_receipt.view" },
+      ],
+    },
+    {
+      name: "Approvals",
+      icon: FileCheck,
+      children: [
+        { name: "Approval Inbox", path: "/invoice-center/approvals/inbox", disabled: true },
+        { name: "My Submitted Documents", path: "/invoice-center/approvals/submitted", disabled: true },
+        { name: "Approval History", path: "/invoice-center/approvals/history", disabled: true },
       ],
     },
     {
@@ -248,20 +259,27 @@ const Sidebar = () => {
       name: "Reports",
       icon: BarChart3,
       children: [
-        { name: "Reports Dashboard", path: "/invoice-center/reports/dashboard", permission: "invoice_center.reports.view" },
-        { name: "Customer Balance", path: "/invoice-center/reports/customer-balance", permission: "invoice_center.reports.view" },
-        { name: "Customer Statement", path: "/invoice-center/reports/customer-statement", permission: "invoice_center.reports.view" },
-        { name: "Customer Aging", path: "/invoice-center/reports/customer-aging", permission: "invoice_center.reports.view" },
-        { name: "Sales Order Register", path: "/invoice-center/reports/sales-order-register", permission: "invoice_center.reports.view" },
-        { name: "Sales Invoice Register", path: "/invoice-center/reports/sales-invoice-register", permission: "invoice_center.reports.view" },
-        { name: "Credit Note Register", path: "/invoice-center/reports/credit-note-register", permission: "invoice_center.reports.view" },
-        { name: "Debit Note Register", path: "/invoice-center/reports/debit-note-register", permission: "invoice_center.reports.view" },
-        { name: "Receipt Register", path: "/invoice-center/reports/customer-receipt-register", permission: "invoice_center.reports.view" },
-        { name: "Outstanding Invoices", path: "/invoice-center/reports/outstanding-invoices", permission: "invoice_center.reports.view" },
-        { name: "Sales by Customer", path: "/invoice-center/reports/sales-by-customer", permission: "invoice_center.reports.view" },
-        { name: "Sales by Product", path: "/invoice-center/reports/sales-by-product", permission: "invoice_center.reports.view" },
-        { name: "Collection Summary", path: "/invoice-center/reports/collection-summary", permission: "invoice_center.reports.view" },
-        { name: "Finance Posting Status", path: "/invoice-center/reports/finance-posting-status", permission: "invoice_center.reports.view" },
+        { name: "Reports Dashboard", path: "/invoice-center/reports/dashboard", permission: "invoice_center.dashboard.view" },
+        { name: "Customer Balance", path: "/invoice-center/reports/customer-balance", permission: "invoice_center.report.customer_balance" },
+        { name: "Customer Statement", path: "/invoice-center/reports/customer-statement", permission: "invoice_center.report.customer_statement" },
+        { name: "Customer Aging", path: "/invoice-center/reports/customer-aging", permission: "invoice_center.report.customer_aging" },
+        { name: "Sales Order Register", path: "/invoice-center/reports/sales-order-register", permission: "invoice_center.report.sales_order_register" },
+        { name: "Sales Invoice Register", path: "/invoice-center/reports/sales-invoice-register", permission: "invoice_center.report.sales_invoice_register" },
+        { name: "Credit Note Register", path: "/invoice-center/reports/credit-note-register", permission: "invoice_center.report.credit_note_register" },
+        { name: "Debit Note Register", path: "/invoice-center/reports/debit-note-register", permission: "invoice_center.report.debit_note_register" },
+        { name: "Customer Receipt Register", path: "/invoice-center/reports/customer-receipt-register", permission: "invoice_center.report.customer_receipt_register" },
+        { name: "Outstanding Invoices", path: "/invoice-center/reports/outstanding-invoices", permission: "invoice_center.report.outstanding_invoices" },
+        { name: "Sales by Customer", path: "/invoice-center/reports/sales-by-customer", permission: "invoice_center.report.sales_by_customer" },
+        { name: "Sales by Product", path: "/invoice-center/reports/sales-by-product", permission: "invoice_center.report.sales_by_product" },
+        { name: "Collection Summary", path: "/invoice-center/reports/collection-summary", permission: "invoice_center.report.collection_summary" },
+        { name: "Finance Posting Status", path: "/invoice-center/reports/finance-posting-status", permission: "invoice_center.report.finance_posting_status" },
+      ],
+    },
+    {
+      name: "Settings",
+      icon: Printer,
+      children: [
+        { name: "Print Format Designer", path: "/invoice-center/settings/print-formats", permission: "invoice_center.print_format.view" },
       ],
     },
   ];

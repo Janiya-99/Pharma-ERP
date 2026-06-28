@@ -51,12 +51,81 @@ export interface ProductLookup {
 // ---- Product Batch Lookup -----------------------------------
 export interface ProductBatchLookup {
   id: number;
+  product_batch_id?: number;
   product_id?: number;
   batch_number: string;
+  manufacturing_date?: string;
   expiry_date?: string;
   batch_status?: string;
   mrp?: number;
   selling_price?: number;
+  stock_unit_cost?: number;
+}
+
+export interface InvoiceInventoryProductLookup {
+  product_id: number;
+  product_code: string;
+  product_name: string;
+  base_unit: string;
+  batch_tracking: boolean;
+  expiry_tracking: boolean;
+  selling_price: number;
+  mrp: number;
+  status: string;
+}
+
+export interface InvoiceStockAvailabilityLookup {
+  product_id: number;
+  product_batch_id?: number | null;
+  warehouse_id: number;
+  warehouse_location_id?: number | null;
+  available_quantity: number;
+  reserved_quantity: number;
+  blocked_quantity: number;
+  expiry_date?: string | null;
+  batch_status?: string;
+  stock_unit_cost: number;
+  selling_price: number;
+  mrp: number;
+}
+
+export interface InvoicePrintFormatField {
+  id?: number;
+  print_format_id?: number;
+  field_key: string;
+  field_label: string;
+  is_visible: boolean;
+  display_order: number;
+  column_width: number;
+  alignment: "left" | "center" | "right";
+}
+
+export interface InvoicePrintFormat {
+  id?: number;
+  branch_id?: number | null;
+  format_name: string;
+  document_type: string;
+  paper_size: string;
+  orientation: "portrait" | "landscape";
+  logo_position: string;
+  header_layout: string;
+  footer_layout: string;
+  primary_color: string;
+  font_family: string;
+  show_company_logo: boolean;
+  show_company_name: boolean;
+  show_branch_details: boolean;
+  show_customer_details: boolean;
+  show_document_status: boolean;
+  show_payment_terms: boolean;
+  show_bank_details: boolean;
+  show_signature_section: boolean;
+  show_qr_code: boolean;
+  terms_and_conditions?: string;
+  footer_note?: string;
+  is_default: boolean;
+  is_active: boolean;
+  fields: InvoicePrintFormatField[];
 }
 
 // ---- Sales Order Line (for form) ----------------------------
@@ -255,15 +324,23 @@ export interface SalesInvoice {
   payment_status: SalesInvoicePaymentStatus;
   created_by?: number;
   created_at?: string;
+  updated_at?: string;
+  customer_code?: string;
+  customer_name?: string;
   lines?: SalesInvoiceLine[];
   approvals?: SalesInvoiceApproval[];
 
   // Relations mapped
-  branch?: { id: number; branch_name: string };
+  branch?: { id: number; branch_code?: string; branch_name: string };
   customer?: Customer;
   sales_order?: {
+    id?: number;
     sales_order_number: string;
     sales_order_date: string;
+    expected_delivery_date?: string | null;
+    customer_reference_number?: string | null;
+    total_amount?: number;
+    pending_amount?: number;
     order_status: string;
     approval_status: string;
   };

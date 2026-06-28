@@ -13,6 +13,7 @@ type StockLedgerEntry struct {
 	ProductID           uint64    `gorm:"not null;index" json:"product_id"`
 	ProductBatchID      *uint64   `gorm:"index" json:"product_batch_id"`
 	TransactionDate     time.Time `gorm:"not null;index" json:"transaction_date"`
+	SourceModule        string    `gorm:"type:varchar(80);index" json:"source_module"`
 	SourceType          string    `gorm:"type:varchar(80);not null" json:"source_type"`
 	SourceID            *uint64   `json:"source_id"`
 	SourceNumber        string    `gorm:"type:varchar(100)" json:"source_number"`

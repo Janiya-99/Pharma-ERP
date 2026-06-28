@@ -10,6 +10,7 @@ type StockInPayload struct {
 	ProductID           uint64    `json:"product_id" validate:"required"`
 	ProductBatchID      *uint64   `json:"product_batch_id"`
 	TransactionDate     time.Time `json:"transaction_date" validate:"required"`
+	SourceModule        string    `json:"source_module"`
 	SourceType          string    `json:"source_type" validate:"required"`
 	SourceID            uint64    `json:"source_id" validate:"required"`
 	SourceNumber        string    `json:"source_number" validate:"required"`
@@ -31,6 +32,7 @@ type StockOutPayload struct {
 	ProductID           uint64    `json:"product_id" validate:"required"`
 	ProductBatchID      *uint64   `json:"product_batch_id"`
 	TransactionDate     time.Time `json:"transaction_date" validate:"required"`
+	SourceModule        string    `json:"source_module"`
 	SourceType          string    `json:"source_type" validate:"required"`
 	SourceID            uint64    `json:"source_id" validate:"required"`
 	SourceNumber        string    `json:"source_number" validate:"required"`

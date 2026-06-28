@@ -2,6 +2,33 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import LoginPage from "../pages/auth/LoginPage";
+
+// Platform Admin imports
+import { PlatformAuthProvider, usePlatformAuth } from "../auth/PlatformAuthContext";
+import PlatformAdminLayout from "../components/layout/PlatformAdminLayout";
+import PlatformAdminLoginPage from "../pages/platform-admin/PlatformAdminLoginPage";
+import PlatformAdminDashboardPage from "../pages/platform-admin/PlatformAdminDashboardPage";
+import { CompaniesPage, CompanyDetailsPage, CompanyEditPage, CompanyDatabasePage } from "../pages/platform-admin/CompaniesPages";
+import CompanyCreatePage from "../pages/platform-admin/CompanyCreatePage";
+import {
+  SubscriptionPlansPage,
+  SubscriptionPlanFormPage,
+  CompanyLicensesPage,
+  SubscriptionInvoicesPage,
+  SubscriptionPaymentsPage,
+  OutstandingBalancesPage,
+} from "../pages/platform-admin/SubscriptionsBillingPages";
+import { ERPModulesPage, ERPFeaturesPage, ERPVersionsPage, FeatureFlagsPage } from "../pages/platform-admin/SoftwareModulesPages";
+import { PlatformUsersPage, PlatformRolesPage, PlatformPermissionsPage } from "../pages/platform-admin/PlatformUsersPages";
+import {
+  SoftwareCompanyProfilePage,
+  BrandingSettingsPage,
+  EmailSettingsPage,
+  PaymentGatewaySettingsPage,
+  BackupSettingsPage,
+} from "../pages/platform-admin/GlobalSettingsPages";
+import SupportTicketsPage from "../pages/platform-admin/SupportTicketsPage";
+import { PlatformLoginLogsPage, PlatformAuditLogsPage } from "../pages/platform-admin/PlatformLogsPages";
 import ControlCenterDashboardPage from "../pages/control-center/dashboard/ControlCenterDashboardPage";
 import PlaceholderPage from "../pages/control-center/PlaceholderPage";
 
@@ -126,6 +153,26 @@ import { SalesByCustomerReportPage } from "../pages/invoice-center/reports/Sales
 import { SalesByProductReportPage } from "../pages/invoice-center/reports/SalesByProductReportPage";
 import { CollectionSummaryReportPage } from "../pages/invoice-center/reports/CollectionSummaryReportPage";
 import { FinancePostingStatusReportPage } from "../pages/invoice-center/reports/FinancePostingStatusReportPage";
+import PrintFormatListPage from "../pages/invoice-center/print-formats/PrintFormatListPage";
+import PrintFormatFormPage from "../pages/invoice-center/print-formats/PrintFormatFormPage";
+import PrintFormatPreviewPage from "../pages/invoice-center/print-formats/PrintFormatPreviewPage";
+import DocumentPrintPage from "../pages/invoice-center/print-formats/DocumentPrintPage";
+
+const PlatformProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = usePlatformAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white space-y-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+        <span className="text-sm font-semibold tracking-wider uppercase text-slate-550">Verifying Authority...</span>
+      </div>
+    );
+  }
+  if (!isAuthenticated) {
+    return <Navigate to="/platform-admin/login" replace />;
+  }
+  return <>{children}</>;
+};
 
 const AppRoutes = () => {
   return (
@@ -315,6 +362,11 @@ const AppRoutes = () => {
           <Route path="/invoice-center/customer-receipts/:id" element={<CustomerReceiptDetailsPage />} />
           <Route path="/invoice-center/customer-receipts/:id/edit" element={<CustomerReceiptFormPage />} />
 
+          <Route path="/invoice-center/settings/print-formats" element={<PrintFormatListPage />} />
+          <Route path="/invoice-center/settings/print-formats/create" element={<PrintFormatFormPage />} />
+          <Route path="/invoice-center/settings/print-formats/:id/edit" element={<PrintFormatFormPage />} />
+          <Route path="/invoice-center/settings/print-formats/:id/preview" element={<PrintFormatPreviewPage />} />
+
           {/* Invoice Center Reports */}
           <Route path="/invoice-center/reports" element={<InvoiceCenterReportsDashboardPage />} />
           <Route path="/invoice-center/reports/dashboard" element={<InvoiceCenterReportsDashboardPage />} />
@@ -334,7 +386,66 @@ const AppRoutes = () => {
 
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>
+        <Route path="/invoice-center/sales-orders/:id/print" element={<DocumentPrintPage documentType="sales_order" />} />
+        <Route path="/invoice-center/proforma-invoices/:id/print" element={<DocumentPrintPage documentType="proforma_invoice" />} />
+        <Route path="/invoice-center/sales-invoices/:id/print" element={<DocumentPrintPage documentType="sales_invoice" />} />
+        <Route path="/invoice-center/credit-notes/:id/print" element={<DocumentPrintPage documentType="credit_note" />} />
+        <Route path="/invoice-center/debit-notes/:id/print" element={<DocumentPrintPage documentType="debit_note" />} />
+        <Route path="/invoice-center/customer-receipts/:id/print" element={<DocumentPrintPage documentType="customer_receipt" />} />
       </Route>
+
+      {/* Platform Admin Portal Routes */}
+      <Route
+        path="/platform-admin/*"
+        element={
+          <PlatformAuthProvider>
+            <Routes>
+              <Route path="login" element={<PlatformAdminLoginPage />} />
+              <Route
+                path=""
+                element={
+                  <PlatformProtectedRoute>
+                    <PlatformAdminLayout />
+                  </PlatformProtectedRoute>
+                }
+              >
+                <Route path="dashboard" element={<PlatformAdminDashboardPage />} />
+                <Route path="companies" element={<CompaniesPage />} />
+                <Route path="companies/create" element={<CompanyCreatePage />} />
+                <Route path="companies/:id" element={<CompanyDetailsPage />} />
+                <Route path="companies/:id/edit" element={<CompanyEditPage />} />
+                <Route path="company-databases" element={<CompanyDatabasePage />} />
+                
+                <Route path="subscriptions/plans" element={<SubscriptionPlansPage />} />
+                <Route path="subscriptions/plans/create" element={<SubscriptionPlanFormPage />} />
+                <Route path="subscriptions/licenses" element={<CompanyLicensesPage />} />
+                
+                <Route path="billing/invoices" element={<SubscriptionInvoicesPage />} />
+                <Route path="billing/payments" element={<SubscriptionPaymentsPage />} />
+                <Route path="billing/outstanding" element={<OutstandingBalancesPage />} />
+
+                <Route path="modules" element={<ERPModulesPage />} />
+                <Route path="features" element={<ERPFeaturesPage />} />
+                <Route path="versions" element={<ERPVersionsPage />} />
+
+                <Route path="users" element={<PlatformUsersPage />} />
+                <Route path="roles" element={<PlatformRolesPage />} />
+                <Route path="permissions" element={<PlatformPermissionsPage />} />
+
+                <Route path="settings/company-profile" element={<SoftwareCompanyProfilePage />} />
+                <Route path="settings/branding" element={<BrandingSettingsPage />} />
+                <Route path="settings/email" element={<EmailSettingsPage />} />
+                <Route path="settings/payment-gateway" element={<PaymentGatewaySettingsPage />} />
+                <Route path="settings/backups" element={<BackupSettingsPage />} />
+
+                <Route path="support/tickets" element={<SupportTicketsPage />} />
+                <Route path="login-logs" element={<PlatformLoginLogsPage />} />
+                <Route path="audit-logs" element={<PlatformAuditLogsPage />} />
+              </Route>
+            </Routes>
+          </PlatformAuthProvider>
+        }
+      />
     </Routes>
   );
 };
