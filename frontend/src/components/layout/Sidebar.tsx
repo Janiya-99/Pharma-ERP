@@ -226,7 +226,7 @@ const Sidebar = () => {
       icon: CreditCard,
       children: [
         { name: "Credit Notes", path: "/invoice-center/credit-notes", permission: "invoice_center.credit_note.view" },
-        { name: "Debit Notes", path: "/invoice-center/debit-notes", permission: "invoice_center.debit_note.view", disabled: true },
+        { name: "Debit Notes", path: "/invoice-center/debit-notes", permission: "invoice_center.debit_note.view" },
       ],
     },
     {

@@ -70,6 +70,18 @@ export const invoiceCenterApi = {
   rejectCreditNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/credit-notes/${id}/reject`, payload),
   postCreditNote: (id: number | string) => apiClient.post(`/invoice-center/credit-notes/${id}/post`),
   cancelCreditNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/credit-notes/${id}/cancel`, payload),
+
+  // ---- Debit Notes ----
+  getDebitNotes: (params: any = {}) => apiClient.get("/invoice-center/debit-notes", { params }),
+  getDebitNoteById: (id: number | string) => apiClient.get(`/invoice-center/debit-notes/${id}`),
+  createDebitNote: (payload: any) => apiClient.post("/invoice-center/debit-notes", payload),
+  updateDebitNote: (id: number | string, payload: any) => apiClient.put(`/invoice-center/debit-notes/${id}`, payload),
+  deleteDebitNote: (id: number | string) => apiClient.delete(`/invoice-center/debit-notes/${id}`),
+  submitDebitNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/debit-notes/${id}/submit`, payload),
+  approveDebitNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/debit-notes/${id}/approve`, payload),
+  rejectDebitNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/debit-notes/${id}/reject`, payload),
+  postDebitNote: (id: number | string) => apiClient.post(`/invoice-center/debit-notes/${id}/post`),
+  cancelDebitNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/debit-notes/${id}/cancel`, payload),
 };
 
 export default invoiceCenterApi;

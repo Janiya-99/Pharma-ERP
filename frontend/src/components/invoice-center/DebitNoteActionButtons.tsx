@@ -1,12 +1,12 @@
 import React from "react";
 import { Button } from "../ui/button";
-import { CreditNoteApprovalStatus, CreditNotePostedStatus } from "../../types/invoice-center";
+import { DebitNoteApprovalStatus, DebitNotePostedStatus } from "../../types/invoice-center";
 import PermissionGuard from "../../auth/PermissionGuard";
 import { Edit, Trash, Send, CheckCircle, XCircle, FileCheck, XSquare } from "lucide-react";
 
 interface Props {
-  approvalStatus: CreditNoteApprovalStatus;
-  postedStatus: CreditNotePostedStatus;
+  approvalStatus: DebitNoteApprovalStatus;
+  postedStatus: DebitNotePostedStatus;
   onEdit?: () => void;
   onDelete?: () => void;
   onSubmit?: () => void;
@@ -16,7 +16,7 @@ interface Props {
   onCancel?: () => void;
 }
 
-export const CreditNoteActionButtons: React.FC<Props> = ({
+export const DebitNoteActionButtons: React.FC<Props> = ({
   approvalStatus,
   postedStatus,
   onEdit,
@@ -37,7 +37,7 @@ export const CreditNoteActionButtons: React.FC<Props> = ({
   return (
     <div className="flex flex-wrap gap-2">
       {canEditOrDelete && onEdit && (
-        <PermissionGuard permission="invoice_center.credit_note.update">
+        <PermissionGuard permission="invoice_center.debit_note.update">
           <Button variant="outline" size="sm" onClick={onEdit}>
             <Edit className="h-4 w-4 mr-2" />
             Edit
@@ -46,7 +46,7 @@ export const CreditNoteActionButtons: React.FC<Props> = ({
       )}
 
       {canSubmit && onSubmit && (
-        <PermissionGuard permission="invoice_center.credit_note.submit">
+        <PermissionGuard permission="invoice_center.debit_note.submit">
           <Button variant="outline" size="sm" onClick={onSubmit} className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
             <Send className="h-4 w-4 mr-2" />
             Submit
@@ -55,7 +55,7 @@ export const CreditNoteActionButtons: React.FC<Props> = ({
       )}
 
       {canApproveOrReject && onApprove && (
-        <PermissionGuard permission="invoice_center.credit_note.approve">
+        <PermissionGuard permission="invoice_center.debit_note.approve">
           <Button variant="outline" size="sm" onClick={onApprove} className="text-green-600 hover:text-green-700 hover:bg-green-50">
             <CheckCircle className="h-4 w-4 mr-2" />
             Approve
@@ -64,7 +64,7 @@ export const CreditNoteActionButtons: React.FC<Props> = ({
       )}
 
       {canApproveOrReject && onReject && (
-        <PermissionGuard permission="invoice_center.credit_note.reject">
+        <PermissionGuard permission="invoice_center.debit_note.reject">
           <Button variant="outline" size="sm" onClick={onReject} className="text-orange-600 hover:text-orange-700 hover:bg-orange-50">
             <XCircle className="h-4 w-4 mr-2" />
             Reject
@@ -73,7 +73,7 @@ export const CreditNoteActionButtons: React.FC<Props> = ({
       )}
 
       {canPost && onPost && (
-        <PermissionGuard permission="invoice_center.credit_note.post">
+        <PermissionGuard permission="invoice_center.debit_note.post">
           <Button size="sm" onClick={onPost} className="bg-green-600 hover:bg-green-700 text-white">
             <FileCheck className="h-4 w-4 mr-2" />
             Post
@@ -82,7 +82,7 @@ export const CreditNoteActionButtons: React.FC<Props> = ({
       )}
 
       {canCancel && onCancel && (
-        <PermissionGuard permission="invoice_center.credit_note.update">
+        <PermissionGuard permission="invoice_center.debit_note.update">
           <Button variant="outline" size="sm" onClick={onCancel} className="text-gray-600 hover:text-gray-700 hover:bg-gray-100">
             <XSquare className="h-4 w-4 mr-2" />
             Cancel Note
@@ -91,7 +91,7 @@ export const CreditNoteActionButtons: React.FC<Props> = ({
       )}
 
       {canEditOrDelete && onDelete && (
-        <PermissionGuard permission="invoice_center.credit_note.delete">
+        <PermissionGuard permission="invoice_center.debit_note.delete">
           <Button variant="outline" size="sm" onClick={onDelete} className="text-red-600 hover:text-red-700 hover:bg-red-50">
             <Trash className="h-4 w-4 mr-2" />
             Delete

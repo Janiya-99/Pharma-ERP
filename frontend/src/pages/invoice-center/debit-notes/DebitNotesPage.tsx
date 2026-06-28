@@ -9,27 +9,30 @@ import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { toast } from "sonner";
-import type { SalesInvoice, SalesInvoiceApprovalStatus, SalesInvoicePostedStatus, SalesInvoicePaymentStatus, ApiResponse, PaginatedResponse } from "../../../types/invoice-center";
-import { SalesInvoiceApprovalStatusBadge, SalesInvoicePostedStatusBadge, SalesInvoicePaymentStatusBadge } from "../../../components/invoice-center";
+import type { DebitNote, PaginatedResponse } from "../../../types/invoice-center";
+import { 
+  DebitNoteApprovalStatusBadge, 
+  DebitNotePostedStatusBadge,
+  DebitNoteTypeBadge 
+} from "../../../components/invoice-center";
 
-const SalesInvoicesPage: React.FC = () => {
+const DebitNotesPage: React.FC = () => {
   const { activeSoftware } = useAuth();
   const navigate = useNavigate();
-  const [invoices, setInvoices] = useState<SalesInvoice[]>([]);
+  const [debitNotes, setDebitNotes] = useState<DebitNote[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Filters
   const [search, setSearch] = useState("");
   const [approvalStatus, setApprovalStatus] = useState<string>("all");
   const [postedStatus, setPostedStatus] = useState<string>("all");
-  const [paymentStatus, setPaymentStatus] = useState<string>("all");
+  const [debitNoteType, setDebitNoteType] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchInvoices = async () => {
+  const fetchDebitNotes = async () => {
     if (activeSoftware?.software_code !== "INVOICE_CENTER") return;
     
     setLoading(true);
@@ -38,22 +41,22 @@ const SalesInvoicesPage: React.FC = () => {
       if (search) params.search = search;
       if (approvalStatus && approvalStatus !== "all") params.approval_status = approvalStatus;
       if (postedStatus && postedStatus !== "all") params.posted_status = postedStatus;
-      if (paymentStatus && paymentStatus !== "all") params.payment_status = paymentStatus;
+      if (debitNoteType && debitNoteType !== "all") params.debit_note_type = debitNoteType;
       
-      const res = await invoiceCenterApi.getSalesInvoices(params);
-      const payload = res.data as PaginatedResponse<SalesInvoice>;
-      setInvoices(payload.data || []);
+      const res = await invoiceCenterApi.getDebitNotes(params);
+      const payload = res.data as PaginatedResponse<DebitNote>;
+      setDebitNotes(payload.data || []);
       setTotalPages(payload.pagination?.total_pages || 1);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to fetch sales invoices.");
+      toast.error(err?.response?.data?.message || "Failed to fetch debit notes.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchInvoices();
-  }, [activeSoftware, search, approvalStatus, postedStatus, paymentStatus, page]);
+    fetchDebitNotes();
+  }, [activeSoftware, search, approvalStatus, postedStatus, debitNoteType, page]);
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
@@ -75,13 +78,13 @@ const SalesInvoicesPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Sales Invoices</h1>
-          <p className="text-sm text-gray-500">Manage all your sales invoices.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Debit Notes</h1>
+          <p className="text-sm text-gray-500">Manage all your customer debit notes.</p>
         </div>
-        <PermissionGuard permission="invoice_center.sales_invoice.create">
-          <Button onClick={() => navigate("/invoice-center/sales-invoices/create")}>
+        <PermissionGuard permission="invoice_center.debit_note.create">
+          <Button onClick={() => navigate("/invoice-center/debit-notes/create")}>
             <Plus className="mr-2 h-4 w-4" />
-            Create Invoice
+            Create Debit Note
           </Button>
         </PermissionGuard>
       </div>
@@ -95,7 +98,7 @@ const SalesInvoicesPage: React.FC = () => {
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
-                placeholder="Search invoices..."
+                placeholder="Search debit notes..."
                 className="pl-9"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -127,17 +130,18 @@ const SalesInvoicesPage: React.FC = () => {
               </SelectContent>
             </Select>
 
-            <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+            <Select value={debitNoteType} onValueChange={setDebitNoteType}>
               <SelectTrigger>
-                <SelectValue placeholder="Payment Status" />
+                <SelectValue placeholder="Debit Note Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Payments</SelectItem>
-                <SelectItem value="unpaid">Unpaid</SelectItem>
-                <SelectItem value="partially_paid">Partially Paid</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="overdue">Overdue</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="price_adjustment">Price Adjustment</SelectItem>
+                <SelectItem value="additional_charge">Additional Charge</SelectItem>
+                <SelectItem value="billing_error">Billing Error</SelectItem>
+                <SelectItem value="freight_charge">Freight Charge</SelectItem>
+                <SelectItem value="tax_adjustment">Tax Adjustment</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -149,14 +153,13 @@ const SalesInvoicesPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Invoice No</TableHead>
+                <TableHead>CN No</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead className="text-right">Total Amount</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
                 <TableHead>Approval</TableHead>
                 <TableHead>Posted</TableHead>
-                <TableHead>Payment</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -167,39 +170,37 @@ const SalesInvoicesPage: React.FC = () => {
                     <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24 float-right" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-8 w-16 float-right" /></TableCell>
                   </TableRow>
                 ))
-              ) : invoices.length === 0 ? (
+              ) : debitNotes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center text-gray-500">
-                    No sales invoices found.
+                  <TableCell colSpan={8} className="h-24 text-center text-gray-500">
+                    No debit notes found.
                   </TableCell>
                 </TableRow>
               ) : (
-                invoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
-                    <TableCell>{formatDate(invoice.invoice_date)}</TableCell>
-                    <TableCell>{invoice.customer?.customer_name || `Customer #${invoice.customer_id}`}</TableCell>
-                    <TableCell className="text-right">{formatMoney(invoice.total_amount)}</TableCell>
-                    <TableCell className="text-right font-medium text-red-600">{formatMoney(invoice.balance_amount)}</TableCell>
+                debitNotes.map((cn) => (
+                  <TableRow key={cn.id}>
+                    <TableCell className="font-medium">{cn.debit_note_number}</TableCell>
+                    <TableCell>{formatDate(cn.debit_note_date)}</TableCell>
+                    <TableCell>{cn.customer?.customer_name || `Customer #${cn.customer_id}`}</TableCell>
                     <TableCell>
-                      <SalesInvoiceApprovalStatusBadge status={invoice.approval_status} />
+                      <DebitNoteTypeBadge type={cn.debit_note_type} />
+                    </TableCell>
+                    <TableCell className="text-right font-medium">{formatMoney(cn.total_amount)}</TableCell>
+                    <TableCell>
+                      <DebitNoteApprovalStatusBadge status={cn.approval_status} />
                     </TableCell>
                     <TableCell>
-                      <SalesInvoicePostedStatusBadge status={invoice.posted_status} />
-                    </TableCell>
-                    <TableCell>
-                      <SalesInvoicePaymentStatusBadge status={invoice.payment_status} />
+                      <DebitNotePostedStatusBadge status={cn.posted_status} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => navigate(`/invoice-center/sales-invoices/${invoice.id}`)}>
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/invoice-center/debit-notes/${cn.id}`)}>
                         View
                       </Button>
                     </TableCell>
@@ -240,4 +241,4 @@ const SalesInvoicesPage: React.FC = () => {
   );
 };
 
-export default SalesInvoicesPage;
+export default DebitNotesPage;
