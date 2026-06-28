@@ -26,7 +26,7 @@ func (s *GenericNameService) GetByID(db *gorm.DB, companyID, id uint64) (*models
 }
 func (s *GenericNameService) Create(c *gin.Context, db *gorm.DB, companyID uint64, req dto.CreateGenericNameRequest) (*models.GenericName, error) {
 	if e, _ := s.repo.GetGenericNameByCode(db, companyID, req.GenericCode); e != nil {
-		return nil, errors.New("generic_code exists")
+		return nil, errors.New("Generic code already exists")
 	}
 	m := &models.GenericName{CompanyID: companyID, GenericCode: req.GenericCode, GenericName: req.GenericName, Description: req.Description, Status: req.Status}
 	err := db.Transaction(func(tx *gorm.DB) error {
@@ -45,7 +45,7 @@ func (s *GenericNameService) Update(c *gin.Context, db *gorm.DB, companyID, id u
 	}
 	if m.GenericCode != req.GenericCode {
 		if e, _ := s.repo.GetGenericNameByCode(db, companyID, req.GenericCode); e != nil {
-			return nil, errors.New("generic_code exists")
+			return nil, errors.New("Generic code already exists")
 		}
 	}
 	old := *m

@@ -13,6 +13,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/database"
 	financeModule "github.com/pixandco/erp-phrma/internal/finance"
 	inventoryModule "github.com/pixandco/erp-phrma/internal/inventory"
+	invoiceCenterRoutes "github.com/pixandco/erp-phrma/internal/invoicecenter/routes"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	"github.com/pixandco/erp-phrma/internal/service"
 	"go.uber.org/zap"
@@ -171,6 +172,13 @@ func Setup(
 
 		// Initialize the audit log service to pass down to inventory routes
 		inventoryModule.SetupRoutes(inventoryGrp, service.NewAuditService(nil, logger), logger)
+
+		// Invoice Center routes
+		invoiceCenterGrp := v1.Group("/invoice-center")
+		invoiceCenterGrp.Use(middleware.CompanyAuthMiddleware(resolver))
+		invoiceCenterGrp.Use(middleware.BranchAccessMiddleware())
+		invoiceCenterGrp.Use(middleware.SoftwareAccessMiddleware())
+		invoiceCenterRoutes.SetupRoutes(invoiceCenterGrp, logger)
 	}
 
 	return r

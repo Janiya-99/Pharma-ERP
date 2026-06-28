@@ -89,7 +89,7 @@ export const inventoryApi = {
   // Stock
   getStockBalances: (params: Record<string, unknown>) => apiClient.get("/inventory/stock-balances", { params }),
   getStockLedgerEntries: (params: Record<string, unknown>) => apiClient.get("/inventory/stock-ledger", { params }),
-  getExpiryReport: (params: Record<string, unknown>) => apiClient.get("/inventory/stock-balances", { params: { ...params, near_expiry_days: params.days || 90 } }),
+  getExpiryReport: (params: Record<string, unknown>) => apiClient.get("/inventory/product-batches", { params: { ...params, near_expiry_days: params.days || 90 } }),
   getBatchReport: (params: Record<string, unknown>) => apiClient.get("/inventory/product-batches", { params }),
 
   // Opening Stock

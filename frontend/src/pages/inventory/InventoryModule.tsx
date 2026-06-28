@@ -95,6 +95,7 @@ type SetupConfig = {
   key: string;
   label: string;
   singular: string;
+  uniqueField?: string;
   list: (params: ApiRecord) => Promise<any>;
   get: (id: string | number) => Promise<any>;
   create: (payload: ApiRecord) => Promise<any>;
@@ -177,6 +178,36 @@ const getErrorMessage = (error: any) => {
   if (status === 404) return "Record not found.";
   if (status >= 500) return "Something went wrong. Please try again.";
   return error?.response?.data?.message || error?.message || "Something went wrong. Please try again.";
+};
+
+const normalizeComparable = (value: unknown) => String(value ?? "").trim().toLowerCase();
+
+const fieldLabel = (fields: FieldConfig[], name: string) =>
+  fields.find((field) => field.name === name)?.label || name.replaceAll("_", " ");
+
+const duplicateFieldError = (field: string, fields: FieldConfig[]) => {
+  const label = fieldLabel(fields, field);
+  return `${label} already exists. Use a different ${label.toLowerCase()}.`;
+};
+
+const localDuplicateErrors = (config: SetupConfig, form: ApiRecord, rows: ApiRecord[], currentId?: string | number) => {
+  const field = config.uniqueField;
+  if (!field) return {};
+  const value = normalizeComparable(form[field]);
+  if (!value) return {};
+  const duplicate = rows.find((row) => normalizeComparable(row[field]) === value && String(getId(row) ?? "") !== String(currentId ?? ""));
+  return duplicate ? { [field]: duplicateFieldError(field, config.fields) } : {};
+};
+
+const backendFieldErrors = (error: any, config: SetupConfig) => {
+  const message = getErrorMessage(error);
+  const normalizedMessage = normalizeComparable(message);
+  const field = config.uniqueField;
+  if (!field || !normalizedMessage.includes("exists")) return {};
+  if (normalizedMessage.includes(field) || normalizedMessage.includes("code exists") || normalizedMessage.includes("already exists")) {
+    return { [field]: duplicateFieldError(field, config.fields) };
+  }
+  return {};
 };
 
 function StatusBadge({ status }: { status: unknown }) {
@@ -487,7 +518,7 @@ function FormField({
 }) {
   const id = `field-${field.name}`;
   return (
-    <div className={`space-y-1.5 ${field.colSpan ? "sm:col-span-2" : ""}`}>
+    <div className={`min-w-0 space-y-1.5 ${field.colSpan ? "sm:col-span-2" : ""}`}>
       <Label htmlFor={id} className="text-xs font-medium tracking-normal text-slate-600">
         {field.label}
         {field.required ? <span className="text-red-500"> *</span> : null}
@@ -499,7 +530,7 @@ function FormField({
           disabled={disabled}
           placeholder={field.placeholder || field.label}
           onChange={(event) => onChange(field.name, event.target.value)}
-          className="min-h-20 rounded-lg border-slate-200 tracking-normal"
+          className="min-h-20 w-full rounded-lg border-slate-200 tracking-normal"
         />
       ) : field.type === "select" ? (
         <Select
@@ -507,7 +538,7 @@ function FormField({
           disabled={disabled}
           onValueChange={(selected) => onChange(field.name, selected)}
         >
-          <SelectTrigger id={id} className="h-9 w-full rounded-lg border-slate-200 tracking-normal">
+          <SelectTrigger id={id} className="h-9 w-full min-w-0 overflow-hidden rounded-lg border-slate-200 tracking-normal [&>span]:truncate">
             <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
           </SelectTrigger>
           <SelectContent>
@@ -531,7 +562,7 @@ function FormField({
           disabled={disabled}
           placeholder={field.placeholder || field.label}
           onChange={(event) => onChange(field.name, field.type === "number" ? event.target.value : event.target.value)}
-          className="h-9 rounded-lg border-slate-200 tracking-normal"
+          className="h-9 w-full rounded-lg border-slate-200 tracking-normal"
         />
       )}
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
@@ -571,13 +602,15 @@ function DrawerForm({
   const readOnly = mode === "view";
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto border-slate-200 bg-white p-0 sm:max-w-xl lg:max-w-2xl">
-        <SheetHeader className="border-b border-slate-200 px-6 py-5">
-          <SheetTitle className="text-lg font-semibold tracking-normal text-slate-950">{title}</SheetTitle>
-          <SheetDescription className="tracking-normal text-slate-500">{description}</SheetDescription>
+      <SheetContent className="max-w-full overflow-x-hidden overflow-y-auto border-slate-200 bg-white p-0 data-[side=right]:w-full data-[side=right]:max-w-full sm:data-[side=right]:w-[min(92vw,720px)] sm:data-[side=right]:max-w-[720px] lg:data-[side=right]:w-[50vw] lg:data-[side=right]:max-w-[50vw]">
+        <SheetHeader className="select-none border-b border-slate-200 px-6 py-5 sm:px-8">
+          <SheetTitle className="text-xl font-semibold tracking-normal text-slate-950">{title}</SheetTitle>
+          <SheetDescription className="max-w-2xl rounded-lg bg-blue-50 px-3 py-2 text-sm tracking-normal text-blue-700">
+            {description}
+          </SheetDescription>
         </SheetHeader>
-        <div className="px-6 py-5">
-          <div className="grid gap-4 sm:grid-cols-2">
+        <div className="min-h-0 flex-1 px-6 py-6 sm:px-8">
+          <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
             {fields.map((field) => (
               <FormField
                 key={field.name}
@@ -590,7 +623,7 @@ function DrawerForm({
             ))}
           </div>
         </div>
-        <SheetFooter className="border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
+        <SheetFooter className="border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end sm:px-8">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
             Close
           </Button>
@@ -790,11 +823,11 @@ export function InventoryDashboardPage() {
       </div>
 
       <Tabs defaultValue="low-stock" className="gap-4">
-        <TabsList className="bg-white shadow-sm">
-          <TabsTrigger value="low-stock">Low Stock</TabsTrigger>
-          <TabsTrigger value="expiry">Expiring Batches</TabsTrigger>
-          <TabsTrigger value="movements">Recent Movements</TabsTrigger>
-          <TabsTrigger value="grns">Recent GRNs</TabsTrigger>
+        <TabsList className="inline-flex h-10 w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="low-stock">Low Stock</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="expiry">Expiring Batches</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="movements">Recent Movements</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="grns">Recent GRNs</TabsTrigger>
         </TabsList>
         <TabsContent value="low-stock">
           <DataGrid
@@ -817,10 +850,10 @@ export function InventoryDashboardPage() {
             data={expiring.rows}
             columns={[
               { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-              { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
-              { header: "Expiry", render: (row) => normalizeDate(valueOf(row, ["product_batch.expiry_date", "expiry_date"], "")) || "—" },
-              { header: "Available", render: (row) => valueOf(row, ["quantity_available", "quantity_on_hand"]) },
-              { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
+              { header: "Batch", render: (row) => valueOf(row, ["batch_number", "product_batch.batch_number"]) },
+              { header: "Expiry", render: (row) => normalizeDate(valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")) || "—" },
+              { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"], "—") },
+              { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
             ]}
           />
         </TabsContent>
@@ -864,6 +897,7 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       key: "categories",
       label: "Categories",
       singular: "Category",
+      uniqueField: "category_code",
       list: inventoryApi.getProductCategories,
       get: inventoryApi.getProductCategoryById,
       create: inventoryApi.createProductCategory,
@@ -889,6 +923,7 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       key: "units",
       label: "Units",
       singular: "Unit",
+      uniqueField: "unit_code",
       list: inventoryApi.getProductUnits,
       get: inventoryApi.getProductUnitById,
       create: inventoryApi.createProductUnit,
@@ -913,6 +948,7 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       key: "dosageForms",
       label: "Dosage Forms",
       singular: "Dosage Form",
+      uniqueField: "dosage_form_code",
       list: inventoryApi.getDosageForms,
       get: inventoryApi.getDosageFormById,
       create: inventoryApi.createDosageForm,
@@ -937,6 +973,7 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       key: "genericNames",
       label: "Generic Names",
       singular: "Generic Name",
+      uniqueField: "generic_code",
       list: inventoryApi.getGenericNames,
       get: inventoryApi.getGenericNameById,
       create: inventoryApi.createGenericName,
@@ -961,6 +998,7 @@ function setupConfigs(context: InventoryContextValue): SetupConfig[] {
       key: "manufacturers",
       label: "Manufacturers",
       singular: "Manufacturer",
+      uniqueField: "manufacturer_code",
       list: inventoryApi.getManufacturers,
       get: inventoryApi.getManufacturerById,
       create: inventoryApi.createManufacturer,
@@ -1185,7 +1223,10 @@ export function ProductSetupPage() {
 
   const submit = async () => {
     if (!requireCompany(context)) return;
-    const nextErrors = validateForm(drawer.config.fields, form);
+    const nextErrors = {
+      ...validateForm(drawer.config.fields, form),
+      ...localDuplicateErrors(drawer.config, form, list.rows, drawer.id),
+    };
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
     setSubmitting(true);
@@ -1201,7 +1242,13 @@ export function ProductSetupPage() {
       setDrawer((current) => ({ ...current, open: false }));
       await list.refresh();
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      const fieldErrors = backendFieldErrors(error, drawer.config);
+      if (Object.keys(fieldErrors).length) {
+        setErrors(fieldErrors);
+        toast.error(Object.values(fieldErrors)[0]);
+      } else {
+        toast.error(getErrorMessage(error));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -1215,43 +1262,70 @@ export function ProductSetupPage() {
 
   return (
     <InventoryPage title="Product Setup" description="Manage product-related setup data in one backend-backed screen." icon={Settings}>
-      <SearchToolbar search={search} setSearch={setSearch}>
-        <Button onClick={() => openSetup("create")} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-          <Plus className="h-4 w-4" />
-          Add {activeConfig.singular}
-        </Button>
-      </SearchToolbar>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="gap-4">
-        <TabsList className="flex h-auto w-full flex-wrap justify-start bg-white p-1 shadow-sm">
-          {configs.map((config) => (
-            <TabsTrigger key={config.key} value={config.key}>
-              {config.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {configs.map((config) => (
-          <TabsContent key={config.key} value={config.key}>
-            <DataGrid
-              loading={list.loading && activeTab === config.key}
-              error={list.error}
-              data={list.rows}
-              columns={[
-                ...config.columns,
-                {
-                  header: "Actions",
-                  render: (row) => (
-                    <ActionMenu
-                      onView={() => openSetup("view", row)}
-                      onEdit={() => openSetup("edit", row)}
-                      onDeactivate={() => deactivateSetup(config, row)}
-                    />
-                  ),
-                },
-              ]}
-            />
-          </TabsContent>
-        ))}
-      </Tabs>
+      <Card className="border border-slate-200 bg-white shadow-sm">
+        <CardHeader className="border-b border-slate-200">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Setup Library</CardTitle>
+              <p className="mt-1 text-sm tracking-normal text-slate-500">
+                Maintain product categories, units, dosage forms, generic names, and manufacturers.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="relative min-w-0 sm:w-72">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={`Search ${activeConfig.label.toLowerCase()}`}
+                  className="h-9 w-full rounded-lg border-slate-200 bg-white pl-9 tracking-normal"
+                />
+              </div>
+              <Button onClick={() => openSetup("create")} className="h-9 rounded-lg bg-blue-600 px-3 text-white hover:bg-blue-700">
+                <Plus className="h-4 w-4" />
+                Add {activeConfig.singular}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col gap-4">
+            <TabsList className="inline-flex h-auto w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
+              {configs.map((config) => (
+                <TabsTrigger
+                  key={config.key}
+                  value={config.key}
+                  className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-white data-active:text-blue-700 data-active:shadow-sm"
+                >
+                  {config.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {configs.map((config) => (
+              <TabsContent key={config.key} value={config.key} className="mt-0">
+                <DataGrid
+                  loading={list.loading && activeTab === config.key}
+                  error={list.error}
+                  data={list.rows}
+                  columns={[
+                    ...config.columns,
+                    {
+                      header: "Actions",
+                      render: (row) => (
+                        <ActionMenu
+                          onView={() => openSetup("view", row)}
+                          onEdit={() => openSetup("edit", row)}
+                          onDeactivate={() => deactivateSetup(config, row)}
+                        />
+                      ),
+                    },
+                  ]}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+        </CardContent>
+      </Card>
       <DrawerForm
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
@@ -2284,11 +2358,11 @@ export function ExpiryReportPage() {
       extraParams={{ days: 90 }}
       columns={[
         { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
-        { header: "Expiry Date", render: (row) => normalizeDate(valueOf(row, ["product_batch.expiry_date", "expiry_date"], "")) },
-        { header: "Quantity", render: (row) => valueOf(row, ["quantity_available", "quantity_on_hand"]) },
-        { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
-        { header: "Status", render: (row) => <StatusBadge status={valueOf(row, ["status"], "monitor")} /> },
+        { header: "Batch", render: (row) => valueOf(row, ["batch_number", "product_batch.batch_number"]) },
+        { header: "Expiry Date", render: (row) => normalizeDate(valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")) },
+        { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"], "—") },
+        { header: "Selling Price", render: (row) => valueOf(row, ["selling_price"], "—") },
+        { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status || "monitor"} /> },
       ]}
     />
   );
