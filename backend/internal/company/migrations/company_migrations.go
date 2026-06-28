@@ -6,6 +6,8 @@ import (
 	financeMigrations "github.com/pixandco/erp-phrma/internal/finance/migrations"
 	inventoryMigrations "github.com/pixandco/erp-phrma/internal/inventory/migrations"
 	inventorySeeders "github.com/pixandco/erp-phrma/internal/inventory/seeders"
+	invoiceCenterMigrations "github.com/pixandco/erp-phrma/internal/invoicecenter/migrations"
+	invoiceCenterSeeders "github.com/pixandco/erp-phrma/internal/invoicecenter/seeders"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -109,6 +111,24 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 	if err := inventorySeeders.SeedInventoryPermissions(db, logger); err != nil {
 		logger.Error("Inventory permission seeder failed", zap.Error(err))
 		return err
+	}
+
+	logger.Info("Running invoice center migrations and seeders...")
+	if err := invoiceCenterMigrations.RunInvoiceCenterMigrations(db, logger); err != nil {
+		logger.Error("Invoice Center migrations failed", zap.Error(err))
+		return err
+	}
+	if mainCompany.ID != 0 {
+		if err := invoiceCenterSeeders.RunInvoiceCenterSeeders(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Invoice Center seeder failed", zap.Error(err))
+			return err
+		}
+	} else {
+		logger.Warn("OMACX company not found, running invoice center permission seeder only")
+		if err := invoiceCenterSeeders.SeedInvoiceCenterPermissions(db, logger); err != nil {
+			logger.Error("Invoice Center permission seeder failed", zap.Error(err))
+			return err
+		}
 	}
 
 	logger.Info("Company migrations and seeding complete")

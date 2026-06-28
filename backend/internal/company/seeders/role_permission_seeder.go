@@ -90,10 +90,10 @@ func SeedRolePermissions(db *gorm.DB, logger *zap.Logger) error {
 	})
 
 	// Invoice Manager: all Invoice Center
-	assignPermission("INVOICE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "invoice.") })
+	assignPermission("INVOICE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.") })
 	// Invoice Viewer
 	assignPermission("INVOICE_VIEWER", func(k string) bool {
-		return strings.HasPrefix(k, "invoice.") && strings.HasSuffix(k, ".view")
+		return (strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.")) && strings.HasSuffix(k, ".view")
 	})
 
 	// Compliance Manager: all Compliance Center

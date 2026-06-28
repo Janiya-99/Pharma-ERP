@@ -42,7 +42,7 @@ func SeedRoles(db *gorm.DB, logger *zap.Logger) error {
 
 		// INVOICE CENTER
 		{"INVOICE_CENTER", "Invoice Manager", "INVOICE_MANAGER"},
-		{"INVOICE_CENTER", "Invoice Creator", "INVOICE_CREATOR"},
+		{"INVOICE_CENTER", "Invoice Executive", "INVOICE_EXECUTIVE"},
 		{"INVOICE_CENTER", "Invoice Approver", "INVOICE_APPROVER"},
 		{"INVOICE_CENTER", "Invoice Viewer", "INVOICE_VIEWER"},
 

@@ -2,7 +2,7 @@ import apiClient from "./apiClient";
 
 export const inventoryApi = {
   // Dashboard
-  getInventoryDashboard: () => apiClient.get("/inventory/dashboard"),
+  getInventoryDashboard: (params: Record<string, unknown> = {}) => apiClient.get("/inventory/dashboard", { params }),
 
   // Warehouses
   getWarehouses: (params: Record<string, unknown>) => apiClient.get("/inventory/warehouses", { params }),
@@ -10,6 +10,7 @@ export const inventoryApi = {
   createWarehouse: (payload: Record<string, unknown>) => apiClient.post("/inventory/warehouses", payload),
   updateWarehouse: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/warehouses/${id}`, payload),
   deleteWarehouse: (id: string | number) => apiClient.delete(`/inventory/warehouses/${id}`),
+  deactivateWarehouse: (id: string | number) => apiClient.delete(`/inventory/warehouses/${id}`),
 
   // Warehouse Locations
   getWarehouseLocations: (params: Record<string, unknown>) => apiClient.get("/inventory/warehouse-locations", { params }),
@@ -17,6 +18,7 @@ export const inventoryApi = {
   createWarehouseLocation: (payload: Record<string, unknown>) => apiClient.post("/inventory/warehouse-locations", payload),
   updateWarehouseLocation: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/warehouse-locations/${id}`, payload),
   deleteWarehouseLocation: (id: string | number) => apiClient.delete(`/inventory/warehouse-locations/${id}`),
+  deactivateWarehouseLocation: (id: string | number) => apiClient.delete(`/inventory/warehouse-locations/${id}`),
 
   // Product Categories
   getProductCategories: (params: Record<string, unknown>) => apiClient.get("/inventory/product-categories", { params }),
@@ -24,6 +26,7 @@ export const inventoryApi = {
   createProductCategory: (payload: Record<string, unknown>) => apiClient.post("/inventory/product-categories", payload),
   updateProductCategory: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/product-categories/${id}`, payload),
   deleteProductCategory: (id: string | number) => apiClient.delete(`/inventory/product-categories/${id}`),
+  deactivateProductCategory: (id: string | number) => apiClient.delete(`/inventory/product-categories/${id}`),
 
   // Product Units
   getProductUnits: (params: Record<string, unknown>) => apiClient.get("/inventory/product-units", { params }),
@@ -31,6 +34,7 @@ export const inventoryApi = {
   createProductUnit: (payload: Record<string, unknown>) => apiClient.post("/inventory/product-units", payload),
   updateProductUnit: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/product-units/${id}`, payload),
   deleteProductUnit: (id: string | number) => apiClient.delete(`/inventory/product-units/${id}`),
+  deactivateProductUnit: (id: string | number) => apiClient.delete(`/inventory/product-units/${id}`),
 
   // Dosage Forms
   getDosageForms: (params: Record<string, unknown>) => apiClient.get("/inventory/dosage-forms", { params }),
@@ -38,6 +42,7 @@ export const inventoryApi = {
   createDosageForm: (payload: Record<string, unknown>) => apiClient.post("/inventory/dosage-forms", payload),
   updateDosageForm: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/dosage-forms/${id}`, payload),
   deleteDosageForm: (id: string | number) => apiClient.delete(`/inventory/dosage-forms/${id}`),
+  deactivateDosageForm: (id: string | number) => apiClient.delete(`/inventory/dosage-forms/${id}`),
 
   // Generic Names
   getGenericNames: (params: Record<string, unknown>) => apiClient.get("/inventory/generic-names", { params }),
@@ -45,6 +50,7 @@ export const inventoryApi = {
   createGenericName: (payload: Record<string, unknown>) => apiClient.post("/inventory/generic-names", payload),
   updateGenericName: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/generic-names/${id}`, payload),
   deleteGenericName: (id: string | number) => apiClient.delete(`/inventory/generic-names/${id}`),
+  deactivateGenericName: (id: string | number) => apiClient.delete(`/inventory/generic-names/${id}`),
 
   // Manufacturers
   getManufacturers: (params: Record<string, unknown>) => apiClient.get("/inventory/manufacturers", { params }),
@@ -52,6 +58,7 @@ export const inventoryApi = {
   createManufacturer: (payload: Record<string, unknown>) => apiClient.post("/inventory/manufacturers", payload),
   updateManufacturer: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/manufacturers/${id}`, payload),
   deleteManufacturer: (id: string | number) => apiClient.delete(`/inventory/manufacturers/${id}`),
+  deactivateManufacturer: (id: string | number) => apiClient.delete(`/inventory/manufacturers/${id}`),
 
   // Suppliers
   getSuppliers: (params: Record<string, unknown>) => apiClient.get("/inventory/suppliers", { params }),
@@ -59,6 +66,7 @@ export const inventoryApi = {
   createSupplier: (payload: Record<string, unknown>) => apiClient.post("/inventory/suppliers", payload),
   updateSupplier: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/suppliers/${id}`, payload),
   deleteSupplier: (id: string | number) => apiClient.delete(`/inventory/suppliers/${id}`),
+  deactivateSupplier: (id: string | number) => apiClient.delete(`/inventory/suppliers/${id}`),
 
   // Products
   getProducts: (params: Record<string, unknown>) => apiClient.get("/inventory/products", { params }),
@@ -66,6 +74,7 @@ export const inventoryApi = {
   createProduct: (payload: Record<string, unknown>) => apiClient.post("/inventory/products", payload),
   updateProduct: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/products/${id}`, payload),
   deleteProduct: (id: string | number) => apiClient.delete(`/inventory/products/${id}`),
+  deactivateProduct: (id: string | number) => apiClient.delete(`/inventory/products/${id}`),
 
   // Product Batches
   getProductBatches: (params: Record<string, unknown>) => apiClient.get("/inventory/product-batches", { params }),
@@ -74,10 +83,14 @@ export const inventoryApi = {
   updateProductBatch: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/product-batches/${id}`, payload),
   blockProductBatch: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/product-batches/${id}/block`, payload),
   unblockProductBatch: (id: string | number) => apiClient.post(`/inventory/product-batches/${id}/unblock`),
+  holdProductBatch: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/product-batches/${id}/block`, payload),
+  releaseProductBatch: (id: string | number) => apiClient.post(`/inventory/product-batches/${id}/unblock`),
 
   // Stock
   getStockBalances: (params: Record<string, unknown>) => apiClient.get("/inventory/stock-balances", { params }),
   getStockLedgerEntries: (params: Record<string, unknown>) => apiClient.get("/inventory/stock-ledger", { params }),
+  getExpiryReport: (params: Record<string, unknown>) => apiClient.get("/inventory/stock-balances", { params: { ...params, near_expiry_days: params.days || 90 } }),
+  getBatchReport: (params: Record<string, unknown>) => apiClient.get("/inventory/product-batches", { params }),
 
   // Opening Stock
   getOpeningStockEntries: (params: Record<string, unknown>) => apiClient.get("/inventory/opening-stock-entries", { params }),
@@ -85,6 +98,7 @@ export const inventoryApi = {
   createOpeningStockEntry: (payload: Record<string, unknown>) => apiClient.post("/inventory/opening-stock-entries", payload),
   updateOpeningStockEntry: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/opening-stock-entries/${id}`, payload),
   deleteOpeningStockEntry: (id: string | number) => apiClient.delete(`/inventory/opening-stock-entries/${id}`),
+  cancelOpeningStockEntry: (id: string | number, payload: Record<string, unknown> = {}) => apiClient.delete(`/inventory/opening-stock-entries/${id}`, { data: payload }),
   submitOpeningStockEntry: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/opening-stock-entries/${id}/submit`, payload),
   approveOpeningStockEntry: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/opening-stock-entries/${id}/approve`, payload),
   rejectOpeningStockEntry: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/opening-stock-entries/${id}/reject`, payload),
@@ -96,6 +110,7 @@ export const inventoryApi = {
   createGRN: (payload: Record<string, unknown>) => apiClient.post("/inventory/grns", payload),
   updateGRN: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/grns/${id}`, payload),
   deleteGRN: (id: string | number) => apiClient.delete(`/inventory/grns/${id}`),
+  cancelGRN: (id: string | number, payload: Record<string, unknown> = {}) => apiClient.delete(`/inventory/grns/${id}`, { data: payload }),
   submitGRN: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/grns/${id}/submit`, payload),
   approveGRN: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/grns/${id}/approve`, payload),
   rejectGRN: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/grns/${id}/reject`, payload),
@@ -109,8 +124,9 @@ export const inventoryApi = {
   deleteStockTransfer: (id: string | number) => apiClient.delete(`/inventory/stock-transfers/${id}`),
   submitStockTransfer: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-transfers/${id}/submit`, payload),
   approveStockTransfer: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-transfers/${id}/approve`, payload),
-  rejectStockTransfer: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/stock-transfers/${id}/reject`, payload),
-  postStockTransfer: (id: string | number) => apiClient.put(`/inventory/stock-transfers/${id}/post`),
+  rejectStockTransfer: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-transfers/${id}/reject`, payload),
+  postStockTransfer: (id: string | number) => apiClient.post(`/inventory/stock-transfers/${id}/post`),
+  cancelStockTransfer: (id: string | number, payload: Record<string, unknown> = {}) => apiClient.delete(`/inventory/stock-transfers/${id}`, { data: payload }),
 
   // Stock Adjustments
   getStockAdjustments: (params: Record<string, unknown>) => apiClient.get("/inventory/stock-adjustments", { params }),
@@ -118,6 +134,7 @@ export const inventoryApi = {
   createStockAdjustment: (payload: Record<string, unknown>) => apiClient.post("/inventory/stock-adjustments", payload),
   updateStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/stock-adjustments/${id}`, payload),
   deleteStockAdjustment: (id: string | number) => apiClient.delete(`/inventory/stock-adjustments/${id}`),
+  cancelStockAdjustment: (id: string | number, payload: Record<string, unknown> = {}) => apiClient.delete(`/inventory/stock-adjustments/${id}`, { data: payload }),
   submitStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/submit`, payload),
   approveStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/approve`, payload),
   rejectStockAdjustment: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/stock-adjustments/${id}/reject`, payload),
@@ -129,6 +146,7 @@ export const inventoryApi = {
   createPurchaseReturn: (payload: Record<string, unknown>) => apiClient.post("/inventory/purchase-returns", payload),
   updatePurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/purchase-returns/${id}`, payload),
   deletePurchaseReturn: (id: string | number) => apiClient.delete(`/inventory/purchase-returns/${id}`),
+  cancelPurchaseReturn: (id: string | number, payload: Record<string, unknown> = {}) => apiClient.delete(`/inventory/purchase-returns/${id}`, { data: payload }),
   submitPurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/submit`, payload),
   approvePurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/approve`, payload),
   rejectPurchaseReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/purchase-returns/${id}/reject`, payload),
@@ -140,9 +158,9 @@ export const inventoryApi = {
   createSalesReturn: (payload: Record<string, unknown>) => apiClient.post("/inventory/sales-returns", payload),
   updateSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.put(`/inventory/sales-returns/${id}`, payload),
   deleteSalesReturn: (id: string | number) => apiClient.delete(`/inventory/sales-returns/${id}`),
+  cancelSalesReturn: (id: string | number, payload: Record<string, unknown> = {}) => apiClient.delete(`/inventory/sales-returns/${id}`, { data: payload }),
   submitSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/sales-returns/${id}/submit`, payload),
   approveSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/sales-returns/${id}/approve`, payload),
   rejectSalesReturn: (id: string | number, payload: Record<string, unknown>) => apiClient.post(`/inventory/sales-returns/${id}/reject`, payload),
   postSalesReturn: (id: string | number) => apiClient.post(`/inventory/sales-returns/${id}/post`),
 };
-

@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import {
   AlertTriangle,
   BarChart3,
@@ -9,6 +10,7 @@ import {
   Edit,
   Eye,
   FileText,
+  Loader2,
   MoreHorizontal,
   Package,
   Plus,
@@ -17,10 +19,14 @@ import {
   Search,
   Settings,
   SlidersHorizontal,
+  Trash2,
   Truck,
   Warehouse,
 } from "lucide-react";
 
+import { inventoryApi } from "@/api/inventoryApi";
+import { useAuth } from "@/auth/AuthContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +47,6 @@ import {
 } from "@/components/ui/select";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -61,66 +66,49 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
+type ApiRecord = Record<string, any>;
 type StatusTone = "success" | "warning" | "danger" | "info" | "neutral";
 type DrawerMode = "create" | "edit" | "view";
+type FieldType = "text" | "number" | "date" | "email" | "textarea" | "select" | "switch";
 
-type Product = {
-  code: string;
+type Option = {
+  label: string;
+  value: string;
+};
+
+type FieldConfig = {
   name: string;
-  genericName: string;
-  category: string;
-  dosageForm: string;
-  unit: string;
-  manufacturer: string;
-  stockStatus: string;
-  status: string;
+  label: string;
+  type?: FieldType;
+  required?: boolean;
+  options?: Option[];
+  placeholder?: string;
+  colSpan?: boolean;
 };
 
-type ProductBatch = {
-  product: string;
-  batchNo: string;
-  manufactureDate: string;
-  expiryDate: string;
-  quantity: number;
-  warehouse: string;
-  status: string;
-};
-
-type WarehouseRecord = {
-  code: string;
-  name: string;
-  branch: string;
-  type: string;
-  address: string;
-  responsiblePerson: string;
-  status: string;
-};
-
-type WarehouseLocationRecord = {
-  code: string;
-  name: string;
-  zone: string;
-  rack: string;
-  shelf: string;
-  bin: string;
-  status: string;
-};
-
-type Supplier = {
-  code: string;
-  name: string;
-  contactPerson: string;
-  phone: string;
-  email: string;
-  paymentTerms: string;
-  status: string;
-};
-
-type TableColumn<T> = {
+type TableColumn = {
   header: string;
-  accessor?: keyof T;
-  render?: (row: T) => React.ReactNode;
-  className?: string;
+  render: (row: ApiRecord) => React.ReactNode;
+};
+
+type SetupConfig = {
+  key: string;
+  label: string;
+  singular: string;
+  list: (params: ApiRecord) => Promise<any>;
+  get: (id: string | number) => Promise<any>;
+  create: (payload: ApiRecord) => Promise<any>;
+  update: (id: string | number, payload: ApiRecord) => Promise<any>;
+  deactivate: (id: string | number) => Promise<any>;
+  columns: TableColumn[];
+  fields: FieldConfig[];
+  defaults: ApiRecord;
+  buildPayload: (form: ApiRecord, context: InventoryContextValue) => ApiRecord;
+};
+
+type InventoryContextValue = {
+  companyId?: number;
+  branchId?: number;
 };
 
 const toneClasses: Record<StatusTone, string> = {
@@ -131,250 +119,178 @@ const toneClasses: Record<StatusTone, string> = {
   neutral: "border-slate-200 bg-slate-50 text-slate-700",
 };
 
-const products: Product[] = [
-  {
-    code: "MED-PARA-500",
-    name: "Paracetamol 500mg Tablet",
-    genericName: "Paracetamol",
-    category: "Analgesics",
-    dosageForm: "Tablet",
-    unit: "Strip",
-    manufacturer: "Ceymed Pharma",
-    stockStatus: "Healthy",
-    status: "Active",
-  },
-  {
-    code: "MED-AMOX-250",
-    name: "Amoxicillin 250mg Capsule",
-    genericName: "Amoxicillin",
-    category: "Antibiotics",
-    dosageForm: "Capsule",
-    unit: "Box",
-    manufacturer: "Nova Labs",
-    stockStatus: "Low Stock",
-    status: "Active",
-  },
-  {
-    code: "MED-METF-500",
-    name: "Metformin 500mg Tablet",
-    genericName: "Metformin",
-    category: "Diabetes Care",
-    dosageForm: "Tablet",
-    unit: "Bottle",
-    manufacturer: "Healthway",
-    stockStatus: "Out of Stock",
-    status: "Inactive",
-  },
-];
-
-const batches: ProductBatch[] = [
-  {
-    product: "Paracetamol 500mg Tablet",
-    batchNo: "B-PAR-2406",
-    manufactureDate: "2025-01-15",
-    expiryDate: "2027-01-15",
-    quantity: 4200,
-    warehouse: "Main Warehouse",
-    status: "Active",
-  },
-  {
-    product: "Amoxicillin 250mg Capsule",
-    batchNo: "B-AMX-2502",
-    manufactureDate: "2024-10-10",
-    expiryDate: "2026-07-20",
-    quantity: 480,
-    warehouse: "Cold Room",
-    status: "On Hold",
-  },
-  {
-    product: "Cetrizine 10mg Tablet",
-    batchNo: "B-CET-2309",
-    manufactureDate: "2023-09-01",
-    expiryDate: "2026-06-10",
-    quantity: 0,
-    warehouse: "Main Warehouse",
-    status: "Expired",
-  },
-];
-
-const warehouses: WarehouseRecord[] = [
-  {
-    code: "WH-HO-01",
-    name: "Main Warehouse",
-    branch: "Head Office",
-    type: "Primary",
-    address: "45 Galle Road, Colombo 03",
-    responsiblePerson: "Nimal Silva",
-    status: "Active",
-  },
-  {
-    code: "WH-CLD-01",
-    name: "Cold Room",
-    branch: "Head Office",
-    type: "Cold Storage",
-    address: "45 Galle Road, Colombo 03",
-    responsiblePerson: "Anusha Perera",
-    status: "Active",
-  },
-  {
-    code: "WH-KDY-01",
-    name: "Kandy Warehouse",
-    branch: "Kandy",
-    type: "Branch",
-    address: "12 Peradeniya Road, Kandy",
-    responsiblePerson: "Ruwan Jayasena",
-    status: "Active",
-  },
-];
-
-const warehouseLocations: WarehouseLocationRecord[] = [
-  { code: "A-01", name: "Fast Moving Rack", zone: "Zone A", rack: "R1", shelf: "S1", bin: "B01", status: "Active" },
-  { code: "B-03", name: "Antibiotics Shelf", zone: "Zone B", rack: "R3", shelf: "S2", bin: "B08", status: "Active" },
-  { code: "Q-01", name: "Quarantine Bin", zone: "QA", rack: "R1", shelf: "S1", bin: "HOLD", status: "Active" },
-];
-
-const suppliers: Supplier[] = [
-  {
-    code: "SUP-001",
-    name: "Lanka Pharma Distributors",
-    contactPerson: "Kasun Fernando",
-    phone: "+94 77 112 3344",
-    email: "orders@lankapharma.lk",
-    paymentTerms: "30 days",
-    status: "Active",
-  },
-  {
-    code: "SUP-002",
-    name: "MediSource Imports",
-    contactPerson: "Ishara Gunasekara",
-    phone: "+94 76 552 1010",
-    email: "supply@medisource.lk",
-    paymentTerms: "45 days",
-    status: "Active",
-  },
-];
-
-const lowStockProducts = [
-  { product: "Amoxicillin 250mg Capsule", sku: "MED-AMOX-250", currentStock: 480, reorderLevel: 600, warehouse: "Cold Room", status: "Low Stock" },
-  { product: "Metformin 500mg Tablet", sku: "MED-METF-500", currentStock: 0, reorderLevel: 300, warehouse: "Kandy Warehouse", status: "Out of Stock" },
-  { product: "Vitamin C 1000mg Tablet", sku: "MED-VITC-1000", currentStock: 120, reorderLevel: 250, warehouse: "Main Warehouse", status: "Low Stock" },
-];
-
-const expiringBatches = [
-  { product: "Amoxicillin 250mg Capsule", batchNo: "B-AMX-2502", expiryDate: "2026-07-20", quantity: 480, warehouse: "Cold Room", daysLeft: 23, status: "Expiring Soon" },
-  { product: "Cetrizine 10mg Tablet", batchNo: "B-CET-2309", expiryDate: "2026-06-10", quantity: 0, warehouse: "Main Warehouse", daysLeft: -17, status: "Expired" },
-  { product: "Omeprazole 20mg Capsule", batchNo: "B-OME-2411", expiryDate: "2026-08-14", quantity: 310, warehouse: "Main Warehouse", daysLeft: 48, status: "Monitor" },
-];
-
-const stockMovements = [
-  { date: "2026-06-27", movementType: "GRN", product: "Paracetamol 500mg Tablet", batchNo: "B-PAR-2406", quantity: "+1,200", warehouse: "Main Warehouse", createdBy: "Nimal Silva" },
-  { date: "2026-06-26", movementType: "Transfer", product: "Metformin 500mg Tablet", batchNo: "B-MET-2409", quantity: "-240", warehouse: "Kandy Warehouse", createdBy: "Anusha Perera" },
-  { date: "2026-06-25", movementType: "Adjustment", product: "Cetrizine 10mg Tablet", batchNo: "B-CET-2309", quantity: "-36", warehouse: "Main Warehouse", createdBy: "Ruwan Jayasena" },
-];
-
-const warehouseSummary = [
-  { warehouse: "Main Warehouse", totalProducts: 284, stockValue: "Rs. 18.4M", lowStockItems: 8, expiringBatches: 11 },
-  { warehouse: "Cold Room", totalProducts: 64, stockValue: "Rs. 6.1M", lowStockItems: 3, expiringBatches: 4 },
-  { warehouse: "Kandy Warehouse", totalProducts: 129, stockValue: "Rs. 7.8M", lowStockItems: 5, expiringBatches: 2 },
-];
-
-const topMovingProducts = [
-  { product: "Paracetamol 500mg Tablet", quantityIn: 5200, quantityOut: 4100, currentStock: 4200 },
-  { product: "Amoxicillin 250mg Capsule", quantityIn: 1800, quantityOut: 1320, currentStock: 480 },
-  { product: "ORS Sachet", quantityIn: 3600, quantityOut: 2990, currentStock: 910 },
-];
-
-const setupTables = {
-  categories: {
-    title: "Categories",
-    addLabel: "Add Category",
-    columns: ["Category Code", "Category Name", "Description", "Status"],
-    rows: [
-      ["CAT-ANA", "Analgesics", "Pain and fever management", "Active"],
-      ["CAT-ANT", "Antibiotics", "Antibacterial products", "Active"],
-      ["CAT-DIA", "Diabetes Care", "Blood sugar management", "Active"],
-    ],
-  },
-  units: {
-    title: "Units",
-    addLabel: "Add Unit",
-    columns: ["Unit Code", "Unit Name", "Short Name", "Description", "Status"],
-    rows: [
-      ["UNT-STR", "Strip", "STR", "Tablet strip pack", "Active"],
-      ["UNT-BOX", "Box", "BOX", "Box pack", "Active"],
-      ["UNT-BTL", "Bottle", "BTL", "Bottle pack", "Active"],
-    ],
-  },
-  dosageForms: {
-    title: "Dosage Forms",
-    addLabel: "Add Dosage Form",
-    columns: ["Dosage Form Name", "Description", "Status"],
-    rows: [
-      ["Tablet", "Solid oral tablet", "Active"],
-      ["Capsule", "Solid oral capsule", "Active"],
-      ["Syrup", "Liquid oral dose", "Active"],
-    ],
-  },
-  genericNames: {
-    title: "Generic Names",
-    addLabel: "Add Generic Name",
-    columns: ["Generic Name", "Description", "Status"],
-    rows: [
-      ["Paracetamol", "Analgesic and antipyretic", "Active"],
-      ["Amoxicillin", "Beta-lactam antibiotic", "Active"],
-      ["Metformin", "Antidiabetic medicine", "Active"],
-    ],
-  },
-  manufacturers: {
-    title: "Manufacturers",
-    addLabel: "Add Manufacturer",
-    columns: ["Manufacturer Name", "Country", "Contact Number", "Email", "Status"],
-    rows: [
-      ["Ceymed Pharma", "Sri Lanka", "+94 11 245 8899", "quality@ceymed.lk", "Active"],
-      ["Nova Labs", "India", "+91 44 2211 3020", "exports@novalabs.in", "Active"],
-      ["Healthway", "Sri Lanka", "+94 11 702 3400", "support@healthway.lk", "Active"],
-    ],
-  },
-};
-
-const reportRows = {
-  stockBalance: [
-    ["Paracetamol 500mg Tablet", "B-PAR-2406", "Main Warehouse", "4,200", "3,950", "250", "Rs. 546,000"],
-    ["Amoxicillin 250mg Capsule", "B-AMX-2502", "Cold Room", "480", "420", "60", "Rs. 326,400"],
-    ["Metformin 500mg Tablet", "B-MET-2409", "Kandy Warehouse", "0", "0", "0", "Rs. 0"],
-  ],
-  stockLedger: [
-    ["2026-06-27", "Paracetamol 500mg Tablet", "B-PAR-2406", "GRN", "GRN-0261", "1,200", "0", "4,200"],
-    ["2026-06-26", "Metformin 500mg Tablet", "B-MET-2409", "Transfer", "TRF-0088", "0", "240", "0"],
-    ["2026-06-25", "Cetrizine 10mg Tablet", "B-CET-2309", "Adjustment", "ADJ-0044", "0", "36", "0"],
-  ],
-  expiry: [
-    ["Amoxicillin 250mg Capsule", "B-AMX-2502", "2026-07-20", "480", "23", "Cold Room", "Expiring Soon"],
-    ["Cetrizine 10mg Tablet", "B-CET-2309", "2026-06-10", "0", "-17", "Main Warehouse", "Expired"],
-    ["Omeprazole 20mg Capsule", "B-OME-2411", "2026-08-14", "310", "48", "Main Warehouse", "Monitor"],
-  ],
-  batch: [
-    ["Paracetamol 500mg Tablet", "B-PAR-2406", "2025-01-15", "2027-01-15", "5,200", "1,000", "4,200", "Active"],
-    ["Amoxicillin 250mg Capsule", "B-AMX-2502", "2024-10-10", "2026-07-20", "1,800", "1,320", "480", "On Hold"],
-    ["Cetrizine 10mg Tablet", "B-CET-2309", "2023-09-01", "2026-06-10", "900", "864", "0", "Expired"],
-  ],
-};
-
-function statusTone(status: string): StatusTone {
-  const normalized = status.toLowerCase();
-  if (["active", "healthy", "posted", "good"].some((word) => normalized.includes(word))) return "success";
-  if (["low", "soon", "pending", "monitor", "hold", "draft"].some((word) => normalized.includes(word))) return "warning";
-  if (["out", "expired", "inactive", "damage", "reject"].some((word) => normalized.includes(word))) return "danger";
-  if (["transfer", "grn", "open"].some((word) => normalized.includes(word))) return "info";
+const statusTone = (status: unknown): StatusTone => {
+  const value = String(status || "").toLowerCase();
+  if (["active", "posted", "approved", "available", "good"].some((word) => value.includes(word))) return "success";
+  if (["draft", "pending", "low", "soon", "hold", "blocked", "submitted"].some((word) => value.includes(word))) return "warning";
+  if (["inactive", "expired", "rejected", "deleted", "out"].some((word) => value.includes(word))) return "danger";
+  if (["transfer", "grn", "open"].some((word) => value.includes(word))) return "info";
   return "neutral";
-}
+};
 
-function StatusBadge({ status }: { status: string }) {
+const normalizeStatus = (value: unknown) => String(value || "active").toLowerCase();
+const normalizeDate = (value: unknown) => (value ? String(value).slice(0, 10) : "");
+const toNumber = (value: unknown) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+const toNullableNumber = (value: unknown) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+const compact = (payload: ApiRecord) =>
+  Object.fromEntries(Object.entries(payload).filter(([, value]) => value !== "" && value !== undefined));
+
+const getId = (row?: ApiRecord) => row?.id ?? row?.ID;
+const getNested = (row: ApiRecord, path: string) =>
+  path.split(".").reduce<any>((current, key) => (current == null ? undefined : current[key]), row);
+const valueOf = (row: ApiRecord, paths: string[], fallback = "—") => {
+  for (const path of paths) {
+    const value = getNested(row, path);
+    if (value !== undefined && value !== null && value !== "") return String(value);
+  }
+  return fallback;
+};
+const nameOf = (row?: ApiRecord) =>
+  row ? valueOf(row, ["name", "product_name", "warehouse_name", "supplier_name", "category_name", "unit_name", "dosage_form_name", "generic_name", "manufacturer_name", "batch_number", "grn_number", "opening_stock_number", "transfer_number", "adjustment_number", "purchase_return_number", "sales_return_number"], "Record") : "Record";
+const makeOptions = (rows: ApiRecord[], labelPaths: string[], valuePath = "id") =>
+  rows
+    .map((row) => ({ label: valueOf(row, labelPaths), value: String(getNested(row, valuePath) ?? "") }))
+    .filter((option) => option.value);
+
+const unwrapBody = (response: any) => response?.data ?? response;
+const unwrapData = (response: any) => {
+  const body = unwrapBody(response);
+  return body?.data?.data ?? body?.data ?? body;
+};
+const unwrapList = (response: any): ApiRecord[] => {
+  const data = unwrapData(response);
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.rows)) return data.rows;
+  if (Array.isArray(data?.items)) return data.items;
+  return [];
+};
+
+const getErrorMessage = (error: any) => {
+  const status = error?.response?.status;
+  if (status === 403) return "You do not have permission to perform this action.";
+  if (status === 404) return "Record not found.";
+  if (status >= 500) return "Something went wrong. Please try again.";
+  return error?.response?.data?.message || error?.message || "Something went wrong. Please try again.";
+};
+
+function StatusBadge({ status }: { status: unknown }) {
+  const label = String(status || "—").replaceAll("_", " ");
   return (
-    <Badge variant="outline" className={toneClasses[statusTone(status)]}>
-      {status}
+    <Badge variant="outline" className={toneClasses[statusTone(label)]}>
+      {label}
     </Badge>
   );
+}
+
+function useInventoryContext(): InventoryContextValue {
+  const { company, activeBranch } = useAuth();
+  return {
+    companyId: company?.id ?? company?.company_id,
+    branchId: activeBranch?.id ?? activeBranch?.branch_id,
+  };
+}
+
+function useBackendList(
+  loader: (params: ApiRecord) => Promise<any>,
+  params: ApiRecord = {},
+  enabled = true,
+) {
+  const [rows, setRows] = useState<ApiRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const refresh = useCallback(async () => {
+    if (!enabled) return;
+    setLoading(true);
+    setError("");
+    try {
+      const response = await loader(params);
+      setRows(unwrapList(response));
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [enabled, loader, JSON.stringify(params)]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { rows, loading, error, refresh, setRows };
+}
+
+function useBackendRecord(
+  loader: (params: ApiRecord) => Promise<any>,
+  params: ApiRecord = {},
+  enabled = true,
+) {
+  const [record, setRecord] = useState<ApiRecord>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const refresh = useCallback(async () => {
+    if (!enabled) return;
+    setLoading(true);
+    setError("");
+    try {
+      const response = await loader(params);
+      const data = unwrapData(response);
+      setRecord(Array.isArray(data) ? data[0] || {} : data || {});
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [enabled, loader, JSON.stringify(params)]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { record, loading, error, refresh };
+}
+
+function requireCompany(context: InventoryContextValue) {
+  if (!context.companyId) {
+    toast.error("Please select a company first.");
+    return false;
+  }
+  return true;
+}
+
+function requireBranch(context: InventoryContextValue) {
+  if (!context.branchId) {
+    toast.error("Please select a branch first.");
+    return false;
+  }
+  return true;
+}
+
+async function runBackendAction(
+  action: () => Promise<any>,
+  successMessage: string,
+  refresh?: () => Promise<void> | void,
+) {
+  try {
+    await action();
+    toast.success(successMessage);
+    await refresh?.();
+    return true;
+  } catch (error) {
+    toast.error(getErrorMessage(error));
+    return false;
+  }
 }
 
 function InventoryPage({
@@ -438,7 +354,39 @@ function SearchToolbar({
   );
 }
 
-function DataGrid<T extends object>({ columns, data }: { columns: TableColumn<T>[]; data: T[] }) {
+function DataGrid({
+  columns,
+  data,
+  loading,
+  error,
+  emptyText = "No records found.",
+}: {
+  columns: TableColumn[];
+  data: ApiRecord[];
+  loading?: boolean;
+  error?: string;
+  emptyText?: string;
+}) {
+  if (loading) {
+    return (
+      <div className="grid gap-3">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} className="h-14 rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive" className="border-red-100 bg-red-50">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Unable to load data</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <Table>
@@ -452,57 +400,44 @@ function DataGrid<T extends object>({ columns, data }: { columns: TableColumn<T>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, index) => (
-            <TableRow key={index} className="hover:bg-blue-50/30">
-              {columns.map((column) => (
-                <TableCell key={column.header} className={`px-4 py-3 text-sm tracking-normal text-slate-700 ${column.className || ""}`}>
-                  {column.render ? column.render(row) : column.accessor ? String(row[column.accessor] ?? "") : null}
-                </TableCell>
-              ))}
+          {data.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center text-sm text-slate-500">
+                {emptyText}
+              </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            data.map((row, index) => (
+              <TableRow key={getId(row) || index} className="hover:bg-blue-50/30">
+                {columns.map((column) => (
+                  <TableCell key={column.header} className="px-4 py-3 text-sm tracking-normal text-slate-700">
+                    {column.render(row)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>
   );
 }
 
-function SimpleTable({
-  columns,
-  rows,
+function ActionMenu({
+  onView,
+  onEdit,
+  onDeactivate,
+  onPost,
+  onHold,
+  onRelease,
 }: {
-  columns: string[];
-  rows: Array<Array<React.ReactNode>>;
+  onView?: () => void;
+  onEdit?: () => void;
+  onDeactivate?: () => void;
+  onPost?: () => void;
+  onHold?: () => void;
+  onRelease?: () => void;
 }) {
-  return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
-            {columns.map((column) => (
-              <TableHead key={column} className="px-4 text-xs font-semibold uppercase tracking-normal text-slate-500">
-                {column}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((row, index) => (
-            <TableRow key={index} className="hover:bg-blue-50/30">
-              {row.map((cell, cellIndex) => (
-                <TableCell key={cellIndex} className="px-4 py-3 text-sm tracking-normal text-slate-700">
-                  {cell}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-
-function ActionMenu({ onView, onEdit, extra }: { onView?: () => void; onEdit?: () => void; extra?: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -523,27 +458,117 @@ function ActionMenu({ onView, onEdit, extra }: { onView?: () => void; onEdit?: (
             Edit
           </DropdownMenuItem>
         ) : null}
-        <DropdownMenuItem>{extra || "Deactivate"}</DropdownMenuItem>
+        {onPost ? <DropdownMenuItem onClick={onPost}>Post</DropdownMenuItem> : null}
+        {onHold ? <DropdownMenuItem onClick={onHold}>Hold Batch</DropdownMenuItem> : null}
+        {onRelease ? <DropdownMenuItem onClick={onRelease}>Release Batch</DropdownMenuItem> : null}
+        {onDeactivate ? (
+          <DropdownMenuItem onClick={onDeactivate} className="text-red-600 focus:text-red-600">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Deactivate
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-function InventoryDrawer({
+function FormField({
+  field,
+  value,
+  error,
+  disabled,
+  onChange,
+}: {
+  field: FieldConfig;
+  value: any;
+  error?: string;
+  disabled?: boolean;
+  onChange: (name: string, value: any) => void;
+}) {
+  const id = `field-${field.name}`;
+  return (
+    <div className={`space-y-1.5 ${field.colSpan ? "sm:col-span-2" : ""}`}>
+      <Label htmlFor={id} className="text-xs font-medium tracking-normal text-slate-600">
+        {field.label}
+        {field.required ? <span className="text-red-500"> *</span> : null}
+      </Label>
+      {field.type === "textarea" ? (
+        <Textarea
+          id={id}
+          value={value ?? ""}
+          disabled={disabled}
+          placeholder={field.placeholder || field.label}
+          onChange={(event) => onChange(field.name, event.target.value)}
+          className="min-h-20 rounded-lg border-slate-200 tracking-normal"
+        />
+      ) : field.type === "select" ? (
+        <Select
+          value={value ? String(value) : ""}
+          disabled={disabled}
+          onValueChange={(selected) => onChange(field.name, selected)}
+        >
+          <SelectTrigger id={id} className="h-9 w-full rounded-lg border-slate-200 tracking-normal">
+            <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
+          </SelectTrigger>
+          <SelectContent>
+            {(field.options || []).map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : field.type === "switch" ? (
+        <div className="flex h-9 items-center justify-between rounded-lg border border-slate-200 px-3">
+          <span className="text-sm text-slate-600">{value ? "Enabled" : "Disabled"}</span>
+          <Switch checked={!!value} disabled={disabled} onCheckedChange={(checked) => onChange(field.name, checked)} />
+        </div>
+      ) : (
+        <Input
+          id={id}
+          type={field.type || "text"}
+          value={value ?? ""}
+          disabled={disabled}
+          placeholder={field.placeholder || field.label}
+          onChange={(event) => onChange(field.name, field.type === "number" ? event.target.value : event.target.value)}
+          className="h-9 rounded-lg border-slate-200 tracking-normal"
+        />
+      )}
+      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+    </div>
+  );
+}
+
+function DrawerForm({
   open,
   onOpenChange,
   title,
   description,
-  children,
-  primaryLabel = "Save",
+  fields,
+  form,
+  setForm,
+  errors,
+  mode,
+  submitting,
+  onSubmit,
+  primaryLabel,
+  secondaryAction,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description: string;
-  children: React.ReactNode;
-  primaryLabel?: string;
+  fields: FieldConfig[];
+  form: ApiRecord;
+  setForm: (next: ApiRecord) => void;
+  errors: Record<string, string>;
+  mode: DrawerMode;
+  submitting: boolean;
+  onSubmit: () => void;
+  primaryLabel: string;
+  secondaryAction?: React.ReactNode;
 }) {
+  const readOnly = mode === "view";
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full overflow-y-auto border-slate-200 bg-white p-0 sm:max-w-xl lg:max-w-2xl">
@@ -551,129 +576,117 @@ function InventoryDrawer({
           <SheetTitle className="text-lg font-semibold tracking-normal text-slate-950">{title}</SheetTitle>
           <SheetDescription className="tracking-normal text-slate-500">{description}</SheetDescription>
         </SheetHeader>
-        <div className="flex flex-col gap-5 px-6 py-5">{children}</div>
+        <div className="px-6 py-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {fields.map((field) => (
+              <FormField
+                key={field.name}
+                field={field}
+                value={form[field.name]}
+                error={errors[field.name]}
+                disabled={readOnly || submitting}
+                onChange={(name, value) => setForm({ ...form, [name]: value })}
+              />
+            ))}
+          </div>
+        </div>
         <SheetFooter className="border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
-          <SheetClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </SheetClose>
-          <SheetClose asChild>
-            <Button className="bg-blue-600 text-white hover:bg-blue-700">{primaryLabel}</Button>
-          </SheetClose>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
+            Close
+          </Button>
+          {secondaryAction}
+          {readOnly ? null : (
+            <Button type="button" onClick={onSubmit} disabled={submitting} className="bg-blue-600 text-white hover:bg-blue-700">
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {primaryLabel}
+            </Button>
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>
   );
 }
 
-function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <h3 className="mb-4 text-sm font-semibold tracking-normal text-slate-950">{title}</h3>
-      <div className="grid gap-4 sm:grid-cols-2">{children}</div>
-    </section>
-  );
+function validateForm(fields: FieldConfig[], form: ApiRecord) {
+  const errors: Record<string, string> = {};
+  for (const field of fields) {
+    if (field.required && (form[field.name] === undefined || form[field.name] === null || form[field.name] === "")) {
+      errors[field.name] = `${field.label} is required`;
+    }
+    if (field.type === "email" && form[field.name] && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form[field.name]))) {
+      errors[field.name] = "Enter a valid email address";
+    }
+    if (field.type === "number" && form[field.name] !== "" && Number(form[field.name]) < 0) {
+      errors[field.name] = `${field.label} cannot be negative`;
+    }
+  }
+  return errors;
 }
 
-function Field({
-  label,
-  placeholder,
-  type = "text",
-  required = false,
-}: {
-  label: string;
-  placeholder?: string;
-  type?: string;
-  required?: boolean;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium tracking-normal text-slate-600">
-        {label}
-        {required ? <span className="text-red-500"> *</span> : null}
-      </Label>
-      <Input type={type} placeholder={placeholder || label} className="h-9 rounded-lg border-slate-200 tracking-normal" />
-    </div>
-  );
-}
+function useReferenceData() {
+  const context = useInventoryContext();
+  const [refs, setRefs] = useState({
+    categories: [] as ApiRecord[],
+    units: [] as ApiRecord[],
+    dosageForms: [] as ApiRecord[],
+    genericNames: [] as ApiRecord[],
+    manufacturers: [] as ApiRecord[],
+    suppliers: [] as ApiRecord[],
+    products: [] as ApiRecord[],
+    warehouses: [] as ApiRecord[],
+    batches: [] as ApiRecord[],
+    grns: [] as ApiRecord[],
+  });
 
-function SelectField({ label, values, required = false }: { label: string; values: string[]; required?: boolean }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium tracking-normal text-slate-600">
-        {label}
-        {required ? <span className="text-red-500"> *</span> : null}
-      </Label>
-      <Select>
-        <SelectTrigger className="h-9 w-full rounded-lg border-slate-200 tracking-normal">
-          <SelectValue placeholder={`Select ${label}`} />
-        </SelectTrigger>
-        <SelectContent>
-          {values.map((value) => (
-            <SelectItem key={value} value={value.toLowerCase().replace(/\s+/g, "-")}>
-              {value}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}
+  const refresh = useCallback(async () => {
+    if (!context.companyId) return;
+    const params = { limit: 1000, company_id: context.companyId, branch_id: context.branchId };
+    try {
+      const [
+        categories,
+        units,
+        dosageForms,
+        genericNames,
+        manufacturers,
+        suppliers,
+        products,
+        warehouses,
+        batches,
+        grns,
+      ] = await Promise.all([
+        inventoryApi.getProductCategories(params),
+        inventoryApi.getProductUnits(params),
+        inventoryApi.getDosageForms(params),
+        inventoryApi.getGenericNames(params),
+        inventoryApi.getManufacturers(params),
+        inventoryApi.getSuppliers(params),
+        inventoryApi.getProducts(params),
+        inventoryApi.getWarehouses(params),
+        inventoryApi.getProductBatches(params),
+        inventoryApi.getGRNs(params),
+      ]);
+      setRefs({
+        categories: unwrapList(categories),
+        units: unwrapList(units),
+        dosageForms: unwrapList(dosageForms),
+        genericNames: unwrapList(genericNames),
+        manufacturers: unwrapList(manufacturers),
+        suppliers: unwrapList(suppliers),
+        products: unwrapList(products),
+        warehouses: unwrapList(warehouses),
+        batches: unwrapList(batches),
+        grns: unwrapList(grns),
+      });
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  }, [context.companyId, context.branchId]);
 
-function SwitchField({ label }: { label: string }) {
-  return (
-    <div className="flex min-h-9 items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
-      <Label className="text-xs font-medium tracking-normal text-slate-600">{label}</Label>
-      <Switch />
-    </div>
-  );
-}
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
-function ProductForm({ mode }: { mode: DrawerMode }) {
-  const disabled = mode === "view";
-  return (
-    <fieldset disabled={disabled} className="space-y-5 disabled:opacity-90">
-      <FormSection title="Basic Details">
-        <Field label="Product Code" required />
-        <Field label="Product Name" required />
-        <SelectField label="Generic Name" values={["Paracetamol", "Amoxicillin", "Metformin"]} />
-        <SelectField label="Category" values={["Analgesics", "Antibiotics", "Diabetes Care"]} required />
-        <SelectField label="Dosage Form" values={["Tablet", "Capsule", "Syrup"]} />
-        <SelectField label="Unit" values={["Strip", "Box", "Bottle"]} required />
-        <SelectField label="Manufacturer" values={["Ceymed Pharma", "Nova Labs", "Healthway"]} />
-        <SelectField label="Supplier" values={suppliers.map((supplier) => supplier.name)} />
-        <Field label="Barcode" />
-        <SelectField label="Status" values={["Active", "Inactive"]} required />
-      </FormSection>
-      <FormSection title="Pharma Details">
-        <Field label="Strength" placeholder="500mg" />
-        <Field label="Pack Size" placeholder="10 x 10" />
-        <SwitchField label="Batch Tracking Required" />
-        <SwitchField label="Expiry Tracking Required" />
-        <SwitchField label="Prescription Required" />
-      </FormSection>
-      <FormSection title="Stock Rules">
-        <Field label="Reorder Level" type="number" />
-        <Field label="Minimum Stock" type="number" />
-        <Field label="Maximum Stock" type="number" />
-        <SelectField label="Default Warehouse" values={warehouses.map((warehouse) => warehouse.name)} />
-      </FormSection>
-      <FormSection title="Pricing">
-        <Field label="Purchase Price" type="number" />
-        <Field label="Selling Price" type="number" />
-        <Field label="Tax Rate" type="number" />
-      </FormSection>
-      <FormSection title="Description">
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label className="text-xs font-medium tracking-normal text-slate-600">Product Description</Label>
-          <Textarea className="min-h-24 rounded-lg border-slate-200 tracking-normal" />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label className="text-xs font-medium tracking-normal text-slate-600">Notes</Label>
-          <Textarea className="min-h-20 rounded-lg border-slate-200 tracking-normal" />
-        </div>
-      </FormSection>
-    </fieldset>
-  );
+  return { refs, refresh };
 }
 
 function KpiCard({
@@ -684,7 +697,7 @@ function KpiCard({
   tone = "info",
 }: {
   title: string;
-  value: string;
+  value: React.ReactNode;
   subtext: string;
   icon: React.ComponentType<{ className?: string }>;
   tone?: StatusTone;
@@ -705,396 +718,841 @@ function KpiCard({
   );
 }
 
-function AlertCard({ title, value, tone }: { title: string; value: string; tone: StatusTone }) {
-  return (
-    <div className={`rounded-xl border p-4 ${toneClasses[tone]}`}>
-      <div className="flex items-center gap-2">
-        <AlertTriangle className="h-4 w-4" />
-        <p className="text-sm font-semibold tracking-normal">{title}</p>
-      </div>
-      <p className="mt-3 text-2xl font-semibold tracking-normal">{value}</p>
-    </div>
-  );
-}
-
 export function InventoryDashboardPage() {
-  const [loading] = useState(false);
+  const context = useInventoryContext();
+  const dashboard = useBackendRecord(inventoryApi.getInventoryDashboard, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+  }, !!context.companyId);
+  const lowStock = useBackendList(inventoryApi.getStockBalances, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    low_stock_only: true,
+    limit: 5,
+  }, !!context.companyId);
+  const expiring = useBackendList(inventoryApi.getExpiryReport, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    days: 90,
+    limit: 5,
+  }, !!context.companyId);
+  const movements = useBackendList(inventoryApi.getStockLedgerEntries, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    limit: 5,
+  }, !!context.companyId);
+  const grns = useBackendList(inventoryApi.getGRNs, {
+    company_id: context.companyId,
+    branch_id: context.branchId,
+    limit: 5,
+  }, !!context.companyId);
+
+  const data = dashboard.record || {};
 
   return (
     <InventoryPage
       title="Inventory Dashboard"
       description="Monitor stock levels, batches, expiry risks, warehouse activity, and inventory movements."
-      icon={LayoutDashboardIcon}
+      icon={BarChart3}
       actions={
-        <Select defaultValue="all">
-          <SelectTrigger className="h-9 w-40 rounded-lg border-slate-200 bg-white">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Warehouses</SelectItem>
-            <SelectItem value="main">Main Warehouse</SelectItem>
-            <SelectItem value="cold">Cold Room</SelectItem>
-          </SelectContent>
-        </Select>
+        <Button variant="outline" onClick={() => Promise.all([dashboard.refresh(), lowStock.refresh(), expiring.refresh(), movements.refresh(), grns.refresh()])}>
+          Refresh
+        </Button>
       }
     >
+      {!context.companyId ? (
+        <Alert className="border-amber-100 bg-amber-50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Company required</AlertTitle>
+          <AlertDescription>Please select a company first.</AlertDescription>
+        </Alert>
+      ) : null}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        {loading ? (
+        {dashboard.loading ? (
           Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="h-32 rounded-xl" />)
         ) : (
           <>
-            <KpiCard title="Total Products" value="477" subtext="421 active SKUs" icon={Package} tone="info" />
-            <KpiCard title="Total Stock Value" value="Rs. 32.3M" subtext="Across 3 warehouses" icon={BarChart3} tone="success" />
-            <KpiCard title="Low Stock Items" value="16" subtext="Below reorder level" icon={AlertTriangle} tone="warning" />
-            <KpiCard title="Out of Stock Items" value="4" subtext="Requires replenishment" icon={Boxes} tone="danger" />
-            <KpiCard title="Expiring Soon" value="17" subtext="Within 60 days" icon={CalendarClock} tone="warning" />
-            <KpiCard title="Active Batches" value="1,238" subtext="Available for issue" icon={ClipboardList} tone="neutral" />
+            <KpiCard title="Total Products" value={data.total_products ?? 0} subtext={`${data.active_products ?? 0} active products`} icon={Package} tone="info" />
+            <KpiCard title="Total Stock Value" value={`Rs. ${Number(data.total_stock_value || 0).toLocaleString()}`} subtext="Backend stock valuation" icon={BarChart3} tone="success" />
+            <KpiCard title="Low Stock Items" value={data.low_stock_products ?? lowStock.rows.length} subtext="Below reorder level" icon={AlertTriangle} tone="warning" />
+            <KpiCard title="Out of Stock Items" value={data.out_of_stock_items ?? 0} subtext="Requires replenishment" icon={Boxes} tone="danger" />
+            <KpiCard title="Expiring Soon" value={data.near_expiry_batches ?? expiring.rows.length} subtext="Near expiry batches" icon={CalendarClock} tone="warning" />
+            <KpiCard title="Active Batches" value={data.total_batches ?? 0} subtext={`${data.blocked_batches ?? 0} blocked`} icon={ClipboardList} tone="neutral" />
           </>
         )}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-4">
-        <AlertCard title="Expired Batches" value="2" tone="danger" />
-        <AlertCard title="Expiring in 30 Days" value="7" tone="warning" />
-        <AlertCard title="Products Below Reorder Level" value="16" tone="warning" />
-        <AlertCard title="Stock Adjustment Pending Review" value="5" tone="info" />
+        <KpiCard title="Expired Batches" value={data.expired_batches ?? 0} subtext="Past expiry" icon={AlertTriangle} tone="danger" />
+        <KpiCard title="Recent GRNs" value={grns.rows.length} subtext="Latest receipts" icon={Truck} tone="info" />
+        <KpiCard title="Recent Movements" value={movements.rows.length} subtext="Ledger entries" icon={Repeat} tone="neutral" />
+        <KpiCard title="Warehouses" value={data.total_warehouses ?? 0} subtext="Inventory locations" icon={Warehouse} tone="success" />
       </div>
-
-      <Card className="border border-slate-200 bg-white shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          {[
-            ["Add Product", "/inventory/products", Package],
-            ["Create GRN", "/inventory/grn", Truck],
-            ["Transfer Stock", "/inventory/stock/transfers", Repeat],
-            ["Adjust Stock", "/inventory/stock/adjustments", SlidersHorizontal],
-            ["View Expiry Report", "/inventory/reports/expiry-report", CalendarClock],
-          ].map(([label, href, Icon]) => {
-            const QuickIcon = Icon as React.ComponentType<{ className?: string }>;
-            return (
-              <Button key={String(label)} asChild variant="outline" className="h-10 justify-start rounded-lg border-slate-200">
-                <Link to={String(href)}>
-                  <QuickIcon className="h-4 w-4 text-blue-600" />
-                  {label}
-                </Link>
-              </Button>
-            );
-          })}
-        </CardContent>
-      </Card>
 
       <Tabs defaultValue="low-stock" className="gap-4">
         <TabsList className="bg-white shadow-sm">
           <TabsTrigger value="low-stock">Low Stock</TabsTrigger>
           <TabsTrigger value="expiry">Expiring Batches</TabsTrigger>
           <TabsTrigger value="movements">Recent Movements</TabsTrigger>
+          <TabsTrigger value="grns">Recent GRNs</TabsTrigger>
         </TabsList>
         <TabsContent value="low-stock">
           <DataGrid
+            loading={lowStock.loading}
+            error={lowStock.error}
+            data={lowStock.rows}
             columns={[
-              { header: "Product", accessor: "product" },
-              { header: "SKU / Code", accessor: "sku" },
-              { header: "Current Stock", accessor: "currentStock" },
-              { header: "Reorder Level", accessor: "reorderLevel" },
-              { header: "Warehouse", accessor: "warehouse" },
-              { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+              { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+              { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
+              { header: "Available", render: (row) => valueOf(row, ["quantity_available"]) },
+              { header: "Status", render: (row) => <StatusBadge status={valueOf(row, ["status"], "low stock")} /> },
             ]}
-            data={lowStockProducts}
           />
         </TabsContent>
         <TabsContent value="expiry">
           <DataGrid
+            loading={expiring.loading}
+            error={expiring.error}
+            data={expiring.rows}
             columns={[
-              { header: "Product", accessor: "product" },
-              { header: "Batch No", accessor: "batchNo" },
-              { header: "Expiry Date", accessor: "expiryDate" },
-              { header: "Quantity", accessor: "quantity" },
-              { header: "Warehouse", accessor: "warehouse" },
-              { header: "Days Left", accessor: "daysLeft" },
-              { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+              { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+              { header: "Expiry", render: (row) => normalizeDate(valueOf(row, ["product_batch.expiry_date", "expiry_date"], "")) || "—" },
+              { header: "Available", render: (row) => valueOf(row, ["quantity_available", "quantity_on_hand"]) },
+              { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
             ]}
-            data={expiringBatches}
           />
         </TabsContent>
         <TabsContent value="movements">
           <DataGrid
+            loading={movements.loading}
+            error={movements.error}
+            data={movements.rows}
             columns={[
-              { header: "Date", accessor: "date" },
-              { header: "Movement Type", accessor: "movementType" },
-              { header: "Product", accessor: "product" },
-              { header: "Batch No", accessor: "batchNo" },
-              { header: "Quantity", accessor: "quantity" },
-              { header: "Warehouse", accessor: "warehouse" },
-              { header: "Created By", accessor: "createdBy" },
+              { header: "Date", render: (row) => normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")) },
+              { header: "Movement Type", render: (row) => valueOf(row, ["movement_type", "source_type"]) },
+              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+              { header: "In", render: (row) => valueOf(row, ["quantity_in"], "0") },
+              { header: "Out", render: (row) => valueOf(row, ["quantity_out"], "0") },
+              { header: "Balance", render: (row) => valueOf(row, ["balance_quantity", "running_balance"], "—") },
             ]}
-            data={stockMovements}
+          />
+        </TabsContent>
+        <TabsContent value="grns">
+          <DataGrid
+            loading={grns.loading}
+            error={grns.error}
+            data={grns.rows}
+            columns={[
+              { header: "GRN No", render: (row) => valueOf(row, ["grn_number"]) },
+              { header: "Date", render: (row) => normalizeDate(valueOf(row, ["grn_date"], "")) },
+              { header: "Supplier", render: (row) => valueOf(row, ["supplier.supplier_name", "supplier_name", "supplier_id"]) },
+              { header: "Quantity", render: (row) => valueOf(row, ["total_quantity", "total_stock_quantity"]) },
+              { header: "Posted", render: (row) => <StatusBadge status={valueOf(row, ["posted_status"], "draft")} /> },
+            ]}
           />
         </TabsContent>
       </Tabs>
-
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Card className="border border-slate-200 bg-white shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Warehouse Stock Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {warehouseSummary.map((item) => (
-              <div key={item.warehouse} className="rounded-xl border border-slate-200 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold tracking-normal text-slate-950">{item.warehouse}</p>
-                  <Badge variant="outline" className="border-blue-100 bg-blue-50 text-blue-700">
-                    {item.totalProducts} products
-                  </Badge>
-                </div>
-                <div className="mt-4 grid grid-cols-3 gap-3 text-sm tracking-normal">
-                  <div>
-                    <p className="text-slate-500">Stock Value</p>
-                    <p className="font-semibold text-slate-950">{item.stockValue}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Low Stock</p>
-                    <p className="font-semibold text-slate-950">{item.lowStockItems}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Expiring</p>
-                    <p className="font-semibold text-slate-950">{item.expiringBatches}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-        <Card className="border border-slate-200 bg-white shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Top Moving Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DataGrid
-              columns={[
-                { header: "Product", accessor: "product" },
-                { header: "Quantity In", accessor: "quantityIn" },
-                { header: "Quantity Out", accessor: "quantityOut" },
-                { header: "Current Stock", accessor: "currentStock" },
-              ]}
-              data={topMovingProducts}
-            />
-          </CardContent>
-        </Card>
-      </div>
     </InventoryPage>
   );
 }
 
-function LayoutDashboardIcon({ className }: { className?: string }) {
-  return <BarChart3 className={className} />;
+function setupConfigs(context: InventoryContextValue): SetupConfig[] {
+  return [
+    {
+      key: "categories",
+      label: "Categories",
+      singular: "Category",
+      list: inventoryApi.getProductCategories,
+      get: inventoryApi.getProductCategoryById,
+      create: inventoryApi.createProductCategory,
+      update: inventoryApi.updateProductCategory,
+      deactivate: inventoryApi.deactivateProductCategory,
+      defaults: { category_code: "", category_name: "", description: "", level: 1, status: "active" },
+      fields: [
+        { name: "category_code", label: "Category Code", required: true },
+        { name: "category_name", label: "Category Name", required: true },
+        { name: "description", label: "Description" },
+        { name: "level", label: "Level", type: "number", required: true },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+      ],
+      columns: [
+        { header: "Code", render: (row) => valueOf(row, ["category_code"]) },
+        { header: "Name", render: (row) => valueOf(row, ["category_name"]) },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+      ],
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, level: toNumber(form.level) || 1, status: normalizeStatus(form.status) }),
+    },
+    {
+      key: "units",
+      label: "Units",
+      singular: "Unit",
+      list: inventoryApi.getProductUnits,
+      get: inventoryApi.getProductUnitById,
+      create: inventoryApi.createProductUnit,
+      update: inventoryApi.updateProductUnit,
+      deactivate: inventoryApi.deactivateProductUnit,
+      defaults: { unit_code: "", unit_name: "", description: "", status: "active" },
+      fields: [
+        { name: "unit_code", label: "Unit Code", required: true },
+        { name: "unit_name", label: "Unit Name", required: true },
+        { name: "description", label: "Description" },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+      ],
+      columns: [
+        { header: "Code", render: (row) => valueOf(row, ["unit_code"]) },
+        { header: "Name", render: (row) => valueOf(row, ["unit_name"]) },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+      ],
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
+    },
+    {
+      key: "dosageForms",
+      label: "Dosage Forms",
+      singular: "Dosage Form",
+      list: inventoryApi.getDosageForms,
+      get: inventoryApi.getDosageFormById,
+      create: inventoryApi.createDosageForm,
+      update: inventoryApi.updateDosageForm,
+      deactivate: inventoryApi.deactivateDosageForm,
+      defaults: { dosage_form_code: "", dosage_form_name: "", description: "", status: "active" },
+      fields: [
+        { name: "dosage_form_code", label: "Dosage Form Code", required: true },
+        { name: "dosage_form_name", label: "Dosage Form Name", required: true },
+        { name: "description", label: "Description" },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+      ],
+      columns: [
+        { header: "Code", render: (row) => valueOf(row, ["dosage_form_code"]) },
+        { header: "Name", render: (row) => valueOf(row, ["dosage_form_name"]) },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+      ],
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
+    },
+    {
+      key: "genericNames",
+      label: "Generic Names",
+      singular: "Generic Name",
+      list: inventoryApi.getGenericNames,
+      get: inventoryApi.getGenericNameById,
+      create: inventoryApi.createGenericName,
+      update: inventoryApi.updateGenericName,
+      deactivate: inventoryApi.deactivateGenericName,
+      defaults: { generic_code: "", generic_name: "", description: "", status: "active" },
+      fields: [
+        { name: "generic_code", label: "Generic Code", required: true },
+        { name: "generic_name", label: "Generic Name", required: true },
+        { name: "description", label: "Description" },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+      ],
+      columns: [
+        { header: "Code", render: (row) => valueOf(row, ["generic_code"]) },
+        { header: "Name", render: (row) => valueOf(row, ["generic_name"]) },
+        { header: "Description", render: (row) => valueOf(row, ["description"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+      ],
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
+    },
+    {
+      key: "manufacturers",
+      label: "Manufacturers",
+      singular: "Manufacturer",
+      list: inventoryApi.getManufacturers,
+      get: inventoryApi.getManufacturerById,
+      create: inventoryApi.createManufacturer,
+      update: inventoryApi.updateManufacturer,
+      deactivate: inventoryApi.deactivateManufacturer,
+      defaults: { manufacturer_code: "", manufacturer_name: "", country: "", contact_person: "", contact_number: "", email: "", address: "", status: "active" },
+      fields: [
+        { name: "manufacturer_code", label: "Manufacturer Code", required: true },
+        { name: "manufacturer_name", label: "Manufacturer Name", required: true },
+        { name: "country", label: "Country" },
+        { name: "contact_person", label: "Contact Person" },
+        { name: "contact_number", label: "Contact Number" },
+        { name: "email", label: "Email", type: "email" },
+        { name: "address", label: "Address", type: "textarea", colSpan: true },
+        { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+      ],
+      columns: [
+        { header: "Code", render: (row) => valueOf(row, ["manufacturer_code"]) },
+        { header: "Name", render: (row) => valueOf(row, ["manufacturer_name"]) },
+        { header: "Country", render: (row) => valueOf(row, ["country"]) },
+        { header: "Email", render: (row) => valueOf(row, ["email"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+      ],
+      buildPayload: (form) => compact({ ...form, company_id: context.companyId, status: normalizeStatus(form.status) }),
+    },
+  ];
 }
 
-export function ProductsPage() {
+const statusOptions = [
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
+];
+
+function BackendCrudPage({
+  title,
+  description,
+  icon,
+  rows,
+  loading,
+  error,
+  refresh,
+  fields,
+  columns,
+  defaults,
+  buildPayload,
+  create,
+  update,
+  get,
+  deactivate,
+  permissionContext,
+  requireBranchForSubmit = false,
+  addLabel = "Add New",
+}: {
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  rows: ApiRecord[];
+  loading: boolean;
+  error: string;
+  refresh: () => Promise<void>;
+  fields: FieldConfig[];
+  columns: TableColumn[];
+  defaults: ApiRecord;
+  buildPayload: (form: ApiRecord, context: InventoryContextValue) => ApiRecord;
+  create: (payload: ApiRecord) => Promise<any>;
+  update: (id: string | number, payload: ApiRecord) => Promise<any>;
+  get: (id: string | number) => Promise<any>;
+  deactivate: (id: string | number) => Promise<any>;
+  permissionContext: InventoryContextValue;
+  requireBranchForSubmit?: boolean;
+  addLabel?: string;
+}) {
   const [search, setSearch] = useState("");
-  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; product?: Product }>({ open: false, mode: "create" });
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
+  const [form, setForm] = useState<ApiRecord>(defaults);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
   const filtered = useMemo(
-    () => products.filter((product) => `${product.code} ${product.name} ${product.category}`.toLowerCase().includes(search.toLowerCase())),
-    [search],
+    () => rows.filter((row) => JSON.stringify(row).toLowerCase().includes(search.toLowerCase())),
+    [rows, search],
   );
 
+  const openCreate = () => {
+    setErrors({});
+    setForm(defaults);
+    setDrawer({ open: true, mode: "create" });
+  };
+
+  const openRecord = async (row: ApiRecord, mode: DrawerMode) => {
+    const id = getId(row);
+    if (!id) return;
+    setSubmitting(true);
+    setErrors({});
+    try {
+      const response = await get(id);
+      setForm({ ...defaults, ...unwrapData(response) });
+      setDrawer({ open: true, mode, id });
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submit = async () => {
+    if (!requireCompany(permissionContext)) return;
+    if (requireBranchForSubmit && !requireBranch(permissionContext)) return;
+    const nextErrors = validateForm(fields, form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+    setSubmitting(true);
+    try {
+      const payload = buildPayload(form, permissionContext);
+      if (drawer.mode === "edit" && drawer.id) {
+        await update(drawer.id, payload);
+        toast.success(`${title} updated`);
+      } else {
+        await create(payload);
+        toast.success(`${title} created`);
+      }
+      setDrawer({ open: false, mode: "create" });
+      setForm(defaults);
+      await refresh();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const deactivateRecord = async (row: ApiRecord) => {
+    const id = getId(row);
+    if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
+    await runBackendAction(() => deactivate(id), `${nameOf(row)} deactivated`, refresh);
+  };
+
   return (
-    <InventoryPage
-      title="Products"
-      description="Manage product master records, pharma details, stock rules, and pricing."
-      icon={Package}
-    >
+    <InventoryPage title={title} description={description} icon={icon}>
       <SearchToolbar search={search} setSearch={setSearch}>
-        <Select defaultValue="all">
-          <SelectTrigger className="h-9 w-40 rounded-lg border-slate-200">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="analgesics">Analgesics</SelectItem>
-            <SelectItem value="antibiotics">Antibiotics</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select defaultValue="active">
-          <SelectTrigger className="h-9 w-36 rounded-lg border-slate-200">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-            <SelectItem value="all">All Status</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button variant="outline" className="rounded-lg border-slate-200">Import Products</Button>
-        <Button variant="outline" className="rounded-lg border-slate-200">Export</Button>
-        <Button onClick={() => setDrawer({ open: true, mode: "create" })} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+        <Button onClick={openCreate} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
           <Plus className="h-4 w-4" />
-          Add Product
+          {addLabel}
         </Button>
       </SearchToolbar>
-
       <DataGrid
+        loading={loading}
+        error={error}
+        data={filtered}
         columns={[
-          { header: "Product Code", accessor: "code" },
-          { header: "Product Name", accessor: "name" },
-          { header: "Generic Name", accessor: "genericName" },
-          { header: "Category", accessor: "category" },
-          { header: "Dosage Form", accessor: "dosageForm" },
-          { header: "Unit", accessor: "unit" },
-          { header: "Manufacturer", accessor: "manufacturer" },
-          { header: "Stock Status", render: (row) => <StatusBadge status={row.stockStatus} /> },
-          { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+          ...columns,
           {
             header: "Actions",
             render: (row) => (
               <ActionMenu
-                onView={() => setDrawer({ open: true, mode: "view", product: row })}
-                onEdit={() => setDrawer({ open: true, mode: "edit", product: row })}
-                extra="View Batches"
+                onView={() => openRecord(row, "view")}
+                onEdit={() => openRecord(row, "edit")}
+                onDeactivate={() => deactivateRecord(row)}
               />
             ),
           },
         ]}
-        data={filtered}
       />
-
-      <InventoryDrawer
+      <DrawerForm
         open={drawer.open}
         onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
-        title={drawer.mode === "create" ? "Add Product" : drawer.mode === "edit" ? "Edit Product" : drawer.product?.name || "Product Details"}
-        description="Use setup values for generic names, categories, dosage forms, units, and manufacturers."
-        primaryLabel={drawer.mode === "view" ? "Done" : "Save Product"}
-      >
-        <ProductForm mode={drawer.mode} />
-      </InventoryDrawer>
+        title={drawer.mode === "create" ? addLabel : drawer.mode === "edit" ? `Update ${title}` : `${title} Details`}
+        description="This action is connected to the Go backend and refreshes the list after success."
+        fields={fields}
+        form={form}
+        setForm={setForm}
+        errors={errors}
+        mode={drawer.mode}
+        submitting={submitting}
+        onSubmit={submit}
+        primaryLabel={drawer.mode === "edit" ? "Update" : "Save"}
+      />
     </InventoryPage>
   );
 }
 
 export function ProductSetupPage() {
+  const context = useInventoryContext();
+  const configs = useMemo(() => setupConfigs(context), [context.companyId, context.branchId]);
+  const [activeTab, setActiveTab] = useState(configs[0].key);
   const [search, setSearch] = useState("");
-  const [drawerTitle, setDrawerTitle] = useState("Add Category");
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number; config: SetupConfig }>({
+    open: false,
+    mode: "create",
+    config: configs[0],
+  });
+  const [form, setForm] = useState<ApiRecord>(configs[0].defaults);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const activeConfig = configs.find((config) => config.key === activeTab) || configs[0];
+  const list = useBackendList(activeConfig.list, { company_id: context.companyId, limit: 1000, search }, !!context.companyId);
+
+  useEffect(() => {
+    setForm(activeConfig.defaults);
+  }, [activeConfig.key]);
+
+  const openSetup = async (mode: DrawerMode, row?: ApiRecord) => {
+    setErrors({});
+    if (!row) {
+      setForm(activeConfig.defaults);
+      setDrawer({ open: true, mode: "create", config: activeConfig });
+      return;
+    }
+    const id = getId(row);
+    if (!id) return;
+    setSubmitting(true);
+    try {
+      const response = await activeConfig.get(id);
+      setForm({ ...activeConfig.defaults, ...unwrapData(response) });
+      setDrawer({ open: true, mode, id, config: activeConfig });
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submit = async () => {
+    if (!requireCompany(context)) return;
+    const nextErrors = validateForm(drawer.config.fields, form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+    setSubmitting(true);
+    try {
+      const payload = drawer.config.buildPayload(form, context);
+      if (drawer.mode === "edit" && drawer.id) {
+        await drawer.config.update(drawer.id, payload);
+        toast.success(`${drawer.config.singular} updated`);
+      } else {
+        await drawer.config.create(payload);
+        toast.success(`${drawer.config.singular} created`);
+      }
+      setDrawer((current) => ({ ...current, open: false }));
+      await list.refresh();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const deactivateSetup = async (config: SetupConfig, row: ApiRecord) => {
+    const id = getId(row);
+    if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
+    await runBackendAction(() => config.deactivate(id), `${config.singular} deactivated`, list.refresh);
+  };
 
   return (
-    <InventoryPage
-      title="Product Setup"
-      description="Manage categories, units, dosage forms, generic names, and manufacturers in one place."
-      icon={Settings}
-    >
-      <SearchToolbar search={search} setSearch={setSearch} />
-      <Tabs defaultValue="categories" className="gap-4">
+    <InventoryPage title="Product Setup" description="Manage product-related setup data in one backend-backed screen." icon={Settings}>
+      <SearchToolbar search={search} setSearch={setSearch}>
+        <Button onClick={() => openSetup("create")} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+          <Plus className="h-4 w-4" />
+          Add {activeConfig.singular}
+        </Button>
+      </SearchToolbar>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="gap-4">
         <TabsList className="flex h-auto w-full flex-wrap justify-start bg-white p-1 shadow-sm">
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="units">Units</TabsTrigger>
-          <TabsTrigger value="dosageForms">Dosage Forms</TabsTrigger>
-          <TabsTrigger value="genericNames">Generic Names</TabsTrigger>
-          <TabsTrigger value="manufacturers">Manufacturers</TabsTrigger>
+          {configs.map((config) => (
+            <TabsTrigger key={config.key} value={config.key}>
+              {config.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
-        {(Object.keys(setupTables) as Array<keyof typeof setupTables>).map((key) => {
-          const setup = setupTables[key];
-          return (
-            <TabsContent key={key} value={key} className="space-y-3">
-              <div className="flex justify-end">
-                <Button
-                  onClick={() => {
-                    setDrawerTitle(setup.addLabel);
-                    setDrawerOpen(true);
-                  }}
-                  className="rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-                >
-                  <Plus className="h-4 w-4" />
-                  {setup.addLabel}
-                </Button>
-              </div>
-              <SimpleTable
-                columns={[...setup.columns, "Actions"]}
-                rows={setup.rows
-                  .filter((row) => row.join(" ").toLowerCase().includes(search.toLowerCase()))
-                  .map((row) => [
-                    ...row.slice(0, -1),
-                    <StatusBadge key="status" status={row[row.length - 1]} />,
+        {configs.map((config) => (
+          <TabsContent key={config.key} value={config.key}>
+            <DataGrid
+              loading={list.loading && activeTab === config.key}
+              error={list.error}
+              data={list.rows}
+              columns={[
+                ...config.columns,
+                {
+                  header: "Actions",
+                  render: (row) => (
                     <ActionMenu
-                      key="actions"
-                      onEdit={() => {
-                        setDrawerTitle(`Edit ${setup.title.slice(0, -1)}`);
-                        setDrawerOpen(true);
-                      }}
-                    />,
-                  ])}
-              />
-            </TabsContent>
-          );
-        })}
+                      onView={() => openSetup("view", row)}
+                      onEdit={() => openSetup("edit", row)}
+                      onDeactivate={() => deactivateSetup(config, row)}
+                    />
+                  ),
+                },
+              ]}
+            />
+          </TabsContent>
+        ))}
       </Tabs>
-      <InventoryDrawer
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        title={drawerTitle}
-        description="Setup records are used by Product Master forms and inventory reports."
-        primaryLabel="Save Setup"
-      >
-        <FormSection title="Setup Details">
-          <Field label="Code or Name" required />
-          <Field label="Description" />
-          <SelectField label="Status" values={["Active", "Inactive"]} required />
-          <Field label="Contact Number" />
-          <Field label="Email" />
-          <Field label="Country" />
-        </FormSection>
-      </InventoryDrawer>
+      <DrawerForm
+        open={drawer.open}
+        onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
+        title={drawer.mode === "create" ? `Add ${drawer.config.singular}` : drawer.mode === "edit" ? `Update ${drawer.config.singular}` : `${drawer.config.singular} Details`}
+        description="Setup records are loaded from and saved to the Go backend."
+        fields={drawer.config.fields}
+        form={form}
+        setForm={setForm}
+        errors={errors}
+        mode={drawer.mode}
+        submitting={submitting}
+        onSubmit={submit}
+        primaryLabel={drawer.mode === "edit" ? "Update" : "Save"}
+      />
     </InventoryPage>
   );
 }
 
 export function SuppliersPage() {
-  const [search, setSearch] = useState("");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const filtered = suppliers.filter((supplier) => `${supplier.code} ${supplier.name}`.toLowerCase().includes(search.toLowerCase()));
+  const context = useInventoryContext();
+  const list = useBackendList(inventoryApi.getSuppliers, { company_id: context.companyId, limit: 1000 }, !!context.companyId);
+  const fields: FieldConfig[] = [
+    { name: "supplier_code", label: "Supplier Code", required: true },
+    { name: "supplier_name", label: "Supplier Name", required: true },
+    { name: "contact_person", label: "Contact Person" },
+    { name: "contact_number", label: "Phone" },
+    { name: "email", label: "Email", type: "email" },
+    { name: "payment_terms_days", label: "Payment Terms Days", type: "number" },
+    { name: "address", label: "Address", type: "textarea", colSpan: true },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+  ];
 
   return (
-    <InventoryPage title="Suppliers" description="Create and manage suppliers." icon={Truck}>
-      <SearchToolbar search={search} setSearch={setSearch}>
-        <Button onClick={() => setDrawerOpen(true)} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-          <Plus className="h-4 w-4" />
-          Add Supplier
-        </Button>
-      </SearchToolbar>
+    <BackendCrudPage
+      title="Suppliers"
+      description="Create and manage suppliers."
+      icon={Truck}
+      rows={list.rows}
+      loading={list.loading}
+      error={list.error}
+      refresh={list.refresh}
+      fields={fields}
+      columns={[
+        { header: "Supplier Code", render: (row) => valueOf(row, ["supplier_code"]) },
+        { header: "Supplier Name", render: (row) => valueOf(row, ["supplier_name"]) },
+        { header: "Contact Person", render: (row) => valueOf(row, ["contact_person"]) },
+        { header: "Phone", render: (row) => valueOf(row, ["contact_number", "phone"]) },
+        { header: "Email", render: (row) => valueOf(row, ["email"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+      ]}
+      defaults={{ supplier_code: "", supplier_name: "", contact_person: "", contact_number: "", email: "", address: "", payment_terms_days: 0, status: "active" }}
+      buildPayload={(form, ctx) => compact({ ...form, company_id: ctx.companyId, payment_terms_days: toNumber(form.payment_terms_days), status: normalizeStatus(form.status) })}
+      create={inventoryApi.createSupplier}
+      update={inventoryApi.updateSupplier}
+      get={inventoryApi.getSupplierById}
+      deactivate={inventoryApi.deactivateSupplier}
+      permissionContext={context}
+      addLabel="Add Supplier"
+    />
+  );
+}
+
+export function ProductsPage() {
+  const context = useInventoryContext();
+  const { refs, refresh: refreshRefs } = useReferenceData();
+  const list = useBackendList(inventoryApi.getProducts, { company_id: context.companyId, limit: 1000 }, !!context.companyId);
+  const fields: FieldConfig[] = [
+    { name: "product_code", label: "Product Code", required: true },
+    { name: "product_name", label: "Product Name", required: true },
+    { name: "generic_name_id", label: "Generic Name", type: "select", options: makeOptions(refs.genericNames, ["generic_name"]) },
+    { name: "product_category_id", label: "Category", type: "select", required: true, options: makeOptions(refs.categories, ["category_name"]) },
+    { name: "dosage_form_id", label: "Dosage Form", type: "select", options: makeOptions(refs.dosageForms, ["dosage_form_name"]) },
+    { name: "base_unit_id", label: "Unit", type: "select", required: true, options: makeOptions(refs.units, ["unit_name"]) },
+    { name: "manufacturer_id", label: "Manufacturer", type: "select", options: makeOptions(refs.manufacturers, ["manufacturer_name"]) },
+    { name: "barcode", label: "Barcode" },
+    { name: "strength", label: "Strength" },
+    { name: "pack_size", label: "Pack Size" },
+    { name: "product_type", label: "Product Type", type: "select", required: true, options: [{ label: "Medicine", value: "medicine" }, { label: "Medical Device", value: "medical_device" }, { label: "Other", value: "other" }] },
+    { name: "requires_batch_tracking", label: "Batch Tracking Required", type: "switch" },
+    { name: "requires_expiry_tracking", label: "Expiry Tracking Required", type: "switch" },
+    { name: "storage_condition", label: "Storage Condition", type: "select", options: [{ label: "Room Temperature", value: "room_temperature" }, { label: "Cold Storage", value: "cold_storage" }, { label: "Controlled", value: "controlled" }] },
+    { name: "reorder_level", label: "Reorder Level", type: "number" },
+    { name: "reorder_quantity", label: "Reorder Quantity", type: "number" },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+  ];
+  const defaults = {
+    product_code: "",
+    product_name: "",
+    product_category_id: "",
+    generic_name_id: "",
+    dosage_form_id: "",
+    manufacturer_id: "",
+    base_unit_id: "",
+    barcode: "",
+    strength: "",
+    pack_size: "",
+    product_type: "medicine",
+    requires_batch_tracking: true,
+    requires_expiry_tracking: true,
+    storage_condition: "room_temperature",
+    reorder_level: 0,
+    reorder_quantity: 0,
+    status: "active",
+  };
+
+  return (
+    <BackendCrudPage
+      title="Products"
+      description="Manage product master records, pharma details, stock rules, and pricing."
+      icon={Package}
+      rows={list.rows}
+      loading={list.loading}
+      error={list.error}
+      refresh={async () => {
+        await list.refresh();
+        await refreshRefs();
+      }}
+      fields={fields}
+      columns={[
+        { header: "Product Code", render: (row) => valueOf(row, ["product_code"]) },
+        { header: "Product Name", render: (row) => valueOf(row, ["product_name"]) },
+        { header: "Generic Name", render: (row) => valueOf(row, ["generic_name.generic_name", "generic_name"]) },
+        { header: "Category", render: (row) => valueOf(row, ["product_category.category_name", "category.category_name", "category_name"]) },
+        { header: "Unit", render: (row) => valueOf(row, ["base_unit.unit_name", "unit.unit_name", "unit_name"]) },
+        { header: "Manufacturer", render: (row) => valueOf(row, ["manufacturer.manufacturer_name", "manufacturer_name"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+      ]}
+      defaults={defaults}
+      buildPayload={(form, ctx) =>
+        compact({
+          ...form,
+          company_id: ctx.companyId,
+          product_category_id: toNullableNumber(form.product_category_id),
+          generic_name_id: toNullableNumber(form.generic_name_id),
+          dosage_form_id: toNullableNumber(form.dosage_form_id),
+          manufacturer_id: toNullableNumber(form.manufacturer_id),
+          base_unit_id: toNumber(form.base_unit_id),
+          reorder_level: toNumber(form.reorder_level),
+          reorder_quantity: toNumber(form.reorder_quantity),
+          status: normalizeStatus(form.status),
+          barcodes: form.barcode ? [{ barcode: form.barcode, barcode_type: "primary" }] : [],
+        })
+      }
+      create={inventoryApi.createProduct}
+      update={inventoryApi.updateProduct}
+      get={inventoryApi.getProductById}
+      deactivate={inventoryApi.deactivateProduct}
+      permissionContext={context}
+      addLabel="Add Product"
+    />
+  );
+}
+
+export function ProductBatchesPage() {
+  const context = useInventoryContext();
+  const { refs } = useReferenceData();
+  const list = useBackendList(inventoryApi.getProductBatches, { company_id: context.companyId, limit: 1000 }, !!context.companyId);
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "view" });
+  const [form, setForm] = useState<ApiRecord>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const fields: FieldConfig[] = [
+    { name: "batch_number", label: "Batch Number", required: true },
+    { name: "manufacture_date", label: "Manufacture Date", type: "date" },
+    { name: "expiry_date", label: "Expiry Date", type: "date" },
+    { name: "supplier_id", label: "Supplier", type: "select", options: makeOptions(refs.suppliers, ["supplier_name"]) },
+    { name: "manufacturer_id", label: "Manufacturer", type: "select", options: makeOptions(refs.manufacturers, ["manufacturer_name"]) },
+    { name: "purchase_rate", label: "Purchase Rate", type: "number" },
+    { name: "selling_price", label: "Selling Price", type: "number" },
+    { name: "mrp", label: "MRP", type: "number" },
+    { name: "batch_status", label: "Status", type: "select", required: true, options: statusOptions },
+  ];
+
+  const openBatch = async (row: ApiRecord, mode: DrawerMode) => {
+    const id = getId(row);
+    if (!id) return;
+    setSubmitting(true);
+    setErrors({});
+    try {
+      const response = await inventoryApi.getProductBatchById(id);
+      setForm({ batch_status: "active", ...unwrapData(response) });
+      setDrawer({ open: true, mode, id });
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submit = async () => {
+    const nextErrors = validateForm(fields, form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length || !drawer.id) return;
+    setSubmitting(true);
+    try {
+      await inventoryApi.updateProductBatch(drawer.id, compact({
+        batch_number: form.batch_number,
+        manufacture_date: form.manufacture_date || null,
+        expiry_date: form.expiry_date || null,
+        supplier_id: toNullableNumber(form.supplier_id),
+        manufacturer_id: toNullableNumber(form.manufacturer_id),
+        purchase_rate: toNumber(form.purchase_rate),
+        selling_price: toNumber(form.selling_price),
+        mrp: toNumber(form.mrp),
+        batch_status: normalizeStatus(form.batch_status),
+      }));
+      toast.success("Batch updated");
+      setDrawer((current) => ({ ...current, open: false }));
+      await list.refresh();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const holdBatch = async (row: ApiRecord) => {
+    const id = getId(row);
+    if (!id || !window.confirm(`Hold batch ${nameOf(row)}?`)) return;
+    await runBackendAction(() => inventoryApi.holdProductBatch(id, { block_reason: "Held from inventory module" }), "Batch held", list.refresh);
+  };
+
+  const releaseBatch = async (row: ApiRecord) => {
+    const id = getId(row);
+    if (!id || !window.confirm(`Release batch ${nameOf(row)}?`)) return;
+    await runBackendAction(() => inventoryApi.releaseProductBatch(id), "Batch released", list.refresh);
+  };
+
+  return (
+    <InventoryPage title="Product Batches" description="View and manage product batch records created by GRNs." icon={Boxes}>
       <DataGrid
+        loading={list.loading}
+        error={list.error}
+        data={list.rows}
         columns={[
-          { header: "Supplier Code", accessor: "code" },
-          { header: "Supplier Name", accessor: "name" },
-          { header: "Contact Person", accessor: "contactPerson" },
-          { header: "Phone", accessor: "phone" },
-          { header: "Email", accessor: "email" },
-          { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
-          { header: "Actions", render: () => <ActionMenu onEdit={() => setDrawerOpen(true)} /> },
+          { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name", "product_id"]) },
+          { header: "Batch Number", render: (row) => valueOf(row, ["batch_number"]) },
+          { header: "Manufacture Date", render: (row) => normalizeDate(row.manufacture_date) || "—" },
+          { header: "Expiry Date", render: (row) => normalizeDate(row.expiry_date) || "—" },
+          { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
+          {
+            header: "Actions",
+            render: (row) => (
+              <ActionMenu
+                onView={() => openBatch(row, "view")}
+                onEdit={() => openBatch(row, "edit")}
+                onHold={() => holdBatch(row)}
+                onRelease={() => releaseBatch(row)}
+              />
+            ),
+          },
         ]}
-        data={filtered}
       />
-      <InventoryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} title="Supplier" description="Supplier records feed GRNs and purchase returns." primaryLabel="Save Supplier">
-        <FormSection title="Supplier Details">
-          <Field label="Supplier Code" required />
-          <Field label="Supplier Name" required />
-          <Field label="Contact Person" />
-          <Field label="Phone" />
-          <Field label="Email" type="email" />
-          <Field label="Payment Terms" />
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label className="text-xs font-medium tracking-normal text-slate-600">Address</Label>
-            <Textarea className="min-h-24 rounded-lg border-slate-200 tracking-normal" />
-          </div>
-          <SelectField label="Status" values={["Active", "Inactive"]} required />
-        </FormSection>
-      </InventoryDrawer>
+      <DrawerForm
+        open={drawer.open}
+        onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
+        title={drawer.mode === "edit" ? "Update Batch" : "Batch Details"}
+        description="Limited batch edits are saved to the Go backend."
+        fields={fields}
+        form={form}
+        setForm={setForm}
+        errors={errors}
+        mode={drawer.mode}
+        submitting={submitting}
+        onSubmit={submit}
+        primaryLabel="Update"
+      />
     </InventoryPage>
   );
 }
 
 export function WarehousesAndLocationsPage() {
-  const [selectedWarehouse, setSelectedWarehouse] = useState(warehouses[0]);
-  const [drawer, setDrawer] = useState<"warehouse" | "location" | null>(null);
+  const context = useInventoryContext();
+  const warehouses = useBackendList(inventoryApi.getWarehouses, { company_id: context.companyId, branch_id: context.branchId, limit: 1000 }, !!context.companyId);
+  const [selected, setSelected] = useState<ApiRecord | null>(null);
+  const locations = useBackendList(inventoryApi.getWarehouseLocations, { warehouse_id: getId(selected), company_id: context.companyId, limit: 1000 }, !!getId(selected));
+  const [drawerType, setDrawerType] = useState<"warehouse" | "location" | null>(null);
+
+  useEffect(() => {
+    if (!selected && warehouses.rows.length) setSelected(warehouses.rows[0]);
+  }, [warehouses.rows, selected]);
+
+  const warehouseFields: FieldConfig[] = [
+    { name: "warehouse_code", label: "Warehouse Code", required: true },
+    { name: "warehouse_name", label: "Warehouse Name", required: true },
+    { name: "warehouse_type", label: "Warehouse Type", type: "select", required: true, options: [{ label: "Primary", value: "primary" }, { label: "Branch", value: "branch" }, { label: "Cold Storage", value: "cold_storage" }, { label: "Quarantine", value: "quarantine" }] },
+    { name: "address", label: "Address" },
+    { name: "contact_person", label: "Responsible Person" },
+    { name: "contact_number", label: "Contact Number" },
+    { name: "is_default", label: "Default Warehouse", type: "switch" },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+  ];
+  const locationFields: FieldConfig[] = [
+    { name: "location_code", label: "Location Code", required: true },
+    { name: "location_name", label: "Location Name" },
+    { name: "rack", label: "Rack" },
+    { name: "shelf", label: "Shelf" },
+    { name: "bin", label: "Bin" },
+    { name: "storage_condition", label: "Storage Condition", type: "select", required: true, options: [{ label: "Room Temperature", value: "room_temperature" }, { label: "Cold Storage", value: "cold_storage" }, { label: "Controlled", value: "controlled" }] },
+    { name: "status", label: "Status", type: "select", required: true, options: statusOptions },
+  ];
 
   return (
     <InventoryPage
@@ -1102,7 +1560,7 @@ export function WarehousesAndLocationsPage() {
       description="Manage warehouses, branch stock locations, racks, shelves, and bins."
       icon={Warehouse}
       actions={
-        <Button onClick={() => setDrawer("warehouse")} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+        <Button onClick={() => setDrawerType("warehouse")} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
           <Plus className="h-4 w-4" />
           Add Warehouse
         </Button>
@@ -1114,18 +1572,24 @@ export function WarehousesAndLocationsPage() {
             <CardTitle className="text-base font-semibold tracking-normal text-slate-950">Warehouse List</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {warehouses.map((warehouse) => (
+            {warehouses.loading ? <Skeleton className="h-20 rounded-xl" /> : null}
+            {warehouses.rows.map((warehouse) => (
               <button
-                key={warehouse.code}
-                onClick={() => setSelectedWarehouse(warehouse)}
-                className={`w-full rounded-xl border p-4 text-left transition ${
-                  selectedWarehouse.code === warehouse.code ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:bg-slate-50"
-                }`}
+                key={getId(warehouse)}
+                onClick={async () => {
+                  setSelected(warehouse);
+                  const id = getId(warehouse);
+                  if (id) {
+                    const response = await inventoryApi.getWarehouseById(id);
+                    setSelected(unwrapData(response));
+                  }
+                }}
+                className={`w-full rounded-xl border p-4 text-left transition ${getId(selected || {}) === getId(warehouse) ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold tracking-normal text-slate-950">{warehouse.name}</p>
-                    <p className="mt-1 text-xs tracking-normal text-slate-500">{warehouse.code} | {warehouse.branch}</p>
+                    <p className="font-semibold tracking-normal text-slate-950">{valueOf(warehouse, ["warehouse_name"])}</p>
+                    <p className="mt-1 text-xs tracking-normal text-slate-500">{valueOf(warehouse, ["warehouse_code"])} | {valueOf(warehouse, ["branch.branch_name", "branch_id"])}</p>
                   </div>
                   <StatusBadge status={warehouse.status} />
                 </div>
@@ -1136,329 +1600,638 @@ export function WarehousesAndLocationsPage() {
         <div className="space-y-4">
           <Card className="border border-slate-200 bg-white shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base font-semibold tracking-normal text-slate-950">{selectedWarehouse.name}</CardTitle>
+              <CardTitle className="text-base font-semibold tracking-normal text-slate-950">{selected ? valueOf(selected, ["warehouse_name"]) : "Select a warehouse"}</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                ["Warehouse Code", selectedWarehouse.code],
-                ["Branch", selectedWarehouse.branch],
-                ["Warehouse Type", selectedWarehouse.type],
-                ["Address", selectedWarehouse.address],
-                ["Responsible Person", selectedWarehouse.responsiblePerson],
-                ["Status", <StatusBadge key="status" status={selectedWarehouse.status} />],
-              ].map(([label, value]) => (
-                <div key={String(label)} className="rounded-xl border border-slate-200 p-3">
-                  <p className="text-xs font-medium tracking-normal text-slate-500">{label}</p>
-                  <div className="mt-1 text-sm font-semibold tracking-normal text-slate-950">{value}</div>
-                </div>
-              ))}
+              {selected ? (
+                [
+                  ["Warehouse Code", valueOf(selected, ["warehouse_code"])],
+                  ["Branch", valueOf(selected, ["branch.branch_name", "branch_id"])],
+                  ["Warehouse Type", valueOf(selected, ["warehouse_type"])],
+                  ["Address", valueOf(selected, ["address"])],
+                  ["Responsible Person", valueOf(selected, ["contact_person"])],
+                  ["Status", <StatusBadge key="status" status={selected.status} />],
+                ].map(([label, value]) => (
+                  <div key={String(label)} className="rounded-xl border border-slate-200 p-3">
+                    <p className="text-xs font-medium tracking-normal text-slate-500">{label}</p>
+                    <div className="mt-1 text-sm font-semibold tracking-normal text-slate-950">{value}</div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-slate-500">No warehouse selected.</p>
+              )}
             </CardContent>
           </Card>
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-base font-semibold tracking-normal text-slate-950">Internal Locations</h2>
-            <Button onClick={() => setDrawer("location")} variant="outline" className="rounded-lg border-slate-200">
+            <Button onClick={() => setDrawerType("location")} variant="outline" className="rounded-lg border-slate-200" disabled={!selected}>
               <Plus className="h-4 w-4" />
               Add Location
             </Button>
           </div>
-          <DataGrid
-            columns={[
-              { header: "Location Code", accessor: "code" },
-              { header: "Location Name", accessor: "name" },
-              { header: "Zone", accessor: "zone" },
-              { header: "Rack", accessor: "rack" },
-              { header: "Shelf", accessor: "shelf" },
-              { header: "Bin", accessor: "bin" },
-              { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
-            ]}
-            data={warehouseLocations}
+          <LocationManager
+            context={context}
+            selected={selected}
+            locations={locations}
+            warehouseFields={warehouseFields}
+            locationFields={locationFields}
+            drawerType={drawerType}
+            setDrawerType={setDrawerType}
+            refreshWarehouses={warehouses.refresh}
           />
         </div>
       </div>
-      <InventoryDrawer
-        open={drawer !== null}
-        onOpenChange={(open) => setDrawer(open ? drawer : null)}
-        title={drawer === "location" ? "Warehouse Location" : "Warehouse"}
-        description={drawer === "location" ? "Create zones, racks, shelves, and bins inside the selected warehouse." : "Create or edit warehouse master details."}
-        primaryLabel="Save"
-      >
-        {drawer === "location" ? (
-          <FormSection title="Warehouse Location">
-            <Field label="Location Code" required />
-            <Field label="Location Name" required />
-            <Field label="Zone" />
-            <Field label="Rack" />
-            <Field label="Shelf" />
-            <Field label="Bin" />
-            <SelectField label="Status" values={["Active", "Inactive"]} required />
-          </FormSection>
-        ) : (
-          <FormSection title="Warehouse Details">
-            <Field label="Warehouse Code" required />
-            <Field label="Warehouse Name" required />
-            <SelectField label="Branch" values={["Head Office", "Kandy", "Galle"]} required />
-            <SelectField label="Warehouse Type" values={["Primary", "Branch", "Cold Storage", "Quarantine"]} />
-            <Field label="Address" />
-            <Field label="Responsible Person" />
-            <SelectField label="Status" values={["Active", "Inactive"]} required />
-          </FormSection>
-        )}
-      </InventoryDrawer>
+    </InventoryPage>
+  );
+}
+
+function LocationManager({
+  context,
+  selected,
+  locations,
+  warehouseFields,
+  locationFields,
+  drawerType,
+  setDrawerType,
+  refreshWarehouses,
+}: {
+  context: InventoryContextValue;
+  selected: ApiRecord | null;
+  locations: ReturnType<typeof useBackendList>;
+  warehouseFields: FieldConfig[];
+  locationFields: FieldConfig[];
+  drawerType: "warehouse" | "location" | null;
+  setDrawerType: (type: "warehouse" | "location" | null) => void;
+  refreshWarehouses: () => Promise<void>;
+}) {
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
+  const [form, setForm] = useState<ApiRecord>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!drawerType) return;
+    if (drawerType === "warehouse") {
+      setForm({ warehouse_code: "", warehouse_name: "", warehouse_type: "primary", address: "", contact_person: "", contact_number: "", is_default: false, status: "active" });
+      setDrawer({ open: true, mode: "create" });
+    }
+    if (drawerType === "location" && selected) {
+      setForm({ location_code: "", location_name: "", rack: "", shelf: "", bin: "", storage_condition: "room_temperature", status: "active" });
+      setDrawer({ open: true, mode: "create" });
+    }
+  }, [drawerType]);
+
+  const fields = drawerType === "warehouse" ? warehouseFields : locationFields;
+
+  const submit = async () => {
+    if (!requireCompany(context)) return;
+    if (drawerType === "warehouse" && !requireBranch(context)) return;
+    if (drawerType === "location" && !selected) {
+      toast.error("Please select a warehouse first.");
+      return;
+    }
+    const nextErrors = validateForm(fields, form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+    setSubmitting(true);
+    try {
+      if (drawerType === "warehouse") {
+        const payload = compact({ ...form, company_id: context.companyId, branch_id: context.branchId, status: normalizeStatus(form.status) });
+        if (drawer.mode === "edit" && drawer.id) await inventoryApi.updateWarehouse(drawer.id, payload);
+        else await inventoryApi.createWarehouse(payload);
+        toast.success(drawer.mode === "edit" ? "Warehouse updated" : "Warehouse created");
+        await refreshWarehouses();
+      } else {
+        const payload = compact({ ...form, company_id: context.companyId, warehouse_id: getId(selected || {}), status: normalizeStatus(form.status) });
+        if (drawer.mode === "edit" && drawer.id) await inventoryApi.updateWarehouseLocation(drawer.id, payload);
+        else await inventoryApi.createWarehouseLocation(payload);
+        toast.success(drawer.mode === "edit" ? "Location updated" : "Location created");
+        await locations.refresh();
+      }
+      setDrawer((current) => ({ ...current, open: false }));
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const openLocation = async (row: ApiRecord, mode: DrawerMode) => {
+    setDrawerType("location");
+    setForm({ location_code: row.location_code, location_name: row.location_name, rack: row.rack, shelf: row.shelf, bin: row.bin, storage_condition: row.storage_condition || "room_temperature", status: normalizeStatus(row.status) });
+    setDrawer({ open: true, mode, id: getId(row) });
+  };
+
+  const deactivateLocation = async (row: ApiRecord) => {
+    const id = getId(row);
+    if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
+    await runBackendAction(() => inventoryApi.deactivateWarehouseLocation(id), "Location deactivated", locations.refresh);
+  };
+
+  return (
+    <>
+      <DataGrid
+        loading={locations.loading}
+        error={locations.error}
+        data={locations.rows}
+        columns={[
+          { header: "Location Code", render: (row) => valueOf(row, ["location_code"]) },
+          { header: "Location Name", render: (row) => valueOf(row, ["location_name"]) },
+          { header: "Rack", render: (row) => valueOf(row, ["rack"]) },
+          { header: "Shelf", render: (row) => valueOf(row, ["shelf"]) },
+          { header: "Bin", render: (row) => valueOf(row, ["bin"]) },
+          { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+          {
+            header: "Actions",
+            render: (row) => <ActionMenu onView={() => openLocation(row, "view")} onEdit={() => openLocation(row, "edit")} onDeactivate={() => deactivateLocation(row)} />,
+          },
+        ]}
+      />
+      <DrawerForm
+        open={drawer.open}
+        onOpenChange={(open) => {
+          setDrawer((current) => ({ ...current, open }));
+          if (!open) setDrawerType(null);
+        }}
+        title={`${drawer.mode === "edit" ? "Update" : drawer.mode === "view" ? "View" : "Add"} ${drawerType === "warehouse" ? "Warehouse" : "Location"}`}
+        description="Warehouse and location actions are saved to the Go backend."
+        fields={fields}
+        form={form}
+        setForm={setForm}
+        errors={errors}
+        mode={drawer.mode}
+        submitting={submitting}
+        onSubmit={submit}
+        primaryLabel={drawer.mode === "edit" ? "Update" : "Save"}
+      />
+    </>
+  );
+}
+
+type WorkflowKind = "opening" | "grn" | "transfer" | "adjustment" | "purchaseReturn" | "salesReturn";
+
+function workflowConfig(kind: WorkflowKind, refs: ReturnType<typeof useReferenceData>["refs"], context: InventoryContextValue) {
+  const productOptions = makeOptions(refs.products, ["product_name"]);
+  const warehouseOptions = makeOptions(refs.warehouses, ["warehouse_name"]);
+  const batchOptions = makeOptions(refs.batches, ["batch_number"]);
+  const supplierOptions = makeOptions(refs.suppliers, ["supplier_name"]);
+  const grnOptions = makeOptions(refs.grns, ["grn_number"]);
+  const baseLineFields: FieldConfig[] = [
+    { name: "product_id", label: "Product", type: "select", required: true, options: productOptions },
+    { name: "product_batch_id", label: "Batch", type: "select", options: batchOptions },
+    { name: "quantity", label: "Quantity", type: "number", required: true },
+    { name: "remarks", label: "Line Remarks" },
+  ];
+  const configs = {
+    opening: {
+      title: "Opening Stock",
+      description: "Enter starting stock when implementing the ERP.",
+      icon: FileText,
+      list: inventoryApi.getOpeningStockEntries,
+      get: inventoryApi.getOpeningStockEntryById,
+      create: inventoryApi.createOpeningStockEntry,
+      update: inventoryApi.updateOpeningStockEntry,
+      post: inventoryApi.postOpeningStockEntry,
+      cancel: inventoryApi.cancelOpeningStockEntry,
+      numberPath: "opening_stock_number",
+      datePath: "opening_stock_date",
+      fields: [
+        { name: "opening_stock_date", label: "Opening Date", type: "date", required: true },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "reference_number", label: "Reference Number" },
+        { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
+        ...baseLineFields,
+        { name: "unit_cost", label: "Cost Price", type: "number" },
+      ],
+      defaults: { opening_stock_date: "", warehouse_id: "", reference_number: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1, unit_cost: 0 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        opening_stock_date: form.opening_stock_date,
+        warehouse_id: toNumber(form.warehouse_id),
+        reference_number: form.reference_number,
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), quantity: toNumber(form.quantity), unit_cost: toNumber(form.unit_cost), line_remarks: form.remarks }],
+      }),
+    },
+    grn: {
+      title: "GRN / Goods Receipt",
+      description: "Receive supplier stock, record batches, and update inventory.",
+      icon: ClipboardList,
+      list: inventoryApi.getGRNs,
+      get: inventoryApi.getGRNById,
+      create: inventoryApi.createGRN,
+      update: inventoryApi.updateGRN,
+      post: inventoryApi.postGRN,
+      cancel: inventoryApi.cancelGRN,
+      numberPath: "grn_number",
+      datePath: "grn_date",
+      fields: [
+        { name: "grn_date", label: "GRN Date", type: "date", required: true },
+        { name: "supplier_id", label: "Supplier", type: "select", required: true, options: supplierOptions },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "purchase_order_number", label: "Purchase Order Number" },
+        { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
+        { name: "product_id", label: "Product", type: "select", required: true, options: productOptions },
+        { name: "batch_number", label: "Batch Number" },
+        { name: "manufacture_date", label: "Manufacture Date", type: "date" },
+        { name: "expiry_date", label: "Expiry Date", type: "date" },
+        { name: "quantity_received", label: "Quantity", type: "number", required: true },
+        { name: "free_quantity", label: "Free Quantity", type: "number" },
+        { name: "unit_cost", label: "Purchase Price", type: "number" },
+        { name: "selling_price", label: "Selling Price", type: "number" },
+        { name: "tax_amount", label: "Tax Amount", type: "number" },
+      ],
+      defaults: { grn_date: "", supplier_id: "", warehouse_id: "", purchase_order_number: "", remarks: "", product_id: "", batch_number: "", manufacture_date: "", expiry_date: "", quantity_received: 1, free_quantity: 0, unit_cost: 0, selling_price: 0, tax_amount: 0 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        supplier_id: toNumber(form.supplier_id),
+        warehouse_id: toNumber(form.warehouse_id),
+        grn_date: form.grn_date,
+        purchase_order_number: form.purchase_order_number,
+        remarks: form.remarks,
+        lines: [{
+          product_id: toNumber(form.product_id),
+          batch_number: form.batch_number,
+          manufacture_date: form.manufacture_date,
+          expiry_date: form.expiry_date,
+          quantity_received: toNumber(form.quantity_received),
+          free_quantity: toNumber(form.free_quantity),
+          unit_cost: toNumber(form.unit_cost),
+          selling_price: toNumber(form.selling_price),
+          tax_amount: toNumber(form.tax_amount),
+        }],
+      }),
+    },
+    transfer: {
+      title: "Stock Transfers",
+      description: "Transfer stock between warehouses or branches.",
+      icon: Repeat,
+      list: inventoryApi.getStockTransfers,
+      get: inventoryApi.getStockTransferById,
+      create: inventoryApi.createStockTransfer,
+      update: inventoryApi.updateStockTransfer,
+      post: inventoryApi.postStockTransfer,
+      cancel: inventoryApi.cancelStockTransfer,
+      numberPath: "transfer_number",
+      datePath: "transfer_date",
+      fields: [
+        { name: "transfer_date", label: "Transfer Date", type: "date", required: true },
+        { name: "from_warehouse_id", label: "From Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "to_warehouse_id", label: "To Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "reference_number", label: "Reference Number" },
+        { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
+        ...baseLineFields,
+      ],
+      defaults: { transfer_date: "", from_warehouse_id: "", to_warehouse_id: "", reference_number: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        transfer_date: form.transfer_date,
+        from_warehouse_id: toNumber(form.from_warehouse_id),
+        to_warehouse_id: toNumber(form.to_warehouse_id),
+        reference_number: form.reference_number,
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), quantity: toNumber(form.quantity), line_remarks: form.remarks }],
+      }),
+    },
+    adjustment: {
+      title: "Stock Adjustments",
+      description: "Correct stock differences for damage, expiry, and physical count variance.",
+      icon: SlidersHorizontal,
+      list: inventoryApi.getStockAdjustments,
+      get: inventoryApi.getStockAdjustmentById,
+      create: inventoryApi.createStockAdjustment,
+      update: inventoryApi.updateStockAdjustment,
+      post: inventoryApi.postStockAdjustment,
+      cancel: inventoryApi.cancelStockAdjustment,
+      numberPath: "adjustment_number",
+      datePath: "adjustment_date",
+      fields: [
+        { name: "adjustment_date", label: "Adjustment Date", type: "date", required: true },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "adjustment_type", label: "Adjustment Type", type: "select", required: true, options: ["increase", "decrease", "damage", "expiry", "correction"].map((value) => ({ label: value, value })) },
+        { name: "reason", label: "Reason" },
+        { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
+        ...baseLineFields,
+      ],
+      defaults: { adjustment_date: "", warehouse_id: "", adjustment_type: "increase", reason: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        adjustment_date: form.adjustment_date,
+        warehouse_id: toNumber(form.warehouse_id),
+        adjustment_type: form.adjustment_type,
+        reason: form.reason,
+        remarks: form.remarks,
+        lines: [{
+          product_id: toNumber(form.product_id),
+          product_batch_id: toNullableNumber(form.product_batch_id),
+          adjustment_direction: ["decrease", "damage", "expiry"].includes(String(form.adjustment_type)) ? "out" : "in",
+          quantity: toNumber(form.quantity),
+          line_reason: form.reason,
+          line_remarks: form.remarks,
+        }],
+      }),
+    },
+    purchaseReturn: {
+      title: "Purchase Returns",
+      description: "Return goods to suppliers and reduce stock after posting.",
+      icon: RotateCcw,
+      list: inventoryApi.getPurchaseReturns,
+      get: inventoryApi.getPurchaseReturnById,
+      create: inventoryApi.createPurchaseReturn,
+      update: inventoryApi.updatePurchaseReturn,
+      post: inventoryApi.postPurchaseReturn,
+      cancel: inventoryApi.cancelPurchaseReturn,
+      numberPath: "purchase_return_number",
+      datePath: "return_date",
+      fields: [
+        { name: "return_date", label: "Return Date", type: "date", required: true },
+        { name: "supplier_id", label: "Supplier", type: "select", required: true, options: supplierOptions },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "goods_receipt_note_id", label: "Related GRN", type: "select", options: grnOptions },
+        { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
+        ...baseLineFields,
+      ],
+      defaults: { return_date: "", supplier_id: "", warehouse_id: "", goods_receipt_note_id: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        return_date: form.return_date,
+        supplier_id: toNumber(form.supplier_id),
+        warehouse_id: toNumber(form.warehouse_id),
+        goods_receipt_note_id: toNullableNumber(form.goods_receipt_note_id),
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), return_quantity: toNumber(form.quantity), return_reason: form.remarks, line_remarks: form.remarks }],
+      }),
+    },
+    salesReturn: {
+      title: "Sales Returns",
+      description: "Receive returned stock from customers.",
+      icon: RotateCcw,
+      list: inventoryApi.getSalesReturns,
+      get: inventoryApi.getSalesReturnById,
+      create: inventoryApi.createSalesReturn,
+      update: inventoryApi.updateSalesReturn,
+      post: inventoryApi.postSalesReturn,
+      cancel: inventoryApi.cancelSalesReturn,
+      numberPath: "sales_return_number",
+      datePath: "sales_return_date",
+      fields: [
+        { name: "sales_return_date", label: "Return Date", type: "date", required: true },
+        { name: "customer_name", label: "Customer" },
+        { name: "sales_invoice_number", label: "Related Invoice" },
+        { name: "warehouse_id", label: "Warehouse", type: "select", required: true, options: warehouseOptions },
+        { name: "return_condition", label: "Condition", type: "select", required: true, options: ["good", "damaged", "expired"].map((value) => ({ label: value, value })) },
+        { name: "return_reason", label: "Reason", required: true },
+        { name: "remarks", label: "Notes", type: "textarea", colSpan: true },
+        ...baseLineFields,
+      ],
+      defaults: { sales_return_date: "", customer_name: "", sales_invoice_number: "", warehouse_id: "", return_condition: "good", return_reason: "", remarks: "", product_id: "", product_batch_id: "", quantity: 1 },
+      payload: (form: ApiRecord) => compact({
+        company_id: context.companyId,
+        branch_id: context.branchId,
+        sales_return_date: form.sales_return_date,
+        customer_name: form.customer_name,
+        sales_invoice_number: form.sales_invoice_number,
+        warehouse_id: toNumber(form.warehouse_id),
+        return_condition: form.return_condition,
+        return_reason: form.return_reason,
+        remarks: form.remarks,
+        lines: [{ product_id: toNumber(form.product_id), product_batch_id: toNullableNumber(form.product_batch_id), return_quantity: toNumber(form.quantity), return_condition: form.return_condition, return_reason: form.return_reason, line_remarks: form.remarks }],
+      }),
+    },
+  } as const;
+  return configs[kind];
+}
+
+function WorkflowPage({ kind }: { kind: WorkflowKind }) {
+  const context = useInventoryContext();
+  const references = useReferenceData();
+  const config = workflowConfig(kind, references.refs, context);
+  const list = useBackendList(config.list, { company_id: context.companyId, branch_id: context.branchId, limit: 1000 }, !!context.companyId);
+  const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
+  const [form, setForm] = useState<ApiRecord>(config.defaults);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const openCreate = () => {
+    setErrors({});
+    setForm(config.defaults);
+    setDrawer({ open: true, mode: "create" });
+  };
+
+  const openRecord = async (row: ApiRecord, mode: DrawerMode) => {
+    const id = getId(row);
+    if (!id) return;
+    setSubmitting(true);
+    try {
+      const response = await config.get(id);
+      setForm({ ...config.defaults, ...unwrapData(response) });
+      setDrawer({ open: true, mode, id });
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const save = async (postAfterSave = false) => {
+    if (!requireCompany(context) || !requireBranch(context)) return;
+    if (kind === "transfer" && form.from_warehouse_id && form.to_warehouse_id && form.from_warehouse_id === form.to_warehouse_id) {
+      setErrors({ to_warehouse_id: "From and To warehouse cannot be the same" });
+      return;
+    }
+    const nextErrors = validateForm(config.fields, form);
+    if (toNumber(form.quantity) <= 0) nextErrors.quantity = "Quantity must be greater than 0";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+    setSubmitting(true);
+    try {
+      const payload = config.payload(form);
+      const response = drawer.mode === "edit" && drawer.id ? await config.update(drawer.id, payload) : await config.create(payload);
+      const saved = unwrapData(response);
+      const savedId = drawer.id || getId(saved);
+      if (postAfterSave) {
+        if (!savedId) throw new Error("Backend did not return a record id to post.");
+        await config.post(savedId);
+        toast.success(`${config.title} posted`);
+      } else {
+        toast.success(drawer.mode === "edit" ? `${config.title} updated` : `${config.title} saved`);
+      }
+      setDrawer((current) => ({ ...current, open: false }));
+      await list.refresh();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const postRecord = async (row: ApiRecord) => {
+    const id = getId(row);
+    if (!id || !window.confirm(`Post ${nameOf(row)}?`)) return;
+    await runBackendAction(() => config.post(id), `${config.title} posted`, list.refresh);
+  };
+
+  const cancelRecord = async (row: ApiRecord) => {
+    const id = getId(row);
+    if (!id || !window.confirm(`Deactivate ${nameOf(row)}?`)) return;
+    await runBackendAction(() => config.cancel(id, { remarks: "Cancelled from inventory module" }), `${config.title} deactivated`, list.refresh);
+  };
+
+  return (
+    <InventoryPage
+      title={config.title}
+      description={config.description}
+      icon={config.icon}
+      actions={
+        <Button onClick={openCreate} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+          <Plus className="h-4 w-4" />
+          New
+        </Button>
+      }
+    >
+      <DataGrid
+        loading={list.loading}
+        error={list.error}
+        data={list.rows}
+        columns={[
+          { header: "Number", render: (row) => valueOf(row, [config.numberPath, "reference_number", "id"]) },
+          { header: "Date", render: (row) => normalizeDate(valueOf(row, [config.datePath], "")) },
+          { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name", "warehouse_id", "from_warehouse_id"]) },
+          { header: "Quantity", render: (row) => valueOf(row, ["total_quantity", "quantity"], "—") },
+          { header: "Approval", render: (row) => <StatusBadge status={valueOf(row, ["approval_status"], "draft")} /> },
+          { header: "Posted", render: (row) => <StatusBadge status={valueOf(row, ["posted_status"], "draft")} /> },
+          {
+            header: "Actions",
+            render: (row) => <ActionMenu onView={() => openRecord(row, "view")} onEdit={() => openRecord(row, "edit")} onPost={() => postRecord(row)} onDeactivate={() => cancelRecord(row)} />,
+          },
+        ]}
+      />
+      <DrawerForm
+        open={drawer.open}
+        onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))}
+        title={drawer.mode === "create" ? `New ${config.title}` : drawer.mode === "edit" ? `Update ${config.title}` : `${config.title} Details`}
+        description="Save Draft and Post both call the Go backend. Posting refreshes the list after success."
+        fields={config.fields}
+        form={form}
+        setForm={setForm}
+        errors={errors}
+        mode={drawer.mode}
+        submitting={submitting}
+        onSubmit={() => save(false)}
+        primaryLabel={drawer.mode === "edit" ? "Update Draft" : "Save Draft"}
+        secondaryAction={
+          drawer.mode === "view" ? null : (
+            <Button type="button" variant="outline" disabled={submitting} onClick={() => save(true)}>
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Post
+            </Button>
+          )
+        }
+      />
     </InventoryPage>
   );
 }
 
 export function GRNPage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  return (
-    <InventoryPage
-      title="GRN / Goods Receipt"
-      description="Receive supplier stock, record batch numbers, expiry dates, and update warehouse inventory."
-      icon={ClipboardList}
-      actions={
-        <>
-          <Button variant="outline" className="rounded-lg border-slate-200">Save Draft</Button>
-          <Button className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">Post GRN</Button>
-        </>
-      }
-    >
-      <Card className="border border-slate-200 bg-white shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold tracking-normal text-slate-950">GRN Header</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Field label="GRN Number" required />
-            <Field label="GRN Date" type="date" required />
-            <SelectField label="Supplier" values={suppliers.map((supplier) => supplier.name)} required />
-            <Field label="Purchase Order Number" />
-            <SelectField label="Warehouse" values={warehouses.map((warehouse) => warehouse.name)} required />
-            <Field label="Received By" />
-            <div className="space-y-1.5 lg:col-span-2">
-              <Label className="text-xs font-medium tracking-normal text-slate-600">Notes</Label>
-              <Textarea className="min-h-20 rounded-lg border-slate-200 tracking-normal" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold tracking-normal text-slate-950">Line Items</h2>
-        <Button onClick={() => setDrawerOpen(true)} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-          <Plus className="h-4 w-4" />
-          Add Line
-        </Button>
-      </div>
-      <SimpleTable
-        columns={["Product", "Batch Number", "Manufacture Date", "Expiry Date", "Quantity", "Free Qty", "Purchase Price", "Selling Price", "Tax", "Total"]}
-        rows={[
-          ["Paracetamol 500mg Tablet", "B-PAR-2406", "2025-01-15", "2027-01-15", "1,200", "60", "Rs. 95", "Rs. 130", "8%", "Rs. 123,120"],
-          ["Amoxicillin 250mg Capsule", "B-AMX-2502", "2024-10-10", "2026-07-20", "480", "24", "Rs. 560", "Rs. 680", "8%", "Rs. 290,304"],
-        ]}
-      />
-      <InventoryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} title="GRN Line Item" description="Batch and expiry fields are required when tracking is enabled." primaryLabel="Add Line">
-        <FormSection title="Line Item">
-          <SelectField label="Product" values={products.map((product) => product.name)} required />
-          <Field label="Batch Number" required />
-          <Field label="Manufacture Date" type="date" />
-          <Field label="Expiry Date" type="date" required />
-          <Field label="Quantity" type="number" required />
-          <Field label="Free Quantity" type="number" />
-          <Field label="Purchase Price" type="number" />
-          <Field label="Selling Price" type="number" />
-          <Field label="Tax" type="number" />
-          <Field label="Total" type="number" />
-        </FormSection>
-      </InventoryDrawer>
-    </InventoryPage>
-  );
-}
-
-export function ProductBatchesPage() {
-  const [drawer, setDrawer] = useState<{ open: boolean; batch?: ProductBatch }>({ open: false });
-  return (
-    <InventoryPage
-      title="Product Batches"
-      description="View and manage product batch records. Most batches are created automatically from GRNs."
-      icon={Boxes}
-    >
-      <DataGrid
-        columns={[
-          { header: "Product", accessor: "product" },
-          { header: "Batch Number", accessor: "batchNo" },
-          { header: "Manufacture Date", accessor: "manufactureDate" },
-          { header: "Expiry Date", accessor: "expiryDate" },
-          { header: "Quantity", accessor: "quantity" },
-          { header: "Warehouse", accessor: "warehouse" },
-          { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
-          {
-            header: "Actions",
-            render: (row) => <ActionMenu onView={() => setDrawer({ open: true, batch: row })} onEdit={() => setDrawer({ open: true, batch: row })} extra={row.status === "On Hold" ? "Release Batch" : "Hold Batch"} />,
-          },
-        ]}
-        data={batches}
-      />
-      <InventoryDrawer open={drawer.open} onOpenChange={(open) => setDrawer((current) => ({ ...current, open }))} title="Batch Details" description="Only limited batch details should be edited after receipt." primaryLabel="Save Batch">
-        <FormSection title="Batch">
-          <SelectField label="Product" values={products.map((product) => product.name)} required />
-          <Field label="Batch Number" required />
-          <Field label="Manufacture Date" type="date" />
-          <Field label="Expiry Date" type="date" />
-          <SelectField label="Warehouse" values={warehouses.map((warehouse) => warehouse.name)} />
-          <SelectField label="Status" values={["Active", "On Hold", "Expired", "Sold Out"]} />
-        </FormSection>
-      </InventoryDrawer>
-    </InventoryPage>
-  );
-}
-
-function MovementPage({
-  title,
-  description,
-  type,
-}: {
-  title: string;
-  description: string;
-  type: "opening" | "transfer" | "adjustment";
-}) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const icon = type === "transfer" ? Repeat : type === "adjustment" ? SlidersHorizontal : FileText;
-  return (
-    <InventoryPage title={title} description={description} icon={icon}>
-      <SearchToolbar search="" setSearch={() => undefined}>
-        <Button onClick={() => setDrawerOpen(true)} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-          <Plus className="h-4 w-4" />
-          New {title}
-        </Button>
-      </SearchToolbar>
-      <SimpleTable
-        columns={type === "transfer" ? ["Transfer Number", "Transfer Date", "From Warehouse", "To Warehouse", "Product", "Batch Number", "Quantity", "Status"] : type === "adjustment" ? ["Adjustment Number", "Adjustment Date", "Warehouse", "Product", "Batch Number", "Adjustment Type", "Quantity", "Status"] : ["Product", "Batch Number", "Expiry Date", "Warehouse", "Quantity", "Cost Price", "Opening Date", "Status"]}
-        rows={[
-          type === "transfer"
-            ? ["TRF-0088", "2026-06-26", "Main Warehouse", "Kandy Warehouse", "Metformin 500mg Tablet", "B-MET-2409", "240", <StatusBadge key="posted" status="Posted" />]
-            : type === "adjustment"
-              ? ["ADJ-0044", "2026-06-25", "Main Warehouse", "Cetrizine 10mg Tablet", "B-CET-2309", "Expiry", "36", <StatusBadge key="pending" status="Pending Review" />]
-              : ["Paracetamol 500mg Tablet", "B-PAR-2406", "2027-01-15", "Main Warehouse", "3,000", "Rs. 95", "2026-01-01", <StatusBadge key="posted" status="Posted" />],
-        ]}
-      />
-      <InventoryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} title={title} description="Stock movement rules validate warehouses, quantities, batches, and ledger impact." primaryLabel="Save Movement">
-        <FormSection title={title}>
-          {type === "transfer" ? (
-            <>
-              <Field label="Transfer Number" required />
-              <Field label="Transfer Date" type="date" required />
-              <SelectField label="From Warehouse" values={warehouses.map((warehouse) => warehouse.name)} required />
-              <SelectField label="To Warehouse" values={warehouses.map((warehouse) => warehouse.name)} required />
-            </>
-          ) : type === "adjustment" ? (
-            <>
-              <Field label="Adjustment Number" required />
-              <Field label="Adjustment Date" type="date" required />
-              <SelectField label="Warehouse" values={warehouses.map((warehouse) => warehouse.name)} required />
-              <SelectField label="Adjustment Type" values={["Increase", "Decrease", "Damage", "Expiry", "Correction"]} required />
-            </>
-          ) : (
-            <>
-              <SelectField label="Warehouse" values={warehouses.map((warehouse) => warehouse.name)} required />
-              <Field label="Opening Date" type="date" required />
-              <Field label="Cost Price" type="number" />
-            </>
-          )}
-          <SelectField label="Product" values={products.map((product) => product.name)} required />
-          <Field label="Batch Number" required />
-          <Field label="Quantity" type="number" required />
-          <Field label="Reason" />
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label className="text-xs font-medium tracking-normal text-slate-600">Notes</Label>
-            <Textarea className="min-h-20 rounded-lg border-slate-200 tracking-normal" />
-          </div>
-        </FormSection>
-      </InventoryDrawer>
-    </InventoryPage>
-  );
+  return <WorkflowPage kind="grn" />;
 }
 
 export function OpeningStockPage() {
-  return <MovementPage title="Opening Stock" description="Enter starting stock when implementing the ERP." type="opening" />;
+  return <WorkflowPage kind="opening" />;
 }
 
 export function StockTransfersPage() {
-  return <MovementPage title="Stock Transfers" description="Transfer stock between warehouses or branches." type="transfer" />;
+  return <WorkflowPage kind="transfer" />;
 }
 
 export function StockAdjustmentsPage() {
-  return <MovementPage title="Stock Adjustments" description="Correct stock differences for damage, expiry, and physical count variances." type="adjustment" />;
-}
-
-function ReturnsPage({ title, description, sales = false }: { title: string; description: string; sales?: boolean }) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  return (
-    <InventoryPage title={title} description={description} icon={RotateCcw}>
-      <SearchToolbar search="" setSearch={() => undefined}>
-        <Button onClick={() => setDrawerOpen(true)} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-          <Plus className="h-4 w-4" />
-          New Return
-        </Button>
-      </SearchToolbar>
-      <SimpleTable
-        columns={sales ? ["Return Number", "Return Date", "Customer", "Related Invoice", "Product", "Batch Number", "Quantity", "Condition"] : ["Return Number", "Return Date", "Supplier", "Related GRN", "Product", "Batch Number", "Quantity", "Reason"]}
-        rows={[
-          sales
-            ? ["SR-0012", "2026-06-24", "City Pharmacy", "INV-1022", "Paracetamol 500mg Tablet", "B-PAR-2406", "12", <StatusBadge key="good" status="Good" />]
-            : ["PR-0008", "2026-06-23", "MediSource Imports", "GRN-0261", "Amoxicillin 250mg Capsule", "B-AMX-2502", "24", "Damaged carton"],
-        ]}
-      />
-      <InventoryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} title={title} description={sales ? "Good condition returns can return to available stock. Damaged or expired stock goes to hold." : "Purchase returns decrease available stock and must not exceed received quantity."} primaryLabel="Save Return">
-        <FormSection title="Return Details">
-          <Field label="Return Number" required />
-          <Field label="Return Date" type="date" required />
-          {sales ? <Field label="Customer" required /> : <SelectField label="Supplier" values={suppliers.map((supplier) => supplier.name)} required />}
-          <Field label={sales ? "Related Invoice" : "Related GRN"} />
-          <SelectField label="Product" values={products.map((product) => product.name)} required />
-          <Field label="Batch Number" required />
-          <Field label="Quantity" type="number" required />
-          {sales ? <SelectField label="Condition" values={["Good", "Damaged", "Expired"]} required /> : <Field label="Reason" />}
-          {sales ? <SelectField label="Warehouse" values={warehouses.map((warehouse) => warehouse.name)} /> : null}
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label className="text-xs font-medium tracking-normal text-slate-600">Notes</Label>
-            <Textarea className="min-h-20 rounded-lg border-slate-200 tracking-normal" />
-          </div>
-        </FormSection>
-      </InventoryDrawer>
-    </InventoryPage>
-  );
+  return <WorkflowPage kind="adjustment" />;
 }
 
 export function PurchaseReturnsPage() {
-  return <ReturnsPage title="Purchase Returns" description="Return goods to supplier." />;
+  return <WorkflowPage kind="purchaseReturn" />;
 }
 
 export function SalesReturnsPage() {
-  return <ReturnsPage title="Sales Returns" description="Receive returned stock from customers." sales />;
+  return <WorkflowPage kind="salesReturn" />;
 }
 
 function ReportPage({
   title,
   description,
+  loader,
   columns,
-  rows,
+  icon = BarChart3,
+  extraParams = {},
 }: {
   title: string;
   description: string;
-  columns: string[];
-  rows: string[][];
+  loader: (params: ApiRecord) => Promise<any>;
+  columns: TableColumn[];
+  icon?: React.ComponentType<{ className?: string }>;
+  extraParams?: ApiRecord;
 }) {
+  const context = useInventoryContext();
+  const references = useReferenceData();
+  const [filters, setFilters] = useState<ApiRecord>({ warehouse_id: "", product_id: "", status: "" });
+  const params = { company_id: context.companyId, branch_id: context.branchId, ...extraParams, ...compact(filters) };
+  const report = useBackendList(loader, params, !!context.companyId);
+  const warehouseOptions = [{ label: "All Warehouses", value: "all" }, ...makeOptions(references.refs.warehouses, ["warehouse_name"])];
+  const productOptions = [{ label: "All Products", value: "all" }, ...makeOptions(references.refs.products, ["product_name"])];
+
+  const setFilter = (name: string, value: string) => {
+    setFilters((current) => ({ ...current, [name]: value === "all" ? "" : value }));
+  };
+
   return (
-    <InventoryPage title={title} description={description} icon={BarChart3}>
+    <InventoryPage
+      title={title}
+      description={description}
+      icon={icon}
+      actions={<Button variant="outline" onClick={report.refresh}>Refresh</Button>}
+    >
       <Card className="border border-slate-200 bg-white shadow-sm">
-        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <SelectField label="Warehouse" values={["All Warehouses", ...warehouses.map((warehouse) => warehouse.name)]} />
-          <SelectField label="Product" values={["All Products", ...products.map((product) => product.name)]} />
-          <SelectField label="Category" values={["All Categories", "Analgesics", "Antibiotics", "Diabetes Care"]} />
-          <Field label="Date From" type="date" />
-          <Field label="Date To" type="date" />
+        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-slate-600">Warehouse</Label>
+            <Select value={filters.warehouse_id || "all"} onValueChange={(value) => setFilter("warehouse_id", value)}>
+              <SelectTrigger className="h-9 w-full rounded-lg border-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {warehouseOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-slate-600">Product</Label>
+            <Select value={filters.product_id || "all"} onValueChange={(value) => setFilter("product_id", value)}>
+              <SelectTrigger className="h-9 w-full rounded-lg border-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {productOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <FormField
+            field={{ name: "date_from", label: "Date From", type: "date" }}
+            value={filters.date_from || ""}
+            onChange={setFilter}
+          />
+          <FormField
+            field={{ name: "date_to", label: "Date To", type: "date" }}
+            value={filters.date_to || ""}
+            onChange={setFilter}
+          />
         </CardContent>
       </Card>
-      <SimpleTable columns={columns} rows={rows.map((row) => row.map((cell) => (["Active", "Expired", "Monitor", "Expiring Soon", "On Hold"].includes(cell) ? <StatusBadge key={cell} status={cell} /> : cell)))} />
+      <DataGrid loading={report.loading} error={report.error} data={report.rows} columns={columns} />
     </InventoryPage>
   );
 }
@@ -1468,8 +2241,16 @@ export function StockBalanceReportPage() {
     <ReportPage
       title="Stock Balance"
       description="Current available, reserved, and valued stock by product, batch, and warehouse."
-      columns={["Product", "Batch Number", "Warehouse", "Quantity", "Available Quantity", "Reserved Quantity", "Stock Value"]}
-      rows={reportRows.stockBalance}
+      loader={inventoryApi.getStockBalances}
+      columns={[
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+        { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
+        { header: "On Hand", render: (row) => valueOf(row, ["quantity_on_hand"]) },
+        { header: "Available", render: (row) => valueOf(row, ["quantity_available"]) },
+        { header: "Allocated", render: (row) => valueOf(row, ["quantity_allocated"]) },
+        { header: "Stock Value", render: (row) => valueOf(row, ["total_stock_value", "stock_value"]) },
+      ]}
     />
   );
 }
@@ -1479,8 +2260,17 @@ export function StockLedgerReportPage() {
     <ReportPage
       title="Stock Ledger"
       description="Every stock movement with references, in quantities, out quantities, and running balance."
-      columns={["Date", "Product", "Batch", "Movement Type", "Reference No", "In Qty", "Out Qty", "Balance Qty"]}
-      rows={reportRows.stockLedger}
+      loader={inventoryApi.getStockLedgerEntries}
+      columns={[
+        { header: "Date", render: (row) => normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")) },
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+        { header: "Movement Type", render: (row) => valueOf(row, ["movement_type", "source_type"]) },
+        { header: "Reference", render: (row) => valueOf(row, ["reference_number", "source_number"]) },
+        { header: "In Qty", render: (row) => valueOf(row, ["quantity_in"], "0") },
+        { header: "Out Qty", render: (row) => valueOf(row, ["quantity_out"], "0") },
+        { header: "Balance", render: (row) => valueOf(row, ["balance_quantity", "running_balance"]) },
+      ]}
     />
   );
 }
@@ -1490,8 +2280,16 @@ export function ExpiryReportPage() {
     <ReportPage
       title="Expiry Report"
       description="Track expired and near-expiry pharma batches by product, category, and warehouse."
-      columns={["Product", "Batch Number", "Expiry Date", "Quantity", "Days Left", "Warehouse", "Status"]}
-      rows={reportRows.expiry}
+      loader={inventoryApi.getExpiryReport}
+      extraParams={{ days: 90 }}
+      columns={[
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
+        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+        { header: "Expiry Date", render: (row) => normalizeDate(valueOf(row, ["product_batch.expiry_date", "expiry_date"], "")) },
+        { header: "Quantity", render: (row) => valueOf(row, ["quantity_available", "quantity_on_hand"]) },
+        { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
+        { header: "Status", render: (row) => <StatusBadge status={valueOf(row, ["status"], "monitor")} /> },
+      ]}
     />
   );
 }
@@ -1501,9 +2299,16 @@ export function BatchReportPage() {
     <ReportPage
       title="Batch Report"
       description="Batch movement summary with received quantity, sold quantity, balance, and status."
-      columns={["Product", "Batch Number", "Manufacture Date", "Expiry Date", "Received Qty", "Sold Qty", "Balance Qty", "Status"]}
-      rows={reportRows.batch}
+      loader={inventoryApi.getBatchReport}
+      columns={[
+        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name", "product_id"]) },
+        { header: "Batch Number", render: (row) => valueOf(row, ["batch_number"]) },
+        { header: "Manufacture Date", render: (row) => normalizeDate(row.manufacture_date) || "—" },
+        { header: "Expiry Date", render: (row) => normalizeDate(row.expiry_date) || "—" },
+        { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"]) },
+        { header: "Selling Price", render: (row) => valueOf(row, ["selling_price"]) },
+        { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
+      ]}
     />
   );
 }
-
