@@ -24,9 +24,22 @@ func NewAuditService(repo *repository.AuditRepository, logger *zap.Logger) *Audi
 // LogAction creates an audit log entry from the Gin context.
 // Can operate within a transaction (pass tx) or standalone (pass nil).
 func (s *AuditService) LogAction(c *gin.Context, tx *gorm.DB, params AuditParams) {
-	userID, _ := c.Get("user_id")
-	companyID, _ := c.Get("company_id")
-	branchID, _ := c.Get("branch_id")
+	var uid, cid, bid uint64
+	if v, ok := c.Get("user_id"); ok && v != nil {
+		if val, ok := v.(uint64); ok {
+			uid = val
+		}
+	}
+	if v, ok := c.Get("company_id"); ok && v != nil {
+		if val, ok := v.(uint64); ok {
+			cid = val
+		}
+	}
+	if v, ok := c.Get("branch_id"); ok && v != nil {
+		if val, ok := v.(uint64); ok {
+			bid = val
+		}
+	}
 
 	var oldJSON, newJSON json.RawMessage
 	if params.OldValues != nil {
@@ -39,9 +52,9 @@ func (s *AuditService) LogAction(c *gin.Context, tx *gorm.DB, params AuditParams
 	}
 
 	log := &model.AuditLog{
-		UserID:     userID.(uint64),
-		CompanyID:  companyID.(uint64),
-		BranchID:   branchID.(uint64),
+		UserID:     uid,
+		CompanyID:  cid,
+		BranchID:   bid,
 		Module:     params.Module,
 		Action:     params.Action,
 		EntityType: params.EntityType,

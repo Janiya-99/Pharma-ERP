@@ -39,6 +39,7 @@ func BranchAccessMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		c.Set("branch_id", ctx.ActiveBranchID)
 		c.Next()
 	}
 }

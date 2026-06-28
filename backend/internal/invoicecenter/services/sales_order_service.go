@@ -625,8 +625,8 @@ func (s *SalesOrderService) CancelSalesOrder(db *gorm.DB, companyID, userID, id 
 	if err != nil {
 		return err
 	}
-	if existing.OrderStatus == "partially_invoiced" || existing.OrderStatus == "fully_invoiced" {
-		return errors.New("invoiced sales orders cannot be cancelled")
+	if existing.OrderStatus == "partially_invoiced" || existing.OrderStatus == "fully_invoiced" || existing.OrderStatus == "closed" {
+		return errors.New("invoiced or closed sales orders cannot be cancelled")
 	}
 	if strings.TrimSpace(remarks) == "" {
 		return errors.New("remarks are required when cancelling a sales order")
