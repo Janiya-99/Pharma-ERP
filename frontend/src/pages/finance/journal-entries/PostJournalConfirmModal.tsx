@@ -3,7 +3,17 @@ import Modal from "../../../../components/common/Modal";
 import { financeApi } from "../../../../api/financeApi";
 import { MdWarning } from "react-icons/md";
 
-export default function PostJournalConfirmModal({ isOpen, onClose, journal, onSuccess }: { isOpen?: boolean; onClose?: unknown; journal?: unknown; onSuccess?: unknown }) {
+export default function PostJournalConfirmModal({
+  isOpen,
+  onClose,
+  journal,
+  onSuccess,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  journal?: unknown;
+  onSuccess?: unknown;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -26,26 +36,38 @@ export default function PostJournalConfirmModal({ isOpen, onClose, journal, onSu
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Post Journal Entry">
       <div className="space-y-4">
-        {error && <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>}
-        
-        <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg border border-amber-200 text-amber-800">
-          <MdWarning className="h-6 w-6 shrink-0 text-amber-500 mt-0.5" />
+        {error && (
+          <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800">
+          <MdWarning className="mt-0.5 h-6 w-6 shrink-0 text-amber-500" />
           <div>
-            <h4 className="font-semibold text-sm">Warning: This action will update account balances.</h4>
-            <p className="text-sm mt-1">
-              Posting journal entry <strong>{journal.journal_number}</strong> will permanently record the transaction in the general ledger. Are you sure you want to proceed?
+            <h4 className="text-sm font-semibold">
+              Warning: This action will update account balances.
+            </h4>
+            <p className="mt-1 text-sm">
+              Posting journal entry <strong>{journal.journal_number}</strong>{" "}
+              will permanently record the transaction in the general ledger. Are
+              you sure you want to proceed?
             </p>
           </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <button type="button" onClick={onClose} className="px-4 py-2 border rounded-md hover:bg-gray-50">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border px-4 py-2 hover:bg-gray-50"
+          >
             Cancel
           </button>
           <button
             onClick={handlePost}
             disabled={loading}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:opacity-50"
           >
             {loading ? "Posting..." : "Confirm & Post"}
           </button>

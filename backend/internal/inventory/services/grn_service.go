@@ -472,12 +472,12 @@ func (s *grnService) PostGRN(db *gorm.DB, companyID, id, userID uint64) error {
 				if err != nil {
 					return err
 				}
-				
+
 				var manufacturerID uint64
 				if product.ManufacturerID != nil {
 					manufacturerID = *product.ManufacturerID
 				}
-				
+
 				batch, err := s.grnRepo.FindOrCreateBatchFromGRNLine(
 					tx,
 					companyID,
@@ -534,7 +534,7 @@ func (s *grnService) PostGRN(db *gorm.DB, companyID, id, userID uint64) error {
 		approval := &models.GoodsReceiptNoteApproval{
 			GoodsReceiptNoteID: id,
 			Action:             "posted",
-			Remarks:             "Automatically posted",
+			Remarks:            "Automatically posted",
 			ActionBy:           userID,
 			ActionAt:           &now,
 		}

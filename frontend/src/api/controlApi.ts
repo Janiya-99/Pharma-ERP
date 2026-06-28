@@ -5,7 +5,9 @@ export const getCompanyProfile = async () => {
   return res.data;
 };
 
-export const updateCompanyProfile = async (payload: Record<string, unknown>) => {
+export const updateCompanyProfile = async (
+  payload: Record<string, unknown>
+) => {
   const res = await apiClient.put("/control/company", payload);
   return res.data;
 };
@@ -26,7 +28,10 @@ export const createBranch = async (payload: Record<string, unknown>) => {
   return res.data;
 };
 
-export const updateBranch = async (id: string | number, payload: Record<string, unknown>) => {
+export const updateBranch = async (
+  id: string | number,
+  payload: Record<string, unknown>
+) => {
   const res = await apiClient.put(`/control/branches/${id}`, payload);
   return res.data;
 };
@@ -52,7 +57,10 @@ export const createDepartment = async (payload: Record<string, unknown>) => {
   return res.data;
 };
 
-export const updateDepartment = async (id: string | number, payload: Record<string, unknown>) => {
+export const updateDepartment = async (
+  id: string | number,
+  payload: Record<string, unknown>
+) => {
   const res = await apiClient.put(`/control/departments/${id}`, payload);
   return res.data;
 };
@@ -78,7 +86,10 @@ export const createDesignation = async (payload: Record<string, unknown>) => {
   return res.data;
 };
 
-export const updateDesignation = async (id: string | number, payload: Record<string, unknown>) => {
+export const updateDesignation = async (
+  id: string | number,
+  payload: Record<string, unknown>
+) => {
   const res = await apiClient.put(`/control/designations/${id}`, payload);
   return res.data;
 };
@@ -110,7 +121,10 @@ export const createUser = async (payload: Record<string, unknown>) => {
   return res.data;
 };
 
-export const updateUser = async (id: string | number, payload: Record<string, unknown>) => {
+export const updateUser = async (
+  id: string | number,
+  payload: Record<string, unknown>
+) => {
   const res = await apiClient.put(`/control/users/${id}`, payload);
   return res.data;
 };
@@ -120,13 +134,25 @@ export const deleteUser = async (id: string | number) => {
   return res.data;
 };
 
-export const changeUserStatus = async (id: string | number, payload: Record<string, unknown>) => {
-  const res = await apiClient.post(`/control/users/${id}/change-status`, payload);
+export const changeUserStatus = async (
+  id: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.post(
+    `/control/users/${id}/change-status`,
+    payload
+  );
   return res.data;
 };
 
-export const resetUserPassword = async (id: string | number, payload: Record<string, unknown>) => {
-  const res = await apiClient.post(`/control/users/${id}/reset-password`, payload);
+export const resetUserPassword = async (
+  id: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.post(
+    `/control/users/${id}/reset-password`,
+    payload
+  );
   return res.data;
 };
 
@@ -136,13 +162,24 @@ export const getUserBranches = async (userId: string | number) => {
   return res.data;
 };
 
-export const assignUserBranches = async (userId: string | number, payload: Record<string, unknown>) => {
-  const res = await apiClient.post(`/control/users/${userId}/branches`, payload);
+export const assignUserBranches = async (
+  userId: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.post(
+    `/control/users/${userId}/branches`,
+    payload
+  );
   return res.data;
 };
 
-export const removeUserBranch = async (userId: string | number, branchId: string | number) => {
-  const res = await apiClient.delete(`/control/users/${userId}/branches/${branchId}`);
+export const removeUserBranch = async (
+  userId: string | number,
+  branchId: string | number
+) => {
+  const res = await apiClient.delete(
+    `/control/users/${userId}/branches/${branchId}`
+  );
   return res.data;
 };
 
@@ -152,13 +189,24 @@ export const getUserSoftware = async (userId: string | number) => {
   return res.data;
 };
 
-export const assignUserSoftware = async (userId: string | number, payload: Record<string, unknown>) => {
-  const res = await apiClient.post(`/control/users/${userId}/software`, payload);
+export const assignUserSoftware = async (
+  userId: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.post(
+    `/control/users/${userId}/software`,
+    payload
+  );
   return res.data;
 };
 
-export const removeUserSoftware = async (userId: string | number, softwareId: string | number) => {
-  const res = await apiClient.delete(`/control/users/${userId}/software/${softwareId}`);
+export const removeUserSoftware = async (
+  userId: string | number,
+  softwareId: string | number
+) => {
+  const res = await apiClient.delete(
+    `/control/users/${userId}/software/${softwareId}`
+  );
   return res.data;
 };
 
@@ -178,7 +226,10 @@ export const createRole = async (payload: Record<string, unknown>) => {
   return res.data;
 };
 
-export const updateRole = async (id: string | number, payload: Record<string, unknown>) => {
+export const updateRole = async (
+  id: string | number,
+  payload: Record<string, unknown>
+) => {
   const res = await apiClient.put(`/control/roles/${id}`, payload);
   return res.data;
 };
@@ -189,7 +240,9 @@ export const deleteRole = async (id: string | number) => {
 };
 
 export const getRolesBySoftware = async (softwareId: string | number) => {
-  const res = await apiClient.get(`/control/software-modules/${softwareId}/roles`);
+  const res = await apiClient.get(
+    `/control/software-modules/${softwareId}/roles`
+  );
   return res.data;
 };
 
@@ -199,7 +252,9 @@ export const getPermissions = async (params: Record<string, unknown>) => {
   return res.data;
 };
 
-export const getPermissionsGrouped = async (params: Record<string, unknown>) => {
+export const getPermissionsGrouped = async (
+  params: Record<string, unknown>
+) => {
   const res = await apiClient.get("/control/permissions/grouped", { params });
   return res.data;
 };
@@ -210,8 +265,14 @@ export const getRolePermissionMatrix = async (roleId: string | number) => {
   return res.data;
 };
 
-export const assignRolePermissions = async (roleId: string | number, payload: Record<string, unknown>) => {
-  const res = await apiClient.post(`/control/roles/${roleId}/permissions`, payload);
+export const assignRolePermissions = async (
+  roleId: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.post(
+    `/control/roles/${roleId}/permissions`,
+    payload
+  );
   return res.data;
 };
 
@@ -221,13 +282,24 @@ export const getUserAccessMatrix = async (userId: string | number) => {
   return res.data;
 };
 
-export const assignUserAccessMatrix = async (userId: string | number, payload: Record<string, unknown>) => {
-  const res = await apiClient.post(`/control/users/${userId}/access-matrix`, payload);
+export const assignUserAccessMatrix = async (
+  userId: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.post(
+    `/control/users/${userId}/access-matrix`,
+    payload
+  );
   return res.data;
 };
 
-export const removeUserAccessMatrix = async (userId: string | number, accessId: string | number) => {
-  const res = await apiClient.delete(`/control/users/${userId}/access-matrix/${accessId}`);
+export const removeUserAccessMatrix = async (
+  userId: string | number,
+  accessId: string | number
+) => {
+  const res = await apiClient.delete(
+    `/control/users/${userId}/access-matrix/${accessId}`
+  );
   return res.data;
 };
 
@@ -241,4 +313,3 @@ export const getLoginLogs = async (params: Record<string, unknown>) => {
   const res = await apiClient.get("/control/login-logs", { params });
   return res.data;
 };
-

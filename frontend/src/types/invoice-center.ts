@@ -2,8 +2,18 @@
 // Invoice Center — Shared TypeScript Types
 // ============================================================
 
-export type SalesOrderApprovalStatus = "draft" | "pending" | "approved" | "rejected" | "cancelled";
-export type SalesOrderStatus = "open" | "partially_invoiced" | "fully_invoiced" | "cancelled" | "closed";
+export type SalesOrderApprovalStatus =
+  | "draft"
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
+export type SalesOrderStatus =
+  | "open"
+  | "partially_invoiced"
+  | "fully_invoiced"
+  | "cancelled"
+  | "closed";
 
 // ---- Customer -----------------------------------------------
 export interface Customer {
@@ -177,9 +187,19 @@ export interface SalesOrderListParams {
 }
 
 // ---- Sales Invoice Types ------------------------------------
-export type SalesInvoiceApprovalStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
-export type SalesInvoicePostedStatus = 'unposted' | 'posted';
-export type SalesInvoicePaymentStatus = 'unpaid' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
+export type SalesInvoiceApprovalStatus =
+  | "draft"
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
+export type SalesInvoicePostedStatus = "unposted" | "posted";
+export type SalesInvoicePaymentStatus =
+  | "unpaid"
+  | "partially_paid"
+  | "paid"
+  | "overdue"
+  | "cancelled";
 
 export interface SalesInvoiceApproval {
   id: number;
@@ -205,7 +225,7 @@ export interface SalesInvoiceLine {
   stock_unit_cost?: number;
   stock_total_cost?: number;
   line_remarks?: string | null;
-  
+
   // Local display properties
   product_code?: string;
   product_name?: string;
@@ -237,12 +257,22 @@ export interface SalesInvoice {
   created_at?: string;
   lines?: SalesInvoiceLine[];
   approvals?: SalesInvoiceApproval[];
-  
+
   // Relations mapped
   branch?: { id: number; branch_name: string };
   customer?: Customer;
-  sales_order?: { sales_order_number: string; sales_order_date: string; order_status: string; approval_status: string };
-  warehouse?: { id: number; warehouse_code: string; warehouse_name: string; warehouse_type: string };
+  sales_order?: {
+    sales_order_number: string;
+    sales_order_date: string;
+    order_status: string;
+    approval_status: string;
+  };
+  warehouse?: {
+    id: number;
+    warehouse_code: string;
+    warehouse_name: string;
+    warehouse_type: string;
+  };
 }
 
 export interface SalesInvoiceListParams {
@@ -295,15 +325,20 @@ export interface WorkflowActionPayload {
 }
 
 // ---- Credit Notes Types -------------------------------------
-export type CreditNoteApprovalStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
-export type CreditNotePostedStatus = 'unposted' | 'posted';
+export type CreditNoteApprovalStatus =
+  | "draft"
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
+export type CreditNotePostedStatus = "unposted" | "posted";
 export type CreditNoteType =
-  | 'sales_return'
-  | 'price_adjustment'
-  | 'discount_adjustment'
-  | 'billing_error'
-  | 'goodwill'
-  | 'other';
+  | "sales_return"
+  | "price_adjustment"
+  | "discount_adjustment"
+  | "billing_error"
+  | "goodwill"
+  | "other";
 
 export interface CreditNoteApproval {
   id: number;
@@ -364,7 +399,15 @@ export interface CreditNote {
   // Relations mapped
   branch?: { id: number; branch_name: string };
   customer?: Customer;
-  sales_invoice?: { invoice_number: string; invoice_date: string; total_amount: number; balance_amount: number; paid_amount: number; payment_status: string; posted_status: string; };
+  sales_invoice?: {
+    invoice_number: string;
+    invoice_date: string;
+    total_amount: number;
+    balance_amount: number;
+    paid_amount: number;
+    payment_status: string;
+    posted_status: string;
+  };
 }
 
 export interface CreditNoteListParams {
@@ -416,17 +459,22 @@ export interface CreditNoteImpactPreview {
 }
 
 // ---- Debit Notes Types --------------------------------------
-export type DebitNoteApprovalStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type DebitNoteApprovalStatus =
+  | "draft"
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
 
-export type DebitNotePostedStatus = 'unposted' | 'posted';
+export type DebitNotePostedStatus = "unposted" | "posted";
 
 export type DebitNoteType =
-  | 'price_adjustment'
-  | 'additional_charge'
-  | 'billing_error'
-  | 'freight_charge'
-  | 'tax_adjustment'
-  | 'other';
+  | "price_adjustment"
+  | "additional_charge"
+  | "billing_error"
+  | "freight_charge"
+  | "tax_adjustment"
+  | "other";
 
 export interface DebitNote {
   id: number;
@@ -456,11 +504,19 @@ export interface DebitNote {
   cancel_reason?: string | null;
   lines?: DebitNoteLine[];
   approvals?: DebitNoteApproval[];
-  
+
   // Relations mapped
   branch?: { id: number; branch_name: string };
   customer?: Customer;
-  sales_invoice?: { invoice_number: string; invoice_date: string; total_amount: number; balance_amount: number; paid_amount: number; payment_status: string; posted_status: string; };
+  sales_invoice?: {
+    invoice_number: string;
+    invoice_date: string;
+    total_amount: number;
+    balance_amount: number;
+    paid_amount: number;
+    payment_status: string;
+    posted_status: string;
+  };
 }
 
 export interface DebitNoteLine {
@@ -540,7 +596,6 @@ export interface DebitNoteImpactPreview {
   linked_invoice_balance_after_debit?: number | null;
 }
 
-
 // ---- Generic API Wrappers -----------------------------------
 export interface ApiResponse<T> {
   success: boolean;
@@ -562,17 +617,22 @@ export interface PaginatedResponse<T> {
 }
 
 // ---- Customer Receipts --------------------------------------
-export type CustomerReceiptApprovalStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
-export type CustomerReceiptPostedStatus = 'unposted' | 'posted';
-export type CustomerReceiptStatus = 'active' | 'cancelled';
+export type CustomerReceiptApprovalStatus =
+  | "draft"
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
+export type CustomerReceiptPostedStatus = "unposted" | "posted";
+export type CustomerReceiptStatus = "active" | "cancelled";
 
 export type CustomerReceiptPaymentMethod =
-  | 'cash'
-  | 'bank_transfer'
-  | 'cheque'
-  | 'card'
-  | 'online'
-  | 'other';
+  | "cash"
+  | "bank_transfer"
+  | "cheque"
+  | "card"
+  | "online"
+  | "other";
 
 export interface CustomerReceipt {
   id: number;
@@ -652,7 +712,8 @@ export interface CreateCustomerReceiptPayload {
   allocations?: CustomerReceiptAllocationPayload[];
 }
 
-export interface UpdateCustomerReceiptPayload extends CreateCustomerReceiptPayload {}
+export interface UpdateCustomerReceiptPayload
+  extends CreateCustomerReceiptPayload {}
 
 export interface CustomerReceiptAllocationPayload {
   sales_invoice_id: number;
@@ -673,13 +734,13 @@ export interface CustomerReceiptImpactPreview {
 // Invoice Center — Finance Posting Types
 // ============================================================
 
-export type InvoiceCenterFinancePostStatus = 'unposted' | 'posted' | 'failed';
+export type InvoiceCenterFinancePostStatus = "unposted" | "posted" | "failed";
 
 export type InvoiceCenterFinancePostingDocumentType =
-  | 'sales_invoice'
-  | 'credit_note'
-  | 'debit_note'
-  | 'customer_receipt';
+  | "sales_invoice"
+  | "credit_note"
+  | "debit_note"
+  | "customer_receipt";
 
 export interface FinanceSettingsParams {
   branch_id?: number | null;

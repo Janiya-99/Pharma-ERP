@@ -11,7 +11,13 @@ interface Action {
   onClick: (item: unknown) => void;
 }
 
-const ActionMenu = ({ actions, item }: { actions?: Action[]; item?: unknown }) => {
+const ActionMenu = ({
+  actions,
+  item,
+}: {
+  actions?: Action[];
+  item?: unknown;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -54,8 +60,10 @@ const ActionMenu = ({ actions, item }: { actions?: Action[]; item?: unknown }) =
     if (!isOpen) return;
     const handleClose = (e: MouseEvent) => {
       if (
-        menuRef.current && !menuRef.current.contains(e.target as Node) &&
-        buttonRef.current && !buttonRef.current.contains(e.target as Node)
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -75,7 +83,7 @@ const ActionMenu = ({ actions, item }: { actions?: Action[]; item?: unknown }) =
     <div
       ref={menuRef}
       style={{ top: menuPos.top, left: menuPos.left }}
-      className="fixed z-[9999] w-48 rounded-xl bg-white shadow-xl ring-1 ring-gray-200 py-1.5 animate-in fade-in-0 zoom-in-95 duration-100"
+      className="fixed z-[9999] w-48 rounded-xl bg-white py-1.5 shadow-xl ring-1 ring-gray-200 duration-100 animate-in fade-in-0 zoom-in-95"
       onClick={(e) => e.stopPropagation()}
     >
       {visibleActions.map((action, index) => (
@@ -92,7 +100,11 @@ const ActionMenu = ({ actions, item }: { actions?: Action[]; item?: unknown }) =
           }`}
         >
           {action.icon && (
-            <action.icon className={`h-3.5 w-3.5 shrink-0 ${action.danger ? "text-red-500" : "text-gray-400"}`} />
+            <action.icon
+              className={`h-3.5 w-3.5 shrink-0 ${
+                action.danger ? "text-red-500" : "text-gray-400"
+              }`}
+            />
           )}
           {action.label}
         </button>
@@ -106,13 +118,13 @@ const ActionMenu = ({ actions, item }: { actions?: Action[]; item?: unknown }) =
         ref={buttonRef}
         type="button"
         onClick={handleOpen}
-        className={`flex items-center justify-center h-7 w-7 rounded-lg transition-all duration-150 ${
+        className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-150 ${
           isOpen
             ? "bg-gray-100 text-gray-700"
             : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
         }`}
       >
-        <MoreVertical className="w-4 h-4" />
+        <MoreVertical className="h-4 w-4" />
       </button>
       {typeof document !== "undefined" && createPortal(menu, document.body)}
     </div>

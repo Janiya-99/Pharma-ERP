@@ -16,7 +16,7 @@ const FixedAssetFormPage = () => {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [branches, setBranches] = useState([]);
-  
+
   const [formData, setFormData] = useState({
     branch_id: "",
     fixed_asset_category_id: "",
@@ -76,25 +76,35 @@ const FixedAssetFormPage = () => {
           serial_number: data.serial_number || "",
           model_number: data.model_number || "",
           manufacturer: data.manufacturer || "",
-          purchase_date: data.purchase_date ? data.purchase_date.split("T")[0] : "",
-          acquisition_date: data.acquisition_date ? data.acquisition_date.split("T")[0] : "",
+          purchase_date: data.purchase_date
+            ? data.purchase_date.split("T")[0]
+            : "",
+          acquisition_date: data.acquisition_date
+            ? data.acquisition_date.split("T")[0]
+            : "",
           supplier_name: data.supplier_name || "",
           invoice_number: data.invoice_number || "",
           acquisition_cost: data.acquisition_cost || "",
           residual_value: data.residual_value || 0,
           useful_life_months: data.useful_life_months || "",
           depreciation_method: data.depreciation_method || "straight_line",
-          depreciation_start_date: data.depreciation_start_date ? data.depreciation_start_date.split("T")[0] : "",
+          depreciation_start_date: data.depreciation_start_date
+            ? data.depreciation_start_date.split("T")[0]
+            : "",
           asset_account_id: data.asset_account_id || "",
-          accumulated_depreciation_account_id: data.accumulated_depreciation_account_id || "",
-          depreciation_expense_account_id: data.depreciation_expense_account_id || "",
+          accumulated_depreciation_account_id:
+            data.accumulated_depreciation_account_id || "",
+          depreciation_expense_account_id:
+            data.depreciation_expense_account_id || "",
           gain_on_disposal_account_id: data.gain_on_disposal_account_id || "",
           loss_on_disposal_account_id: data.loss_on_disposal_account_id || "",
           status: data.status || "active",
         });
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to load asset details");
+      toast.error(
+        err.response?.data?.message || "Failed to load asset details"
+      );
       history.push("/admin/finance/fixed-assets");
     } finally {
       setLoading(false);
@@ -110,13 +120,24 @@ const FixedAssetFormPage = () => {
         if (category) {
           setFormData((prev: unknown) => ({
             ...prev,
-            useful_life_months: category.default_useful_life_months || prev.useful_life_months,
-            depreciation_method: category.default_depreciation_method || prev.depreciation_method,
-            asset_account_id: category.default_asset_account_id || prev.asset_account_id,
-            accumulated_depreciation_account_id: category.default_accumulated_depreciation_account_id || prev.accumulated_depreciation_account_id,
-            depreciation_expense_account_id: category.default_depreciation_expense_account_id || prev.depreciation_expense_account_id,
-            gain_on_disposal_account_id: category.default_gain_on_disposal_account_id || prev.gain_on_disposal_account_id,
-            loss_on_disposal_account_id: category.default_loss_on_disposal_account_id || prev.loss_on_disposal_account_id,
+            useful_life_months:
+              category.default_useful_life_months || prev.useful_life_months,
+            depreciation_method:
+              category.default_depreciation_method || prev.depreciation_method,
+            asset_account_id:
+              category.default_asset_account_id || prev.asset_account_id,
+            accumulated_depreciation_account_id:
+              category.default_accumulated_depreciation_account_id ||
+              prev.accumulated_depreciation_account_id,
+            depreciation_expense_account_id:
+              category.default_depreciation_expense_account_id ||
+              prev.depreciation_expense_account_id,
+            gain_on_disposal_account_id:
+              category.default_gain_on_disposal_account_id ||
+              prev.gain_on_disposal_account_id,
+            loss_on_disposal_account_id:
+              category.default_loss_on_disposal_account_id ||
+              prev.loss_on_disposal_account_id,
           }));
         }
       } catch (err) {
@@ -128,33 +149,47 @@ const FixedAssetFormPage = () => {
   const validate = () => {
     const newErrors = {};
     if (!formData.branch_id) newErrors.branch_id = "Branch is required";
-    if (!formData.fixed_asset_category_id) newErrors.fixed_asset_category_id = "Category is required";
-    if (!formData.asset_code?.trim()) newErrors.asset_code = "Asset Code is required";
-    if (!formData.asset_name?.trim()) newErrors.asset_name = "Asset Name is required";
-    if (!formData.purchase_date) newErrors.purchase_date = "Purchase Date is required";
-    if (!formData.acquisition_date) newErrors.acquisition_date = "Acquisition Date is required";
-    
+    if (!formData.fixed_asset_category_id)
+      newErrors.fixed_asset_category_id = "Category is required";
+    if (!formData.asset_code?.trim())
+      newErrors.asset_code = "Asset Code is required";
+    if (!formData.asset_name?.trim())
+      newErrors.asset_name = "Asset Name is required";
+    if (!formData.purchase_date)
+      newErrors.purchase_date = "Purchase Date is required";
+    if (!formData.acquisition_date)
+      newErrors.acquisition_date = "Acquisition Date is required";
+
     if (!formData.acquisition_cost || Number(formData.acquisition_cost) <= 0) {
       newErrors.acquisition_cost = "Acquisition Cost must be greater than zero";
     }
-    
+
     if (formData.residual_value !== "" && Number(formData.residual_value) < 0) {
       newErrors.residual_value = "Cannot be negative";
     }
-    
+
     if (Number(formData.residual_value) > Number(formData.acquisition_cost)) {
       newErrors.residual_value = "Cannot be greater than Acquisition Cost";
     }
-    
-    if (!formData.useful_life_months || Number(formData.useful_life_months) <= 0) {
+
+    if (
+      !formData.useful_life_months ||
+      Number(formData.useful_life_months) <= 0
+    ) {
       newErrors.useful_life_months = "Useful Life is required and must be > 0";
     }
-    
-    if (!formData.depreciation_start_date) newErrors.depreciation_start_date = "Depreciation Start Date is required";
-    if (!formData.asset_account_id) newErrors.asset_account_id = "Asset Account is required";
-    if (!formData.accumulated_depreciation_account_id) newErrors.accumulated_depreciation_account_id = "Accumulated Depreciation Account is required";
-    if (!formData.depreciation_expense_account_id) newErrors.depreciation_expense_account_id = "Depreciation Expense Account is required";
-    
+
+    if (!formData.depreciation_start_date)
+      newErrors.depreciation_start_date = "Depreciation Start Date is required";
+    if (!formData.asset_account_id)
+      newErrors.asset_account_id = "Asset Account is required";
+    if (!formData.accumulated_depreciation_account_id)
+      newErrors.accumulated_depreciation_account_id =
+        "Accumulated Depreciation Account is required";
+    if (!formData.depreciation_expense_account_id)
+      newErrors.depreciation_expense_account_id =
+        "Depreciation Expense Account is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -190,19 +225,23 @@ const FixedAssetFormPage = () => {
     }
   };
 
-  const depreciableAmount = Number(formData.acquisition_cost || 0) - Number(formData.residual_value || 0);
-  const monthlyDepreciation = formData.useful_life_months ? depreciableAmount / Number(formData.useful_life_months) : 0;
+  const depreciableAmount =
+    Number(formData.acquisition_cost || 0) -
+    Number(formData.residual_value || 0);
+  const monthlyDepreciation = formData.useful_life_months
+    ? depreciableAmount / Number(formData.useful_life_months)
+    : 0;
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900 pb-10 overflow-y-auto">
+    <div className="flex h-full flex-col overflow-y-auto bg-gray-50 pb-10 dark:bg-navy-900">
       <PageHeader
         title={isEdit ? "Edit Fixed Asset" : "Create Fixed Asset"}
         breadcrumb={[
@@ -212,53 +251,60 @@ const FixedAssetFormPage = () => {
         ]}
       />
 
-      <div className="px-6 max-w-6xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mx-auto w-full max-w-6xl px-6">
+        <div className="mb-4 flex items-center justify-between">
           <button
             onClick={() => history.push("/admin/finance/fixed-assets")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-navy-700 dark:text-gray-400 dark:hover:text-white"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to List
+            <ArrowLeft className="h-4 w-4" /> Back to List
           </button>
-          
+
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 shadow-sm disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-brand-600 disabled:opacity-50"
           >
-            <Save className="w-4 h-4" /> {saving ? "Saving..." : "Save Asset"}
+            <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Asset"}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             {/* Basic Asset Details */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+              <h3 className="mb-6 border-b border-gray-100 pb-3 text-lg font-bold text-navy-700 dark:border-navy-700 dark:text-white">
                 1. Basic Asset Details
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Branch <span className="text-red-500">*</span>
                   </label>
                   <select
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
                       errors.branch_id ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.branch_id}
-                    onChange={(e: any) => setFormData({ ...formData, branch_id: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, branch_id: e.target.value })
+                    }
                   >
                     <option value="">Select Branch</option>
                     {branches.map((b: unknown) => (
-                      <option key={b.id} value={b.id}>{b.branch_code} - {b.branch_name}</option>
+                      <option key={b.id} value={b.id}>
+                        {b.branch_code} - {b.branch_name}
+                      </option>
                     ))}
                   </select>
-                  {errors.branch_id && <span className="text-xs text-red-500 mt-1">{errors.branch_id}</span>}
+                  {errors.branch_id && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.branch_id}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Asset Category <span className="text-red-500">*</span>
                   </label>
                   <FixedAssetCategorySelect
@@ -269,202 +315,313 @@ const FixedAssetFormPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Asset Code <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
                       errors.asset_code ? "border-red-500" : "border-gray-200"
                     }`}
                     placeholder="e.g., FA-COMP-001"
                     value={formData.asset_code}
-                    onChange={(e: any) => setFormData({ ...formData, asset_code: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, asset_code: e.target.value })
+                    }
                   />
-                  {errors.asset_code && <span className="text-xs text-red-500 mt-1">{errors.asset_code}</span>}
+                  {errors.asset_code && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.asset_code}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Asset Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
                       errors.asset_name ? "border-red-500" : "border-gray-200"
                     }`}
                     placeholder="e.g., Dell Latitude 5420"
                     value={formData.asset_name}
-                    onChange={(e: any) => setFormData({ ...formData, asset_name: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, asset_name: e.target.value })
+                    }
                   />
-                  {errors.asset_name && <span className="text-xs text-red-500 mt-1">{errors.asset_name}</span>}
+                  {errors.asset_name && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.asset_name}
+                    </span>
+                  )}
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Description
                   </label>
                   <textarea
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                    className="w-full rounded-xl border border-gray-200 bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                     placeholder="Asset details..."
                     rows="2"
                     value={formData.description}
-                    onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Serial Number</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Serial Number
+                  </label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full rounded-xl border border-gray-200 bg-white p-2.5 outline-none focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                     value={formData.serial_number}
-                    onChange={(e: any) => setFormData({ ...formData, serial_number: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        serial_number: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model Number</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Model Number
+                  </label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full rounded-xl border border-gray-200 bg-white p-2.5 outline-none focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                     value={formData.model_number}
-                    onChange={(e: any) => setFormData({ ...formData, model_number: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, model_number: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Manufacturer</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Manufacturer
+                  </label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full rounded-xl border border-gray-200 bg-white p-2.5 outline-none focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                     value={formData.manufacturer}
-                    onChange={(e: any) => setFormData({ ...formData, manufacturer: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, manufacturer: e.target.value })
+                    }
                   />
                 </div>
               </div>
             </div>
 
             {/* Purchase Details */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+              <h3 className="mb-6 border-b border-gray-100 pb-3 text-lg font-bold text-navy-700 dark:border-navy-700 dark:text-white">
                 2. Purchase & Acquisition
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Purchase Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
-                      errors.purchase_date ? "border-red-500" : "border-gray-200"
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
+                      errors.purchase_date
+                        ? "border-red-500"
+                        : "border-gray-200"
                     }`}
                     value={formData.purchase_date}
-                    onChange={(e: any) => setFormData({ ...formData, purchase_date: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        purchase_date: e.target.value,
+                      })
+                    }
                   />
-                  {errors.purchase_date && <span className="text-xs text-red-500 mt-1">{errors.purchase_date}</span>}
+                  {errors.purchase_date && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.purchase_date}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Acquisition Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
-                      errors.acquisition_date ? "border-red-500" : "border-gray-200"
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
+                      errors.acquisition_date
+                        ? "border-red-500"
+                        : "border-gray-200"
                     }`}
                     value={formData.acquisition_date}
-                    onChange={(e: any) => setFormData({ ...formData, acquisition_date: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        acquisition_date: e.target.value,
+                      })
+                    }
                   />
-                  {errors.acquisition_date && <span className="text-xs text-red-500 mt-1">{errors.acquisition_date}</span>}
+                  {errors.acquisition_date && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.acquisition_date}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Supplier Name</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Supplier Name
+                  </label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full rounded-xl border border-gray-200 bg-white p-2.5 outline-none focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                     value={formData.supplier_name}
-                    onChange={(e: any) => setFormData({ ...formData, supplier_name: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        supplier_name: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invoice Number</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Invoice Number
+                  </label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full rounded-xl border border-gray-200 bg-white p-2.5 outline-none focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                     value={formData.invoice_number}
-                    onChange={(e: any) => setFormData({ ...formData, invoice_number: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        invoice_number: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Acquisition Cost (LKR) <span className="text-red-500">*</span>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Acquisition Cost (LKR){" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
-                      errors.acquisition_cost ? "border-red-500" : "border-gray-200"
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
+                      errors.acquisition_cost
+                        ? "border-red-500"
+                        : "border-gray-200"
                     }`}
                     value={formData.acquisition_cost}
-                    onChange={(e: any) => setFormData({ ...formData, acquisition_cost: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        acquisition_cost: e.target.value,
+                      })
+                    }
                   />
-                  {errors.acquisition_cost && <span className="text-xs text-red-500 mt-1">{errors.acquisition_cost}</span>}
+                  {errors.acquisition_cost && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.acquisition_cost}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Residual Value (LKR)
                   </label>
                   <input
                     type="number"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
-                      errors.residual_value ? "border-red-500" : "border-gray-200"
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
+                      errors.residual_value
+                        ? "border-red-500"
+                        : "border-gray-200"
                     }`}
                     value={formData.residual_value}
-                    onChange={(e: any) => setFormData({ ...formData, residual_value: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        residual_value: e.target.value,
+                      })
+                    }
                   />
-                  {errors.residual_value && <span className="text-xs text-red-500 mt-1">{errors.residual_value}</span>}
+                  {errors.residual_value && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.residual_value}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Depreciation Setup */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+              <h3 className="mb-6 border-b border-gray-100 pb-3 text-lg font-bold text-navy-700 dark:border-navy-700 dark:text-white">
                 3. Depreciation Details
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Useful Life (Months) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
-                      errors.useful_life_months ? "border-red-500" : "border-gray-200"
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
+                      errors.useful_life_months
+                        ? "border-red-500"
+                        : "border-gray-200"
                     }`}
                     value={formData.useful_life_months}
-                    onChange={(e: any) => setFormData({ ...formData, useful_life_months: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        useful_life_months: e.target.value,
+                      })
+                    }
                   />
-                  {errors.useful_life_months && <span className="text-xs text-red-500 mt-1">{errors.useful_life_months}</span>}
+                  {errors.useful_life_months && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.useful_life_months}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Depreciation Start Date <span className="text-red-500">*</span>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Depreciation Start Date{" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
-                      errors.depreciation_start_date ? "border-red-500" : "border-gray-200"
+                    className={`w-full rounded-xl border bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white ${
+                      errors.depreciation_start_date
+                        ? "border-red-500"
+                        : "border-gray-200"
                     }`}
                     value={formData.depreciation_start_date}
-                    onChange={(e: any) => setFormData({ ...formData, depreciation_start_date: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({
+                        ...formData,
+                        depreciation_start_date: e.target.value,
+                      })
+                    }
                   />
-                  {errors.depreciation_start_date && <span className="text-xs text-red-500 mt-1">{errors.depreciation_start_date}</span>}
+                  {errors.depreciation_start_date && (
+                    <span className="mt-1 text-xs text-red-500">
+                      {errors.depreciation_start_date}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Depreciation Method
                   </label>
                   <input
                     type="text"
                     disabled
-                    className="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 dark:bg-navy-900/50 dark:border-navy-700 text-gray-500"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 p-2.5 text-gray-500 dark:border-navy-700 dark:bg-navy-900/50"
                     value="Straight Line"
                   />
                 </div>
@@ -472,69 +629,99 @@ const FixedAssetFormPage = () => {
             </div>
 
             {/* Accounting Setup */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+              <h3 className="mb-6 border-b border-gray-100 pb-3 text-lg font-bold text-navy-700 dark:border-navy-700 dark:text-white">
                 4. Accounting Integration
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Asset Account <span className="text-red-500">*</span>
                   </label>
                   <ChartOfAccountSelect
                     value={formData.asset_account_id}
-                    onChange={(val: unknown) => setFormData({ ...formData, asset_account_id: val })}
+                    onChange={(val: unknown) =>
+                      setFormData({ ...formData, asset_account_id: val })
+                    }
                     error={errors.asset_account_id}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Accumulated Depreciation Account <span className="text-red-500">*</span>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Accumulated Depreciation Account{" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <ChartOfAccountSelect
                     value={formData.accumulated_depreciation_account_id}
-                    onChange={(val: unknown) => setFormData({ ...formData, accumulated_depreciation_account_id: val })}
+                    onChange={(val: unknown) =>
+                      setFormData({
+                        ...formData,
+                        accumulated_depreciation_account_id: val,
+                      })
+                    }
                     error={errors.accumulated_depreciation_account_id}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Depreciation Expense Account <span className="text-red-500">*</span>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Depreciation Expense Account{" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <ChartOfAccountSelect
                     value={formData.depreciation_expense_account_id}
-                    onChange={(val: unknown) => setFormData({ ...formData, depreciation_expense_account_id: val })}
+                    onChange={(val: unknown) =>
+                      setFormData({
+                        ...formData,
+                        depreciation_expense_account_id: val,
+                      })
+                    }
                     error={errors.depreciation_expense_account_id}
                   />
                 </div>
                 <div></div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gain on Disposal Account</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Gain on Disposal Account
+                  </label>
                   <ChartOfAccountSelect
                     value={formData.gain_on_disposal_account_id}
-                    onChange={(val: unknown) => setFormData({ ...formData, gain_on_disposal_account_id: val })}
+                    onChange={(val: unknown) =>
+                      setFormData({
+                        ...formData,
+                        gain_on_disposal_account_id: val,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Loss on Disposal Account</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Loss on Disposal Account
+                  </label>
                   <ChartOfAccountSelect
                     value={formData.loss_on_disposal_account_id}
-                    onChange={(val: unknown) => setFormData({ ...formData, loss_on_disposal_account_id: val })}
+                    onChange={(val: unknown) =>
+                      setFormData({
+                        ...formData,
+                        loss_on_disposal_account_id: val,
+                      })
+                    }
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Status <span className="text-red-500">*</span>
                   </label>
                   <select
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                    className="w-full rounded-xl border border-gray-200 bg-white p-2.5 outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                     value={formData.status}
-                    onChange={(e: any) => setFormData({ ...formData, status: e.target.value })}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -542,42 +729,54 @@ const FixedAssetFormPage = () => {
                 </div>
               </div>
             </div>
-
           </div>
 
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6 lg:col-span-1">
             {/* Live Financial Summary */}
-            <div className="bg-gradient-to-br from-brand-50 to-white dark:from-navy-800 dark:to-navy-900 rounded-2xl shadow-sm border border-brand-100 dark:border-brand-900/30 p-6 sticky top-6">
-              <h3 className="text-lg font-bold text-brand-700 dark:text-brand-400 mb-6">
+            <div className="sticky top-6 rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 to-white p-6 shadow-sm dark:border-brand-900/30 dark:from-navy-800 dark:to-navy-900">
+              <h3 className="mb-6 text-lg font-bold text-brand-700 dark:text-brand-400">
                 Financial Preview
               </h3>
-              
+
               <div className="space-y-4">
-                <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Acquisition Cost</span>
+                <div className="flex items-center justify-between border-b border-brand-100 pb-3 dark:border-brand-900/30">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    Acquisition Cost
+                  </span>
                   <span className="font-bold text-navy-700 dark:text-white">
-                    LKR {Number(formData.acquisition_cost || 0).toLocaleString()}
+                    LKR{" "}
+                    {Number(formData.acquisition_cost || 0).toLocaleString()}
                   </span>
                 </div>
-                
-                <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Residual Value</span>
+
+                <div className="flex items-center justify-between border-b border-brand-100 pb-3 dark:border-brand-900/30">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    Residual Value
+                  </span>
                   <span className="font-medium text-gray-700 dark:text-gray-300">
                     LKR {Number(formData.residual_value || 0).toLocaleString()}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                  <span className="text-sm font-semibold text-brand-700 dark:text-brand-400">Depreciable Amount</span>
+                <div className="flex items-center justify-between border-b border-brand-100 pb-3 dark:border-brand-900/30">
+                  <span className="text-sm font-semibold text-brand-700 dark:text-brand-400">
+                    Depreciable Amount
+                  </span>
                   <span className="font-bold text-brand-700 dark:text-brand-400">
                     LKR {depreciableAmount.toLocaleString()}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Monthly Depr.</span>
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    Monthly Depr.
+                  </span>
                   <span className="font-bold text-red-600 dark:text-red-400">
-                    LKR {monthlyDepreciation.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    LKR{" "}
+                    {monthlyDepreciation.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
               </div>

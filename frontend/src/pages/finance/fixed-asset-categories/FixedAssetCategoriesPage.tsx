@@ -70,22 +70,38 @@ const FixedAssetCategoriesPage = () => {
     {
       key: "category_code",
       label: "Code",
-      render: (val: unknown) => <span className="font-bold text-navy-700 dark:text-white">{val}</span>,
+      render: (val: unknown) => (
+        <span className="font-bold text-navy-700 dark:text-white">{val}</span>
+      ),
     },
     {
       key: "category_name",
       label: "Name",
-      render: (val: unknown) => <span className="font-medium text-gray-800 dark:text-gray-200">{val}</span>,
+      render: (val: unknown) => (
+        <span className="font-medium text-gray-800 dark:text-gray-200">
+          {val}
+        </span>
+      ),
     },
     {
       key: "default_asset_account",
       label: "Asset Account",
-      render: (_: unknown, row: unknown) => <span>{row.default_asset_account?.account_code} - {row.default_asset_account?.account_name}</span>,
+      render: (_: unknown, row: unknown) => (
+        <span>
+          {row.default_asset_account?.account_code} -{" "}
+          {row.default_asset_account?.account_name}
+        </span>
+      ),
     },
     {
       key: "default_depreciation_expense_account",
       label: "Depreciation Exp Account",
-      render: (_: unknown, row: unknown) => <span>{row.default_depreciation_expense_account?.account_code} - {row.default_depreciation_expense_account?.account_name}</span>,
+      render: (_: unknown, row: unknown) => (
+        <span>
+          {row.default_depreciation_expense_account?.account_code} -{" "}
+          {row.default_depreciation_expense_account?.account_name}
+        </span>
+      ),
     },
     {
       key: "default_useful_life_months",
@@ -102,8 +118,10 @@ const FixedAssetCategoriesPage = () => {
       label: "Status",
       render: (val: unknown) => (
         <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-            val === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+            val === "active"
+              ? "bg-green-100 text-green-700"
+              : "bg-gray-100 text-gray-700"
           }`}
         >
           {val === "active" ? "Active" : "Inactive"}
@@ -118,29 +136,35 @@ const FixedAssetCategoriesPage = () => {
         <div className="flex items-center justify-end gap-2">
           {hasPermission("finance.fixed_asset_category.view") && (
             <button
-              onClick={() => history.push(`/admin/finance/fixed-asset-categories/${row.id}`)}
-              className="p-1.5 text-gray-500 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-navy-700 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-gray-300"
+              onClick={() =>
+                history.push(`/admin/finance/fixed-asset-categories/${row.id}`)
+              }
+              className="rounded-lg bg-gray-100 p-1.5 text-gray-500 transition-colors hover:bg-gray-200 hover:text-navy-700 dark:bg-navy-700 dark:text-gray-300 dark:hover:bg-navy-600"
               title="View Details"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="h-4 w-4" />
             </button>
           )}
           {hasPermission("finance.fixed_asset_category.update") && (
             <button
-              onClick={() => history.push(`/admin/finance/fixed-asset-categories/${row.id}/edit`)}
-              className="p-1.5 text-brand-600 transition-colors bg-brand-50 rounded-lg hover:bg-brand-100 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-brand-400"
+              onClick={() =>
+                history.push(
+                  `/admin/finance/fixed-asset-categories/${row.id}/edit`
+                )
+              }
+              className="rounded-lg bg-brand-50 p-1.5 text-brand-600 transition-colors hover:bg-brand-100 dark:bg-navy-700 dark:text-brand-400 dark:hover:bg-navy-600"
               title="Edit"
             >
-              <Edit className="w-4 h-4" />
+              <Edit className="h-4 w-4" />
             </button>
           )}
           {hasPermission("finance.fixed_asset_category.delete") && (
             <button
               onClick={() => handleDeleteClick(row)}
-              className="p-1.5 text-red-600 transition-colors bg-red-50 rounded-lg hover:bg-red-100 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-red-400"
+              className="rounded-lg bg-red-50 p-1.5 text-red-600 transition-colors hover:bg-red-100 dark:bg-navy-700 dark:text-red-400 dark:hover:bg-navy-600"
               title="Delete"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -149,41 +173,43 @@ const FixedAssetCategoriesPage = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900">
+    <div className="flex h-full flex-col bg-gray-50 dark:bg-navy-900">
       <PageHeader
         title="Fixed Asset Categories"
         breadcrumb={[{ label: "Finance" }, { label: "Fixed Asset Categories" }]}
         action={
           hasPermission("finance.fixed_asset_category.create") && (
             <button
-              onClick={() => history.push("/admin/finance/fixed-asset-categories/create")}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 shadow-sm shadow-brand-500/20"
+              onClick={() =>
+                history.push("/admin/finance/fixed-asset-categories/create")
+              }
+              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand-500/20 transition-all hover:bg-brand-600"
             >
-              <Plus className="w-4 h-4" /> Create Category
+              <Plus className="h-4 w-4" /> Create Category
             </button>
           )
         }
       />
 
-      <div className="flex-1 p-6 overflow-hidden">
-        <div className="flex flex-col h-full bg-white border border-gray-100 shadow-sm dark:bg-navy-800 dark:border-navy-700 rounded-2xl">
+      <div className="flex-1 overflow-hidden p-6">
+        <div className="flex h-full flex-col rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
           {/* Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-5 border-b border-gray-100 dark:border-navy-700">
-            <div className="relative flex-1 min-w-[250px] max-w-md">
-              <Search className="absolute w-4 h-4 text-gray-400 -translate-y-1/2 left-3 top-1/2" />
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 p-5 dark:border-navy-700">
+            <div className="relative min-w-[250px] max-w-md flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by code or name..."
-                className="w-full py-2 pl-9 pr-4 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                 value={search}
                 onChange={(e: any) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl dark:bg-navy-900 dark:border-navy-600">
-                <Filter className="w-4 h-4 text-gray-500" />
+              <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-navy-600 dark:bg-navy-900">
+                <Filter className="h-4 w-4 text-gray-500" />
                 <select
-                  className="text-sm bg-transparent outline-none text-gray-700 dark:text-gray-300"
+                  className="bg-transparent text-sm text-gray-700 outline-none dark:text-gray-300"
                   value={statusFilter}
                   onChange={(e: any) => setStatusFilter(e.target.value)}
                 >
@@ -216,7 +242,7 @@ const FixedAssetCategoriesPage = () => {
         onClose={() => setDeleteModalOpen(false)}
         title="Delete Category"
       >
-        <p className="text-gray-700 dark:text-gray-300 mb-6">
+        <p className="mb-6 text-gray-700 dark:text-gray-300">
           Are you sure you want to delete category{" "}
           <span className="font-bold text-navy-700 dark:text-white">
             {categoryToDelete?.category_code}
@@ -226,14 +252,14 @@ const FixedAssetCategoriesPage = () => {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setDeleteModalOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
+            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
             disabled={deleting}
           >
             Cancel
           </button>
           <button
             onClick={confirmDelete}
-            className="px-4 py-2 text-sm font-bold text-white transition-all bg-red-500 rounded-xl hover:bg-red-600 disabled:opacity-50"
+            className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-red-600 disabled:opacity-50"
             disabled={deleting}
           >
             {deleting ? "Deleting..." : "Delete"}

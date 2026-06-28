@@ -7,7 +7,11 @@ interface Props {
   disabled?: boolean;
 }
 
-export const SalesInvoiceLineBatchSelect: React.FC<Props> = ({ value, onChange, disabled }) => {
+export const SalesInvoiceLineBatchSelect: React.FC<Props> = ({
+  value,
+  onChange,
+  disabled,
+}) => {
   // Fallback simple input since Invoice Center-safe batch lookup is not confirmed
   return (
     <div>

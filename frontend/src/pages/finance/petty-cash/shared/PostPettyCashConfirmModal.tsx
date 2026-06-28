@@ -1,7 +1,17 @@
 import React from "react";
 import ConfirmDialog from "../../../../components/common/ConfirmDialog";
 
-const PostPettyCashConfirmModal = ({ isOpen, onClose, onConfirm, isSubmitting }: { isOpen?: boolean; onClose?: unknown; onConfirm?: unknown; isSubmitting?: boolean }) => {
+const PostPettyCashConfirmModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  isSubmitting,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  onConfirm?: unknown;
+  isSubmitting?: boolean;
+}) => {
   return (
     <ConfirmDialog
       isOpen={isOpen}

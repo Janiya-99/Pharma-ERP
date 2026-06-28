@@ -4,9 +4,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	res := db.Exec(`
 		UPDATE customers SET current_balance = 0, credit_limit = 1000 WHERE id = 7;
 	`)
-	
+
 	if res.Error != nil {
 		log.Fatal(res.Error)
 	}

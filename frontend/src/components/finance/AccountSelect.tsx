@@ -23,7 +23,13 @@ const AccountSelect: React.FC<AccountSelectProps> = ({
   placeholder = "Select Account",
   className,
   disabled,
-}: { value?: unknown; onChange?: unknown; placeholder?: unknown; className?: unknown; disabled?: unknown }) => {
+}: {
+  value?: unknown;
+  onChange?: unknown;
+  placeholder?: unknown;
+  className?: unknown;
+  disabled?: unknown;
+}) => {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -46,8 +52,17 @@ const AccountSelect: React.FC<AccountSelectProps> = ({
   }, []);
 
   return (
-    <Select value={value} onValueChange={onChange} disabled={disabled || loading}>
-      <SelectTrigger className={className || "w-full bg-white dark:bg-navy-900 border-gray-300 dark:border-navy-700"}>
+    <Select
+      value={value}
+      onValueChange={onChange}
+      disabled={disabled || loading}
+    >
+      <SelectTrigger
+        className={
+          className ||
+          "w-full border-gray-300 bg-white dark:border-navy-700 dark:bg-navy-900"
+        }
+      >
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
       <SelectContent className="bg-white dark:bg-navy-800">

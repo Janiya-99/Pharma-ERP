@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../../../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Label } from "../../../components/ui/label";
@@ -16,7 +23,14 @@ interface Props {
   showStockWarning?: boolean;
 }
 
-export const ApproveSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invoiceId, onSuccess, showCreditWarning, showStockWarning }) => {
+export const ApproveSalesInvoiceModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  invoiceId,
+  onSuccess,
+  showCreditWarning,
+  showStockWarning,
+}) => {
   const [remarks, setRemarks] = useState("Approved");
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +42,9 @@ export const ApproveSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, inv
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to approve sales invoice.");
+      toast.error(
+        err?.response?.data?.message || "Failed to approve sales invoice."
+      );
     } finally {
       setLoading(false);
     }
@@ -39,17 +55,21 @@ export const ApproveSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, inv
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Approve Sales Invoice</DialogTitle>
-          <DialogDescription>Review and approve this sales invoice.</DialogDescription>
+          <DialogDescription>
+            Review and approve this sales invoice.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           {showCreditWarning && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-md flex gap-2 items-center text-sm border border-red-200">
+            <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
               <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-              <span>Warning: This invoice will exceed the customer's credit limit.</span>
+              <span>
+                Warning: This invoice will exceed the customer's credit limit.
+              </span>
             </div>
           )}
           {showStockWarning && (
-            <div className="bg-yellow-50 text-yellow-700 p-3 rounded-md flex gap-2 items-center text-sm border border-yellow-200">
+            <div className="flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-700">
               <AlertTriangle className="h-5 w-5 flex-shrink-0" />
               <span>Warning: Insufficient available stock for some items.</span>
             </div>
@@ -68,7 +88,11 @@ export const ApproveSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, inv
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700" disabled={loading}>
+          <Button
+            onClick={handleApprove}
+            className="bg-green-600 hover:bg-green-700"
+            disabled={loading}
+          >
             {loading ? "Approving..." : "Approve"}
           </Button>
         </DialogFooter>

@@ -36,7 +36,7 @@ function CheckTable(props: { tableData: any }) {
             colorScheme="brandScheme"
             me="10px"
           />
-          <p className="text-sm font-bold text-navy-700 ms-3 dark:text-white">
+          <p className="ms-3 text-sm font-bold text-navy-700 dark:text-white">
             {info.getValue()[0]}
           </p>
         </div>
@@ -113,7 +113,7 @@ function CheckTable(props: { tableData: any }) {
                       key={header.id}
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="cursor-pointer border-b-[1px] border-gray-200 pt-4 pb-2 pe-4 text-start"
+                      className="cursor-pointer border-b-[1px] border-gray-200 pb-2 pe-4 pt-4 text-start"
                     >
                       <div className="items-center justify-between text-xs text-gray-200">
                         {flexRender(

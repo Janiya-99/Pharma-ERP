@@ -11,22 +11,30 @@ import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
 export default function BankReconciliationsPage() {
   const history = useHistory();
   const { hasPermission, activeSoftware } = useAuth();
-  
+
   const [reconciliations, setReconciliations] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [filters, setFilters] = useState({
     bank_account_id: "",
     status: "",
-    search: ""
+    search: "",
   });
 
-  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+  });
 
   const fetchReconciliations = async () => {
     setLoading(true);
     try {
-      const params = { ...filters, page: pagination.page, limit: pagination.limit };
+      const params = {
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      };
       const res = await financeApi.getBankReconciliations(params);
       if (res.data?.success) {
         setReconciliations(res.data.data);
@@ -52,40 +60,61 @@ export default function BankReconciliationsPage() {
       alert("Only draft reconciliations can be deleted.");
       return;
     }
-    if (window.confirm("Are you sure you want to delete this draft reconciliation?")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this draft reconciliation?"
+      )
+    ) {
       try {
         await financeApi.deleteBankReconciliation(rec.id);
         fetchReconciliations();
       } catch (err) {
-        alert("Failed to delete: " + (err.response?.data?.message || err.message));
+        alert(
+          "Failed to delete: " + (err.response?.data?.message || err.message)
+        );
       }
     }
   };
 
   if (activeSoftware?.software_code !== "FINANCE") {
-    return <div className="p-8 text-center text-red-500 font-medium">Please switch to Finance module to access this page.</div>;
+    return (
+      <div className="p-8 text-center font-medium text-red-500">
+        Please switch to Finance module to access this page.
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-4 py-4 h-full">
+    <div className="flex h-full flex-col gap-4 py-4">
       <FinancePageHeader
         title="Bank Reconciliations"
         subtitle="Match system transactions with bank statements"
-        onAdd={hasPermission("finance.bank_reconciliation.create") ? () => history.push("/admin/finance/bank-reconciliations/create") : undefined}
+        onAdd={
+          hasPermission("finance.bank_reconciliation.create")
+            ? () => history.push("/admin/finance/bank-reconciliations/create")
+            : undefined
+        }
         addLabel="New Reconciliation"
       />
 
-      <div className="bg-white dark:bg-navy-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <BankAccountSelect
             value={filters.bank_account_id}
-            onChange={(val: unknown) => setFilters((prev: unknown) => ({ ...prev, bank_account_id: val }))}
+            onChange={(val: unknown) =>
+              setFilters((prev: unknown) => ({ ...prev, bank_account_id: val }))
+            }
             placeholder="All Bank Accounts"
           />
           <select
             value={filters.status}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, status: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) =>
+              setFilters((prev: unknown) => ({
+                ...prev,
+                status: e.target.value,
+              }))
+            }
+            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
           >
             <option value="">All Statuses</option>
             <option value="draft">Draft</option>
@@ -96,16 +125,21 @@ export default function BankReconciliationsPage() {
             type="text"
             placeholder="Search Reference..."
             value={filters.search}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
+            onChange={(e: any) =>
+              setFilters((prev: unknown) => ({
+                ...prev,
+                search: e.target.value,
+              }))
+            }
+            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-navy-500"
           />
         </div>
       </div>
 
-      <div className="flex-1 bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
+      <div className="flex-1 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-gray-200 bg-gray-50 font-semibold text-gray-500 dark:border-navy-700 dark:bg-navy-700/50 dark:text-gray-300">
               <tr>
                 <th className="px-4 py-3">Reference</th>
                 <th className="px-4 py-3">Bank Account</th>
@@ -120,30 +154,63 @@ export default function BankReconciliationsPage() {
             <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">Loading...</td>
+                  <td
+                    colSpan="8"
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    Loading...
+                  </td>
                 </tr>
               ) : reconciliations.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">No reconciliations found.</td>
+                  <td
+                    colSpan="8"
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    No reconciliations found.
+                  </td>
                 </tr>
               ) : (
                 reconciliations.map((rec: unknown) => {
-                  const diff = Math.abs((rec.statement_closing_balance || 0) - (rec.system_closing_balance || 0));
+                  const diff = Math.abs(
+                    (rec.statement_closing_balance || 0) -
+                      (rec.system_closing_balance || 0)
+                  );
                   return (
-                    <tr key={rec.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30">
+                    <tr
+                      key={rec.id}
+                      className="hover:bg-gray-50 dark:hover:bg-navy-700/30"
+                    >
                       <td className="px-4 py-3 font-medium text-navy-700">
-                        <button 
-                          onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}`)}
+                        <button
+                          onClick={() =>
+                            history.push(
+                              `/admin/finance/bank-reconciliations/${rec.id}`
+                            )
+                          }
                           className="text-brand-500 hover:underline"
                         >
                           {rec.reference_number || `REC-${rec.id}`}
                         </button>
                       </td>
-                      <td className="px-4 py-3">{rec.bank_account?.bank_name} - {rec.bank_account?.account_number}</td>
-                      <td className="px-4 py-3">{new Date(rec.statement_date).toLocaleDateString()}</td>
-                      <td className="px-4 py-3 text-right"><MoneyDisplay amount={rec.statement_closing_balance} /></td>
-                      <td className="px-4 py-3 text-right"><MoneyDisplay amount={rec.system_closing_balance} /></td>
-                      <td className={`px-4 py-3 text-right font-medium ${diff > 0.01 ? 'text-red-600' : 'text-green-600'}`}>
+                      <td className="px-4 py-3">
+                        {rec.bank_account?.bank_name} -{" "}
+                        {rec.bank_account?.account_number}
+                      </td>
+                      <td className="px-4 py-3">
+                        {new Date(rec.statement_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <MoneyDisplay amount={rec.statement_closing_balance} />
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <MoneyDisplay amount={rec.system_closing_balance} />
+                      </td>
+                      <td
+                        className={`px-4 py-3 text-right font-medium ${
+                          diff > 0.01 ? "text-red-600" : "text-green-600"
+                        }`}
+                      >
                         <MoneyDisplay amount={diff} />
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -151,21 +218,46 @@ export default function BankReconciliationsPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          {hasPermission("finance.bank_reconciliation.view") && (
-                            <button onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}`)} className="text-gray-500 hover:text-navy-700">
+                          {hasPermission(
+                            "finance.bank_reconciliation.view"
+                          ) && (
+                            <button
+                              onClick={() =>
+                                history.push(
+                                  `/admin/finance/bank-reconciliations/${rec.id}`
+                                )
+                              }
+                              className="text-gray-500 hover:text-navy-700"
+                            >
                               <MdVisibility className="h-5 w-5" />
                             </button>
                           )}
-                          {hasPermission("finance.bank_reconciliation.update") && rec.status === "draft" && (
-                            <button onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}/edit`)} className="text-brand-500 hover:text-brand-700">
-                              <MdEdit className="h-5 w-5" />
-                            </button>
-                          )}
-                          {hasPermission("finance.bank_reconciliation.delete") && rec.status === "draft" && (
-                            <button onClick={() => handleDelete(rec)} className="text-red-500 hover:text-red-700">
-                              <MdDelete className="h-5 w-5" />
-                            </button>
-                          )}
+                          {hasPermission(
+                            "finance.bank_reconciliation.update"
+                          ) &&
+                            rec.status === "draft" && (
+                              <button
+                                onClick={() =>
+                                  history.push(
+                                    `/admin/finance/bank-reconciliations/${rec.id}/edit`
+                                  )
+                                }
+                                className="text-brand-500 hover:text-brand-700"
+                              >
+                                <MdEdit className="h-5 w-5" />
+                              </button>
+                            )}
+                          {hasPermission(
+                            "finance.bank_reconciliation.delete"
+                          ) &&
+                            rec.status === "draft" && (
+                              <button
+                                onClick={() => handleDelete(rec)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <MdDelete className="h-5 w-5" />
+                              </button>
+                            )}
                         </div>
                       </td>
                     </tr>
@@ -175,12 +267,36 @@ export default function BankReconciliationsPage() {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-navy-700">
-          <span className="text-gray-500">Total Records: {pagination.total}</span>
+        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3 dark:border-navy-700">
+          <span className="text-gray-500">
+            Total Records: {pagination.total}
+          </span>
           <div className="flex gap-2">
-            <button disabled={pagination.page <= 1} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page - 1 }))} className="px-3 py-1 border rounded disabled:opacity-50">Previous</button>
+            <button
+              disabled={pagination.page <= 1}
+              onClick={() =>
+                setPagination((prev: unknown) => ({
+                  ...prev,
+                  page: prev.page - 1,
+                }))
+              }
+              className="rounded border px-3 py-1 disabled:opacity-50"
+            >
+              Previous
+            </button>
             <span className="px-3 py-1">Page {pagination.page}</span>
-            <button disabled={reconciliations.length < pagination.limit} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page + 1 }))} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+            <button
+              disabled={reconciliations.length < pagination.limit}
+              onClick={() =>
+                setPagination((prev: unknown) => ({
+                  ...prev,
+                  page: prev.page + 1,
+                }))
+              }
+              className="rounded border px-3 py-1 disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

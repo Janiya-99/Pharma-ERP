@@ -66,7 +66,8 @@ const BranchFormModal = ({
   }, [isOpen, branch]);
 
   const handleChange = (e: any) => {
-    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    const value =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setFormData({
       ...formData,
       [e.target.name]: value,
@@ -104,11 +105,14 @@ const BranchFormModal = ({
         const duplicatePhone = existingBranches.find(
           (b: any) =>
             b.phone &&
-            b.phone.trim().toLowerCase() === formData.phone.trim().toLowerCase() &&
+            b.phone.trim().toLowerCase() ===
+              formData.phone.trim().toLowerCase() &&
             (!isEdit || b.id !== branch.id)
         );
         if (duplicatePhone) {
-          setError(`Contact number is already registered to branch "${duplicatePhone.branch_name}".`);
+          setError(
+            `Contact number is already registered to branch "${duplicatePhone.branch_name}".`
+          );
           setLoading(false);
           return;
         }
@@ -118,11 +122,14 @@ const BranchFormModal = ({
         const duplicateEmail = existingBranches.find(
           (b: any) =>
             b.email &&
-            b.email.trim().toLowerCase() === formData.email.trim().toLowerCase() &&
+            b.email.trim().toLowerCase() ===
+              formData.email.trim().toLowerCase() &&
             (!isEdit || b.id !== branch.id)
         );
         if (duplicateEmail) {
-          setError(`Email address is already registered to branch "${duplicateEmail.branch_name}".`);
+          setError(
+            `Email address is already registered to branch "${duplicateEmail.branch_name}".`
+          );
           setLoading(false);
           return;
         }
@@ -159,8 +166,8 @@ const BranchFormModal = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
             label="Branch Code *"
             name="branch_code"
@@ -178,7 +185,7 @@ const BranchFormModal = ({
             required
             placeholder="e.g. Colombo Headquarters"
           />
-          
+
           <Select
             label="Branch Type"
             name="branch_type"
@@ -193,7 +200,7 @@ const BranchFormModal = ({
               { value: "Admin Office", label: "Admin Office" },
             ]}
           />
-          
+
           <Select
             label="Status"
             name="status"
@@ -223,27 +230,32 @@ const BranchFormModal = ({
           />
 
           <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-slate-950 mb-1.5">Address</label>
+            <label className="text-slate-950 mb-1.5 block text-xs font-semibold">
+              Address
+            </label>
             <textarea
               name="address"
               value={formData.address}
               onChange={handleChange}
               rows={2}
               placeholder="e.g. 123 Galle Road, Colombo 03"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100/50 transition-all duration-150"
+              className="border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:ring-slate-100/50 w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm shadow-sm transition-all duration-150 focus:outline-none focus:ring-2"
             />
           </div>
 
-          <div className="sm:col-span-2 flex items-center mt-2">
+          <div className="mt-2 flex items-center sm:col-span-2">
             <input
               id="is_main_branch"
               name="is_main_branch"
               type="checkbox"
               checked={formData.is_main_branch}
               onChange={handleChange}
-              className="h-4 w-4 rounded-md border-slate-200 text-slate-900 focus:ring-slate-200 cursor-pointer transition-all"
+              className="border-slate-200 text-slate-900 focus:ring-slate-200 h-4 w-4 cursor-pointer rounded-md transition-all"
             />
-            <label htmlFor="is_main_branch" className="ml-2 block text-sm font-medium text-slate-900 select-none cursor-pointer">
+            <label
+              htmlFor="is_main_branch"
+              className="text-slate-900 ml-2 block cursor-pointer select-none text-sm font-medium"
+            >
               Set as Main Branch
             </label>
           </div>

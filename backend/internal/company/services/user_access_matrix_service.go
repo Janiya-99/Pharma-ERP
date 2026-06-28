@@ -57,7 +57,6 @@ func (s *UserAccessMatrixService) ValidateUserBranchSoftwareRole(userID, branchI
 		return errors.New("role does not exist or is inactive")
 	}
 
-
 	// 6. User must already have branch access in user_branch_access
 	var uba models.UserBranchAccess
 	if err := s.db.Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").First(&uba).Error; err != nil {

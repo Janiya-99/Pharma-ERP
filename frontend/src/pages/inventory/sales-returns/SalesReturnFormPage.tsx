@@ -6,11 +6,20 @@ import * as controlApi from "api/controlApi";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Textarea } from "components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "components/ui/select";
 import { Card, CardContent } from "components/ui/card";
 import { SalesReturn, SalesReturnLine } from "types/inventory";
 import SalesReturnLinesTable from "./SalesReturnLinesTable";
-import { SalesReturnTotalsCard, ReturnConditionWarehouseWarning } from "components/inventory/SalesReturnCards";
+import {
+  SalesReturnTotalsCard,
+  ReturnConditionWarehouseWarning,
+} from "components/inventory/SalesReturnCards";
 import PermissionGuard from "auth/PermissionGuard";
 
 const SalesReturnFormPage: React.FC = () => {
@@ -20,13 +29,15 @@ const SalesReturnFormPage: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  
+
   // Lookups
   const [branches, setBranches] = useState<any[]>([]);
   const [warehouses, setWarehouses] = useState<any[]>([]);
-  
+
   // Header state
-  const [salesReturnDate, setSalesReturnDate] = useState(new Date().toISOString().split("T")[0]);
+  const [salesReturnDate, setSalesReturnDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [branchId, setBranchId] = useState("");
   const [warehouseId, setWarehouseId] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -52,11 +63,12 @@ const SalesReturnFormPage: React.FC = () => {
     try {
       const [branchesRes, warehousesRes] = await Promise.all([
         controlApi.getBranches(),
-        inventoryApi.getWarehouses({ status: "active", limit: 100 })
+        inventoryApi.getWarehouses({ status: "active", limit: 100 }),
       ]);
 
       if (branchesRes.data?.success) setBranches(branchesRes.data.data);
-      if (warehousesRes.data?.success) setWarehouses(warehousesRes.data.data?.data || warehousesRes.data.data);
+      if (warehousesRes.data?.success)
+        setWarehouses(warehousesRes.data.data?.data || warehousesRes.data.data);
     } catch (error) {
       console.error("Failed to fetch lookups", error);
     }
@@ -68,13 +80,18 @@ const SalesReturnFormPage: React.FC = () => {
       const response = await inventoryApi.getSalesReturnById(id!);
       if (response.data?.success) {
         const sr = response.data.data;
-        if (sr.posted_status !== "unposted" || !["draft", "rejected"].includes(sr.approval_status)) {
+        if (
+          sr.posted_status !== "unposted" ||
+          !["draft", "rejected"].includes(sr.approval_status)
+        ) {
           alert("This sales return cannot be edited.");
           navigate(`/inventory/sales-returns/${sr.id}`);
           return;
         }
 
-        setSalesReturnDate(new Date(sr.sales_return_date).toISOString().split("T")[0]);
+        setSalesReturnDate(
+          new Date(sr.sales_return_date).toISOString().split("T")[0]
+        );
         setBranchId(sr.branch_id?.toString() || "");
         setWarehouseId(sr.warehouse_id?.toString() || "");
         setCustomerName(sr.customer_name || "");
@@ -102,9 +119,10 @@ const SalesReturnFormPage: React.FC = () => {
     let totalDiscount = 0;
     let totalTax = 0;
 
-    lines.forEach(line => {
+    lines.forEach((line) => {
       totalQty += Number(line.return_quantity) || 0;
-      subtotal += (Number(line.return_quantity) || 0) * (Number(line.unit_price) || 0);
+      subtotal +=
+        (Number(line.return_quantity) || 0) * (Number(line.unit_price) || 0);
       totalDiscount += Number(line.discount_amount) || 0;
       totalTax += Number(line.tax_amount) || 0;
     });
@@ -114,7 +132,7 @@ const SalesReturnFormPage: React.FC = () => {
       subtotal_amount: subtotal,
       discount_amount: totalDiscount,
       tax_amount: totalTax,
-      total_amount: subtotal - totalDiscount + totalTax
+      total_amount: subtotal - totalDiscount + totalTax,
     };
   };
 
@@ -124,29 +142,45 @@ const SalesReturnFormPage: React.FC = () => {
     setLines([]); // clear lines
   };
 
-  const selectedWarehouseType = warehouses.find(w => w.id.toString() === warehouseId)?.warehouse_type;
+  const selectedWarehouseType = warehouses.find(
+    (w) => w.id.toString() === warehouseId
+  )?.warehouse_type;
 
   const handleSave = async () => {
-    if (!branchId || !warehouseId || !salesReturnDate || !returnReason || !returnCondition) {
-      alert("Please fill all mandatory fields (Branch, Warehouse, Return Date, Reason, Condition)");
+    if (
+      !branchId ||
+      !warehouseId ||
+      !salesReturnDate ||
+      !returnReason ||
+      !returnCondition
+    ) {
+      alert(
+        "Please fill all mandatory fields (Branch, Warehouse, Return Date, Reason, Condition)"
+      );
       return;
     }
     if (lines.length === 0) {
       alert("Please add at least one line item");
       return;
     }
-    
-    // Validating Return Condition vs Warehouse Type locally
-    const allowedTypes = {
-      "saleable": ["main", "secondary", "cold_storage"],
-      "quarantine": ["quarantine", "return"],
-      "damaged": ["damaged", "return"],
-      "expired": ["expired", "return"],
-      "recall": ["quarantine", "return", "damaged"],
-    }[returnCondition] || [];
 
-    if (selectedWarehouseType && !allowedTypes.includes(selectedWarehouseType)) {
-      alert(`Selected warehouse type (${selectedWarehouseType}) is not suitable for return condition (${returnCondition}).`);
+    // Validating Return Condition vs Warehouse Type locally
+    const allowedTypes =
+      {
+        saleable: ["main", "secondary", "cold_storage"],
+        quarantine: ["quarantine", "return"],
+        damaged: ["damaged", "return"],
+        expired: ["expired", "return"],
+        recall: ["quarantine", "return", "damaged"],
+      }[returnCondition] || [];
+
+    if (
+      selectedWarehouseType &&
+      !allowedTypes.includes(selectedWarehouseType)
+    ) {
+      alert(
+        `Selected warehouse type (${selectedWarehouseType}) is not suitable for return condition (${returnCondition}).`
+      );
       return;
     }
 
@@ -161,7 +195,12 @@ const SalesReturnFormPage: React.FC = () => {
         alert(`Line ${i + 1}: Return quantity must be greater than 0`);
         return;
       }
-      if (Number(line.unit_price) < 0 || Number(line.discount_amount) < 0 || Number(line.tax_amount) < 0 || Number(line.stock_unit_cost) < 0) {
+      if (
+        Number(line.unit_price) < 0 ||
+        Number(line.discount_amount) < 0 ||
+        Number(line.tax_amount) < 0 ||
+        Number(line.stock_unit_cost) < 0
+      ) {
         alert(`Line ${i + 1}: Amounts cannot be negative`);
         return;
       }
@@ -188,8 +227,10 @@ const SalesReturnFormPage: React.FC = () => {
         return_condition: returnCondition,
         remarks,
         ...totals,
-        lines: lines.map(line => ({
-          warehouse_location_id: line.warehouse_location_id ? Number(line.warehouse_location_id) : null,
+        lines: lines.map((line) => ({
+          warehouse_location_id: line.warehouse_location_id
+            ? Number(line.warehouse_location_id)
+            : null,
           product_id: line.product_id,
           product_batch_id: line.product_batch_id || null,
           return_quantity: Number(line.return_quantity),
@@ -200,8 +241,8 @@ const SalesReturnFormPage: React.FC = () => {
           stock_unit_cost: Number(line.stock_unit_cost) || 0,
           return_reason: line.return_reason || returnReason,
           return_condition: line.return_condition || returnCondition,
-          line_remarks: line.line_remarks
-        }))
+          line_remarks: line.line_remarks,
+        })),
       };
 
       if (isEdit) {
@@ -212,7 +253,10 @@ const SalesReturnFormPage: React.FC = () => {
       navigate("/inventory/sales-returns");
     } catch (error: any) {
       console.error("Failed to save sales return", error);
-      alert(error.response?.data?.message || "Failed to save. Please check the inputs.");
+      alert(
+        error.response?.data?.message ||
+          "Failed to save. Please check the inputs."
+      );
     } finally {
       setSaving(false);
     }
@@ -223,41 +267,57 @@ const SalesReturnFormPage: React.FC = () => {
   const totals = calculateTotals();
 
   // Filter warehouses based on branch_id
-  const filteredWarehouses = warehouses.filter(w => !branchId || w.branch_id.toString() === branchId);
+  const filteredWarehouses = warehouses.filter(
+    (w) => !branchId || w.branch_id.toString() === branchId
+  );
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/inventory/sales-returns">
             <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-semibold text-slate-800">
+            <h1 className="text-slate-800 text-2xl font-semibold">
               {isEdit ? "Edit Sales Return" : "Create Sales Return"}
             </h1>
-            <p className="text-sm text-slate-500">
-              {isEdit ? "Update return details and line items" : "Create a new return from a customer"}
+            <p className="text-slate-500 text-sm">
+              {isEdit
+                ? "Update return details and line items"
+                : "Create a new return from a customer"}
             </p>
           </div>
         </div>
-        <PermissionGuard permission={isEdit ? "inventory.sales_return.update" : "inventory.sales_return.create"}>
-          <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
-            <Save className="w-4 h-4 mr-2" />
+        <PermissionGuard
+          permission={
+            isEdit
+              ? "inventory.sales_return.update"
+              : "inventory.sales_return.create"
+          }
+        >
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Save className="mr-2 h-4 w-4" />
             {saving ? "Saving..." : "Save Draft"}
           </Button>
         </PermissionGuard>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
           <Card>
-            <CardContent className="p-6 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-4 p-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Branch <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium">
+                    Branch <span className="text-red-500">*</span>
+                  </label>
                   <Select value={branchId} onValueChange={handleBranchChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Branch" />
@@ -273,8 +333,14 @@ const SalesReturnFormPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Warehouse <span className="text-red-500">*</span></label>
-                  <Select value={warehouseId} onValueChange={setWarehouseId} disabled={!branchId}>
+                  <label className="text-sm font-medium">
+                    Warehouse <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={warehouseId}
+                    onValueChange={setWarehouseId}
+                    disabled={!branchId}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Warehouse" />
                     </SelectTrigger>
@@ -289,7 +355,9 @@ const SalesReturnFormPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Return Date <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium">
+                    Return Date <span className="text-red-500">*</span>
+                  </label>
                   <Input
                     type="date"
                     value={salesReturnDate}
@@ -307,7 +375,9 @@ const SalesReturnFormPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Customer Contact</label>
+                  <label className="text-sm font-medium">
+                    Customer Contact
+                  </label>
                   <Input
                     placeholder="E.g., 0771234567"
                     value={customerContactNumber}
@@ -316,7 +386,9 @@ const SalesReturnFormPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Sales Invoice Number</label>
+                  <label className="text-sm font-medium">
+                    Sales Invoice Number
+                  </label>
                   <Input
                     placeholder="E.g., INV-001"
                     value={salesInvoiceNumber}
@@ -325,16 +397,22 @@ const SalesReturnFormPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Customer Credit Note No</label>
+                  <label className="text-sm font-medium">
+                    Customer Credit Note No
+                  </label>
                   <Input
                     placeholder="If any"
                     value={customerCreditNoteNumber}
-                    onChange={(e) => setCustomerCreditNoteNumber(e.target.value)}
+                    onChange={(e) =>
+                      setCustomerCreditNoteNumber(e.target.value)
+                    }
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Reference Number</label>
+                  <label className="text-sm font-medium">
+                    Reference Number
+                  </label>
                   <Input
                     placeholder="E.g., SR-REF-001"
                     value={referenceNumber}
@@ -343,7 +421,9 @@ const SalesReturnFormPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Global Return Reason <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium">
+                    Global Return Reason <span className="text-red-500">*</span>
+                  </label>
                   <Select value={returnReason} onValueChange={setReturnReason}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Reason" />
@@ -352,19 +432,30 @@ const SalesReturnFormPage: React.FC = () => {
                       <SelectItem value="damaged">Damaged</SelectItem>
                       <SelectItem value="expired">Expired</SelectItem>
                       <SelectItem value="wrong_item">Wrong Item</SelectItem>
-                      <SelectItem value="customer_return">Customer Return</SelectItem>
-                      <SelectItem value="quality_issue">Quality Issue</SelectItem>
+                      <SelectItem value="customer_return">
+                        Customer Return
+                      </SelectItem>
+                      <SelectItem value="quality_issue">
+                        Quality Issue
+                      </SelectItem>
                       <SelectItem value="recall">Recall</SelectItem>
                       <SelectItem value="near_expiry">Near Expiry</SelectItem>
-                      <SelectItem value="pricing_error">Pricing Error</SelectItem>
+                      <SelectItem value="pricing_error">
+                        Pricing Error
+                      </SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Return Condition <span className="text-red-500">*</span></label>
-                  <Select value={returnCondition} onValueChange={setReturnCondition}>
+                  <label className="text-sm font-medium">
+                    Return Condition <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={returnCondition}
+                    onValueChange={setReturnCondition}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Condition" />
                     </SelectTrigger>
@@ -379,7 +470,10 @@ const SalesReturnFormPage: React.FC = () => {
                 </div>
               </div>
 
-              <ReturnConditionWarehouseWarning condition={returnCondition} warehouseType={selectedWarehouseType} />
+              <ReturnConditionWarehouseWarning
+                condition={returnCondition}
+                warehouseType={selectedWarehouseType}
+              />
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Remarks</label>

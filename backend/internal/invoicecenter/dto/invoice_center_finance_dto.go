@@ -47,20 +47,20 @@ type GetPendingFinancePostingsRequest struct {
 }
 
 type PendingFinancePostingResponse struct {
-	DocumentType        string  `json:"document_type"`
-	DocumentID          uint64  `json:"document_id"`
-	DocumentNumber      string  `json:"document_number"`
-	DocumentDate        string  `json:"document_date"`
-	BranchID            uint64  `json:"branch_id"`
-	BranchName          string  `json:"branch_name"`
-	CustomerID          uint64  `json:"customer_id"`
-	CustomerName        string  `json:"customer_name"`
-	TotalAmount         float64 `json:"total_amount"`
-	ApprovalStatus      string  `json:"approval_status"`
-	OperationalStatus   string  `json:"operational_posted_status"`
-	FinancePostStatus   string  `json:"finance_post_status"`
-	CreatedBy           uint64  `json:"created_by"`
-	CreatedAt           string  `json:"created_at"`
+	DocumentType      string  `json:"document_type"`
+	DocumentID        uint64  `json:"document_id"`
+	DocumentNumber    string  `json:"document_number"`
+	DocumentDate      string  `json:"document_date"`
+	BranchID          uint64  `json:"branch_id"`
+	BranchName        string  `json:"branch_name"`
+	CustomerID        uint64  `json:"customer_id"`
+	CustomerName      string  `json:"customer_name"`
+	TotalAmount       float64 `json:"total_amount"`
+	ApprovalStatus    string  `json:"approval_status"`
+	OperationalStatus string  `json:"operational_posted_status"`
+	FinancePostStatus string  `json:"finance_post_status"`
+	CreatedBy         uint64  `json:"created_by"`
+	CreatedAt         string  `json:"created_at"`
 }
 
 type GetFinancePostingHistoryRequest struct {

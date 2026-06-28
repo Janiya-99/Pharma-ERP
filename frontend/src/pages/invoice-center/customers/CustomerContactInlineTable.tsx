@@ -23,14 +23,22 @@ interface CustomerContactInlineTableProps {
   onRefresh: () => void;
 }
 
-const CustomerContactInlineTable: React.FC<CustomerContactInlineTableProps> = ({ customerId, contacts = [], onRefresh }) => {
-  const [modalState, setModalState] = useState<{ isOpen: boolean; contact: Contact | null }>({
+const CustomerContactInlineTable: React.FC<CustomerContactInlineTableProps> = ({
+  customerId,
+  contacts = [],
+  onRefresh,
+}) => {
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    contact: Contact | null;
+  }>({
     isOpen: false,
     contact: null,
   });
 
   const handleDelete = async (contactId: number, name: string) => {
-    if (!window.confirm(`Are you sure you want to delete contact "${name}"?`)) return;
+    if (!window.confirm(`Are you sure you want to delete contact "${name}"?`))
+      return;
     try {
       await invoiceCenterApi.deleteCustomerContact(customerId, contactId);
       onRefresh();
@@ -41,67 +49,89 @@ const CustomerContactInlineTable: React.FC<CustomerContactInlineTableProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-navy-800 rounded-3xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
-      <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-navy-700">
+    <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+      <div className="flex items-center justify-between border-b border-gray-100 p-5 dark:border-navy-700">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-amber-500" />
-          <h3 className="text-lg font-bold text-navy-900 dark:text-white">Contact Persons</h3>
+          <Users className="h-5 w-5 text-amber-500" />
+          <h3 className="text-lg font-bold text-navy-900 dark:text-white">
+            Contact Persons
+          </h3>
         </div>
         <PermissionGuard permission="invoice_center.customer.update">
           <button
             onClick={() => setModalState({ isOpen: true, contact: null })}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-navy-700 dark:hover:bg-navy-600 text-amber-600 dark:text-amber-400 text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-600 transition-all hover:bg-amber-100 dark:bg-navy-700 dark:text-amber-400 dark:hover:bg-navy-600"
           >
-            <Plus className="w-4 h-4" /> Add Contact
+            <Plus className="h-4 w-4" /> Add Contact
           </button>
         </PermissionGuard>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-gray-50 dark:bg-navy-700/50 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-              <th className="py-3 px-4">Name</th>
-              <th className="py-3 px-4">Designation</th>
-              <th className="py-3 px-4">Department</th>
-              <th className="py-3 px-4">Email</th>
-              <th className="py-3 px-4">Phone / Mobile</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4 text-right">Actions</th>
+            <tr className="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:bg-navy-700/50">
+              <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Designation</th>
+              <th className="px-4 py-3">Department</th>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Phone / Mobile</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-navy-700 text-sm">
+          <tbody className="divide-y divide-gray-100 text-sm dark:divide-navy-700">
             {contacts.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={7}
+                  className="py-8 text-center text-gray-500 dark:text-gray-400"
+                >
                   No contact persons registered.
                 </td>
               </tr>
             ) : (
               contacts.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50/80 dark:hover:bg-navy-700/50 transition-colors">
-                  <td className="py-3 px-4 font-bold text-navy-900 dark:text-white">{c.contact_name}</td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{c.designation || "—"}</td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{c.department || "—"}</td>
-                  <td className="py-3 px-4 text-blue-600 dark:text-blue-400 font-medium">{c.email || "—"}</td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{c.mobile || c.phone || "—"}</td>
-                  <td className="py-3 px-4"><PrimaryContactBadge isPrimary={c.is_primary} /></td>
-                  <td className="py-3 px-4 text-right">
+                <tr
+                  key={c.id}
+                  className="transition-colors hover:bg-gray-50/80 dark:hover:bg-navy-700/50"
+                >
+                  <td className="px-4 py-3 font-bold text-navy-900 dark:text-white">
+                    {c.contact_name}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                    {c.designation || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                    {c.department || "—"}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-blue-600 dark:text-blue-400">
+                    {c.email || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                    {c.mobile || c.phone || "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <PrimaryContactBadge isPrimary={c.is_primary} />
+                  </td>
+                  <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <PermissionGuard permission="invoice_center.customer.update">
                         <button
-                          onClick={() => setModalState({ isOpen: true, contact: c })}
-                          className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-navy-700 transition-colors"
+                          onClick={() =>
+                            setModalState({ isOpen: true, contact: c })
+                          }
+                          className="rounded-lg p-1.5 text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-navy-700"
                           title="Edit Contact"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(c.id, c.contact_name)}
-                          className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-navy-700 transition-colors"
+                          className="text-rose-600 hover:bg-rose-50 rounded-lg p-1.5 transition-colors dark:hover:bg-navy-700"
                           title="Delete Contact"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </PermissionGuard>
                     </div>

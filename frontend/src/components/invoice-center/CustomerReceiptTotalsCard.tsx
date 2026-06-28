@@ -16,7 +16,10 @@ export const CustomerReceiptTotalsCard: React.FC<Props> = ({
   allocationCount,
 }) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount || 0);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount || 0);
   };
 
   return (
@@ -32,7 +35,7 @@ export const CustomerReceiptTotalsCard: React.FC<Props> = ({
               <span>{allocationCount}</span>
             </div>
           )}
-          <div className="flex justify-between font-bold text-base">
+          <div className="flex justify-between text-base font-bold">
             <span>Receipt Amount</span>
             <span>{formatLKR(receiptAmount)}</span>
           </div>
@@ -41,7 +44,11 @@ export const CustomerReceiptTotalsCard: React.FC<Props> = ({
             <span>Allocated Amount</span>
             <span>{formatLKR(allocatedAmount)}</span>
           </div>
-          <div className={`flex justify-between text-sm font-medium ${unallocatedAmount > 0 ? "text-orange-600" : "text-gray-600"}`}>
+          <div
+            className={`flex justify-between text-sm font-medium ${
+              unallocatedAmount > 0 ? "text-orange-600" : "text-gray-600"
+            }`}
+          >
             <span>Unallocated Amount</span>
             <span>{formatLKR(unallocatedAmount)}</span>
           </div>

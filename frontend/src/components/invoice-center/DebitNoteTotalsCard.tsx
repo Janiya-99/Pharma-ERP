@@ -18,7 +18,10 @@ export const DebitNoteTotalsCard: React.FC<Props> = ({
   lineCount,
 }) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   return (
@@ -47,7 +50,7 @@ export const DebitNoteTotalsCard: React.FC<Props> = ({
             <span>{formatLKR(tax)}</span>
           </div>
           <Separator className="my-2" />
-          <div className="flex justify-between font-bold text-base">
+          <div className="flex justify-between text-base font-bold">
             <span>Total Amount</span>
             <span>{formatLKR(total)}</span>
           </div>

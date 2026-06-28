@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { SalesInvoice } from "../../types/invoice-center";
-import PermissionGuard  from "../../auth/PermissionGuard";
+import PermissionGuard from "../../auth/PermissionGuard";
 
 interface Props {
   invoice: SalesInvoice;
@@ -32,34 +32,49 @@ export const SalesInvoiceActionButtons: React.FC<Props> = ({
   const isPosted = posted_status === "posted";
 
   return (
-    <div className={`flex gap-2 ${layout === "vertical" ? "flex-col" : "flex-row"} ${className}`}>
-      {!isPosted && (approval_status === "draft" || approval_status === "rejected") && onEdit && (
-        <PermissionGuard permission="invoice_center.sales_invoice.update">
-          <Button variant="outline" onClick={onEdit} size="sm">
-            Edit
-          </Button>
-        </PermissionGuard>
-      )}
+    <div
+      className={`flex gap-2 ${
+        layout === "vertical" ? "flex-col" : "flex-row"
+      } ${className}`}
+    >
+      {!isPosted &&
+        (approval_status === "draft" || approval_status === "rejected") &&
+        onEdit && (
+          <PermissionGuard permission="invoice_center.sales_invoice.update">
+            <Button variant="outline" onClick={onEdit} size="sm">
+              Edit
+            </Button>
+          </PermissionGuard>
+        )}
 
-      {!isPosted && (approval_status === "draft" || approval_status === "rejected") && onDelete && (
-        <PermissionGuard permission="invoice_center.sales_invoice.delete">
-          <Button variant="destructive" onClick={onDelete} size="sm">
-            Delete
-          </Button>
-        </PermissionGuard>
-      )}
+      {!isPosted &&
+        (approval_status === "draft" || approval_status === "rejected") &&
+        onDelete && (
+          <PermissionGuard permission="invoice_center.sales_invoice.delete">
+            <Button variant="destructive" onClick={onDelete} size="sm">
+              Delete
+            </Button>
+          </PermissionGuard>
+        )}
 
-      {!isPosted && (approval_status === "draft" || approval_status === "rejected") && onSubmit && (
-        <PermissionGuard permission="invoice_center.sales_invoice.submit">
-          <Button variant="default" onClick={onSubmit} size="sm">
-            Submit
-          </Button>
-        </PermissionGuard>
-      )}
+      {!isPosted &&
+        (approval_status === "draft" || approval_status === "rejected") &&
+        onSubmit && (
+          <PermissionGuard permission="invoice_center.sales_invoice.submit">
+            <Button variant="default" onClick={onSubmit} size="sm">
+              Submit
+            </Button>
+          </PermissionGuard>
+        )}
 
       {!isPosted && approval_status === "pending" && onApprove && (
         <PermissionGuard permission="invoice_center.sales_invoice.approve">
-          <Button variant="default" className="bg-green-600 hover:bg-green-700" onClick={onApprove} size="sm">
+          <Button
+            variant="default"
+            className="bg-green-600 hover:bg-green-700"
+            onClick={onApprove}
+            size="sm"
+          >
             Approve
           </Button>
         </PermissionGuard>
@@ -75,19 +90,29 @@ export const SalesInvoiceActionButtons: React.FC<Props> = ({
 
       {!isPosted && approval_status === "approved" && onPost && (
         <PermissionGuard permission="invoice_center.sales_invoice.post">
-          <Button variant="default" className="bg-blue-600 hover:bg-blue-700" onClick={onPost} size="sm">
+          <Button
+            variant="default"
+            className="bg-blue-600 hover:bg-blue-700"
+            onClick={onPost}
+            size="sm"
+          >
             Post
           </Button>
         </PermissionGuard>
       )}
 
-      {!isPosted && (approval_status === "draft" || approval_status === "pending" || approval_status === "rejected" || approval_status === "approved") && onCancel && (
-        <PermissionGuard permission="invoice_center.sales_invoice.update">
-          <Button variant="outline" onClick={onCancel} size="sm">
-            Cancel
-          </Button>
-        </PermissionGuard>
-      )}
+      {!isPosted &&
+        (approval_status === "draft" ||
+          approval_status === "pending" ||
+          approval_status === "rejected" ||
+          approval_status === "approved") &&
+        onCancel && (
+          <PermissionGuard permission="invoice_center.sales_invoice.update">
+            <Button variant="outline" onClick={onCancel} size="sm">
+              Cancel
+            </Button>
+          </PermissionGuard>
+        )}
     </div>
   );
 };

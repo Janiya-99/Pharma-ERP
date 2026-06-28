@@ -23,7 +23,9 @@ export default function ChartOfAccountFormModal({
     if (open) {
       const fetchClassifications = async () => {
         try {
-          const res = await financeApi.getAccountClassifications({ limit: 1000 });
+          const res = await financeApi.getAccountClassifications({
+            limit: 1000,
+          });
           if (res.data.success) {
             setClassifications(
               res.data.data.map((c: any) => ({

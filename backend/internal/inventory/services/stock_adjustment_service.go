@@ -439,7 +439,7 @@ func (s *stockAdjustmentService) ValidateStockAdjustmentLines(db *gorm.DB, lineR
 		if lr.AdjustmentDirection != "in" && lr.AdjustmentDirection != "out" {
 			return nil, errors.New("adjustment direction must be in or out")
 		}
-		
+
 		product, err := s.movementRepo.FindProductByID(db, lr.ProductID)
 		if err != nil {
 			return nil, err
@@ -472,7 +472,7 @@ func (s *stockAdjustmentService) ValidateStockAdjustmentLines(db *gorm.DB, lineR
 				// Wait, if we are doing "expiry" adjustment type, maybe it's allowed.
 				// For now let's allow it but the stock movement service might block it in ProcessStockIn/Out if we aren't careful.
 				// The stock_movement_service says: "if batch.ExpiryDate.Before(time.Now()) return err"
-				// So we need to ensure the standard validation is okay or bypassing it if it's an out movement. 
+				// So we need to ensure the standard validation is okay or bypassing it if it's an out movement.
 				// The out movement usually doesn't block expired stock. ProcessStockOut blocks on expired if it's strict, but the prompt said "batch must be active, not blocked, not recalled, and not disposed"
 			}
 		}
@@ -498,7 +498,7 @@ func (s *stockAdjustmentService) ValidateStockAdjustmentLines(db *gorm.DB, lineR
 				dir = "out"
 			}
 			qty = math.Abs(variance)
-			
+
 			if variance == 0 {
 				continue // ignore line
 			}

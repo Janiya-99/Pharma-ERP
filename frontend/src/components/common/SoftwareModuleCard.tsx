@@ -47,17 +47,20 @@ const SoftwareModuleCard = ({
 }: SoftwareModuleCardProps) => {
   const code = module.software_code?.toLowerCase().replace(/[\s-]/g, "_") || "";
   const icon = MODULE_ICONS[code] || <Package className="h-5 w-5" />;
-  const desc = module.description || MODULE_DESCRIPTIONS[code] || "Software module access";
+  const desc =
+    module.description || MODULE_DESCRIPTIONS[code] || "Software module access";
 
   return (
     <div
       onClick={() => onToggle(module)}
-      className={`module-card ${isSelected ? "module-card-active" : "module-card-inactive"}`}
+      className={`module-card ${
+        isSelected ? "module-card-active" : "module-card-inactive"
+      }`}
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
         <div
-          className={`flex h-10 w-10 items-center justify-center rounded-xl shrink-0 ${
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
             isSelected
               ? "bg-indigo-100 text-indigo-600"
               : "bg-gray-100 text-gray-400"
@@ -67,7 +70,7 @@ const SoftwareModuleCard = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h4
               className={`text-sm font-semibold ${
@@ -77,12 +80,14 @@ const SoftwareModuleCard = ({
               {module.software_name}
             </h4>
             {isDefault && (
-              <span className="text-[10px] font-bold uppercase tracking-wide text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full">
+              <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-600">
                 Default
               </span>
             )}
           </div>
-          <p className="text-[12px] text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
+          <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">
+            {desc}
+          </p>
         </div>
 
         {/* Toggle */}
@@ -93,10 +98,14 @@ const SoftwareModuleCard = ({
               e.stopPropagation();
               onToggle(module);
             }}
-            className={`toggle-switch ${isSelected ? "toggle-switch-on" : "toggle-switch-off"}`}
+            className={`toggle-switch ${
+              isSelected ? "toggle-switch-on" : "toggle-switch-off"
+            }`}
           >
             <span
-              className={`toggle-switch-dot ${isSelected ? "toggle-switch-dot-on" : "toggle-switch-dot-off"}`}
+              className={`toggle-switch-dot ${
+                isSelected ? "toggle-switch-dot-on" : "toggle-switch-dot-off"
+              }`}
             />
           </button>
         </div>
@@ -110,7 +119,7 @@ const SoftwareModuleCard = ({
             e.stopPropagation();
             onSetDefault(module);
           }}
-          className="mt-3 text-[11px] text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+          className="mt-3 text-[11px] font-medium text-indigo-500 transition-colors hover:text-indigo-700"
         >
           Set as default module
         </button>

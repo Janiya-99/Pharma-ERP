@@ -1,14 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 
-const MultiSelect = ({ 
-  options = [], 
-  selectedValues = [], 
-  onChange, 
+const MultiSelect = ({
+  options = [],
+  selectedValues = [],
+  onChange,
   placeholder = "Select options...",
   displayKey = "name",
-  valueKey = "id"
-}: { options?: any[]; selectedValues?: any[]; onChange?: (values: any[]) => void; placeholder?: string; displayKey?: string; valueKey?: string }) => {
+  valueKey = "id",
+}: {
+  options?: any[];
+  selectedValues?: any[];
+  onChange?: (values: any[]) => void;
+  placeholder?: string;
+  displayKey?: string;
+  valueKey?: string;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
@@ -24,9 +31,13 @@ const MultiSelect = ({
   }, []);
 
   const handleSelect = (option: any) => {
-    const isSelected = selectedValues.some((v: any) => v[valueKey] === option[valueKey]);
+    const isSelected = selectedValues.some(
+      (v: any) => v[valueKey] === option[valueKey]
+    );
     if (isSelected) {
-      onChange?.(selectedValues.filter((v: any) => v[valueKey] !== option[valueKey]));
+      onChange?.(
+        selectedValues.filter((v: any) => v[valueKey] !== option[valueKey])
+      );
     } else {
       onChange?.([...selectedValues, option]);
     }
@@ -34,32 +45,36 @@ const MultiSelect = ({
 
   const handleRemove = (e: any, option: any) => {
     e.stopPropagation();
-    onChange?.(selectedValues.filter((v: any) => v[valueKey] !== option[valueKey]));
+    onChange?.(
+      selectedValues.filter((v: any) => v[valueKey] !== option[valueKey])
+    );
   };
 
-  const filteredOptions = options.filter((option: any) => 
+  const filteredOptions = options.filter((option: any) =>
     option[displayKey]?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="relative w-full" ref={wrapperRef}>
-      <div 
-        className="min-h-[42px] w-full flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white cursor-text focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow"
+      <div
+        className="flex min-h-[42px] w-full cursor-text flex-wrap items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 transition-shadow focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
         onClick={() => setIsOpen(true)}
       >
         {selectedValues.length === 0 && !searchTerm && (
-          <span className="text-gray-500 text-sm select-none">{placeholder}</span>
+          <span className="select-none text-sm text-gray-500">
+            {placeholder}
+          </span>
         )}
-        
+
         {selectedValues.map((selected: any) => (
-          <span 
-            key={selected[valueKey]} 
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+          <span
+            key={selected[valueKey]}
+            className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-800"
           >
             {selected[displayKey]}
             <button
               type="button"
-              className="hover:bg-blue-200 rounded-full p-0.5 focus:outline-none"
+              className="rounded-full p-0.5 hover:bg-blue-200 focus:outline-none"
               onClick={(e: any) => handleRemove(e, selected)}
             >
               <X className="h-3 w-3" />
@@ -69,7 +84,7 @@ const MultiSelect = ({
 
         <input
           type="text"
-          className="flex-1 min-w-[60px] bg-transparent outline-none border-none p-0 text-sm focus:ring-0"
+          className="min-w-[60px] flex-1 border-none bg-transparent p-0 text-sm outline-none focus:ring-0"
           value={searchTerm}
           onChange={(e: any) => {
             setSearchTerm(e.target.value);
@@ -77,26 +92,39 @@ const MultiSelect = ({
           }}
           onClick={() => setIsOpen(true)}
         />
-        
+
         <div className="ml-auto flex items-center">
-          <ChevronsUpDown className="h-4 w-4 text-gray-400 cursor-pointer" onClick={() => setIsOpen(!isOpen)} />
+          <ChevronsUpDown
+            className="h-4 w-4 cursor-pointer text-gray-400"
+            onClick={() => setIsOpen(!isOpen)}
+          />
         </div>
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
           {filteredOptions.length === 0 ? (
-            <div className="px-4 py-2 text-sm text-gray-500">No options found.</div>
+            <div className="px-4 py-2 text-sm text-gray-500">
+              No options found.
+            </div>
           ) : (
             filteredOptions.map((option: any) => {
-              const isSelected = selectedValues.some((v: any) => v[valueKey] === option[valueKey]);
+              const isSelected = selectedValues.some(
+                (v: any) => v[valueKey] === option[valueKey]
+              );
               return (
                 <div
                   key={option[valueKey]}
-                  className={`cursor-pointer select-none relative py-2 pl-10 pr-4 hover:bg-blue-50 ${isSelected ? 'bg-blue-50/50' : ''}`}
+                  className={`relative cursor-pointer select-none py-2 pl-10 pr-4 hover:bg-blue-50 ${
+                    isSelected ? "bg-blue-50/50" : ""
+                  }`}
                   onClick={() => handleSelect(option)}
                 >
-                  <span className={`block truncate ${isSelected ? 'font-medium text-blue-900' : 'font-normal'}`}>
+                  <span
+                    className={`block truncate ${
+                      isSelected ? "font-medium text-blue-900" : "font-normal"
+                    }`}
+                  >
                     {option[displayKey]}
                   </span>
                   {isSelected && (

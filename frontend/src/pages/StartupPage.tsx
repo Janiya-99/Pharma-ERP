@@ -28,7 +28,8 @@ const StartupPage = () => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+        background:
+          "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
         fontFamily: "'Inter', 'Geist', sans-serif",
         color: "#f1f5f9",
       }}
@@ -65,7 +66,8 @@ const StartupPage = () => {
           fontWeight: 700,
           letterSpacing: "-0.02em",
           marginBottom: 8,
-          background: "linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 50%, #818cf8 100%)",
+          background:
+            "linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 50%, #818cf8 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
         }}

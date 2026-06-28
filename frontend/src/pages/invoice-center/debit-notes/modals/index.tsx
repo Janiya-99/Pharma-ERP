@@ -46,4 +46,3 @@ export const CancelDebitNoteModal: React.FC<Props> = (props) => (
 );
 
 export * from "./ConfirmModals";
-

@@ -16,7 +16,12 @@ interface ChangeCustomerStatusModalProps {
   customer?: Customer | null;
 }
 
-const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({ isOpen, onClose, onSuccess, customer }) => {
+const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  customer,
+}) => {
   const [status, setStatus] = useState("active");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,45 +43,63 @@ const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({ i
     setError(null);
 
     try {
-      await invoiceCenterApi.changeCustomerStatus(customer.id, { status, reason });
+      await invoiceCenterApi.changeCustomerStatus(customer.id, {
+        status,
+        reason,
+      });
       onSuccess();
       onClose();
     } catch (err: any) {
       console.error("Change status error:", err);
-      setError(err.response?.data?.message || "Failed to change customer status.");
+      setError(
+        err.response?.data?.message || "Failed to change customer status."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-navy-800 rounded-3xl shadow-2xl max-w-md w-full border border-gray-100 dark:border-navy-700 overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-navy-700 bg-amber-50/50 dark:bg-amber-900/10">
-          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-bold">
-            <ShieldAlert className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl dark:border-navy-700 dark:bg-navy-800">
+        <div className="flex items-center justify-between border-b border-gray-100 bg-amber-50/50 p-6 dark:border-navy-700 dark:bg-amber-900/10">
+          <div className="flex items-center gap-2 font-bold text-amber-700 dark:text-amber-400">
+            <ShieldAlert className="h-5 w-5" />
             <span>Change Customer Status</span>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-            <X className="w-5 h-5" />
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-sm">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-4 p-6">
+          {error && (
+            <div className="bg-rose-50 border-rose-200 text-rose-600 rounded-xl border p-3 text-sm">
+              {error}
+            </div>
+          )}
 
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Updating account status for <strong className="text-navy-900 dark:text-white">{customer.customer_name}</strong> ({customer.customer_code}).
+              Updating account status for{" "}
+              <strong className="text-navy-900 dark:text-white">
+                {customer.customer_name}
+              </strong>{" "}
+              ({customer.customer_code}).
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">New Status *</label>
+            <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
+              New Status *
+            </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl bg-white dark:bg-navy-700 text-sm focus:ring-2 focus:ring-navy-500 outline-none"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -86,29 +109,31 @@ const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({ i
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Reason / Notes</label>
+            <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
+              Reason / Notes
+            </label>
             <textarea
               rows={3}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Explain why the status is being changed..."
-              className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl bg-white dark:bg-navy-700 text-sm focus:ring-2 focus:ring-navy-500 outline-none"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-navy-700">
+          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-navy-700">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 rounded-xl border border-gray-200 dark:border-navy-600 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700"
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold shadow-md disabled:opacity-50"
+              className="rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-amber-700 disabled:opacity-50"
             >
               {loading ? "Updating..." : "Update Status"}
             </button>

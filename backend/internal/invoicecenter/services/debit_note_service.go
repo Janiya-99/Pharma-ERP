@@ -376,7 +376,7 @@ func (s *DebitNoteService) PostDebitNote(db *gorm.DB, companyID, id, userID uint
 
 	return db.Transaction(func(tx *gorm.DB) error {
 		now := time.Now()
-		
+
 		// 1. Update customer balance
 		if err := s.repo.UpdateCustomerBalanceAfterDebitNote(tx, companyID, customer.ID, existing.TotalAmount); err != nil {
 			return err

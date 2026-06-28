@@ -6,19 +6,31 @@ interface Props {
   unallocatedAmount: number;
 }
 
-export const CustomerReceiptUnallocatedWarningCard: React.FC<Props> = ({ unallocatedAmount }) => {
+export const CustomerReceiptUnallocatedWarningCard: React.FC<Props> = ({
+  unallocatedAmount,
+}) => {
   if (unallocatedAmount <= 0) return null;
 
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   return (
-    <Alert variant="default" className="bg-orange-50 border-orange-200 text-orange-800">
+    <Alert
+      variant="default"
+      className="border-orange-200 bg-orange-50 text-orange-800"
+    >
       <AlertCircle className="h-4 w-4 stroke-orange-600" />
-      <AlertTitle className="text-orange-800 font-semibold">Unallocated Amount: {formatLKR(unallocatedAmount)}</AlertTitle>
-      <AlertDescription className="text-orange-700 text-sm mt-1">
-        This unallocated amount will be stored on the receipt for visibility, but it <strong>will not</strong> reduce the customer's balance in this step. Advanced allocation will be built later.
+      <AlertTitle className="font-semibold text-orange-800">
+        Unallocated Amount: {formatLKR(unallocatedAmount)}
+      </AlertTitle>
+      <AlertDescription className="mt-1 text-sm text-orange-700">
+        This unallocated amount will be stored on the receipt for visibility,
+        but it <strong>will not</strong> reduce the customer's balance in this
+        step. Advanced allocation will be built later.
       </AlertDescription>
     </Alert>
   );

@@ -28,7 +28,9 @@ const FixedAssetCategoryDetailsPage = () => {
       const res = await financeApi.getFixedAssetCategoryById(id);
       setCategory(res.data?.data);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to load category details");
+      toast.error(
+        err.response?.data?.message || "Failed to load category details"
+      );
       history.push("/admin/finance/fixed-asset-categories");
     } finally {
       setLoading(false);
@@ -51,7 +53,7 @@ const FixedAssetCategoryDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <div className="text-gray-500">Loading...</div>
       </div>
     );
@@ -60,54 +62,69 @@ const FixedAssetCategoryDetailsPage = () => {
   if (!category) return null;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900 overflow-y-auto pb-10">
+    <div className="flex h-full flex-col overflow-y-auto bg-gray-50 pb-10 dark:bg-navy-900">
       <PageHeader
         title="Category Details"
         breadcrumb={[
           { label: "Finance" },
-          { label: "Fixed Asset Categories", path: "/admin/finance/fixed-asset-categories" },
+          {
+            label: "Fixed Asset Categories",
+            path: "/admin/finance/fixed-asset-categories",
+          },
           { label: category.category_code },
         ]}
       />
 
-      <div className="px-6 max-w-5xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-6">
+      <div className="mx-auto w-full max-w-5xl px-6">
+        <div className="mb-6 flex items-center justify-between">
           <button
-            onClick={() => history.push("/admin/finance/fixed-asset-categories")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            onClick={() =>
+              history.push("/admin/finance/fixed-asset-categories")
+            }
+            className="flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-navy-700 dark:text-gray-400 dark:hover:text-white"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to List
+            <ArrowLeft className="h-4 w-4" /> Back to List
           </button>
-          
+
           <div className="flex items-center gap-3">
             {hasPermission("finance.fixed_asset_category.update") && (
               <button
-                onClick={() => history.push(`/admin/finance/fixed-asset-categories/${id}/edit`)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-xl hover:bg-brand-100 dark:bg-navy-800 dark:text-brand-400 dark:hover:bg-navy-700 transition-all"
+                onClick={() =>
+                  history.push(
+                    `/admin/finance/fixed-asset-categories/${id}/edit`
+                  )
+                }
+                className="flex items-center gap-2 rounded-xl bg-brand-50 px-4 py-2 text-sm font-medium text-brand-600 transition-all hover:bg-brand-100 dark:bg-navy-800 dark:text-brand-400 dark:hover:bg-navy-700"
               >
-                <Edit className="w-4 h-4" /> Edit
+                <Edit className="h-4 w-4" /> Edit
               </button>
             )}
             {hasPermission("finance.fixed_asset_category.delete") && (
               <button
                 onClick={() => setDeleteModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 dark:bg-navy-800 dark:text-red-400 dark:hover:bg-navy-700 transition-all"
+                className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition-all hover:bg-red-100 dark:bg-navy-800 dark:text-red-400 dark:hover:bg-navy-700"
               >
-                <Trash2 className="w-4 h-4" /> Delete
+                <Trash2 className="h-4 w-4" /> Delete
               </button>
             )}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
-          <div className="flex justify-between items-start mb-6">
+        <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+          <div className="mb-6 flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white">{category.category_name}</h2>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Code: {category.category_code}</p>
+              <h2 className="text-2xl font-bold text-navy-700 dark:text-white">
+                {category.category_name}
+              </h2>
+              <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                Code: {category.category_code}
+              </p>
             </div>
             <span
-              className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
-                category.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+              className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${
+                category.status === "active"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-700"
               }`}
             >
               {category.status === "active" ? "Active" : "Inactive"}
@@ -115,37 +132,49 @@ const FixedAssetCategoryDetailsPage = () => {
           </div>
           {category.description && (
             <div className="mb-4">
-              <p className="text-sm text-gray-700 dark:text-gray-300">{category.description}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                {category.description}
+              </p>
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b border-gray-100 dark:border-navy-700 pb-3">
+        <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+            <h3 className="mb-4 border-b border-gray-100 pb-3 text-lg font-bold text-navy-700 dark:border-navy-700 dark:text-white">
               Depreciation Defaults
             </h3>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Useful Life</p>
-                <p className="text-sm font-medium text-navy-700 dark:text-white">{category.default_useful_life_months} Months</p>
+                <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                  Useful Life
+                </p>
+                <p className="text-sm font-medium text-navy-700 dark:text-white">
+                  {category.default_useful_life_months} Months
+                </p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Depreciation Method</p>
+                <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                  Depreciation Method
+                </p>
                 <div className="mt-1">
-                  <DepreciationMethodBadge method={category.default_depreciation_method} />
+                  <DepreciationMethodBadge
+                    method={category.default_depreciation_method}
+                  />
                 </div>
               </div>
             </div>
           </div>
-          
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b border-gray-100 dark:border-navy-700 pb-3">
+
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+            <h3 className="mb-4 border-b border-gray-100 pb-3 text-lg font-bold text-navy-700 dark:border-navy-700 dark:text-white">
               System Info
             </h3>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Created At</p>
+                <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                  Created At
+                </p>
                 <p className="text-sm font-medium text-navy-700 dark:text-white">
                   {new Date(category.created_at).toLocaleString()}
                 </p>
@@ -154,49 +183,72 @@ const FixedAssetCategoryDetailsPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+        <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+          <h3 className="mb-6 border-b border-gray-100 pb-3 text-lg font-bold text-navy-700 dark:border-navy-700 dark:text-white">
             Default Chart of Accounts Mapping
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Asset Account</p>
+              <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                Asset Account
+              </p>
               <p className="text-sm font-medium text-navy-700 dark:text-white">
-                {category.default_asset_account?.account_code} - {category.default_asset_account?.account_name}
+                {category.default_asset_account?.account_code} -{" "}
+                {category.default_asset_account?.account_name}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Accumulated Depreciation Account</p>
+              <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                Accumulated Depreciation Account
+              </p>
               <p className="text-sm font-medium text-navy-700 dark:text-white">
-                {category.default_accumulated_depreciation_account?.account_code} - {category.default_accumulated_depreciation_account?.account_name}
+                {
+                  category.default_accumulated_depreciation_account
+                    ?.account_code
+                }{" "}
+                -{" "}
+                {
+                  category.default_accumulated_depreciation_account
+                    ?.account_name
+                }
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Depreciation Expense Account</p>
+              <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                Depreciation Expense Account
+              </p>
               <p className="text-sm font-medium text-navy-700 dark:text-white">
-                {category.default_depreciation_expense_account?.account_code} - {category.default_depreciation_expense_account?.account_name}
+                {category.default_depreciation_expense_account?.account_code} -{" "}
+                {category.default_depreciation_expense_account?.account_name}
               </p>
             </div>
             <div></div>
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Gain on Disposal Account</p>
+              <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                Gain on Disposal Account
+              </p>
               <p className="text-sm font-medium text-navy-700 dark:text-white">
-                {category.default_gain_on_disposal_account ? 
-                  `${category.default_gain_on_disposal_account.account_code} - ${category.default_gain_on_disposal_account.account_name}` : 
-                  <span className="text-gray-400 italic">Not set</span>}
+                {category.default_gain_on_disposal_account ? (
+                  `${category.default_gain_on_disposal_account.account_code} - ${category.default_gain_on_disposal_account.account_name}`
+                ) : (
+                  <span className="italic text-gray-400">Not set</span>
+                )}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Loss on Disposal Account</p>
+              <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+                Loss on Disposal Account
+              </p>
               <p className="text-sm font-medium text-navy-700 dark:text-white">
-                {category.default_loss_on_disposal_account ? 
-                  `${category.default_loss_on_disposal_account.account_code} - ${category.default_loss_on_disposal_account.account_name}` : 
-                  <span className="text-gray-400 italic">Not set</span>}
+                {category.default_loss_on_disposal_account ? (
+                  `${category.default_loss_on_disposal_account.account_code} - ${category.default_loss_on_disposal_account.account_name}`
+                ) : (
+                  <span className="italic text-gray-400">Not set</span>
+                )}
               </p>
             </div>
           </div>
         </div>
-
       </div>
 
       <Modal
@@ -204,7 +256,7 @@ const FixedAssetCategoryDetailsPage = () => {
         onClose={() => setDeleteModalOpen(false)}
         title="Delete Category"
       >
-        <p className="text-gray-700 dark:text-gray-300 mb-6">
+        <p className="mb-6 text-gray-700 dark:text-gray-300">
           Are you sure you want to delete category{" "}
           <span className="font-bold text-navy-700 dark:text-white">
             {category.category_code}
@@ -214,14 +266,14 @@ const FixedAssetCategoryDetailsPage = () => {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setDeleteModalOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
+            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
             disabled={deleting}
           >
             Cancel
           </button>
           <button
             onClick={confirmDelete}
-            className="px-4 py-2 text-sm font-bold text-white transition-all bg-red-500 rounded-xl hover:bg-red-600 disabled:opacity-50"
+            className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-red-600 disabled:opacity-50"
             disabled={deleting}
           >
             {deleting ? "Deleting..." : "Delete"}

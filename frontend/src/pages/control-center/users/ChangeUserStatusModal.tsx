@@ -6,7 +6,17 @@ import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
 import { changeUserStatus } from "../../../api/controlApi";
 
-const ChangeUserStatusModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boolean; onClose?: unknown; user?: unknown; onSuccess?: unknown }) => {
+const ChangeUserStatusModal = ({
+  isOpen,
+  onClose,
+  user,
+  onSuccess,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  user?: unknown;
+  onSuccess?: unknown;
+}) => {
   const [status, setStatus] = useState("active");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +33,7 @@ const ChangeUserStatusModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!user) return;
-    
+
     setLoading(true);
     setError(null);
 
@@ -49,8 +59,10 @@ const ChangeUserStatusModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: 
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="bg-blue-50 p-3 rounded-md mb-4 text-sm text-blue-800">
-          Updating status for: <span className="font-semibold">{user?.name || user?.full_name}</span> ({user?.email})
+        <div className="mb-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800">
+          Updating status for:{" "}
+          <span className="font-semibold">{user?.name || user?.full_name}</span>{" "}
+          ({user?.email})
         </div>
 
         <FormError message={error} />
@@ -70,7 +82,9 @@ const ChangeUserStatusModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: 
         />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Reason (Optional)</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Reason (Optional)
+          </label>
           <Input
             placeholder="Enter reason for status change"
             value={reason}
@@ -79,12 +93,14 @@ const ChangeUserStatusModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: 
         </div>
 
         {(status === "locked" || status === "suspended") && (
-          <p className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-100">
-            Warning: Setting the status to <strong>{status}</strong> will immediately prevent this user from logging in or accessing the system.
+          <p className="rounded border border-red-100 bg-red-50 p-2 text-sm text-red-600">
+            Warning: Setting the status to <strong>{status}</strong> will
+            immediately prevent this user from logging in or accessing the
+            system.
           </p>
         )}
 
-        <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+        <div className="mt-6 flex justify-end space-x-3 border-t border-gray-200 pt-4">
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel
           </Button>

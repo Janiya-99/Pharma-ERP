@@ -1,16 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { invoiceCenterApi } from "@/api/invoiceCenterApi";
 import { ReportPageShell } from "@/components/invoice-center/reports/ReportPageShell";
 import { ReportFilterBar } from "@/components/invoice-center/reports/ReportFilterBar";
-import { ReportSummaryCards, SummaryCardItem } from "@/components/invoice-center/reports/ReportSummaryCards";
-import { ReportDataTable, ColumnDef } from "@/components/invoice-center/reports/ReportDataTable";
+import {
+  ReportSummaryCards,
+  SummaryCardItem,
+} from "@/components/invoice-center/reports/ReportSummaryCards";
+import {
+  ReportDataTable,
+  ColumnDef,
+} from "@/components/invoice-center/reports/ReportDataTable";
 import { ReportPermissionState } from "@/components/invoice-center/reports/ReportPermissionState";
 import { ReportExportActions } from "@/components/invoice-center/reports/ReportExportActions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CreditNoteRegisterReportParams, CreditNoteRegisterReportRow } from "@/types/invoice-center-reports";
+import {
+  CreditNoteRegisterReportParams,
+  CreditNoteRegisterReportRow,
+} from "@/types/invoice-center-reports";
 import { toast } from "sonner";
 import { FileDown, Coins, UploadCloud, DownloadCloud } from "lucide-react";
 
@@ -24,9 +39,17 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
     posted_status: "all",
     finance_post_status: "all",
   });
-  
-  const [data, setData] = useState<{ summary: any, rows: CreditNoteRegisterReportRow[] } | null>(null);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10, totalPages: 1 });
+
+  const [data, setData] = useState<{
+    summary: any;
+    rows: CreditNoteRegisterReportRow[];
+  } | null>(null);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
@@ -34,14 +57,20 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
     try {
       setIsLoading(true);
       setHasPermission(true);
-      
-      const cleanFilters = { ...filters };
-      if (cleanFilters.credit_note_type === "all") delete cleanFilters.credit_note_type;
-      if (cleanFilters.approval_status === "all") delete cleanFilters.approval_status;
-      if (cleanFilters.posted_status === "all") delete cleanFilters.posted_status;
-      if (cleanFilters.finance_post_status === "all") delete cleanFilters.finance_post_status;
 
-      const res = await invoiceCenterApi.getCreditNoteRegisterReport(cleanFilters);
+      const cleanFilters = { ...filters };
+      if (cleanFilters.credit_note_type === "all")
+        delete cleanFilters.credit_note_type;
+      if (cleanFilters.approval_status === "all")
+        delete cleanFilters.approval_status;
+      if (cleanFilters.posted_status === "all")
+        delete cleanFilters.posted_status;
+      if (cleanFilters.finance_post_status === "all")
+        delete cleanFilters.finance_post_status;
+
+      const res = await invoiceCenterApi.getCreditNoteRegisterReport(
+        cleanFilters
+      );
       setData(res.data?.data || null);
       if (res.data?.pagination) {
         setPagination({
@@ -55,7 +84,9 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
       if (err.response?.status === 403) {
         setHasPermission(false);
       } else {
-        toast.error(err.response?.data?.message || "Failed to load report data");
+        toast.error(
+          err.response?.data?.message || "Failed to load report data"
+        );
       }
     } finally {
       setIsLoading(false);
@@ -70,25 +101,32 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
     if (filters.page === 1) {
       fetchData();
     } else {
-      setFilters(prev => ({ ...prev, page: 1 }));
+      setFilters((prev) => ({ ...prev, page: 1 }));
     }
   };
 
   const handleResetFilters = () => {
-    setFilters({ 
-      page: 1, limit: 10, search: "", 
-      credit_note_type: "all", approval_status: "all", 
-      posted_status: "all", finance_post_status: "all" 
+    setFilters({
+      page: 1,
+      limit: 10,
+      search: "",
+      credit_note_type: "all",
+      approval_status: "all",
+      posted_status: "all",
+      finance_post_status: "all",
     });
     setTimeout(() => handleApplyFilters(), 0);
   };
 
   const handlePageChange = (newPage: number) => {
-    setFilters(prev => ({ ...prev, page: newPage }));
+    setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
   const formatMoney = (val: number) => {
-    return new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR' }).format(val || 0);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(val || 0);
   };
 
   const columns: ColumnDef<CreditNoteRegisterReportRow>[] = [
@@ -96,45 +134,57 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
     { header: "Date", accessorKey: "credit_note_date" },
     { header: "Customer Name", accessorKey: "customer_name" },
     { header: "Inv No.", accessorKey: "sales_invoice_number" },
-    { 
-      header: "Type", 
-      cell: (row) => (
-        <Badge variant="outline">{row.credit_note_type}</Badge>
-      ),
-      align: "center"
+    {
+      header: "Type",
+      cell: (row) => <Badge variant="outline">{row.credit_note_type}</Badge>,
+      align: "center",
     },
-    { 
-      header: "Subtotal", 
+    {
+      header: "Subtotal",
       cell: (row) => formatMoney(row.subtotal_amount),
-      align: "right"
+      align: "right",
     },
-    { 
-      header: "Tax", 
+    {
+      header: "Tax",
       cell: (row) => formatMoney(row.tax_amount),
-      align: "right"
+      align: "right",
     },
-    { 
-      header: "Total", 
-      cell: (row) => <span className="font-semibold text-navy-900">{formatMoney(row.total_amount)}</span>,
-      align: "right"
-    },
-    { 
-      header: "Approval", 
+    {
+      header: "Total",
       cell: (row) => (
-        <Badge variant={row.approval_status === 'approved' ? 'default' : row.approval_status === 'rejected' ? 'destructive' : 'secondary'}>
+        <span className="font-semibold text-navy-900">
+          {formatMoney(row.total_amount)}
+        </span>
+      ),
+      align: "right",
+    },
+    {
+      header: "Approval",
+      cell: (row) => (
+        <Badge
+          variant={
+            row.approval_status === "approved"
+              ? "default"
+              : row.approval_status === "rejected"
+              ? "destructive"
+              : "secondary"
+          }
+        >
           {row.approval_status}
         </Badge>
       ),
-      align: "center"
+      align: "center",
     },
-    { 
-      header: "Posted", 
+    {
+      header: "Posted",
       cell: (row) => (
-        <Badge variant={row.posted_status === 'posted' ? 'default' : 'secondary'}>
+        <Badge
+          variant={row.posted_status === "posted" ? "default" : "secondary"}
+        >
           {row.posted_status}
         </Badge>
       ),
-      align: "center"
+      align: "center",
     },
   ];
 
@@ -148,10 +198,30 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
 
   const summary = data?.summary || {};
   const summaryCards: SummaryCardItem[] = [
-    { title: "Credit Note Count", value: summary.credit_note_count || 0, format: "number", icon: <FileDown className="h-4 w-4" /> },
-    { title: "Total Amount", value: summary.total_amount || 0, format: "currency", icon: <Coins className="h-4 w-4 text-emerald-500" /> },
-    { title: "Finance Posted", value: summary.finance_posted_count || 0, format: "number", icon: <UploadCloud className="h-4 w-4 text-blue-500" /> },
-    { title: "Finance Unposted", value: summary.finance_unposted_count || 0, format: "number", icon: <DownloadCloud className="h-4 w-4 text-amber-500" /> },
+    {
+      title: "Credit Note Count",
+      value: summary.credit_note_count || 0,
+      format: "number",
+      icon: <FileDown className="h-4 w-4" />,
+    },
+    {
+      title: "Total Amount",
+      value: summary.total_amount || 0,
+      format: "currency",
+      icon: <Coins className="text-emerald-500 h-4 w-4" />,
+    },
+    {
+      title: "Finance Posted",
+      value: summary.finance_posted_count || 0,
+      format: "number",
+      icon: <UploadCloud className="h-4 w-4 text-blue-500" />,
+    },
+    {
+      title: "Finance Unposted",
+      value: summary.finance_unposted_count || 0,
+      format: "number",
+      icon: <DownloadCloud className="h-4 w-4 text-amber-500" />,
+    },
   ];
 
   return (
@@ -159,9 +229,11 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
       title="Credit Note Register"
       description="View all credit notes and their statuses."
       actions={
-        <ReportExportActions 
-          data={data} 
-          filename={`credit-note-register-${new Date().toISOString().split('T')[0]}`} 
+        <ReportExportActions
+          data={data}
+          filename={`credit-note-register-${
+            new Date().toISOString().split("T")[0]
+          }`}
           disabled={isLoading || !data || data.rows.length === 0}
         />
       }
@@ -173,36 +245,44 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
         >
           <div className="space-y-1">
             <Label htmlFor="search">Search</Label>
-            <Input 
-              id="search" 
+            <Input
+              id="search"
               placeholder="Search credit notes, customers..."
               value={filters.search || ""}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, search: e.target.value }))
+              }
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="date_from">Date From</Label>
-            <Input 
-              id="date_from" 
+            <Input
+              id="date_from"
               type="date"
               value={filters.date_from || ""}
-              onChange={(e) => setFilters(prev => ({ ...prev, date_from: e.target.value }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, date_from: e.target.value }))
+              }
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="date_to">Date To</Label>
-            <Input 
-              id="date_to" 
+            <Input
+              id="date_to"
               type="date"
               value={filters.date_to || ""}
-              onChange={(e) => setFilters(prev => ({ ...prev, date_to: e.target.value }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, date_to: e.target.value }))
+              }
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="credit_note_type">Type</Label>
-            <Select 
-              value={filters.credit_note_type || "all"} 
-              onValueChange={(val) => setFilters(prev => ({ ...prev, credit_note_type: val }))}
+            <Select
+              value={filters.credit_note_type || "all"}
+              onValueChange={(val) =>
+                setFilters((prev) => ({ ...prev, credit_note_type: val }))
+              }
             >
               <SelectTrigger id="credit_note_type">
                 <SelectValue placeholder="All Types" />
@@ -211,16 +291,20 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="sales_return">Sales Return</SelectItem>
                 <SelectItem value="discount">Discount</SelectItem>
-                <SelectItem value="price_adjustment">Price Adjustment</SelectItem>
+                <SelectItem value="price_adjustment">
+                  Price Adjustment
+                </SelectItem>
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1">
             <Label htmlFor="posted_status">Posted Status</Label>
-            <Select 
-              value={filters.posted_status || "all"} 
-              onValueChange={(val) => setFilters(prev => ({ ...prev, posted_status: val }))}
+            <Select
+              value={filters.posted_status || "all"}
+              onValueChange={(val) =>
+                setFilters((prev) => ({ ...prev, posted_status: val }))
+              }
             >
               <SelectTrigger id="posted_status">
                 <SelectValue placeholder="All Statuses" />
@@ -238,10 +322,10 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
         <ReportSummaryCards items={summaryCards} isLoading={isLoading} />
       }
       table={
-        <ReportDataTable 
-          columns={columns} 
-          data={data?.rows || []} 
-          isLoading={isLoading} 
+        <ReportDataTable
+          columns={columns}
+          data={data?.rows || []}
+          isLoading={isLoading}
           pagination={pagination}
           onPageChange={handlePageChange}
         />

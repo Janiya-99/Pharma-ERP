@@ -6,16 +6,37 @@ import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { toast } from "sonner";
-import type { CreditNote, PaginatedResponse } from "../../../types/invoice-center";
-import { 
-  CreditNoteApprovalStatusBadge, 
+import type {
+  CreditNote,
+  PaginatedResponse,
+} from "../../../types/invoice-center";
+import {
+  CreditNoteApprovalStatusBadge,
   CreditNotePostedStatusBadge,
-  CreditNoteTypeBadge 
+  CreditNoteTypeBadge,
 } from "../../../components/invoice-center";
 
 const CreditNotesPage: React.FC = () => {
@@ -23,7 +44,7 @@ const CreditNotesPage: React.FC = () => {
   const navigate = useNavigate();
   const [creditNotes, setCreditNotes] = useState<CreditNote[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Filters
   const [search, setSearch] = useState("");
   const [approvalStatus, setApprovalStatus] = useState<string>("all");
@@ -34,21 +55,26 @@ const CreditNotesPage: React.FC = () => {
 
   const fetchCreditNotes = async () => {
     if (activeSoftware?.software_code !== "INVOICE_CENTER") return;
-    
+
     setLoading(true);
     try {
       const params: any = { page, limit: 10 };
       if (search) params.search = search;
-      if (approvalStatus && approvalStatus !== "all") params.approval_status = approvalStatus;
-      if (postedStatus && postedStatus !== "all") params.posted_status = postedStatus;
-      if (creditNoteType && creditNoteType !== "all") params.credit_note_type = creditNoteType;
-      
+      if (approvalStatus && approvalStatus !== "all")
+        params.approval_status = approvalStatus;
+      if (postedStatus && postedStatus !== "all")
+        params.posted_status = postedStatus;
+      if (creditNoteType && creditNoteType !== "all")
+        params.credit_note_type = creditNoteType;
+
       const res = await invoiceCenterApi.getCreditNotes(params);
       const payload = res.data as PaginatedResponse<CreditNote>;
       setCreditNotes(payload.data || []);
       setTotalPages(payload.pagination?.total_pages || 1);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to fetch credit notes.");
+      toast.error(
+        err?.response?.data?.message || "Failed to fetch credit notes."
+      );
     } finally {
       setLoading(false);
     }
@@ -56,7 +82,14 @@ const CreditNotesPage: React.FC = () => {
 
   useEffect(() => {
     fetchCreditNotes();
-  }, [activeSoftware, search, approvalStatus, postedStatus, creditNoteType, page]);
+  }, [
+    activeSoftware,
+    search,
+    approvalStatus,
+    postedStatus,
+    creditNoteType,
+    page,
+  ]);
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
@@ -67,7 +100,10 @@ const CreditNotesPage: React.FC = () => {
   }
 
   const formatMoney = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   const formatDate = (dateStr: string) => {
@@ -76,13 +112,19 @@ const CreditNotesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Credit Notes</h1>
-          <p className="text-sm text-gray-500">Manage all your customer credit notes.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            Credit Notes
+          </h1>
+          <p className="text-sm text-gray-500">
+            Manage all your customer credit notes.
+          </p>
         </div>
         <PermissionGuard permission="invoice_center.credit_note.create">
-          <Button onClick={() => navigate("/invoice-center/credit-notes/create")}>
+          <Button
+            onClick={() => navigate("/invoice-center/credit-notes/create")}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Create Credit Note
           </Button>
@@ -94,7 +136,7 @@ const CreditNotesPage: React.FC = () => {
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
@@ -104,7 +146,7 @@ const CreditNotesPage: React.FC = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            
+
             <Select value={approvalStatus} onValueChange={setApprovalStatus}>
               <SelectTrigger>
                 <SelectValue placeholder="Approval Status" />
@@ -137,8 +179,12 @@ const CreditNotesPage: React.FC = () => {
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="sales_return">Sales Return</SelectItem>
-                <SelectItem value="price_adjustment">Price Adjustment</SelectItem>
-                <SelectItem value="discount_adjustment">Discount Adjustment</SelectItem>
+                <SelectItem value="price_adjustment">
+                  Price Adjustment
+                </SelectItem>
+                <SelectItem value="discount_adjustment">
+                  Discount Adjustment
+                </SelectItem>
                 <SelectItem value="billing_error">Billing Error</SelectItem>
                 <SelectItem value="goodwill">Goodwill</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
@@ -167,40 +213,74 @@ const CreditNotesPage: React.FC = () => {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24 float-right" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-16 float-right" /></TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="float-right h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="float-right h-8 w-16" />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : creditNotes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center text-gray-500">
+                  <TableCell
+                    colSpan={8}
+                    className="h-24 text-center text-gray-500"
+                  >
                     No credit notes found.
                   </TableCell>
                 </TableRow>
               ) : (
                 creditNotes.map((cn) => (
                   <TableRow key={cn.id}>
-                    <TableCell className="font-medium">{cn.credit_note_number}</TableCell>
+                    <TableCell className="font-medium">
+                      {cn.credit_note_number}
+                    </TableCell>
                     <TableCell>{formatDate(cn.credit_note_date)}</TableCell>
-                    <TableCell>{cn.customer?.customer_name || `Customer #${cn.customer_id}`}</TableCell>
+                    <TableCell>
+                      {cn.customer?.customer_name ||
+                        `Customer #${cn.customer_id}`}
+                    </TableCell>
                     <TableCell>
                       <CreditNoteTypeBadge type={cn.credit_note_type} />
                     </TableCell>
-                    <TableCell className="text-right font-medium">{formatMoney(cn.total_amount)}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatMoney(cn.total_amount)}
+                    </TableCell>
                     <TableCell>
-                      <CreditNoteApprovalStatusBadge status={cn.approval_status} />
+                      <CreditNoteApprovalStatusBadge
+                        status={cn.approval_status}
+                      />
                     </TableCell>
                     <TableCell>
                       <CreditNotePostedStatusBadge status={cn.posted_status} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => navigate(`/invoice-center/credit-notes/${cn.id}`)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          navigate(`/invoice-center/credit-notes/${cn.id}`)
+                        }
+                      >
                         View
                       </Button>
                     </TableCell>
@@ -210,9 +290,9 @@ const CreditNotesPage: React.FC = () => {
             </TableBody>
           </Table>
         </div>
-        
+
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-4 border-t">
+          <div className="flex items-center justify-between border-t px-4 py-4">
             <div className="text-sm text-gray-500">
               Page {page} of {totalPages}
             </div>

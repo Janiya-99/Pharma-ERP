@@ -11,7 +11,10 @@ const StorageConditionBadge = ({ condition }: { condition?: unknown }) => {
     quarantine: { label: "Quarantine", variant: "danger" },
   };
 
-  const config = conditionMap[condition] || { label: condition || "Unknown", variant: "gray" };
+  const config = conditionMap[condition] || {
+    label: condition || "Unknown",
+    variant: "gray",
+  };
 
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };

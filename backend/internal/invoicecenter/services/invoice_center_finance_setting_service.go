@@ -144,7 +144,7 @@ func (s *InvoiceCenterFinanceSettingService) SaveFinanceSettings(db *gorm.DB, co
 		if err := s.repo.CreateFinanceSettingsTx(tx, &setting); err != nil {
 			return err
 		}
-		
+
 		s.auditService.LogAction(tx, companyID, userID, "INVOICE_CENTER_FINANCE_SETTINGS_UPDATED", "Updated finance settings", setting.ID)
 		return nil
 	})

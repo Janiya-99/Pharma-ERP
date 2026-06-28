@@ -8,7 +8,19 @@ import { createRole, updateRole } from "../../../api/controlApi";
 
 import { toast } from "sonner";
 
-const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { isOpen?: boolean; onClose?: unknown; role?: unknown; onSuccess?: unknown; softwareModules?: unknown }) => {
+const RoleFormModal = ({
+  isOpen,
+  onClose,
+  role,
+  onSuccess,
+  softwareModules,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  role?: unknown;
+  onSuccess?: unknown;
+  softwareModules?: unknown;
+}) => {
   const isEdit = !!role;
 
   const [formData, setFormData] = useState({
@@ -112,8 +124,9 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
         <FormError message={error} />
 
         {isEdit && role?.is_system && (
-          <div className="bg-blue-50 text-blue-800 p-3 rounded-md text-sm border border-blue-100">
-            <strong>System Role:</strong> This role is required by the system. Some properties may be restricted from changes.
+          <div className="rounded-md border border-blue-100 bg-blue-50 p-3 text-sm text-blue-800">
+            <strong>System Role:</strong> This role is required by the system.
+            Some properties may be restricted from changes.
           </div>
         )}
 
@@ -126,7 +139,10 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
           required
           searchable={true}
           placeholder="Select Software Module"
-          options={softwareModules.map((s: unknown) => ({ value: s.id, label: s.software_name }))}
+          options={softwareModules.map((s: unknown) => ({
+            value: s.id,
+            label: s.software_name,
+          }))}
         />
 
         <Input
@@ -147,7 +163,9 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
         />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Description
+          </label>
           <textarea
             name="description"
             value={formData.description}
@@ -170,7 +188,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
           ]}
         />
 
-        <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+        <div className="mt-6 flex justify-end space-x-3 border-t border-gray-200 pt-4">
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel
           </Button>

@@ -35,7 +35,7 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	productBatchSvc := services.NewProductBatchService(productBatchRepo, productRepo, stockRepo, auditService)
 	stockBalanceSvc := services.NewStockBalanceService(stockRepo)
 	stockLedgerSvc := services.NewStockLedgerService(stockRepo)
-	
+
 	invAuditLogger := services.NewAuditLogService(logger)
 	stockMovementSvc := services.NewInventoryStockMovementService(stockMovementRepo)
 	openingStockSvc := services.NewOpeningStockService(openingStockRepo, stockMovementRepo, stockMovementSvc, invAuditLogger)
@@ -49,7 +49,6 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	purchaseReturnSvc := services.NewPurchaseReturnService(purchaseReturnRepo, stockMovementSvc)
 	salesReturnRepo := repositories.NewSalesReturnRepository()
 	salesReturnSvc := services.NewSalesReturnService(salesReturnRepo, stockMovementRepo, stockMovementSvc, logger)
-
 
 	// 3. Initialize Handlers
 	warehouseHdl := handlers.NewWarehouseHandler(warehouseSvc, logger)
@@ -71,7 +70,6 @@ func SetupRoutes(r *gin.RouterGroup, auditService *service.AuditService, logger 
 	purchaseReturnHandler := handlers.NewPurchaseReturnHandler(purchaseReturnSvc)
 	salesReturnHandler := handlers.NewSalesReturnHandler(salesReturnSvc)
 	dashboardHdl := handlers.NewDashboardHandler(logger)
-
 
 	inventory := r.Group("")
 

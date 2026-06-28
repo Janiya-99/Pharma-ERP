@@ -17,9 +17,9 @@ type PurchaseReturnLine struct {
 
 	ReturnQuantity float64 `gorm:"type:decimal(18,3);not null;default:0" json:"return_quantity"`
 
-	UnitCost       float64 `gorm:"type:decimal(18,2);default:0" json:"unit_cost"`
-	TaxAmount      float64 `gorm:"type:decimal(18,2);default:0" json:"tax_amount"`
-	LineTotal      float64 `gorm:"type:decimal(18,2);default:0" json:"line_total"`
+	UnitCost  float64 `gorm:"type:decimal(18,2);default:0" json:"unit_cost"`
+	TaxAmount float64 `gorm:"type:decimal(18,2);default:0" json:"tax_amount"`
+	LineTotal float64 `gorm:"type:decimal(18,2);default:0" json:"line_total"`
 
 	ReturnReason string `gorm:"type:varchar(255)" json:"return_reason"`
 	LineRemarks  string `gorm:"type:text" json:"line_remarks"`

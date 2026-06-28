@@ -20,10 +20,14 @@ export const SalesInvoiceStockAvailabilityCard: React.FC<Props> = ({
   requiredQuantity,
 }) => {
   const isInsufficient = requiredQuantity > quantityAvailable;
-  const isExact = requiredQuantity === quantityAvailable && requiredQuantity > 0;
+  const isExact =
+    requiredQuantity === quantityAvailable && requiredQuantity > 0;
 
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   const formatQty = (qty: number) => {
@@ -31,9 +35,15 @@ export const SalesInvoiceStockAvailabilityCard: React.FC<Props> = ({
   };
 
   return (
-    <Card className={isInsufficient ? "border-red-500" : isExact ? "border-yellow-500" : ""}>
-      <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-sm font-medium">Stock Availability</CardTitle>
+    <Card
+      className={
+        isInsufficient ? "border-red-500" : isExact ? "border-yellow-500" : ""
+      }
+    >
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">
+          Stock Availability
+        </CardTitle>
         {isInsufficient ? (
           <AlertTriangle className="h-4 w-4 text-red-500" />
         ) : isExact ? (
@@ -52,16 +62,18 @@ export const SalesInvoiceStockAvailabilityCard: React.FC<Props> = ({
             <span>Quantity Allocated</span>
             <span>{formatQty(quantityAllocated)}</span>
           </div>
-          <div className="flex justify-between pt-1 border-t mt-1 font-semibold">
+          <div className="mt-1 flex justify-between border-t pt-1 font-semibold">
             <span>Quantity Available</span>
-            <span className={isInsufficient ? "text-red-600" : ""}>{formatQty(quantityAvailable)}</span>
+            <span className={isInsufficient ? "text-red-600" : ""}>
+              {formatQty(quantityAvailable)}
+            </span>
           </div>
-          <div className="flex justify-between text-xs mt-2 text-blue-600">
+          <div className="mt-2 flex justify-between text-xs text-blue-600">
             <span>Required Quantity</span>
             <span>{formatQty(requiredQuantity)}</span>
           </div>
-          
-          <div className="mt-4 pt-2 border-t space-y-1 text-xs">
+
+          <div className="mt-4 space-y-1 border-t pt-2 text-xs">
             <div className="flex justify-between">
               <span className="text-gray-500">Average Cost</span>
               <span>{formatLKR(averageCost)}</span>
@@ -71,12 +83,16 @@ export const SalesInvoiceStockAvailabilityCard: React.FC<Props> = ({
               <span>{formatLKR(stockValue)}</span>
             </div>
           </div>
-          
+
           <div className="mt-3">
             {isInsufficient ? (
-              <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded block text-center">Insufficient Stock</span>
+              <span className="block rounded bg-red-50 px-2 py-1 text-center text-xs font-semibold text-red-600">
+                Insufficient Stock
+              </span>
             ) : isExact ? (
-              <span className="text-xs font-semibold text-yellow-700 bg-yellow-50 px-2 py-1 rounded block text-center">Zero Stock After Invoice</span>
+              <span className="block rounded bg-yellow-50 px-2 py-1 text-center text-xs font-semibold text-yellow-700">
+                Zero Stock After Invoice
+              </span>
             ) : null}
           </div>
         </div>

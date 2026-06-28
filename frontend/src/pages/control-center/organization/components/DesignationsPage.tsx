@@ -4,15 +4,27 @@ import { ERPFormModal, FormField } from "components/erp/ERPFormModal";
 import api from "lib/api";
 
 const fields: FormField[] = [
-  { key: "name", label: "Designation Name", type: "text", required: true, placeholder: "e.g. Sales Executive" },
-  { key: "description", label: "Description", type: "textarea", span: 2, placeholder: "Role description and responsibilities" },
+  {
+    key: "name",
+    label: "Designation Name",
+    type: "text",
+    required: true,
+    placeholder: "e.g. Sales Executive",
+  },
+  {
+    key: "description",
+    label: "Description",
+    type: "textarea",
+    span: 2,
+    placeholder: "Role description and responsibilities",
+  },
 ];
 
 export default function DesignationsPage() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  
+
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState<any>(null);
   const [isEdit, setIsEdit] = useState(false);
@@ -33,8 +45,16 @@ export default function DesignationsPage() {
     fetchData();
   }, []);
 
-  const handleAdd = () => { setSelected(null); setIsEdit(false); setShowForm(true); };
-  const handleEdit = (row: any) => { setSelected(row); setIsEdit(true); setShowForm(true); };
+  const handleAdd = () => {
+    setSelected(null);
+    setIsEdit(false);
+    setShowForm(true);
+  };
+  const handleEdit = (row: any) => {
+    setSelected(row);
+    setIsEdit(true);
+    setShowForm(true);
+  };
 
   const handleSave = async (values: Record<string, any>) => {
     setSaving(true);

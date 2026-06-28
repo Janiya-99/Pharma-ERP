@@ -15,7 +15,11 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 
-type Column = { key: string; label: string; render?: (row: any) => React.ReactNode };
+type Column = {
+  key: string;
+  label: string;
+  render?: (row: any) => React.ReactNode;
+};
 
 type StatusConfig = Record<string, string>;
 
@@ -41,9 +45,12 @@ const defaultStatusColors: StatusConfig = {
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const cls = defaultStatusColors[status] || "bg-gray-500 text-white dark:bg-gray-600";
+  const cls =
+    defaultStatusColors[status] || "bg-gray-500 text-white dark:bg-gray-600";
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-transparent dark:border-white/5 ${cls}`}>
+    <span
+      className={`inline-flex items-center rounded-full border border-transparent px-2.5 py-0.5 text-[11px] font-semibold dark:border-white/5 ${cls}`}
+    >
       {status}
     </span>
   );
@@ -85,7 +92,9 @@ export function ERPListPage({
 
   const filtered = React.useMemo(() => {
     return data.filter((row: unknown) =>
-      String(row[searchKey] || "").toLowerCase().includes(search.toLowerCase())
+      String(row[searchKey] || "")
+        .toLowerCase()
+        .includes(search.toLowerCase())
     );
   }, [data, search, searchKey]);
 
@@ -102,7 +111,9 @@ export function ERPListPage({
         ),
         cell: (info: unknown) => (
           <div className="text-[13px] font-bold text-navy-700 dark:text-white">
-            {col.render ? col.render(info.row.original) : info.getValue() ?? "—"}
+            {col.render
+              ? col.render(info.row.original)
+              : info.getValue() ?? "—"}
           </div>
         ),
       })
@@ -113,7 +124,7 @@ export function ERPListPage({
         columnHelper.display({
           id: "actions",
           header: () => (
-            <p className="text-[12px] font-bold text-gray-400 dark:text-gray-300 text-right">
+            <p className="text-right text-[12px] font-bold text-gray-400 dark:text-gray-300">
               ACTIONS
             </p>
           ),
@@ -121,24 +132,33 @@ export function ERPListPage({
             <div className="flex items-center justify-end gap-2">
               {onRowClick && (
                 <button
-                  onClick={(e: any) => { e.stopPropagation(); onRowClick(info.row.original); }}
-                  className="px-3 py-1.5 rounded-lg bg-brand-50 text-brand-600 text-[12px] font-bold hover:bg-brand-100 transition-colors"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    onRowClick(info.row.original);
+                  }}
+                  className="rounded-lg bg-brand-50 px-3 py-1.5 text-[12px] font-bold text-brand-600 transition-colors hover:bg-brand-100"
                 >
                   View
                 </button>
               )}
               {onEdit && (
                 <button
-                  onClick={(e: any) => { e.stopPropagation(); onEdit(info.row.original); }}
-                  className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 text-[12px] font-bold hover:bg-amber-100 transition-colors"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    onEdit(info.row.original);
+                  }}
+                  className="rounded-lg bg-amber-50 px-3 py-1.5 text-[12px] font-bold text-amber-600 transition-colors hover:bg-amber-100"
                 >
                   Edit
                 </button>
               )}
               {onDelete && (
                 <button
-                  onClick={(e: any) => { e.stopPropagation(); onDelete(info.row.original); }}
-                  className="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-[12px] font-bold hover:bg-red-100 transition-colors"
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    onDelete(info.row.original);
+                  }}
+                  className="rounded-lg bg-red-50 px-3 py-1.5 text-[12px] font-bold text-red-600 transition-colors hover:bg-red-100"
                 >
                   Delete
                 </button>
@@ -166,21 +186,27 @@ export function ERPListPage({
   });
 
   return (
-    <div className="flex flex-col gap-4 py-4 h-full">
+    <div className="flex h-full flex-col gap-4 py-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-navy-700 dark:text-white">{title}</h1>
-          {subtitle && <p className="text-sm text-gray-400 dark:text-gray-400">{subtitle}</p>}
+          <h1 className="text-xl font-bold text-navy-700 dark:text-white">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="text-sm text-gray-400 dark:text-gray-400">
+              {subtitle}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-navy-600 text-[13px] font-medium text-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
+          <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-[13px] font-medium text-gray-600 transition-all hover:bg-gray-50 dark:border-navy-600 dark:text-white dark:hover:bg-white/5">
             <MdDownload size={16} /> Export
           </button>
           {onAdd && (
             <button
               onClick={onAdd}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand-500 text-white text-[13px] font-semibold hover:bg-brand-600 transition-all shadow-sm shadow-brand-200 dark:shadow-none"
+              className="flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-[13px] font-semibold text-white shadow-sm shadow-brand-200 transition-all hover:bg-brand-600 dark:shadow-none"
             >
               <MdAdd size={18} /> {addLabel}
             </button>
@@ -189,40 +215,50 @@ export function ERPListPage({
       </div>
 
       {/* Table Card */}
-      <div className="flex-1 flex flex-col min-h-0 bg-white dark:!bg-navy-800 rounded-xl border border-gray-100 dark:border-navy-700 shadow-sm overflow-hidden transition-all duration-200">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-200 dark:border-navy-700 dark:!bg-navy-800">
         {/* Search & Filter Bar */}
-        <div className="px-4 py-3 border-b border-gray-50 dark:border-navy-700 flex flex-col sm:flex-row gap-2 sm:items-center bg-white dark:bg-navy-800">
-          <div className="relative flex-1 max-w-xs">
+        <div className="flex flex-col gap-2 border-b border-gray-50 bg-white px-4 py-3 dark:border-navy-700 dark:bg-navy-800 sm:flex-row sm:items-center">
+          <div className="relative max-w-xs flex-1">
             <MdSearch className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               placeholder="Search..."
               value={search}
-              onChange={(e: any) => { setSearch(e.target.value); table.setPageIndex(0); }}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-full bg-lightPrimary dark:bg-navy-900 text-navy-700 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all border border-transparent dark:border-navy-700"
+              onChange={(e: any) => {
+                setSearch(e.target.value);
+                table.setPageIndex(0);
+              }}
+              className="w-full rounded-full border border-transparent bg-lightPrimary py-2 pl-9 pr-4 text-sm text-navy-700 transition-all placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-navy-700 dark:bg-navy-900 dark:text-white dark:placeholder:text-gray-500"
             />
           </div>
-          <button className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-lightPrimary dark:bg-navy-900 text-[13px] font-medium text-navy-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all border border-transparent dark:border-navy-700">
+          <button className="flex items-center gap-1.5 rounded-full border border-transparent bg-lightPrimary px-4 py-2 text-[13px] font-medium text-navy-700 transition-all hover:bg-gray-100 dark:border-navy-700 dark:bg-navy-900 dark:text-white dark:hover:bg-white/10">
             <MdFilterList size={16} /> Filters
           </button>
-          <p className="text-[12px] text-gray-400 dark:text-gray-500 ml-auto shrink-0 font-medium">
+          <p className="ml-auto shrink-0 text-[12px] font-medium text-gray-400 dark:text-gray-500">
             {filtered.length} record{filtered.length !== 1 ? "s" : ""}
           </p>
         </div>
 
         {/* Table */}
-        <div className="flex-1 overflow-auto w-full">
+        <div className="w-full flex-1 overflow-auto">
           <table className="w-full text-sm">
             <thead>
               {table.getHeaderGroups().map((headerGroup: unknown) => (
-                <tr key={headerGroup.id} className="border-b border-gray-200 dark:border-navy-700">
+                <tr
+                  key={headerGroup.id}
+                  className="border-b border-gray-200 dark:border-navy-700"
+                >
                   {headerGroup.headers.map((header: unknown) => (
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="px-4 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors text-left"
+                      className="cursor-pointer px-4 py-4 text-left transition-colors hover:bg-gray-50 dark:hover:bg-navy-700"
                     >
-                      <div className={`flex items-center gap-2 ${header.id === "actions" ? "justify-end" : ""}`}>
+                      <div
+                        className={`flex items-center gap-2 ${
+                          header.id === "actions" ? "justify-end" : ""
+                        }`}
+                      >
                         {flexRender(
                           header.column.columnDef.header,
                           header.getContext()
@@ -242,28 +278,41 @@ export function ERPListPage({
             <tbody className="bg-white dark:bg-navy-800">
               {isLoading ? (
                 <tr>
-                  <td colSpan={columns.length + 1} className="px-4 py-16 text-center">
+                  <td
+                    colSpan={columns.length + 1}
+                    className="px-4 py-16 text-center"
+                  >
                     <div className="flex flex-col items-center justify-center gap-3">
                       <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-brand-500 dark:border-navy-600 dark:border-t-brand-400" />
-                      <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">Loading data...</p>
+                      <p className="text-sm font-medium text-gray-400 dark:text-gray-500">
+                        Loading data...
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length + 1} className="px-4 py-16 text-center">
-                    <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">No records found.</p>
+                  <td
+                    colSpan={columns.length + 1}
+                    className="px-4 py-16 text-center"
+                  >
+                    <p className="text-sm font-medium text-gray-400 dark:text-gray-500">
+                      No records found.
+                    </p>
                   </td>
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row: unknown) => (
                   <tr
                     key={row.id}
-                    className="border-b border-gray-50 dark:border-navy-700 hover:bg-gray-50/50 dark:hover:bg-navy-700/30 transition-colors"
+                    className="border-b border-gray-50 transition-colors hover:bg-gray-50/50 dark:border-navy-700 dark:hover:bg-navy-700/30"
                   >
                     {row.getVisibleCells().map((cell: unknown) => (
                       <td key={cell.id} className="px-4 py-4">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -275,22 +324,23 @@ export function ERPListPage({
 
         {/* Pagination */}
         {table.getPageCount() > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-50 dark:border-navy-700 bg-white dark:bg-navy-800">
+          <div className="flex items-center justify-between border-t border-gray-50 bg-white px-4 py-3 dark:border-navy-700 dark:bg-navy-800">
             <p className="text-[12px] text-gray-400 dark:text-gray-500">
-              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                className="flex items-center justify-center h-8 px-3 rounded-full text-[12px] font-medium bg-lightPrimary dark:bg-navy-900 text-navy-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-40 transition-all border border-transparent dark:border-navy-700"
+                className="flex h-8 items-center justify-center rounded-full border border-transparent bg-lightPrimary px-3 text-[12px] font-medium text-navy-700 transition-all hover:bg-gray-100 disabled:opacity-40 dark:border-navy-700 dark:bg-navy-900 dark:text-white dark:hover:bg-white/10"
               >
                 Prev
               </button>
               <button
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                className="flex items-center justify-center h-8 px-3 rounded-full text-[12px] font-medium bg-lightPrimary dark:bg-navy-900 text-navy-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-40 transition-all border border-transparent dark:border-navy-700"
+                className="flex h-8 items-center justify-center rounded-full border border-transparent bg-lightPrimary px-3 text-[12px] font-medium text-navy-700 transition-all hover:bg-gray-100 disabled:opacity-40 dark:border-navy-700 dark:bg-navy-900 dark:text-white dark:hover:bg-white/10"
               >
                 Next
               </button>

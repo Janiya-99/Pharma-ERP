@@ -1,5 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { login, getAuthContext, switchBranch, switchSoftware } from "../api/authApi";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import {
+  login,
+  getAuthContext,
+  switchBranch,
+  switchSoftware,
+} from "../api/authApi";
 
 export interface AuthContextType {
   token: string | null;
@@ -47,7 +58,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     try {
       setLoading(true);
       const res = await getAuthContext();
-      
+
       // Handle both {success: true, data: {...}} and direct object {...}
       const data = res.data || res;
       const isSuccess = res.success !== false; // Treat undefined as success
@@ -78,7 +89,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
   const loginUser = async (email: unknown, password: unknown) => {
     try {
       const res = await login({ email, password });
-      
+
       // Handle different token path structures
       const data = res.data || res;
       const tokenStr = data?.tokens?.access_token || res.token || data?.token;
@@ -87,7 +98,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
       if (isSuccess && tokenStr) {
         localStorage.setItem("erp_token", tokenStr);
         setToken(tokenStr);
-        
+
         // If login returns the context, set it immediately to prevent redirect loops
         if (data && data.user) {
           setUser(data.user);
@@ -98,14 +109,15 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
           setSoftwareModules(data.software_modules || []);
           setPermissions(data.permissions || []);
         }
-        
+
         return { success: true };
       }
       return { success: false, message: res.message || "Login failed" };
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "An error occurred during login",
+        message:
+          error.response?.data?.message || "An error occurred during login",
       };
     }
   };
@@ -127,7 +139,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     try {
       setLoading(true);
       const res = await switchBranch(branchId);
-      const token = res.data?.tokens?.access_token || res.token || res.data?.token;
+      const token =
+        res.data?.tokens?.access_token || res.token || res.data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
         localStorage.setItem("erp_token", token);
@@ -148,7 +161,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     try {
       setLoading(true);
       const res = await switchSoftware(softwareCode);
-      const token = res.data?.tokens?.access_token || res.token || res.data?.token;
+      const token =
+        res.data?.tokens?.access_token || res.token || res.data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
         localStorage.setItem("erp_token", token);
@@ -166,14 +180,20 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
   };
 
   const hasPermission = (permissionKey: unknown) => {
-    if (user?.user_type === "super_admin" && activeSoftware?.software_code === "CONTROL_CENTER") {
+    if (
+      user?.user_type === "super_admin" &&
+      activeSoftware?.software_code === "CONTROL_CENTER"
+    ) {
       return true;
     }
     return permissions.includes(permissionKey);
   };
 
   const hasAnyPermission = (permissionKeys: unknown) => {
-    if (user?.user_type === "super_admin" && activeSoftware?.software_code === "CONTROL_CENTER") {
+    if (
+      user?.user_type === "super_admin" &&
+      activeSoftware?.software_code === "CONTROL_CENTER"
+    ) {
       return true;
     }
     return permissionKeys.some((key: unknown) => permissions.includes(key));

@@ -15,7 +15,13 @@ const PettyCashFundSelect = ({
   placeholder = "Select Petty Cash Fund",
   className,
   disabled,
-}: { value?: unknown; onChange?: unknown; placeholder?: unknown; className?: unknown; disabled?: unknown }) => {
+}: {
+  value?: unknown;
+  onChange?: unknown;
+  placeholder?: unknown;
+  className?: unknown;
+  disabled?: unknown;
+}) => {
   const [funds, setFunds] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +29,10 @@ const PettyCashFundSelect = ({
     const fetchFunds = async () => {
       setLoading(true);
       try {
-        const response = await financeApi.getPettyCashFunds({ limit: 1000, status: "active" });
+        const response = await financeApi.getPettyCashFunds({
+          limit: 1000,
+          status: "active",
+        });
         if (response.data.success) {
           setFunds(response.data.data);
         }
@@ -38,14 +47,28 @@ const PettyCashFundSelect = ({
   }, []);
 
   return (
-    <Select value={value?.toString() || ""} onValueChange={(val: unknown) => onChange(parseInt(val, 10))} disabled={disabled || loading}>
-      <SelectTrigger className={className || "w-full bg-white dark:bg-navy-900 border-gray-300 dark:border-navy-700"}>
+    <Select
+      value={value?.toString() || ""}
+      onValueChange={(val: unknown) => onChange(parseInt(val, 10))}
+      disabled={disabled || loading}
+    >
+      <SelectTrigger
+        className={
+          className ||
+          "w-full border-gray-300 bg-white dark:border-navy-700 dark:bg-navy-900"
+        }
+      >
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
       <SelectContent className="bg-white dark:bg-navy-800">
         {funds.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
-            {item.fund_code} - {item.fund_name} (Balance: LKR {item.current_balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+            {item.fund_code} - {item.fund_name} (Balance: LKR{" "}
+            {item.current_balance?.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+            )
           </SelectItem>
         ))}
       </SelectContent>

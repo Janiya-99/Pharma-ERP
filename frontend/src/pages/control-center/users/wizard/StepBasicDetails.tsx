@@ -9,7 +9,12 @@ interface StepBasicDetailsProps {
   designations: any[];
 }
 
-const StepBasicDetails = ({ formData, onChange, departments, designations }: StepBasicDetailsProps) => {
+const StepBasicDetails = ({
+  formData,
+  onChange,
+  departments,
+  designations,
+}: StepBasicDetailsProps) => {
   const handleChange = (e: any) => {
     onChange(e.target.name, e.target.value);
   };
@@ -18,12 +23,16 @@ const StepBasicDetails = ({ formData, onChange, departments, designations }: Ste
     <div className="card-premium">
       <div className="card-premium-header">
         <div>
-          <h3 className="text-base font-semibold text-gray-900">Basic Details</h3>
-          <p className="text-xs text-gray-500 mt-0.5">Enter the user's personal and organizational information</p>
+          <h3 className="text-base font-semibold text-gray-900">
+            Basic Details
+          </h3>
+          <p className="mt-0.5 text-xs text-gray-500">
+            Enter the user's personal and organizational information
+          </p>
         </div>
       </div>
       <div className="card-premium-body">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <Input
             label="First Name *"
             name="first_name"
@@ -75,7 +84,10 @@ const StepBasicDetails = ({ formData, onChange, departments, designations }: Ste
             onChange={handleChange}
             searchable={true}
             placeholder="Select Department"
-            options={departments.map((d: any) => ({ value: d.id, label: d.department_name }))}
+            options={departments.map((d: any) => ({
+              value: d.id,
+              label: d.department_name,
+            }))}
           />
           <Select
             label="Designation"
@@ -84,7 +96,10 @@ const StepBasicDetails = ({ formData, onChange, departments, designations }: Ste
             onChange={handleChange}
             searchable={true}
             placeholder="Select Designation"
-            options={designations.map((d: any) => ({ value: d.id, label: d.designation_name }))}
+            options={designations.map((d: any) => ({
+              value: d.id,
+              label: d.designation_name,
+            }))}
           />
         </div>
 

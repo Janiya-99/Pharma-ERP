@@ -57,16 +57,16 @@ type OpeningStockFilter struct {
 }
 
 type OpeningStockResponse struct {
-	ID                 uint64     `json:"id"`
-	OpeningStockNumber string     `json:"opening_stock_number"`
-	OpeningStockDate   time.Time  `json:"opening_stock_date"`
-	BranchID           uint64     `json:"branch_id"`
-	WarehouseID        uint64     `json:"warehouse_id"`
-	ReferenceNumber    string     `json:"reference_number"`
-	TotalQuantity      float64    `json:"total_quantity"`
-	TotalStockValue    float64    `json:"total_stock_value"`
-	ApprovalStatus     string     `json:"approval_status"`
-	PostedStatus       string     `json:"posted_status"`
-	CreatedBy          uint64     `json:"created_by"`
-	CreatedAt          time.Time  `json:"created_at"`
+	ID                 uint64    `json:"id"`
+	OpeningStockNumber string    `json:"opening_stock_number"`
+	OpeningStockDate   time.Time `json:"opening_stock_date"`
+	BranchID           uint64    `json:"branch_id"`
+	WarehouseID        uint64    `json:"warehouse_id"`
+	ReferenceNumber    string    `json:"reference_number"`
+	TotalQuantity      float64   `json:"total_quantity"`
+	TotalStockValue    float64   `json:"total_stock_value"`
+	ApprovalStatus     string    `json:"approval_status"`
+	PostedStatus       string    `json:"posted_status"`
+	CreatedBy          uint64    `json:"created_by"`
+	CreatedAt          time.Time `json:"created_at"`
 }

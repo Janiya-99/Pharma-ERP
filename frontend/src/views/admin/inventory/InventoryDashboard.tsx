@@ -36,24 +36,34 @@ export default function InventoryDashboard() {
 
   return (
     <div className="flex flex-col gap-5 py-5">
-      <div className="flex flex-col mb-4">
-        <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Inventory Dashboard</h1>
-        <p className="text-sm text-gray-400">Realtime overview of stock, products, and movements</p>
+      <div className="mb-4 flex flex-col">
+        <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+          Inventory Dashboard
+        </h1>
+        <p className="text-sm text-gray-400">
+          Realtime overview of stock, products, and movements
+        </p>
       </div>
 
       <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3">
         <Widget
-          icon={<MdInventory2 className="h-6 w-6 text-brand-500 dark:text-white" />}
+          icon={
+            <MdInventory2 className="h-6 w-6 text-brand-500 dark:text-white" />
+          }
           title="Total Products"
           subtitle={stats.products.toString()}
         />
         <Widget
-          icon={<MdStorefront className="h-6 w-6 text-brand-500 dark:text-white" />}
+          icon={
+            <MdStorefront className="h-6 w-6 text-brand-500 dark:text-white" />
+          }
           title="Warehouses"
           subtitle={stats.warehouses.toString()}
         />
         <Widget
-          icon={<MdLocalShipping className="h-6 w-6 text-brand-500 dark:text-white" />}
+          icon={
+            <MdLocalShipping className="h-6 w-6 text-brand-500 dark:text-white" />
+          }
           title="Suppliers"
           subtitle={stats.suppliers.toString()}
         />

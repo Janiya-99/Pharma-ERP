@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../../../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Label } from "../../../components/ui/label";
@@ -13,7 +20,12 @@ interface Props {
   onSuccess: () => void;
 }
 
-export const RejectSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invoiceId, onSuccess }) => {
+export const RejectSalesInvoiceModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  invoiceId,
+  onSuccess,
+}) => {
   const [remarks, setRemarks] = useState("Customer credit issue");
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +34,7 @@ export const RejectSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
       toast.error("Remarks are required for rejection.");
       return;
     }
-    
+
     setLoading(true);
     try {
       await invoiceCenterApi.rejectSalesInvoice(invoiceId, { remarks });
@@ -30,7 +42,9 @@ export const RejectSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to reject sales invoice.");
+      toast.error(
+        err?.response?.data?.message || "Failed to reject sales invoice."
+      );
     } finally {
       setLoading(false);
     }
@@ -41,11 +55,15 @@ export const RejectSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Reject Sales Invoice</DialogTitle>
-          <DialogDescription>Are you sure you want to reject this invoice? Remarks are required.</DialogDescription>
+          <DialogDescription>
+            Are you sure you want to reject this invoice? Remarks are required.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="remarks" className="text-red-500">Reason for Rejection *</Label>
+            <Label htmlFor="remarks" className="text-red-500">
+              Reason for Rejection *
+            </Label>
             <Textarea
               id="remarks"
               value={remarks}
@@ -59,7 +77,11 @@ export const RejectSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleReject} disabled={loading || !remarks.trim()}>
+          <Button
+            variant="destructive"
+            onClick={handleReject}
+            disabled={loading || !remarks.trim()}
+          >
             {loading ? "Rejecting..." : "Reject"}
           </Button>
         </DialogFooter>

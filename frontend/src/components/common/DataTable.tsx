@@ -48,26 +48,26 @@ function DataTable<TData = any>({
 }: DataTableProps<TData>) {
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm gap-3">
+      <div className="border-slate-100 flex flex-col items-center justify-center gap-3 rounded-2xl border bg-white py-20 shadow-sm">
         <div className="relative">
-          <div className="h-10 w-10 rounded-full border-2 border-slate-100" />
-          <Loader2 className="absolute inset-0 h-10 w-10 animate-spin text-slate-900" />
+          <div className="border-slate-100 h-10 w-10 rounded-full border-2" />
+          <Loader2 className="text-slate-900 absolute inset-0 h-10 w-10 animate-spin" />
         </div>
-        <p className="text-sm text-slate-500 font-semibold">Loading data...</p>
+        <p className="text-slate-500 text-sm font-semibold">Loading data...</p>
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm gap-3">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 border border-slate-100">
-          <Inbox className="h-6 w-6 text-slate-400" />
+      <div className="border-slate-100 flex flex-col items-center justify-center gap-3 rounded-2xl border bg-white py-20 shadow-sm">
+        <div className="bg-slate-50 border-slate-100 flex h-14 w-14 items-center justify-center rounded-2xl border">
+          <Inbox className="text-slate-400 h-6 w-6" />
         </div>
         <div className="text-center">
-          <p className="text-sm font-semibold text-slate-900">{emptyTitle}</p>
+          <p className="text-slate-900 text-sm font-semibold">{emptyTitle}</p>
           {emptyDescription && (
-            <p className="text-xs text-slate-400 mt-1">{emptyDescription}</p>
+            <p className="text-slate-400 mt-1 text-xs">{emptyDescription}</p>
           )}
         </div>
       </div>
@@ -84,38 +84,46 @@ function DataTable<TData = any>({
 
   return (
     <div>
-      <div className="overflow-hidden bg-white rounded-2xl border border-slate-150 shadow-sm">
+      <div className="border-slate-150 overflow-hidden rounded-2xl border bg-white shadow-sm">
         <Table>
-          <TableHeader className="bg-slate-50/75 border-b border-slate-100">
+          <TableHeader className="bg-slate-50/75 border-slate-100 border-b">
             <TableRow className="hover:bg-transparent">
               {columns.map((col, index) => (
                 <TableHead
                   key={col.id || col.accessorKey || col.accessor || index}
-                  className={`px-5 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap h-auto border-none ${col.className || ""}`}
+                  className={`text-slate-500 h-auto whitespace-nowrap border-none px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider ${
+                    col.className || ""
+                  }`}
                 >
                   {col.header}
                 </TableHead>
               ))}
               {hasActions && (
-                <TableHead className="px-5 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap h-auto border-none">
+                <TableHead className="text-slate-500 h-auto whitespace-nowrap border-none px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider">
                   Actions
                 </TableHead>
               )}
             </TableRow>
           </TableHeader>
-          <TableBody className="divide-y divide-slate-100">
+          <TableBody className="divide-slate-100 divide-y">
             {data.map((row, rowIndex) => (
               <TableRow
-                key={(row as any).id as string || rowIndex}
+                key={((row as any).id as string) || rowIndex}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={`hover:bg-slate-50/50 transition-colors duration-150 border-none group ${onRowClick ? "cursor-pointer" : ""}`}
+                className={`hover:bg-slate-50/50 group border-none transition-colors duration-150 ${
+                  onRowClick ? "cursor-pointer" : ""
+                }`}
               >
                 {columns.map((col, colIndex) => {
                   const accessorPath = col.accessorKey || col.accessor;
                   return (
                     <TableCell
-                      key={col.id || col.accessorKey || col.accessor || colIndex}
-                      className={`px-5 py-4 text-sm text-slate-900 border-none font-medium ${col.cellClassName || ""}`}
+                      key={
+                        col.id || col.accessorKey || col.accessor || colIndex
+                      }
+                      className={`text-slate-900 border-none px-5 py-4 text-sm font-medium ${
+                        col.cellClassName || ""
+                      }`}
                     >
                       {col.cell
                         ? col.cell(row)
@@ -126,7 +134,7 @@ function DataTable<TData = any>({
                   );
                 })}
                 {hasActions && (
-                  <TableCell className="px-5 py-4 text-sm border-none">
+                  <TableCell className="border-none px-5 py-4 text-sm">
                     <div className="flex items-center gap-1">
                       {onEdit && (
                         <button
@@ -134,10 +142,21 @@ function DataTable<TData = any>({
                             e.stopPropagation();
                             onEdit(row);
                           }}
-                          className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                          className="text-slate-400 hover:bg-slate-100 hover:text-slate-900 inline-flex h-8 w-8 items-center justify-center rounded-xl transition-colors"
                           title="Edit"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                          </svg>
                         </button>
                       )}
                       {onDelete && (
@@ -146,10 +165,22 @@ function DataTable<TData = any>({
                             e.stopPropagation();
                             onDelete(row);
                           }}
-                          className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                          className="text-slate-400 hover:bg-rose-50 hover:text-rose-600 inline-flex h-8 w-8 items-center justify-center rounded-xl transition-colors"
                           title="Delete"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
                         </button>
                       )}
                     </div>
@@ -162,29 +193,42 @@ function DataTable<TData = any>({
       </div>
 
       {/* Pagination */}
-      {pagination && onPaginationChange && pageCount != null && pageCount > 1 && (
-        <div className="flex items-center justify-between px-2 py-3 mt-3">
-          <p className="text-xs text-slate-500 font-medium">
-            Page {pagination.pageIndex + 1} of {pageCount}
-          </p>
-          <div className="flex items-center gap-1.5">
-            <button
-              disabled={pagination.pageIndex === 0}
-              onClick={() => onPaginationChange({ ...pagination, pageIndex: pagination.pageIndex - 1 })}
-              className="inline-flex items-center justify-center h-8 w-8 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              disabled={pagination.pageIndex >= pageCount - 1}
-              onClick={() => onPaginationChange({ ...pagination, pageIndex: pagination.pageIndex + 1 })}
-              className="inline-flex items-center justify-center h-8 w-8 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
+      {pagination &&
+        onPaginationChange &&
+        pageCount != null &&
+        pageCount > 1 && (
+          <div className="mt-3 flex items-center justify-between px-2 py-3">
+            <p className="text-slate-500 text-xs font-medium">
+              Page {pagination.pageIndex + 1} of {pageCount}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <button
+                disabled={pagination.pageIndex === 0}
+                onClick={() =>
+                  onPaginationChange({
+                    ...pagination,
+                    pageIndex: pagination.pageIndex - 1,
+                  })
+                }
+                className="border-slate-200 text-slate-500 hover:bg-slate-50 inline-flex h-8 w-8 items-center justify-center rounded-xl border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                disabled={pagination.pageIndex >= pageCount - 1}
+                onClick={() =>
+                  onPaginationChange({
+                    ...pagination,
+                    pageIndex: pagination.pageIndex + 1,
+                  })
+                }
+                className="border-slate-200 text-slate-500 hover:bg-slate-50 inline-flex h-8 w-8 items-center justify-center rounded-xl border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

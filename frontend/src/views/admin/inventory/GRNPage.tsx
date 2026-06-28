@@ -1,2 +1,32 @@
-import React from "react"; import { ERPListPage, StatusBadge } from "components/erp/ERPListPage"; import { grns } from "variables/mockData";
-export default function GRNPage() { return <ERPListPage title="Goods Received Notes (GRN)" subtitle="Create and manage goods received from suppliers" searchKey="refNo" data={grns} onAdd={() => {}} addLabel="New GRN" columns={[ { key: "refNo", label: "GRN No." }, { key: "date", label: "Date" }, { key: "supplier", label: "Supplier" }, { key: "poRef", label: "PO Ref" }, { key: "receivedBy", label: "Received By" }, { key: "totalCost", label: "Total Cost", render: (r: unknown) => `LKR ${r.totalCost.toLocaleString()}` }, { key: "status", label: "Status", render: (r: unknown) => <StatusBadge status={r.status} /> } ]} />; }
+import React from "react";
+import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
+import { grns } from "variables/mockData";
+export default function GRNPage() {
+  return (
+    <ERPListPage
+      title="Goods Received Notes (GRN)"
+      subtitle="Create and manage goods received from suppliers"
+      searchKey="refNo"
+      data={grns}
+      onAdd={() => {}}
+      addLabel="New GRN"
+      columns={[
+        { key: "refNo", label: "GRN No." },
+        { key: "date", label: "Date" },
+        { key: "supplier", label: "Supplier" },
+        { key: "poRef", label: "PO Ref" },
+        { key: "receivedBy", label: "Received By" },
+        {
+          key: "totalCost",
+          label: "Total Cost",
+          render: (r: unknown) => `LKR ${r.totalCost.toLocaleString()}`,
+        },
+        {
+          key: "status",
+          label: "Status",
+          render: (r: unknown) => <StatusBadge status={r.status} />,
+        },
+      ]}
+    />
+  );
+}

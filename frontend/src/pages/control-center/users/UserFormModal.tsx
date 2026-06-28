@@ -4,11 +4,30 @@ import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
 import Select from "../../../components/common/Select";
 import FormError from "../../../components/common/FormError";
-import { createUser, updateUser, getBranches, getUserBranches } from "../../../api/controlApi";
+import {
+  createUser,
+  updateUser,
+  getBranches,
+  getUserBranches,
+} from "../../../api/controlApi";
 
 import { toast } from "sonner";
 
-const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designations }: { isOpen?: boolean; onClose?: unknown; user?: unknown; onSuccess?: unknown; departments?: unknown; designations?: unknown }) => {
+const UserFormModal = ({
+  isOpen,
+  onClose,
+  user,
+  onSuccess,
+  departments,
+  designations,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  user?: unknown;
+  onSuccess?: unknown;
+  departments?: unknown;
+  designations?: unknown;
+}) => {
   const isEdit = !!user;
 
   const [formData, setFormData] = useState({
@@ -95,11 +114,13 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
     if (!formData.email.trim()) return "Email is required.";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) return "Invalid email address.";
-    
+
     if (!isEdit) {
       if (!formData.password) return "Password is required.";
-      if (formData.password.length < 8) return "Password must be at least 8 characters.";
-      if (formData.password !== formData.confirm_password) return "Passwords do not match.";
+      if (formData.password.length < 8)
+        return "Password must be at least 8 characters.";
+      if (formData.password !== formData.confirm_password)
+        return "Passwords do not match.";
     }
 
     if (!formData.status) return "Status is required.";
@@ -123,9 +144,15 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
       full_name: formData.full_name,
       email: formData.email,
       phone: formData.phone,
-      department_id: formData.department_id ? parseInt(formData.department_id, 10) : null,
-      designation_id: formData.designation_id ? parseInt(formData.designation_id, 10) : null,
-      default_branch_id: formData.default_branch_id ? parseInt(formData.default_branch_id, 10) : null,
+      department_id: formData.department_id
+        ? parseInt(formData.department_id, 10)
+        : null,
+      designation_id: formData.designation_id
+        ? parseInt(formData.designation_id, 10)
+        : null,
+      default_branch_id: formData.default_branch_id
+        ? parseInt(formData.default_branch_id, 10)
+        : null,
       user_type: formData.user_type,
       status: formData.status,
     };
@@ -169,7 +196,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Input
             label="Full Name *"
             name="full_name"
@@ -201,7 +228,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
         </div>
 
         {!isEdit && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-b border-gray-100 py-4 my-2">
+          <div className="my-2 grid grid-cols-1 gap-4 border-b border-t border-gray-100 py-4 md:grid-cols-2">
             <Input
               label="Password *"
               type="password"
@@ -221,7 +248,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Select
             label="Department"
             name="department_id"
@@ -229,7 +256,10 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
             onChange={handleChange}
             searchable={true}
             placeholder="Select Department"
-            options={departments.map((d: unknown) => ({ value: d.id, label: d.department_name }))}
+            options={departments.map((d: unknown) => ({
+              value: d.id,
+              label: d.department_name,
+            }))}
           />
 
           <Select
@@ -239,7 +269,10 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
             onChange={handleChange}
             searchable={true}
             placeholder="Select Designation"
-            options={designations.map((d: unknown) => ({ value: d.id, label: d.designation_name }))}
+            options={designations.map((d: unknown) => ({
+              value: d.id,
+              label: d.designation_name,
+            }))}
           />
 
           <div>
@@ -250,10 +283,15 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
               onChange={handleChange}
               searchable={true}
               placeholder="Select Branch"
-              options={branches.map((b: unknown) => ({ value: b.id, label: b.branch_name }))}
+              options={branches.map((b: unknown) => ({
+                value: b.id,
+                label: b.branch_name,
+              }))}
             />
             {isEdit && branches.length === 0 && (
-              <p className="text-xs text-gray-500 mt-1">User has no assigned branches.</p>
+              <p className="mt-1 text-xs text-gray-500">
+                User has no assigned branches.
+              </p>
             )}
           </div>
 
@@ -286,7 +324,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
           />
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+        <div className="mt-6 flex justify-end space-x-3 border-t border-gray-200 pt-4">
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel
           </Button>

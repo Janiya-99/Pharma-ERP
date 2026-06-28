@@ -1,5 +1,14 @@
 import React from "react";
-import { CheckCircle2, Eye, FileCheck2, Lock, Pencil, Send, Trash2, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Eye,
+  FileCheck2,
+  Lock,
+  Pencil,
+  Send,
+  Trash2,
+  XCircle,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import PermissionGuard from "../../auth/PermissionGuard";
 import type { SalesOrder } from "../../types/invoice-center";
@@ -29,20 +38,34 @@ const SalesOrderActionButtons: React.FC<SalesOrderActionButtonsProps> = ({
 }) => {
   const canEditDraft = order.approval_status === "draft";
   const canApprove = order.approval_status === "pending";
-  const canClose = order.approval_status === "approved" && order.order_status === "open";
-  const canCancel = order.order_status !== "cancelled" && order.order_status !== "closed";
+  const canClose =
+    order.approval_status === "approved" && order.order_status === "open";
+  const canCancel =
+    order.order_status !== "cancelled" && order.order_status !== "closed";
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       {onView && (
-        <Button type="button" variant="outline" size="sm" onClick={onView} title="View">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onView}
+          title="View"
+        >
           <Eye className="h-4 w-4" />
           View
         </Button>
       )}
       {onEdit && canEditDraft && (
         <PermissionGuard permission="invoice_center.sales_order.update">
-          <Button type="button" variant="outline" size="sm" onClick={onEdit} title="Edit">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onEdit}
+            title="Edit"
+          >
             <Pencil className="h-4 w-4" />
             Edit
           </Button>
@@ -50,7 +73,13 @@ const SalesOrderActionButtons: React.FC<SalesOrderActionButtonsProps> = ({
       )}
       {onSubmit && canEditDraft && (
         <PermissionGuard permission="invoice_center.sales_order.submit">
-          <Button type="button" variant="outline" size="sm" onClick={onSubmit} title="Submit">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onSubmit}
+            title="Submit"
+          >
             <Send className="h-4 w-4" />
             Submit
           </Button>
@@ -58,7 +87,13 @@ const SalesOrderActionButtons: React.FC<SalesOrderActionButtonsProps> = ({
       )}
       {onApprove && canApprove && (
         <PermissionGuard permission="invoice_center.sales_order.approve">
-          <Button type="button" variant="outline" size="sm" onClick={onApprove} title="Approve">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onApprove}
+            title="Approve"
+          >
             <CheckCircle2 className="h-4 w-4" />
             Approve
           </Button>
@@ -66,7 +101,13 @@ const SalesOrderActionButtons: React.FC<SalesOrderActionButtonsProps> = ({
       )}
       {onReject && canApprove && (
         <PermissionGuard permission="invoice_center.sales_order.reject">
-          <Button type="button" variant="destructive" size="sm" onClick={onReject} title="Reject">
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={onReject}
+            title="Reject"
+          >
             <XCircle className="h-4 w-4" />
             Reject
           </Button>
@@ -74,7 +115,13 @@ const SalesOrderActionButtons: React.FC<SalesOrderActionButtonsProps> = ({
       )}
       {onClose && canClose && (
         <PermissionGuard permission="invoice_center.sales_order.close">
-          <Button type="button" variant="outline" size="sm" onClick={onClose} title="Close">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            title="Close"
+          >
             <Lock className="h-4 w-4" />
             Close
           </Button>
@@ -82,7 +129,13 @@ const SalesOrderActionButtons: React.FC<SalesOrderActionButtonsProps> = ({
       )}
       {onCancel && canCancel && (
         <PermissionGuard permission="invoice_center.sales_order.cancel">
-          <Button type="button" variant="destructive" size="sm" onClick={onCancel} title="Cancel">
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={onCancel}
+            title="Cancel"
+          >
             <FileCheck2 className="h-4 w-4" />
             Cancel
           </Button>
@@ -90,7 +143,13 @@ const SalesOrderActionButtons: React.FC<SalesOrderActionButtonsProps> = ({
       )}
       {onDelete && canEditDraft && (
         <PermissionGuard permission="invoice_center.sales_order.delete">
-          <Button type="button" variant="destructive" size="sm" onClick={onDelete} title="Delete">
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={onDelete}
+            title="Delete"
+          >
             <Trash2 className="h-4 w-4" />
             Delete
           </Button>

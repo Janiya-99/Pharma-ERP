@@ -8,7 +8,9 @@ type SalesOrderLineProductSelectProps = {
   disabled?: boolean;
 };
 
-const SalesOrderLineProductSelect: React.FC<SalesOrderLineProductSelectProps> = ({ value, onChange, disabled }) => {
+const SalesOrderLineProductSelect: React.FC<
+  SalesOrderLineProductSelectProps
+> = ({ value, onChange, disabled }) => {
   return (
     <div className="space-y-1">
       <Label>Product ID</Label>
@@ -17,7 +19,9 @@ const SalesOrderLineProductSelect: React.FC<SalesOrderLineProductSelectProps> = 
         min={1}
         value={value ?? ""}
         disabled={disabled}
-        onChange={(event) => onChange(event.target.value ? Number(event.target.value) : null)}
+        onChange={(event) =>
+          onChange(event.target.value ? Number(event.target.value) : null)
+        }
         placeholder="Enter product ID"
       />
     </div>

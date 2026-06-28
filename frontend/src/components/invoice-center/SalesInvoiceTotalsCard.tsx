@@ -22,7 +22,10 @@ export const SalesInvoiceTotalsCard: React.FC<Props> = ({
   lineCount,
 }) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   return (
@@ -51,11 +54,11 @@ export const SalesInvoiceTotalsCard: React.FC<Props> = ({
             <span>{formatLKR(tax)}</span>
           </div>
           <Separator className="my-2" />
-          <div className="flex justify-between font-bold text-base">
+          <div className="flex justify-between text-base font-bold">
             <span>Total Amount</span>
             <span>{formatLKR(total)}</span>
           </div>
-          
+
           {paid !== undefined && balance !== undefined && (
             <>
               <Separator className="my-2" />
@@ -63,7 +66,7 @@ export const SalesInvoiceTotalsCard: React.FC<Props> = ({
                 <span>Paid Amount</span>
                 <span>{formatLKR(paid)}</span>
               </div>
-              <div className="flex justify-between font-semibold text-sm">
+              <div className="flex justify-between text-sm font-semibold">
                 <span>Balance Due</span>
                 <span>{formatLKR(balance)}</span>
               </div>

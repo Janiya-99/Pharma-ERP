@@ -7,7 +7,11 @@ import PermissionGuard from "../../../auth/PermissionGuard";
 import StockTransferStatusBadge from "../../../components/inventory/StockTransferStatusBadge";
 import StockTransferPostedStatusBadge from "../../../components/inventory/StockTransferPostedStatusBadge";
 import { formatNumber, formatDate } from "../../../lib/utils";
-import { StockTransfer, PaginatedData, ApiResponse } from "../../../types/inventory";
+import {
+  StockTransfer,
+  PaginatedData,
+  ApiResponse,
+} from "../../../types/inventory";
 
 const StockTransfersPage = () => {
   const [transfers, setTransfers] = useState<StockTransfer[]>([]);
@@ -35,11 +39,15 @@ const StockTransfersPage = () => {
       if (statusFilter !== "all") {
         params.approval_status = statusFilter;
       }
-      
-      const res = await inventoryApi.getStockTransfers(params) as unknown as ApiResponse<PaginatedData<StockTransfer> | StockTransfer[]>;
+
+      const res = (await inventoryApi.getStockTransfers(
+        params
+      )) as unknown as ApiResponse<
+        PaginatedData<StockTransfer> | StockTransfer[]
+      >;
       if (res.success !== false) {
         // Handle both paginated and unpaginated responses
-        if (res.data && 'data' in res.data && Array.isArray(res.data.data)) {
+        if (res.data && "data" in res.data && Array.isArray(res.data.data)) {
           setTransfers(res.data.data);
           setTotal(res.data.total || 0);
         } else if (Array.isArray(res.data)) {
@@ -58,25 +66,63 @@ const StockTransfersPage = () => {
   };
 
   const columns = [
-    { header: "Reference No", accessorKey: "reference_no", cell: ({ row }: { row: { original: StockTransfer } }) => (
-      <span className="font-medium text-brand-600 dark:text-brand-400">
-        {row.original.reference_no || "DRAFT"}
-      </span>
-    )},
-    { header: "Date", accessorKey: "transfer_date", cell: ({ row }: { row: { original: StockTransfer } }) => formatDate(row.original.transfer_date) },
-    { header: "Source", accessorKey: "source_warehouse_id", cell: ({ row }: { row: { original: StockTransfer } }) => row.original.source_warehouse?.warehouse_name },
-    { header: "Destination", accessorKey: "destination_warehouse_id", cell: ({ row }: { row: { original: StockTransfer } }) => row.original.destination_warehouse?.warehouse_name },
-    { header: "Total Qty", accessorKey: "total_quantity", cell: ({ row }: { row: { original: StockTransfer } }) => formatNumber(row.original.total_quantity, 3) },
-    { header: "Status", accessorKey: "approval_status", cell: ({ row }: { row: { original: StockTransfer } }) => <StockTransferStatusBadge status={row.original.approval_status} /> },
-    { header: "Posted", accessorKey: "posted_status", cell: ({ row }: { row: { original: StockTransfer } }) => <StockTransferPostedStatusBadge status={row.original.posted_status} /> },
+    {
+      header: "Reference No",
+      accessorKey: "reference_no",
+      cell: ({ row }: { row: { original: StockTransfer } }) => (
+        <span className="font-medium text-brand-600 dark:text-brand-400">
+          {row.original.reference_no || "DRAFT"}
+        </span>
+      ),
+    },
+    {
+      header: "Date",
+      accessorKey: "transfer_date",
+      cell: ({ row }: { row: { original: StockTransfer } }) =>
+        formatDate(row.original.transfer_date),
+    },
+    {
+      header: "Source",
+      accessorKey: "source_warehouse_id",
+      cell: ({ row }: { row: { original: StockTransfer } }) =>
+        row.original.source_warehouse?.warehouse_name,
+    },
+    {
+      header: "Destination",
+      accessorKey: "destination_warehouse_id",
+      cell: ({ row }: { row: { original: StockTransfer } }) =>
+        row.original.destination_warehouse?.warehouse_name,
+    },
+    {
+      header: "Total Qty",
+      accessorKey: "total_quantity",
+      cell: ({ row }: { row: { original: StockTransfer } }) =>
+        formatNumber(row.original.total_quantity, 3),
+    },
+    {
+      header: "Status",
+      accessorKey: "approval_status",
+      cell: ({ row }: { row: { original: StockTransfer } }) => (
+        <StockTransferStatusBadge status={row.original.approval_status} />
+      ),
+    },
+    {
+      header: "Posted",
+      accessorKey: "posted_status",
+      cell: ({ row }: { row: { original: StockTransfer } }) => (
+        <StockTransferPostedStatusBadge status={row.original.posted_status} />
+      ),
+    },
   ];
 
   return (
     <div className="p-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Stock Transfers</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Stock Transfers
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Manage warehouse stock transfers and their approval process.
           </p>
         </div>
@@ -84,7 +130,7 @@ const StockTransfersPage = () => {
           <PermissionGuard permission="inventory.stock_transfer.create">
             <Link
               to="/inventory/stock-transfers/create"
-              className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl hover:bg-brand-700 transition-colors font-medium shadow-sm shadow-brand-500/20"
+              className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 font-medium text-white shadow-sm shadow-brand-500/20 transition-colors hover:bg-brand-700"
             >
               <Plus className="h-5 w-5" />
               New Transfer
@@ -93,24 +139,28 @@ const StockTransfersPage = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-100 dark:border-navy-700 flex flex-col sm:flex-row gap-4 justify-between items-center bg-gray-50/50 dark:bg-navy-800/50">
+      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+        <div className="flex flex-col items-center justify-between gap-4 border-b border-gray-100 bg-gray-50/50 p-4 dark:border-navy-700 dark:bg-navy-800/50 sm:flex-row">
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search reference..."
               value={search}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearch(e.target.value)
+              }
+              className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-4 text-sm focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
             />
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <Filter className="h-4 w-4 text-gray-400" />
             <select
               value={statusFilter}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white outline-none"
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setStatusFilter(e.target.value)
+              }
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
             >
               <option value="all">All Statuses</option>
               <option value="draft">Draft</option>
@@ -125,7 +175,9 @@ const StockTransfersPage = () => {
           columns={columns}
           data={transfers}
           loading={loading}
-          onRowClick={(row: StockTransfer) => navigate(`/inventory/stock-transfers/${row.id}`)}
+          onRowClick={(row: StockTransfer) =>
+            navigate(`/inventory/stock-transfers/${row.id}`)
+          }
           pagination={{
             page,
             limit,

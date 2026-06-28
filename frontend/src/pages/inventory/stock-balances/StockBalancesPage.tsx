@@ -39,37 +39,102 @@ const StockBalancesPage = () => {
   const columns = [
     { header: "Product Code", accessorKey: "product.product_code" },
     { header: "Product Name", accessorKey: "product.product_name" },
-    { header: "Batch", accessorKey: "batch.batch_number", cell: ({ row }: { row?: unknown }) => row.original.batch?.batch_number || "-" },
-    { header: "Expiry", accessorKey: "batch.expiry_date", cell: ({ row }: { row?: unknown }) => {
+    {
+      header: "Batch",
+      accessorKey: "batch.batch_number",
+      cell: ({ row }: { row?: unknown }) =>
+        row.original.batch?.batch_number || "-",
+    },
+    {
+      header: "Expiry",
+      accessorKey: "batch.expiry_date",
+      cell: ({ row }: { row?: unknown }) => {
         if (!row.original.batch?.expiry_date) return "-";
         const isExpired = new Date(row.original.batch.expiry_date) < new Date();
-        return <span className={isExpired ? "text-red-600 font-medium" : ""}>{new Date(row.original.batch.expiry_date).toLocaleDateString()}</span>;
-    } },
+        return (
+          <span className={isExpired ? "font-medium text-red-600" : ""}>
+            {new Date(row.original.batch.expiry_date).toLocaleDateString()}
+          </span>
+        );
+      },
+    },
     { header: "Warehouse", accessorKey: "warehouse.warehouse_name" },
-    { header: "Location", accessorKey: "location.location_name", cell: ({ row }: { row?: unknown }) => row.original.location?.location_name || "-" },
-    { header: "Qty On Hand", accessorKey: "quantity_on_hand", cell: ({ row }: { row?: unknown }) => <StockQuantityDisplay quantity={row.original.quantity_on_hand} /> },
-    { header: "Qty Allocated", accessorKey: "quantity_allocated", cell: ({ row }: { row?: unknown }) => <StockQuantityDisplay quantity={row.original.quantity_allocated} /> },
-    { header: "Qty Available", accessorKey: "quantity_available", cell: ({ row }: { row?: unknown }) => <StockQuantityDisplay quantity={row.original.quantity_available} /> },
-    { header: "Avg Cost", accessorKey: "average_cost", cell: ({ row }: { row?: unknown }) => <StockValueDisplay value={row.original.average_cost} /> },
-    { header: "Stock Value", accessorKey: "stock_value", cell: ({ row }: { row?: unknown }) => <StockValueDisplay value={row.original.stock_value} /> },
+    {
+      header: "Location",
+      accessorKey: "location.location_name",
+      cell: ({ row }: { row?: unknown }) =>
+        row.original.location?.location_name || "-",
+    },
+    {
+      header: "Qty On Hand",
+      accessorKey: "quantity_on_hand",
+      cell: ({ row }: { row?: unknown }) => (
+        <StockQuantityDisplay quantity={row.original.quantity_on_hand} />
+      ),
+    },
+    {
+      header: "Qty Allocated",
+      accessorKey: "quantity_allocated",
+      cell: ({ row }: { row?: unknown }) => (
+        <StockQuantityDisplay quantity={row.original.quantity_allocated} />
+      ),
+    },
+    {
+      header: "Qty Available",
+      accessorKey: "quantity_available",
+      cell: ({ row }: { row?: unknown }) => (
+        <StockQuantityDisplay quantity={row.original.quantity_available} />
+      ),
+    },
+    {
+      header: "Avg Cost",
+      accessorKey: "average_cost",
+      cell: ({ row }: { row?: unknown }) => (
+        <StockValueDisplay value={row.original.average_cost} />
+      ),
+    },
+    {
+      header: "Stock Value",
+      accessorKey: "stock_value",
+      cell: ({ row }: { row?: unknown }) => (
+        <StockValueDisplay value={row.original.stock_value} />
+      ),
+    },
   ];
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Stock Balances</h1>
-          <p className="text-sm text-gray-500 mt-1">Real-time inventory visibility across warehouses</p>
+          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+            Stock Balances
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Real-time inventory visibility across warehouses
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input type="text" placeholder="Search..." value={search} onChange={(e: any) => setSearch(e.target.value)} className="pl-9 pr-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={(e: any) => setSearch(e.target.value)}
+              className="rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-700 dark:text-white"
+            />
           </div>
         </div>
       </div>
-      <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
-        <DataTable columns={columns} data={data} loading={loading} pagination={pagination} onPaginationChange={setPagination} pageCount={Math.ceil(totalRecords / pagination.pageSize)} />
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+        <DataTable
+          columns={columns}
+          data={data}
+          loading={loading}
+          pagination={pagination}
+          onPaginationChange={setPagination}
+          pageCount={Math.ceil(totalRecords / pagination.pageSize)}
+        />
       </div>
     </div>
   );

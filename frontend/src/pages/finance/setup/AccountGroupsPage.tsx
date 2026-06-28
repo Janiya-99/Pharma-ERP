@@ -1,12 +1,26 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { AlertCircle, Edit, Loader2, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  Edit,
+  Loader2,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { useAuth } from "../../../auth/AuthContext";
 import { financeApi } from "../../../api/financeApi";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -74,9 +88,13 @@ const emptyForm: AccountGroupForm = {
 };
 
 const getErrorMessage = (error: any, fallback: string) =>
-  error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
+  error?.response?.data?.message ||
+  error?.response?.data?.error ||
+  error?.message ||
+  fallback;
 
-const labelize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+const labelize = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1);
 
 const AccountGroupsPage = () => {
   const { company, user } = useAuth();
@@ -89,10 +107,15 @@ const AccountGroupsPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<AccountGroup | null>(null);
-  const [groupToDeactivate, setGroupToDeactivate] = useState<AccountGroup | null>(null);
+  const [groupToDeactivate, setGroupToDeactivate] =
+    useState<AccountGroup | null>(null);
   const [form, setForm] = useState<AccountGroupForm>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [filters, setFilters] = useState({ search: "", account_type: "all", status: "all" });
+  const [filters, setFilters] = useState({
+    search: "",
+    account_type: "all",
+    status: "all",
+  });
 
   const fetchGroups = async () => {
     if (!companyId) {
@@ -107,7 +130,8 @@ const AccountGroupsPage = () => {
         limit: 500,
         company_id: companyId,
         search: filters.search,
-        account_type: filters.account_type === "all" ? "" : filters.account_type,
+        account_type:
+          filters.account_type === "all" ? "" : filters.account_type,
         status: filters.status === "all" ? "" : filters.status,
       });
       setGroups(res.data?.data || []);
@@ -131,7 +155,10 @@ const AccountGroupsPage = () => {
     });
   }, [groups, form.account_type, editingGroup]);
 
-  const setField = <K extends keyof AccountGroupForm>(key: K, value: AccountGroupForm[K]) => {
+  const setField = <K extends keyof AccountGroupForm>(
+    key: K,
+    value: AccountGroupForm[K]
+  ) => {
     setForm((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: "" }));
   };
@@ -149,7 +176,9 @@ const AccountGroupsPage = () => {
       group_code: group.group_code || "",
       group_name: group.group_name || "",
       account_type: group.account_type || "asset",
-      parent_group_id: group.parent_group_id ? String(group.parent_group_id) : "none",
+      parent_group_id: group.parent_group_id
+        ? String(group.parent_group_id)
+        : "none",
       description: group.description || "",
       status: group.status || "active",
     });
@@ -159,12 +188,20 @@ const AccountGroupsPage = () => {
 
   const validate = () => {
     const nextErrors: Record<string, string> = {};
-    if (!companyId) nextErrors.company_id = "Please select a company before saving.";
-    if (!form.group_code.trim()) nextErrors.group_code = "Group code is required.";
-    if (!form.group_name.trim()) nextErrors.group_name = "Group name is required.";
-    if (!form.account_type) nextErrors.account_type = "Account type is required.";
+    if (!companyId)
+      nextErrors.company_id = "Please select a company before saving.";
+    if (!form.group_code.trim())
+      nextErrors.group_code = "Group code is required.";
+    if (!form.group_name.trim())
+      nextErrors.group_name = "Group name is required.";
+    if (!form.account_type)
+      nextErrors.account_type = "Account type is required.";
     if (!form.status) nextErrors.status = "Status is required.";
-    if (editingGroup && form.parent_group_id !== "none" && Number(form.parent_group_id) === editingGroup.id) {
+    if (
+      editingGroup &&
+      form.parent_group_id !== "none" &&
+      Number(form.parent_group_id) === editingGroup.id
+    ) {
       nextErrors.parent_group_id = "Parent group cannot be the same group.";
     }
 
@@ -185,7 +222,8 @@ const AccountGroupsPage = () => {
       group_code: form.group_code.trim(),
       group_name: form.group_name.trim(),
       account_type: form.account_type,
-      parent_group_id: form.parent_group_id === "none" ? null : Number(form.parent_group_id),
+      parent_group_id:
+        form.parent_group_id === "none" ? null : Number(form.parent_group_id),
       description: form.description.trim(),
       status: form.status,
       ...(editingGroup ? { updated_by: user?.id } : { created_by: user?.id }),
@@ -220,7 +258,9 @@ const AccountGroupsPage = () => {
     if (!groupToDeactivate) return;
     setDeactivating(true);
     try {
-      await financeApi.deactivateAccountGroup(groupToDeactivate.id, { updated_by: user?.id });
+      await financeApi.deactivateAccountGroup(groupToDeactivate.id, {
+        updated_by: user?.id,
+      });
       toast.success("Account group deactivated successfully");
       setConfirmOpen(false);
       setGroupToDeactivate(null);
@@ -234,60 +274,89 @@ const AccountGroupsPage = () => {
 
   if (!companyId) {
     return (
-      <div className="min-h-full bg-[#F8FAFC] p-6 text-slate-900">
+      <div className="text-slate-900 min-h-full bg-[#F8FAFC] p-6">
         <Alert className="border-amber-200 bg-amber-50 text-amber-900">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Please select a company before using Account Groups.</AlertDescription>
+          <AlertDescription>
+            Please select a company before using Account Groups.
+          </AlertDescription>
         </Alert>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] p-6 text-slate-900">
+    <div className="text-slate-900 min-h-full bg-[#F8FAFC] p-6">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Finance Setup</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Account Groups</h1>
-          <p className="mt-2 max-w-3xl text-sm text-slate-500">
-            Create and maintain account groups used to organize the chart of accounts and finance reports.
+          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
+            Finance Setup
+          </p>
+          <h1 className="text-slate-900 mt-1 text-3xl font-bold tracking-tight">
+            Account Groups
+          </h1>
+          <p className="text-slate-500 mt-2 max-w-3xl text-sm">
+            Create and maintain account groups used to organize the chart of
+            accounts and finance reports.
           </p>
         </div>
-        <Button onClick={openCreateDialog} className="bg-indigo-600 text-white hover:bg-indigo-700">
+        <Button
+          onClick={openCreateDialog}
+          className="bg-indigo-600 text-white hover:bg-indigo-700"
+        >
           <Plus className="h-4 w-4" />
           Create Account Group
         </Button>
       </div>
 
-      <Card className="border border-slate-200 bg-white shadow-sm">
-        <CardHeader className="border-b border-slate-100">
+      <Card className="border-slate-200 border bg-white shadow-sm">
+        <CardHeader className="border-slate-100 border-b">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <CardTitle>Account Groups</CardTitle>
-              <CardDescription>Search, filter, create, edit, and deactivate account groups.</CardDescription>
+              <CardDescription>
+                Search, filter, create, edit, and deactivate account groups.
+              </CardDescription>
             </div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(220px,1fr)_150px_130px]">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="text-slate-400 pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                 <Input
                   value={filters.search}
-                  onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
+                  onChange={(event) =>
+                    setFilters((current) => ({
+                      ...current,
+                      search: event.target.value,
+                    }))
+                  }
                   placeholder="Search groups"
                   className="pl-9"
                 />
               </div>
-              <Select value={filters.account_type} onValueChange={(value) => setFilters((current) => ({ ...current, account_type: value }))}>
+              <Select
+                value={filters.account_type}
+                onValueChange={(value) =>
+                  setFilters((current) => ({ ...current, account_type: value }))
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
                   {accountTypes.map((type) => (
-                    <SelectItem key={type} value={type}>{labelize(type)}</SelectItem>
+                    <SelectItem key={type} value={type}>
+                      {labelize(type)}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={filters.status} onValueChange={(value) => setFilters((current) => ({ ...current, status: value }))}>
+              <Select
+                value={filters.status}
+                onValueChange={(value) =>
+                  setFilters((current) => ({ ...current, status: value }))
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -317,30 +386,50 @@ const AccountGroupsPage = () => {
                 Array.from({ length: 5 }).map((_, index) => (
                   <TableRow key={index}>
                     <TableCell colSpan={6}>
-                      <div className="h-8 animate-pulse rounded bg-slate-100" />
+                      <div className="bg-slate-100 h-8 animate-pulse rounded" />
                     </TableCell>
                   </TableRow>
                 ))
               ) : groups.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-sm text-slate-500">
+                  <TableCell
+                    colSpan={6}
+                    className="text-slate-500 h-32 text-center text-sm"
+                  >
                     No account groups found.
                   </TableCell>
                 </TableRow>
               ) : (
                 groups.map((group) => (
                   <TableRow key={group.id}>
-                    <TableCell className="font-medium text-slate-900">{group.group_code}</TableCell>
+                    <TableCell className="text-slate-900 font-medium">
+                      {group.group_code}
+                    </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-slate-900">{group.group_name}</p>
-                        {group.description ? <p className="mt-1 line-clamp-1 text-xs text-slate-500">{group.description}</p> : null}
+                        <p className="text-slate-900 font-medium">
+                          {group.group_name}
+                        </p>
+                        {group.description ? (
+                          <p className="text-slate-500 mt-1 line-clamp-1 text-xs">
+                            {group.description}
+                          </p>
+                        ) : null}
                       </div>
                     </TableCell>
                     <TableCell>{labelize(group.account_type || "")}</TableCell>
-                    <TableCell>{group.parent_group?.group_name || "Root group"}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={group.status === "active" ? "border-green-200 bg-green-50 text-green-700" : "border-slate-200 bg-slate-50 text-slate-600"}>
+                      {group.parent_group?.group_name || "Root group"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={
+                          group.status === "active"
+                            ? "border-green-200 bg-green-50 text-green-700"
+                            : "border-slate-200 bg-slate-50 text-slate-600"
+                        }
+                      >
                         {labelize(group.status || "inactive")}
                       </Badge>
                     </TableCell>
@@ -352,12 +441,17 @@ const AccountGroupsPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEditDialog(group)}>
+                          <DropdownMenuItem
+                            onClick={() => openEditDialog(group)}
+                          >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => requestDeactivate(group)} className="text-red-600">
+                          <DropdownMenuItem
+                            onClick={() => requestDeactivate(group)}
+                            className="text-red-600"
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Deactivate
                           </DropdownMenuItem>
@@ -376,34 +470,58 @@ const AccountGroupsPage = () => {
         <DialogContent className="max-w-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
-              <DialogTitle>{editingGroup ? "Update Account Group" : "Create Account Group"}</DialogTitle>
-              <DialogDescription>Required fields are marked with an asterisk.</DialogDescription>
+              <DialogTitle>
+                {editingGroup ? "Update Account Group" : "Create Account Group"}
+              </DialogTitle>
+              <DialogDescription>
+                Required fields are marked with an asterisk.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Group Code" required error={errors.group_code}>
-                <Input value={form.group_code} onChange={(event) => setField("group_code", event.target.value)} placeholder="AG-001" />
+                <Input
+                  value={form.group_code}
+                  onChange={(event) =>
+                    setField("group_code", event.target.value)
+                  }
+                  placeholder="AG-001"
+                />
               </Field>
               <Field label="Group Name" required error={errors.group_name}>
-                <Input value={form.group_name} onChange={(event) => setField("group_name", event.target.value)} placeholder="Current Assets" />
+                <Input
+                  value={form.group_name}
+                  onChange={(event) =>
+                    setField("group_name", event.target.value)
+                  }
+                  placeholder="Current Assets"
+                />
               </Field>
               <Field label="Account Type" required error={errors.account_type}>
-                <Select value={form.account_type} onValueChange={(value) => {
-                  setField("account_type", value);
-                  setField("parent_group_id", "none");
-                }}>
+                <Select
+                  value={form.account_type}
+                  onValueChange={(value) => {
+                    setField("account_type", value);
+                    setField("parent_group_id", "none");
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select account type" />
                   </SelectTrigger>
                   <SelectContent>
                     {accountTypes.map((type) => (
-                      <SelectItem key={type} value={type}>{labelize(type)}</SelectItem>
+                      <SelectItem key={type} value={type}>
+                        {labelize(type)}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </Field>
               <Field label="Parent Group" error={errors.parent_group_id}>
-                <Select value={form.parent_group_id} onValueChange={(value) => setField("parent_group_id", value)}>
+                <Select
+                  value={form.parent_group_id}
+                  onValueChange={(value) => setField("parent_group_id", value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Root group" />
                   </SelectTrigger>
@@ -418,7 +536,10 @@ const AccountGroupsPage = () => {
                 </Select>
               </Field>
               <Field label="Status" required error={errors.status}>
-                <Select value={form.status} onValueChange={(value) => setField("status", value)}>
+                <Select
+                  value={form.status}
+                  onValueChange={(value) => setField("status", value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -430,17 +551,35 @@ const AccountGroupsPage = () => {
               </Field>
               <div className="md:col-span-2">
                 <Field label="Description">
-                  <Textarea value={form.description} onChange={(event) => setField("description", event.target.value)} rows={3} placeholder="Optional notes for this account group" />
+                  <Textarea
+                    value={form.description}
+                    onChange={(event) =>
+                      setField("description", event.target.value)
+                    }
+                    rows={3}
+                    placeholder="Optional notes for this account group"
+                  />
                 </Field>
               </div>
             </div>
 
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} disabled={submitting}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDialogOpen(false)}
+                disabled={submitting}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitting} className="bg-indigo-600 text-white hover:bg-indigo-700">
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : null}
                 {editingGroup ? "Update Account Group" : "Create Account Group"}
               </Button>
             </DialogFooter>
@@ -474,7 +613,7 @@ const Field = ({
   children: React.ReactNode;
 }) => (
   <div className="space-y-2">
-    <Label className="text-sm font-medium text-slate-700">
+    <Label className="text-slate-700 text-sm font-medium">
       {label} {required ? <span className="text-red-500">*</span> : null}
     </Label>
     {children}

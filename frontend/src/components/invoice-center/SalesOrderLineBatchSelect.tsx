@@ -8,7 +8,11 @@ type SalesOrderLineBatchSelectProps = {
   disabled?: boolean;
 };
 
-const SalesOrderLineBatchSelect: React.FC<SalesOrderLineBatchSelectProps> = ({ value, onChange, disabled }) => {
+const SalesOrderLineBatchSelect: React.FC<SalesOrderLineBatchSelectProps> = ({
+  value,
+  onChange,
+  disabled,
+}) => {
   return (
     <div className="space-y-1">
       <Label>Batch ID</Label>
@@ -17,7 +21,9 @@ const SalesOrderLineBatchSelect: React.FC<SalesOrderLineBatchSelectProps> = ({ v
         min={1}
         value={value ?? ""}
         disabled={disabled}
-        onChange={(event) => onChange(event.target.value ? Number(event.target.value) : null)}
+        onChange={(event) =>
+          onChange(event.target.value ? Number(event.target.value) : null)
+        }
         placeholder="Optional batch ID"
       />
     </div>

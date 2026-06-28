@@ -55,4 +55,3 @@ func (r *InvoiceCenterFinanceSettingRepository) ValidateChartOfAccount(db *gorm.
 	}
 	return count > 0, nil
 }
-

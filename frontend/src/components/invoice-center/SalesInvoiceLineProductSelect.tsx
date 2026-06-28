@@ -7,7 +7,11 @@ interface Props {
   disabled?: boolean;
 }
 
-export const SalesInvoiceLineProductSelect: React.FC<Props> = ({ value, onChange, disabled }) => {
+export const SalesInvoiceLineProductSelect: React.FC<Props> = ({
+  value,
+  onChange,
+  disabled,
+}) => {
   // Fallback simple input since Invoice Center-safe product lookup is not confirmed
   return (
     <div>

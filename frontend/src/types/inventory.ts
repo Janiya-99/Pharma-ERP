@@ -176,7 +176,12 @@ export interface PurchaseReturn {
   warehouse_id: number;
   warehouse?: Warehouse;
   goods_receipt_note_id?: number | null;
-  goods_receipt_note?: { id: number; grn_number: string; grn_date: string; posted_status: string };
+  goods_receipt_note?: {
+    id: number;
+    grn_number: string;
+    grn_date: string;
+    posted_status: string;
+  };
   financial_year_id?: number | null;
   accounting_period_id?: number | null;
   supplier_invoice_number?: string;
@@ -203,4 +208,3 @@ export interface PurchaseReturn {
   posted_by_user?: { name: string };
   posted_at?: string;
 }
-

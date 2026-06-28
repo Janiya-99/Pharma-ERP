@@ -34,4 +34,3 @@ func (h *SoftwareModuleHandler) List(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dto.SuccessResponse("Software modules loaded successfully", modules))
 }
-

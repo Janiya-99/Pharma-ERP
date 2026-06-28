@@ -8,12 +8,15 @@ interface Props {
   creditLimit: number;
 }
 
-export const DebitNoteCreditLimitWarningCard: React.FC<Props> = ({ 
-  projectedBalance, 
-  creditLimit 
+export const DebitNoteCreditLimitWarningCard: React.FC<Props> = ({
+  projectedBalance,
+  creditLimit,
 }) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   if (creditLimit <= 0) return null;
@@ -34,23 +37,24 @@ export const DebitNoteCreditLimitWarningCard: React.FC<Props> = ({
           </div>
           <div className="flex justify-between text-sm">
             <span>Projected Balance</span>
-            <span className={isExceeding ? "text-red-600 font-medium" : ""}>
+            <span className={isExceeding ? "font-medium text-red-600" : ""}>
               {formatLKR(projectedBalance)}
             </span>
           </div>
-          <div className="flex justify-between font-bold text-sm mt-1">
+          <div className="mt-1 flex justify-between text-sm font-bold">
             <span>Available Credit After Debit</span>
             <span className={isExceeding ? "text-red-600" : "text-green-600"}>
               {formatLKR(availableCredit)}
             </span>
           </div>
-          
+
           {isExceeding && (
             <Alert variant="destructive" className="mt-3">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Credit Limit Exceeded</AlertTitle>
               <AlertDescription>
-                This debit note will cause the customer's balance to exceed their credit limit. Approval and posting will be blocked.
+                This debit note will cause the customer's balance to exceed
+                their credit limit. Approval and posting will be blocked.
               </AlertDescription>
             </Alert>
           )}

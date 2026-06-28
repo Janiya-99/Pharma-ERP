@@ -14,8 +14,19 @@ function InputField(props: {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
-  const { label, id, extra, type, placeholder, variant, state, disabled, icon, value, onChange } =
-    props;
+  const {
+    label,
+    id,
+    extra,
+    type,
+    placeholder,
+    variant,
+    state,
+    disabled,
+    icon,
+    value,
+    onChange,
+  } = props;
 
   const isLuxury = variant === "luxury";
 
@@ -41,20 +52,24 @@ function InputField(props: {
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          className={`w-full rounded-xl px-4 py-3.5 text-[14px] font-medium leading-relaxed outline-none transition-all duration-300 shadow-sm ${
+          className={`w-full rounded-xl px-4 py-3.5 text-[14px] font-medium leading-relaxed shadow-sm outline-none transition-all duration-300 ${
             isLuxury
               ? "auth-input-luxury"
               : disabled === true
-              ? "border border-gray-100 bg-gray-50 text-gray-500 cursor-not-allowed dark:border-white/5 dark:bg-white/5 dark:text-white/40"
+              ? "cursor-not-allowed border border-gray-100 bg-gray-50 text-gray-500 dark:border-white/5 dark:bg-white/5 dark:text-white/40"
               : state === "error"
               ? "border border-red-500 bg-red-50 text-red-600 placeholder:text-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 dark:border-red-400 dark:bg-red-400/10"
               : state === "success"
               ? "border border-green-500 bg-green-50 text-green-600 placeholder:text-green-400 focus:border-green-500 focus:ring-4 focus:ring-green-500/10 dark:border-green-400 dark:bg-green-400/10"
-              : "border border-gray-200 bg-white text-navy-700 placeholder:text-gray-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-gray-300 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:placeholder:text-white/30 dark:focus:border-brand-500 dark:focus:ring-brand-500/20"
+              : "border border-gray-200 bg-white text-navy-700 placeholder:text-gray-400 hover:border-gray-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:placeholder:text-white/30 dark:focus:border-brand-500 dark:focus:ring-brand-500/20"
           }`}
         />
         {icon && (
-          <div className={`absolute right-4 flex items-center ${isLuxury ? "" : "text-gray-400 dark:text-white"}`}>
+          <div
+            className={`absolute right-4 flex items-center ${
+              isLuxury ? "" : "text-gray-400 dark:text-white"
+            }`}
+          >
             {icon}
           </div>
         )}

@@ -224,7 +224,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	{
 		financePosting.GET("/pending", middleware.RequirePermission("invoice_center.finance_posting.view"), financePostingHdl.GetPendingFinancePostings)
 		financePosting.GET("/history", middleware.RequirePermission("invoice_center.finance_posting.view"), financePostingHdl.GetFinancePostingHistory)
-		
+
 		financePosting.POST("/sales-invoice/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostSalesInvoiceToFinance)
 		financePosting.POST("/credit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostCreditNoteToFinance)
 		financePosting.POST("/debit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostDebitNoteToFinance)

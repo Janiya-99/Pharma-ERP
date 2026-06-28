@@ -6,7 +6,8 @@ const StockAdjustmentTypeBadge = ({ type }: { type?: unknown }) => {
 
   switch (type) {
     case "positive":
-      bgColor = "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      bgColor =
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
       display = "Positive";
       break;
     case "negative":
@@ -14,15 +15,18 @@ const StockAdjustmentTypeBadge = ({ type }: { type?: unknown }) => {
       display = "Negative";
       break;
     case "mixed":
-      bgColor = "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+      bgColor =
+        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
       display = "Mixed";
       break;
     case "physical_count":
-      bgColor = "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400";
+      bgColor =
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400";
       display = "Physical Count";
       break;
     case "damage":
-      bgColor = "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400";
+      bgColor =
+        "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400";
       display = "Damage";
       break;
     case "expiry":
@@ -35,13 +39,15 @@ const StockAdjustmentTypeBadge = ({ type }: { type?: unknown }) => {
       break;
     default:
       if (type) {
-        display = type.replace(/_/g, " ").replace(/\b\w/g, (l: unknown) => l.toUpperCase());
+        display = type
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l: unknown) => l.toUpperCase());
       }
       break;
   }
 
   return (
-    <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${bgColor}`}>
+    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${bgColor}`}>
       {display || "Unknown"}
     </span>
   );

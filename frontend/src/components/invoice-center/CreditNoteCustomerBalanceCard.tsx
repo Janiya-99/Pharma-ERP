@@ -9,9 +9,15 @@ interface Props {
   creditNoteTotal: number;
 }
 
-export const CreditNoteCustomerBalanceCard: React.FC<Props> = ({ customer, creditNoteTotal }) => {
+export const CreditNoteCustomerBalanceCard: React.FC<Props> = ({
+  customer,
+  creditNoteTotal,
+}) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   if (!customer) {
@@ -21,7 +27,9 @@ export const CreditNoteCustomerBalanceCard: React.FC<Props> = ({ customer, credi
           <CardTitle className="text-lg">Customer Balance</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-gray-500 italic">Select a customer to view balance impact.</div>
+          <div className="text-sm italic text-gray-500">
+            Select a customer to view balance impact.
+          </div>
         </CardContent>
       </Card>
     );
@@ -38,36 +46,40 @@ export const CreditNoteCustomerBalanceCard: React.FC<Props> = ({ customer, credi
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex items-center justify-between text-sm">
             <span className="font-medium">{customer.customer_name}</span>
             <Badge variant="outline">{customer.customer_code}</Badge>
           </div>
-          
+
           <div className="flex justify-between text-sm text-gray-600">
             <span>Status</span>
-            <span className="capitalize">{customer.status.replace("_", " ")}</span>
+            <span className="capitalize">
+              {customer.status.replace("_", " ")}
+            </span>
           </div>
 
           <Separator />
-          
+
           <div className="flex justify-between text-sm">
             <span>Current Balance</span>
             <span>{formatLKR(currentBalance)}</span>
           </div>
-          
+
           <div className="flex justify-between text-sm text-green-600">
             <span>Credit Amount</span>
             <span>-{formatLKR(creditNoteTotal)}</span>
           </div>
-          
-          <div className="flex justify-between font-bold text-base mt-2">
+
+          <div className="mt-2 flex justify-between text-base font-bold">
             <span>Balance After Credit</span>
-            <span className={isExceeding ? "text-red-600" : ""}>{formatLKR(balanceAfterCredit)}</span>
+            <span className={isExceeding ? "text-red-600" : ""}>
+              {formatLKR(balanceAfterCredit)}
+            </span>
           </div>
 
           {isExceeding && (
-            <div className="mt-2 text-xs text-red-500 font-medium">
-              Warning: Credit note amount exceeds current balance. 
+            <div className="mt-2 text-xs font-medium text-red-500">
+              Warning: Credit note amount exceeds current balance.
             </div>
           )}
         </div>

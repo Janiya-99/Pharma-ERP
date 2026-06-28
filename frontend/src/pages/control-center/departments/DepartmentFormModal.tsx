@@ -8,7 +8,17 @@ import { createDepartment, updateDepartment } from "../../../api/controlApi";
 
 import { toast } from "sonner";
 
-const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: { isOpen?: boolean; onClose?: unknown; department?: unknown; onSuccess?: unknown }) => {
+const DepartmentFormModal = ({
+  isOpen,
+  onClose,
+  department = null,
+  onSuccess,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  department?: unknown;
+  onSuccess?: unknown;
+}) => {
   const isEdit = !!department;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -77,7 +87,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
-        
+
         <Input
           label="Department Code *"
           name="department_code"
@@ -87,7 +97,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
           disabled={isEdit}
           placeholder="e.g. IT"
         />
-        
+
         <Input
           label="Department Name *"
           name="department_name"
@@ -95,9 +105,11 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
           onChange={handleChange}
           required
         />
-        
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Description
+          </label>
           <textarea
             name="description"
             value={formData.description}

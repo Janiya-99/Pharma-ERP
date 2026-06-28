@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Table,
   TableBody,
@@ -8,7 +8,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import { ReportEmptyState } from "./ReportEmptyState";
 import { ReportLoadingState } from "./ReportLoadingState";
 
@@ -16,7 +21,7 @@ export interface ColumnDef<T> {
   header: string;
   accessorKey?: keyof T | string;
   cell?: (row: T) => React.ReactNode;
-  align?: 'left' | 'center' | 'right';
+  align?: "left" | "center" | "right";
 }
 
 interface ReportDataTableProps<T> {
@@ -39,11 +44,12 @@ export function ReportDataTable<T>({
   isLoading = false,
   pagination,
   onPageChange,
-  emptyMessage = "No data found for the selected criteria."
+  emptyMessage = "No data found for the selected criteria.",
 }: ReportDataTableProps<T>) {
-  
   if (isLoading) {
-    return <ReportLoadingState type="table" columns={columns.length} rows={5} />;
+    return (
+      <ReportLoadingState type="table" columns={columns.length} rows={5} />
+    );
   }
 
   if (!data || data.length === 0) {
@@ -52,15 +58,21 @@ export function ReportDataTable<T>({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border bg-white overflow-hidden">
+      <div className="overflow-hidden rounded-md border bg-white">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-slate-50 sticky top-0">
               <TableRow>
                 {columns.map((col, index) => (
-                  <TableHead 
-                    key={index} 
-                    className={`whitespace-nowrap font-semibold text-slate-700 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}`}
+                  <TableHead
+                    key={index}
+                    className={`text-slate-700 whitespace-nowrap font-semibold ${
+                      col.align === "right"
+                        ? "text-right"
+                        : col.align === "center"
+                        ? "text-center"
+                        : "text-left"
+                    }`}
                   >
                     {col.header}
                   </TableHead>
@@ -71,11 +83,19 @@ export function ReportDataTable<T>({
               {data.map((row, rowIndex) => (
                 <TableRow key={rowIndex} className="hover:bg-slate-50">
                   {columns.map((col, colIndex) => (
-                    <TableCell 
+                    <TableCell
                       key={colIndex}
-                      className={`whitespace-nowrap ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}`}
+                      className={`whitespace-nowrap ${
+                        col.align === "right"
+                          ? "text-right"
+                          : col.align === "center"
+                          ? "text-center"
+                          : "text-left"
+                      }`}
                     >
-                      {col.cell ? col.cell(row) : String((row as any)[col.accessorKey as string] || '')}
+                      {col.cell
+                        ? col.cell(row)
+                        : String((row as any)[col.accessorKey as string] || "")}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -88,8 +108,15 @@ export function ReportDataTable<T>({
       {pagination && onPageChange && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between px-2 print:hidden">
           <div className="text-sm text-muted-foreground">
-            Showing <span className="font-medium">{((pagination.page - 1) * pagination.limit) + 1}</span> to <span className="font-medium">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{" "}
-            <span className="font-medium">{pagination.total}</span> entries
+            Showing{" "}
+            <span className="font-medium">
+              {(pagination.page - 1) * pagination.limit + 1}
+            </span>{" "}
+            to{" "}
+            <span className="font-medium">
+              {Math.min(pagination.page * pagination.limit, pagination.total)}
+            </span>{" "}
+            of <span className="font-medium">{pagination.total}</span> entries
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -110,7 +137,7 @@ export function ReportDataTable<T>({
               <span className="sr-only">Go to previous page</span>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="text-sm font-medium px-4">
+            <div className="px-4 text-sm font-medium">
               Page {pagination.page} of {pagination.totalPages}
             </div>
             <Button

@@ -25,10 +25,10 @@ type OpeningStockService interface {
 }
 
 type openingStockService struct {
-	repo                    repositories.OpeningStockRepository
-	stockMovementRepo       repositories.StockMovementRepository
-	stockMovementService    InventoryStockMovementService
-	auditLogger             *AuditLogService
+	repo                 repositories.OpeningStockRepository
+	stockMovementRepo    repositories.StockMovementRepository
+	stockMovementService InventoryStockMovementService
+	auditLogger          *AuditLogService
 }
 
 func NewOpeningStockService(

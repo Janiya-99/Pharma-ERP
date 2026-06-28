@@ -25,10 +25,10 @@ type SalesReturnService interface {
 }
 
 type salesReturnService struct {
-	repo                repositories.SalesReturnRepository
-	stockMovementRepo   repositories.StockMovementRepository
-	stockMovementSvc    InventoryStockMovementService
-	logger              *zap.Logger
+	repo              repositories.SalesReturnRepository
+	stockMovementRepo repositories.StockMovementRepository
+	stockMovementSvc  InventoryStockMovementService
+	logger            *zap.Logger
 }
 
 func NewSalesReturnService(
@@ -173,7 +173,7 @@ func (s *salesReturnService) CreateSalesReturn(db *gorm.DB, companyID, userID ui
 			if batch.BatchStatus == "disposed" {
 				return nil, errors.New("cannot return disposed batch")
 			}
-			
+
 			if req.ReturnCondition == "saleable" && batch.BatchStatus == "expired" {
 				return nil, errors.New("cannot use expired batch for saleable return")
 			}
@@ -190,7 +190,7 @@ func (s *salesReturnService) CreateSalesReturn(db *gorm.DB, companyID, userID ui
 		if lineCond == "" {
 			lineCond = req.ReturnCondition
 		}
-		
+
 		lineTotal := (lReq.ReturnQuantity * lReq.UnitPrice) - lReq.DiscountAmount + lReq.TaxAmount
 
 		salesReturn.Lines = append(salesReturn.Lines, inventoryModels.SalesReturnLine{
@@ -246,7 +246,7 @@ func (s *salesReturnService) UpdateSalesReturn(db *gorm.DB, companyID, userID, i
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if err := s.ValidateReturnConditionWarehouse(warehouse.WarehouseType, req.ReturnCondition); err != nil {
 		return nil, err
 	}
@@ -283,7 +283,7 @@ func (s *salesReturnService) UpdateSalesReturn(db *gorm.DB, companyID, userID, i
 		if product.RequiresBatchTracking && lReq.ProductBatchID == nil {
 			return nil, errors.New("product batch is required for batch tracked product")
 		}
-		
+
 		if lReq.ProductBatchID != nil {
 			batch, err := s.stockMovementRepo.FindBatchByID(db, *lReq.ProductBatchID)
 			if err != nil || batch == nil {
@@ -516,11 +516,11 @@ func (s *salesReturnService) PostSalesReturn(db *gorm.DB, companyID, userID, id 
 		}
 
 		for _, line := range existing.Lines {
-			
+
 			allowExpired := false
 			allowBlocked := false
 			allowRecalled := false
-			
+
 			warehouse, _ := s.stockMovementRepo.FindWarehouseByID(tx, existing.WarehouseID)
 			whType := ""
 			if warehouse != nil {
@@ -532,7 +532,7 @@ func (s *salesReturnService) PostSalesReturn(db *gorm.DB, companyID, userID, id 
 			}
 			if line.ReturnCondition == "recall" && (whType == "quarantine" || whType == "return" || whType == "damaged") {
 				allowRecalled = true
-				allowBlocked = true 
+				allowBlocked = true
 			}
 
 			stockInPayload := dto.StockInPayload{

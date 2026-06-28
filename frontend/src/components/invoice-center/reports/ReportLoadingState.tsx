@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -10,22 +10,22 @@ import {
 } from "@/components/ui/table";
 
 interface ReportLoadingStateProps {
-  type?: 'table' | 'cards' | 'full';
+  type?: "table" | "cards" | "full";
   columns?: number;
   rows?: number;
 }
 
 export const ReportLoadingState: React.FC<ReportLoadingStateProps> = ({
-  type = 'full',
+  type = "full",
   columns = 5,
   rows = 5,
 }) => {
-  if (type === 'cards') {
+  if (type === "cards") {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="p-4 bg-white rounded-md border shadow-sm">
-            <Skeleton className="h-4 w-[100px] mb-4" />
+          <div key={i} className="rounded-md border bg-white p-4 shadow-sm">
+            <Skeleton className="mb-4 h-4 w-[100px]" />
             <Skeleton className="h-8 w-[150px]" />
           </div>
         ))}
@@ -34,7 +34,7 @@ export const ReportLoadingState: React.FC<ReportLoadingStateProps> = ({
   }
 
   const table = (
-    <div className="rounded-md border bg-white overflow-hidden">
+    <div className="overflow-hidden rounded-md border bg-white">
       <Table>
         <TableHeader className="bg-slate-50">
           <TableRow>
@@ -60,7 +60,7 @@ export const ReportLoadingState: React.FC<ReportLoadingStateProps> = ({
     </div>
   );
 
-  if (type === 'table') {
+  if (type === "table") {
     return table;
   }
 
@@ -68,8 +68,8 @@ export const ReportLoadingState: React.FC<ReportLoadingStateProps> = ({
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="p-4 bg-white rounded-md border shadow-sm">
-            <Skeleton className="h-4 w-[100px] mb-4" />
+          <div key={i} className="rounded-md border bg-white p-4 shadow-sm">
+            <Skeleton className="mb-4 h-4 w-[100px]" />
             <Skeleton className="h-8 w-[150px]" />
           </div>
         ))}

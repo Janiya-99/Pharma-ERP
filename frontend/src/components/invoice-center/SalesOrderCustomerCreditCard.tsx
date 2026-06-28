@@ -9,12 +9,18 @@ type SalesOrderCustomerCreditCardProps = {
 };
 
 const formatMoney = (value: number | undefined): string =>
-  `LKR ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `LKR ${Number(value || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
-const SalesOrderCustomerCreditCard: React.FC<SalesOrderCustomerCreditCardProps> = ({ customer }) => {
+const SalesOrderCustomerCreditCard: React.FC<
+  SalesOrderCustomerCreditCardProps
+> = ({ customer }) => {
   if (!customer) return null;
 
-  const isOverLimit = Number(customer.current_balance || 0) > Number(customer.credit_limit || 0);
+  const isOverLimit =
+    Number(customer.current_balance || 0) > Number(customer.credit_limit || 0);
 
   return (
     <Card className="bg-white">
@@ -38,7 +44,9 @@ const SalesOrderCustomerCreditCard: React.FC<SalesOrderCustomerCreditCardProps> 
         </div>
         <div>
           <p className="text-muted-foreground">Current Balance</p>
-          <p className="font-semibold">{formatMoney(customer.current_balance)}</p>
+          <p className="font-semibold">
+            {formatMoney(customer.current_balance)}
+          </p>
         </div>
       </CardContent>
     </Card>

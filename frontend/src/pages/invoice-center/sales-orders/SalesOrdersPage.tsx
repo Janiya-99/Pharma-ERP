@@ -10,13 +10,36 @@ import {
   SalesOrderStatusBadge,
 } from "../../../components/invoice-center";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import type { ApiResponse, PaginatedResponse, SalesOrder, SalesOrderListParams } from "../../../types/invoice-center";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  SalesOrder,
+  SalesOrderListParams,
+} from "../../../types/invoice-center";
 
 const emptyFilters: SalesOrderListParams = {
   search: "",
@@ -31,9 +54,14 @@ const emptyFilters: SalesOrderListParams = {
 };
 
 const formatMoney = (value: number): string =>
-  `LKR ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `LKR ${Number(value || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
-const getOrdersFromResponse = (response: PaginatedResponse<SalesOrder> | ApiResponse<SalesOrder[]>): SalesOrder[] => {
+const getOrdersFromResponse = (
+  response: PaginatedResponse<SalesOrder> | ApiResponse<SalesOrder[]>
+): SalesOrder[] => {
   if (Array.isArray(response.data)) return response.data;
   return [];
 };
@@ -51,10 +79,18 @@ const SalesOrdersPage: React.FC = () => {
     setError(null);
     try {
       const params = Object.fromEntries(
-        Object.entries({ ...filters, limit: 100 }).filter(([, value]) => value !== "" && value !== undefined)
+        Object.entries({ ...filters, limit: 100 }).filter(
+          ([, value]) => value !== "" && value !== undefined
+        )
       );
       const response = await invoiceCenterApi.getSalesOrders(params);
-      setOrders(getOrdersFromResponse(response.data as PaginatedResponse<SalesOrder> | ApiResponse<SalesOrder[]>));
+      setOrders(
+        getOrdersFromResponse(
+          response.data as
+            | PaginatedResponse<SalesOrder>
+            | ApiResponse<SalesOrder[]>
+        )
+      );
     } catch (fetchError) {
       console.error("Fetch sales orders error:", fetchError);
       setError("Failed to fetch sales orders.");
@@ -71,7 +107,7 @@ const SalesOrdersPage: React.FC = () => {
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
-      <div className="m-6 rounded-xl border border-rose-200 bg-rose-50 p-8 text-center font-medium text-rose-600">
+      <div className="border-rose-200 bg-rose-50 text-rose-600 m-6 rounded-xl border p-8 text-center font-medium">
         Please switch to Invoice Center module to access this page.
       </div>
     );
@@ -83,14 +119,28 @@ const SalesOrdersPage: React.FC = () => {
         <div className="flex flex-col gap-4 rounded-xl border bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-navy-900">Sales Orders</h1>
-            <p className="text-sm text-muted-foreground">Manage Invoice Center sales order entry and approval.</p>
+            <p className="text-sm text-muted-foreground">
+              Manage Invoice Center sales order entry and approval.
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" size="icon" onClick={fetchOrders} disabled={loading} title="Refresh">
-              <RefreshCw className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={fetchOrders}
+              disabled={loading}
+              title="Refresh"
+            >
+              <RefreshCw
+                className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"}
+              />
             </Button>
             <PermissionGuard permission="invoice_center.sales_order.create">
-              <Button type="button" onClick={() => navigate("/invoice-center/sales-orders/create")}>
+              <Button
+                type="button"
+                onClick={() => navigate("/invoice-center/sales-orders/create")}
+              >
                 <Plus className="h-4 w-4" />
                 New Sales Order
               </Button>
@@ -109,7 +159,12 @@ const SalesOrdersPage: React.FC = () => {
                 <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
                 <Input
                   value={filters.search}
-                  onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
+                  onChange={(event) =>
+                    setFilters((current) => ({
+                      ...current,
+                      search: event.target.value,
+                    }))
+                  }
                   className="pl-8"
                   placeholder="Search order, customer, reference"
                 />
@@ -117,15 +172,39 @@ const SalesOrdersPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Branch ID</Label>
-              <Input value={filters.branch_id ?? ""} onChange={(event) => setFilters((current) => ({ ...current, branch_id: event.target.value }))} />
+              <Input
+                value={filters.branch_id ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    branch_id: event.target.value,
+                  }))
+                }
+              />
             </div>
             <div className="space-y-1">
               <Label>Customer ID</Label>
-              <Input value={filters.customer_id ?? ""} onChange={(event) => setFilters((current) => ({ ...current, customer_id: event.target.value }))} />
+              <Input
+                value={filters.customer_id ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    customer_id: event.target.value,
+                  }))
+                }
+              />
             </div>
             <div className="space-y-1">
               <Label>Approval Status</Label>
-              <Select value={String(filters.approval_status || "all")} onValueChange={(value) => setFilters((current) => ({ ...current, approval_status: value === "all" ? "" : value }))}>
+              <Select
+                value={String(filters.approval_status || "all")}
+                onValueChange={(value) =>
+                  setFilters((current) => ({
+                    ...current,
+                    approval_status: value === "all" ? "" : value,
+                  }))
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -141,14 +220,24 @@ const SalesOrdersPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Order Status</Label>
-              <Select value={String(filters.order_status || "all")} onValueChange={(value) => setFilters((current) => ({ ...current, order_status: value === "all" ? "" : value }))}>
+              <Select
+                value={String(filters.order_status || "all")}
+                onValueChange={(value) =>
+                  setFilters((current) => ({
+                    ...current,
+                    order_status: value === "all" ? "" : value,
+                  }))
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="open">Open</SelectItem>
-                  <SelectItem value="partially_invoiced">Partially Invoiced</SelectItem>
+                  <SelectItem value="partially_invoiced">
+                    Partially Invoiced
+                  </SelectItem>
                   <SelectItem value="fully_invoiced">Fully Invoiced</SelectItem>
                   <SelectItem value="closed">Closed</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -157,24 +246,64 @@ const SalesOrdersPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Order Date From</Label>
-              <Input type="date" value={filters.sales_order_date_from ?? ""} onChange={(event) => setFilters((current) => ({ ...current, sales_order_date_from: event.target.value }))} />
+              <Input
+                type="date"
+                value={filters.sales_order_date_from ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    sales_order_date_from: event.target.value,
+                  }))
+                }
+              />
             </div>
             <div className="space-y-1">
               <Label>Order Date To</Label>
-              <Input type="date" value={filters.sales_order_date_to ?? ""} onChange={(event) => setFilters((current) => ({ ...current, sales_order_date_to: event.target.value }))} />
+              <Input
+                type="date"
+                value={filters.sales_order_date_to ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    sales_order_date_to: event.target.value,
+                  }))
+                }
+              />
             </div>
             <div className="space-y-1">
               <Label>Delivery From</Label>
-              <Input type="date" value={filters.expected_delivery_date_from ?? ""} onChange={(event) => setFilters((current) => ({ ...current, expected_delivery_date_from: event.target.value }))} />
+              <Input
+                type="date"
+                value={filters.expected_delivery_date_from ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    expected_delivery_date_from: event.target.value,
+                  }))
+                }
+              />
             </div>
             <div className="space-y-1">
               <Label>Delivery To</Label>
-              <Input type="date" value={filters.expected_delivery_date_to ?? ""} onChange={(event) => setFilters((current) => ({ ...current, expected_delivery_date_to: event.target.value }))} />
+              <Input
+                type="date"
+                value={filters.expected_delivery_date_to ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    expected_delivery_date_to: event.target.value,
+                  }))
+                }
+              />
             </div>
           </CardContent>
         </Card>
 
-        {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>}
+        {error && (
+          <div className="border-rose-200 bg-rose-50 text-rose-700 rounded-xl border p-4 text-sm">
+            {error}
+          </div>
+        )}
 
         <Card className="bg-white">
           <CardContent className="p-0">
@@ -206,28 +335,55 @@ const SalesOrdersPage: React.FC = () => {
                   </TableRow>
                 ) : orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={14} className="py-10 text-center text-muted-foreground">
+                    <TableCell
+                      colSpan={14}
+                      className="py-10 text-center text-muted-foreground"
+                    >
                       No sales orders found.
                     </TableCell>
                   </TableRow>
                 ) : (
                   orders.map((order) => (
                     <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.sales_order_number}</TableCell>
-                      <TableCell>{order.sales_order_date}</TableCell>
-                      <TableCell>{order.expected_delivery_date || "-"}</TableCell>
-                      <TableCell>{order.branch?.branch_name || order.branch_id}</TableCell>
-                      <TableCell>
-                        <div className="font-medium">{order.customer_name || order.customer_id}</div>
-                        {order.customer_code && <div className="text-xs text-muted-foreground">{order.customer_code}</div>}
+                      <TableCell className="font-medium">
+                        {order.sales_order_number}
                       </TableCell>
-                      <TableCell>{order.customer_reference_number || "-"}</TableCell>
-                      <TableCell className="text-right">{formatMoney(order.subtotal_amount)}</TableCell>
-                      <TableCell className="text-right">{formatMoney(order.discount_amount)}</TableCell>
-                      <TableCell className="text-right">{formatMoney(order.tax_amount)}</TableCell>
-                      <TableCell className="text-right font-semibold">{formatMoney(order.total_amount)}</TableCell>
+                      <TableCell>{order.sales_order_date}</TableCell>
                       <TableCell>
-                        <SalesOrderApprovalStatusBadge status={order.approval_status} />
+                        {order.expected_delivery_date || "-"}
+                      </TableCell>
+                      <TableCell>
+                        {order.branch?.branch_name || order.branch_id}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">
+                          {order.customer_name || order.customer_id}
+                        </div>
+                        {order.customer_code && (
+                          <div className="text-xs text-muted-foreground">
+                            {order.customer_code}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {order.customer_reference_number || "-"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatMoney(order.subtotal_amount)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatMoney(order.discount_amount)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatMoney(order.tax_amount)}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {formatMoney(order.total_amount)}
+                      </TableCell>
+                      <TableCell>
+                        <SalesOrderApprovalStatusBadge
+                          status={order.approval_status}
+                        />
                       </TableCell>
                       <TableCell>
                         <SalesOrderStatusBadge status={order.order_status} />
@@ -236,8 +392,14 @@ const SalesOrdersPage: React.FC = () => {
                       <TableCell>
                         <SalesOrderActionButtons
                           order={order}
-                          onView={() => navigate(`/invoice-center/sales-orders/${order.id}`)}
-                          onEdit={() => navigate(`/invoice-center/sales-orders/${order.id}/edit`)}
+                          onView={() =>
+                            navigate(`/invoice-center/sales-orders/${order.id}`)
+                          }
+                          onEdit={() =>
+                            navigate(
+                              `/invoice-center/sales-orders/${order.id}/edit`
+                            )
+                          }
                         />
                       </TableCell>
                     </TableRow>

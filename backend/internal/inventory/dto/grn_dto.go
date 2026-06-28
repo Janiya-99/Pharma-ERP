@@ -7,9 +7,9 @@ type GRNLinePayload struct {
 	ProductID           uint64  `json:"product_id" validate:"required"`
 	ProductBatchID      *uint64 `json:"product_batch_id"`
 
-	BatchNumber     string  `json:"batch_number"`
-	ManufactureDate string  `json:"manufacture_date"`
-	ExpiryDate      string  `json:"expiry_date"`
+	BatchNumber     string `json:"batch_number"`
+	ManufactureDate string `json:"manufacture_date"`
+	ExpiryDate      string `json:"expiry_date"`
 
 	QuantityReceived float64 `json:"quantity_received" validate:"required,gt=0"`
 	FreeQuantity     float64 `json:"free_quantity" validate:"gte=0"`
@@ -24,11 +24,11 @@ type GRNLinePayload struct {
 }
 
 type CreateGRNPayload struct {
-	CompanyID          uint64 `json:"-"`
-	CreatedBy          uint64 `json:"-"`
-	BranchID           uint64 `json:"branch_id" validate:"required"`
-	SupplierID         uint64 `json:"supplier_id" validate:"required"`
-	WarehouseID        uint64 `json:"warehouse_id" validate:"required"`
+	CompanyID          uint64  `json:"-"`
+	CreatedBy          uint64  `json:"-"`
+	BranchID           uint64  `json:"branch_id" validate:"required"`
+	SupplierID         uint64  `json:"supplier_id" validate:"required"`
+	WarehouseID        uint64  `json:"warehouse_id" validate:"required"`
 	FinancialYearID    *uint64 `json:"financial_year_id"`
 	AccountingPeriodID *uint64 `json:"accounting_period_id"`
 
@@ -43,11 +43,11 @@ type CreateGRNPayload struct {
 }
 
 type UpdateGRNPayload struct {
-	CompanyID          uint64 `json:"-"`
-	UpdatedBy          uint64 `json:"-"`
-	BranchID           uint64 `json:"branch_id" validate:"required"`
-	SupplierID         uint64 `json:"supplier_id" validate:"required"`
-	WarehouseID        uint64 `json:"warehouse_id" validate:"required"`
+	CompanyID          uint64  `json:"-"`
+	UpdatedBy          uint64  `json:"-"`
+	BranchID           uint64  `json:"branch_id" validate:"required"`
+	SupplierID         uint64  `json:"supplier_id" validate:"required"`
+	WarehouseID        uint64  `json:"warehouse_id" validate:"required"`
 	FinancialYearID    *uint64 `json:"financial_year_id"`
 	AccountingPeriodID *uint64 `json:"accounting_period_id"`
 

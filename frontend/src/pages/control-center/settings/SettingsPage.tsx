@@ -32,22 +32,34 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col gap-6 py-4">
       <div>
-        <h1 className="text-xl font-bold text-navy-700 dark:text-white">System Settings</h1>
-        <p className="text-sm text-gray-400">Configure global ERP system settings</p>
+        <h1 className="text-xl font-bold text-navy-700 dark:text-white">
+          System Settings
+        </h1>
+        <p className="text-sm text-gray-400">
+          Configure global ERP system settings
+        </p>
       </div>
       {settingGroups.map((g: any) => (
-        <div key={g.group} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-50">
+        <div
+          key={g.group}
+          className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"
+        >
+          <div className="border-b border-gray-50 px-5 py-4">
             <h2 className="text-sm font-bold text-navy-700">{g.group}</h2>
           </div>
           <div className="divide-y divide-gray-50">
             {g.settings.map((s: any) => (
-              <div key={s.label} className="flex items-center justify-between px-5 py-3">
-                <label className="text-sm font-medium text-gray-700">{s.label}</label>
+              <div
+                key={s.label}
+                className="flex items-center justify-between px-5 py-3"
+              >
+                <label className="text-sm font-medium text-gray-700">
+                  {s.label}
+                </label>
                 <input
                   type={s.type}
                   defaultValue={s.value}
-                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-brand-400 w-56 text-right"
+                  className="w-56 rounded-lg border border-gray-200 px-3 py-1.5 text-right text-sm focus:border-brand-400 focus:outline-none"
                 />
               </div>
             ))}
@@ -55,7 +67,7 @@ export default function SettingsPage() {
         </div>
       ))}
       <div className="flex justify-end">
-        <button className="px-5 py-2.5 rounded-lg bg-brand-500 text-white text-sm font-semibold hover:bg-brand-600 transition-all shadow-sm">
+        <button className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-600">
           Save Settings
         </button>
       </div>

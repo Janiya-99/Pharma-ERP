@@ -36,7 +36,7 @@ func (h *StockTransferHandler) ListStockTransfers(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	
+
 	var branchID *uint64
 	if bID, err := strconv.ParseUint(c.Query("branch_id"), 10, 64); err == nil {
 		branchID = &bID

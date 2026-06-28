@@ -17,32 +17,41 @@ import type { ERPRoute, SubRoute } from "routes";
 // Map child names to icons for the Control Center sidebar
 const CHILD_ICONS: Record<string, React.ReactNode> = {
   "Organization Setup": <Building2 className="h-4 w-4" />,
-  "Users": <Users className="h-4 w-4" />,
+  Users: <Users className="h-4 w-4" />,
   "Roles & Permissions": <ShieldCheck className="h-4 w-4" />,
   "User Access": <Grid3X3 className="h-4 w-4" />,
   "Software Modules": <Boxes className="h-4 w-4" />,
-  "Settings": <Settings className="h-4 w-4" />,
+  Settings: <Settings className="h-4 w-4" />,
   "Audit Logs": <FileSearch className="h-4 w-4" />,
   "Login Logs": <LogIn className="h-4 w-4" />,
 };
 
-export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element => {
+export const SidebarLinks = ({
+  routes,
+}: {
+  routes: ERPRoute[];
+}): JSX.Element => {
   const location = useLocation();
   const [openModule, setOpenModule] = useState<string | null>(() => {
     // Auto-open the module matching current path
     const match = routes.find(
-      (r: any) => r.children && r.children.some((c: any) => location.pathname.includes(c.path))
+      (r: any) =>
+        r.children &&
+        r.children.some((c: any) => location.pathname.includes(c.path))
     );
     return match?.path ?? null;
   });
 
   const isActive = (path: string) => location.pathname.includes(path);
   const isModuleActive = (route: ERPRoute) => {
-    if (route.children) return route.children.some((c: any) => isActive(c.path));
+    if (route.children)
+      return route.children.some((c: any) => isActive(c.path));
     return isActive(route.path);
   };
 
-  const adminRoutes = routes.filter((r: any) => r.layout === "/admin" && !r.secondary);
+  const adminRoutes = routes.filter(
+    (r: any) => r.layout === "/admin" && !r.secondary
+  );
 
   // Group children by section for rendering section headers
   const groupChildrenBySections = (children: SubRoute[]) => {
@@ -79,16 +88,18 @@ export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element =>
               <Link
                 to={`${route.layout}/${route.path}`}
                 className={`sidebar-item ${
-                  active
-                    ? "sidebar-item-active"
-                    : "sidebar-item-default"
+                  active ? "sidebar-item-active" : "sidebar-item-default"
                 }`}
               >
-                <span className={`${active ? "text-indigo-600" : "text-gray-400"}`}>
+                <span
+                  className={`${active ? "text-indigo-600" : "text-gray-400"}`}
+                >
                   {route.icon}
                 </span>
                 {route.name}
-                {active && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-500" />}
+                {active && (
+                  <div className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                )}
               </Link>
             </li>
           );
@@ -102,18 +113,22 @@ export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element =>
           <li key={route.path}>
             <button
               onClick={() => setOpenModule(isOpen ? null : route.path)}
-              className={`w-full sidebar-item ${
+              className={`sidebar-item w-full ${
                 active
-                  ? "text-indigo-700 font-semibold"
+                  ? "font-semibold text-indigo-700"
                   : "sidebar-item-default"
               }`}
             >
-              <span className={`${active ? "text-indigo-600" : "text-gray-400"}`}>
+              <span
+                className={`${active ? "text-indigo-600" : "text-gray-400"}`}
+              >
                 {route.icon}
               </span>
               <span className="flex-1 text-left">{route.name}</span>
               <MdChevronRight
-                className={`h-4 w-4 transition-transform duration-200 text-gray-400 ${isOpen ? "rotate-90" : ""}`}
+                className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
+                  isOpen ? "rotate-90" : ""
+                }`}
               />
             </button>
 
@@ -123,7 +138,7 @@ export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element =>
                 isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <div className="ml-3 mt-0.5 border-l border-gray-100 dark:border-navy-600 pl-2">
+              <div className="ml-3 mt-0.5 border-l border-gray-100 pl-2 dark:border-navy-600">
                 {sectionGroups.map((group, groupIdx) => (
                   <div key={groupIdx}>
                     {/* Section header */}
@@ -150,7 +165,13 @@ export const SidebarLinks = ({ routes }: { routes: ERPRoute[] }): JSX.Element =>
                               }`}
                             >
                               {childIcon && (
-                                <span className={childActive ? "text-indigo-600" : "text-gray-400"}>
+                                <span
+                                  className={
+                                    childActive
+                                      ? "text-indigo-600"
+                                      : "text-gray-400"
+                                  }
+                                >
                                   {childIcon}
                                 </span>
                               )}

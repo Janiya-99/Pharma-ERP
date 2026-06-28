@@ -7,9 +7,7 @@ import { useLocation } from "react-router-dom";
 
 // Map path segments to human-readable breadcrumb names
 const segmentLabel = (s: string) =>
-  s
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 const Topbar = () => {
   const { user, company, logoutUser } = useAuth();
@@ -30,17 +28,19 @@ const Topbar = () => {
     .slice(0, 2);
 
   return (
-    <header className="flex items-center justify-between px-6 h-14 glass-header shrink-0 z-10 sticky top-0">
+    <header className="glass-header sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between px-6">
       {/* Left: Company + Breadcrumb */}
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="flex items-center gap-1.5 text-sm text-blueMono-800/70 min-w-0">
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="flex min-w-0 items-center gap-1.5 text-sm text-blueMono-800/70">
           {breadcrumbs.map((crumb, i) => (
             <React.Fragment key={i}>
-              {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-blueMono-300/60 shrink-0" />}
+              {i > 0 && (
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-blueMono-300/60" />
+              )}
               <span
                 className={`truncate ${
                   crumb.isLast
-                    ? "text-blueMono-900 font-semibold"
+                    ? "font-semibold text-blueMono-900"
                     : "text-blueMono-800/70"
                 }`}
               >
@@ -52,33 +52,33 @@ const Topbar = () => {
       </div>
 
       {/* Center: Switchers */}
-      <div className="flex items-center gap-2 mx-4">
+      <div className="mx-4 flex items-center gap-2">
         <BranchSwitcher />
         <SoftwareSwitcher />
       </div>
 
       {/* Right: User info + Logout */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex shrink-0 items-center gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold shadow-sm shadow-blueMono-900/30">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blueMono-700 text-xs font-bold text-white shadow-sm shadow-blueMono-900/30">
             {initials}
           </div>
-          <div className="hidden sm:block text-right">
-            <p className="text-sm font-semibold text-blueMono-900 leading-none">
+          <div className="hidden text-right sm:block">
+            <p className="text-sm font-semibold leading-none text-blueMono-900">
               {user?.name || user?.full_name || "User"}
             </p>
-            <p className="text-[10px] text-blueMono-700/80 mt-0.5 leading-none">
+            <p className="mt-0.5 text-[10px] leading-none text-blueMono-700/80">
               {company?.company_name || "Pharma ERP"}
             </p>
           </div>
         </div>
-        <div className="w-px h-6 bg-white/40 mx-1" />
+        <div className="mx-1 h-6 w-px bg-white/40" />
         <button
           onClick={logoutUser}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-blueMono-800 hover:text-red-700 hover:bg-white/30 rounded-lg transition-colors duration-150"
+          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-blueMono-800 transition-colors duration-150 hover:bg-white/30 hover:text-red-700"
           title="Logout"
         >
-          <LogOut className="w-3.5 h-3.5" />
+          <LogOut className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Sign out</span>
         </button>
       </div>

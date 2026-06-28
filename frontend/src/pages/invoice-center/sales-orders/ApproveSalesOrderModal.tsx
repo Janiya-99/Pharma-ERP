@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Button } from "../../../components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/dialog";
 import { Textarea } from "../../../components/ui/textarea";
 
 type ApproveSalesOrderModalProps = {
@@ -10,7 +17,12 @@ type ApproveSalesOrderModalProps = {
   onConfirm: (remarks: string) => Promise<void> | void;
 };
 
-const ApproveSalesOrderModal: React.FC<ApproveSalesOrderModalProps> = ({ open, loading, onOpenChange, onConfirm }) => {
+const ApproveSalesOrderModal: React.FC<ApproveSalesOrderModalProps> = ({
+  open,
+  loading,
+  onOpenChange,
+  onConfirm,
+}) => {
   const [remarks, setRemarks] = useState("");
 
   return (
@@ -18,14 +30,29 @@ const ApproveSalesOrderModal: React.FC<ApproveSalesOrderModalProps> = ({ open, l
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Approve Sales Order</DialogTitle>
-          <DialogDescription>Approve this sales order for downstream invoicing.</DialogDescription>
+          <DialogDescription>
+            Approve this sales order for downstream invoicing.
+          </DialogDescription>
         </DialogHeader>
-        <Textarea value={remarks} onChange={(event) => setRemarks(event.target.value)} placeholder="Approval remarks" />
+        <Textarea
+          value={remarks}
+          onChange={(event) => setRemarks(event.target.value)}
+          placeholder="Approval remarks"
+        />
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Cancel
           </Button>
-          <Button type="button" onClick={() => onConfirm(remarks)} disabled={loading}>
+          <Button
+            type="button"
+            onClick={() => onConfirm(remarks)}
+            disabled={loading}
+          >
             Approve
           </Button>
         </DialogFooter>

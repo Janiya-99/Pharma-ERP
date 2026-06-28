@@ -9,31 +9,31 @@ type CustomerReceiptAllocationRequest struct {
 }
 
 type CreateCustomerReceiptRequest struct {
-	BranchID             uint64                             `json:"branch_id" binding:"required"`
-	CustomerID           uint64                             `json:"customer_id" binding:"required"`
-	FinancialYearID      *uint64                            `json:"financial_year_id"`
-	AccountingPeriodID   *uint64                            `json:"accounting_period_id"`
-	ReceiptDate          string                             `json:"receipt_date" binding:"required"` // Format: YYYY-MM-DD
-	PaymentMethod        string                             `json:"payment_method" binding:"required"`
-	ReferenceNumber      string                             `json:"reference_number"`
-	BankReferenceNumber  string                             `json:"bank_reference_number"`
-	ChequeNumber         string                             `json:"cheque_number"`
-	ChequeDate           *string                            `json:"cheque_date"`
-	Remarks              string                             `json:"remarks"`
-	ReceiptAmount        float64                            `json:"receipt_amount" binding:"required,gt=0"`
-	Allocations          []CustomerReceiptAllocationRequest `json:"allocations"`
+	BranchID            uint64                             `json:"branch_id" binding:"required"`
+	CustomerID          uint64                             `json:"customer_id" binding:"required"`
+	FinancialYearID     *uint64                            `json:"financial_year_id"`
+	AccountingPeriodID  *uint64                            `json:"accounting_period_id"`
+	ReceiptDate         string                             `json:"receipt_date" binding:"required"` // Format: YYYY-MM-DD
+	PaymentMethod       string                             `json:"payment_method" binding:"required"`
+	ReferenceNumber     string                             `json:"reference_number"`
+	BankReferenceNumber string                             `json:"bank_reference_number"`
+	ChequeNumber        string                             `json:"cheque_number"`
+	ChequeDate          *string                            `json:"cheque_date"`
+	Remarks             string                             `json:"remarks"`
+	ReceiptAmount       float64                            `json:"receipt_amount" binding:"required,gt=0"`
+	Allocations         []CustomerReceiptAllocationRequest `json:"allocations"`
 }
 
 type UpdateCustomerReceiptRequest struct {
-	ReceiptDate          string                             `json:"receipt_date" binding:"required"` // Format: YYYY-MM-DD
-	PaymentMethod        string                             `json:"payment_method" binding:"required"`
-	ReferenceNumber      string                             `json:"reference_number"`
-	BankReferenceNumber  string                             `json:"bank_reference_number"`
-	ChequeNumber         string                             `json:"cheque_number"`
-	ChequeDate           *string                            `json:"cheque_date"`
-	Remarks              string                             `json:"remarks"`
-	ReceiptAmount        float64                            `json:"receipt_amount" binding:"required,gt=0"`
-	Allocations          []CustomerReceiptAllocationRequest `json:"allocations"`
+	ReceiptDate         string                             `json:"receipt_date" binding:"required"` // Format: YYYY-MM-DD
+	PaymentMethod       string                             `json:"payment_method" binding:"required"`
+	ReferenceNumber     string                             `json:"reference_number"`
+	BankReferenceNumber string                             `json:"bank_reference_number"`
+	ChequeNumber        string                             `json:"cheque_number"`
+	ChequeDate          *string                            `json:"cheque_date"`
+	Remarks             string                             `json:"remarks"`
+	ReceiptAmount       float64                            `json:"receipt_amount" binding:"required,gt=0"`
+	Allocations         []CustomerReceiptAllocationRequest `json:"allocations"`
 }
 
 type CustomerReceiptActionRequest struct {
@@ -41,27 +41,27 @@ type CustomerReceiptActionRequest struct {
 }
 
 type CustomerReceiptResponse struct {
-	ID                 uint64                              `json:"id"`
-	ReceiptNumber      string                              `json:"receipt_number"`
-	ReceiptDate        time.Time                           `json:"receipt_date"`
-	BranchID           uint64                              `json:"branch_id"`
-	CustomerID         uint64                              `json:"customer_id"`
-	PaymentMethod      string                              `json:"payment_method"`
-	ReferenceNumber    string                              `json:"reference_number"`
-	BankReferenceNumber string                             `json:"bank_reference_number"`
-	ChequeNumber       string                              `json:"cheque_number"`
-	ReceiptAmount      float64                             `json:"receipt_amount"`
-	AllocatedAmount    float64                             `json:"allocated_amount"`
-	UnallocatedAmount  float64                             `json:"unallocated_amount"`
-	ApprovalStatus     string                              `json:"approval_status"`
-	PostedStatus       string                              `json:"posted_status"`
-	ReceiptStatus      string                              `json:"receipt_status"`
-	CreatedBy          *uint64                             `json:"created_by"`
-	CreatedAt          time.Time                           `json:"created_at"`
-	CustomerCode       string                              `json:"customer_code"`
-	CustomerName       string                              `json:"customer_name"`
-	BranchSummary      interface{}                         `json:"branch_summary,omitempty"`
-	ActionsMetadata    map[string]bool                     `json:"actions_metadata,omitempty"`
+	ID                  uint64          `json:"id"`
+	ReceiptNumber       string          `json:"receipt_number"`
+	ReceiptDate         time.Time       `json:"receipt_date"`
+	BranchID            uint64          `json:"branch_id"`
+	CustomerID          uint64          `json:"customer_id"`
+	PaymentMethod       string          `json:"payment_method"`
+	ReferenceNumber     string          `json:"reference_number"`
+	BankReferenceNumber string          `json:"bank_reference_number"`
+	ChequeNumber        string          `json:"cheque_number"`
+	ReceiptAmount       float64         `json:"receipt_amount"`
+	AllocatedAmount     float64         `json:"allocated_amount"`
+	UnallocatedAmount   float64         `json:"unallocated_amount"`
+	ApprovalStatus      string          `json:"approval_status"`
+	PostedStatus        string          `json:"posted_status"`
+	ReceiptStatus       string          `json:"receipt_status"`
+	CreatedBy           *uint64         `json:"created_by"`
+	CreatedAt           time.Time       `json:"created_at"`
+	CustomerCode        string          `json:"customer_code"`
+	CustomerName        string          `json:"customer_name"`
+	BranchSummary       interface{}     `json:"branch_summary,omitempty"`
+	ActionsMetadata     map[string]bool `json:"actions_metadata,omitempty"`
 }
 
 type CustomerReceiptDetailResponse struct {

@@ -1,2 +1,28 @@
-import React from "react"; import { ERPListPage, StatusBadge } from "components/erp/ERPListPage"; import { batches } from "variables/mockData";
-export default function BatchesPage() { return <ERPListPage title="Batches" subtitle="Track batch-wise stock with expiry and warehouse details" searchKey="product" data={batches} columns={[ { key: "product", label: "Product" }, { key: "batchNo", label: "Batch No." }, { key: "mfgDate", label: "Mfg Date" }, { key: "expiryDate", label: "Expiry Date" }, { key: "warehouse", label: "Warehouse" }, { key: "bin", label: "Bin" }, { key: "availableQty", label: "Available" }, { key: "reservedQty", label: "Reserved" }, { key: "status", label: "Status", render: (r: unknown) => <StatusBadge status={r.status} /> } ]} />; }
+import React from "react";
+import { ERPListPage, StatusBadge } from "components/erp/ERPListPage";
+import { batches } from "variables/mockData";
+export default function BatchesPage() {
+  return (
+    <ERPListPage
+      title="Batches"
+      subtitle="Track batch-wise stock with expiry and warehouse details"
+      searchKey="product"
+      data={batches}
+      columns={[
+        { key: "product", label: "Product" },
+        { key: "batchNo", label: "Batch No." },
+        { key: "mfgDate", label: "Mfg Date" },
+        { key: "expiryDate", label: "Expiry Date" },
+        { key: "warehouse", label: "Warehouse" },
+        { key: "bin", label: "Bin" },
+        { key: "availableQty", label: "Available" },
+        { key: "reservedQty", label: "Reserved" },
+        {
+          key: "status",
+          label: "Status",
+          render: (r: unknown) => <StatusBadge status={r.status} />,
+        },
+      ]}
+    />
+  );
+}

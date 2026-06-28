@@ -1,7 +1,10 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Separator } from "../ui/separator";
-import type { SalesOrderLineForm, SalesOrderLine } from "../../types/invoice-center";
+import type {
+  SalesOrderLineForm,
+  SalesOrderLine,
+} from "../../types/invoice-center";
 
 type SalesOrderTotalsCardProps = {
   lines?: SalesOrderLineForm[] | SalesOrderLine[];
@@ -11,10 +14,14 @@ type SalesOrderTotalsCardProps = {
   totalAmount?: number;
 };
 
-const toNumber = (value: number | string | undefined | null): number => Number(value || 0);
+const toNumber = (value: number | string | undefined | null): number =>
+  Number(value || 0);
 
 const formatMoney = (value: number): string =>
-  `LKR ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `LKR ${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
 const SalesOrderTotalsCard: React.FC<SalesOrderTotalsCardProps> = ({
   lines = [],

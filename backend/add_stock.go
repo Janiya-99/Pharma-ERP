@@ -4,9 +4,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 		VALUES (1, 1, 1, 4, 1, 100, 0, 100, 10.0, NOW(), NOW())
 		ON DUPLICATE KEY UPDATE quantity_on_hand = 100, quantity_available = 100;
 	`)
-	
+
 	if res.Error != nil {
 		log.Fatal(res.Error)
 	}

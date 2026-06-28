@@ -6,7 +6,10 @@ import DataTable from "../../../components/common/DataTable";
 import PageHeader from "../../../components/common/PageHeader";
 import { Plus, Search, Filter, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
-import { DisposalTypeBadge, GainLossBadge } from "../../../components/finance/FixedAssetBadges";
+import {
+  DisposalTypeBadge,
+  GainLossBadge,
+} from "../../../components/finance/FixedAssetBadges";
 import Modal from "../../../components/common/Modal";
 
 const FixedAssetDisposalsPage = () => {
@@ -40,7 +43,9 @@ const FixedAssetDisposalsPage = () => {
       setTotalCount(res.data?.meta?.total || 0);
     } catch (err) {
       console.error("Failed to fetch disposals:", err);
-      toast.error(err.response?.data?.message || "Failed to load asset disposals");
+      toast.error(
+        err.response?.data?.message || "Failed to load asset disposals"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,20 +75,28 @@ const FixedAssetDisposalsPage = () => {
     {
       key: "disposal_number",
       label: "Disposal No.",
-      render: (val: unknown) => <span className="font-bold text-navy-700 dark:text-white">{val}</span>,
+      render: (val: unknown) => (
+        <span className="font-bold text-navy-700 dark:text-white">{val}</span>
+      ),
     },
     {
       key: "disposal_date",
       label: "Disposal Date",
-      render: (val: unknown) => <span>{new Date(val).toLocaleDateString()}</span>,
+      render: (val: unknown) => (
+        <span>{new Date(val).toLocaleDateString()}</span>
+      ),
     },
     {
       key: "fixed_asset",
       label: "Asset",
       render: (_: unknown, row: unknown) => (
         <div>
-          <span className="font-medium text-navy-700 dark:text-white block">{row.fixed_asset?.asset_code}</span>
-          <span className="text-xs text-gray-500">{row.fixed_asset?.asset_name}</span>
+          <span className="block font-medium text-navy-700 dark:text-white">
+            {row.fixed_asset?.asset_code}
+          </span>
+          <span className="text-xs text-gray-500">
+            {row.fixed_asset?.asset_name}
+          </span>
         </div>
       ),
     },
@@ -96,13 +109,17 @@ const FixedAssetDisposalsPage = () => {
       key: "sale_value",
       label: "Sale Value",
       align: "right",
-      render: (val: unknown) => <span>LKR {Number(val || 0).toLocaleString()}</span>,
+      render: (val: unknown) => (
+        <span>LKR {Number(val || 0).toLocaleString()}</span>
+      ),
     },
     {
       key: "net_book_value_at_disposal",
       label: "NBV at Disposal",
       align: "right",
-      render: (val: unknown) => <span>LKR {Number(val || 0).toLocaleString()}</span>,
+      render: (val: unknown) => (
+        <span>LKR {Number(val || 0).toLocaleString()}</span>
+      ),
     },
     {
       key: "gain_loss_amount",
@@ -110,7 +127,15 @@ const FixedAssetDisposalsPage = () => {
       align: "right",
       render: (val: unknown) => (
         <div className="flex flex-col items-end">
-          <span className={`font-medium ${val > 0 ? "text-green-600 dark:text-green-400" : val < 0 ? "text-red-600 dark:text-red-400" : ""}`}>
+          <span
+            className={`font-medium ${
+              val > 0
+                ? "text-green-600 dark:text-green-400"
+                : val < 0
+                ? "text-red-600 dark:text-red-400"
+                : ""
+            }`}
+          >
             LKR {Math.abs(Number(val || 0)).toLocaleString()}
           </span>
           <GainLossBadge amount={val} />
@@ -130,7 +155,11 @@ const FixedAssetDisposalsPage = () => {
           posted: "bg-emerald-100 text-emerald-700 border-emerald-200",
         };
         return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize ${colors[val] || colors.draft}`}>
+          <span
+            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize ${
+              colors[val] || colors.draft
+            }`}
+          >
             {val}
           </span>
         );
@@ -144,62 +173,67 @@ const FixedAssetDisposalsPage = () => {
         <div className="flex items-center justify-end gap-2">
           {hasPermission("finance.fixed_asset_disposal.view") && (
             <button
-              onClick={() => history.push(`/admin/finance/fixed-asset-disposals/${row.id}`)}
-              className="p-1.5 text-gray-500 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-navy-700 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-gray-300"
+              onClick={() =>
+                history.push(`/admin/finance/fixed-asset-disposals/${row.id}`)
+              }
+              className="rounded-lg bg-gray-100 p-1.5 text-gray-500 transition-colors hover:bg-gray-200 hover:text-navy-700 dark:bg-navy-700 dark:text-gray-300 dark:hover:bg-navy-600"
               title="View Details"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="h-4 w-4" />
             </button>
           )}
-          {hasPermission("finance.fixed_asset_disposal.delete") && row.status === "draft" && (
-            <button
-              onClick={() => handleDeleteClick(row)}
-              className="p-1.5 text-red-600 transition-colors bg-red-50 rounded-lg hover:bg-red-100 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-red-400"
-              title="Delete"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
+          {hasPermission("finance.fixed_asset_disposal.delete") &&
+            row.status === "draft" && (
+              <button
+                onClick={() => handleDeleteClick(row)}
+                className="rounded-lg bg-red-50 p-1.5 text-red-600 transition-colors hover:bg-red-100 dark:bg-navy-700 dark:text-red-400 dark:hover:bg-navy-600"
+                title="Delete"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
         </div>
       ),
     },
   ];
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900">
+    <div className="flex h-full flex-col bg-gray-50 dark:bg-navy-900">
       <PageHeader
         title="Asset Disposals"
         breadcrumb={[{ label: "Finance" }, { label: "Asset Disposals" }]}
         action={
           hasPermission("finance.fixed_asset_disposal.create") && (
             <button
-              onClick={() => history.push("/admin/finance/fixed-asset-disposals/create")}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 shadow-sm shadow-brand-500/20"
+              onClick={() =>
+                history.push("/admin/finance/fixed-asset-disposals/create")
+              }
+              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand-500/20 transition-all hover:bg-brand-600"
             >
-              <Plus className="w-4 h-4" /> Record Disposal
+              <Plus className="h-4 w-4" /> Record Disposal
             </button>
           )
         }
       />
 
-      <div className="flex-1 p-6 overflow-hidden">
-        <div className="flex flex-col h-full bg-white border border-gray-100 shadow-sm dark:bg-navy-800 dark:border-navy-700 rounded-2xl">
-          <div className="flex flex-wrap items-center justify-between gap-4 p-5 border-b border-gray-100 dark:border-navy-700">
-            <div className="relative flex-1 min-w-[250px] max-w-md">
-              <Search className="absolute w-4 h-4 text-gray-400 -translate-y-1/2 left-3 top-1/2" />
+      <div className="flex-1 overflow-hidden p-6">
+        <div className="flex h-full flex-col rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 p-5 dark:border-navy-700">
+            <div className="relative min-w-[250px] max-w-md flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by disposal number or asset code..."
-                className="w-full py-2 pl-9 pr-4 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm outline-none transition-all focus:border-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
                 value={search}
                 onChange={(e: any) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl dark:bg-navy-900 dark:border-navy-600">
-                <Filter className="w-4 h-4 text-gray-500" />
+              <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-navy-600 dark:bg-navy-900">
+                <Filter className="h-4 w-4 text-gray-500" />
                 <select
-                  className="text-sm bg-transparent outline-none text-gray-700 dark:text-gray-300"
+                  className="bg-transparent text-sm text-gray-700 outline-none dark:text-gray-300"
                   value={statusFilter}
                   onChange={(e: any) => setStatusFilter(e.target.value)}
                 >
@@ -234,7 +268,7 @@ const FixedAssetDisposalsPage = () => {
         onClose={() => setDeleteModalOpen(false)}
         title="Delete Asset Disposal"
       >
-        <p className="text-gray-700 dark:text-gray-300 mb-6">
+        <p className="mb-6 text-gray-700 dark:text-gray-300">
           Are you sure you want to delete asset disposal{" "}
           <span className="font-bold text-navy-700 dark:text-white">
             {disposalToDelete?.disposal_number}
@@ -244,14 +278,14 @@ const FixedAssetDisposalsPage = () => {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setDeleteModalOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
+            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
             disabled={deleting}
           >
             Cancel
           </button>
           <button
             onClick={confirmDelete}
-            className="px-4 py-2 text-sm font-bold text-white transition-all bg-red-500 rounded-xl hover:bg-red-600 disabled:opacity-50"
+            className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-red-600 disabled:opacity-50"
             disabled={deleting}
           >
             {deleting ? "Deleting..." : "Delete"}

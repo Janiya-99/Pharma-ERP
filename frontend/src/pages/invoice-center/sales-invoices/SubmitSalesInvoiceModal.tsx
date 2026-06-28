@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../../../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Label } from "../../../components/ui/label";
@@ -13,7 +20,12 @@ interface Props {
   onSuccess: () => void;
 }
 
-export const SubmitSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invoiceId, onSuccess }) => {
+export const SubmitSalesInvoiceModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  invoiceId,
+  onSuccess,
+}) => {
   const [remarks, setRemarks] = useState("Submitted for approval");
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +37,9 @@ export const SubmitSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to submit sales invoice.");
+      toast.error(
+        err?.response?.data?.message || "Failed to submit sales invoice."
+      );
     } finally {
       setLoading(false);
     }
@@ -36,7 +50,9 @@ export const SubmitSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Submit Sales Invoice</DialogTitle>
-          <DialogDescription>Are you sure you want to submit this invoice for approval?</DialogDescription>
+          <DialogDescription>
+            Are you sure you want to submit this invoice for approval?
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">

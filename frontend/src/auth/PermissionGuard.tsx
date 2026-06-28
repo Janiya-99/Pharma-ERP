@@ -21,7 +21,10 @@ const PermissionGuard = ({
   if (loading) return null;
 
   // If no permission requirements specified, allow access
-  if (!permission && (!permissions || !Array.isArray(permissions) || permissions.length === 0)) {
+  if (
+    !permission &&
+    (!permissions || !Array.isArray(permissions) || permissions.length === 0)
+  ) {
     return <>{children}</>;
   }
 
@@ -32,7 +35,10 @@ const PermissionGuard = ({
   } else if (permissions && Array.isArray(permissions)) {
     if (mode === "any" && hasAnyPermission(permissions)) {
       return <>{children}</>;
-    } else if (mode === "all" && permissions.every((key) => hasPermission(key))) {
+    } else if (
+      mode === "all" &&
+      permissions.every((key) => hasPermission(key))
+    ) {
       return <>{children}</>;
     }
   }

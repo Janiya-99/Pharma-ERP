@@ -88,7 +88,9 @@ export default function FinancialYearFormModal({
         onOpenChange(false);
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to save financial year");
+      toast.error(
+        err.response?.data?.message || "Failed to save financial year"
+      );
     } finally {
       setLoading(false);
     }

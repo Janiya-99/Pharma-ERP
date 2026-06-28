@@ -34,7 +34,7 @@ export default function PaymentVoucherFormPage() {
   });
 
   const [lines, setLines] = useState([
-    { account_id: "", line_description: "", amount: 0 }
+    { account_id: "", line_description: "", amount: 0 },
   ]);
 
   useEffect(() => {
@@ -63,11 +63,13 @@ export default function PaymentVoucherFormPage() {
           description: d.description || "",
         });
         if (d.lines && d.lines.length > 0) {
-          setLines(d.lines.map((l: unknown) => ({
-            account_id: l.account_id,
-            line_description: l.line_description || "",
-            amount: l.amount || 0
-          })));
+          setLines(
+            d.lines.map((l: unknown) => ({
+              account_id: l.account_id,
+              line_description: l.line_description || "",
+              amount: l.amount || 0,
+            }))
+          );
         }
       }
     } catch (err) {
@@ -83,13 +85,26 @@ export default function PaymentVoucherFormPage() {
     setError(null);
 
     // Validation
-    if (!formData.branch_id || !formData.financial_year_id || !formData.accounting_period_id || !formData.payment_date) {
-      setError("Branch, Financial Year, Accounting Period, and Payment Date are required.");
+    if (
+      !formData.branch_id ||
+      !formData.financial_year_id ||
+      !formData.accounting_period_id ||
+      !formData.payment_date
+    ) {
+      setError(
+        "Branch, Financial Year, Accounting Period, and Payment Date are required."
+      );
       return;
     }
 
-    if (!formData.payment_type || !formData.payment_method || !formData.paid_from_account_id) {
-      setError("Payment Type, Payment Method, and Paid From Account are required.");
+    if (
+      !formData.payment_type ||
+      !formData.payment_method ||
+      !formData.paid_from_account_id
+    ) {
+      setError(
+        "Payment Type, Payment Method, and Paid From Account are required."
+      );
       return;
     }
 
@@ -121,7 +136,7 @@ export default function PaymentVoucherFormPage() {
         setError(`Line ${i + 1}: Amount must be greater than zero.`);
         return;
       }
-      totalAmount += (Number(line.amount) || 0);
+      totalAmount += Number(line.amount) || 0;
     }
 
     if (totalAmount <= 0) {
@@ -138,15 +153,19 @@ export default function PaymentVoucherFormPage() {
       payment_type: formData.payment_type,
       payment_method: formData.payment_method,
       paid_from_account_id: Number(formData.paid_from_account_id),
-      cheque_number: formData.payment_method === "cheque" ? formData.cheque_number : "",
-      cheque_date: formData.payment_method === "cheque" && formData.cheque_date ? formData.cheque_date : null,
+      cheque_number:
+        formData.payment_method === "cheque" ? formData.cheque_number : "",
+      cheque_date:
+        formData.payment_method === "cheque" && formData.cheque_date
+          ? formData.cheque_date
+          : null,
       reference_number: formData.reference_number,
       description: formData.description,
       lines: lines.map((l: unknown) => ({
         account_id: Number(l.account_id),
         line_description: l.line_description,
-        amount: Number(l.amount) || 0
-      }))
+        amount: Number(l.amount) || 0,
+      })),
     };
 
     try {
@@ -157,7 +176,11 @@ export default function PaymentVoucherFormPage() {
       }
       history.push("/admin/finance/payment-vouchers");
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to save payment voucher");
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to save payment voucher"
+      );
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -169,18 +192,24 @@ export default function PaymentVoucherFormPage() {
   }
 
   if (activeSoftware?.software_code !== "FINANCE") {
-    return <div className="p-8 text-center text-red-500 font-medium">Please switch to Finance module to access this page.</div>;
+    return (
+      <div className="p-8 text-center font-medium text-red-500">
+        Please switch to Finance module to access this page.
+      </div>
+    );
   }
 
-  const isSaveDisabled = lines.reduce((s: unknown, l: unknown) => s + (Number(l.amount) || 0), 0) <= 0;
+  const isSaveDisabled =
+    lines.reduce((s: unknown, l: unknown) => s + (Number(l.amount) || 0), 0) <=
+    0;
 
   return (
-    <div className="flex flex-col gap-4 py-4 h-full max-w-7xl mx-auto">
+    <div className="mx-auto flex h-full max-w-7xl flex-col gap-4 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => history.goBack()}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors"
+            className="rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-navy-700"
           >
             <MdArrowBack className="h-6 w-6 text-gray-500 dark:text-gray-400" />
           </button>
@@ -191,7 +220,7 @@ export default function PaymentVoucherFormPage() {
         <button
           onClick={handleSave}
           disabled={submitting || isSaveDisabled}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <MdSave size={20} />
           {submitting ? "Saving..." : "Save Voucher"}
@@ -199,65 +228,109 @@ export default function PaymentVoucherFormPage() {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
           {error}
         </div>
       )}
 
-      <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
-        <h3 className="text-lg font-medium text-navy-800 dark:text-white mb-4">Header Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+        <h3 className="mb-4 text-lg font-medium text-navy-800 dark:text-white">
+          Header Information
+        </h3>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Branch *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Branch *
+            </label>
             <BranchSelector
               value={formData.branch_id}
-              onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, branch_id: val }))}
+              onChange={(val: unknown) =>
+                setFormData((prev: unknown) => ({ ...prev, branch_id: val }))
+              }
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Financial Year *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Financial Year *
+            </label>
             <FinancialYearSelect
               value={formData.financial_year_id}
-              onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, financial_year_id: val, accounting_period_id: "" }))}
+              onChange={(val: unknown) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  financial_year_id: val,
+                  accounting_period_id: "",
+                }))
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Accounting Period *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Accounting Period *
+            </label>
             <AccountingPeriodSelect
               financialYearId={formData.financial_year_id}
               value={formData.accounting_period_id}
-              onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, accounting_period_id: val }))}
+              onChange={(val: unknown) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  accounting_period_id: val,
+                }))
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Date *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Payment Date *
+            </label>
             <input
               type="date"
               value={formData.payment_date}
-              onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, payment_date: e.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+              onChange={(e: any) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  payment_date: e.target.value,
+                }))
+              }
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-navy-500 focus:outline-none focus:ring-navy-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Type *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Payment Type *
+            </label>
             <select
               value={formData.payment_type}
-              onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, payment_type: e.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+              onChange={(e: any) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  payment_type: e.target.value,
+                }))
+              }
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-navy-500 focus:outline-none focus:ring-navy-500"
             >
               <option value="supplier_payment">Supplier Payment</option>
-              <option value="supplier_advance_payment">Supplier Advance Payment</option>
+              <option value="supplier_advance_payment">
+                Supplier Advance Payment
+              </option>
               <option value="other_payment">Other Payment</option>
               <option value="payment_return">Payment Return</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Method *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Payment Method *
+            </label>
             <select
               value={formData.payment_method}
-              onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, payment_method: e.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+              onChange={(e: any) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  payment_method: e.target.value,
+                }))
+              }
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-navy-500 focus:outline-none focus:ring-navy-500"
             >
               <option value="cash">Cash</option>
               <option value="bank_transfer">Bank Transfer</option>
@@ -267,54 +340,89 @@ export default function PaymentVoucherFormPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paid From Account *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Paid From Account *
+            </label>
             <AccountSelect
               value={formData.paid_from_account_id}
-              onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, paid_from_account_id: val }))}
+              onChange={(val: unknown) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  paid_from_account_id: val,
+                }))
+              }
               placeholder="Select Bank/Cash Account"
             />
           </div>
           {formData.payment_method === "cheque" && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cheque Number *</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Cheque Number *
+                </label>
                 <input
                   type="text"
                   value={formData.cheque_number}
-                  onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, cheque_number: e.target.value }))}
+                  onChange={(e: any) =>
+                    setFormData((prev: unknown) => ({
+                      ...prev,
+                      cheque_number: e.target.value,
+                    }))
+                  }
                   placeholder="e.g. 123456"
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-navy-500 focus:outline-none focus:ring-navy-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cheque Date *</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Cheque Date *
+                </label>
                 <input
                   type="date"
                   value={formData.cheque_date}
-                  onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, cheque_date: e.target.value }))}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+                  onChange={(e: any) =>
+                    setFormData((prev: unknown) => ({
+                      ...prev,
+                      cheque_date: e.target.value,
+                    }))
+                  }
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-navy-500 focus:outline-none focus:ring-navy-500"
                 />
               </div>
             </>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reference Number</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Reference Number
+            </label>
             <input
               type="text"
               value={formData.reference_number}
-              onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, reference_number: e.target.value }))}
+              onChange={(e: any) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  reference_number: e.target.value,
+                }))
+              }
               placeholder="e.g. PAY-REF-001"
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-navy-500 focus:outline-none focus:ring-navy-500"
             />
           </div>
           <div className="lg:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Description
+            </label>
             <textarea
               value={formData.description}
-              onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, description: e.target.value }))}
+              onChange={(e: any) =>
+                setFormData((prev: unknown) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               rows={2}
               placeholder="Payment description..."
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-navy-500 focus:outline-none focus:ring-navy-500"
             />
           </div>
         </div>

@@ -1,9 +1,9 @@
-import React from 'react';
-import { Button } from '../ui/button';
-import { Send, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import PermissionGuard from '../../auth/PermissionGuard';
-import type { InvoiceCenterFinancePostingDocumentType } from '../../types/invoice-center';
+import React from "react";
+import { Button } from "../ui/button";
+import { Send, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import PermissionGuard from "../../auth/PermissionGuard";
+import type { InvoiceCenterFinancePostingDocumentType } from "../../types/invoice-center";
 
 interface Props {
   documentType: InvoiceCenterFinancePostingDocumentType;
@@ -13,11 +13,14 @@ interface Props {
   posting?: boolean;
 }
 
-const sourceDocumentRoutes: Record<InvoiceCenterFinancePostingDocumentType, string> = {
-  sales_invoice: '/admin/invoice-center/sales-invoices',
-  credit_note: '/admin/invoice-center/credit-notes',
-  debit_note: '/admin/invoice-center/debit-notes',
-  customer_receipt: '/admin/invoice-center/customer-receipts',
+const sourceDocumentRoutes: Record<
+  InvoiceCenterFinancePostingDocumentType,
+  string
+> = {
+  sales_invoice: "/admin/invoice-center/sales-invoices",
+  credit_note: "/admin/invoice-center/credit-notes",
+  debit_note: "/admin/invoice-center/debit-notes",
+  customer_receipt: "/admin/invoice-center/customer-receipts",
 };
 
 export const FinancePostingActionButtons: React.FC<Props> = ({
@@ -28,11 +31,11 @@ export const FinancePostingActionButtons: React.FC<Props> = ({
   posting = false,
 }) => {
   const navigate = useNavigate();
-  const basePath = sourceDocumentRoutes[documentType] || '';
+  const basePath = sourceDocumentRoutes[documentType] || "";
 
   return (
     <div className="flex items-center gap-1.5">
-      {financePostStatus !== 'posted' && onPostToFinance && (
+      {financePostStatus !== "posted" && onPostToFinance && (
         <PermissionGuard permission="invoice_center.finance_posting.post">
           <Button
             size="sm"
@@ -41,7 +44,7 @@ export const FinancePostingActionButtons: React.FC<Props> = ({
             disabled={posting}
             className="h-7 px-2 text-xs"
           >
-            <Send className="h-3 w-3 mr-1" />
+            <Send className="mr-1 h-3 w-3" />
             Post to Finance
           </Button>
         </PermissionGuard>
@@ -52,7 +55,7 @@ export const FinancePostingActionButtons: React.FC<Props> = ({
         onClick={() => navigate(`${basePath}/${documentId}`)}
         className="h-7 px-2 text-xs"
       >
-        <Eye className="h-3 w-3 mr-1" />
+        <Eye className="mr-1 h-3 w-3" />
         View
       </Button>
     </div>

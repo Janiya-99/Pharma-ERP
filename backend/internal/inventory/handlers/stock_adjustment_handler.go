@@ -36,7 +36,7 @@ func (h *StockAdjustmentHandler) ListStockAdjustments(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	
+
 	filters := make(map[string]interface{})
 	if bID, err := strconv.ParseUint(c.Query("branch_id"), 10, 64); err == nil {
 		filters["branch_id"] = bID

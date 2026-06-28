@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Button } from "../../../components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/dialog";
 import { Textarea } from "../../../components/ui/textarea";
 
 type RejectSalesOrderModalProps = {
@@ -10,7 +17,12 @@ type RejectSalesOrderModalProps = {
   onConfirm: (remarks: string) => Promise<void> | void;
 };
 
-const RejectSalesOrderModal: React.FC<RejectSalesOrderModalProps> = ({ open, loading, onOpenChange, onConfirm }) => {
+const RejectSalesOrderModal: React.FC<RejectSalesOrderModalProps> = ({
+  open,
+  loading,
+  onOpenChange,
+  onConfirm,
+}) => {
   const [remarks, setRemarks] = useState("");
 
   return (
@@ -18,14 +30,30 @@ const RejectSalesOrderModal: React.FC<RejectSalesOrderModalProps> = ({ open, loa
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Reject Sales Order</DialogTitle>
-          <DialogDescription>Reject this sales order and return it to the requester.</DialogDescription>
+          <DialogDescription>
+            Reject this sales order and return it to the requester.
+          </DialogDescription>
         </DialogHeader>
-        <Textarea value={remarks} onChange={(event) => setRemarks(event.target.value)} placeholder="Rejection reason" />
+        <Textarea
+          value={remarks}
+          onChange={(event) => setRemarks(event.target.value)}
+          placeholder="Rejection reason"
+        />
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Cancel
           </Button>
-          <Button type="button" variant="destructive" onClick={() => onConfirm(remarks)} disabled={loading}>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => onConfirm(remarks)}
+            disabled={loading}
+          >
             Reject
           </Button>
         </DialogFooter>

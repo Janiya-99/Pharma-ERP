@@ -3,9 +3,9 @@ package dto
 import "time"
 
 type CreateStockTransferRequest struct {
-	BranchID           uint64 `json:"branch_id" validate:"required"`
-	FromWarehouseID    uint64 `json:"from_warehouse_id" validate:"required"`
-	ToWarehouseID      uint64 `json:"to_warehouse_id" validate:"required"`
+	BranchID           uint64  `json:"branch_id" validate:"required"`
+	FromWarehouseID    uint64  `json:"from_warehouse_id" validate:"required"`
+	ToWarehouseID      uint64  `json:"to_warehouse_id" validate:"required"`
 	FinancialYearID    *uint64 `json:"financial_year_id"`
 	AccountingPeriodID *uint64 `json:"accounting_period_id"`
 
@@ -27,9 +27,9 @@ type CreateStockTransferLineRequest struct {
 }
 
 type UpdateStockTransferRequest struct {
-	BranchID           uint64 `json:"branch_id" validate:"required"`
-	FromWarehouseID    uint64 `json:"from_warehouse_id" validate:"required"`
-	ToWarehouseID      uint64 `json:"to_warehouse_id" validate:"required"`
+	BranchID           uint64  `json:"branch_id" validate:"required"`
+	FromWarehouseID    uint64  `json:"from_warehouse_id" validate:"required"`
+	ToWarehouseID      uint64  `json:"to_warehouse_id" validate:"required"`
 	FinancialYearID    *uint64 `json:"financial_year_id"`
 	AccountingPeriodID *uint64 `json:"accounting_period_id"`
 
@@ -69,34 +69,34 @@ type ListStockTransfersFilters struct {
 
 // Responses
 type StockTransferResponse struct {
-	ID                 uint64    `json:"id"`
-	CompanyID          uint64    `json:"company_id"`
-	BranchID           uint64    `json:"branch_id"`
-	FromWarehouseID    uint64    `json:"from_warehouse_id"`
-	ToWarehouseID      uint64    `json:"to_warehouse_id"`
-	FinancialYearID    *uint64   `json:"financial_year_id"`
-	AccountingPeriodID *uint64   `json:"accounting_period_id"`
-	TransferNumber     string    `json:"transfer_number"`
-	TransferDate       time.Time `json:"transfer_date"`
-	ReferenceNumber    string    `json:"reference_number"`
-	Remarks            string    `json:"remarks"`
-	TotalQuantity      float64   `json:"total_quantity"`
-	TotalStockValue    float64   `json:"total_stock_value"`
-	ApprovalStatus     string    `json:"approval_status"`
-	ApprovedBy         *uint64   `json:"approved_by"`
+	ID                 uint64     `json:"id"`
+	CompanyID          uint64     `json:"company_id"`
+	BranchID           uint64     `json:"branch_id"`
+	FromWarehouseID    uint64     `json:"from_warehouse_id"`
+	ToWarehouseID      uint64     `json:"to_warehouse_id"`
+	FinancialYearID    *uint64    `json:"financial_year_id"`
+	AccountingPeriodID *uint64    `json:"accounting_period_id"`
+	TransferNumber     string     `json:"transfer_number"`
+	TransferDate       time.Time  `json:"transfer_date"`
+	ReferenceNumber    string     `json:"reference_number"`
+	Remarks            string     `json:"remarks"`
+	TotalQuantity      float64    `json:"total_quantity"`
+	TotalStockValue    float64    `json:"total_stock_value"`
+	ApprovalStatus     string     `json:"approval_status"`
+	ApprovedBy         *uint64    `json:"approved_by"`
 	ApprovedAt         *time.Time `json:"approved_at"`
-	PostedStatus       string    `json:"posted_status"`
-	PostedBy           *uint64   `json:"posted_by"`
+	PostedStatus       string     `json:"posted_status"`
+	PostedBy           *uint64    `json:"posted_by"`
 	PostedAt           *time.Time `json:"posted_at"`
-	Status             string    `json:"status"`
-	CreatedBy          uint64    `json:"created_by"`
-	UpdatedBy          uint64    `json:"updated_by"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	Status             string     `json:"status"`
+	CreatedBy          uint64     `json:"created_by"`
+	UpdatedBy          uint64     `json:"updated_by"`
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at"`
 
-	Branch           interface{} `json:"branch,omitempty"`
-	FromWarehouse    interface{} `json:"from_warehouse,omitempty"`
-	ToWarehouse      interface{} `json:"to_warehouse,omitempty"`
-	Lines            interface{} `json:"lines,omitempty"`
-	Approvals        interface{} `json:"approvals,omitempty"`
+	Branch        interface{} `json:"branch,omitempty"`
+	FromWarehouse interface{} `json:"from_warehouse,omitempty"`
+	ToWarehouse   interface{} `json:"to_warehouse,omitempty"`
+	Lines         interface{} `json:"lines,omitempty"`
+	Approvals     interface{} `json:"approvals,omitempty"`
 }

@@ -8,13 +8,23 @@ interface ToggleSwitchProps {
   disabled?: boolean;
 }
 
-const ToggleSwitch = ({ checked, onChange, label, description, disabled }: ToggleSwitchProps) => {
+const ToggleSwitch = ({
+  checked,
+  onChange,
+  label,
+  description,
+  disabled,
+}: ToggleSwitchProps) => {
   return (
     <div className="flex items-center justify-between gap-3">
       {(label || description) && (
         <div className="min-w-0">
-          {label && <p className="text-sm font-medium text-gray-700">{label}</p>}
-          {description && <p className="text-[12px] text-gray-400 mt-0.5">{description}</p>}
+          {label && (
+            <p className="text-sm font-medium text-gray-700">{label}</p>
+          )}
+          {description && (
+            <p className="mt-0.5 text-[12px] text-gray-400">{description}</p>
+          )}
         </div>
       )}
       <button
@@ -25,7 +35,7 @@ const ToggleSwitch = ({ checked, onChange, label, description, disabled }: Toggl
         onClick={() => !disabled && onChange(!checked)}
         className={`toggle-switch shrink-0 ${
           checked ? "toggle-switch-on" : "toggle-switch-off"
-        } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+        } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
       >
         <span
           className={`toggle-switch-dot ${

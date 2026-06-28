@@ -38,33 +38,45 @@ export const RejectCustomerReceiptModal: React.FC<Props> = ({
 
     try {
       setIsSubmitting(true);
-      const res = await invoiceCenterApi.rejectCustomerReceipt(receiptId, { remarks });
+      const res = await invoiceCenterApi.rejectCustomerReceipt(receiptId, {
+        remarks,
+      });
       if (res.data?.success) {
-        toast.success(res.data.message || "Customer receipt rejected successfully");
+        toast.success(
+          res.data.message || "Customer receipt rejected successfully"
+        );
         onSuccess();
         onClose();
       } else {
         toast.error(res.data?.message || "Failed to reject customer receipt");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred during rejection");
+      toast.error(
+        error.response?.data?.message || "An error occurred during rejection"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && !isSubmitting && onClose()}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Reject Customer Receipt</DialogTitle>
           <DialogDescription>
-            Are you sure you want to reject this customer receipt? You must provide a reason.
+            Are you sure you want to reject this customer receipt? You must
+            provide a reason.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="remarks" className="text-red-600">Rejection Reason *</Label>
+            <Label htmlFor="remarks" className="text-red-600">
+              Rejection Reason *
+            </Label>
             <Textarea
               id="remarks"
               value={remarks}
@@ -79,7 +91,11 @@ export const RejectCustomerReceiptModal: React.FC<Props> = ({
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button onClick={handleReject} disabled={isSubmitting || !remarks.trim()} className="bg-red-600 hover:bg-red-700">
+          <Button
+            onClick={handleReject}
+            disabled={isSubmitting || !remarks.trim()}
+            className="bg-red-600 hover:bg-red-700"
+          >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Reject
           </Button>

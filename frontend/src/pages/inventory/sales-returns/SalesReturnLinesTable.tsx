@@ -7,7 +7,13 @@ import {
   SalesReturnLineBatchSelect,
 } from "components/inventory/SalesReturnSelectComponents";
 import { Input } from "components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "components/ui/select";
 
 interface Props {
   lines: SalesReturnLine[];
@@ -38,7 +44,14 @@ const RETURN_CONDITIONS = [
   { value: "recall", label: "Recall" },
 ];
 
-const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled, defaultReturnReason = "customer_return", defaultReturnCondition = "saleable", warehouseId }) => {
+const SalesReturnLinesTable: React.FC<Props> = ({
+  lines,
+  onLinesChange,
+  disabled,
+  defaultReturnReason = "customer_return",
+  defaultReturnCondition = "saleable",
+  warehouseId,
+}) => {
   const addLine = () => {
     onLinesChange([
       ...lines,
@@ -66,16 +79,20 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
     onLinesChange(newLines);
   };
 
-  const updateLine = (index: number, field: keyof SalesReturnLine, value: any) => {
+  const updateLine = (
+    index: number,
+    field: keyof SalesReturnLine,
+    value: any
+  ) => {
     const newLines = [...lines];
     newLines[index] = { ...newLines[index], [field]: value };
-    
+
     // Recalculate line total
     const qty = Number(newLines[index].return_quantity) || 0;
     const price = Number(newLines[index].unit_price) || 0;
     const discount = Number(newLines[index].discount_amount) || 0;
     const tax = Number(newLines[index].tax_amount) || 0;
-    newLines[index].line_total = (qty * price) - discount + tax;
+    newLines[index].line_total = qty * price - discount + tax;
 
     onLinesChange(newLines);
   };
@@ -104,39 +121,58 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Return Items</h3>
-        <Button variant="outline" size="sm" onClick={addLine} disabled={disabled || !warehouseId} type="button">
-          <Plus className="w-4 h-4 mr-1" /> Add Line
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={addLine}
+          disabled={disabled || !warehouseId}
+          type="button"
+        >
+          <Plus className="mr-1 h-4 w-4" /> Add Line
         </Button>
       </div>
 
       {!warehouseId && (
-        <div className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded border border-yellow-200">
+        <div className="rounded border border-yellow-200 bg-yellow-50 p-2 text-sm text-yellow-600">
           Please select a warehouse first to add line items.
         </div>
       )}
 
-      <div className="overflow-x-auto border rounded-md">
-        <table className="w-full text-sm text-left min-w-[1200px]">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+      <div className="overflow-x-auto rounded-md border">
+        <table className="w-full min-w-[1200px] text-left text-sm">
+          <thead className="border-b bg-gray-50 text-xs uppercase text-gray-700">
             <tr>
-              <th className="px-4 py-3 w-[200px]">Product <span className="text-red-500">*</span></th>
-              <th className="px-4 py-3 w-[150px]">Batch</th>
-              <th className="px-4 py-3 w-[130px]">Condition <span className="text-red-500">*</span></th>
-              <th className="px-4 py-3 w-[130px]">Reason <span className="text-red-500">*</span></th>
-              <th className="px-4 py-3 w-28 text-right">Return Qty <span className="text-red-500">*</span></th>
-              <th className="px-4 py-3 w-28 text-right">Unit Price <span className="text-red-500">*</span></th>
-              <th className="px-4 py-3 w-24 text-right">Discount</th>
-              <th className="px-4 py-3 w-24 text-right">Tax</th>
-              <th className="px-4 py-3 w-28 text-right">Line Total</th>
-              <th className="px-4 py-3 w-16 text-center">Action</th>
+              <th className="w-[200px] px-4 py-3">
+                Product <span className="text-red-500">*</span>
+              </th>
+              <th className="w-[150px] px-4 py-3">Batch</th>
+              <th className="w-[130px] px-4 py-3">
+                Condition <span className="text-red-500">*</span>
+              </th>
+              <th className="w-[130px] px-4 py-3">
+                Reason <span className="text-red-500">*</span>
+              </th>
+              <th className="w-28 px-4 py-3 text-right">
+                Return Qty <span className="text-red-500">*</span>
+              </th>
+              <th className="w-28 px-4 py-3 text-right">
+                Unit Price <span className="text-red-500">*</span>
+              </th>
+              <th className="w-24 px-4 py-3 text-right">Discount</th>
+              <th className="w-24 px-4 py-3 text-right">Tax</th>
+              <th className="w-28 px-4 py-3 text-right">Line Total</th>
+              <th className="w-16 px-4 py-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-gray-500 bg-gray-50/50">
+                <td
+                  colSpan={10}
+                  className="bg-gray-50/50 px-4 py-8 text-center text-gray-500"
+                >
                   No items added. Click "Add Line" to add products to return.
                 </td>
               </tr>
@@ -146,13 +182,15 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                   {/* Product */}
                   <td className="px-4 py-3 align-top">
                     {line.id ? (
-                      <div className="text-sm font-medium pt-2">
+                      <div className="pt-2 text-sm font-medium">
                         {line.product?.product_name}
                       </div>
                     ) : (
                       <SalesReturnLineProductSelect
                         value={line.product_id?.toString() || ""}
-                        onChange={(val, prod) => updateProduct(index, val, prod)}
+                        onChange={(val, prod) =>
+                          updateProduct(index, val, prod)
+                        }
                         disabled={disabled}
                       />
                     )}
@@ -161,14 +199,16 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                   {/* Batch */}
                   <td className="px-4 py-3 align-top">
                     {line.id ? (
-                      <div className="text-sm pt-2">
+                      <div className="pt-2 text-sm">
                         {line.batch?.batch_number || "N/A"}
                       </div>
                     ) : (
                       <SalesReturnLineBatchSelect
                         productId={line.product_id}
                         value={line.product_batch_id?.toString() || ""}
-                        onChange={(val, batch) => updateBatch(index, val, batch)}
+                        onChange={(val, batch) =>
+                          updateBatch(index, val, batch)
+                        }
                         disabled={disabled || !line.product_id}
                       />
                     )}
@@ -178,7 +218,9 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                   <td className="px-4 py-3 align-top">
                     <Select
                       value={line.return_condition}
-                      onValueChange={(val) => updateLine(index, "return_condition", val)}
+                      onValueChange={(val) =>
+                        updateLine(index, "return_condition", val)
+                      }
                       disabled={disabled}
                     >
                       <SelectTrigger>
@@ -198,7 +240,9 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                   <td className="px-4 py-3 align-top">
                     <Select
                       value={line.return_reason}
-                      onValueChange={(val) => updateLine(index, "return_reason", val)}
+                      onValueChange={(val) =>
+                        updateLine(index, "return_reason", val)
+                      }
                       disabled={disabled}
                     >
                       <SelectTrigger>
@@ -222,7 +266,9 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                       step="0.001"
                       className="w-full text-right"
                       value={line.return_quantity}
-                      onChange={(e) => updateLine(index, "return_quantity", e.target.value)}
+                      onChange={(e) =>
+                        updateLine(index, "return_quantity", e.target.value)
+                      }
                       disabled={disabled}
                     />
                   </td>
@@ -235,7 +281,9 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                       step="0.01"
                       className="w-full text-right"
                       value={line.unit_price}
-                      onChange={(e) => updateLine(index, "unit_price", e.target.value)}
+                      onChange={(e) =>
+                        updateLine(index, "unit_price", e.target.value)
+                      }
                       disabled={disabled}
                     />
                   </td>
@@ -248,7 +296,9 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                       step="0.01"
                       className="w-full text-right"
                       value={line.discount_amount}
-                      onChange={(e) => updateLine(index, "discount_amount", e.target.value)}
+                      onChange={(e) =>
+                        updateLine(index, "discount_amount", e.target.value)
+                      }
                       disabled={disabled}
                     />
                   </td>
@@ -261,27 +311,31 @@ const SalesReturnLinesTable: React.FC<Props> = ({ lines, onLinesChange, disabled
                       step="0.01"
                       className="w-full text-right"
                       value={line.tax_amount}
-                      onChange={(e) => updateLine(index, "tax_amount", e.target.value)}
+                      onChange={(e) =>
+                        updateLine(index, "tax_amount", e.target.value)
+                      }
                       disabled={disabled}
                     />
                   </td>
 
                   {/* Line Total */}
-                  <td className="px-4 py-3 text-right font-medium align-top pt-5">
-                    {(line.line_total || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                  <td className="px-4 py-3 pt-5 text-right align-top font-medium">
+                    {(line.line_total || 0).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </td>
 
                   {/* Action */}
-                  <td className="px-4 py-3 text-center align-top pt-3">
+                  <td className="px-4 py-3 pt-3 text-center align-top">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeLine(index)}
                       disabled={disabled}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-500 hover:bg-red-50 hover:text-red-700"
                       type="button"
                     >
-                      <Trash className="w-4 h-4" />
+                      <Trash className="h-4 w-4" />
                     </Button>
                   </td>
                 </tr>

@@ -1,11 +1,27 @@
 import React from "react";
 import { Plus, Trash2, Copy } from "lucide-react";
-import { useFieldArray, Control, UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
+import {
+  useFieldArray,
+  Control,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
-import { SalesInvoiceLineProductSelect, SalesInvoiceLineBatchSelect } from "../../../components/invoice-center";
+import {
+  SalesInvoiceLineProductSelect,
+  SalesInvoiceLineBatchSelect,
+} from "../../../components/invoice-center";
 
 export const createBlankSalesInvoiceLine = () => ({
   product_id: "",
@@ -25,7 +41,13 @@ interface Props {
   errors: any;
 }
 
-export const SalesInvoiceLinesTable: React.FC<Props> = ({ control, register, setValue, watch, errors }) => {
+export const SalesInvoiceLinesTable: React.FC<Props> = ({
+  control,
+  register,
+  setValue,
+  watch,
+  errors,
+}) => {
   const { fields, append, remove, insert } = useFieldArray({
     control,
     name: "lines",
@@ -41,17 +63,29 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({ control, register, set
     setValue(`lines.${index}.product_batch_id`, val, { shouldValidate: true });
   };
 
-  const calculateLineTotal = (qty: number, price: number, discount: number, tax: number) => {
-    return (Number(qty || 0) * Number(price || 0)) - Number(discount || 0) + Number(tax || 0);
+  const calculateLineTotal = (
+    qty: number,
+    price: number,
+    discount: number,
+    tax: number
+  ) => {
+    return (
+      Number(qty || 0) * Number(price || 0) -
+      Number(discount || 0) +
+      Number(tax || 0)
+    );
   };
 
   const formatMoney = (amount: number) => {
-    return Number(amount || 0).toLocaleString("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return Number(amount || 0).toLocaleString("en-LK", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Line Items</h3>
         <Button
           type="button"
@@ -59,12 +93,12 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({ control, register, set
           size="sm"
           onClick={() => append(createBlankSalesInvoiceLine())}
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           Add Line
         </Button>
       </div>
 
-      <div className="border rounded-md overflow-x-auto">
+      <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader className="bg-gray-50">
             <TableRow>
@@ -84,14 +118,19 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({ control, register, set
             {fields.map((field, index) => {
               const qty = Number(watch(`lines.${index}.quantity`) || 0);
               const price = Number(watch(`lines.${index}.unit_price`) || 0);
-              const discount = Number(watch(`lines.${index}.discount_amount`) || 0);
+              const discount = Number(
+                watch(`lines.${index}.discount_amount`) || 0
+              );
               const tax = Number(watch(`lines.${index}.tax_amount`) || 0);
               const total = calculateLineTotal(qty, price, discount, tax);
               const lineError = errors?.lines?.[index];
 
               return (
-                <TableRow key={field.id} className={lineError ? "bg-red-50/50" : ""}>
-                  <TableCell className="text-center text-gray-500 text-sm">
+                <TableRow
+                  key={field.id}
+                  className={lineError ? "bg-red-50/50" : ""}
+                >
+                  <TableCell className="text-center text-sm text-gray-500">
                     {index + 1}
                   </TableCell>
                   <TableCell>
@@ -100,7 +139,9 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({ control, register, set
                       onChange={(val) => handleProductChange(index, val)}
                     />
                     {lineError?.product_id && (
-                      <span className="text-xs text-red-500 mt-1 block">{lineError.product_id.message}</span>
+                      <span className="mt-1 block text-xs text-red-500">
+                        {lineError.product_id.message}
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -113,41 +154,57 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({ control, register, set
                     <Input
                       type="number"
                       step="0.001"
-                      className={`text-right ${lineError?.quantity ? "border-red-500" : ""}`}
-                      {...register(`lines.${index}.quantity`, { valueAsNumber: true })}
+                      className={`text-right ${
+                        lineError?.quantity ? "border-red-500" : ""
+                      }`}
+                      {...register(`lines.${index}.quantity`, {
+                        valueAsNumber: true,
+                      })}
                     />
                   </TableCell>
                   <TableCell>
                     <Input
                       type="number"
                       step="0.01"
-                      className={`text-right ${lineError?.unit_price ? "border-red-500" : ""}`}
-                      {...register(`lines.${index}.unit_price`, { valueAsNumber: true })}
+                      className={`text-right ${
+                        lineError?.unit_price ? "border-red-500" : ""
+                      }`}
+                      {...register(`lines.${index}.unit_price`, {
+                        valueAsNumber: true,
+                      })}
                     />
                   </TableCell>
                   <TableCell>
                     <Input
                       type="number"
                       step="0.01"
-                      className={`text-right ${lineError?.discount_amount ? "border-red-500" : ""}`}
-                      {...register(`lines.${index}.discount_amount`, { valueAsNumber: true })}
+                      className={`text-right ${
+                        lineError?.discount_amount ? "border-red-500" : ""
+                      }`}
+                      {...register(`lines.${index}.discount_amount`, {
+                        valueAsNumber: true,
+                      })}
                     />
                   </TableCell>
                   <TableCell>
                     <Input
                       type="number"
                       step="0.01"
-                      className={`text-right ${lineError?.tax_amount ? "border-red-500" : ""}`}
-                      {...register(`lines.${index}.tax_amount`, { valueAsNumber: true })}
+                      className={`text-right ${
+                        lineError?.tax_amount ? "border-red-500" : ""
+                      }`}
+                      {...register(`lines.${index}.tax_amount`, {
+                        valueAsNumber: true,
+                      })}
                     />
                   </TableCell>
-                  <TableCell className="text-right font-semibold text-blue-700 bg-gray-50">
+                  <TableCell className="bg-gray-50 text-right font-semibold text-blue-700">
                     {formatMoney(total)}
                   </TableCell>
                   <TableCell>
                     <Textarea
                       rows={1}
-                      className="resize-none min-h-0 py-2"
+                      className="min-h-0 resize-none py-2"
                       placeholder="Remarks..."
                       {...register(`lines.${index}.line_remarks`)}
                     />
@@ -181,24 +238,24 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({ control, register, set
             })}
           </TableBody>
         </Table>
-        
+
         {fields.length === 0 && (
-          <div className="text-center py-8 text-gray-500 border-t">
+          <div className="border-t py-8 text-center text-gray-500">
             <p className="mb-4">No line items added yet.</p>
             <Button
               type="button"
               variant="outline"
               onClick={() => append(createBlankSalesInvoiceLine())}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Add First Line
             </Button>
           </div>
         )}
       </div>
-      
+
       {errors?.lines?.root && (
-        <div className="text-sm text-red-500 font-medium">
+        <div className="text-sm font-medium text-red-500">
           {errors.lines.root.message}
         </div>
       )}

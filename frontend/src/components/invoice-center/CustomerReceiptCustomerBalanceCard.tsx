@@ -24,7 +24,10 @@ export const CustomerReceiptCustomerBalanceCard: React.FC<Props> = ({
   customerStatus,
 }) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount || 0);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount || 0);
   };
 
   return (
@@ -37,7 +40,9 @@ export const CustomerReceiptCustomerBalanceCard: React.FC<Props> = ({
           {customerStatus && (
             <div className="flex justify-between text-sm text-gray-500">
               <span>Customer Status</span>
-              <span className="capitalize font-medium">{customerStatus.replace("_", " ")}</span>
+              <span className="font-medium capitalize">
+                {customerStatus.replace("_", " ")}
+              </span>
             </div>
           )}
           {creditLimit !== undefined && creditLimit > 0 && (
@@ -70,7 +75,7 @@ export const CustomerReceiptCustomerBalanceCard: React.FC<Props> = ({
             <span>{formatLKR(unallocatedAmount)}</span>
           </div>
           <Separator className="my-2" />
-          <div className="flex justify-between font-bold text-base">
+          <div className="flex justify-between text-base font-bold">
             <span>Balance After Allocation</span>
             <span>{formatLKR(balanceAfterReceipt)}</span>
           </div>

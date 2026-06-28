@@ -26,18 +26,18 @@ type StockTransferService interface {
 }
 
 type stockTransferService struct {
-	repo               repositories.StockTransferRepository
-	stockMovementSvc   InventoryStockMovementService
-	stockMovementRepo  repositories.StockMovementRepository
-	auditLogger        *AuditLogService
+	repo              repositories.StockTransferRepository
+	stockMovementSvc  InventoryStockMovementService
+	stockMovementRepo repositories.StockMovementRepository
+	auditLogger       *AuditLogService
 }
 
 func NewStockTransferService(repo repositories.StockTransferRepository, smSvc InventoryStockMovementService, smRepo repositories.StockMovementRepository, auditLogger *AuditLogService) StockTransferService {
 	return &stockTransferService{
-		repo:               repo,
-		stockMovementSvc:   smSvc,
-		stockMovementRepo:  smRepo,
-		auditLogger:        auditLogger,
+		repo:              repo,
+		stockMovementSvc:  smSvc,
+		stockMovementRepo: smRepo,
+		auditLogger:       auditLogger,
 	}
 }
 
@@ -157,7 +157,7 @@ func (s *stockTransferService) CreateStockTransfer(db *gorm.DB, companyID, userI
 	}
 
 	transfer.Lines = lines
-	
+
 	s.CalculateStockTransferHeaderTotals(transfer)
 
 	err = s.repo.CreateStockTransferWithLines(db, transfer)

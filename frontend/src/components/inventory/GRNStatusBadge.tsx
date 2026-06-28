@@ -24,7 +24,9 @@ const GRNStatusBadge = ({ status }: { status?: unknown }) => {
   };
 
   return (
-    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${getBadgeStyle()}`}>
+    <span
+      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getBadgeStyle()}`}
+    >
       {getLabel()}
     </span>
   );

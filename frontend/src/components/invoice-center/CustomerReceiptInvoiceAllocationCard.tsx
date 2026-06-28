@@ -20,13 +20,18 @@ export const CustomerReceiptInvoiceAllocationCard: React.FC<Props> = ({
   balanceAfterAllocation,
 }) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount || 0);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount || 0);
   };
 
   return (
-    <Card className="bg-gray-50 border-gray-200">
+    <Card className="border-gray-200 bg-gray-50">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-gray-600">Selected Invoice: {invoiceNumber}</CardTitle>
+        <CardTitle className="text-sm text-gray-600">
+          Selected Invoice: {invoiceNumber}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-1">
@@ -47,7 +52,7 @@ export const CustomerReceiptInvoiceAllocationCard: React.FC<Props> = ({
             <span>Allocating Now</span>
             <span>-{formatLKR(allocatedAmount)}</span>
           </div>
-          <div className="flex justify-between font-medium text-sm">
+          <div className="flex justify-between text-sm font-medium">
             <span>Balance After Allocation</span>
             <span>{formatLKR(balanceAfterAllocation)}</span>
           </div>

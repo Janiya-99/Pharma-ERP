@@ -24,9 +24,9 @@ const Radio = (props: {
       id={id}
       name={name}
       type="radio"
-      className={`before:contet[""] relative h-5 w-5 cursor-pointer appearance-none rounded-full
-       border !border-gray-300 transition-all duration-[0.2s] before:absolute before:top-[3px]
-       before:left-[50%] before:h-3 before:w-3 before:translate-x-[-50%] before:rounded-full before:transition-all before:duration-[0.2s] dark:!border-gray-800
+      className={`before:contet[""] duration-[0.2s] before:duration-[0.2s] relative h-5 w-5 cursor-pointer
+       appearance-none rounded-full border !border-gray-300 transition-all before:absolute
+       before:left-[50%] before:top-[3px] before:h-3 before:w-3 before:translate-x-[-50%] before:rounded-full before:transition-all dark:!border-gray-800
        ${
          color === "red"
            ? "checked:!border-red-500 checked:before:!bg-red-500 dark:checked:!border-red-400 dark:checked:before:!bg-red-400"

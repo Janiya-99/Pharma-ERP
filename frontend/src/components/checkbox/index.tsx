@@ -21,8 +21,8 @@ const Checkbox = (props: {
   return (
     <input
       type="checkbox"
-      className={`defaultCheckbox relative flex h-[20px] min-h-[20px] w-[20px] min-w-[20px] appearance-none items-center 
-      justify-center rounded-md border border-gray-300 text-white/0 outline-none transition duration-[0.2s]
+      className={`defaultCheckbox duration-[0.2s] relative flex h-[20px] min-h-[20px] w-[20px] min-w-[20px] appearance-none 
+      items-center justify-center rounded-md border border-gray-300 text-white/0 outline-none transition
       checked:border-none checked:text-white hover:cursor-pointer dark:border-white/10 ${
         color === "red"
           ? "checked:border-none checked:bg-red-500 dark:checked:bg-red-400"

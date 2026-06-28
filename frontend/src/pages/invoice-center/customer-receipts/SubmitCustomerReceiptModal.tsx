@@ -33,28 +33,38 @@ export const SubmitCustomerReceiptModal: React.FC<Props> = ({
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      const res = await invoiceCenterApi.submitCustomerReceipt(receiptId, { remarks });
+      const res = await invoiceCenterApi.submitCustomerReceipt(receiptId, {
+        remarks,
+      });
       if (res.data?.success) {
-        toast.success(res.data.message || "Customer receipt submitted successfully");
+        toast.success(
+          res.data.message || "Customer receipt submitted successfully"
+        );
         onSuccess();
         onClose();
       } else {
         toast.error(res.data?.message || "Failed to submit customer receipt");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred during submission");
+      toast.error(
+        error.response?.data?.message || "An error occurred during submission"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && !isSubmitting && onClose()}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Submit Customer Receipt</DialogTitle>
           <DialogDescription>
-            Are you sure you want to submit this customer receipt for approval? Once submitted, you can no longer edit it unless it is rejected.
+            Are you sure you want to submit this customer receipt for approval?
+            Once submitted, you can no longer edit it unless it is rejected.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

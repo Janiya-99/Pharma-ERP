@@ -26,26 +26,26 @@ function CardMenu(props: { transparent?: boolean }) {
       animation={"origin-top-right transition-all duration-300 ease-in-out"}
       classNames={`${transparent ? "top-8" : "top-11"} right-0 w-max`}
       children={
-        <div className="z-50 w-max rounded-xl bg-white py-3 px-4 text-sm shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-          <p className="hover:text-black flex cursor-pointer items-center gap-2 text-gray-600 hover:font-medium">
+        <div className="z-50 w-max rounded-xl bg-white px-4 py-3 text-sm shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+          <p className="flex cursor-pointer items-center gap-2 text-gray-600 hover:font-medium hover:text-black">
             <span>
               <AiOutlineUser />
             </span>
             Panel 1
           </p>
-          <p className="hover:text-black mt-2 flex cursor-pointer items-center gap-2 pt-1 text-gray-600 hover:font-medium">
+          <p className="mt-2 flex cursor-pointer items-center gap-2 pt-1 text-gray-600 hover:font-medium hover:text-black">
             <span>
               <AiOutlineShop />
             </span>
             Panel 2
           </p>
-          <p className="hover:text-black mt-2 flex cursor-pointer items-center gap-2 pt-1 text-gray-600 hover:font-medium">
+          <p className="mt-2 flex cursor-pointer items-center gap-2 pt-1 text-gray-600 hover:font-medium hover:text-black">
             <span>
               <TiLightbulb />
             </span>
             Panel 3
           </p>
-          <p className="hover:text-black mt-2 flex cursor-pointer items-center gap-2 pt-1 text-gray-600 hover:font-medium">
+          <p className="mt-2 flex cursor-pointer items-center gap-2 pt-1 text-gray-600 hover:font-medium hover:text-black">
             <span>
               <FiSettings />
             </span>

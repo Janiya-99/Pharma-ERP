@@ -16,7 +16,13 @@ interface CustomerSelectProps {
   error?: string;
 }
 
-const CustomerSelect: React.FC<CustomerSelectProps> = ({ value, onChange, disabled = false, filterActiveOnly = false, error }) => {
+const CustomerSelect: React.FC<CustomerSelectProps> = ({
+  value,
+  onChange,
+  disabled = false,
+  filterActiveOnly = false,
+  error,
+}) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,22 +52,32 @@ const CustomerSelect: React.FC<CustomerSelectProps> = ({ value, onChange, disabl
         value={value || ""}
         onChange={(e) => onChange(Number(e.target.value) || "")}
         disabled={disabled || loading}
-        className={`w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-800 text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 transition-all ${
-          error ? "border-rose-500 focus:ring-rose-500" : "border-gray-200 dark:border-navy-600"
-        } ${disabled ? "bg-gray-50 cursor-not-allowed opacity-70" : ""}`}
+        className={`w-full rounded-xl border bg-white px-3 py-2 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-navy-500 dark:bg-navy-800 ${
+          error
+            ? "border-rose-500 focus:ring-rose-500"
+            : "border-gray-200 dark:border-navy-600"
+        } ${disabled ? "cursor-not-allowed bg-gray-50 opacity-70" : ""}`}
       >
-        <option value="">{loading ? "Loading customers..." : "Select Customer"}</option>
+        <option value="">
+          {loading ? "Loading customers..." : "Select Customer"}
+        </option>
         {customers.map((cust) => {
           const isSelectable = cust.status === "active";
-          const statusText = cust.status !== "active" ? ` [${cust.status.toUpperCase()}]` : "";
+          const statusText =
+            cust.status !== "active" ? ` [${cust.status.toUpperCase()}]` : "";
           return (
-            <option key={cust.id} value={cust.id} disabled={!isSelectable && filterActiveOnly}>
-              {cust.customer_code} - {cust.customer_name}{statusText}
+            <option
+              key={cust.id}
+              value={cust.id}
+              disabled={!isSelectable && filterActiveOnly}
+            >
+              {cust.customer_code} - {cust.customer_name}
+              {statusText}
             </option>
           );
         })}
       </select>
-      {error && <p className="mt-1 text-xs text-rose-500">{error}</p>}
+      {error && <p className="text-rose-500 mt-1 text-xs">{error}</p>}
     </div>
   );
 };

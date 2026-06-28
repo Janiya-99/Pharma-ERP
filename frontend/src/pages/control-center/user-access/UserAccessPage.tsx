@@ -98,10 +98,46 @@ type AccessRecord = {
 };
 
 const mockUsers: UserItem[] = [
-  { id: "mock-1", name: "Janith Samarasinghe", email: "janith@omacxpharma.lk", employee_code: "EMP-001", status: "active", role_name: "Super Admin", login_enabled: true, isMock: true },
-  { id: "mock-2", name: "Nimal Perera", email: "nimal@omacxpharma.lk", employee_code: "EMP-014", status: "active", role_name: "Accountant", login_enabled: true, isMock: true },
-  { id: "mock-3", name: "Kasun Silva", email: "kasun@omacxpharma.lk", employee_code: "EMP-027", status: "active", role_name: "Inventory Manager", login_enabled: true, isMock: true },
-  { id: "mock-4", name: "Amal Fernando", email: "amal@omacxpharma.lk", employee_code: "EMP-038", status: "inactive", role_name: "Viewer", login_enabled: false, isMock: true },
+  {
+    id: "mock-1",
+    name: "Janith Samarasinghe",
+    email: "janith@omacxpharma.lk",
+    employee_code: "EMP-001",
+    status: "active",
+    role_name: "Super Admin",
+    login_enabled: true,
+    isMock: true,
+  },
+  {
+    id: "mock-2",
+    name: "Nimal Perera",
+    email: "nimal@omacxpharma.lk",
+    employee_code: "EMP-014",
+    status: "active",
+    role_name: "Accountant",
+    login_enabled: true,
+    isMock: true,
+  },
+  {
+    id: "mock-3",
+    name: "Kasun Silva",
+    email: "kasun@omacxpharma.lk",
+    employee_code: "EMP-027",
+    status: "active",
+    role_name: "Inventory Manager",
+    login_enabled: true,
+    isMock: true,
+  },
+  {
+    id: "mock-4",
+    name: "Amal Fernando",
+    email: "amal@omacxpharma.lk",
+    employee_code: "EMP-038",
+    status: "inactive",
+    role_name: "Viewer",
+    login_enabled: false,
+    isMock: true,
+  },
 ];
 
 const fallbackBranches: BranchItem[] = [
@@ -113,11 +149,36 @@ const fallbackBranches: BranchItem[] = [
 ];
 
 const fallbackSoftware: SoftwareItem[] = [
-  { id: "control", software_name: "Control Center", software_code: "CONTROL_CENTER", description: "Users, roles, branches, and system setup" },
-  { id: "finance", software_name: "Finance", software_code: "FINANCE", description: "Accounting, ledgers, cash, and reports" },
-  { id: "inventory", software_name: "Inventory", software_code: "INVENTORY", description: "Products, stock, warehouses, and transfers" },
-  { id: "invoice", software_name: "Invoice Center", software_code: "INVOICE_CENTER", description: "Invoices, sales orders, and customer billing" },
-  { id: "compliance", software_name: "Compliance Center", software_code: "COMPLIANCE_CENTER", description: "Licenses, recalls, batch holds, and controls" },
+  {
+    id: "control",
+    software_name: "Control Center",
+    software_code: "CONTROL_CENTER",
+    description: "Users, roles, branches, and system setup",
+  },
+  {
+    id: "finance",
+    software_name: "Finance",
+    software_code: "FINANCE",
+    description: "Accounting, ledgers, cash, and reports",
+  },
+  {
+    id: "inventory",
+    software_name: "Inventory",
+    software_code: "INVENTORY",
+    description: "Products, stock, warehouses, and transfers",
+  },
+  {
+    id: "invoice",
+    software_name: "Invoice Center",
+    software_code: "INVOICE_CENTER",
+    description: "Invoices, sales orders, and customer billing",
+  },
+  {
+    id: "compliance",
+    software_name: "Compliance Center",
+    software_code: "COMPLIANCE_CENTER",
+    description: "Licenses, recalls, batch holds, and controls",
+  },
 ];
 
 const fallbackRoles: RoleItem[] = [
@@ -135,7 +196,11 @@ const permissionSummary: Record<string, string[]> = {
   INVENTORY: ["View stock", "Create GRN", "Transfer stock"],
   CONTROL_CENTER: ["View dashboard", "Manage users"],
   INVOICE_CENTER: ["View invoices", "Create sales orders", "Record receipts"],
-  COMPLIANCE_CENTER: ["View compliance records", "Track batch holds", "Review recalls"],
+  COMPLIANCE_CENTER: [
+    "View compliance records",
+    "Track batch holds",
+    "Review recalls",
+  ],
 };
 
 const normaliseList = <T,>(res: any, nestedKey?: string): T[] => {
@@ -148,7 +213,8 @@ const normaliseList = <T,>(res: any, nestedKey?: string): T[] => {
   return [];
 };
 
-const nameFor = (user: UserItem) => user.display_name || user.name || user.full_name || "Unnamed User";
+const nameFor = (user: UserItem) =>
+  user.display_name || user.name || user.full_name || "Unnamed User";
 const initialsFor = (name: string) =>
   name
     .split(" ")
@@ -158,14 +224,21 @@ const initialsFor = (name: string) =>
     .toUpperCase()
     .slice(0, 2) || "U";
 const idKey = (value: string | number | undefined) => String(value ?? "");
-const roleLabel = (role?: RoleItem | null) => role?.role_name || role?.name || "Viewer";
-const branchLabel = (branch: BranchItem) => branch.branch_name || branch.name || "Unnamed Branch";
-const softwareLabel = (software: SoftwareItem) => software.software_name || software.software_code || "Unnamed Module";
-const softwareCode = (software: SoftwareItem) => software.software_code || software.software_name?.toUpperCase().replace(/\s+/g, "_") || "";
+const roleLabel = (role?: RoleItem | null) =>
+  role?.role_name || role?.name || "Viewer";
+const branchLabel = (branch: BranchItem) =>
+  branch.branch_name || branch.name || "Unnamed Branch";
+const softwareLabel = (software: SoftwareItem) =>
+  software.software_name || software.software_code || "Unnamed Module";
+const softwareCode = (software: SoftwareItem) =>
+  software.software_code ||
+  software.software_name?.toUpperCase().replace(/\s+/g, "_") ||
+  "";
 
 const statusClasses = (status?: string) => {
   if (status === "active") return "border-green-200 bg-green-50 text-green-700";
-  if (status === "locked" || status === "suspended") return "border-red-200 bg-red-50 text-red-700";
+  if (status === "locked" || status === "suspended")
+    return "border-red-200 bg-red-50 text-red-700";
   return "border-slate-200 bg-slate-50 text-slate-600";
 };
 
@@ -173,7 +246,8 @@ const UserAccessPage = () => {
   const [searchParams] = useSearchParams();
   const [users, setUsers] = useState<UserItem[]>([]);
   const [branches, setBranches] = useState<BranchItem[]>(fallbackBranches);
-  const [softwareModules, setSoftwareModules] = useState<SoftwareItem[]>(fallbackSoftware);
+  const [softwareModules, setSoftwareModules] =
+    useState<SoftwareItem[]>(fallbackSoftware);
   const [roles, setRoles] = useState<RoleItem[]>(fallbackRoles);
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
   const [selectedBranchIds, setSelectedBranchIds] = useState<string[]>([]);
@@ -194,12 +268,13 @@ const UserAccessPage = () => {
     const fetchSetupData = async () => {
       setLoadingUsers(true);
       try {
-        const [usersRes, branchesRes, softwareRes, rolesRes] = await Promise.allSettled([
-          getUsers({ page: 1, limit: 100 }),
-          getBranches({ page: 1, limit: 100, status: "active" }),
-          getSoftwareModules(),
-          getRoles({ page: 1, limit: 100, status: "active" }),
-        ]);
+        const [usersRes, branchesRes, softwareRes, rolesRes] =
+          await Promise.allSettled([
+            getUsers({ page: 1, limit: 100 }),
+            getBranches({ page: 1, limit: 100, status: "active" }),
+            getSoftwareModules(),
+            getRoles({ page: 1, limit: 100, status: "active" }),
+          ]);
 
         if (usersRes.status === "fulfilled") {
           const userList = normaliseList<UserItem>(usersRes.value);
@@ -264,12 +339,23 @@ const UserAccessPage = () => {
       return;
     }
 
-    setAccessEnabled(selectedUser.login_enabled !== false && selectedUser.status !== "inactive");
+    setAccessEnabled(
+      selectedUser.login_enabled !== false && selectedUser.status !== "inactive"
+    );
 
     if (selectedUser.isMock) {
       setSelectedBranchIds([idKey(branches[0]?.id)].filter(Boolean));
-      setSelectedSoftwareIds([idKey(softwareModules[0]?.id), idKey(softwareModules[1]?.id)].filter(Boolean));
-      setSelectedRoleId(idKey(roles.find((role) => roleLabel(role) === selectedUser.role_name)?.id || roles[0]?.id));
+      setSelectedSoftwareIds(
+        [idKey(softwareModules[0]?.id), idKey(softwareModules[1]?.id)].filter(
+          Boolean
+        )
+      );
+      setSelectedRoleId(
+        idKey(
+          roles.find((role) => roleLabel(role) === selectedUser.role_name)
+            ?.id || roles[0]?.id
+        )
+      );
       return;
     }
 
@@ -285,23 +371,34 @@ const UserAccessPage = () => {
 
         if (branchRes.status === "fulfilled") {
           const branchList = normaliseList<any>(branchRes.value, "branches");
-          const branchIds = branchList.map((branch) => idKey(branch.branch_id || branch.id));
+          const branchIds = branchList.map((branch) =>
+            idKey(branch.branch_id || branch.id)
+          );
           setAssignedBranchIds(branchIds);
           setSelectedBranchIds(branchIds);
         }
 
         if (softwareRes.status === "fulfilled") {
-          const softwareList = normaliseList<any>(softwareRes.value, "software_modules");
-          const softwareIds = softwareList.map((software) => idKey(software.software_id || software.id));
+          const softwareList = normaliseList<any>(
+            softwareRes.value,
+            "software_modules"
+          );
+          const softwareIds = softwareList.map((software) =>
+            idKey(software.software_id || software.id)
+          );
           setAssignedSoftwareIds(softwareIds);
           setSelectedSoftwareIds(softwareIds);
         }
 
         if (matrixRes.status === "fulfilled") {
           const matrixData = matrixRes.value?.data || matrixRes.value;
-          const records = Array.isArray(matrixData) ? matrixData : matrixData?.access_matrix || [];
+          const records = Array.isArray(matrixData)
+            ? matrixData
+            : matrixData?.access_matrix || [];
           setAccessRecords(records);
-          const firstRoleId = records.find((record: AccessRecord) => record.role_id)?.role_id;
+          const firstRoleId = records.find(
+            (record: AccessRecord) => record.role_id
+          )?.role_id;
           if (firstRoleId) setSelectedRoleId(idKey(firstRoleId));
         }
       } catch {
@@ -317,18 +414,36 @@ const UserAccessPage = () => {
   const filteredUsers = useMemo(() => {
     const q = search.trim().toLowerCase();
     return users.filter((user) => {
-      const matchesSearch = !q || `${nameFor(user)} ${user.email || ""} ${user.employee_code || ""}`.toLowerCase().includes(q);
-      const matchesStatus = statusFilter === "all" || (user.status || "active") === statusFilter;
+      const matchesSearch =
+        !q ||
+        `${nameFor(user)} ${user.email || ""} ${user.employee_code || ""}`
+          .toLowerCase()
+          .includes(q);
+      const matchesStatus =
+        statusFilter === "all" || (user.status || "active") === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [search, statusFilter, users]);
 
-  const selectedRole = roles.find((role) => idKey(role.id) === selectedRoleId) || null;
-  const selectedSoftware = softwareModules.filter((software) => selectedSoftwareIds.includes(idKey(software.id)));
-  const selectedBranches = branches.filter((branch) => selectedBranchIds.includes(idKey(branch.id)));
+  const selectedRole =
+    roles.find((role) => idKey(role.id) === selectedRoleId) || null;
+  const selectedSoftware = softwareModules.filter((software) =>
+    selectedSoftwareIds.includes(idKey(software.id))
+  );
+  const selectedBranches = branches.filter((branch) =>
+    selectedBranchIds.includes(idKey(branch.id))
+  );
 
-  const toggleId = (value: string, selected: string[], setSelected: React.Dispatch<React.SetStateAction<string[]>>) => {
-    setSelected((current) => (current.includes(value) ? current.filter((item) => item !== value) : [...current, value]));
+  const toggleId = (
+    value: string,
+    selected: string[],
+    setSelected: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    setSelected((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value]
+    );
   };
 
   const saveAccess = async () => {
@@ -347,36 +462,65 @@ const UserAccessPage = () => {
     setError("");
 
     try {
-      const branchIdsToAssign = selectedBranchIds.filter((id) => !assignedBranchIds.includes(id));
-      const branchIdsToRemove = assignedBranchIds.filter((id) => !selectedBranchIds.includes(id));
-      const softwareIdsToAssign = selectedSoftwareIds.filter((id) => !assignedSoftwareIds.includes(id));
-      const softwareIdsToRemove = assignedSoftwareIds.filter((id) => !selectedSoftwareIds.includes(id));
+      const branchIdsToAssign = selectedBranchIds.filter(
+        (id) => !assignedBranchIds.includes(id)
+      );
+      const branchIdsToRemove = assignedBranchIds.filter(
+        (id) => !selectedBranchIds.includes(id)
+      );
+      const softwareIdsToAssign = selectedSoftwareIds.filter(
+        (id) => !assignedSoftwareIds.includes(id)
+      );
+      const softwareIdsToRemove = assignedSoftwareIds.filter(
+        (id) => !selectedSoftwareIds.includes(id)
+      );
 
       if (branchIdsToAssign.length > 0) {
         await assignUserBranches(selectedUser.id, {
-          branches: branchIdsToAssign.map((branchId) => ({ branch_id: Number(branchId), is_default: false })),
+          branches: branchIdsToAssign.map((branchId) => ({
+            branch_id: Number(branchId),
+            is_default: false,
+          })),
         });
       }
 
-      await Promise.all(branchIdsToRemove.map((branchId) => removeUserBranch(selectedUser.id, branchId)));
+      await Promise.all(
+        branchIdsToRemove.map((branchId) =>
+          removeUserBranch(selectedUser.id, branchId)
+        )
+      );
 
       if (softwareIdsToAssign.length > 0) {
         await assignUserSoftware(selectedUser.id, {
-          software_modules: softwareIdsToAssign.map((softwareId) => ({ software_id: Number(softwareId), can_access: true })),
+          software_modules: softwareIdsToAssign.map((softwareId) => ({
+            software_id: Number(softwareId),
+            can_access: true,
+          })),
         });
       }
 
-      await Promise.all(softwareIdsToRemove.map((softwareId) => removeUserSoftware(selectedUser.id, softwareId)));
+      await Promise.all(
+        softwareIdsToRemove.map((softwareId) =>
+          removeUserSoftware(selectedUser.id, softwareId)
+        )
+      );
 
       const targetKeys = new Set(
         selectedBranchIds.flatMap((branchId) =>
-          selectedSoftwareIds.map((softwareId) => `${branchId}:${softwareId}:${selectedRoleId}`)
+          selectedSoftwareIds.map(
+            (softwareId) => `${branchId}:${softwareId}:${selectedRoleId}`
+          )
         )
       );
 
       await Promise.all(
         accessRecords
-          .filter((record) => !targetKeys.has(`${record.branch_id}:${record.software_id}:${record.role_id}`))
+          .filter(
+            (record) =>
+              !targetKeys.has(
+                `${record.branch_id}:${record.software_id}:${record.role_id}`
+              )
+          )
           .map((record) => removeUserAccessMatrix(selectedUser.id, record.id))
       );
 
@@ -397,9 +541,16 @@ const UserAccessPage = () => {
       setAssignedSoftwareIds(selectedSoftwareIds);
       const refreshed = await getUserAccessMatrix(selectedUser.id);
       const refreshedData = refreshed?.data;
-      setAccessRecords(Array.isArray(refreshedData) ? refreshedData : refreshedData?.access_matrix || []);
+      setAccessRecords(
+        Array.isArray(refreshedData)
+          ? refreshedData
+          : refreshedData?.access_matrix || []
+      );
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Unable to save access. Please review the selections and try again.");
+      setError(
+        err?.response?.data?.message ||
+          "Unable to save access. Please review the selections and try again."
+      );
     } finally {
       setSaving(false);
     }
@@ -408,18 +559,21 @@ const UserAccessPage = () => {
   const selectedUserName = selectedUser ? nameFor(selectedUser) : "";
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] p-6 text-slate-900">
+    <div className="text-slate-900 min-h-full bg-[#F8FAFC] p-6">
       <div className="mx-auto max-w-[1200px] space-y-6">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-slate-500">
+          <div className="text-slate-500 flex items-center gap-2 text-sm">
             <span>Control Center</span>
             <span>/</span>
-            <span className="font-medium text-slate-900">User Access</span>
+            <span className="text-slate-900 font-medium">User Access</span>
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">User Access</h1>
-            <p className="mt-2 text-sm text-slate-500">
-              Select a user and manage their branch access, software modules, and role in one place.
+            <h1 className="text-slate-900 text-3xl font-bold tracking-tight">
+              User Access
+            </h1>
+            <p className="text-slate-500 mt-2 text-sm">
+              Select a user and manage their branch access, software modules,
+              and role in one place.
             </p>
           </div>
         </div>
@@ -432,9 +586,9 @@ const UserAccessPage = () => {
         )}
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[380px_minmax(0,1fr)]">
-          <Card className="border border-slate-200 bg-white shadow-sm">
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle className="flex items-center gap-2 text-slate-900">
+          <Card className="border-slate-200 border bg-white shadow-sm">
+            <CardHeader className="border-slate-100 border-b">
+              <CardTitle className="text-slate-900 flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
                 Users
               </CardTitle>
@@ -442,7 +596,7 @@ const UserAccessPage = () => {
             </CardHeader>
             <CardContent className="space-y-4 pt-1">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Search className="text-slate-400 pointer-events-none absolute left-3 top-3 h-4 w-4" />
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
@@ -467,18 +621,23 @@ const UserAccessPage = () => {
                 <div className="space-y-2">
                   {loadingUsers ? (
                     Array.from({ length: 6 }).map((_, index) => (
-                      <div key={index} className="rounded-xl border border-slate-100 p-3">
-                        <Skeleton className="h-11 w-full bg-slate-100" />
+                      <div
+                        key={index}
+                        className="border-slate-100 rounded-xl border p-3"
+                      >
+                        <Skeleton className="bg-slate-100 h-11 w-full" />
                       </div>
                     ))
                   ) : filteredUsers.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">
+                    <div className="border-slate-200 text-slate-500 rounded-xl border border-dashed p-8 text-center text-sm">
                       No users found
                     </div>
                   ) : (
                     filteredUsers.map((user) => {
                       const fullName = nameFor(user);
-                      const isSelected = selectedUser && idKey(selectedUser.id) === idKey(user.id);
+                      const isSelected =
+                        selectedUser &&
+                        idKey(selectedUser.id) === idKey(user.id);
                       return (
                         <button
                           key={idKey(user.id)}
@@ -487,7 +646,7 @@ const UserAccessPage = () => {
                           className={`w-full rounded-xl border p-3 text-left transition-all ${
                             isSelected
                               ? "border-blue-200 bg-blue-50 shadow-sm"
-                              : "border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50"
+                              : "border-slate-200 hover:bg-slate-50 bg-white hover:border-blue-200"
                           }`}
                         >
                           <div className="flex items-start gap-3">
@@ -497,13 +656,28 @@ const UserAccessPage = () => {
                               </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-semibold text-slate-900">{fullName}</p>
-                              <p className="truncate text-xs text-slate-500">{user.email || "No email"}</p>
+                              <p className="text-slate-900 truncate text-sm font-semibold">
+                                {fullName}
+                              </p>
+                              <p className="text-slate-500 truncate text-xs">
+                                {user.email || "No email"}
+                              </p>
                               <div className="mt-2 flex flex-wrap gap-1.5">
-                                <Badge variant="outline" className="border-indigo-200 bg-indigo-50 text-indigo-700">
-                                  {user.role_name || user.role?.role_name || (user.user_type || "Viewer").replace(/_/g, " ")}
+                                <Badge
+                                  variant="outline"
+                                  className="border-indigo-200 bg-indigo-50 text-indigo-700"
+                                >
+                                  {user.role_name ||
+                                    user.role?.role_name ||
+                                    (user.user_type || "Viewer").replace(
+                                      /_/g,
+                                      " "
+                                    )}
                                 </Badge>
-                                <Badge variant="outline" className={statusClasses(user.status)}>
+                                <Badge
+                                  variant="outline"
+                                  className={statusClasses(user.status)}
+                                >
                                   {user.status || "active"}
                                 </Badge>
                               </div>
@@ -518,36 +692,42 @@ const UserAccessPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="border border-slate-200 bg-white shadow-sm">
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle className="flex items-center gap-2 text-slate-900">
+          <Card className="border-slate-200 border bg-white shadow-sm">
+            <CardHeader className="border-slate-100 border-b">
+              <CardTitle className="text-slate-900 flex items-center gap-2">
                 <UserCog className="h-5 w-5 text-blue-600" />
                 Access Setup
               </CardTitle>
-              <CardDescription>Assign branches, software modules, and role for the selected user.</CardDescription>
+              <CardDescription>
+                Assign branches, software modules, and role for the selected
+                user.
+              </CardDescription>
             </CardHeader>
             <CardContent className="pt-1">
               {!selectedUser ? (
-                <div className="flex min-h-[620px] items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
+                <div className="border-slate-200 bg-slate-50 flex min-h-[620px] items-center justify-center rounded-xl border border-dashed p-8 text-center">
                   <div className="max-w-sm">
                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
                       <Users className="h-6 w-6" />
                     </div>
-                    <h2 className="text-lg font-semibold text-slate-900">Select a user to manage access</h2>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Choose a user from the list to assign branches, software modules, and role.
+                    <h2 className="text-slate-900 text-lg font-semibold">
+                      Select a user to manage access
+                    </h2>
+                    <p className="text-slate-500 mt-2 text-sm">
+                      Choose a user from the list to assign branches, software
+                      modules, and role.
                     </p>
                   </div>
                 </div>
               ) : loadingAccess ? (
                 <div className="space-y-5">
-                  <Skeleton className="h-28 w-full bg-slate-100" />
-                  <Skeleton className="h-40 w-full bg-slate-100" />
-                  <Skeleton className="h-56 w-full bg-slate-100" />
+                  <Skeleton className="bg-slate-100 h-28 w-full" />
+                  <Skeleton className="bg-slate-100 h-40 w-full" />
+                  <Skeleton className="bg-slate-100 h-56 w-full" />
                 </div>
               ) : (
                 <div className="space-y-5">
-                  <section className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+                  <section className="border-slate-200 bg-slate-50 rounded-xl border p-5">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-4">
                         <Avatar className="h-14 w-14">
@@ -556,23 +736,38 @@ const UserAccessPage = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h2 className="text-lg font-semibold text-slate-900">{selectedUserName}</h2>
-                          <p className="text-sm text-slate-500">{selectedUser.email || "No email"}</p>
-                          <p className="mt-1 text-xs font-medium text-slate-500">
+                          <h2 className="text-slate-900 text-lg font-semibold">
+                            {selectedUserName}
+                          </h2>
+                          <p className="text-slate-500 text-sm">
+                            {selectedUser.email || "No email"}
+                          </p>
+                          <p className="text-slate-500 mt-1 text-xs font-medium">
                             Employee code: {selectedUser.employee_code || "N/A"}
                           </p>
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" className={statusClasses(selectedUser.status)}>
+                        <Badge
+                          variant="outline"
+                          className={statusClasses(selectedUser.status)}
+                        >
                           {selectedUser.status || "active"}
                         </Badge>
-                        <Badge variant="outline" className="border-indigo-200 bg-indigo-50 text-indigo-700">
+                        <Badge
+                          variant="outline"
+                          className="border-indigo-200 bg-indigo-50 text-indigo-700"
+                        >
                           {roleLabel(selectedRole)}
                         </Badge>
-                        <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5">
-                          <Label className="text-xs text-slate-500">Access enabled</Label>
-                          <Switch checked={accessEnabled} onCheckedChange={setAccessEnabled} />
+                        <div className="border-slate-200 flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
+                          <Label className="text-slate-500 text-xs">
+                            Access enabled
+                          </Label>
+                          <Switch
+                            checked={accessEnabled}
+                            onCheckedChange={setAccessEnabled}
+                          />
                         </div>
                       </div>
                     </div>
@@ -580,11 +775,13 @@ const UserAccessPage = () => {
 
                   <section className="space-y-3">
                     <div>
-                      <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+                      <h3 className="text-slate-900 flex items-center gap-2 text-base font-semibold">
                         <Building2 className="h-5 w-5 text-blue-600" />
                         Branch Access
                       </h3>
-                      <p className="mt-1 text-sm text-slate-500">Select the branches this user can access.</p>
+                      <p className="text-slate-500 mt-1 text-sm">
+                        Select the branches this user can access.
+                      </p>
                     </div>
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                       {branches.map((branch) => {
@@ -592,13 +789,21 @@ const UserAccessPage = () => {
                         return (
                           <label
                             key={value}
-                            className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:border-blue-200 hover:bg-slate-50"
+                            className="border-slate-200 hover:bg-slate-50 flex cursor-pointer items-center gap-3 rounded-xl border bg-white p-3 hover:border-blue-200"
                           >
                             <Checkbox
                               checked={selectedBranchIds.includes(value)}
-                              onCheckedChange={() => toggleId(value, selectedBranchIds, setSelectedBranchIds)}
+                              onCheckedChange={() =>
+                                toggleId(
+                                  value,
+                                  selectedBranchIds,
+                                  setSelectedBranchIds
+                                )
+                              }
                             />
-                            <span className="text-sm font-medium text-slate-700">{branchLabel(branch)}</span>
+                            <span className="text-slate-700 text-sm font-medium">
+                              {branchLabel(branch)}
+                            </span>
                           </label>
                         );
                       })}
@@ -609,7 +814,7 @@ const UserAccessPage = () => {
 
                   <section className="space-y-3">
                     <div>
-                      <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+                      <h3 className="text-slate-900 flex items-center gap-2 text-base font-semibold">
                         <Boxes className="h-5 w-5 text-blue-600" />
                         Software Access
                       </h3>
@@ -622,9 +827,17 @@ const UserAccessPage = () => {
                           <button
                             key={value}
                             type="button"
-                            onClick={() => toggleId(value, selectedSoftwareIds, setSelectedSoftwareIds)}
+                            onClick={() =>
+                              toggleId(
+                                value,
+                                selectedSoftwareIds,
+                                setSelectedSoftwareIds
+                              )
+                            }
                             className={`rounded-xl border p-4 text-left transition-all ${
-                              checked ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50"
+                              checked
+                                ? "border-blue-200 bg-blue-50"
+                                : "border-slate-200 hover:bg-slate-50 bg-white hover:border-blue-200"
                             }`}
                           >
                             <div className="flex gap-3">
@@ -634,15 +847,24 @@ const UserAccessPage = () => {
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-start justify-between gap-3">
                                   <div>
-                                    <p className="font-semibold text-slate-900">{softwareLabel(software)}</p>
-                                    <p className="mt-1 text-sm text-slate-500">
-                                      {software.description || "Module access and related workflows"}
+                                    <p className="text-slate-900 font-semibold">
+                                      {softwareLabel(software)}
+                                    </p>
+                                    <p className="text-slate-500 mt-1 text-sm">
+                                      {software.description ||
+                                        "Module access and related workflows"}
                                     </p>
                                   </div>
                                   <Checkbox
                                     checked={checked}
                                     onClick={(event) => event.stopPropagation()}
-                                    onCheckedChange={() => toggleId(value, selectedSoftwareIds, setSelectedSoftwareIds)}
+                                    onCheckedChange={() =>
+                                      toggleId(
+                                        value,
+                                        selectedSoftwareIds,
+                                        setSelectedSoftwareIds
+                                      )
+                                    }
                                   />
                                 </div>
                               </div>
@@ -657,21 +879,28 @@ const UserAccessPage = () => {
 
                   <section className="space-y-3">
                     <div>
-                      <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+                      <h3 className="text-slate-900 flex items-center gap-2 text-base font-semibold">
                         <ShieldCheck className="h-5 w-5 text-blue-600" />
                         Role
                       </h3>
-                      <p className="mt-1 text-sm text-slate-500">
-                        The selected role controls the user's permissions inside assigned modules.
+                      <p className="text-slate-500 mt-1 text-sm">
+                        The selected role controls the user's permissions inside
+                        assigned modules.
                       </p>
                     </div>
-                    <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
+                    <Select
+                      value={selectedRoleId}
+                      onValueChange={setSelectedRoleId}
+                    >
                       <SelectTrigger className="h-10 w-full max-w-sm bg-white">
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
                         {roles.map((role) => (
-                          <SelectItem key={idKey(role.id)} value={idKey(role.id)}>
+                          <SelectItem
+                            key={idKey(role.id)}
+                            value={idKey(role.id)}
+                          >
                             {roleLabel(role)}
                           </SelectItem>
                         ))}
@@ -683,32 +912,54 @@ const UserAccessPage = () => {
 
                   <section className="space-y-3">
                     <div>
-                      <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+                      <h3 className="text-slate-900 flex items-center gap-2 text-base font-semibold">
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
                         Permission Summary
                       </h3>
-                      <p className="mt-1 text-sm text-slate-500">Read-only summary based on the selected role and modules.</p>
+                      <p className="text-slate-500 mt-1 text-sm">
+                        Read-only summary based on the selected role and
+                        modules.
+                      </p>
                     </div>
                     {selectedSoftware.length === 0 ? (
                       <Alert className="border-slate-200 bg-slate-50">
-                        <AlertDescription>Select at least one software module to see the permission summary.</AlertDescription>
+                        <AlertDescription>
+                          Select at least one software module to see the
+                          permission summary.
+                        </AlertDescription>
                       </Alert>
                     ) : (
                       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                         {selectedSoftware.map((software) => {
                           const code = softwareCode(software);
-                          const summary = permissionSummary[code] || ["View assigned records", "Create permitted records", "Review assigned work"];
+                          const summary = permissionSummary[code] || [
+                            "View assigned records",
+                            "Create permitted records",
+                            "Review assigned work",
+                          ];
                           return (
-                            <div key={idKey(software.id)} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <div
+                              key={idKey(software.id)}
+                              className="border-slate-200 bg-slate-50 rounded-xl border p-4"
+                            >
                               <div className="mb-3 flex items-center justify-between gap-3">
-                                <p className="font-semibold text-slate-900">{softwareLabel(software)}</p>
-                                <Badge variant="outline" className="border-slate-200 bg-white text-slate-600">
+                                <p className="text-slate-900 font-semibold">
+                                  {softwareLabel(software)}
+                                </p>
+                                <Badge
+                                  variant="outline"
+                                  className="border-slate-200 text-slate-600 bg-white"
+                                >
                                   {roleLabel(selectedRole)}
                                 </Badge>
                               </div>
                               <div className="flex flex-wrap gap-2">
                                 {summary.map((item) => (
-                                  <Badge key={item} variant="outline" className="border-blue-100 bg-white text-slate-600">
+                                  <Badge
+                                    key={item}
+                                    variant="outline"
+                                    className="text-slate-600 border-blue-100 bg-white"
+                                  >
                                     {item}
                                   </Badge>
                                 ))}
@@ -734,7 +985,11 @@ const UserAccessPage = () => {
                     </Button>
                     <Button
                       className="h-10 bg-blue-600 text-white hover:bg-blue-700"
-                      disabled={saving || selectedBranches.length === 0 || selectedSoftware.length === 0}
+                      disabled={
+                        saving ||
+                        selectedBranches.length === 0 ||
+                        selectedSoftware.length === 0
+                      }
                       onClick={saveAccess}
                     >
                       <Save className="h-4 w-4" />

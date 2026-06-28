@@ -4,7 +4,17 @@ import { XCircle } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
 import Modal from "../../../components/common/Modal";
 
-const RejectGRNModal = ({ isOpen, onClose, grnId, onSuccess }: { isOpen?: boolean; onClose?: unknown; grnId?: string | number; onSuccess?: unknown }) => {
+const RejectGRNModal = ({
+  isOpen,
+  onClose,
+  grnId,
+  onSuccess,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  grnId?: string | number;
+  onSuccess?: unknown;
+}) => {
   const [remarks, setRemarks] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -31,38 +41,39 @@ const RejectGRNModal = ({ isOpen, onClose, grnId, onSuccess }: { isOpen?: boolea
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Reject Goods Receipt Note">
       <div className="p-4">
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-          Are you sure you want to reject this GRN? Please provide a reason below.
+        <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+          Are you sure you want to reject this GRN? Please provide a reason
+          below.
         </p>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Remarks (Required) <span className="text-red-500">*</span>
           </label>
           <textarea
             value={remarks}
             onChange={(e: any) => setRemarks(e.target.value)}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
             placeholder="Reason for rejection..."
             required
           />
         </div>
 
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700 disabled:opacity-50"
+            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700"
           >
             Cancel
           </button>
           <button
             onClick={handleReject}
             disabled={submitting || !remarks.trim()}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
           >
-            <XCircle className="w-4 h-4" />
+            <XCircle className="h-4 w-4" />
             {submitting ? "Rejecting..." : "Reject"}
           </button>
         </div>

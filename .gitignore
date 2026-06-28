@@ -1,3 +1,13 @@
 /backend/server
 .env
 .env.*!.env.example
+
+# IDEs
+.vscode/
+.idea/
+
+# Node
+node_modules/
+dist/
+build/
+*.log

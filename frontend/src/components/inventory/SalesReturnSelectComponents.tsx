@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "components/ui/select";
 import { inventoryApi } from "api/inventoryApi";
 import { Product, ProductBatch } from "types/inventory";
 
@@ -9,7 +15,11 @@ interface ProductSelectProps {
   disabled?: boolean;
 }
 
-export const SalesReturnLineProductSelect: React.FC<ProductSelectProps> = ({ value, onChange, disabled }) => {
+export const SalesReturnLineProductSelect: React.FC<ProductSelectProps> = ({
+  value,
+  onChange,
+  disabled,
+}) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +27,10 @@ export const SalesReturnLineProductSelect: React.FC<ProductSelectProps> = ({ val
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await inventoryApi.getProducts({ status: "active", limit: 1000 });
+        const response = await inventoryApi.getProducts({
+          status: "active",
+          limit: 1000,
+        });
         if (response.data?.success) {
           setProducts(response.data.data?.data || response.data.data || []);
         }
@@ -60,7 +73,12 @@ interface BatchSelectProps {
   disabled?: boolean;
 }
 
-export const SalesReturnLineBatchSelect: React.FC<BatchSelectProps> = ({ productId, value, onChange, disabled }) => {
+export const SalesReturnLineBatchSelect: React.FC<BatchSelectProps> = ({
+  productId,
+  value,
+  onChange,
+  disabled,
+}) => {
   const [batches, setBatches] = useState<ProductBatch[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -72,7 +90,10 @@ export const SalesReturnLineBatchSelect: React.FC<BatchSelectProps> = ({ product
       }
       setLoading(true);
       try {
-        const response = await inventoryApi.getProductBatches({ product_id: productId, limit: 1000 });
+        const response = await inventoryApi.getProductBatches({
+          product_id: productId,
+          limit: 1000,
+        });
         if (response.data?.success) {
           setBatches(response.data.data?.data || response.data.data || []);
         }
@@ -100,11 +121,19 @@ export const SalesReturnLineBatchSelect: React.FC<BatchSelectProps> = ({ product
       <SelectContent>
         {batches.map((b) => (
           <SelectItem key={b.id} value={b.id.toString()}>
-            {b.batch_number} {b.batch_status !== "active" ? `[${b.batch_status.toUpperCase()}]` : ""} {b.expiry_date ? ` (Exp: ${new Date(b.expiry_date).toLocaleDateString()})` : ""}
+            {b.batch_number}{" "}
+            {b.batch_status !== "active"
+              ? `[${b.batch_status.toUpperCase()}]`
+              : ""}{" "}
+            {b.expiry_date
+              ? ` (Exp: ${new Date(b.expiry_date).toLocaleDateString()})`
+              : ""}
           </SelectItem>
         ))}
         {batches.length === 0 && !loading && (
-          <div className="p-2 text-sm text-gray-500 text-center">No batches found</div>
+          <div className="p-2 text-center text-sm text-gray-500">
+            No batches found
+          </div>
         )}
       </SelectContent>
     </Select>

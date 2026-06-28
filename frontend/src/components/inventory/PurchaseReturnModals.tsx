@@ -43,7 +43,9 @@ export const SubmitPurchaseReturnModal: React.FC<BaseModalProps> = ({
           <DialogTitle>Submit Purchase Return</DialogTitle>
           <DialogDescription>
             Are you sure you want to submit Purchase Return{" "}
-            <span className="font-semibold text-gray-900">{purchaseReturn?.purchase_return_number}</span>{" "}
+            <span className="font-semibold text-gray-900">
+              {purchaseReturn?.purchase_return_number}
+            </span>{" "}
             for approval?
           </DialogDescription>
         </DialogHeader>
@@ -93,7 +95,10 @@ export const ApprovePurchaseReturnModal: React.FC<BaseModalProps> = ({
           <DialogTitle>Approve Purchase Return</DialogTitle>
           <DialogDescription>
             Are you sure you want to approve Purchase Return{" "}
-            <span className="font-semibold text-gray-900">{purchaseReturn?.purchase_return_number}</span>?
+            <span className="font-semibold text-gray-900">
+              {purchaseReturn?.purchase_return_number}
+            </span>
+            ?
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -109,7 +114,11 @@ export const ApprovePurchaseReturnModal: React.FC<BaseModalProps> = ({
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleConfirm} disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
+          <Button
+            onClick={handleConfirm}
+            disabled={loading}
+            className="bg-green-600 text-white hover:bg-green-700"
+          >
             {loading ? "Approving..." : "Approve"}
           </Button>
         </DialogFooter>
@@ -142,23 +151,31 @@ export const RejectPurchaseReturnModal: React.FC<BaseModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) {
-        setRemarks("");
-        setError("");
-        onClose();
-      }
-    }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          setRemarks("");
+          setError("");
+          onClose();
+        }
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Reject Purchase Return</DialogTitle>
           <DialogDescription>
             Are you sure you want to reject Purchase Return{" "}
-            <span className="font-semibold text-gray-900">{purchaseReturn?.purchase_return_number}</span>?
+            <span className="font-semibold text-gray-900">
+              {purchaseReturn?.purchase_return_number}
+            </span>
+            ?
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <label className="text-sm font-medium">Remarks <span className="text-red-500">*</span></label>
+          <label className="text-sm font-medium">
+            Remarks <span className="text-red-500">*</span>
+          </label>
           <Textarea
             value={remarks}
             onChange={(e) => {
@@ -168,13 +185,17 @@ export const RejectPurchaseReturnModal: React.FC<BaseModalProps> = ({
             placeholder="Reason for rejection..."
             className={`mt-2 ${error ? "border-red-500" : ""}`}
           />
-          {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+          {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleConfirm} disabled={loading} className="bg-red-600 hover:bg-red-700 text-white">
+          <Button
+            onClick={handleConfirm}
+            disabled={loading}
+            className="bg-red-600 text-white hover:bg-red-700"
+          >
             {loading ? "Rejecting..." : "Reject"}
           </Button>
         </DialogFooter>
@@ -205,37 +226,59 @@ export const PostPurchaseReturnConfirmModal: React.FC<PostModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-red-600">Post Purchase Return</DialogTitle>
+          <DialogTitle className="text-red-600">
+            Post Purchase Return
+          </DialogTitle>
           <DialogDescription>
             You are about to post Purchase Return{" "}
-            <span className="font-semibold text-gray-900">{purchaseReturn?.purchase_return_number}</span>.
+            <span className="font-semibold text-gray-900">
+              {purchaseReturn?.purchase_return_number}
+            </span>
+            .
           </DialogDescription>
         </DialogHeader>
-        
-        <div className="py-2 space-y-4">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded p-3 text-sm">
-            <strong>Warning:</strong> Posting this return will permanently reduce stock from the selected warehouse and create read-only stock ledger entries.
+
+        <div className="space-y-4 py-2">
+          <div className="rounded border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+            <strong>Warning:</strong> Posting this return will permanently
+            reduce stock from the selected warehouse and create read-only stock
+            ledger entries.
             <br className="my-1" />
-            <span className="font-semibold">This action cannot be undone. You cannot edit or delete a posted document.</span>
+            <span className="font-semibold">
+              This action cannot be undone. You cannot edit or delete a posted
+              document.
+            </span>
           </div>
 
           {purchaseReturn && (
-            <div className="bg-gray-50 border border-gray-200 rounded p-3 text-sm space-y-2">
+            <div className="space-y-2 rounded border border-gray-200 bg-gray-50 p-3 text-sm">
               <div className="flex justify-between border-b pb-1">
                 <span className="text-gray-500">Supplier:</span>
-                <span className="font-medium">{purchaseReturn.supplier?.supplier_name}</span>
+                <span className="font-medium">
+                  {purchaseReturn.supplier?.supplier_name}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-1">
                 <span className="text-gray-500">Warehouse:</span>
-                <span className="font-medium">{purchaseReturn.warehouse?.warehouse_name}</span>
+                <span className="font-medium">
+                  {purchaseReturn.warehouse?.warehouse_name}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-1">
                 <span className="text-gray-500">Total Quantity:</span>
-                <span className="font-medium">{purchaseReturn.total_quantity?.toFixed(3)}</span>
+                <span className="font-medium">
+                  {purchaseReturn.total_quantity?.toFixed(3)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Total Amount:</span>
-                <span className="font-medium font-mono">{(purchaseReturn.total_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})} LKR</span>
+                <span className="font-mono font-medium">
+                  {(purchaseReturn.total_amount || 0).toLocaleString(
+                    undefined,
+                    { minimumFractionDigits: 2 }
+                  )}{" "}
+                  LKR
+                </span>
               </div>
             </div>
           )}
@@ -245,7 +288,11 @@ export const PostPurchaseReturnConfirmModal: React.FC<PostModalProps> = ({
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={onConfirm} disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button
+            onClick={onConfirm}
+            disabled={loading}
+            className="bg-blue-600 text-white hover:bg-blue-700"
+          >
             {loading ? "Posting..." : "Confirm & Post"}
           </Button>
         </DialogFooter>

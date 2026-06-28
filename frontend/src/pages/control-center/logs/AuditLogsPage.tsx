@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getAuditLogs, getSoftwareModules, getBranches, getUsers } from "../../../api/controlApi";
+import {
+  getAuditLogs,
+  getSoftwareModules,
+  getBranches,
+  getUsers,
+} from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
@@ -9,20 +14,48 @@ import FormError from "../../../components/common/FormError";
 import DateRangeFilter from "../../../components/common/DateRangeFilter";
 import ActionMenu from "../../../components/common/ActionMenu";
 import AuditLogDetailModal from "./AuditLogDetailModal";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { Activity, Building2, FilterX, RefreshCw, Search, Users, Layers3 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import {
+  Activity,
+  Building2,
+  FilterX,
+  RefreshCw,
+  Search,
+  Users,
+  Layers3,
+} from "lucide-react";
 
 const ALL_OPTION = "__all__";
 
-const MetricCard = ({ label, value, helper, icon: Icon, iconClassName }: any) => (
-  <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+const MetricCard = ({
+  label,
+  value,
+  helper,
+  icon: Icon,
+  iconClassName,
+}: any) => (
+  <div className="border-slate-200 rounded-2xl border bg-white p-4 shadow-sm">
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-        <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
-        {helper && <p className="mt-1 text-xs text-slate-500">{helper}</p>}
+        <p className="text-slate-500 text-[11px] font-bold uppercase tracking-[0.18em]">
+          {label}
+        </p>
+        <p className="text-slate-900 mt-2 text-2xl font-semibold tracking-tight">
+          {value}
+        </p>
+        {helper && <p className="text-slate-500 mt-1 text-xs">{helper}</p>}
       </div>
-      <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconClassName || "bg-slate-100 text-slate-600"}`}>
+      <div
+        className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+          iconClassName || "bg-slate-100 text-slate-600"
+        }`}
+      >
         <Icon className="h-4 w-4" />
       </div>
     </div>
@@ -45,9 +78,11 @@ const FilterSelect = ({
   className?: string;
 }) => (
   <div className={`space-y-1.5 ${className}`}>
-    <label className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</label>
+    <label className="text-slate-500 block text-[11px] font-bold uppercase tracking-[0.18em]">
+      {label}
+    </label>
     <Select value={value || ALL_OPTION} onValueChange={onValueChange}>
-      <SelectTrigger className="h-11 w-full rounded-xl border-slate-200 bg-white px-3.5 shadow-sm">
+      <SelectTrigger className="border-slate-200 h-11 w-full rounded-xl bg-white px-3.5 shadow-sm">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
@@ -114,7 +149,13 @@ const AuditLogsPage = () => {
       setError(null);
       const res = await getAuditLogs(filters);
       if (res.success) {
-        setLogs(Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []));
+        setLogs(
+          Array.isArray(res.data.items)
+            ? res.data.items
+            : Array.isArray(res.data)
+            ? res.data
+            : []
+        );
         setPagination(res.meta || res.pagination);
       }
     } catch (err: any) {
@@ -132,9 +173,30 @@ const AuditLogsPage = () => {
         getUsers({ limit: 100 }),
       ]);
 
-      if (softRes.success) setSoftwareModules(Array.isArray(softRes.data.items) ? softRes.data.items : (Array.isArray(softRes.data) ? softRes.data : []));
-      if (branchRes.success) setBranches(Array.isArray(branchRes.data.items) ? branchRes.data.items : (Array.isArray(branchRes.data) ? branchRes.data : []));
-      if (userRes.success) setUsers(Array.isArray(userRes.data.items) ? userRes.data.items : (Array.isArray(userRes.data) ? userRes.data : []));
+      if (softRes.success)
+        setSoftwareModules(
+          Array.isArray(softRes.data.items)
+            ? softRes.data.items
+            : Array.isArray(softRes.data)
+            ? softRes.data
+            : []
+        );
+      if (branchRes.success)
+        setBranches(
+          Array.isArray(branchRes.data.items)
+            ? branchRes.data.items
+            : Array.isArray(branchRes.data)
+            ? branchRes.data
+            : []
+        );
+      if (userRes.success)
+        setUsers(
+          Array.isArray(userRes.data.items)
+            ? userRes.data.items
+            : Array.isArray(userRes.data)
+            ? userRes.data
+            : []
+        );
     } catch (err) {
       console.error("Failed to load dropdown data", err);
     }
@@ -150,11 +212,20 @@ const AuditLogsPage = () => {
   };
 
   const handleDateRangeChange = (range: any) => {
-    setFilters({ ...filters, date_from: range.dateFrom, date_to: range.dateTo, page: 1 });
+    setFilters({
+      ...filters,
+      date_from: range.dateFrom,
+      date_to: range.dateTo,
+      page: 1,
+    });
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFilters({ ...filters, [name]: value === ALL_OPTION ? "" : value, page: 1 });
+    setFilters({
+      ...filters,
+      [name]: value === ALL_OPTION ? "" : value,
+      page: 1,
+    });
   };
 
   const clearFilters = () => {
@@ -189,11 +260,19 @@ const AuditLogsPage = () => {
   const totalResults = pagination?.total ?? logs.length;
 
   const currentUsers = useMemo(
-    () => new Set(logs.map((row: any) => row.user?.full_name || row.user_name || "System")).size,
+    () =>
+      new Set(
+        logs.map((row: any) => row.user?.full_name || row.user_name || "System")
+      ).size,
     [logs]
   );
   const currentBranches = useMemo(
-    () => new Set(logs.map((row: any) => row.branch?.branch_name || row.branch_name || "-")).size,
+    () =>
+      new Set(
+        logs.map(
+          (row: any) => row.branch?.branch_name || row.branch_name || "-"
+        )
+      ).size,
     [logs]
   );
   const currentActions = useMemo(
@@ -221,9 +300,13 @@ const AuditLogsPage = () => {
       accessor: "created_at",
       cell: (row: any) => (
         <div className="whitespace-nowrap">
-          <span className="font-semibold text-slate-900">{new Date(row.created_at).toLocaleDateString()}</span>
+          <span className="text-slate-900 font-semibold">
+            {new Date(row.created_at).toLocaleDateString()}
+          </span>
           <br />
-          <span className="text-xs text-slate-500">{new Date(row.created_at).toLocaleTimeString()}</span>
+          <span className="text-slate-500 text-xs">
+            {new Date(row.created_at).toLocaleTimeString()}
+          </span>
         </div>
       ),
     },
@@ -240,13 +323,17 @@ const AuditLogsPage = () => {
     {
       header: "Software",
       accessor: "software_name",
-      cell: (row: any) => row.software?.software_name || row.software_module?.software_name || row.software_name || "-",
+      cell: (row: any) =>
+        row.software?.software_name ||
+        row.software_module?.software_name ||
+        row.software_name ||
+        "-",
     },
     {
       header: "Action",
       accessor: "action",
       cell: (row: any) => (
-        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-slate-700">
+        <span className="border-slate-200 bg-slate-50 text-slate-700 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider">
           {row.action || "-"}
         </span>
       ),
@@ -254,28 +341,43 @@ const AuditLogsPage = () => {
     {
       header: "Entity Name",
       accessor: "entity_name",
-      cell: (row: any) => <span className="font-medium text-slate-900">{row.entity_name || "-"}</span>,
+      cell: (row: any) => (
+        <span className="text-slate-900 font-medium">
+          {row.entity_name || "-"}
+        </span>
+      ),
     },
     {
       header: "Entity ID",
       accessor: "entity_id",
-      cell: (row: any) => <span className="font-mono text-xs text-slate-600">{row.entity_id || "-"}</span>,
+      cell: (row: any) => (
+        <span className="text-slate-600 font-mono text-xs">
+          {row.entity_id || "-"}
+        </span>
+      ),
     },
     {
       header: "IP Address",
       accessor: "ip_address",
-      cell: (row: any) => <span className="font-mono text-xs text-slate-500">{row.ip_address || "-"}</span>,
+      cell: (row: any) => (
+        <span className="text-slate-500 font-mono text-xs">
+          {row.ip_address || "-"}
+        </span>
+      ),
     },
     {
       header: "Actions",
       cellClassName: "text-right",
-      cell: (row: any) => <ActionMenu actions={getRowActions(row)} item={row} />,
+      cell: (row: any) => (
+        <ActionMenu actions={getRowActions(row)} item={row} />
+      ),
     },
   ];
 
   const softwareOptions = softwareModules.map((module: any) => ({
     value: String(module.id),
-    label: module.software_name || module.software_code || `Module ${module.id}`,
+    label:
+      module.software_name || module.software_code || `Module ${module.id}`,
   }));
   const branchOptions = branches.map((branch: any) => ({
     value: String(branch.id),
@@ -287,22 +389,35 @@ const AuditLogsPage = () => {
   }));
 
   return (
-    <div className="min-h-full bg-slate-50">
+    <div className="bg-slate-50 min-h-full">
       <PageHeader
         title="Audit Logs"
         description="Track system activity, configuration changes, and user actions."
         badge={
-          <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
+          <span className="border-slate-200 bg-slate-50 text-slate-600 inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold">
             {Number(totalResults || 0).toLocaleString()} total
           </span>
         }
         action={
           <>
-            <Button type="button" variant="outline" size="sm" className="gap-2" onClick={fetchLogs}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={fetchLogs}
+            >
               <RefreshCw className="h-4 w-4" />
               Refresh
             </Button>
-            <Button type="button" variant="ghost" size="sm" className="gap-2" onClick={clearFilters} disabled={!activeFilterCount}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={clearFilters}
+              disabled={!activeFilterCount}
+            >
               <FilterX className="h-4 w-4" />
               Clear
             </Button>
@@ -344,21 +459,30 @@ const AuditLogsPage = () => {
           />
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="border-slate-200 rounded-2xl border bg-white p-4 shadow-sm">
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-            <form onSubmit={handleSearch} className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+            <form
+              onSubmit={handleSearch}
+              className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]"
+            >
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Search</label>
+                <label className="text-slate-500 block text-[11px] font-bold uppercase tracking-[0.18em]">
+                  Search
+                </label>
                 <Input
                   placeholder="Search user, action, entity, IP..."
                   name="search"
                   value={searchDraft}
                   onChange={(e: any) => setSearchDraft(e.target.value)}
-                  className="h-11 rounded-xl border-slate-200 bg-white shadow-sm"
+                  className="border-slate-200 h-11 rounded-xl bg-white shadow-sm"
                 />
               </div>
 
-              <Button type="submit" variant="info" className="h-11 w-11 rounded-xl px-0">
+              <Button
+                type="submit"
+                variant="info"
+                className="h-11 w-11 rounded-xl px-0"
+              >
                 <Search className="h-4 w-4" />
               </Button>
             </form>
@@ -376,7 +500,9 @@ const AuditLogsPage = () => {
               value={filters.software_id}
               placeholder="All software"
               options={softwareOptions}
-              onValueChange={(value) => handleSelectChange("software_id", value)}
+              onValueChange={(value) =>
+                handleSelectChange("software_id", value)
+              }
             />
 
             <FilterSelect
@@ -396,34 +522,49 @@ const AuditLogsPage = () => {
             />
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Action</label>
+              <label className="text-slate-500 block text-[11px] font-bold uppercase tracking-[0.18em]">
+                Action
+              </label>
               <Input
                 placeholder="CREATE, UPDATE..."
                 name="action"
                 value={filters.action}
                 onChange={handleFilterChange}
-                className="h-11 rounded-xl border-slate-200 bg-white shadow-sm"
+                className="border-slate-200 h-11 rounded-xl bg-white shadow-sm"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Entity</label>
+              <label className="text-slate-500 block text-[11px] font-bold uppercase tracking-[0.18em]">
+                Entity
+              </label>
               <Input
                 placeholder="Entity name"
                 name="entity_name"
                 value={filters.entity_name}
                 onChange={handleFilterChange}
-                className="h-11 rounded-xl border-slate-200 bg-white shadow-sm"
+                className="border-slate-200 h-11 rounded-xl bg-white shadow-sm"
               />
             </div>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
-            <Button type="button" variant="outline" className="h-11 gap-2 rounded-xl" onClick={fetchLogs}>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 gap-2 rounded-xl"
+              onClick={fetchLogs}
+            >
               <RefreshCw className="h-4 w-4" />
               Reload
             </Button>
-            <Button type="button" variant="ghost" className="h-11 gap-2 rounded-xl" onClick={clearFilters} disabled={!activeFilterCount}>
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-11 gap-2 rounded-xl"
+              onClick={clearFilters}
+              disabled={!activeFilterCount}
+            >
               <FilterX className="h-4 w-4" />
               Reset
             </Button>
@@ -433,10 +574,14 @@ const AuditLogsPage = () => {
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">Audit trail</h2>
-              <p className="text-xs text-slate-500">Activity captured on the current result set.</p>
+              <h2 className="text-slate-900 text-sm font-semibold">
+                Audit trail
+              </h2>
+              <p className="text-slate-500 text-xs">
+                Activity captured on the current result set.
+              </p>
             </div>
-            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500 shadow-sm">
+            <span className="border-slate-200 text-slate-500 rounded-full border bg-white px-3 py-1 text-xs font-semibold shadow-sm">
               {logs.length.toLocaleString()} rows on this page
             </span>
           </div>

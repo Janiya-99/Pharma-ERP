@@ -31,26 +31,37 @@ const BranchCard = ({
   if (compact) {
     return (
       <div
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-150 ${
+        className={`flex items-center gap-2 rounded-lg border px-3 py-2 transition-all duration-150 ${
           isSelected
             ? "border-indigo-300 bg-indigo-50/40"
             : "border-gray-200 bg-white hover:border-gray-300"
         }`}
       >
-        <Building2 className={`h-3.5 w-3.5 shrink-0 ${isSelected ? "text-indigo-500" : "text-gray-400"}`} />
-        <span className={`text-sm font-medium ${isSelected ? "text-indigo-700" : "text-gray-700"}`}>
+        <Building2
+          className={`h-3.5 w-3.5 shrink-0 ${
+            isSelected ? "text-indigo-500" : "text-gray-400"
+          }`}
+        />
+        <span
+          className={`text-sm font-medium ${
+            isSelected ? "text-indigo-700" : "text-gray-700"
+          }`}
+        >
           {branch.branch_name}
         </span>
         {isPrimary && (
-          <span className="text-[9px] font-bold uppercase tracking-wide text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded-full ml-auto">
+          <span className="ml-auto rounded-full bg-indigo-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-indigo-600">
             Primary
           </span>
         )}
         {onRemove && (
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onRemove(branch); }}
-            className="ml-auto text-gray-300 hover:text-red-500 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(branch);
+            }}
+            className="ml-auto text-gray-300 transition-colors hover:text-red-500"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -62,26 +73,36 @@ const BranchCard = ({
   return (
     <div
       onClick={() => onToggle(branch)}
-      className={`branch-card cursor-pointer ${isSelected ? "branch-card-selected" : "hover:border-gray-300 hover:shadow-sm"}`}
+      className={`branch-card cursor-pointer ${
+        isSelected
+          ? "branch-card-selected"
+          : "hover:border-gray-300 hover:shadow-sm"
+      }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h4 className={`text-sm font-semibold ${isSelected ? "text-indigo-800" : "text-gray-700"}`}>
+            <h4
+              className={`text-sm font-semibold ${
+                isSelected ? "text-indigo-800" : "text-gray-700"
+              }`}
+            >
               {branch.branch_name}
             </h4>
             {isPrimary && (
-              <span className="text-[9px] font-bold uppercase tracking-wide text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded-full">
+              <span className="rounded-full bg-indigo-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-indigo-600">
                 Primary
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 mt-1.5">
+          <div className="mt-1.5 flex items-center gap-3">
             {branch.branch_code && (
-              <span className="text-[11px] text-gray-400 font-mono">{branch.branch_code}</span>
+              <span className="font-mono text-[11px] text-gray-400">
+                {branch.branch_code}
+              </span>
             )}
             {branch.city && (
-              <span className="text-[11px] text-gray-400 flex items-center gap-1">
+              <span className="flex items-center gap-1 text-[11px] text-gray-400">
                 <MapPin className="h-3 w-3" />
                 {branch.city}
               </span>
@@ -90,7 +111,7 @@ const BranchCard = ({
         </div>
 
         {/* Status indicator */}
-        <div className="shrink-0 flex flex-col items-end gap-2">
+        <div className="flex shrink-0 flex-col items-end gap-2">
           {branch.status && (
             <span
               className={`badge-status ${
@@ -105,7 +126,7 @@ const BranchCard = ({
             checked={isSelected}
             onChange={() => onToggle(branch)}
             onClick={(e) => e.stopPropagation()}
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+            className="h-4 w-4 cursor-pointer rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
           />
         </div>
       </div>
@@ -117,7 +138,7 @@ const BranchCard = ({
             e.stopPropagation();
             onSetPrimary(branch);
           }}
-          className="mt-2.5 text-[11px] text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+          className="mt-2.5 text-[11px] font-medium text-indigo-500 transition-colors hover:text-indigo-700"
         >
           Set as primary branch
         </button>

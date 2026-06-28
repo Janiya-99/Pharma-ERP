@@ -10,7 +10,10 @@ interface Props {
 
 export const DebitNoteInvoiceLinkCard: React.FC<Props> = ({ salesInvoice }) => {
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   const formatDate = (dateStr: string) => {
@@ -25,12 +28,14 @@ export const DebitNoteInvoiceLinkCard: React.FC<Props> = ({ salesInvoice }) => {
 
   return (
     <Card>
-      <CardHeader className="pb-2 bg-blue-50">
-        <CardTitle className="text-lg text-blue-900">Linked Sales Invoice</CardTitle>
+      <CardHeader className="bg-blue-50 pb-2">
+        <CardTitle className="text-lg text-blue-900">
+          Linked Sales Invoice
+        </CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
         <div className="space-y-3">
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex items-center justify-between text-sm">
             <span className="font-medium">Invoice No</span>
             <Badge variant="secondary">{salesInvoice.invoice_number}</Badge>
           </div>
@@ -59,7 +64,9 @@ export const DebitNoteInvoiceLinkCard: React.FC<Props> = ({ salesInvoice }) => {
 
           <div className="flex justify-between text-sm text-gray-600">
             <span>Payment Status</span>
-            <span className="capitalize">{salesInvoice.payment_status?.replace('_', ' ')}</span>
+            <span className="capitalize">
+              {salesInvoice.payment_status?.replace("_", " ")}
+            </span>
           </div>
 
           <div className="flex justify-between text-sm text-gray-600">

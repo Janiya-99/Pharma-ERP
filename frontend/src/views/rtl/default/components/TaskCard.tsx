@@ -12,7 +12,7 @@ const TaskCard = () => {
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-100 dark:bg-white/5">
             <MdCheckCircle className="h-6 w-6 text-brand-500 dark:text-white" />
           </div>
-          <h4 className="text-xl font-bold text-navy-700 ms-4 dark:text-white">
+          <h4 className="ms-4 text-xl font-bold text-navy-700 dark:text-white">
             Tasks
           </h4>
         </div>

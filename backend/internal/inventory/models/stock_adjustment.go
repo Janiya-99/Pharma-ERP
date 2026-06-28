@@ -18,8 +18,8 @@ type StockAdjustment struct {
 	WarehouseID uint64     `gorm:"index;not null" json:"warehouse_id"`
 	Warehouse   *Warehouse `gorm:"foreignKey:WarehouseID" json:"warehouse,omitempty"`
 
-	FinancialYearID    *uint64                        `gorm:"index" json:"financial_year_id,omitempty"`
-	AccountingPeriodID *uint64                        `gorm:"index" json:"accounting_period_id,omitempty"`
+	FinancialYearID    *uint64 `gorm:"index" json:"financial_year_id,omitempty"`
+	AccountingPeriodID *uint64 `gorm:"index" json:"accounting_period_id,omitempty"`
 
 	AdjustmentNumber string    `gorm:"type:varchar(50);uniqueIndex:idx_company_adjustment_no;not null" json:"adjustment_number"`
 	AdjustmentDate   time.Time `gorm:"type:date;index;not null" json:"adjustment_date"`
@@ -34,15 +34,15 @@ type StockAdjustment struct {
 	TotalQuantityOut float64 `gorm:"type:decimal(18,3);default:0" json:"total_quantity_out"`
 	TotalStockValue  float64 `gorm:"type:decimal(18,2);default:0" json:"total_stock_value"`
 
-	ApprovalStatus string `gorm:"type:varchar(30);default:'draft';index" json:"approval_status"` // draft, pending, approved, rejected, cancelled
-	ApprovedBy     *uint64 `gorm:"index" json:"approved_by,omitempty"`
+	ApprovalStatus string              `gorm:"type:varchar(30);default:'draft';index" json:"approval_status"` // draft, pending, approved, rejected, cancelled
+	ApprovedBy     *uint64             `gorm:"index" json:"approved_by,omitempty"`
 	ApprovedByUser *companyModels.User `gorm:"foreignKey:ApprovedBy" json:"approved_by_user,omitempty"`
-	ApprovedAt     *time.Time `json:"approved_at,omitempty"`
+	ApprovedAt     *time.Time          `json:"approved_at,omitempty"`
 
-	PostedStatus   string `gorm:"type:varchar(30);default:'unposted';index" json:"posted_status"` // unposted, posted
-	PostedBy       *uint64 `gorm:"index" json:"posted_by,omitempty"`
-	PostedByUser   *companyModels.User `gorm:"foreignKey:PostedBy" json:"posted_by_user,omitempty"`
-	PostedAt       *time.Time `json:"posted_at,omitempty"`
+	PostedStatus string              `gorm:"type:varchar(30);default:'unposted';index" json:"posted_status"` // unposted, posted
+	PostedBy     *uint64             `gorm:"index" json:"posted_by,omitempty"`
+	PostedByUser *companyModels.User `gorm:"foreignKey:PostedBy" json:"posted_by_user,omitempty"`
+	PostedAt     *time.Time          `json:"posted_at,omitempty"`
 
 	Status string `gorm:"type:varchar(30);default:'active'" json:"status"`
 
@@ -53,6 +53,6 @@ type StockAdjustment struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Lines            []StockAdjustmentLine       `gorm:"foreignKey:StockAdjustmentID" json:"lines,omitempty"`
-	ApprovalHistory  []StockAdjustmentApproval   `gorm:"foreignKey:StockAdjustmentID" json:"approval_history,omitempty"`
+	Lines           []StockAdjustmentLine     `gorm:"foreignKey:StockAdjustmentID" json:"lines,omitempty"`
+	ApprovalHistory []StockAdjustmentApproval `gorm:"foreignKey:StockAdjustmentID" json:"approval_history,omitempty"`
 }

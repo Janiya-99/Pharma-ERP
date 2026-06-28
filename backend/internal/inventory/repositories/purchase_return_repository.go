@@ -112,7 +112,7 @@ func (r *purchaseReturnRepository) UpdatePostedStatus(db *gorm.DB, returnID uint
 			"posted_status": status,
 			"posted_by":     userID,
 			"posted_at":     gorm.Expr("CURRENT_TIMESTAMP"),
-			"updated_by":      userID,
+			"updated_by":    userID,
 		}).Error
 }
 

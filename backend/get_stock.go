@@ -4,9 +4,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 )
 
 type StockBalance struct {
@@ -26,7 +26,7 @@ func main() {
 	if err := db.Table("stock_balances").Where("quantity_available > 0").First(&sb).Error; err != nil {
 		log.Fatal(err)
 	}
-	
+
 	batchID := "null"
 	if sb.ProductBatchID != nil {
 		batchID = fmt.Sprintf("%d", *sb.ProductBatchID)
@@ -35,6 +35,6 @@ func main() {
 	if sb.WarehouseLocationID != nil {
 		locationID = fmt.Sprintf("%d", *sb.WarehouseLocationID)
 	}
-	
+
 	fmt.Printf("ProductID=%d BatchID=%s WarehouseID=%d LocationID=%s\n", sb.ProductID, batchID, sb.WarehouseID, locationID)
 }

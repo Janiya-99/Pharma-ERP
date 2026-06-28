@@ -14,14 +14,14 @@ type GRNRepository interface {
 	FindGRNs(db *gorm.DB, filter dto.GRNFilter) ([]dto.GRNResponse, int64, error)
 	FindGRNByID(db *gorm.DB, companyID, id uint64) (*models.GoodsReceiptNote, error)
 	GetLastGRNNumber(db *gorm.DB, companyID uint64) (string, error)
-	
+
 	CreateGRNWithLines(db *gorm.DB, grn *models.GoodsReceiptNote) error
 	UpdateGRNWithLines(db *gorm.DB, grn *models.GoodsReceiptNote) error
 	SoftDeleteGRN(db *gorm.DB, grn *models.GoodsReceiptNote) error
-	
+
 	UpdateGRNStatus(db *gorm.DB, companyID, id uint64, approvalStatus, postedStatus string, userID *uint64, actionAt *time.Time) error
 	CreateGRNApprovalRecord(db *gorm.DB, approval *models.GoodsReceiptNoteApproval) error
-	
+
 	CheckGRNStockLedgerExists(db *gorm.DB, companyID, grnID uint64) (bool, error)
 	FindOrCreateBatchFromGRNLine(tx *gorm.DB, companyID, productID uint64, batchNumber string, manufactureDate, expiryDate *time.Time, supplierID, manufacturerID uint64, purchaseRate, sellingPrice, mrp float64, createdBy uint64) (*models.ProductBatch, error)
 	UpdateBatchPricesFromGRNLine(tx *gorm.DB, batchID uint64, purchaseRate, sellingPrice, mrp float64) error
@@ -208,11 +208,11 @@ func (r *grnRepository) FindOrCreateBatchFromGRNLine(tx *gorm.DB, companyID, pro
 
 	var batch models.ProductBatch
 	err := tx.Where("company_id = ? AND product_id = ? AND batch_number = ?", companyID, productID, batchNumber).First(&batch).Error
-	
+
 	if err == nil {
 		return &batch, nil
 	}
-	
+
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func (r *grnRepository) FindOrCreateBatchFromGRNLine(tx *gorm.DB, companyID, pro
 		ManufactureDate: manufactureDate,
 		ExpiryDate:      expiryDate,
 		SupplierID:      &supplierID,
-		ManufacturerID:  nil, 
+		ManufacturerID:  nil,
 		PurchaseRate:    purchaseRate,
 		SellingPrice:    sellingPrice,
 		MRP:             mrp,
@@ -255,7 +255,7 @@ func (r *grnRepository) UpdateBatchPricesFromGRNLine(tx *gorm.DB, batchID uint64
 	if mrp > 0 {
 		updates["mrp"] = mrp
 	}
-	
+
 	if len(updates) == 0 {
 		return nil
 	}

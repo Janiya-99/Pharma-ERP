@@ -41,26 +41,37 @@ export const DeleteCustomerReceiptConfirmModal: React.FC<Props> = ({
         toast.error(res.data?.message || "Failed to delete customer receipt");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred while deleting");
+      toast.error(
+        error.response?.data?.message || "An error occurred while deleting"
+      );
     } finally {
       setIsDeleting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && !isDeleting && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open: boolean) => !open && !isDeleting && onClose()}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete Customer Receipt</DialogTitle>
           <DialogDescription>
-            Are you sure you want to permanently delete receipt <strong>{receiptNumber}</strong>? This action cannot be undone. Only draft or rejected receipts can be deleted.
+            Are you sure you want to permanently delete receipt{" "}
+            <strong>{receiptNumber}</strong>? This action cannot be undone. Only
+            draft or rejected receipts can be deleted.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" disabled={isDeleting} onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleDelete} disabled={isDeleting} variant="destructive">
+          <Button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            variant="destructive"
+          >
             {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Delete Receipt
           </Button>

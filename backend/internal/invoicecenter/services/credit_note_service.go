@@ -382,7 +382,7 @@ func (s *CreditNoteService) PostCreditNote(db *gorm.DB, companyID, id, userID ui
 
 	return db.Transaction(func(tx *gorm.DB) error {
 		now := time.Now()
-		
+
 		// 1. Update customer balance
 		if err := s.repo.UpdateCustomerBalanceAfterCreditNote(tx, companyID, customer.ID, existing.TotalAmount); err != nil {
 			return err

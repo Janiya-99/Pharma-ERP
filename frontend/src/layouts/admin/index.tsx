@@ -11,10 +11,12 @@ function PageLoader() {
     <div className="flex h-full w-full items-center justify-center py-24">
       <div className="flex flex-col items-center gap-4">
         <div className="relative flex h-16 w-16 items-center justify-center">
-          <div className="absolute inset-0 rounded-full border-[3.5px] border-slate-100 border-t-blue-600 border-r-indigo-600 animate-spin shadow-[0_0_15px_rgba(37,99,235,0.2)]" />
-          <div className="absolute inset-2 rounded-full border-[2.5px] border-slate-50 border-b-blue-500 border-l-indigo-500 animate-[spin_2s_linear_infinite_reverse]" />
+          <div className="border-slate-100 absolute inset-0 animate-spin rounded-full border-[3.5px] border-r-indigo-600 border-t-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.2)]" />
+          <div className="border-slate-50 absolute inset-2 animate-[spin_2s_linear_infinite_reverse] rounded-full border-[2.5px] border-b-blue-500 border-l-indigo-500" />
         </div>
-        <p className="text-sm text-slate-500 font-semibold tracking-wide animate-pulse">Loading workspace...</p>
+        <p className="text-slate-500 animate-pulse text-sm font-semibold tracking-wide">
+          Loading workspace...
+        </p>
       </div>
     </div>
   );
@@ -40,7 +42,9 @@ export default function AdminLayout(props: { [x: string]: any }) {
     for (const route of routes) {
       if (route.layout !== "/admin") continue;
       if (route.children) {
-        const child = route.children.find((c: unknown) => location.pathname.includes(c.path));
+        const child = route.children.find((c: unknown) =>
+          location.pathname.includes(c.path)
+        );
         if (child) return `${route.name} / ${child.name}`;
       } else if (location.pathname.includes(route.path)) {
         return route.name;
@@ -62,7 +66,11 @@ export default function AdminLayout(props: { [x: string]: any }) {
       if (route.children) {
         route.children.forEach((child: unknown, j: unknown) => {
           result.push(
-            <Route key={`${i}-${j}`} path={child.path} element={child.component} />
+            <Route
+              key={`${i}-${j}`}
+              path={child.path}
+              element={child.component}
+            />
           );
         });
       }
@@ -75,7 +83,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
   // Full-screen layout for landing page (no sidebar/topbar)
   if (isLandingPage) {
     return (
-      <div className="w-full min-h-screen bg-[#0b1437]">
+      <div className="min-h-screen w-full bg-[#0b1437]">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {renderRoutes(routes)}
@@ -88,13 +96,13 @@ export default function AdminLayout(props: { [x: string]: any }) {
 
   // Standard admin layout with sidebar + topbar
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:!bg-navy-900 relative">
+    <div className="relative flex h-screen w-full overflow-hidden bg-gray-50 dark:!bg-navy-900">
       <Sidebar open={open} onClose={() => setOpen(false)} />
 
       {/* Floating Sidebar Toggle Button (Desktop only) */}
       <button
         onClick={() => setOpen(!open)}
-        className={`absolute top-20 z-50 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:text-gray-700 dark:bg-navy-800 dark:border-navy-700 dark:text-gray-300 dark:hover:bg-navy-700 dark:hover:text-white hidden xl:flex ${
+        className={`absolute top-20 z-50 flex hidden h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:text-gray-700 dark:border-navy-700 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700 dark:hover:text-white xl:flex ${
           open ? "left-[246px]" : "left-4"
         }`}
       >
@@ -114,7 +122,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
           {...rest}
         />
 
-        <main className="flex-1 flex flex-col overflow-hidden px-4 md:px-6 pb-6 pt-2 h-full">
+        <main className="flex h-full flex-1 flex-col overflow-hidden px-4 pb-6 pt-2 md:px-6">
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {renderRoutes(routes)}

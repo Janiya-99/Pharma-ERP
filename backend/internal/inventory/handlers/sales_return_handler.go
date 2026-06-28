@@ -99,9 +99,9 @@ func (h *SalesReturnHandler) ListSalesReturns(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true, 
-		"message": "Sales returns loaded successfully", 
-		"data": returns,
+		"success": true,
+		"message": "Sales returns loaded successfully",
+		"data":    returns,
 		"meta": gin.H{
 			"current_page": filter.Page,
 			"per_page":     filter.Limit,

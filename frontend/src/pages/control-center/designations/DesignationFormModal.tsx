@@ -8,7 +8,17 @@ import { createDesignation, updateDesignation } from "../../../api/controlApi";
 
 import { toast } from "sonner";
 
-const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }: { isOpen?: boolean; onClose?: unknown; designation?: unknown; onSuccess?: unknown }) => {
+const DesignationFormModal = ({
+  isOpen,
+  onClose,
+  designation = null,
+  onSuccess,
+}: {
+  isOpen?: boolean;
+  onClose?: unknown;
+  designation?: unknown;
+  onSuccess?: unknown;
+}) => {
   const isEdit = !!designation;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -74,7 +84,7 @@ const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
-        
+
         <Input
           label="Designation Name *"
           name="designation_name"
@@ -83,9 +93,11 @@ const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }
           required
           placeholder="e.g. Finance Manager"
         />
-        
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Description
+          </label>
           <textarea
             name="description"
             value={formData.description}

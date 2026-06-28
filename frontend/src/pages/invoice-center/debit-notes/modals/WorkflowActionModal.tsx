@@ -54,10 +54,15 @@ export const WorkflowActionModal: React.FC<Props> = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-2 my-4">
+
+        <div className="my-4 space-y-2">
           <Label htmlFor="remarks">
-            Remarks {requireRemarks ? <span className="text-red-500">*</span> : "(Optional)"}
+            Remarks{" "}
+            {requireRemarks ? (
+              <span className="text-red-500">*</span>
+            ) : (
+              "(Optional)"
+            )}
           </Label>
           <Textarea
             id="remarks"
@@ -72,8 +77,8 @@ export const WorkflowActionModal: React.FC<Props> = ({
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleConfirm} 
+          <Button
+            onClick={handleConfirm}
             disabled={loading || (requireRemarks && !remarks.trim())}
           >
             {loading ? "Processing..." : confirmLabel}

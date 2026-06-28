@@ -18,7 +18,7 @@ export default function OpeningBalancesPage() {
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [financialYearId, setFinancialYearId] = useState("");
-  
+
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -58,7 +58,9 @@ export default function OpeningBalancesPage() {
   };
 
   const handleDelete = async (record: any) => {
-    if (window.confirm(`Are you sure you want to delete this opening balance?`)) {
+    if (
+      window.confirm(`Are you sure you want to delete this opening balance?`)
+    ) {
       try {
         const res = await financeApi.deleteOpeningBalance(record.id);
         if (res.data.success) {
@@ -66,47 +68,61 @@ export default function OpeningBalancesPage() {
           fetchBalances();
         }
       } catch (err: any) {
-        toast.error(err.response?.data?.message || "Failed to delete opening balance");
+        toast.error(
+          err.response?.data?.message || "Failed to delete opening balance"
+        );
       }
     }
   };
 
   const columns = [
-    { 
-      header: "Financial Year", 
+    {
+      header: "Financial Year",
       accessor: "financial_year",
-      render: (val: any) => val?.year_name || "N/A"
+      render: (val: any) => val?.year_name || "N/A",
     },
-    { 
-      header: "Account", 
+    {
+      header: "Account",
       accessor: "account",
-      render: (val: any) => val ? `${val.account_code} - ${val.account_name}` : "N/A"
+      render: (val: any) =>
+        val ? `${val.account_code} - ${val.account_name}` : "N/A",
     },
-    { 
-      header: "Debit Balance", 
+    {
+      header: "Debit Balance",
       accessor: "debit_balance",
       render: (val: string, row: any) => (
-        <MoneyDisplay amount={val} currency={row.base_currency} className={parseFloat(val) > 0 ? "text-red-500" : ""} />
-      )
+        <MoneyDisplay
+          amount={val}
+          currency={row.base_currency}
+          className={parseFloat(val) > 0 ? "text-red-500" : ""}
+        />
+      ),
     },
-    { 
-      header: "Credit Balance", 
+    {
+      header: "Credit Balance",
       accessor: "credit_balance",
       render: (val: string, row: any) => (
-        <MoneyDisplay amount={val} currency={row.base_currency} className={parseFloat(val) > 0 ? "text-green-500" : ""} />
-      )
+        <MoneyDisplay
+          amount={val}
+          currency={row.base_currency}
+          className={parseFloat(val) > 0 ? "text-green-500" : ""}
+        />
+      ),
     },
     { header: "Currency", accessor: "base_currency" },
   ];
 
   return (
     <div className="py-5">
-      <FinancePageHeader 
-        title="Opening Balances" 
+      <FinancePageHeader
+        title="Opening Balances"
         description="Manage initial account balances for financial years"
         action={
           <PermissionGuard permission="finance.opening_balance.create">
-            <Button onClick={handleCreate} className="bg-brand-500 hover:bg-brand-600 text-white">
+            <Button
+              onClick={handleCreate}
+              className="bg-brand-500 text-white hover:bg-brand-600"
+            >
               <Plus className="mr-2 h-4 w-4" /> Add Balance
             </Button>
           </PermissionGuard>
@@ -121,7 +137,7 @@ export default function OpeningBalancesPage() {
         />
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
+      <div className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
         <DataTable
           columns={columns}
           data={data}
@@ -134,19 +150,19 @@ export default function OpeningBalancesPage() {
           onSearch={setSearch}
           searchPlaceholder="Search balances..."
           actions={(record: unknown) => (
-            <div className="flex space-x-2 justify-end">
+            <div className="flex justify-end space-x-2">
               <PermissionGuard permission="finance.opening_balance.update">
-                <button 
+                <button
                   onClick={() => handleEdit(record)}
-                  className="text-brand-500 hover:text-brand-600 font-medium text-sm transition-colors"
+                  className="text-sm font-medium text-brand-500 transition-colors hover:text-brand-600"
                 >
                   Edit
                 </button>
               </PermissionGuard>
               <PermissionGuard permission="finance.opening_balance.delete">
-                <button 
+                <button
                   onClick={() => handleDelete(record)}
-                  className="text-red-500 hover:text-red-600 font-medium text-sm transition-colors"
+                  className="text-sm font-medium text-red-500 transition-colors hover:text-red-600"
                 >
                   Delete
                 </button>

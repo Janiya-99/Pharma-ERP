@@ -1,6 +1,12 @@
 import React from "react";
 
-type BadgeVariant = "default" | "success" | "danger" | "warning" | "info" | "indigo";
+type BadgeVariant =
+  | "default"
+  | "success"
+  | "danger"
+  | "warning"
+  | "info"
+  | "indigo";
 
 const Badge = ({
   variant = "default",
@@ -20,7 +26,9 @@ const Badge = ({
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-semibold tracking-wide capitalize ${variants[variant] || variants.default}`}
+      className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[11px] font-semibold capitalize tracking-wide ${
+        variants[variant] || variants.default
+      }`}
     >
       {children}
     </span>

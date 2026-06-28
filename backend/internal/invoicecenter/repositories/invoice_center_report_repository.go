@@ -84,7 +84,7 @@ func (r *invoiceCenterReportRepository) GetDashboardSummary(db *gorm.DB, company
 	baseSiQuery().Count(&summary.TotalSalesInvoices)
 	baseSiQuery().Where("posted_status = ?", "posted").Count(&summary.PostedSalesInvoices)
 	baseSiQuery().Where("posted_status != ?", "posted").Count(&summary.UnpostedSalesInvoices)
-	
+
 	baseSiQuery().Where("posted_status = ?", "posted").Where("payment_status = ?", "unpaid").Count(&summary.UnpaidInvoices)
 	baseSiQuery().Where("posted_status = ?", "posted").Where("payment_status = ?", "partially_paid").Count(&summary.PartiallyPaidInvoices)
 	baseSiQuery().Where("posted_status = ?", "posted").Where("payment_status = ?", "paid").Count(&summary.PaidInvoices)
@@ -132,7 +132,7 @@ func (r *invoiceCenterReportRepository) GetDashboardSummary(db *gorm.DB, company
 	if filters.DateTo != nil {
 		crQuery = crQuery.Where("receipt_date <= ?", *filters.DateTo)
 	}
-	
+
 	type ReceiptTotals struct {
 		ReceiptAmount     float64
 		AllocatedAmount   float64
@@ -146,38 +146,42 @@ func (r *invoiceCenterReportRepository) GetDashboardSummary(db *gorm.DB, company
 
 	// Finance Postings
 	var postedDocs, unpostedDocs int64
-	
+
 	countFinance := func(table string, dateField string) (int64, int64) {
 		var p, u int64
-		
+
 		qBase := func() *gorm.DB {
 			q := db.Table(table).Where("company_id = ? AND deleted_at IS NULL AND posted_status = 'posted'", companyID)
 			q = r.applyCommonFilters(q, filters)
 			if filters.DateFrom != nil {
-				q = q.Where(dateField + " >= ?", *filters.DateFrom)
+				q = q.Where(dateField+" >= ?", *filters.DateFrom)
 			}
 			if filters.DateTo != nil {
-				q = q.Where(dateField + " <= ?", *filters.DateTo)
+				q = q.Where(dateField+" <= ?", *filters.DateTo)
 			}
 			return q
 		}
-		
+
 		qBase().Where("finance_post_status = ?", "posted").Count(&p)
 		qBase().Where("finance_post_status = ?", "unposted").Count(&u)
 		return p, u
 	}
-	
+
 	sp, su := countFinance("sales_invoices", "invoice_date")
-	postedDocs += sp; unpostedDocs += su
-	
+	postedDocs += sp
+	unpostedDocs += su
+
 	cp, cu := countFinance("credit_notes", "credit_note_date")
-	postedDocs += cp; unpostedDocs += cu
-	
+	postedDocs += cp
+	unpostedDocs += cu
+
 	dp, du := countFinance("debit_notes", "debit_note_date")
-	postedDocs += dp; unpostedDocs += du
-	
+	postedDocs += dp
+	unpostedDocs += du
+
 	rp, ru := countFinance("customer_receipts", "receipt_date")
-	postedDocs += rp; unpostedDocs += ru
+	postedDocs += rp
+	unpostedDocs += ru
 
 	summary.FinancePostedDocuments = postedDocs
 	summary.FinanceUnpostedDocuments = unpostedDocs
@@ -248,12 +252,12 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 	if err != nil {
 		return nil, header, err
 	}
-	
+
 	header.DateFrom = filters.DateFrom
 	header.DateTo = filters.DateTo
-	
+
 	var rows []dto.CustomerStatementRowDTO
-	
+
 	statusFilter := "posted_status = 'posted'"
 	if filters.IncludeUnposted != nil && *filters.IncludeUnposted {
 		statusFilter = "1=1" // All statuses except deleted
@@ -263,7 +267,7 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 	if filters.BranchID != nil {
 		branchFilter = " AND branch_id = " + db.Dialector.Explain("?", *filters.BranchID)
 	}
-	
+
 	query := `
 		SELECT 
 			created_at, invoice_date as transaction_date, 'Sales Invoice' as document_type, invoice_number as document_number, 
@@ -305,9 +309,9 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 		
 		ORDER BY transaction_date ASC, created_at ASC
 	`
-	
+
 	err = db.Raw(query, *filters.CustomerID, companyID, *filters.CustomerID, companyID, *filters.CustomerID, companyID, *filters.CustomerID, companyID).Scan(&rows).Error
-	
+
 	return rows, header, err
 }
 

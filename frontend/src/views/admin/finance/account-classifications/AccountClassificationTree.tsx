@@ -15,48 +15,48 @@ const TreeNode = ({ node, onEdit, onDelete }: any) => {
 
   return (
     <div className="ml-6 mt-2">
-      <div className="flex items-center group py-1">
+      <div className="group flex items-center py-1">
         {hasChildren ? (
-          <button 
-            onClick={() => setExpanded(!expanded)} 
-            className="w-5 h-5 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded mr-1"
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="mr-1 flex h-5 w-5 items-center justify-center rounded text-gray-500 hover:bg-gray-100"
           >
             {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
         ) : (
-          <div className="w-5 h-5 mr-1 flex items-center justify-center">
-            <div className="w-1 h-1 bg-gray-300 rounded-full" />
+          <div className="mr-1 flex h-5 w-5 items-center justify-center">
+            <div className="h-1 w-1 rounded-full bg-gray-300" />
           </div>
         )}
-        
+
         {node.level === 1 ? (
-          <Folder size={16} className="text-brand-500 mr-2" />
+          <Folder size={16} className="mr-2 text-brand-500" />
         ) : (
-          <FileText size={16} className="text-gray-400 mr-2" />
+          <FileText size={16} className="mr-2 text-gray-400" />
         )}
-        
-        <span className="font-medium text-navy-700 dark:text-white mr-4">
+
+        <span className="mr-4 font-medium text-navy-700 dark:text-white">
           {node.name}
         </span>
-        
-        <span className="text-xs text-gray-400 mr-4">
+
+        <span className="mr-4 text-xs text-gray-400">
           {node.type} • Level {node.level} • {node.normal_balance}
         </span>
-        
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+
+        <div className="flex space-x-2 opacity-0 transition-opacity group-hover:opacity-100">
           <PermissionGuard permission="finance.account_classification.update">
-            <button 
+            <button
               onClick={() => onEdit(node)}
-              className="text-xs text-brand-500 hover:text-brand-600 font-medium"
+              className="text-xs font-medium text-brand-500 hover:text-brand-600"
             >
               Edit
             </button>
           </PermissionGuard>
           {!hasChildren && (
             <PermissionGuard permission="finance.account_classification.delete">
-              <button 
+              <button
                 onClick={() => onDelete(node)}
-                className="text-xs text-red-500 hover:text-red-600 font-medium"
+                className="text-xs font-medium text-red-500 hover:text-red-600"
               >
                 Delete
               </button>
@@ -64,15 +64,15 @@ const TreeNode = ({ node, onEdit, onDelete }: any) => {
           )}
         </div>
       </div>
-      
+
       {expanded && hasChildren && (
-        <div className="border-l border-gray-200 dark:border-navy-700 ml-2.5">
+        <div className="ml-2.5 border-l border-gray-200 dark:border-navy-700">
           {node.children.map((child: any) => (
-            <TreeNode 
-              key={child.id} 
-              node={child} 
-              onEdit={onEdit} 
-              onDelete={onDelete} 
+            <TreeNode
+              key={child.id}
+              node={child}
+              onEdit={onEdit}
+              onDelete={onDelete}
             />
           ))}
         </div>
@@ -96,13 +96,13 @@ export default function AccountClassificationTree({
   }
 
   return (
-    <div className="py-2 overflow-x-auto">
+    <div className="overflow-x-auto py-2">
       {data.map((node: unknown) => (
-        <TreeNode 
-          key={node.id} 
-          node={node} 
-          onEdit={onEdit} 
-          onDelete={onDelete} 
+        <TreeNode
+          key={node.id}
+          node={node}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>

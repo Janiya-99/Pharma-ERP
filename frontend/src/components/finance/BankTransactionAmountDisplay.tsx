@@ -1,6 +1,12 @@
 import React from "react";
 
-const BankTransactionAmountDisplay = ({ debitAmount, creditAmount }: { debitAmount?: unknown; creditAmount?: unknown }) => {
+const BankTransactionAmountDisplay = ({
+  debitAmount,
+  creditAmount,
+}: {
+  debitAmount?: unknown;
+  creditAmount?: unknown;
+}) => {
   const isDebit = parseFloat(debitAmount) > 0;
   const isCredit = parseFloat(creditAmount) > 0;
 
@@ -12,14 +18,22 @@ const BankTransactionAmountDisplay = ({ debitAmount, creditAmount }: { debitAmou
   };
 
   if (isDebit) {
-    return <span className="text-green-600 font-medium text-right block">{formatLKR(debitAmount)}</span>;
+    return (
+      <span className="block text-right font-medium text-green-600">
+        {formatLKR(debitAmount)}
+      </span>
+    );
   }
 
   if (isCredit) {
-    return <span className="text-red-600 font-medium text-right block">{formatLKR(creditAmount)}</span>;
+    return (
+      <span className="block text-right font-medium text-red-600">
+        {formatLKR(creditAmount)}
+      </span>
+    );
   }
 
-  return <span className="text-gray-500 text-right block">{formatLKR(0)}</span>;
+  return <span className="block text-right text-gray-500">{formatLKR(0)}</span>;
 };
 
 export default BankTransactionAmountDisplay;

@@ -118,7 +118,8 @@ export interface DebitNoteRegisterReportParams extends RegisterReportParams {
   debit_note_type?: string;
 }
 
-export interface CustomerReceiptRegisterReportParams extends RegisterReportParams {
+export interface CustomerReceiptRegisterReportParams
+  extends RegisterReportParams {
   payment_method?: string;
   receipt_status?: string;
 }
@@ -165,7 +166,8 @@ export interface CollectionSummaryReportParams extends ReportPaginationParams {
   search?: string;
 }
 
-export interface FinancePostingStatusReportParams extends ReportPaginationParams {
+export interface FinancePostingStatusReportParams
+  extends ReportPaginationParams {
   branch_id?: number;
   document_type?: string;
   finance_post_status?: string;

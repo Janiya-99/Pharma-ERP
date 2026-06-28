@@ -13,7 +13,11 @@ import { Label } from "../../../components/ui/label";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { toast } from "sonner";
 import { Loader2, AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "../../../components/ui/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "../../../components/ui/alert";
 
 interface Props {
   isOpen: boolean;
@@ -34,29 +38,41 @@ export const ApproveCustomerReceiptModal: React.FC<Props> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formatLKR = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   const handleApprove = async () => {
     try {
       setIsSubmitting(true);
-      const res = await invoiceCenterApi.approveCustomerReceipt(receiptId, { remarks });
+      const res = await invoiceCenterApi.approveCustomerReceipt(receiptId, {
+        remarks,
+      });
       if (res.data?.success) {
-        toast.success(res.data.message || "Customer receipt approved successfully");
+        toast.success(
+          res.data.message || "Customer receipt approved successfully"
+        );
         onSuccess();
         onClose();
       } else {
         toast.error(res.data?.message || "Failed to approve customer receipt");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred during approval");
+      toast.error(
+        error.response?.data?.message || "An error occurred during approval"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && !isSubmitting && onClose()}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Approve Customer Receipt</DialogTitle>
@@ -66,11 +82,18 @@ export const ApproveCustomerReceiptModal: React.FC<Props> = ({
         </DialogHeader>
 
         {unallocatedAmount > 0 && (
-          <Alert variant="default" className="bg-orange-50 border-orange-200 mt-2">
+          <Alert
+            variant="default"
+            className="mt-2 border-orange-200 bg-orange-50"
+          >
             <AlertTriangle className="h-4 w-4 stroke-orange-600" />
-            <AlertTitle className="text-orange-800">Unallocated Amount</AlertTitle>
-            <AlertDescription className="text-orange-700 text-sm">
-              This receipt has an unallocated amount of <strong>{formatLKR(unallocatedAmount)}</strong> which will be stored on the receipt.
+            <AlertTitle className="text-orange-800">
+              Unallocated Amount
+            </AlertTitle>
+            <AlertDescription className="text-sm text-orange-700">
+              This receipt has an unallocated amount of{" "}
+              <strong>{formatLKR(unallocatedAmount)}</strong> which will be
+              stored on the receipt.
             </AlertDescription>
           </Alert>
         )}
@@ -91,7 +114,11 @@ export const ApproveCustomerReceiptModal: React.FC<Props> = ({
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button onClick={handleApprove} disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
+          <Button
+            onClick={handleApprove}
+            disabled={isSubmitting}
+            className="bg-green-600 hover:bg-green-700"
+          >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Approve
           </Button>

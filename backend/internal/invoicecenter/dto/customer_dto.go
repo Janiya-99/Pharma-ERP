@@ -74,10 +74,10 @@ type CreditSummary struct {
 }
 
 type InvoiceSummaryPlaceholder struct {
-	TotalInvoices    int64      `json:"total_invoices"`
-	UnpaidInvoices   int64      `json:"unpaid_invoices"`
-	PaidInvoices     int64      `json:"paid_invoices"`
-	LastInvoiceDate  *time.Time `json:"last_invoice_date"`
+	TotalInvoices   int64      `json:"total_invoices"`
+	UnpaidInvoices  int64      `json:"unpaid_invoices"`
+	PaidInvoices    int64      `json:"paid_invoices"`
+	LastInvoiceDate *time.Time `json:"last_invoice_date"`
 }
 
 type CustomerDetailResponse struct {
@@ -102,8 +102,8 @@ type CustomerDetailResponse struct {
 	CreatedAt                  time.Time                 `json:"created_at"`
 	UpdatedAt                  time.Time                 `json:"updated_at"`
 
-	Addresses                  []CustomerAddressResponse `json:"addresses"`
-	Contacts                   []CustomerContactResponse `json:"contacts"`
-	CreditSummary              CreditSummary             `json:"credit_summary"`
-	InvoiceSummary             InvoiceSummaryPlaceholder `json:"invoice_summary"`
+	Addresses      []CustomerAddressResponse `json:"addresses"`
+	Contacts       []CustomerContactResponse `json:"contacts"`
+	CreditSummary  CreditSummary             `json:"credit_summary"`
+	InvoiceSummary InvoiceSummaryPlaceholder `json:"invoice_summary"`
 }

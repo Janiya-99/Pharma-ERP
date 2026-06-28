@@ -1,7 +1,7 @@
-import React from 'react';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Badge } from '../ui/badge';
+import React from "react";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Badge } from "../ui/badge";
 
 interface Props {
   label: string;
@@ -25,10 +25,13 @@ export const FinanceSettingsAccountInput: React.FC<Props> = ({
       <div className="flex items-center gap-2">
         <Label className="text-sm font-medium text-gray-700">
           {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
+          {required && <span className="ml-0.5 text-red-500">*</span>}
         </Label>
         {!required && (
-          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-gray-300 text-gray-500">
+          <Badge
+            variant="outline"
+            className="h-4 border-gray-300 px-1.5 py-0 text-[10px] text-gray-500"
+          >
             Optional
           </Badge>
         )}
@@ -38,12 +41,14 @@ export const FinanceSettingsAccountInput: React.FC<Props> = ({
         type="number"
         min={1}
         placeholder="Enter Account ID"
-        value={value ?? ''}
+        value={value ?? ""}
         onChange={(e) => {
           const val = e.target.value;
           onChange(val ? parseInt(val, 10) : null);
         }}
-        className={`max-w-xs ${error ? 'border-red-400 focus-visible:ring-red-400' : ''}`}
+        className={`max-w-xs ${
+          error ? "border-red-400 focus-visible:ring-red-400" : ""
+        }`}
       />
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>

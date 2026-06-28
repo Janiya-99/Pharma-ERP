@@ -26,7 +26,9 @@ export default function AccountClassificationFormModal({
           const res = await financeApi.getAccountClassifications({});
           if (res.data.success) {
             // Only Level 1 and 2 can be parents
-            const validParents = res.data.data.filter((c: any) => c.level < 3 && c.id !== record?.id);
+            const validParents = res.data.data.filter(
+              (c: any) => c.level < 3 && c.id !== record?.id
+            );
             setClassifications(
               validParents.map((c: any) => ({
                 label: `${c.name} (Level ${c.level})`,
@@ -76,7 +78,7 @@ export default function AccountClassificationFormModal({
       type: "select",
       options: classifications,
       // Logic for required parent is handled in backend and can be dynamic here,
-      // but to keep ERPFormModal simple, we make it optional in UI 
+      // but to keep ERPFormModal simple, we make it optional in UI
       // and backend will strictly validate.
     },
     {
@@ -147,7 +149,9 @@ export default function AccountClassificationFormModal({
         onOpenChange(false);
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to save classification");
+      toast.error(
+        err.response?.data?.message || "Failed to save classification"
+      );
     } finally {
       setLoading(false);
     }

@@ -50,7 +50,7 @@ type StockAdjustmentActionRequest struct {
 
 type StockAdjustmentResponse struct {
 	models.StockAdjustment
-	Lines           []StockAdjustmentLineResponse      `json:"lines,omitempty"`
+	Lines           []StockAdjustmentLineResponse    `json:"lines,omitempty"`
 	ApprovalHistory []models.StockAdjustmentApproval `json:"approval_history,omitempty"`
 }
 

@@ -38,33 +38,45 @@ export const CancelCustomerReceiptModal: React.FC<Props> = ({
 
     try {
       setIsSubmitting(true);
-      const res = await invoiceCenterApi.cancelCustomerReceipt(receiptId, { remarks });
+      const res = await invoiceCenterApi.cancelCustomerReceipt(receiptId, {
+        remarks,
+      });
       if (res.data?.success) {
-        toast.success(res.data.message || "Customer receipt cancelled successfully");
+        toast.success(
+          res.data.message || "Customer receipt cancelled successfully"
+        );
         onSuccess();
         onClose();
       } else {
         toast.error(res.data?.message || "Failed to cancel customer receipt");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred during cancellation");
+      toast.error(
+        error.response?.data?.message || "An error occurred during cancellation"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && !isSubmitting && onClose()}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Cancel Customer Receipt</DialogTitle>
           <DialogDescription>
-            Are you sure you want to cancel this customer receipt? Please note that posted receipts cannot be cancelled in this step.
+            Are you sure you want to cancel this customer receipt? Please note
+            that posted receipts cannot be cancelled in this step.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="remarks" className="text-gray-700">Cancellation Reason *</Label>
+            <Label htmlFor="remarks" className="text-gray-700">
+              Cancellation Reason *
+            </Label>
             <Textarea
               id="remarks"
               value={remarks}
@@ -78,7 +90,11 @@ export const CancelCustomerReceiptModal: React.FC<Props> = ({
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             Keep Receipt
           </Button>
-          <Button onClick={handleCancel} disabled={isSubmitting || !remarks.trim()} variant="destructive">
+          <Button
+            onClick={handleCancel}
+            disabled={isSubmitting || !remarks.trim()}
+            variant="destructive"
+          >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Confirm Cancellation
           </Button>

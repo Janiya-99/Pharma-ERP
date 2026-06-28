@@ -12,9 +12,9 @@ import (
 )
 
 type CustomerReceiptService struct {
-	customerReceiptRepo       *repositories.CustomerReceiptRepository
-	salesInvoiceRepo          *repositories.SalesInvoiceRepository
-	auditService              *AuditLogService
+	customerReceiptRepo *repositories.CustomerReceiptRepository
+	salesInvoiceRepo    *repositories.SalesInvoiceRepository
+	auditService        *AuditLogService
 }
 
 func NewCustomerReceiptService(
@@ -23,9 +23,9 @@ func NewCustomerReceiptService(
 	auditService *AuditLogService,
 ) *CustomerReceiptService {
 	return &CustomerReceiptService{
-		customerReceiptRepo:       customerReceiptRepo,
-		salesInvoiceRepo:          salesInvoiceRepo,
-		auditService:              auditService,
+		customerReceiptRepo: customerReceiptRepo,
+		salesInvoiceRepo:    salesInvoiceRepo,
+		auditService:        auditService,
 	}
 }
 
@@ -91,26 +91,26 @@ func (s *CustomerReceiptService) CreateCustomerReceipt(db *gorm.DB, companyID, b
 	}
 
 	receipt := &models.CustomerReceipt{
-		CompanyID:          companyID,
-		BranchID:           branchID,
-		CustomerID:         req.CustomerID,
-		FinancialYearID:    req.FinancialYearID,
-		AccountingPeriodID: req.AccountingPeriodID,
-		ReceiptNumber:      receiptNumber,
-		ReceiptDate:        receiptDate,
-		PaymentMethod:      req.PaymentMethod,
-		ReferenceNumber:    req.ReferenceNumber,
+		CompanyID:           companyID,
+		BranchID:            branchID,
+		CustomerID:          req.CustomerID,
+		FinancialYearID:     req.FinancialYearID,
+		AccountingPeriodID:  req.AccountingPeriodID,
+		ReceiptNumber:       receiptNumber,
+		ReceiptDate:         receiptDate,
+		PaymentMethod:       req.PaymentMethod,
+		ReferenceNumber:     req.ReferenceNumber,
 		BankReferenceNumber: req.BankReferenceNumber,
-		ChequeNumber:       req.ChequeNumber,
-		ChequeDate:         parsedChequeDate,
-		ReceivedAmount:     req.ReceiptAmount,
-		Remarks:            req.Remarks,
-		ApprovalStatus:     "draft",
-		PostedStatus:       "unposted",
-		ReceiptStatus:      "active",
-		Status:             "active",
-		CreatedBy:          &userID,
-		UpdatedBy:          &userID,
+		ChequeNumber:        req.ChequeNumber,
+		ChequeDate:          parsedChequeDate,
+		ReceivedAmount:      req.ReceiptAmount,
+		Remarks:             req.Remarks,
+		ApprovalStatus:      "draft",
+		PostedStatus:        "unposted",
+		ReceiptStatus:       "active",
+		Status:              "active",
+		CreatedBy:           &userID,
+		UpdatedBy:           &userID,
 	}
 
 	var allocations []models.CustomerReceiptAllocation

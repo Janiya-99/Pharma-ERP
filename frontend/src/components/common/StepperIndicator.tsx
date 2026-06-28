@@ -12,9 +12,13 @@ interface StepperIndicatorProps {
   onStepClick?: (step: number) => void;
 }
 
-const StepperIndicator = ({ steps, currentStep, onStepClick }: StepperIndicatorProps) => {
+const StepperIndicator = ({
+  steps,
+  currentStep,
+  onStepClick,
+}: StepperIndicatorProps) => {
   return (
-    <div className="card-premium p-6 mb-6">
+    <div className="card-premium mb-6 p-6">
       <div className="flex items-center">
         {steps.map((step, index) => {
           const isCompleted = index < currentStep;
@@ -25,11 +29,14 @@ const StepperIndicator = ({ steps, currentStep, onStepClick }: StepperIndicatorP
             <React.Fragment key={index}>
               {/* Step circle + label */}
               <div
-                className={`flex flex-col items-center gap-1.5 shrink-0 ${
-                  onStepClick && (isCompleted || isActive) ? "cursor-pointer" : ""
+                className={`flex shrink-0 flex-col items-center gap-1.5 ${
+                  onStepClick && (isCompleted || isActive)
+                    ? "cursor-pointer"
+                    : ""
                 }`}
                 onClick={() => {
-                  if (onStepClick && (isCompleted || isActive)) onStepClick(index);
+                  if (onStepClick && (isCompleted || isActive))
+                    onStepClick(index);
                 }}
               >
                 <div
@@ -50,9 +57,9 @@ const StepperIndicator = ({ steps, currentStep, onStepClick }: StepperIndicatorP
                   )}
                 </div>
                 <span
-                  className={`text-[11px] font-medium whitespace-nowrap hidden sm:block ${
+                  className={`hidden whitespace-nowrap text-[11px] font-medium sm:block ${
                     isActive
-                      ? "text-indigo-700 font-semibold"
+                      ? "font-semibold text-indigo-700"
                       : isCompleted
                       ? "text-indigo-500"
                       : "text-gray-400"
@@ -66,7 +73,9 @@ const StepperIndicator = ({ steps, currentStep, onStepClick }: StepperIndicatorP
               {index < steps.length - 1 && (
                 <div
                   className={`step-connector ${
-                    index < currentStep ? "step-connector-completed" : "step-connector-pending"
+                    index < currentStep
+                      ? "step-connector-completed"
+                      : "step-connector-pending"
                   }`}
                 />
               )}

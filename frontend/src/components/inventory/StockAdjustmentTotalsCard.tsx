@@ -7,23 +7,32 @@ const StockAdjustmentTotalsCard = ({
   totalQuantityOut,
   totalStockValue,
   lineCount,
-}: { totalQuantityIn?: unknown; totalQuantityOut?: unknown; totalStockValue?: unknown; lineCount?: unknown }) => {
+}: {
+  totalQuantityIn?: unknown;
+  totalQuantityOut?: unknown;
+  totalStockValue?: unknown;
+  lineCount?: unknown;
+}) => {
   return (
-    <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Adjustment Summary</h3>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-gray-50 dark:bg-navy-900 rounded-lg border border-gray-100 dark:border-navy-700">
-          <div className="flex items-center gap-2 mb-2 text-gray-500 dark:text-gray-400">
-            <List className="w-4 h-4" />
+    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+      <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        Adjustment Summary
+      </h3>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-navy-700 dark:bg-navy-900">
+          <div className="mb-2 flex items-center gap-2 text-gray-500 dark:text-gray-400">
+            <List className="h-4 w-4" />
             <span className="text-sm font-medium">Total Lines</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{lineCount}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            {lineCount}
+          </p>
         </div>
 
-        <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-900/30">
-          <div className="flex items-center gap-2 mb-2 text-green-600 dark:text-green-400">
-            <ArrowUpRight className="w-4 h-4" />
+        <div className="rounded-lg border border-green-100 bg-green-50 p-4 dark:border-green-900/30 dark:bg-green-900/10">
+          <div className="mb-2 flex items-center gap-2 text-green-600 dark:text-green-400">
+            <ArrowUpRight className="h-4 w-4" />
             <span className="text-sm font-medium">Total Qty In</span>
           </div>
           <p className="text-2xl font-bold text-green-700 dark:text-green-300">
@@ -31,9 +40,9 @@ const StockAdjustmentTotalsCard = ({
           </p>
         </div>
 
-        <div className="p-4 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
-          <div className="flex items-center gap-2 mb-2 text-red-600 dark:text-red-400">
-            <ArrowDownRight className="w-4 h-4" />
+        <div className="rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-900/10">
+          <div className="mb-2 flex items-center gap-2 text-red-600 dark:text-red-400">
+            <ArrowDownRight className="h-4 w-4" />
             <span className="text-sm font-medium">Total Qty Out</span>
           </div>
           <p className="text-2xl font-bold text-red-700 dark:text-red-300">
@@ -41,9 +50,9 @@ const StockAdjustmentTotalsCard = ({
           </p>
         </div>
 
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
-          <div className="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400">
-            <DollarSign className="w-4 h-4" />
+        <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
+          <div className="mb-2 flex items-center gap-2 text-blue-600 dark:text-blue-400">
+            <DollarSign className="h-4 w-4" />
             <span className="text-sm font-medium">Total Value Impact</span>
           </div>
           <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">

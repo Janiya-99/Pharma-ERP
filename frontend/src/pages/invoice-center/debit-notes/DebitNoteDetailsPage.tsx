@@ -4,14 +4,26 @@ import { useNavigate, useParams } from "react-router-dom";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { useAuth } from "../../../auth/AuthContext";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Separator } from "../../../components/ui/separator";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 import { toast } from "sonner";
 import type { DebitNote } from "../../../types/invoice-center";
-import { 
-  DebitNoteApprovalStatusBadge, 
+import {
+  DebitNoteApprovalStatusBadge,
   DebitNotePostedStatusBadge,
   DebitNoteTypeBadge,
   DebitNoteActionButtons,
@@ -19,7 +31,7 @@ import {
   DebitNoteCustomerBalanceCard,
   DebitNoteInvoiceLinkCard,
   DebitNoteBalanceImpactCard,
-  DebitNoteCreditLimitWarningCard
+  DebitNoteCreditLimitWarningCard,
 } from "../../../components/invoice-center";
 import {
   SubmitDebitNoteModal,
@@ -27,7 +39,7 @@ import {
   RejectDebitNoteModal,
   PostDebitNoteConfirmModal,
   CancelDebitNoteModal,
-  DeleteDebitNoteConfirmModal
+  DeleteDebitNoteConfirmModal,
 } from "./modals";
 
 const DebitNoteDetailsPage: React.FC = () => {
@@ -52,7 +64,9 @@ const DebitNoteDetailsPage: React.FC = () => {
       const res = await invoiceCenterApi.getDebitNoteById(id);
       setDebitNote(res.data.data);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to fetch debit note.");
+      toast.error(
+        err?.response?.data?.message || "Failed to fetch debit note."
+      );
     } finally {
       setLoading(false);
     }
@@ -71,22 +85,35 @@ const DebitNoteDetailsPage: React.FC = () => {
   }
 
   if (loading) {
-    return <div className="p-8"><Skeleton className="h-96 w-full" /></div>;
+    return (
+      <div className="p-8">
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
   }
 
   if (!debitNote) {
-    return <div className="p-8 text-center text-gray-500">Debit Note not found.</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">Debit Note not found.</div>
+    );
   }
 
   const formatMoney = (amount: number) => {
-    return new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(amount);
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(amount);
   };
 
   return (
     <div className="space-y-6 pb-20">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" onClick={() => navigate("/invoice-center/debit-notes")}>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate("/invoice-center/debit-notes")}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -98,7 +125,9 @@ const DebitNoteDetailsPage: React.FC = () => {
         <DebitNoteActionButtons
           approvalStatus={debitNote.approval_status}
           postedStatus={debitNote.posted_status}
-          onEdit={() => navigate(`/invoice-center/debit-notes/${debitNote.id}/edit`)}
+          onEdit={() =>
+            navigate(`/invoice-center/debit-notes/${debitNote.id}/edit`)
+          }
           onDelete={() => setIsDeleteOpen(true)}
           onSubmit={() => setIsSubmitOpen(true)}
           onApprove={() => setIsApproveOpen(true)}
@@ -108,29 +137,37 @@ const DebitNoteDetailsPage: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="space-y-6 md:col-span-2">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>Debit Note Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
                 <div>
                   <div className="text-gray-500">Date</div>
-                  <div className="font-medium">{new Date(debitNote.debit_note_date).toLocaleDateString()}</div>
+                  <div className="font-medium">
+                    {new Date(debitNote.debit_note_date).toLocaleDateString()}
+                  </div>
                 </div>
                 <div>
                   <div className="text-gray-500">Type</div>
-                  <div className="font-medium"><DebitNoteTypeBadge type={debitNote.debit_note_type} /></div>
+                  <div className="font-medium">
+                    <DebitNoteTypeBadge type={debitNote.debit_note_type} />
+                  </div>
                 </div>
                 <div>
                   <div className="text-gray-500">Branch</div>
-                  <div className="font-medium">{debitNote.branch?.branch_name || "-"}</div>
+                  <div className="font-medium">
+                    {debitNote.branch?.branch_name || "-"}
+                  </div>
                 </div>
                 <div>
                   <div className="text-gray-500">Reference Number</div>
-                  <div className="font-medium">{debitNote.reference_number || "-"}</div>
+                  <div className="font-medium">
+                    {debitNote.reference_number || "-"}
+                  </div>
                 </div>
                 <div className="col-span-2">
                   <div className="text-gray-500">Reason</div>
@@ -167,25 +204,38 @@ const DebitNoteDetailsPage: React.FC = () => {
                     {debitNote.lines && debitNote.lines.length > 0 ? (
                       debitNote.lines.map((line, index) => (
                         <TableRow key={line.id || index}>
-                          <TableCell className="text-center text-gray-500 text-sm">
+                          <TableCell className="text-center text-sm text-gray-500">
                             {index + 1}
                           </TableCell>
                           <TableCell>
                             {line.product_name || `Product #${line.product_id}`}
                           </TableCell>
-                          <TableCell className="text-right">{line.quantity}</TableCell>
-                          <TableCell className="text-right">{formatMoney(line.unit_price)}</TableCell>
-                          <TableCell className="text-right">{formatMoney(line.discount_amount)}</TableCell>
-                          <TableCell className="text-right">{formatMoney(line.tax_amount)}</TableCell>
+                          <TableCell className="text-right">
+                            {line.quantity}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatMoney(line.unit_price)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatMoney(line.discount_amount)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatMoney(line.tax_amount)}
+                          </TableCell>
                           <TableCell className="text-right font-medium">
                             {formatMoney(line.line_total)}
                           </TableCell>
-                          <TableCell className="text-sm text-gray-500">{line.description || "-"}</TableCell>
+                          <TableCell className="text-sm text-gray-500">
+                            {line.description || "-"}
+                          </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                        <TableCell
+                          colSpan={8}
+                          className="py-8 text-center text-gray-500"
+                        >
                           No line items found.
                         </TableCell>
                       </TableRow>
@@ -195,8 +245,8 @@ const DebitNoteDetailsPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
-          <div className="flex justify-end mt-4">
+
+          <div className="mt-4 flex justify-end">
             <div className="w-full md:w-1/2 lg:w-1/3">
               <DebitNoteTotalsCard
                 subtotal={debitNote.subtotal_amount}
@@ -215,11 +265,13 @@ const DebitNoteDetailsPage: React.FC = () => {
               <CardTitle>Status Overview</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500">Approval</span>
-                <DebitNoteApprovalStatusBadge status={debitNote.approval_status} />
+                <DebitNoteApprovalStatusBadge
+                  status={debitNote.approval_status}
+                />
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500">Posting</span>
                 <DebitNotePostedStatusBadge status={debitNote.posted_status} />
               </div>
@@ -231,12 +283,17 @@ const DebitNoteDetailsPage: React.FC = () => {
             debitNoteTotal={debitNote.total_amount}
           />
 
-          {debitNote.customer && debitNote.approval_status !== "posted" && debitNote.approval_status !== "cancelled" && (
-            <DebitNoteCreditLimitWarningCard
-              projectedBalance={Number(debitNote.customer.current_balance || 0) + debitNote.total_amount}
-              creditLimit={Number(debitNote.customer.credit_limit || 0)}
-            />
-          )}
+          {debitNote.customer &&
+            debitNote.approval_status !== "posted" &&
+            debitNote.approval_status !== "cancelled" && (
+              <DebitNoteCreditLimitWarningCard
+                projectedBalance={
+                  Number(debitNote.customer.current_balance || 0) +
+                  debitNote.total_amount
+                }
+                creditLimit={Number(debitNote.customer.credit_limit || 0)}
+              />
+            )}
 
           <DebitNoteInvoiceLinkCard
             salesInvoice={debitNote.sales_invoice || null}
@@ -244,12 +301,22 @@ const DebitNoteDetailsPage: React.FC = () => {
           />
 
           <DebitNoteBalanceImpactCard
-            customerCurrentBalance={Number(debitNote.customer?.current_balance || 0)}
+            customerCurrentBalance={Number(
+              debitNote.customer?.current_balance || 0
+            )}
             debitNoteTotal={debitNote.total_amount}
-            customerBalanceAfterDebit={Number(debitNote.customer?.current_balance || 0) + debitNote.total_amount}
+            customerBalanceAfterDebit={
+              Number(debitNote.customer?.current_balance || 0) +
+              debitNote.total_amount
+            }
             isLinkedToInvoice={!!debitNote.sales_invoice_id}
             invoiceBalanceBefore={debitNote.sales_invoice?.balance_amount}
-            invoiceBalanceAfter={debitNote.sales_invoice ? Number(debitNote.sales_invoice.balance_amount) + debitNote.total_amount : null}
+            invoiceBalanceAfter={
+              debitNote.sales_invoice
+                ? Number(debitNote.sales_invoice.balance_amount) +
+                  debitNote.total_amount
+                : null
+            }
           />
         </div>
       </div>
@@ -262,13 +329,23 @@ const DebitNoteDetailsPage: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {debitNote.approvals.map((approval) => (
-                <div key={approval.id} className="text-sm flex flex-col md:flex-row justify-between border-b pb-2 last:border-0 last:pb-0">
+                <div
+                  key={approval.id}
+                  className="flex flex-col justify-between border-b pb-2 text-sm last:border-0 last:pb-0 md:flex-row"
+                >
                   <div>
-                    <span className="font-semibold capitalize">{approval.action}</span>
-                    {approval.remarks && <span className="text-gray-500 ml-2">- {approval.remarks}</span>}
+                    <span className="font-semibold capitalize">
+                      {approval.action}
+                    </span>
+                    {approval.remarks && (
+                      <span className="ml-2 text-gray-500">
+                        - {approval.remarks}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-gray-400 mt-1 md:mt-0 text-xs">
-                    {new Date(approval.action_at).toLocaleString()} by User {approval.action_by}
+                  <div className="mt-1 text-xs text-gray-400 md:mt-0">
+                    {new Date(approval.action_at).toLocaleString()} by User{" "}
+                    {approval.action_by}
                   </div>
                 </div>
               ))}
@@ -278,59 +355,59 @@ const DebitNoteDetailsPage: React.FC = () => {
       )}
 
       {/* Workflow Modals */}
-      <SubmitDebitNoteModal 
-        isOpen={isSubmitOpen} 
-        onClose={() => setIsSubmitOpen(false)} 
+      <SubmitDebitNoteModal
+        isOpen={isSubmitOpen}
+        onClose={() => setIsSubmitOpen(false)}
         onConfirm={async (remarks) => {
           await invoiceCenterApi.submitDebitNote(debitNote.id, { remarks });
           toast.success("Debit note submitted successfully.");
           fetchDebitNote();
-        }} 
+        }}
       />
-      <ApproveDebitNoteModal 
-        isOpen={isApproveOpen} 
-        onClose={() => setIsApproveOpen(false)} 
+      <ApproveDebitNoteModal
+        isOpen={isApproveOpen}
+        onClose={() => setIsApproveOpen(false)}
         onConfirm={async (remarks) => {
           await invoiceCenterApi.approveDebitNote(debitNote.id, { remarks });
           toast.success("Debit note approved successfully.");
           fetchDebitNote();
-        }} 
+        }}
       />
-      <RejectDebitNoteModal 
-        isOpen={isRejectOpen} 
-        onClose={() => setIsRejectOpen(false)} 
+      <RejectDebitNoteModal
+        isOpen={isRejectOpen}
+        onClose={() => setIsRejectOpen(false)}
         onConfirm={async (remarks) => {
           await invoiceCenterApi.rejectDebitNote(debitNote.id, { remarks });
           toast.success("Debit note rejected successfully.");
           fetchDebitNote();
-        }} 
+        }}
       />
-      <PostDebitNoteConfirmModal 
-        isOpen={isPostOpen} 
-        onClose={() => setIsPostOpen(false)} 
+      <PostDebitNoteConfirmModal
+        isOpen={isPostOpen}
+        onClose={() => setIsPostOpen(false)}
         onConfirm={async () => {
           await invoiceCenterApi.postDebitNote(debitNote.id);
           toast.success("Debit note posted successfully.");
           fetchDebitNote();
-        }} 
+        }}
       />
-      <CancelDebitNoteModal 
-        isOpen={isCancelOpen} 
-        onClose={() => setIsCancelOpen(false)} 
+      <CancelDebitNoteModal
+        isOpen={isCancelOpen}
+        onClose={() => setIsCancelOpen(false)}
         onConfirm={async (remarks) => {
           await invoiceCenterApi.cancelDebitNote(debitNote.id, { remarks });
           toast.success("Debit note cancelled successfully.");
           fetchDebitNote();
-        }} 
+        }}
       />
-      <DeleteDebitNoteConfirmModal 
-        isOpen={isDeleteOpen} 
-        onClose={() => setIsDeleteOpen(false)} 
+      <DeleteDebitNoteConfirmModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
         onConfirm={async () => {
           await invoiceCenterApi.deleteDebitNote(debitNote.id);
           toast.success("Debit note deleted successfully.");
           navigate("/invoice-center/debit-notes");
-        }} 
+        }}
       />
     </div>
   );

@@ -21,7 +21,13 @@ import StatusBadge from "../../../components/common/StatusBadge";
 import ActionMenu from "../../../components/common/ActionMenu";
 import ChangeUserStatusModal from "./ChangeUserStatusModal";
 import ResetPasswordModal from "./ResetPasswordModal";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import {
   Plus,
   Search,
@@ -80,13 +86,14 @@ const UsersPage = () => {
   const { data: dropdownsData } = useQuery({
     queryKey: ["userDropdowns"],
     queryFn: async () => {
-      const [deptRes, desigRes, branchRes, rolesRes, softwareRes] = await Promise.all([
-        getDepartments({ limit: 100 }),
-        getDesignations({ limit: 100 }),
-        getBranches({ limit: 100 }),
-        getRoles({ limit: 100 }),
-        getSoftwareModules(),
-      ]);
+      const [deptRes, desigRes, branchRes, rolesRes, softwareRes] =
+        await Promise.all([
+          getDepartments({ limit: 100 }),
+          getDesignations({ limit: 100 }),
+          getBranches({ limit: 100 }),
+          getRoles({ limit: 100 }),
+          getSoftwareModules(),
+        ]);
       return {
         departments: deptRes.data?.items || deptRes.data || [],
         designations: desigRes.data?.items || desigRes.data || [],
@@ -103,7 +110,12 @@ const UsersPage = () => {
   const roles = dropdownsData?.roles || [];
   const softwareModules = dropdownsData?.softwareModules || [];
 
-  const { data: usersData, isLoading: usersLoading, error, refetch } = useQuery({
+  const {
+    data: usersData,
+    isLoading: usersLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["users", filters],
     queryFn: async () => {
       const res = await getUsers(filters);
@@ -240,7 +252,7 @@ const UsersPage = () => {
       cell: (row: any) => {
         const role = row.primary_role || row.user_type;
         return (
-          <span className="text-xs font-medium text-gray-600 capitalize">
+          <span className="text-xs font-medium capitalize text-gray-600">
             {role?.replace(/_/g, " ") || "—"}
           </span>
         );
@@ -253,7 +265,8 @@ const UsersPage = () => {
     {
       header: "Last Login",
       cell: (row: any) => {
-        if (!row.last_login_at) return <span className="text-xs text-gray-400">Never</span>;
+        if (!row.last_login_at)
+          return <span className="text-xs text-gray-400">Never</span>;
         return (
           <span className="text-xs text-gray-500">
             {new Date(row.last_login_at).toLocaleDateString()}
@@ -265,7 +278,9 @@ const UsersPage = () => {
       header: "",
       id: "actions",
       cellClassName: "text-right",
-      cell: (row: any) => <ActionMenu actions={getRowActions(row)} item={row} />,
+      cell: (row: any) => (
+        <ActionMenu actions={getRowActions(row)} item={row} />
+      ),
     },
   ];
 
@@ -280,25 +295,27 @@ const UsersPage = () => {
       />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 mb-6">
+      <div className="mb-6 mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">User & Access Center</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl font-bold tracking-tight text-gray-900">
+            User & Access Center
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
             Manage system users, access controls, and permissions
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" onClick={() => refetch()}>
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
             Refresh
           </Button>
           <Button variant="secondary" size="sm">
-            <Download className="w-3.5 h-3.5 mr-1.5" />
+            <Download className="mr-1.5 h-3.5 w-3.5" />
             Export
           </Button>
           <PermissionGuard permission="control.user.create">
             <Button onClick={() => navigate("/control-center/users/create")}>
-              <Plus className="w-4 h-4 mr-1.5" />
+              <Plus className="mr-1.5 h-4 w-4" />
               Create User
             </Button>
           </PermissionGuard>
@@ -309,9 +326,9 @@ const UsersPage = () => {
 
       {/* Filter Bar */}
       <div className="filter-bar">
-        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+        <form onSubmit={handleSearch} className="flex min-w-0 flex-1 gap-2">
+          <div className="relative max-w-sm flex-1">
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search by name, email, or code..."
@@ -322,63 +339,137 @@ const UsersPage = () => {
             />
           </div>
           <Button type="submit" variant="secondary" size="sm">
-            <Search className="w-3.5 h-3.5" />
+            <Search className="h-3.5 w-3.5" />
           </Button>
         </form>
 
         <div className="flex flex-wrap gap-2">
-          <Select value={filters.branch_id || "all"} onValueChange={(val) => setFilters({ ...filters, branch_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[150px] h-[38px] bg-white border-gray-200">
+          <Select
+            value={filters.branch_id || "all"}
+            onValueChange={(val) =>
+              setFilters({
+                ...filters,
+                branch_id: val === "all" ? "" : val,
+                page: 1,
+              })
+            }
+          >
+            <SelectTrigger className="h-[38px] w-[150px] border-gray-200 bg-white">
               <SelectValue placeholder="All Branches" />
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="all">All Branches</SelectItem>
-              {branches.map((b: any) => <SelectItem key={b.id} value={b.id.toString()}>{b.branch_name}</SelectItem>)}
+              {branches.map((b: any) => (
+                <SelectItem key={b.id} value={b.id.toString()}>
+                  {b.branch_name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.software_id || "all"} onValueChange={(val) => setFilters({ ...filters, software_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[150px] h-[38px] bg-white border-gray-200">
+          <Select
+            value={filters.software_id || "all"}
+            onValueChange={(val) =>
+              setFilters({
+                ...filters,
+                software_id: val === "all" ? "" : val,
+                page: 1,
+              })
+            }
+          >
+            <SelectTrigger className="h-[38px] w-[150px] border-gray-200 bg-white">
               <SelectValue placeholder="All Modules" />
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="all">All Modules</SelectItem>
-              {softwareModules.map((s: any) => <SelectItem key={s.id} value={s.id.toString()}>{s.software_name}</SelectItem>)}
+              {softwareModules.map((s: any) => (
+                <SelectItem key={s.id} value={s.id.toString()}>
+                  {s.software_name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.role_id || "all"} onValueChange={(val) => setFilters({ ...filters, role_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[140px] h-[38px] bg-white border-gray-200">
+          <Select
+            value={filters.role_id || "all"}
+            onValueChange={(val) =>
+              setFilters({
+                ...filters,
+                role_id: val === "all" ? "" : val,
+                page: 1,
+              })
+            }
+          >
+            <SelectTrigger className="h-[38px] w-[140px] border-gray-200 bg-white">
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="all">All Roles</SelectItem>
-              {roles.map((r: any) => <SelectItem key={r.id} value={r.id.toString()}>{r.role_name || r.name}</SelectItem>)}
+              {roles.map((r: any) => (
+                <SelectItem key={r.id} value={r.id.toString()}>
+                  {r.role_name || r.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.department_id || "all"} onValueChange={(val) => setFilters({ ...filters, department_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[160px] h-[38px] bg-white border-gray-200">
+          <Select
+            value={filters.department_id || "all"}
+            onValueChange={(val) =>
+              setFilters({
+                ...filters,
+                department_id: val === "all" ? "" : val,
+                page: 1,
+              })
+            }
+          >
+            <SelectTrigger className="h-[38px] w-[160px] border-gray-200 bg-white">
               <SelectValue placeholder="All Departments" />
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="all">All Departments</SelectItem>
-              {departments.map((d: any) => <SelectItem key={d.id} value={d.id.toString()}>{d.department_name}</SelectItem>)}
+              {departments.map((d: any) => (
+                <SelectItem key={d.id} value={d.id.toString()}>
+                  {d.department_name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.designation_id || "all"} onValueChange={(val) => setFilters({ ...filters, designation_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[160px] h-[38px] bg-white border-gray-200">
+          <Select
+            value={filters.designation_id || "all"}
+            onValueChange={(val) =>
+              setFilters({
+                ...filters,
+                designation_id: val === "all" ? "" : val,
+                page: 1,
+              })
+            }
+          >
+            <SelectTrigger className="h-[38px] w-[160px] border-gray-200 bg-white">
               <SelectValue placeholder="All Designations" />
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="all">All Designations</SelectItem>
-              {designations.map((d: any) => <SelectItem key={d.id} value={d.id.toString()}>{d.designation_name}</SelectItem>)}
+              {designations.map((d: any) => (
+                <SelectItem key={d.id} value={d.id.toString()}>
+                  {d.designation_name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.status || "all"} onValueChange={(val) => setFilters({ ...filters, status: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[130px] h-[38px] bg-white border-gray-200">
+          <Select
+            value={filters.status || "all"}
+            onValueChange={(val) =>
+              setFilters({
+                ...filters,
+                status: val === "all" ? "" : val,
+                page: 1,
+              })
+            }
+          >
+            <SelectTrigger className="h-[38px] w-[130px] border-gray-200 bg-white">
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent className="bg-white">
@@ -433,7 +524,9 @@ const UsersPage = () => {
         title="Delete User"
         message={
           deleteError ||
-          `Are you sure you want to delete user "${(userToDelete as any)?.full_name}"?`
+          `Are you sure you want to delete user "${
+            (userToDelete as any)?.full_name
+          }"?`
         }
         confirmText="Delete User"
         isConfirming={isDeleting}

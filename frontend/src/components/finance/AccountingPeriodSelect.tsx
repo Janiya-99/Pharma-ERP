@@ -25,7 +25,14 @@ const AccountingPeriodSelect: React.FC<AccountingPeriodSelectProps> = ({
   placeholder = "Select Period",
   className,
   disabled,
-}: { value?: unknown; onChange?: unknown; financialYearId?: string | number; placeholder?: unknown; className?: unknown; disabled?: unknown }) => {
+}: {
+  value?: unknown;
+  onChange?: unknown;
+  financialYearId?: string | number;
+  placeholder?: unknown;
+  className?: unknown;
+  disabled?: unknown;
+}) => {
   const [periods, setPeriods] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -56,9 +63,26 @@ const AccountingPeriodSelect: React.FC<AccountingPeriodSelectProps> = ({
   }, [financialYearId]);
 
   return (
-    <Select value={value} onValueChange={onChange} disabled={disabled || loading || !financialYearId}>
-      <SelectTrigger className={className || "w-full bg-white dark:bg-navy-900 border-gray-300 dark:border-navy-700"}>
-        <SelectValue placeholder={!financialYearId ? "Select FY first" : loading ? "Loading..." : placeholder} />
+    <Select
+      value={value}
+      onValueChange={onChange}
+      disabled={disabled || loading || !financialYearId}
+    >
+      <SelectTrigger
+        className={
+          className ||
+          "w-full border-gray-300 bg-white dark:border-navy-700 dark:bg-navy-900"
+        }
+      >
+        <SelectValue
+          placeholder={
+            !financialYearId
+              ? "Select FY first"
+              : loading
+              ? "Loading..."
+              : placeholder
+          }
+        />
       </SelectTrigger>
       <SelectContent className="bg-white dark:bg-navy-800">
         {periods.map((item: unknown) => (

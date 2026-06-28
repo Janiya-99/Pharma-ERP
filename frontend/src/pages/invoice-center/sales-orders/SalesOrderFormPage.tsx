@@ -3,14 +3,30 @@ import { ArrowLeft, Save } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { useAuth } from "../../../auth/AuthContext";
-import { SalesOrderCustomerCreditCard, SalesOrderTotalsCard } from "../../../components/invoice-center";
+import {
+  SalesOrderCustomerCreditCard,
+  SalesOrderTotalsCard,
+} from "../../../components/invoice-center";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
-import type { ApiResponse, CreateSalesOrderPayload, Customer, SalesOrderDetail, SalesOrderLineForm } from "../../../types/invoice-center";
-import SalesOrderLinesTable, { createBlankSalesOrderLine } from "./SalesOrderLinesTable";
+import type {
+  ApiResponse,
+  CreateSalesOrderPayload,
+  Customer,
+  SalesOrderDetail,
+  SalesOrderLineForm,
+} from "../../../types/invoice-center";
+import SalesOrderLinesTable, {
+  createBlankSalesOrderLine,
+} from "./SalesOrderLinesTable";
 
 type SalesOrderFormState = {
   branch_id: string;
@@ -23,7 +39,8 @@ type SalesOrderFormState = {
 
 const today = (): string => new Date().toISOString().slice(0, 10);
 
-const toNumber = (value: number | string | null | undefined): number => Number(value || 0);
+const toNumber = (value: number | string | null | undefined): number =>
+  Number(value || 0);
 
 const SalesOrderFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,17 +55,24 @@ const SalesOrderFormPage: React.FC = () => {
     customer_reference_number: "",
     remarks: "",
   });
-  const [lines, setLines] = useState<SalesOrderLineForm[]>([createBlankSalesOrderLine()]);
+  const [lines, setLines] = useState<SalesOrderLineForm[]>([
+    createBlankSalesOrderLine(),
+  ]);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setForm((current) => ({ ...current, branch_id: current.branch_id || (activeBranch?.id ? String(activeBranch.id) : "") }));
+    setForm((current) => ({
+      ...current,
+      branch_id:
+        current.branch_id || (activeBranch?.id ? String(activeBranch.id) : ""),
+    }));
   }, [activeBranch]);
 
   useEffect(() => {
-    if (!isEdit || !id || activeSoftware?.software_code !== "INVOICE_CENTER") return;
+    if (!isEdit || !id || activeSoftware?.software_code !== "INVOICE_CENTER")
+      return;
 
     const loadOrder = async () => {
       setLoading(true);
@@ -91,14 +115,19 @@ const SalesOrderFormPage: React.FC = () => {
   }, [activeSoftware, id, isEdit]);
 
   useEffect(() => {
-    if (!form.customer_id || activeSoftware?.software_code !== "INVOICE_CENTER") {
+    if (
+      !form.customer_id ||
+      activeSoftware?.software_code !== "INVOICE_CENTER"
+    ) {
       setCustomer(null);
       return;
     }
 
     const loadCustomer = async () => {
       try {
-        const response = await invoiceCenterApi.getCustomerById(form.customer_id);
+        const response = await invoiceCenterApi.getCustomerById(
+          form.customer_id
+        );
         setCustomer((response.data as ApiResponse<Customer>).data);
       } catch (customerError) {
         console.error("Load customer error:", customerError);
@@ -111,7 +140,7 @@ const SalesOrderFormPage: React.FC = () => {
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
-      <div className="m-6 rounded-xl border border-rose-200 bg-rose-50 p-8 text-center font-medium text-rose-600">
+      <div className="border-rose-200 bg-rose-50 text-rose-600 m-6 rounded-xl border p-8 text-center font-medium">
         Please switch to Invoice Center module to access this page.
       </div>
     );
@@ -125,7 +154,9 @@ const SalesOrderFormPage: React.FC = () => {
       .filter((line) => line.product_id && toNumber(line.quantity) > 0)
       .map((line) => ({
         product_id: Number(line.product_id),
-        product_batch_id: line.product_batch_id ? Number(line.product_batch_id) : null,
+        product_batch_id: line.product_batch_id
+          ? Number(line.product_batch_id)
+          : null,
         quantity: toNumber(line.quantity),
         unit_price: toNumber(line.unit_price),
         discount_amount: toNumber(line.discount_amount),
@@ -165,15 +196,27 @@ const SalesOrderFormPage: React.FC = () => {
   };
 
   return (
-    <form onSubmit={submitForm} className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6">
+    <form
+      onSubmit={submitForm}
+      className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6"
+    >
       <div className="flex flex-col gap-4 rounded-xl border bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Button type="button" variant="outline" size="icon" onClick={() => navigate(-1)}>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-navy-900">{isEdit ? "Edit Sales Order" : "Create Sales Order"}</h1>
-            <p className="text-sm text-muted-foreground">Use TypeScript-only Invoice Center order entry.</p>
+            <h1 className="text-2xl font-bold text-navy-900">
+              {isEdit ? "Edit Sales Order" : "Create Sales Order"}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Use TypeScript-only Invoice Center order entry.
+            </p>
           </div>
         </div>
         <Button type="submit" disabled={loading}>
@@ -182,7 +225,11 @@ const SalesOrderFormPage: React.FC = () => {
         </Button>
       </div>
 
-      {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>}
+      {error && (
+        <div className="border-rose-200 bg-rose-50 text-rose-700 rounded-xl border p-4 text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
@@ -193,34 +240,91 @@ const SalesOrderFormPage: React.FC = () => {
             <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="space-y-1">
                 <Label>Branch ID</Label>
-                <Input required value={form.branch_id} onChange={(event) => setForm((current) => ({ ...current, branch_id: event.target.value }))} />
+                <Input
+                  required
+                  value={form.branch_id}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      branch_id: event.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="space-y-1">
                 <Label>Customer ID</Label>
-                <Input required value={form.customer_id} onChange={(event) => setForm((current) => ({ ...current, customer_id: event.target.value }))} />
+                <Input
+                  required
+                  value={form.customer_id}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      customer_id: event.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="space-y-1">
                 <Label>Customer Reference</Label>
-                <Input value={form.customer_reference_number} onChange={(event) => setForm((current) => ({ ...current, customer_reference_number: event.target.value }))} />
+                <Input
+                  value={form.customer_reference_number}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      customer_reference_number: event.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="space-y-1">
                 <Label>Sales Order Date</Label>
-                <Input required type="date" value={form.sales_order_date} onChange={(event) => setForm((current) => ({ ...current, sales_order_date: event.target.value }))} />
+                <Input
+                  required
+                  type="date"
+                  value={form.sales_order_date}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      sales_order_date: event.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="space-y-1">
                 <Label>Expected Delivery Date</Label>
-                <Input type="date" value={form.expected_delivery_date} onChange={(event) => setForm((current) => ({ ...current, expected_delivery_date: event.target.value }))} />
+                <Input
+                  type="date"
+                  value={form.expected_delivery_date}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      expected_delivery_date: event.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="space-y-1 md:col-span-3">
                 <Label>Remarks</Label>
-                <Textarea value={form.remarks} onChange={(event) => setForm((current) => ({ ...current, remarks: event.target.value }))} />
+                <Textarea
+                  value={form.remarks}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      remarks: event.target.value,
+                    }))
+                  }
+                />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white">
             <CardContent>
-              <SalesOrderLinesTable lines={lines} onChange={setLines} disabled={loading} />
+              <SalesOrderLinesTable
+                lines={lines}
+                onChange={setLines}
+                disabled={loading}
+              />
             </CardContent>
           </Card>
         </div>

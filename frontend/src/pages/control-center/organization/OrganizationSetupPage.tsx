@@ -14,8 +14,16 @@ import DepartmentsPage from "../departments/DepartmentsPage";
 const TABS = [
   { key: "company", label: "Company", icon: <Building2 className="h-4 w-4" /> },
   { key: "branches", label: "Branches", icon: <MapPin className="h-4 w-4" /> },
-  { key: "departments", label: "Departments", icon: <Briefcase className="h-4 w-4" /> },
-  { key: "designations", label: "Designations", icon: <Award className="h-4 w-4" /> },
+  {
+    key: "departments",
+    label: "Departments",
+    icon: <Briefcase className="h-4 w-4" />,
+  },
+  {
+    key: "designations",
+    label: "Designations",
+    icon: <Award className="h-4 w-4" />,
+  },
 ];
 
 const OrganizationSetupPage = () => {
@@ -47,10 +55,12 @@ const OrganizationSetupPage = () => {
       />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 mb-6">
+      <div className="mb-6 mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">Organization Setup</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl font-bold tracking-tight text-gray-900">
+            Organization Setup
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
             Manage your company profile, branches, departments, and designations
           </p>
         </div>
@@ -58,16 +68,22 @@ const OrganizationSetupPage = () => {
 
       {/* Tab Navigation */}
       <div className="card-premium mb-6">
-        <div className="flex items-center gap-1 p-1.5 overflow-x-auto">
+        <div className="flex items-center gap-1 overflow-x-auto p-1.5">
           {TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`tab-premium flex items-center gap-2 whitespace-nowrap ${
-                activeTab === tab.key ? "tab-premium-active" : "tab-premium-default"
+                activeTab === tab.key
+                  ? "tab-premium-active"
+                  : "tab-premium-default"
               }`}
             >
-              <span className={activeTab === tab.key ? "text-indigo-600" : "text-gray-400"}>
+              <span
+                className={
+                  activeTab === tab.key ? "text-indigo-600" : "text-gray-400"
+                }
+              >
                 {tab.icon}
               </span>
               {tab.label}

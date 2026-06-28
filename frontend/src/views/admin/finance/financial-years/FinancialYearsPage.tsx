@@ -15,7 +15,7 @@ export default function FinancialYearsPage() {
   const [limit, setLimit] = useState(10);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
-  
+
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -56,15 +56,23 @@ export default function FinancialYearsPage() {
 
   const handleCloseYear = async (record: any) => {
     if (record.is_closed) return;
-    if (window.confirm(`Are you sure you want to close financial year ${record.year_name}? This action cannot be undone.`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to close financial year ${record.year_name}? This action cannot be undone.`
+      )
+    ) {
       try {
         const res = await financeApi.closeFinancialYear(record.id);
         if (res.data.success) {
-          toast.success(`Financial year ${record.year_name} closed successfully`);
+          toast.success(
+            `Financial year ${record.year_name} closed successfully`
+          );
           fetchFinancialYears();
         }
       } catch (err: any) {
-        toast.error(err.response?.data?.message || "Failed to close financial year");
+        toast.error(
+          err.response?.data?.message || "Failed to close financial year"
+        );
       }
     }
   };
@@ -73,56 +81,67 @@ export default function FinancialYearsPage() {
     { header: "Year Name", accessor: "year_name" },
     { header: "Start Date", accessor: "start_date" },
     { header: "End Date", accessor: "end_date" },
-    { 
-      header: "Status", 
+    {
+      header: "Status",
       accessor: "status",
       render: (val: string) => (
-        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-          val === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-        }`}>
+        <span
+          className={`rounded-full px-2 py-1 text-xs font-semibold ${
+            val === "active"
+              ? "bg-green-100 text-green-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+        >
           {val}
         </span>
-      )
+      ),
     },
-    { 
-      header: "Active", 
+    {
+      header: "Active",
       accessor: "is_active",
       render: (val: boolean) => (
-        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-          val ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
-        }`}>
+        <span
+          className={`rounded-full px-2 py-1 text-xs font-semibold ${
+            val ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+          }`}
+        >
           {val ? "Yes" : "No"}
         </span>
-      )
+      ),
     },
-    { 
-      header: "Closed", 
+    {
+      header: "Closed",
       accessor: "is_closed",
       render: (val: boolean) => (
-        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-          val ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"
-        }`}>
+        <span
+          className={`rounded-full px-2 py-1 text-xs font-semibold ${
+            val ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"
+          }`}
+        >
           {val ? "Closed" : "Open"}
         </span>
-      )
+      ),
     },
   ];
 
   return (
     <div className="py-5">
-      <FinancePageHeader 
-        title="Financial Years" 
+      <FinancePageHeader
+        title="Financial Years"
         description="Manage financial years and accounting periods"
         action={
           <PermissionGuard permission="finance.financial_year.create">
-            <Button onClick={handleCreate} className="bg-brand-500 hover:bg-brand-600 text-white">
+            <Button
+              onClick={handleCreate}
+              className="bg-brand-500 text-white hover:bg-brand-600"
+            >
               <Plus className="mr-2 h-4 w-4" /> New Financial Year
             </Button>
           </PermissionGuard>
         }
       />
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
+      <div className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
         <DataTable
           columns={columns}
           data={data}
@@ -135,12 +154,12 @@ export default function FinancialYearsPage() {
           onSearch={setSearch}
           searchPlaceholder="Search financial years..."
           actions={(record: unknown) => (
-            <div className="flex space-x-2 justify-end">
+            <div className="flex justify-end space-x-2">
               {!record.is_closed && (
                 <PermissionGuard permission="finance.financial_year.update">
-                  <button 
+                  <button
                     onClick={() => handleEdit(record)}
-                    className="text-brand-500 hover:text-brand-600 font-medium text-sm transition-colors"
+                    className="text-sm font-medium text-brand-500 transition-colors hover:text-brand-600"
                   >
                     Edit
                   </button>
@@ -148,9 +167,9 @@ export default function FinancialYearsPage() {
               )}
               {!record.is_closed && (
                 <PermissionGuard permission="finance.financial_year.close">
-                  <button 
+                  <button
                     onClick={() => handleCloseYear(record)}
-                    className="text-red-500 hover:text-red-600 font-medium text-sm transition-colors"
+                    className="text-sm font-medium text-red-500 transition-colors hover:text-red-600"
                   >
                     Close Year
                   </button>

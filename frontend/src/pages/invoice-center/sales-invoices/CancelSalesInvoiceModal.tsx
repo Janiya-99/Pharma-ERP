@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../../../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Label } from "../../../components/ui/label";
@@ -14,8 +21,15 @@ interface Props {
   onSuccess: () => void;
 }
 
-export const CancelSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invoiceId, onSuccess }) => {
-  const [remarks, setRemarks] = useState("Customer cancelled invoice before posting");
+export const CancelSalesInvoiceModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  invoiceId,
+  onSuccess,
+}) => {
+  const [remarks, setRemarks] = useState(
+    "Customer cancelled invoice before posting"
+  );
   const [loading, setLoading] = useState(false);
 
   const handleCancel = async () => {
@@ -23,7 +37,7 @@ export const CancelSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
       toast.error("Remarks are required for cancellation.");
       return;
     }
-    
+
     setLoading(true);
     try {
       await invoiceCenterApi.cancelSalesInvoice(invoiceId, { remarks });
@@ -31,7 +45,9 @@ export const CancelSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to cancel sales invoice.");
+      toast.error(
+        err?.response?.data?.message || "Failed to cancel sales invoice."
+      );
     } finally {
       setLoading(false);
     }
@@ -47,12 +63,14 @@ export const CancelSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="bg-yellow-50 text-yellow-700 p-3 rounded-md flex gap-2 items-center text-sm border border-yellow-200">
+          <div className="flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-700">
             <AlertTriangle className="h-5 w-5 flex-shrink-0" />
             <span>Note: Posted invoices cannot be cancelled in this step.</span>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="remarks" className="text-red-500">Reason for Cancellation *</Label>
+            <Label htmlFor="remarks" className="text-red-500">
+              Reason for Cancellation *
+            </Label>
             <Textarea
               id="remarks"
               value={remarks}
@@ -66,7 +84,11 @@ export const CancelSalesInvoiceModal: React.FC<Props> = ({ isOpen, onClose, invo
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Back
           </Button>
-          <Button variant="destructive" onClick={handleCancel} disabled={loading || !remarks.trim()}>
+          <Button
+            variant="destructive"
+            onClick={handleCancel}
+            disabled={loading || !remarks.trim()}
+          >
             {loading ? "Cancelling..." : "Cancel Invoice"}
           </Button>
         </DialogFooter>

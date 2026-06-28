@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getCompanyProfile, updateCompanyProfile } from "../../../api/controlApi";
+import {
+  getCompanyProfile,
+  updateCompanyProfile,
+} from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
 import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
@@ -14,7 +17,7 @@ import {
   ShieldCheck,
   Image as ImageIcon,
   Building2,
-  X
+  X,
 } from "lucide-react";
 
 // Interface for strictly typed company profile response data
@@ -35,8 +38,8 @@ interface CompanyProfile {
 
 const SkeletonField = () => (
   <div className="space-y-2">
-    <div className="h-4 w-24 bg-slate-100 rounded-md animate-pulse"></div>
-    <div className="h-10 w-full bg-slate-50 border border-slate-100 rounded-xl animate-pulse"></div>
+    <div className="bg-slate-100 h-4 w-24 animate-pulse rounded-md"></div>
+    <div className="bg-slate-50 border-slate-100 h-10 w-full animate-pulse rounded-xl border"></div>
   </div>
 );
 
@@ -62,10 +65,16 @@ const CompanyProfilePage = () => {
     status: "",
   });
 
-  const [originalData, setOriginalData] = useState<CompanyProfile>({ ...formData });
+  const [originalData, setOriginalData] = useState<CompanyProfile>({
+    ...formData,
+  });
   const [lastSaved, setLastSaved] = useState<string>("Never");
 
-  const { data: profile, isLoading, error: queryError } = useQuery<CompanyProfile>({
+  const {
+    data: profile,
+    isLoading,
+    error: queryError,
+  } = useQuery<CompanyProfile>({
     queryKey: ["companyProfile"],
     queryFn: async () => {
       const res = await getCompanyProfile();
@@ -95,18 +104,26 @@ const CompanyProfilePage = () => {
       setOriginalData(mapped);
       if (profile.updated_at) {
         const date = new Date(profile.updated_at);
-        setLastSaved(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        setLastSaved(
+          date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        );
       }
     }
   }, [profile]);
 
   useEffect(() => {
     if (queryError) {
-      setError(queryError instanceof Error ? queryError.message : "Failed to load company profile");
+      setError(
+        queryError instanceof Error
+          ? queryError.message
+          : "Failed to load company profile"
+      );
     }
   }, [queryError]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -124,9 +141,9 @@ const CompanyProfilePage = () => {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        logo_url: reader.result as string
+        logo_url: reader.result as string,
       }));
       toast.success("Logo loaded. Save changes to persist.");
     };
@@ -134,9 +151,9 @@ const CompanyProfilePage = () => {
   };
 
   const handleRemoveImage = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      logo_url: ""
+      logo_url: "",
     }));
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -172,7 +189,9 @@ const CompanyProfilePage = () => {
         setFormData(res.data);
         setOriginalData(res.data);
         const now = new Date();
-        setLastSaved(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        setLastSaved(
+          now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        );
         toast.success("Company profile updated successfully!");
       } else {
         setError(res.message);
@@ -191,55 +210,64 @@ const CompanyProfilePage = () => {
   const isDirty = JSON.stringify(formData) !== JSON.stringify(originalData);
 
   return (
-    <div className="page-content space-y-8 font-sans pb-32">
+    <div className="page-content space-y-8 pb-32 font-sans">
       <div>
-        <h1 className="text-3xl font-bold text-slate-950 tracking-tight">Company Profile</h1>
+        <h1 className="text-slate-950 text-3xl font-bold tracking-tight">
+          Company Profile
+        </h1>
         <p className="text-slate-600 mt-1 max-w-3xl">
-          Update your organization's legal information, contact details, and branding. These details will be reflected across your workspace and in all outgoing communications.
+          Update your organization's legal information, contact details, and
+          branding. These details will be reflected across your workspace and in
+          all outgoing communications.
         </p>
       </div>
 
       <FormError message={error} />
 
       {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-8 animate-pulse">
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col items-center">
-              <div className="w-full h-5 bg-slate-100 rounded mb-4"></div>
-              <div className="w-48 h-48 rounded-xl bg-slate-100 mb-4"></div>
-              <div className="w-full h-10 bg-slate-50 border border-slate-100 rounded-xl"></div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="animate-pulse space-y-8 lg:col-span-1">
+            <div className="border-slate-200/80 flex flex-col items-center rounded-2xl border bg-white p-6 shadow-sm">
+              <div className="bg-slate-100 mb-4 h-5 w-full rounded"></div>
+              <div className="bg-slate-100 mb-4 h-48 w-48 rounded-xl"></div>
+              <div className="bg-slate-50 border-slate-100 h-10 w-full rounded-xl border"></div>
             </div>
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="w-32 h-5 bg-slate-100 rounded"></div>
-              <div className="w-full h-10 bg-slate-100 rounded-lg"></div>
-              <div className="w-full h-12 bg-slate-100 rounded-lg"></div>
+            <div className="border-slate-200/80 space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+              <div className="bg-slate-100 h-5 w-32 rounded"></div>
+              <div className="bg-slate-100 h-10 w-full rounded-lg"></div>
+              <div className="bg-slate-100 h-12 w-full rounded-lg"></div>
             </div>
           </div>
-          <div className="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
-            <div className="w-48 h-5 bg-slate-100 rounded mb-4"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="border-slate-200/80 space-y-6 rounded-2xl border bg-white p-6 shadow-sm lg:col-span-2">
+            <div className="bg-slate-100 mb-4 h-5 w-48 rounded"></div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <SkeletonField />
               <SkeletonField />
               <SkeletonField />
               <SkeletonField />
               <SkeletonField />
               <SkeletonField />
-              <div className="md:col-span-2 space-y-2">
-                <div className="h-4 w-24 bg-slate-100 rounded-md"></div>
-                <div className="h-24 w-full bg-slate-50 border border-slate-100 rounded-xl"></div>
+              <div className="space-y-2 md:col-span-2">
+                <div className="bg-slate-100 h-4 w-24 rounded-md"></div>
+                <div className="bg-slate-50 border-slate-100 h-24 w-full rounded-xl border"></div>
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 gap-8 lg:grid-cols-3"
+        >
           {/* Left Column - Branding & Identifiers */}
-          <div className="lg:col-span-1 space-y-8">
+          <div className="space-y-8 lg:col-span-1">
             {/* Branding Card */}
-            <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col items-center">
-              <div className="w-full flex items-center gap-2 mb-4 pb-2 border-b border-slate-100">
-                <ImageIcon className="h-5 w-5 text-slate-500" />
-                <h2 className="text-base font-bold text-slate-950">Company Branding</h2>
+            <div className="border-slate-200/80 flex flex-col items-center rounded-2xl border bg-white/80 p-6 shadow-sm backdrop-blur-md">
+              <div className="border-slate-100 mb-4 flex w-full items-center gap-2 border-b pb-2">
+                <ImageIcon className="text-slate-500 h-5 w-5" />
+                <h2 className="text-slate-950 text-base font-bold">
+                  Company Branding
+                </h2>
               </div>
 
               {/* Logo Preview */}
@@ -251,28 +279,30 @@ const CompanyProfilePage = () => {
                     fileInputRef.current?.click();
                   }
                 }}
-                className="w-48 h-48 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center justify-center overflow-hidden mb-4 group relative cursor-pointer hover:border-blue-500/50 hover:bg-slate-100/50 transition-all duration-200"
+                className="border-slate-200 bg-slate-50/50 hover:bg-slate-100/50 group relative mb-4 flex h-48 w-48 cursor-pointer items-center justify-center overflow-hidden rounded-xl border transition-all duration-200 hover:border-blue-500/50"
               >
                 {formData.logo_url ? (
                   <>
                     <img
                       src={formData.logo_url}
                       alt="Company Logo"
-                      className="max-w-full max-h-full object-contain p-2 transition-transform duration-200 group-hover:scale-[1.02]"
+                      className="max-h-full max-w-full object-contain p-2 transition-transform duration-200 group-hover:scale-[1.02]"
                     />
-                    <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-white text-xs font-semibold gap-1.5">
+                    <div className="bg-slate-950/40 absolute inset-0 flex items-center justify-center gap-1.5 text-xs font-semibold text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       <ImageIcon className="h-4 w-4" />
                       <span>Click to view</span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="flex flex-col items-center text-slate-500 transition-colors duration-200 group-hover:text-blue-600">
+                    <div className="text-slate-500 flex flex-col items-center transition-colors duration-200 group-hover:text-blue-600">
                       <Building2 className="h-12 w-12 stroke-[1.5]" />
-                      <span className="text-xs font-semibold mt-2">No Logo Uploaded</span>
+                      <span className="mt-2 text-xs font-semibold">
+                        No Logo Uploaded
+                      </span>
                     </div>
                     {canUpdate && (
-                      <div className="absolute inset-0 bg-slate-950/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-slate-600 text-xs font-semibold gap-1.5">
+                      <div className="bg-slate-950/5 text-slate-600 absolute inset-0 flex items-center justify-center gap-1.5 text-xs font-semibold opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                         <UploadIcon className="h-4 w-4" />
                         <span>Click to upload</span>
                       </div>
@@ -281,7 +311,7 @@ const CompanyProfilePage = () => {
                 )}
               </div>
 
-              <p className="text-xs text-slate-500 text-center mb-6 leading-relaxed">
+              <p className="text-slate-500 mb-6 text-center text-xs leading-relaxed">
                 Recommended size: 512x512px. Supported formats: PNG, JPG, SVG.
               </p>
 
@@ -294,14 +324,14 @@ const CompanyProfilePage = () => {
                 disabled={!canUpdate}
               />
 
-              <div className="flex gap-4 w-full">
+              <div className="flex w-full gap-4">
                 <Button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={!canUpdate}
                   variant="outline"
                   size="sm"
-                  className="flex-1 text-slate-950 font-semibold shadow-sm transition-all"
+                  className="text-slate-950 flex-1 font-semibold shadow-sm transition-all"
                 >
                   Change Image
                 </Button>
@@ -312,7 +342,7 @@ const CompanyProfilePage = () => {
                     disabled={!canUpdate}
                     variant="ghost"
                     size="sm"
-                    className="flex-1 text-rose-600 hover:text-rose-700 font-semibold hover:bg-rose-50/50 transition-all"
+                    className="text-rose-600 hover:text-rose-700 hover:bg-rose-50/50 flex-1 font-semibold transition-all"
                   >
                     Remove
                   </Button>
@@ -321,32 +351,40 @@ const CompanyProfilePage = () => {
             </div>
 
             {/* Identifiers Card */}
-            <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-5">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                <span className="text-base font-bold text-slate-950">#</span>
-                <h2 className="text-base font-bold text-slate-950">System Identifiers</h2>
+            <div className="border-slate-200/80 space-y-5 rounded-2xl border bg-white/80 p-6 shadow-sm backdrop-blur-md">
+              <div className="border-slate-100 flex items-center gap-2 border-b pb-2">
+                <span className="text-slate-950 text-base font-bold">#</span>
+                <h2 className="text-slate-950 text-base font-bold">
+                  System Identifiers
+                </h2>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed -mt-2">
+              <p className="text-slate-600 -mt-2 text-xs leading-relaxed">
                 Internal administrative metadata used for technical integration.
               </p>
 
               <div>
-                <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs font-bold text-slate-950">Company Code</label>
-                  <span className="text-[9px] font-bold tracking-wider text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/50 uppercase">Read Only</span>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <label className="text-slate-950 text-xs font-bold">
+                    Company Code
+                  </label>
+                  <span className="text-slate-600 bg-slate-100 border-slate-200/50 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                    Read Only
+                  </span>
                 </div>
                 <input
                   type="text"
                   value={formData.company_code}
                   disabled
-                  className="w-full h-10 rounded-lg border border-slate-200 bg-slate-50/80 px-3 text-sm text-slate-600 font-mono shadow-sm cursor-not-allowed"
+                  className="border-slate-200 bg-slate-50/80 text-slate-600 h-10 w-full cursor-not-allowed rounded-lg border px-3 font-mono text-sm shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-950 mb-1.5">Account Status</label>
-                <div className="flex items-center gap-2 p-3 bg-blue-50/30 border border-blue-100/60 rounded-xl text-blue-900 font-semibold text-sm">
-                  <ShieldCheck className="h-5 w-5 text-blue-600 shrink-0" />
+                <label className="text-slate-950 mb-1.5 block text-xs font-bold">
+                  Account Status
+                </label>
+                <div className="flex items-center gap-2 rounded-xl border border-blue-100/60 bg-blue-50/30 p-3 text-sm font-semibold text-blue-900">
+                  <ShieldCheck className="h-5 w-5 shrink-0 text-blue-600" />
                   <span>Premium Enterprise Plan</span>
                 </div>
               </div>
@@ -354,19 +392,24 @@ const CompanyProfilePage = () => {
           </div>
 
           {/* Right Column - General Info */}
-          <div className="lg:col-span-2 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <Building2 className="h-5 w-5 text-slate-500" />
-              <h2 className="text-base font-bold text-slate-950">General Information</h2>
+          <div className="border-slate-200/80 space-y-6 rounded-2xl border bg-white/80 p-6 shadow-sm backdrop-blur-md lg:col-span-2">
+            <div className="border-slate-100 flex items-center gap-2 border-b pb-2">
+              <Building2 className="text-slate-500 h-5 w-5" />
+              <h2 className="text-slate-950 text-base font-bold">
+                General Information
+              </h2>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed -mt-4">
-              Public-facing details used for billing, support, and legal registrations.
+            <p className="text-slate-600 -mt-4 text-xs leading-relaxed">
+              Public-facing details used for billing, support, and legal
+              registrations.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {/* Company Legal Name */}
               <div className="md:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Company Legal Name</label>
+                <label className="text-slate-700 mb-1.5 block text-xs font-semibold">
+                  Company Legal Name
+                </label>
                 <input
                   type="text"
                   name="company_name"
@@ -375,15 +418,17 @@ const CompanyProfilePage = () => {
                   disabled={!canUpdate}
                   required
                   placeholder="e.g. Acme Corp Ltd"
-                  className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all disabled:bg-slate-50"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               {/* Official Email Address */}
               <div className="md:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Official Email Address</label>
+                <label className="text-slate-700 mb-1.5 block text-xs font-semibold">
+                  Official Email Address
+                </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400/80 h-4 w-4 stroke-[1.5]" />
+                  <Mail className="text-slate-400/80 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5]" />
                   <input
                     type="email"
                     name="email"
@@ -392,16 +437,18 @@ const CompanyProfilePage = () => {
                     disabled={!canUpdate}
                     required
                     placeholder="e.g. hq@company.com"
-                    className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all disabled:bg-slate-50"
+                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               {/* Primary Phone Number */}
               <div className="md:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Primary Phone Number</label>
+                <label className="text-slate-700 mb-1.5 block text-xs font-semibold">
+                  Primary Phone Number
+                </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400/80 h-4 w-4 stroke-[1.5]" />
+                  <Phone className="text-slate-400/80 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5]" />
                   <input
                     type="text"
                     name="phone"
@@ -409,14 +456,16 @@ const CompanyProfilePage = () => {
                     onChange={handleChange}
                     disabled={!canUpdate}
                     placeholder="e.g. +1 (555) 019-2834"
-                    className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all disabled:bg-slate-50"
+                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               {/* Business Registration Number */}
               <div className="md:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Business Registration Number</label>
+                <label className="text-slate-700 mb-1.5 block text-xs font-semibold">
+                  Business Registration Number
+                </label>
                 <input
                   type="text"
                   name="registration_number"
@@ -424,13 +473,15 @@ const CompanyProfilePage = () => {
                   onChange={handleChange}
                   disabled={!canUpdate}
                   placeholder="e.g. REG-12345678"
-                  className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all disabled:bg-slate-50"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               {/* Tax Identification Number */}
               <div className="md:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tax Identification Number</label>
+                <label className="text-slate-700 mb-1.5 block text-xs font-semibold">
+                  Tax Identification Number
+                </label>
                 <input
                   type="text"
                   name="tax_number"
@@ -438,15 +489,17 @@ const CompanyProfilePage = () => {
                   onChange={handleChange}
                   disabled={!canUpdate}
                   placeholder="e.g. TAX-98765432"
-                  className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all disabled:bg-slate-50"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               {/* Corporate Website URL */}
               <div className="md:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Corporate Website URL</label>
+                <label className="text-slate-700 mb-1.5 block text-xs font-semibold">
+                  Corporate Website URL
+                </label>
                 <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400/80 h-4 w-4 stroke-[1.5]" />
+                  <Globe className="text-slate-400/80 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5]" />
                   <input
                     type="url"
                     name="website"
@@ -454,14 +507,16 @@ const CompanyProfilePage = () => {
                     onChange={handleChange}
                     disabled={!canUpdate}
                     placeholder="e.g. https://company.com"
-                    className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all disabled:bg-slate-50"
+                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               {/* Physical Headquarters Address */}
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Physical Headquarters Address</label>
+                <label className="text-slate-700 mb-1.5 block text-xs font-semibold">
+                  Physical Headquarters Address
+                </label>
                 <textarea
                   name="address"
                   rows={4}
@@ -469,7 +524,7 @@ const CompanyProfilePage = () => {
                   onChange={handleChange}
                   disabled={!canUpdate}
                   placeholder="Street address, City, State, ZIP, Country"
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all disabled:bg-slate-50"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -477,20 +532,22 @@ const CompanyProfilePage = () => {
 
           {/* Sticky Action Footer */}
           {isDirty && (
-            <div className="col-span-full sticky bottom-4 z-40 bg-white border border-slate-200/80 rounded-2xl px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 shadow-lg animate-in slide-in-from-bottom duration-300">
-              <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                <span className="text-sm font-bold text-slate-800">Unsaved Changes</span>
-                <span className="text-xs text-slate-400 mt-0.5">
+            <div className="border-slate-200/80 sticky bottom-4 z-40 col-span-full mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl border bg-white px-8 py-4 shadow-lg duration-300 animate-in slide-in-from-bottom sm:flex-row">
+              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                <span className="text-slate-800 text-sm font-bold">
+                  Unsaved Changes
+                </span>
+                <span className="text-slate-400 mt-0.5 text-xs">
                   Last saved {lastSaved} {user?.name ? `by ${user.name}` : ""}
                 </span>
               </div>
-              <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="flex w-full items-center gap-4 sm:w-auto">
                 <Button
                   type="button"
                   variant="outline"
                   size="md"
                   onClick={handleDiscard}
-                  className="flex-1 sm:flex-initial h-10 px-5 text-slate-700 font-semibold shadow-sm transition-all"
+                  className="text-slate-700 h-10 flex-1 px-5 font-semibold shadow-sm transition-all sm:flex-initial"
                 >
                   Discard Changes
                 </Button>
@@ -498,7 +555,7 @@ const CompanyProfilePage = () => {
                   type="submit"
                   isLoading={saving}
                   size="md"
-                  className="flex-1 sm:flex-initial h-10 px-5 bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm transition-all flex items-center justify-center gap-2"
+                  className="bg-slate-900 hover:bg-slate-800 flex h-10 flex-1 items-center justify-center gap-2 px-5 font-semibold text-white shadow-sm transition-all sm:flex-initial"
                 >
                   {!saving && <Save className="h-4 w-4 stroke-[1.75]" />}
                   Save Changes
@@ -510,31 +567,33 @@ const CompanyProfilePage = () => {
       )}
       {/* Logo Fullscreen Preview Modal */}
       {showPreviewModal && formData.logo_url && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="relative bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl flex flex-col items-center">
+        <div className="bg-slate-950/60 fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm duration-200 animate-in fade-in">
+          <div className="relative flex w-full max-w-2xl flex-col items-center rounded-2xl bg-white p-6 shadow-2xl">
             <button
               type="button"
               onClick={() => setShowPreviewModal(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+              className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 absolute right-4 top-4 rounded-xl p-2 transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <h3 className="text-base font-bold text-slate-950 mb-4 self-start">Company Logo Preview</h3>
+            <h3 className="text-slate-950 mb-4 self-start text-base font-bold">
+              Company Logo Preview
+            </h3>
 
-            <div className="w-full h-[50vh] flex items-center justify-center overflow-hidden bg-slate-50 border border-slate-100 rounded-xl p-6">
+            <div className="bg-slate-50 border-slate-100 flex h-[50vh] w-full items-center justify-center overflow-hidden rounded-xl border p-6">
               <img
                 src={formData.logo_url}
                 alt="Full Company Logo"
-                className="max-w-full max-h-full object-contain"
+                className="max-h-full max-w-full object-contain"
               />
             </div>
 
-            <div className="mt-6 flex justify-end w-full">
+            <div className="mt-6 flex w-full justify-end">
               <button
                 type="button"
                 onClick={() => setShowPreviewModal(false)}
-                className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all shadow-sm"
+                className="border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg border bg-white px-4 py-2 text-sm font-semibold shadow-sm transition-all"
               >
                 Close Preview
               </button>

@@ -8,11 +8,20 @@ interface Props {
   disabled?: boolean;
 }
 
-export const ReturnQuantityInput: React.FC<Props> = ({ value, onChange, availableQuantity, disabled }) => {
+export const ReturnQuantityInput: React.FC<Props> = ({
+  value,
+  onChange,
+  availableQuantity,
+  disabled,
+}) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (value && availableQuantity !== undefined && availableQuantity !== null) {
+    if (
+      value &&
+      availableQuantity !== undefined &&
+      availableQuantity !== null
+    ) {
       const numValue = Number(value);
       if (numValue > availableQuantity) {
         setError(`Exceeds available stock (${availableQuantity.toFixed(3)})`);
@@ -33,10 +42,12 @@ export const ReturnQuantityInput: React.FC<Props> = ({ value, onChange, availabl
         disabled={disabled}
         min="0"
         step="0.001"
-        className={`w-full text-right ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+        className={`w-full text-right ${
+          error ? "border-red-500 focus-visible:ring-red-500" : ""
+        }`}
       />
       {error && (
-        <span className="absolute -bottom-5 right-0 text-[10px] text-red-600 whitespace-nowrap bg-white px-1 z-10 rounded shadow-sm border border-red-100">
+        <span className="absolute -bottom-5 right-0 z-10 whitespace-nowrap rounded border border-red-100 bg-white px-1 text-[10px] text-red-600 shadow-sm">
           {error}
         </span>
       )}

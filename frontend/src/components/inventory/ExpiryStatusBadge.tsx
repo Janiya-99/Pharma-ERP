@@ -8,7 +8,10 @@ const ExpiryStatusBadge = ({ status }: { status?: unknown }) => {
     expired: { label: "Expired", variant: "danger" },
   };
 
-  const config = statusMap[status] || { label: status || "Unknown", variant: "gray" };
+  const config = statusMap[status] || {
+    label: status || "Unknown",
+    variant: "gray",
+  };
 
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };

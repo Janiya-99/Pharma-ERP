@@ -12,10 +12,25 @@ import {
   SalesOrderTotalsCard,
 } from "../../../components/invoice-center";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Separator } from "../../../components/ui/separator";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import type { ApiResponse, SalesOrderDetail } from "../../../types/invoice-center";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import type {
+  ApiResponse,
+  SalesOrderDetail,
+} from "../../../types/invoice-center";
 import ApproveSalesOrderModal from "./ApproveSalesOrderModal";
 import CancelSalesOrderModal from "./CancelSalesOrderModal";
 import CloseSalesOrderModal from "./CloseSalesOrderModal";
@@ -23,7 +38,14 @@ import DeleteSalesOrderConfirmModal from "./DeleteSalesOrderConfirmModal";
 import RejectSalesOrderModal from "./RejectSalesOrderModal";
 import SubmitSalesOrderModal from "./SubmitSalesOrderModal";
 
-type ActionModal = "submit" | "approve" | "reject" | "close" | "cancel" | "delete" | null;
+type ActionModal =
+  | "submit"
+  | "approve"
+  | "reject"
+  | "close"
+  | "cancel"
+  | "delete"
+  | null;
 
 const SalesOrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -58,22 +80,30 @@ const SalesOrderDetailsPage: React.FC = () => {
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
-      <div className="m-6 rounded-xl border border-rose-200 bg-rose-50 p-8 text-center font-medium text-rose-600">
+      <div className="border-rose-200 bg-rose-50 text-rose-600 m-6 rounded-xl border p-8 text-center font-medium">
         Please switch to Invoice Center module to access this page.
       </div>
     );
   }
 
-  const runAction = async (action: Exclude<ActionModal, null | "delete">, remarks: string) => {
+  const runAction = async (
+    action: Exclude<ActionModal, null | "delete">,
+    remarks: string
+  ) => {
     if (!id) return;
     setActionLoading(true);
     try {
       const payload = { remarks };
-      if (action === "submit") await invoiceCenterApi.submitSalesOrder(id, payload);
-      if (action === "approve") await invoiceCenterApi.approveSalesOrder(id, payload);
-      if (action === "reject") await invoiceCenterApi.rejectSalesOrder(id, payload);
-      if (action === "close") await invoiceCenterApi.closeSalesOrder(id, payload);
-      if (action === "cancel") await invoiceCenterApi.cancelSalesOrder(id, payload);
+      if (action === "submit")
+        await invoiceCenterApi.submitSalesOrder(id, payload);
+      if (action === "approve")
+        await invoiceCenterApi.approveSalesOrder(id, payload);
+      if (action === "reject")
+        await invoiceCenterApi.rejectSalesOrder(id, payload);
+      if (action === "close")
+        await invoiceCenterApi.closeSalesOrder(id, payload);
+      if (action === "cancel")
+        await invoiceCenterApi.cancelSalesOrder(id, payload);
       setModal(null);
       await fetchOrder();
     } finally {
@@ -96,22 +126,42 @@ const SalesOrderDetailsPage: React.FC = () => {
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
       <div className="flex flex-col gap-4 rounded-xl border bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Button type="button" variant="outline" size="icon" onClick={() => navigate(-1)}>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-navy-900">{order?.sales_order_number || "Sales Order"}</h1>
-            <p className="text-sm text-muted-foreground">Sales order details, approval history, and line items.</p>
+            <h1 className="text-2xl font-bold text-navy-900">
+              {order?.sales_order_number || "Sales Order"}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Sales order details, approval history, and line items.
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" size="icon" onClick={fetchOrder} disabled={loading} title="Refresh">
-            <RefreshCw className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={fetchOrder}
+            disabled={loading}
+            title="Refresh"
+          >
+            <RefreshCw
+              className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"}
+            />
           </Button>
           {order && (
             <SalesOrderActionButtons
               order={order}
-              onEdit={() => navigate(`/invoice-center/sales-orders/${order.id}/edit`)}
+              onEdit={() =>
+                navigate(`/invoice-center/sales-orders/${order.id}/edit`)
+              }
               onSubmit={() => setModal("submit")}
               onApprove={() => setModal("approve")}
               onReject={() => setModal("reject")}
@@ -123,7 +173,11 @@ const SalesOrderDetailsPage: React.FC = () => {
         </div>
       </div>
 
-      {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>}
+      {error && (
+        <div className="border-rose-200 bg-rose-50 text-rose-700 rounded-xl border p-4 text-sm">
+          {error}
+        </div>
+      )}
 
       {order && (
         <>
@@ -139,15 +193,21 @@ const SalesOrderDetailsPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Expected Delivery</p>
-                  <p className="font-semibold">{order.expected_delivery_date || "-"}</p>
+                  <p className="font-semibold">
+                    {order.expected_delivery_date || "-"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Branch</p>
-                  <p className="font-semibold">{order.branch?.branch_name || order.branch_id}</p>
+                  <p className="font-semibold">
+                    {order.branch?.branch_name || order.branch_id}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Approval Status</p>
-                  <SalesOrderApprovalStatusBadge status={order.approval_status} />
+                  <SalesOrderApprovalStatusBadge
+                    status={order.approval_status}
+                  />
                 </div>
                 <div>
                   <p className="text-muted-foreground">Order Status</p>
@@ -155,7 +215,9 @@ const SalesOrderDetailsPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Customer Reference</p>
-                  <p className="font-semibold">{order.customer_reference_number || "-"}</p>
+                  <p className="font-semibold">
+                    {order.customer_reference_number || "-"}
+                  </p>
                 </div>
                 {order.remarks && (
                   <div className="md:col-span-3">
@@ -205,7 +267,9 @@ const SalesOrderDetailsPage: React.FC = () => {
                   {order.approvals?.length ? (
                     order.approvals.map((approval) => (
                       <TableRow key={approval.id}>
-                        <TableCell className="font-medium">{approval.action}</TableCell>
+                        <TableCell className="font-medium">
+                          {approval.action}
+                        </TableCell>
                         <TableCell>{approval.remarks || "-"}</TableCell>
                         <TableCell>{approval.action_by}</TableCell>
                         <TableCell>{approval.action_at}</TableCell>
@@ -213,7 +277,10 @@ const SalesOrderDetailsPage: React.FC = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                      <TableCell
+                        colSpan={4}
+                        className="py-8 text-center text-muted-foreground"
+                      >
                         No approval actions recorded.
                       </TableCell>
                     </TableRow>
@@ -225,12 +292,42 @@ const SalesOrderDetailsPage: React.FC = () => {
         </>
       )}
 
-      <SubmitSalesOrderModal open={modal === "submit"} loading={actionLoading} onOpenChange={(open) => setModal(open ? "submit" : null)} onConfirm={(remarks) => runAction("submit", remarks)} />
-      <ApproveSalesOrderModal open={modal === "approve"} loading={actionLoading} onOpenChange={(open) => setModal(open ? "approve" : null)} onConfirm={(remarks) => runAction("approve", remarks)} />
-      <RejectSalesOrderModal open={modal === "reject"} loading={actionLoading} onOpenChange={(open) => setModal(open ? "reject" : null)} onConfirm={(remarks) => runAction("reject", remarks)} />
-      <CloseSalesOrderModal open={modal === "close"} loading={actionLoading} onOpenChange={(open) => setModal(open ? "close" : null)} onConfirm={(remarks) => runAction("close", remarks)} />
-      <CancelSalesOrderModal open={modal === "cancel"} loading={actionLoading} onOpenChange={(open) => setModal(open ? "cancel" : null)} onConfirm={(remarks) => runAction("cancel", remarks)} />
-      <DeleteSalesOrderConfirmModal open={modal === "delete"} loading={actionLoading} onOpenChange={(open) => setModal(open ? "delete" : null)} onConfirm={deleteOrder} />
+      <SubmitSalesOrderModal
+        open={modal === "submit"}
+        loading={actionLoading}
+        onOpenChange={(open) => setModal(open ? "submit" : null)}
+        onConfirm={(remarks) => runAction("submit", remarks)}
+      />
+      <ApproveSalesOrderModal
+        open={modal === "approve"}
+        loading={actionLoading}
+        onOpenChange={(open) => setModal(open ? "approve" : null)}
+        onConfirm={(remarks) => runAction("approve", remarks)}
+      />
+      <RejectSalesOrderModal
+        open={modal === "reject"}
+        loading={actionLoading}
+        onOpenChange={(open) => setModal(open ? "reject" : null)}
+        onConfirm={(remarks) => runAction("reject", remarks)}
+      />
+      <CloseSalesOrderModal
+        open={modal === "close"}
+        loading={actionLoading}
+        onOpenChange={(open) => setModal(open ? "close" : null)}
+        onConfirm={(remarks) => runAction("close", remarks)}
+      />
+      <CancelSalesOrderModal
+        open={modal === "cancel"}
+        loading={actionLoading}
+        onOpenChange={(open) => setModal(open ? "cancel" : null)}
+        onConfirm={(remarks) => runAction("cancel", remarks)}
+      />
+      <DeleteSalesOrderConfirmModal
+        open={modal === "delete"}
+        loading={actionLoading}
+        onOpenChange={(open) => setModal(open ? "delete" : null)}
+        onConfirm={deleteOrder}
+      />
     </div>
   );
 };
