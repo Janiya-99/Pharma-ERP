@@ -668,3 +668,134 @@ export interface CustomerReceiptImpactPreview {
   customer_balance_after_receipt: number;
   allocation_count: number;
 }
+
+// ============================================================
+// Invoice Center — Finance Posting Types
+// ============================================================
+
+export type InvoiceCenterFinancePostStatus = 'unposted' | 'posted' | 'failed';
+
+export type InvoiceCenterFinancePostingDocumentType =
+  | 'sales_invoice'
+  | 'credit_note'
+  | 'debit_note'
+  | 'customer_receipt';
+
+export interface FinanceSettingsParams {
+  branch_id?: number | null;
+}
+
+export interface InvoiceCenterFinanceSettings {
+  id?: number;
+  company_id?: number;
+  branch_id?: number | null;
+
+  accounts_receivable_account_id: number;
+  sales_revenue_account_id: number;
+  sales_discount_account_id?: number | null;
+  output_tax_account_id?: number | null;
+
+  credit_note_adjustment_account_id: number;
+  debit_note_income_account_id: number;
+
+  cash_account_id?: number | null;
+  bank_transfer_account_id?: number | null;
+  cheque_clearing_account_id?: number | null;
+  card_clearing_account_id?: number | null;
+  online_payment_account_id?: number | null;
+  other_receipt_account_id?: number | null;
+
+  customer_advance_account_id?: number | null;
+
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+
+  account_summaries?: FinanceAccountSummary[];
+}
+
+export interface SaveFinanceSettingsPayload {
+  branch_id?: number | null;
+
+  accounts_receivable_account_id: number;
+  sales_revenue_account_id: number;
+  sales_discount_account_id?: number | null;
+  output_tax_account_id?: number | null;
+
+  credit_note_adjustment_account_id: number;
+  debit_note_income_account_id: number;
+
+  cash_account_id?: number | null;
+  bank_transfer_account_id?: number | null;
+  cheque_clearing_account_id?: number | null;
+  card_clearing_account_id?: number | null;
+  online_payment_account_id?: number | null;
+  other_receipt_account_id?: number | null;
+
+  customer_advance_account_id?: number | null;
+}
+
+export interface FinanceAccountSummary {
+  id: number;
+  account_code: string;
+  account_name: string;
+  account_type?: string;
+  status?: string;
+}
+
+export interface PendingFinancePostingParams {
+  branch_id?: number;
+  document_type?: InvoiceCenterFinancePostingDocumentType;
+  date_from?: string;
+  date_to?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PendingFinancePosting {
+  document_type: InvoiceCenterFinancePostingDocumentType;
+  document_id: number;
+  document_number: string;
+  document_date: string;
+  branch_id: number;
+  branch_name?: string;
+  customer_id?: number;
+  customer_code?: string;
+  customer_name?: string;
+  total_amount: number;
+  operational_posted_status: string;
+  finance_post_status: InvoiceCenterFinancePostStatus;
+  created_by?: number;
+  created_at?: string;
+}
+
+export interface FinancePostingHistoryParams {
+  branch_id?: number;
+  document_type?: InvoiceCenterFinancePostingDocumentType;
+  document_number?: string;
+  date_from?: string;
+  date_to?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface InvoiceCenterFinancePostingHistory {
+  id: number;
+  document_type: InvoiceCenterFinancePostingDocumentType;
+  document_id: number;
+  document_number: string;
+  finance_reference_number: string;
+  debit_total: number;
+  credit_total: number;
+  posting_status: string;
+  posted_by: number;
+  posted_at: string;
+  remarks?: string | null;
+}
+
+export interface FinancePostingResult {
+  finance_reference_number: string;
+  debit_total: number;
+  credit_total: number;
+  message?: string;
+}

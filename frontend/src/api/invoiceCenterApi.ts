@@ -94,6 +94,18 @@ export const invoiceCenterApi = {
   rejectCustomerReceipt: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/customer-receipts/${id}/reject`, payload),
   postCustomerReceipt: (id: number | string) => apiClient.post(`/invoice-center/customer-receipts/${id}/post`),
   cancelCustomerReceipt: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/customer-receipts/${id}/cancel`, payload),
+
+  // ---- Finance Settings ----
+  getInvoiceCenterFinanceSettings: (params: Record<string, unknown> = {}) => apiClient.get("/invoice-center/finance-settings", { params }),
+  saveInvoiceCenterFinanceSettings: (payload: Record<string, unknown>) => apiClient.post("/invoice-center/finance-settings", payload),
+
+  // ---- Finance Posting ----
+  getPendingFinancePostings: (params: Record<string, unknown> = {}) => apiClient.get("/invoice-center/finance-posting/pending", { params }),
+  getFinancePostingHistory: (params: Record<string, unknown> = {}) => apiClient.get("/invoice-center/finance-posting/history", { params }),
+  postSalesInvoiceToFinance: (id: number | string) => apiClient.post(`/invoice-center/finance-posting/sales-invoice/${id}/post`),
+  postCreditNoteToFinance: (id: number | string) => apiClient.post(`/invoice-center/finance-posting/credit-note/${id}/post`),
+  postDebitNoteToFinance: (id: number | string) => apiClient.post(`/invoice-center/finance-posting/debit-note/${id}/post`),
+  postCustomerReceiptToFinance: (id: number | string) => apiClient.post(`/invoice-center/finance-posting/customer-receipt/${id}/post`),
 };
 
 export default invoiceCenterApi;

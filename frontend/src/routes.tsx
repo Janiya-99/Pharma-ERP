@@ -88,6 +88,8 @@ import DebitNotesPage from "views/admin/invoice-center/DebitNotesPage";
 import CustomerReceiptsPage from "pages/invoice-center/customer-receipts/CustomerReceiptsPage";
 import CustomerReceiptFormPage from "pages/invoice-center/customer-receipts/CustomerReceiptFormPage";
 import CustomerReceiptDetailsPage from "pages/invoice-center/customer-receipts/CustomerReceiptDetailsPage";
+import InvoiceCenterFinanceSettingsPage from "pages/invoice-center/finance-settings/InvoiceCenterFinanceSettingsPage";
+import InvoiceCenterFinancePostingPage from "pages/invoice-center/finance-posting/InvoiceCenterFinancePostingPage";
 
 // Compliance Center
 import ComplianceDashboard from "views/admin/compliance/ComplianceDashboard";
@@ -291,6 +293,10 @@ const routes: ERPRoute[] = [
       { name: "Create Customer Receipt", path: "invoice-center/customer-receipts/create", component: <CustomerReceiptFormPage />, hide: true },
       { name: "Edit Customer Receipt", path: "invoice-center/customer-receipts/:id/edit", component: <CustomerReceiptFormPage />, hide: true },
       { name: "Customer Receipt Details", path: "invoice-center/customer-receipts/:id", component: <CustomerReceiptDetailsPage />, hide: true },
+      { name: "Finance Settings", path: "invoice-center/finance-settings", component: <InvoiceCenterFinanceSettingsPage />, section: "Finance Integration" },
+      { name: "Finance Posting", path: "invoice-center/finance-posting", component: <InvoiceCenterFinancePostingPage />, section: "Finance Integration" },
+      { name: "Pending Postings", path: "invoice-center/finance-posting/pending", component: <InvoiceCenterFinancePostingPage />, hide: true },
+      { name: "Posting History", path: "invoice-center/finance-posting/history", component: <InvoiceCenterFinancePostingPage />, hide: true },
     ],
   },
   {

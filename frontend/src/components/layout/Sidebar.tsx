@@ -236,6 +236,14 @@ const Sidebar = () => {
         { name: "Customer Receipts", path: "/invoice-center/customer-receipts", permission: "invoice_center.customer_receipt.view" },
       ],
     },
+    {
+      name: "Finance Integration",
+      icon: Landmark,
+      children: [
+        { name: "Finance Settings", path: "/invoice-center/finance-settings", permission: "invoice_center.finance_settings.view" },
+        { name: "Finance Posting", path: "/invoice-center/finance-posting", permission: "invoice_center.finance_posting.view" },
+      ],
+    },
   ];
 
   const getMenus = (): MenuItem[] => {
