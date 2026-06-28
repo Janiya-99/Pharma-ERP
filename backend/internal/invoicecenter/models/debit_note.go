@@ -23,7 +23,13 @@ type DebitNote struct {
 	SubtotalAmount     float64         `gorm:"type:decimal(18,2);default:0" json:"subtotal_amount"`
 	DiscountAmount     float64         `gorm:"type:decimal(18,2);default:0" json:"discount_amount"`
 	TaxAmount          float64         `gorm:"type:decimal(18,2);default:0" json:"tax_amount"`
-	TotalAmount        float64         `gorm:"type:decimal(18,2);default:0" json:"total_amount"`
+	TotalAmount        float64         `gorm:"type:decimal(18,4);not null" json:"total_amount"`
+
+	FinancePostStatus      string     `gorm:"type:varchar(30);default:'unposted'" json:"finance_post_status"`
+	FinanceReferenceNumber *string    `gorm:"type:varchar(100)" json:"finance_reference_number,omitempty"`
+	FinancePostedBy        *uint64    `json:"finance_posted_by,omitempty"`
+	FinancePostedAt        *time.Time `json:"finance_posted_at,omitempty"`
+
 	ApprovalStatus     string          `gorm:"type:varchar(30);default:'draft';index" json:"approval_status"`
 	ApprovedBy         *uint64         `json:"approved_by"`
 	ApprovedAt         *time.Time      `json:"approved_at"`

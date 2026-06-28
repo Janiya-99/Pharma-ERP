@@ -79,6 +79,11 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"Customer Receipt", "invoice_center.customer_receipt.approve", "Approve Customer Receipt"},
 		{"Customer Receipt", "invoice_center.customer_receipt.reject", "Reject Customer Receipt"},
 		{"Customer Receipt", "invoice_center.customer_receipt.post", "Post Customer Receipt"},
+
+		{"Finance Posting", "invoice_center.finance_settings.view", "View Finance Settings"},
+		{"Finance Posting", "invoice_center.finance_settings.update", "Update Finance Settings"},
+		{"Finance Posting", "invoice_center.finance_posting.view", "View Finance Postings"},
+		{"Finance Posting", "invoice_center.finance_posting.post", "Post to Finance"},
 	}
 
 	for _, p := range permissions {
@@ -199,7 +204,11 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 			k == "invoice_center.customer_receipt.view" ||
 			k == "invoice_center.customer_receipt.approve" ||
 			k == "invoice_center.customer_receipt.reject" ||
-			k == "invoice_center.customer_receipt.post"
+			k == "invoice_center.customer_receipt.post" ||
+			k == "invoice_center.finance_settings.view" ||
+			k == "invoice_center.finance_settings.update" ||
+			k == "invoice_center.finance_posting.view" ||
+			k == "invoice_center.finance_posting.post"
 	})
 
 	assignPermission("INVOICE_VIEWER", func(k string) bool {

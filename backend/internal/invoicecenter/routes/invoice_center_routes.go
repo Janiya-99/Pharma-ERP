@@ -53,6 +53,8 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	debitNoteRepo := repositories.NewDebitNoteRepository()
 	stockMovementRepo := invrepositories.NewStockMovementRepository()
 	customerReceiptRepo := repositories.NewCustomerReceiptRepository()
+	financeSettingRepo := repositories.NewInvoiceCenterFinanceSettingRepository()
+	financePostingRepo := repositories.NewInvoiceCenterFinancePostingRepository()
 
 	// Initialize services
 	dashboardSvc := services.NewInvoiceDashboardService(dashboardRepo, logger)
@@ -66,6 +68,17 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	creditNoteSvc := services.NewCreditNoteService(creditNoteRepo, auditSvc, logger)
 	debitNoteSvc := services.NewDebitNoteService(debitNoteRepo, auditSvc, logger)
 	customerReceiptSvc := services.NewCustomerReceiptService(customerReceiptRepo, salesInvoiceRepo, auditSvc)
+	financeSettingSvc := services.NewInvoiceCenterFinanceSettingService(financeSettingRepo, auditSvc, logger)
+	financePostingSvc := services.NewInvoiceCenterFinancePostingService(
+		financePostingRepo,
+		financeSettingRepo,
+		salesInvoiceRepo,
+		creditNoteRepo,
+		debitNoteRepo,
+		customerReceiptRepo,
+		auditSvc,
+		logger,
+	)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -78,6 +91,8 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	creditNoteHdl := handlers.NewCreditNoteHandler(creditNoteSvc, logger)
 	debitNoteHdl := handlers.NewDebitNoteHandler(debitNoteSvc, logger)
 	customerReceiptHdl := handlers.NewCustomerReceiptHandler(customerReceiptSvc)
+	financeSettingHdl := handlers.NewInvoiceCenterFinanceSettingHandler(financeSettingSvc)
+	financePostingHdl := handlers.NewInvoiceCenterFinancePostingHandler(financePostingSvc)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -192,5 +207,24 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		customerReceipts.POST("/:id/reject", middleware.RequirePermission("invoice_center.customer_receipt.reject"), customerReceiptHdl.RejectCustomerReceipt)
 		customerReceipts.POST("/:id/post", middleware.RequirePermission("invoice_center.customer_receipt.post"), customerReceiptHdl.PostCustomerReceipt)
 		customerReceipts.POST("/:id/cancel", middleware.RequirePermission("invoice_center.customer_receipt.update"), customerReceiptHdl.CancelCustomerReceipt)
+	}
+
+	// Finance Settings Routes
+	financeSettings := r.Group("/finance-settings")
+	{
+		financeSettings.GET("", middleware.RequirePermission("invoice_center.finance_settings.view"), financeSettingHdl.GetFinanceSettings)
+		financeSettings.POST("", middleware.RequirePermission("invoice_center.finance_settings.update"), financeSettingHdl.SaveFinanceSettings)
+	}
+
+	// Finance Posting Routes
+	financePosting := r.Group("/finance-posting")
+	{
+		financePosting.GET("/pending", middleware.RequirePermission("invoice_center.finance_posting.view"), financePostingHdl.GetPendingFinancePostings)
+		financePosting.GET("/history", middleware.RequirePermission("invoice_center.finance_posting.view"), financePostingHdl.GetFinancePostingHistory)
+		
+		financePosting.POST("/sales-invoice/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostSalesInvoiceToFinance)
+		financePosting.POST("/credit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostCreditNoteToFinance)
+		financePosting.POST("/debit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostDebitNoteToFinance)
+		financePosting.POST("/customer-receipt/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostCustomerReceiptToFinance)
 	}
 }

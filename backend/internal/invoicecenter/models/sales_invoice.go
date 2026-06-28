@@ -43,10 +43,17 @@ type SalesInvoice struct {
 	UpdatedAt               time.Time      `json:"updated_at"`
 	DeletedAt               gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Customer   Customer               `gorm:"foreignKey:CustomerID" json:"customer"`
-	SalesOrder *SalesOrder            `gorm:"foreignKey:SalesOrderID" json:"sales_order,omitempty"`
-	Lines      []SalesInvoiceLine     `gorm:"foreignKey:SalesInvoiceID" json:"lines,omitempty"`
-	Approvals  []SalesInvoiceApproval `gorm:"foreignKey:SalesInvoiceID" json:"approvals,omitempty"`
+	Customer      Customer    `gorm:"foreignKey:CustomerID" json:"customer"`
+	SalesOrder    *SalesOrder `gorm:"foreignKey:SalesOrderID" json:"sales_order,omitempty"`
+	SalesPersonID *uint64     `json:"sales_person_id,omitempty"`
+
+	FinancePostStatus      string     `gorm:"type:varchar(30);default:'unposted'" json:"finance_post_status"`
+	FinanceReferenceNumber *string    `gorm:"type:varchar(100)" json:"finance_reference_number,omitempty"`
+	FinancePostedBy        *uint64    `json:"finance_posted_by,omitempty"`
+	FinancePostedAt        *time.Time `json:"finance_posted_at,omitempty"`
+
+	Lines     []SalesInvoiceLine     `gorm:"foreignKey:SalesInvoiceID" json:"lines,omitempty"`
+	Approvals []SalesInvoiceApproval `gorm:"foreignKey:SalesInvoiceID" json:"approvals,omitempty"`
 }
 
 func (SalesInvoice) TableName() string {
