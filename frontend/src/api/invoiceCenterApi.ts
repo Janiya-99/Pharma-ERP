@@ -46,6 +46,18 @@ export const invoiceCenterApi = {
   rejectSalesOrder: (id: number | string, payload: { remarks: string }) => apiClient.post(`/invoice-center/sales-orders/${id}/reject`, payload),
   closeSalesOrder: (id: number | string, payload: { remarks: string }) => apiClient.post(`/invoice-center/sales-orders/${id}/close`, payload),
   cancelSalesOrder: (id: number | string, payload: { remarks: string }) => apiClient.post(`/invoice-center/sales-orders/${id}/cancel`, payload),
+
+  // ---- Sales Invoices ----
+  getSalesInvoices: (params: any = {}) => apiClient.get("/invoice-center/sales-invoices", { params }),
+  getSalesInvoiceById: (id: number | string) => apiClient.get(`/invoice-center/sales-invoices/${id}`),
+  createSalesInvoice: (payload: any) => apiClient.post("/invoice-center/sales-invoices", payload),
+  updateSalesInvoice: (id: number | string, payload: any) => apiClient.put(`/invoice-center/sales-invoices/${id}`, payload),
+  deleteSalesInvoice: (id: number | string) => apiClient.delete(`/invoice-center/sales-invoices/${id}`),
+  submitSalesInvoice: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/sales-invoices/${id}/submit`, payload),
+  approveSalesInvoice: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/sales-invoices/${id}/approve`, payload),
+  rejectSalesInvoice: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/sales-invoices/${id}/reject`, payload),
+  postSalesInvoice: (id: number | string) => apiClient.post(`/invoice-center/sales-invoices/${id}/post`),
+  cancelSalesInvoice: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/sales-invoices/${id}/cancel`, payload),
 };
 
 export default invoiceCenterApi;

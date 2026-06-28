@@ -176,6 +176,124 @@ export interface SalesOrderListParams {
   limit?: number;
 }
 
+// ---- Sales Invoice Types ------------------------------------
+export type SalesInvoiceApprovalStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type SalesInvoicePostedStatus = 'unposted' | 'posted';
+export type SalesInvoicePaymentStatus = 'unpaid' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
+
+export interface SalesInvoiceApproval {
+  id: number;
+  sales_invoice_id: number;
+  action: string;
+  remarks?: string | null;
+  action_by: number;
+  action_at: string;
+}
+
+export interface SalesInvoiceLine {
+  id?: number;
+  sales_invoice_id?: number;
+  sales_order_line_id?: number | null;
+  warehouse_location_id?: number | null;
+  product_id: number;
+  product_batch_id?: number | null;
+  quantity: number;
+  unit_price: number;
+  discount_amount: number;
+  tax_amount: number;
+  line_total: number;
+  stock_unit_cost?: number;
+  stock_total_cost?: number;
+  line_remarks?: string | null;
+  
+  // Local display properties
+  product_code?: string;
+  product_name?: string;
+  batch_number?: string;
+  expiry_date?: string;
+}
+
+export interface SalesInvoice {
+  id: number;
+  invoice_number: string;
+  invoice_date: string;
+  due_date?: string | null;
+  branch_id: number;
+  customer_id: number;
+  sales_order_id?: number | null;
+  warehouse_id: number;
+  customer_reference_number?: string | null;
+  remarks?: string | null;
+  subtotal_amount: number;
+  discount_amount: number;
+  tax_amount: number;
+  total_amount: number;
+  paid_amount: number;
+  balance_amount: number;
+  approval_status: SalesInvoiceApprovalStatus;
+  posted_status: SalesInvoicePostedStatus;
+  payment_status: SalesInvoicePaymentStatus;
+  created_by?: number;
+  created_at?: string;
+  lines?: SalesInvoiceLine[];
+  approvals?: SalesInvoiceApproval[];
+  
+  // Relations mapped
+  branch?: { id: number; branch_name: string };
+  customer?: Customer;
+  sales_order?: { sales_order_number: string; sales_order_date: string; order_status: string; approval_status: string };
+  warehouse?: { id: number; warehouse_code: string; warehouse_name: string; warehouse_type: string };
+}
+
+export interface SalesInvoiceListParams {
+  branch_id?: number;
+  customer_id?: number;
+  sales_order_id?: number;
+  warehouse_id?: number;
+  approval_status?: SalesInvoiceApprovalStatus;
+  posted_status?: SalesInvoicePostedStatus;
+  payment_status?: SalesInvoicePaymentStatus;
+  invoice_date_from?: string;
+  invoice_date_to?: string;
+  due_date_from?: string;
+  due_date_to?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SalesInvoiceLinePayload {
+  sales_order_line_id?: number | null;
+  warehouse_location_id?: number | null;
+  product_id: number;
+  product_batch_id?: number | null;
+  quantity: number;
+  unit_price: number;
+  discount_amount: number;
+  tax_amount: number;
+  line_remarks?: string | null;
+}
+
+export interface CreateSalesInvoicePayload {
+  branch_id: number;
+  customer_id: number;
+  sales_order_id?: number | null;
+  warehouse_id: number;
+  financial_year_id?: number | null;
+  accounting_period_id?: number | null;
+  invoice_date: string;
+  due_date?: string | null;
+  customer_reference_number?: string | null;
+  remarks?: string | null;
+  lines: SalesInvoiceLinePayload[];
+}
+
+export interface UpdateSalesInvoicePayload extends CreateSalesInvoicePayload {}
+
+export interface WorkflowActionPayload {
+  remarks?: string;
+}
+
 // ---- Generic API Wrappers -----------------------------------
 export interface ApiResponse<T> {
   success: boolean;
