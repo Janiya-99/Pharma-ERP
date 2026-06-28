@@ -4,6 +4,22 @@ import type {
   CreateSalesOrderPayload,
   UpdateSalesOrderPayload,
 } from "../types/invoice-center";
+import type {
+  DashboardSummaryReportParams,
+  CustomerBalanceReportParams,
+  CustomerStatementReportParams,
+  CustomerAgingReportParams,
+  SalesOrderRegisterReportParams,
+  SalesInvoiceRegisterReportParams,
+  CreditNoteRegisterReportParams,
+  DebitNoteRegisterReportParams,
+  CustomerReceiptRegisterReportParams,
+  OutstandingInvoiceReportParams,
+  SalesByCustomerReportParams,
+  SalesByProductReportParams,
+  CollectionSummaryReportParams,
+  FinancePostingStatusReportParams,
+} from "../types/invoice-center-reports";
 
 export const invoiceCenterApi = {
   getInvoiceCenterDashboard: () => apiClient.get("/invoice-center/dashboard"),
@@ -106,6 +122,22 @@ export const invoiceCenterApi = {
   postCreditNoteToFinance: (id: number | string) => apiClient.post(`/invoice-center/finance-posting/credit-note/${id}/post`),
   postDebitNoteToFinance: (id: number | string) => apiClient.post(`/invoice-center/finance-posting/debit-note/${id}/post`),
   postCustomerReceiptToFinance: (id: number | string) => apiClient.post(`/invoice-center/finance-posting/customer-receipt/${id}/post`),
+
+  // ---- Reports ----
+  getInvoiceCenterDashboardSummary: (params: DashboardSummaryReportParams = {}) => apiClient.get("/invoice-center/reports/dashboard-summary", { params }),
+  getCustomerBalanceReport: (params: CustomerBalanceReportParams = {}) => apiClient.get("/invoice-center/reports/customer-balances", { params }),
+  getCustomerStatementReport: (params: CustomerStatementReportParams) => apiClient.get("/invoice-center/reports/customer-statement", { params }),
+  getCustomerAgingReport: (params: CustomerAgingReportParams = {}) => apiClient.get("/invoice-center/reports/customer-aging", { params }),
+  getSalesOrderRegisterReport: (params: SalesOrderRegisterReportParams = {}) => apiClient.get("/invoice-center/reports/sales-order-register", { params }),
+  getSalesInvoiceRegisterReport: (params: SalesInvoiceRegisterReportParams = {}) => apiClient.get("/invoice-center/reports/sales-invoice-register", { params }),
+  getCreditNoteRegisterReport: (params: CreditNoteRegisterReportParams = {}) => apiClient.get("/invoice-center/reports/credit-note-register", { params }),
+  getDebitNoteRegisterReport: (params: DebitNoteRegisterReportParams = {}) => apiClient.get("/invoice-center/reports/debit-note-register", { params }),
+  getCustomerReceiptRegisterReport: (params: CustomerReceiptRegisterReportParams = {}) => apiClient.get("/invoice-center/reports/customer-receipt-register", { params }),
+  getOutstandingInvoiceReport: (params: OutstandingInvoiceReportParams = {}) => apiClient.get("/invoice-center/reports/outstanding-invoices", { params }),
+  getSalesByCustomerReport: (params: SalesByCustomerReportParams = {}) => apiClient.get("/invoice-center/reports/sales-by-customer", { params }),
+  getSalesByProductReport: (params: SalesByProductReportParams = {}) => apiClient.get("/invoice-center/reports/sales-by-product", { params }),
+  getCollectionSummaryReport: (params: CollectionSummaryReportParams = {}) => apiClient.get("/invoice-center/reports/collection-summary", { params }),
+  getFinancePostingStatusReport: (params: FinancePostingStatusReportParams = {}) => apiClient.get("/invoice-center/reports/finance-posting-status", { params }),
 };
 
 export default invoiceCenterApi;

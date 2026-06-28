@@ -55,6 +55,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	customerReceiptRepo := repositories.NewCustomerReceiptRepository()
 	financeSettingRepo := repositories.NewInvoiceCenterFinanceSettingRepository()
 	financePostingRepo := repositories.NewInvoiceCenterFinancePostingRepository()
+	reportRepo := repositories.NewInvoiceCenterReportRepository()
 
 	// Initialize services
 	dashboardSvc := services.NewInvoiceDashboardService(dashboardRepo, logger)
@@ -79,6 +80,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		auditSvc,
 		logger,
 	)
+	reportSvc := services.NewInvoiceCenterReportService(reportRepo)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -93,6 +95,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	customerReceiptHdl := handlers.NewCustomerReceiptHandler(customerReceiptSvc)
 	financeSettingHdl := handlers.NewInvoiceCenterFinanceSettingHandler(financeSettingSvc)
 	financePostingHdl := handlers.NewInvoiceCenterFinancePostingHandler(financePostingSvc)
+	reportHdl := handlers.NewInvoiceCenterReportHandler(reportSvc)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -226,5 +229,23 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		financePosting.POST("/credit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostCreditNoteToFinance)
 		financePosting.POST("/debit-note/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostDebitNoteToFinance)
 		financePosting.POST("/customer-receipt/:id/post", middleware.RequirePermission("invoice_center.finance_posting.post"), financePostingHdl.PostCustomerReceiptToFinance)
+	}
+
+	// Reports Routes
+	reports := r.Group("/reports")
+	{
+		reports.GET("/customer-balance", middleware.RequirePermission("invoice_center.report.customer_balance"), reportHdl.GetCustomerBalances)
+		reports.GET("/customer-statement", middleware.RequirePermission("invoice_center.report.customer_statement"), reportHdl.GetCustomerStatement)
+		reports.GET("/customer-aging", middleware.RequirePermission("invoice_center.report.customer_aging"), reportHdl.GetCustomerAging)
+		reports.GET("/sales-order-register", middleware.RequirePermission("invoice_center.report.sales_order_register"), reportHdl.GetSalesOrderRegister)
+		reports.GET("/sales-invoice-register", middleware.RequirePermission("invoice_center.report.sales_invoice_register"), reportHdl.GetSalesInvoiceRegister)
+		reports.GET("/credit-note-register", middleware.RequirePermission("invoice_center.report.credit_note_register"), reportHdl.GetCreditNoteRegister)
+		reports.GET("/debit-note-register", middleware.RequirePermission("invoice_center.report.debit_note_register"), reportHdl.GetDebitNoteRegister)
+		reports.GET("/customer-receipt-register", middleware.RequirePermission("invoice_center.report.customer_receipt_register"), reportHdl.GetCustomerReceiptRegister)
+		reports.GET("/outstanding-invoices", middleware.RequirePermission("invoice_center.report.outstanding_invoices"), reportHdl.GetOutstandingInvoices)
+		reports.GET("/sales-by-customer", middleware.RequirePermission("invoice_center.report.sales_by_customer"), reportHdl.GetSalesByCustomer)
+		reports.GET("/sales-by-product", middleware.RequirePermission("invoice_center.report.sales_by_product"), reportHdl.GetSalesByProduct)
+		reports.GET("/collection-summary", middleware.RequirePermission("invoice_center.report.collection_summary"), reportHdl.GetCollectionSummary)
+		reports.GET("/finance-posting-status", middleware.RequirePermission("invoice_center.report.finance_posting_status"), reportHdl.GetFinancePostingStatus)
 	}
 }
