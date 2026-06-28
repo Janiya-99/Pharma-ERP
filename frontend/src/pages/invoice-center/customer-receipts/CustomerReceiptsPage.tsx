@@ -55,7 +55,7 @@ const CustomerReceiptsPage = () => {
   };
 
   const handleEdit = (row: any) => {
-    navigate(`/admin/invoice-center/customer-receipts/${row.id}/edit`);
+    navigate(`/invoice-center/customer-receipts/${row.id}/edit`);
   };
 
   const columns = React.useMemo(
@@ -65,7 +65,7 @@ const CustomerReceiptsPage = () => {
         header: "Receipt #",
         cell: (info: any) => (
           <Link
-            to={`/admin/invoice-center/customer-receipts/${info.row.original.id}`}
+            to={`/invoice-center/customer-receipts/${info.row.original.id}`}
             className="font-medium text-brand-500 hover:underline"
           >
             {info.getValue()}
@@ -95,7 +95,7 @@ const CustomerReceiptsPage = () => {
         cell: (info: any) => formatCurrency(info.getValue()),
       },
       {
-        accessorKey: "status",
+        accessorKey: "receipt_status",
         header: "Status",
         cell: (info: any) => (
           <CustomerReceiptStatusBadge status={info.getValue()} />
@@ -131,7 +131,7 @@ const CustomerReceiptsPage = () => {
         <div className="flex items-center gap-2">
           <PermissionGuard permission="invoice_center.customer_receipt.create">
             <Link
-              to="/admin/invoice-center/customer-receipts/create"
+              to="/invoice-center/customer-receipts/create"
               className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600"
             >
               <Plus className="h-4 w-4" />

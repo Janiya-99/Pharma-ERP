@@ -6,6 +6,7 @@ import * as z from "zod";
 import { ArrowLeft, Save, Loader2, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
+import { useAuth } from "../../../auth/AuthContext";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
@@ -28,6 +29,7 @@ const CustomerReceiptFormPage = () => {
   const { id } = useParams<{ id: string }>();
   const isEditMode = !!id;
   const navigate = useNavigate();
+  const { activeBranch } = useAuth();
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
   const [allocations, setAllocations] = useState<any[]>([]);
@@ -90,7 +92,7 @@ const CustomerReceiptFormPage = () => {
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to load receipt");
-      navigate("/admin/invoice-center/customer-receipts");
+      navigate("/invoice-center/customer-receipts");
     } finally {
       setLoading(false);
     }
@@ -112,6 +114,7 @@ const CustomerReceiptFormPage = () => {
       // Format payload
       const payload = {
         ...data,
+        branch_id: activeBranch?.id || 1,
         allocations: allocations.map(a => ({
           sales_invoice_id: a.sales_invoice_id,
           allocated_amount: Number(a.allocated_amount),
@@ -122,13 +125,13 @@ const CustomerReceiptFormPage = () => {
         const res = await invoiceCenterApi.updateCustomerReceipt(id, payload);
         if (res.data?.success) {
           toast.success("Receipt updated successfully");
-          navigate(`/admin/invoice-center/customer-receipts/${id}`);
+          navigate(`/invoice-center/customer-receipts/${id}`);
         }
       } else {
         const res = await invoiceCenterApi.createCustomerReceipt(payload);
         if (res.data?.success) {
           toast.success("Receipt created successfully");
-          navigate(`/admin/invoice-center/customer-receipts/${res.data.data.id}`);
+          navigate(`/invoice-center/customer-receipts/${res.data.data.id}`);
         }
       }
     } catch (error: any) {
@@ -147,7 +150,7 @@ const CustomerReceiptFormPage = () => {
     return (
       <div className="p-8 text-center space-y-4">
         <div className="text-red-500 font-medium">This receipt cannot be edited because it is {initialData.approval_status}.</div>
-        <Button variant="outline" onClick={() => navigate(`/admin/invoice-center/customer-receipts/${id}`)}>
+        <Button variant="outline" onClick={() => navigate(`/invoice-center/customer-receipts/${id}`)}>
           View Receipt
         </Button>
       </div>

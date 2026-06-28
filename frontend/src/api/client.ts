@@ -15,7 +15,7 @@ const apiClient = axios.create({
 // Request interceptor — attach auth token if available
 apiClient.interceptors.request.use(
   (config: unknown) => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("erp_token") || localStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

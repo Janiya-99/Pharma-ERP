@@ -17,7 +17,7 @@ func main() {
 	}
 
 	res := db.Exec(`
-		UPDATE customers SET current_balance = 0, credit_limit = 1000 WHERE id = 7;
+		UPDATE customers SET current_balance = 5000, credit_limit = 10000 WHERE id = 7;
 	`)
 
 	if res.Error != nil {

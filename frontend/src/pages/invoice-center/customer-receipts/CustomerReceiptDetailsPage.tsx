@@ -65,20 +65,20 @@ const CustomerReceiptDetailsPage = () => {
   }
 
   const { customer, allocations = [] } = data;
-  const isCancelled = data.status === "cancelled";
+  const isCancelled = data.receipt_status === "cancelled";
 
   return (
     <div className="max-w-6xl mx-auto py-6 space-y-6">
       {/* Header Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/admin/invoice-center/customer-receipts")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/invoice-center/customer-receipts")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
               Receipt {data.receipt_number}
-              <CustomerReceiptStatusBadge status={data.status} />
+              <CustomerReceiptStatusBadge status={data.receipt_status} />
               <CustomerReceiptApprovalStatusBadge status={data.approval_status} />
               <CustomerReceiptPostedStatusBadge status={data.posted_status} />
             </h1>
@@ -88,7 +88,7 @@ const CustomerReceiptDetailsPage = () => {
           <CustomerReceiptActionButtons
             approvalStatus={data.approval_status}
             postedStatus={data.posted_status}
-            onEdit={() => navigate(`/admin/invoice-center/customer-receipts/${data.id}/edit`)}
+            onEdit={() => navigate(`/invoice-center/customer-receipts/${data.id}/edit`)}
             onSubmit={() => setSubmitModalOpen(true)}
             onApprove={() => setApproveModalOpen(true)}
             onReject={() => setRejectModalOpen(true)}
@@ -293,7 +293,7 @@ const CustomerReceiptDetailsPage = () => {
         receiptId={data.id}
         receiptNumber={data.receipt_number}
         onSuccess={() => {
-          navigate("/admin/invoice-center/customer-receipts");
+          navigate("/invoice-center/customer-receipts");
         }}
       />
     </div>

@@ -109,6 +109,9 @@ import CreditNoteDetailsPage from "../pages/invoice-center/credit-notes/CreditNo
 import DebitNotesPage from "../pages/invoice-center/debit-notes/DebitNotesPage";
 import DebitNoteFormPage from "../pages/invoice-center/debit-notes/DebitNoteFormPage";
 import DebitNoteDetailsPage from "../pages/invoice-center/debit-notes/DebitNoteDetailsPage";
+import CustomerReceiptsPage from "../pages/invoice-center/customer-receipts/CustomerReceiptsPage";
+import CustomerReceiptFormPage from "../pages/invoice-center/customer-receipts/CustomerReceiptFormPage";
+import CustomerReceiptDetailsPage from "../pages/invoice-center/customer-receipts/CustomerReceiptDetailsPage";
 import { InvoiceCenterReportsDashboardPage } from "../pages/invoice-center/reports/InvoiceCenterReportsDashboardPage";
 import { CustomerBalanceReportPage } from "../pages/invoice-center/reports/CustomerBalanceReportPage";
 import { CustomerStatementReportPage } from "../pages/invoice-center/reports/CustomerStatementReportPage";
@@ -306,6 +309,11 @@ const AppRoutes = () => {
           <Route path="/invoice-center/debit-notes/create" element={<DebitNoteFormPage />} />
           <Route path="/invoice-center/debit-notes/:id" element={<DebitNoteDetailsPage />} />
           <Route path="/invoice-center/debit-notes/:id/edit" element={<DebitNoteFormPage />} />
+
+          <Route path="/invoice-center/customer-receipts" element={<CustomerReceiptsPage />} />
+          <Route path="/invoice-center/customer-receipts/create" element={<CustomerReceiptFormPage />} />
+          <Route path="/invoice-center/customer-receipts/:id" element={<CustomerReceiptDetailsPage />} />
+          <Route path="/invoice-center/customer-receipts/:id/edit" element={<CustomerReceiptFormPage />} />
 
           {/* Invoice Center Reports */}
           <Route path="/invoice-center/reports" element={<InvoiceCenterReportsDashboardPage />} />

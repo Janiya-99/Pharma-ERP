@@ -14,7 +14,9 @@ export const SalesInvoiceCustomerCreditCard: React.FC<Props> = ({
 }) => {
   if (!customer) return null;
 
-  const { credit_limit, current_balance, credit_days } = customer;
+  const credit_limit = Number(customer.credit_limit) || 0;
+  const current_balance = Number(customer.current_balance) || 0;
+  const credit_days = Number(customer.credit_days) || 0;
   const projectedBalance = current_balance + invoiceTotal;
   const availableCredit =
     credit_limit > 0 ? credit_limit - projectedBalance : 0;
