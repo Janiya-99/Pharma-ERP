@@ -58,6 +58,18 @@ export const invoiceCenterApi = {
   rejectSalesInvoice: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/sales-invoices/${id}/reject`, payload),
   postSalesInvoice: (id: number | string) => apiClient.post(`/invoice-center/sales-invoices/${id}/post`),
   cancelSalesInvoice: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/sales-invoices/${id}/cancel`, payload),
+
+  // ---- Credit Notes ----
+  getCreditNotes: (params: any = {}) => apiClient.get("/invoice-center/credit-notes", { params }),
+  getCreditNoteById: (id: number | string) => apiClient.get(`/invoice-center/credit-notes/${id}`),
+  createCreditNote: (payload: any) => apiClient.post("/invoice-center/credit-notes", payload),
+  updateCreditNote: (id: number | string, payload: any) => apiClient.put(`/invoice-center/credit-notes/${id}`, payload),
+  deleteCreditNote: (id: number | string) => apiClient.delete(`/invoice-center/credit-notes/${id}`),
+  submitCreditNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/credit-notes/${id}/submit`, payload),
+  approveCreditNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/credit-notes/${id}/approve`, payload),
+  rejectCreditNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/credit-notes/${id}/reject`, payload),
+  postCreditNote: (id: number | string) => apiClient.post(`/invoice-center/credit-notes/${id}/post`),
+  cancelCreditNote: (id: number | string, payload: { remarks?: string }) => apiClient.post(`/invoice-center/credit-notes/${id}/cancel`, payload),
 };
 
 export default invoiceCenterApi;

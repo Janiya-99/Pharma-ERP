@@ -106,6 +106,9 @@ import SalesOrderDetailsPage from "../pages/invoice-center/sales-orders/SalesOrd
 import SalesInvoicesPage from "../pages/invoice-center/sales-invoices/SalesInvoicesPage";
 import SalesInvoiceFormPage from "../pages/invoice-center/sales-invoices/SalesInvoiceFormPage";
 import SalesInvoiceDetailsPage from "../pages/invoice-center/sales-invoices/SalesInvoiceDetailsPage";
+import CreditNotesPage from "../pages/invoice-center/credit-notes/CreditNotesPage";
+import CreditNoteFormPage from "../pages/invoice-center/credit-notes/CreditNoteFormPage";
+import CreditNoteDetailsPage from "../pages/invoice-center/credit-notes/CreditNoteDetailsPage";
 
 const AppRoutes = () => {
   return (
@@ -279,6 +282,11 @@ const AppRoutes = () => {
           <Route path="/invoice-center/sales-invoices/create" element={<SalesInvoiceFormPage />} />
           <Route path="/invoice-center/sales-invoices/:id" element={<SalesInvoiceDetailsPage />} />
           <Route path="/invoice-center/sales-invoices/:id/edit" element={<SalesInvoiceFormPage />} />
+          
+          <Route path="/invoice-center/credit-notes" element={<CreditNotesPage />} />
+          <Route path="/invoice-center/credit-notes/create" element={<CreditNoteFormPage />} />
+          <Route path="/invoice-center/credit-notes/:id" element={<CreditNoteDetailsPage />} />
+          <Route path="/invoice-center/credit-notes/:id/edit" element={<CreditNoteFormPage />} />
 
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>
