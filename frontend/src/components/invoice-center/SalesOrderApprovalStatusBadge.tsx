@@ -1,4 +1,5 @@
 import React from "react";
+import { Badge } from "../ui/badge";
 import type { SalesOrderApprovalStatus } from "../../types/invoice-center";
 
 interface Props {
@@ -16,9 +17,9 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 const SalesOrderApprovalStatusBadge: React.FC<Props> = ({ status }) => {
   const cfg = statusConfig[status] ?? { label: status, className: "bg-gray-100 text-gray-500" };
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${cfg.className}`}>
+    <Badge variant="secondary" className={`uppercase tracking-wide ${cfg.className}`}>
       {cfg.label}
-    </span>
+    </Badge>
   );
 };
 

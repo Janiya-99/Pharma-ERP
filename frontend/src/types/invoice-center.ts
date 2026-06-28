@@ -41,6 +41,7 @@ export interface ProductLookup {
 // ---- Product Batch Lookup -----------------------------------
 export interface ProductBatchLookup {
   id: number;
+  product_id?: number;
   batch_number: string;
   expiry_date?: string;
   batch_status?: string;
@@ -64,7 +65,7 @@ export interface SalesOrderLineForm {
 }
 
 // ---- Sales Order Line (from API response) -------------------
-export interface SalesOrderLineResponse {
+export interface SalesOrderLine {
   id: number;
   product_id: number;
   product_code?: string;
@@ -82,6 +83,8 @@ export interface SalesOrderLineResponse {
   line_remarks?: string;
 }
 
+export type SalesOrderLineResponse = SalesOrderLine;
+
 // ---- Sales Order Approval -----------------------------------
 export interface SalesOrderApproval {
   id: number;
@@ -92,7 +95,7 @@ export interface SalesOrderApproval {
 }
 
 // ---- Sales Order (list item) --------------------------------
-export interface SalesOrderListItem {
+export interface SalesOrder {
   id: number;
   sales_order_number: string;
   sales_order_date: string;
@@ -114,8 +117,10 @@ export interface SalesOrderListItem {
   updated_at: string;
 }
 
+export type SalesOrderListItem = SalesOrder;
+
 // ---- Sales Order Detail (single) ----------------------------
-export interface SalesOrderDetail extends SalesOrderListItem {
+export interface SalesOrderDetail extends SalesOrder {
   financial_year_id?: number;
   accounting_period_id?: number;
   remarks?: string;

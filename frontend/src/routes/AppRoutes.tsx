@@ -100,6 +100,9 @@ import CustomerCategoriesPage from "../pages/invoice-center/customer-categories/
 import CustomersPage from "../pages/invoice-center/customers/CustomersPage";
 import CustomerFormPage from "../pages/invoice-center/customers/CustomerFormPage";
 import CustomerDetailsPage from "../pages/invoice-center/customers/CustomerDetailsPage";
+import SalesOrdersPage from "../pages/invoice-center/sales-orders/SalesOrdersPage";
+import SalesOrderFormPage from "../pages/invoice-center/sales-orders/SalesOrderFormPage";
+import SalesOrderDetailsPage from "../pages/invoice-center/sales-orders/SalesOrderDetailsPage";
 
 const AppRoutes = () => {
   return (
@@ -265,6 +268,10 @@ const AppRoutes = () => {
           <Route path="/invoice-center/customers/create" element={<CustomerFormPage />} />
           <Route path="/invoice-center/customers/:id" element={<CustomerDetailsPage />} />
           <Route path="/invoice-center/customers/:id/edit" element={<CustomerFormPage />} />
+          <Route path="/invoice-center/sales-orders" element={<SalesOrdersPage />} />
+          <Route path="/invoice-center/sales-orders/create" element={<SalesOrderFormPage />} />
+          <Route path="/invoice-center/sales-orders/:id" element={<SalesOrderDetailsPage />} />
+          <Route path="/invoice-center/sales-orders/:id/edit" element={<SalesOrderFormPage />} />
 
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>

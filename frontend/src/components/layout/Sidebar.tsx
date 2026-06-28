@@ -217,7 +217,7 @@ const Sidebar = () => {
       name: "Sales",
       icon: FileText,
       children: [
-        { name: "Sales Orders", path: "/invoice-center/sales-orders", permission: "invoice_center.sales_order.view", disabled: true },
+        { name: "Sales Orders", path: "/invoice-center/sales-orders", permission: "invoice_center.sales_order.view" },
         { name: "Sales Invoices", path: "/invoice-center/sales-invoices", permission: "invoice_center.sales_invoice.view", disabled: true },
       ],
     },

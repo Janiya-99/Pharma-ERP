@@ -79,8 +79,8 @@ func (s *inventoryStockMovementService) ProcessStockOut(db *gorm.DB, payload dto
 
 	// 4. Update Stock Balance
 	balance.QuantityOnHand -= payload.Quantity
-	
-	// If stock reaches zero, keep the last average cost but set stock value to 0. 
+
+	// If stock reaches zero, keep the last average cost but set stock value to 0.
 	// The problem states: "If quantity_on_hand becomes zero, keep last average_cost or set stock_value = 0."
 	if balance.QuantityOnHand <= 0 {
 		balance.QuantityOnHand = 0
@@ -177,10 +177,10 @@ func (s *inventoryStockMovementService) validateStockInMovement(db *gorm.DB, pay
 		if batch.IsBlocked && !payload.AllowBlockedBatch {
 			return nil, nil, errors.New("product batch is blocked")
 		}
-		
+
 		isExpiredStatus := batch.BatchStatus == "expired"
 		isRecalledStatus := batch.BatchStatus == "recalled"
-		
+
 		if batch.BatchStatus == "disposed" || batch.BatchStatus == "inactive" {
 			return nil, nil, errors.New("product batch is in invalid state for stock in")
 		}
@@ -190,7 +190,7 @@ func (s *inventoryStockMovementService) validateStockInMovement(db *gorm.DB, pay
 		if isRecalledStatus && !payload.AllowRecalledBatch {
 			return nil, nil, errors.New("product batch is recalled")
 		}
-		
+
 		if product.RequiresExpiryTracking && batch.ExpiryDate != nil && batch.ExpiryDate.Before(time.Now()) && !payload.AllowExpiredBatch {
 			return nil, nil, errors.New("product batch is expired")
 		}
@@ -291,6 +291,8 @@ func (s *inventoryStockMovementService) createStockOutLedgerEntry(db *gorm.DB, p
 		entry.MovementType = "adjustment_out"
 	} else if payload.SourceType == "purchase_return" {
 		entry.MovementType = "return_out"
+	} else if payload.SourceType == "sales_invoice" {
+		entry.MovementType = "sales_invoice_out"
 	}
 
 	return s.repo.CreateStockLedgerEntry(db, entry)

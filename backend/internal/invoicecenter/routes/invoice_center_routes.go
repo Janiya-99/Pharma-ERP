@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	invrepositories "github.com/pixandco/erp-phrma/internal/inventory/repositories"
+	invservices "github.com/pixandco/erp-phrma/internal/inventory/services"
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/handlers"
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/repositories"
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/services"
@@ -46,6 +48,8 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	contactRepo := repositories.NewCustomerContactRepository()
 	customerRepo := repositories.NewCustomerRepository()
 	salesOrderRepo := repositories.NewSalesOrderRepository()
+	salesInvoiceRepo := repositories.NewSalesInvoiceRepository()
+	stockMovementRepo := invrepositories.NewStockMovementRepository()
 
 	// Initialize services
 	dashboardSvc := services.NewInvoiceDashboardService(dashboardRepo, logger)
@@ -54,6 +58,8 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	contactSvc := services.NewCustomerContactService(contactRepo, auditSvc, logger)
 	customerSvc := services.NewCustomerService(customerRepo, categoryRepo, addressRepo, contactRepo, auditSvc, logger)
 	salesOrderSvc := services.NewSalesOrderService(salesOrderRepo, auditSvc, logger)
+	stockMovementSvc := invservices.NewInventoryStockMovementService(stockMovementRepo)
+	salesInvoiceSvc := services.NewSalesInvoiceService(salesInvoiceRepo, stockMovementSvc, auditSvc, logger)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -62,6 +68,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	contactHdl := handlers.NewCustomerContactHandler(contactSvc, logger)
 	customerHdl := handlers.NewCustomerHandler(customerSvc, logger)
 	salesOrderHdl := handlers.NewSalesOrderHandler(salesOrderSvc, logger)
+	salesInvoiceHdl := handlers.NewSalesInvoiceHandler(salesInvoiceSvc, logger)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -116,5 +123,20 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		salesOrders.POST("/:id/reject", middleware.RequirePermission("invoice_center.sales_order.reject"), salesOrderHdl.Reject)
 		salesOrders.POST("/:id/close", middleware.RequirePermission("invoice_center.sales_order.close"), salesOrderHdl.Close)
 		salesOrders.POST("/:id/cancel", middleware.RequirePermission("invoice_center.sales_order.cancel"), salesOrderHdl.Cancel)
+	}
+
+	// Sales Invoice Routes
+	salesInvoices := r.Group("/sales-invoices")
+	{
+		salesInvoices.GET("", middleware.RequirePermission("invoice_center.sales_invoice.view"), salesInvoiceHdl.List)
+		salesInvoices.GET("/:id", middleware.RequirePermission("invoice_center.sales_invoice.view"), salesInvoiceHdl.Get)
+		salesInvoices.POST("", middleware.RequirePermission("invoice_center.sales_invoice.create"), salesInvoiceHdl.Create)
+		salesInvoices.PUT("/:id", middleware.RequirePermission("invoice_center.sales_invoice.update"), salesInvoiceHdl.Update)
+		salesInvoices.DELETE("/:id", middleware.RequirePermission("invoice_center.sales_invoice.delete"), salesInvoiceHdl.Delete)
+		salesInvoices.POST("/:id/submit", middleware.RequirePermission("invoice_center.sales_invoice.submit"), salesInvoiceHdl.Submit)
+		salesInvoices.POST("/:id/approve", middleware.RequirePermission("invoice_center.sales_invoice.approve"), salesInvoiceHdl.Approve)
+		salesInvoices.POST("/:id/reject", middleware.RequirePermission("invoice_center.sales_invoice.reject"), salesInvoiceHdl.Reject)
+		salesInvoices.POST("/:id/post", middleware.RequirePermission("invoice_center.sales_invoice.post"), salesInvoiceHdl.Post)
+		salesInvoices.POST("/:id/cancel", middleware.RequirePermission("invoice_center.sales_invoice.update"), salesInvoiceHdl.Cancel)
 	}
 }

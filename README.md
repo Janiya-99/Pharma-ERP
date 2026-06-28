@@ -9,6 +9,20 @@ This repository contains two main projects:
 
 ---
 
+## Frontend Standard
+All frontend application code must use TypeScript, React + Vite, shadcn/ui components, and Tailwind CSS.
+
+- Use TypeScript only.
+- Use `.tsx` for React components.
+- Use `.ts` for API, hooks, utilities, and types.
+- Use shadcn/ui components for UI.
+- Do not create `.js` or `.jsx` frontend application files.
+- Use `react-hook-form` and `zod` for forms and validation where suitable.
+
+Future frontend implementation steps must explicitly mention these rules.
+
+---
+
 ## 🚀 Running the Project Locally
 
 ### Prerequisites
