@@ -393,6 +393,9 @@ export interface CollectionSummaryReportRow {
   bank_reference_number: string;
   cheque_number: string;
   finance_post_status: string;
+  receipt_count?: number;
+  total_amount?: number;
+  percentage_of_total?: number;
 }
 
 export interface FinancePostingStatusReportRow {

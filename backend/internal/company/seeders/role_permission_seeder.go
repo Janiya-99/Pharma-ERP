@@ -91,7 +91,12 @@ func SeedRolePermissions(db *gorm.DB, logger *zap.Logger) error {
 
 	// Invoice Manager: all Invoice Center
 	assignPermission("INVOICE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.") })
-	// Invoice Viewer
+	// Invoice Approver: view, approve, reject, post, complete, cancel, and reports
+	assignPermission("INVOICE_APPROVER", func(k string) bool {
+		return (strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.")) && 
+		(strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post") || strings.HasSuffix(k, ".complete") || strings.HasSuffix(k, ".cancel"))
+	})
+	// Invoice Viewer: all view permissions (including reports)
 	assignPermission("INVOICE_VIEWER", func(k string) bool {
 		return (strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.")) && strings.HasSuffix(k, ".view")
 	})

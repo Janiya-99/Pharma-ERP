@@ -112,6 +112,20 @@ import CreditNoteDetailsPage from "../pages/invoice-center/credit-notes/CreditNo
 import DebitNotesPage from "../pages/invoice-center/debit-notes/DebitNotesPage";
 import DebitNoteFormPage from "../pages/invoice-center/debit-notes/DebitNoteFormPage";
 import DebitNoteDetailsPage from "../pages/invoice-center/debit-notes/DebitNoteDetailsPage";
+import { InvoiceCenterReportsDashboardPage } from "../pages/invoice-center/reports/InvoiceCenterReportsDashboardPage";
+import { CustomerBalanceReportPage } from "../pages/invoice-center/reports/CustomerBalanceReportPage";
+import { CustomerStatementReportPage } from "../pages/invoice-center/reports/CustomerStatementReportPage";
+import { CustomerAgingReportPage } from "../pages/invoice-center/reports/CustomerAgingReportPage";
+import { SalesOrderRegisterReportPage } from "../pages/invoice-center/reports/SalesOrderRegisterReportPage";
+import { SalesInvoiceRegisterReportPage } from "../pages/invoice-center/reports/SalesInvoiceRegisterReportPage";
+import { CreditNoteRegisterReportPage } from "../pages/invoice-center/reports/CreditNoteRegisterReportPage";
+import { DebitNoteRegisterReportPage } from "../pages/invoice-center/reports/DebitNoteRegisterReportPage";
+import { CustomerReceiptRegisterReportPage } from "../pages/invoice-center/reports/CustomerReceiptRegisterReportPage";
+import { OutstandingInvoiceReportPage } from "../pages/invoice-center/reports/OutstandingInvoiceReportPage";
+import { SalesByCustomerReportPage } from "../pages/invoice-center/reports/SalesByCustomerReportPage";
+import { SalesByProductReportPage } from "../pages/invoice-center/reports/SalesByProductReportPage";
+import { CollectionSummaryReportPage } from "../pages/invoice-center/reports/CollectionSummaryReportPage";
+import { FinancePostingStatusReportPage } from "../pages/invoice-center/reports/FinancePostingStatusReportPage";
 
 const AppRoutes = () => {
   return (
@@ -295,6 +309,23 @@ const AppRoutes = () => {
           <Route path="/invoice-center/debit-notes/create" element={<DebitNoteFormPage />} />
           <Route path="/invoice-center/debit-notes/:id" element={<DebitNoteDetailsPage />} />
           <Route path="/invoice-center/debit-notes/:id/edit" element={<DebitNoteFormPage />} />
+
+          {/* Invoice Center Reports */}
+          <Route path="/invoice-center/reports" element={<InvoiceCenterReportsDashboardPage />} />
+          <Route path="/invoice-center/reports/dashboard" element={<InvoiceCenterReportsDashboardPage />} />
+          <Route path="/invoice-center/reports/customer-balance" element={<CustomerBalanceReportPage />} />
+          <Route path="/invoice-center/reports/customer-statement" element={<CustomerStatementReportPage />} />
+          <Route path="/invoice-center/reports/customer-aging" element={<CustomerAgingReportPage />} />
+          <Route path="/invoice-center/reports/sales-order-register" element={<SalesOrderRegisterReportPage />} />
+          <Route path="/invoice-center/reports/sales-invoice-register" element={<SalesInvoiceRegisterReportPage />} />
+          <Route path="/invoice-center/reports/credit-note-register" element={<CreditNoteRegisterReportPage />} />
+          <Route path="/invoice-center/reports/debit-note-register" element={<DebitNoteRegisterReportPage />} />
+          <Route path="/invoice-center/reports/customer-receipt-register" element={<CustomerReceiptRegisterReportPage />} />
+          <Route path="/invoice-center/reports/outstanding-invoices" element={<OutstandingInvoiceReportPage />} />
+          <Route path="/invoice-center/reports/sales-by-customer" element={<SalesByCustomerReportPage />} />
+          <Route path="/invoice-center/reports/sales-by-product" element={<SalesByProductReportPage />} />
+          <Route path="/invoice-center/reports/collection-summary" element={<CollectionSummaryReportPage />} />
+          <Route path="/invoice-center/reports/finance-posting-status" element={<FinancePostingStatusReportPage />} />
 
           <Route path="/compliance-center/dashboard" element={<PlaceholderPage title="Compliance Center Dashboard" />} />
         </Route>

@@ -244,6 +244,26 @@ const Sidebar = () => {
         { name: "Finance Posting", path: "/invoice-center/finance-posting", permission: "invoice_center.finance_posting.view" },
       ],
     },
+    {
+      name: "Reports",
+      icon: BarChart3,
+      children: [
+        { name: "Reports Dashboard", path: "/invoice-center/reports/dashboard", permission: "invoice_center.reports.view" },
+        { name: "Customer Balance", path: "/invoice-center/reports/customer-balance", permission: "invoice_center.reports.view" },
+        { name: "Customer Statement", path: "/invoice-center/reports/customer-statement", permission: "invoice_center.reports.view" },
+        { name: "Customer Aging", path: "/invoice-center/reports/customer-aging", permission: "invoice_center.reports.view" },
+        { name: "Sales Order Register", path: "/invoice-center/reports/sales-order-register", permission: "invoice_center.reports.view" },
+        { name: "Sales Invoice Register", path: "/invoice-center/reports/sales-invoice-register", permission: "invoice_center.reports.view" },
+        { name: "Credit Note Register", path: "/invoice-center/reports/credit-note-register", permission: "invoice_center.reports.view" },
+        { name: "Debit Note Register", path: "/invoice-center/reports/debit-note-register", permission: "invoice_center.reports.view" },
+        { name: "Receipt Register", path: "/invoice-center/reports/customer-receipt-register", permission: "invoice_center.reports.view" },
+        { name: "Outstanding Invoices", path: "/invoice-center/reports/outstanding-invoices", permission: "invoice_center.reports.view" },
+        { name: "Sales by Customer", path: "/invoice-center/reports/sales-by-customer", permission: "invoice_center.reports.view" },
+        { name: "Sales by Product", path: "/invoice-center/reports/sales-by-product", permission: "invoice_center.reports.view" },
+        { name: "Collection Summary", path: "/invoice-center/reports/collection-summary", permission: "invoice_center.reports.view" },
+        { name: "Finance Posting Status", path: "/invoice-center/reports/finance-posting-status", permission: "invoice_center.reports.view" },
+      ],
+    },
   ];
 
   const getMenus = (): MenuItem[] => {
