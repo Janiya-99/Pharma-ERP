@@ -33,13 +33,17 @@ type DebitNote struct {
 	Status             string          `gorm:"type:varchar(30);default:'active';index" json:"status"`
 	CreatedBy          *uint64         `json:"created_by"`
 	UpdatedBy          *uint64         `json:"updated_by"`
+	CancelledBy        *uint64         `json:"cancelled_by"`
+	CancelledAt        *time.Time      `json:"cancelled_at"`
+	CancelReason       string          `gorm:"type:text" json:"cancel_reason"`
 	CreatedAt          time.Time       `json:"created_at"`
 	UpdatedAt          time.Time       `json:"updated_at"`
 	DeletedAt          gorm.DeletedAt  `gorm:"index" json:"-"`
 
-	Customer           Customer        `gorm:"foreignKey:CustomerID" json:"customer"`
-	SalesInvoice       *SalesInvoice   `gorm:"foreignKey:SalesInvoiceID" json:"sales_invoice,omitempty"`
-	Lines              []DebitNoteLine `gorm:"foreignKey:DebitNoteID" json:"lines,omitempty"`
+	Customer           Customer            `gorm:"foreignKey:CustomerID" json:"customer"`
+	SalesInvoice       *SalesInvoice       `gorm:"foreignKey:SalesInvoiceID" json:"sales_invoice,omitempty"`
+	Lines              []DebitNoteLine     `gorm:"foreignKey:DebitNoteID" json:"lines,omitempty"`
+	Approvals          []DebitNoteApproval `gorm:"foreignKey:DebitNoteID" json:"approvals,omitempty"`
 }
 
 func (DebitNote) TableName() string {

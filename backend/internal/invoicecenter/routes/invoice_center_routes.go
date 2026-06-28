@@ -50,6 +50,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	salesOrderRepo := repositories.NewSalesOrderRepository()
 	salesInvoiceRepo := repositories.NewSalesInvoiceRepository()
 	creditNoteRepo := repositories.NewCreditNoteRepository()
+	debitNoteRepo := repositories.NewDebitNoteRepository()
 	stockMovementRepo := invrepositories.NewStockMovementRepository()
 
 	// Initialize services
@@ -62,6 +63,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	stockMovementSvc := invservices.NewInventoryStockMovementService(stockMovementRepo)
 	salesInvoiceSvc := services.NewSalesInvoiceService(salesInvoiceRepo, stockMovementSvc, auditSvc, logger)
 	creditNoteSvc := services.NewCreditNoteService(creditNoteRepo, auditSvc, logger)
+	debitNoteSvc := services.NewDebitNoteService(debitNoteRepo, auditSvc, logger)
 
 	// Initialize handlers
 	dashboardHdl := handlers.NewInvoiceDashboardHandler(dashboardSvc, logger)
@@ -72,6 +74,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	salesOrderHdl := handlers.NewSalesOrderHandler(salesOrderSvc, logger)
 	salesInvoiceHdl := handlers.NewSalesInvoiceHandler(salesInvoiceSvc, logger)
 	creditNoteHdl := handlers.NewCreditNoteHandler(creditNoteSvc, logger)
+	debitNoteHdl := handlers.NewDebitNoteHandler(debitNoteSvc, logger)
 
 	// Dashboard Routes
 	dashboard := r.Group("/dashboard")
@@ -156,5 +159,20 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		creditNotes.POST("/:id/reject", middleware.RequirePermission("invoice_center.credit_note.reject"), creditNoteHdl.Reject)
 		creditNotes.POST("/:id/post", middleware.RequirePermission("invoice_center.credit_note.post"), creditNoteHdl.Post)
 		creditNotes.POST("/:id/cancel", middleware.RequirePermission("invoice_center.credit_note.update"), creditNoteHdl.Cancel)
+	}
+
+	// Debit Note Routes
+	debitNotes := r.Group("/debit-notes")
+	{
+		debitNotes.GET("", middleware.RequirePermission("invoice_center.debit_note.view"), debitNoteHdl.List)
+		debitNotes.GET("/:id", middleware.RequirePermission("invoice_center.debit_note.view"), debitNoteHdl.Get)
+		debitNotes.POST("", middleware.RequirePermission("invoice_center.debit_note.create"), debitNoteHdl.Create)
+		debitNotes.PUT("/:id", middleware.RequirePermission("invoice_center.debit_note.update"), debitNoteHdl.Update)
+		debitNotes.DELETE("/:id", middleware.RequirePermission("invoice_center.debit_note.delete"), debitNoteHdl.Delete)
+		debitNotes.POST("/:id/submit", middleware.RequirePermission("invoice_center.debit_note.submit"), debitNoteHdl.Submit)
+		debitNotes.POST("/:id/approve", middleware.RequirePermission("invoice_center.debit_note.approve"), debitNoteHdl.Approve)
+		debitNotes.POST("/:id/reject", middleware.RequirePermission("invoice_center.debit_note.reject"), debitNoteHdl.Reject)
+		debitNotes.POST("/:id/post", middleware.RequirePermission("invoice_center.debit_note.post"), debitNoteHdl.Post)
+		debitNotes.POST("/:id/cancel", middleware.RequirePermission("invoice_center.debit_note.update"), debitNoteHdl.Cancel)
 	}
 }
