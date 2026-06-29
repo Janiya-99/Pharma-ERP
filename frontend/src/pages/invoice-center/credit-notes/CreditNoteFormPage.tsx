@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
@@ -393,13 +394,18 @@ const CreditNoteFormPage: React.FC = () => {
                     >
                       Date *
                     </Label>
-                    <Input
-                      type="date"
-                      id="credit_note_date"
-                      {...register("credit_note_date")}
-                      className={
-                        errors.credit_note_date ? "border-red-500" : ""
+                    <DatePicker
+                      value={watch("credit_note_date")}
+                      onChange={(value) =>
+                        setValue("credit_note_date", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
                       }
+                      placeholder="Credit note date"
+                      clearable={false}
+                      triggerClassName={errors.credit_note_date ? "border-red-500" : ""}
+                      aria-label="Credit note date"
                     />
                     {errors.credit_note_date && (
                       <span className="text-xs text-red-500">

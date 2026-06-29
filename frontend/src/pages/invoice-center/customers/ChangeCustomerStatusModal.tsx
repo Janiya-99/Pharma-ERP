@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { X, ShieldAlert } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 interface Customer {
   id: number;
@@ -96,16 +103,17 @@ const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({
             <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
               New Status *
             </label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="blocked">Blocked</option>
-              <option value="on_hold">On Hold</option>
-            </select>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="blocked">Blocked</SelectItem>
+                <SelectItem value="on_hold">On Hold</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

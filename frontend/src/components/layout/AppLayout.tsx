@@ -1,28 +1,63 @@
 import { Outlet } from "react-router-dom";
+import { useState, createContext, useContext } from "react";
+import type { CSSProperties } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
+// ── Sidebar State Context ──
+interface SidebarContextValue {
+  mobileOpen: boolean;
+  setMobileOpen: (open: boolean) => void;
+  desktopExpanded: boolean;
+  setDesktopExpanded: (expanded: boolean) => void;
+}
+
+const SidebarContext = createContext<SidebarContextValue>({
+  mobileOpen: false,
+  setMobileOpen: () => {},
+  desktopExpanded: false,
+  setDesktopExpanded: () => {},
+});
+
+export const useSidebarState = () => useContext(SidebarContext);
+
 const AppLayout = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopExpanded, setDesktopExpanded] = useState(false);
+
   return (
-    <div className="flex h-screen bg-white font-sans text-blueMono-900 overflow-hidden">
-      <Sidebar />
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <Topbar />
-        <main
-          className="flex-1 overflow-y-auto scroll-smooth flex flex-col justify-between bg-white"
-        >
-          <div className="flex-grow">
-            <Outlet />
-          </div>
-          <footer className="py-4 px-8 mb-1 border-t border-slate-200 bg-white/20 backdrop-blur-md text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto">
-            <span>© {new Date().getFullYear()} Pharma ERP. All rights reserved.</span>
-            <span>Developed by <span className="font-semibold text-slate-700">PIXANDCO</span></span>
-          </footer>
-        </main>
+    <SidebarContext.Provider
+      value={{ mobileOpen, setMobileOpen, desktopExpanded, setDesktopExpanded }}
+    >
+      <div
+        className="grid h-screen grid-cols-[0_1fr] gap-0 overflow-hidden bg-slate-50 font-sans text-[#1F2937] transition-[grid-template-columns] duration-300 lg:grid-cols-[var(--sidebar-width)_1fr]"
+        style={
+          {
+            "--sidebar-width": desktopExpanded ? "15rem" : "68px",
+          } as CSSProperties
+        }
+      >
+        <Sidebar />
+        <div className="flex min-w-0 flex-col overflow-hidden border-l border-slate-200/70">
+          <Topbar />
+          <main className="flex flex-1 flex-col overflow-y-auto scroll-smooth bg-slate-50">
+            <div className="page-content flex-grow space-y-8 pb-32 font-sans">
+              <Outlet />
+            </div>
+            <footer className="mt-auto border-t border-slate-200/70 bg-white/55 px-3 py-4 backdrop-blur-xl md:px-6">
+              <div className="flex flex-col items-center justify-between gap-2 text-xs text-[#6B7280] sm:flex-row">
+                <span>© {new Date().getFullYear()} Pharma ERP. All rights reserved.</span>
+                <span>
+                  Developed by{" "}
+                  <span className="font-semibold text-[#1F2937]">PIXANDCO</span>
+                </span>
+              </div>
+            </footer>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarContext.Provider>
   );
 };
 
 export default AppLayout;
-

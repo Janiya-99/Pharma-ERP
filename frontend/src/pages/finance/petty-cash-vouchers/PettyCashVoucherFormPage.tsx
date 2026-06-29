@@ -6,6 +6,7 @@ import { useAuth } from "../../../../auth/AuthContext";
 import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
 import PettyCashLinesTable from "../../../../components/finance/PettyCashLinesTable";
 import PettyCashTotalSummary from "../../../../components/finance/PettyCashTotalSummary";
+import { DatePicker } from "../../../../components/ui/date-picker";
 
 export default function PettyCashVoucherFormPage() {
   const { id } = useParams();
@@ -231,7 +232,12 @@ export default function PettyCashVoucherFormPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Voucher Date *</label>
-              <input type="date" name="voucher_date" value={formData.voucher_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required placeholder="e.g. 2026-06-27" />
+              <DatePicker
+                value={formData.voucher_date}
+                onChange={(value) => setFormData((prev: any) => ({ ...prev, voucher_date: value }))}
+                placeholder="Voucher date"
+                clearable={false}
+              />
             </div>
 
             <div>

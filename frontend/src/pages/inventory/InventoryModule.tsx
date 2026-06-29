@@ -373,8 +373,8 @@ function InventoryPage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-full bg-[#F8FAFC] px-4 py-5 text-slate-900 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5">
+    <div className="min-h-full bg-[#F8FAFC] text-slate-900">
+      <div className="flex w-full flex-col gap-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             {Icon ? (

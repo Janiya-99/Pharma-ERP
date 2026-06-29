@@ -8,6 +8,7 @@ import GenericNameSelect from "../../../components/inventory/GenericNameSelect";
 import DosageFormSelect from "../../../components/inventory/DosageFormSelect";
 import ManufacturerSelect from "../../../components/inventory/ManufacturerSelect";
 import ProductUnitSelect from "../../../components/inventory/ProductUnitSelect";
+import { DatePicker } from "../../../components/ui/date-picker";
 
 const ProductFormPage = () => {
   const navigate = useNavigate();
@@ -231,7 +232,11 @@ const ProductFormPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">NMRA Expiry Date</label>
-              <input type="date" name="nmra_expiry_date" value={formData.nmra_expiry_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 2026-06-27" />
+              <DatePicker
+                value={formData.nmra_expiry_date}
+                onChange={(value) => setFormData((prev: any) => ({ ...prev, nmra_expiry_date: value }))}
+                placeholder="NMRA expiry date"
+              />
             </div>
           </div>
         </div>

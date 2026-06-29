@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
@@ -278,29 +279,29 @@ const SalesOrderFormPage: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <Label>Sales Order Date</Label>
-                <Input
-                  required
-                  type="date"
+                <DatePicker
                   value={form.sales_order_date}
-                  onChange={(event) =>
+                  onChange={(value) =>
                     setForm((current) => ({
                       ...current,
-                      sales_order_date: event.target.value,
+                      sales_order_date: value,
                     }))
                   }
+                  placeholder="Sales order date"
+                  clearable={false}
                 />
               </div>
               <div className="space-y-1">
                 <Label>Expected Delivery Date</Label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={form.expected_delivery_date}
-                  onChange={(event) =>
+                  onChange={(value) =>
                     setForm((current) => ({
                       ...current,
-                      expected_delivery_date: event.target.value,
+                      expected_delivery_date: value,
                     }))
                   }
+                  placeholder="Expected delivery date"
                 />
               </div>
               <div className="space-y-1 md:col-span-3">

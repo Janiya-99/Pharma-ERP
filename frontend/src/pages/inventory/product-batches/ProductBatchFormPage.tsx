@@ -6,6 +6,7 @@ import { inventoryApi } from "../../../api/inventoryApi";
 import ProductSelect from "../../../components/inventory/ProductSelect";
 import SupplierSelect from "../../../components/inventory/SupplierSelect";
 import ManufacturerSelect from "../../../components/inventory/ManufacturerSelect";
+import { DatePicker } from "../../../components/ui/date-picker";
 
 const ProductBatchFormPage = () => {
   const navigate = useNavigate();
@@ -152,13 +153,22 @@ const ProductBatchFormPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Manufacture Date</label>
-            <input type="date" name="manufacture_date" value={formData.manufacture_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 2026-06-27" />
+            <DatePicker
+              value={formData.manufacture_date}
+              onChange={(value) => setFormData((prev: any) => ({ ...prev, manufacture_date: value }))}
+              placeholder="Manufacture date"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
               Expiry Date {productData?.requires_expiry_tracking && <span className="text-red-500">*</span>}
             </label>
-            <input type="date" name="expiry_date" value={formData.expiry_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 2028-06-27" />
+            <DatePicker
+              value={formData.expiry_date}
+              onChange={(value) => setFormData((prev: any) => ({ ...prev, expiry_date: value }))}
+              placeholder="Expiry date"
+              clearable={!productData?.requires_expiry_tracking}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Supplier</label>

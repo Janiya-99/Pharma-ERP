@@ -4,6 +4,7 @@ import { financeApi } from "../../../../api/financeApi";
 import { getBranches } from "../../../../api/controlApi";
 import { useAuth } from "../../../../auth/AuthContext";
 import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
+import { DatePicker } from "../../../../components/ui/date-picker";
 
 export default function PettyCashReplenishmentFormPage() {
   const { id } = useParams();
@@ -184,7 +185,12 @@ export default function PettyCashReplenishmentFormPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date *</label>
-              <input type="date" name="replenishment_date" value={formData.replenishment_date} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required placeholder="e.g. 2026-06-27" />
+              <DatePicker
+                value={formData.replenishment_date}
+                onChange={(value) => setFormData((prev: any) => ({ ...prev, replenishment_date: value }))}
+                placeholder="Replenishment date"
+                clearable={false}
+              />
             </div>
 
             <div>

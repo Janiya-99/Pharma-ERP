@@ -10,6 +10,13 @@ import ChangeCustomerStatusModal from "./ChangeCustomerStatusModal";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Search, Plus, RefreshCw, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 interface Category {
   id: number;
@@ -175,51 +182,65 @@ const CustomersPage: React.FC = () => {
           />
         </div>
 
-        <select
-          value={filters.category_id}
-          onChange={(e) =>
-            setFilters({ ...filters, category_id: e.target.value })
+        <Select
+          value={filters.category_id || "all"}
+          onValueChange={(value) =>
+            setFilters({ ...filters, category_id: value === "all" ? "" : value })
           }
-          className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
         >
-          <option value="">All Categories</option>
+          <SelectTrigger className="bg-gray-50">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+          <SelectItem value="all">All Categories</SelectItem>
           {categories.map((c) => (
-            <option key={c.id} value={c.id}>
+            <SelectItem key={c.id} value={String(c.id)}>
               {c.category_name}
-            </option>
+            </SelectItem>
           ))}
-        </select>
+          </SelectContent>
+        </Select>
 
-        <select
-          value={filters.customer_type}
-          onChange={(e) =>
-            setFilters({ ...filters, customer_type: e.target.value })
+        <Select
+          value={filters.customer_type || "all"}
+          onValueChange={(value) =>
+            setFilters({ ...filters, customer_type: value === "all" ? "" : value })
           }
-          className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
         >
-          <option value="">All Types</option>
-          <option value="pharmacy">Pharmacy</option>
-          <option value="hospital">Hospital</option>
-          <option value="clinic">Clinic</option>
-          <option value="doctor">Doctor</option>
-          <option value="distributor">Distributor</option>
-          <option value="retailer">Retailer</option>
-          <option value="wholesaler">Wholesaler</option>
-          <option value="individual">Individual</option>
-          <option value="other">Other</option>
-        </select>
+          <SelectTrigger className="bg-gray-50">
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="pharmacy">Pharmacy</SelectItem>
+            <SelectItem value="hospital">Hospital</SelectItem>
+            <SelectItem value="clinic">Clinic</SelectItem>
+            <SelectItem value="doctor">Doctor</SelectItem>
+            <SelectItem value="distributor">Distributor</SelectItem>
+            <SelectItem value="retailer">Retailer</SelectItem>
+            <SelectItem value="wholesaler">Wholesaler</SelectItem>
+            <SelectItem value="individual">Individual</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <select
-          value={filters.status}
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+        <Select
+          value={filters.status || "all"}
+          onValueChange={(value) =>
+            setFilters({ ...filters, status: value === "all" ? "" : value })
+          }
         >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="blocked">Blocked</option>
-          <option value="on_hold">On Hold</option>
-        </select>
+          <SelectTrigger className="bg-gray-50">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="blocked">Blocked</SelectItem>
+            <SelectItem value="on_hold">On Hold</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}

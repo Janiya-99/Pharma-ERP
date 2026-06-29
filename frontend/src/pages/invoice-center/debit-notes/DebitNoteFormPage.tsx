@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
@@ -391,11 +392,18 @@ const DebitNoteFormPage: React.FC = () => {
                     >
                       Date *
                     </Label>
-                    <Input
-                      type="date"
-                      id="debit_note_date"
-                      {...register("debit_note_date")}
-                      className={errors.debit_note_date ? "border-red-500" : ""}
+                    <DatePicker
+                      value={watch("debit_note_date")}
+                      onChange={(value) =>
+                        setValue("debit_note_date", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      placeholder="Debit note date"
+                      clearable={false}
+                      triggerClassName={errors.debit_note_date ? "border-red-500" : ""}
+                      aria-label="Debit note date"
                     />
                     {errors.debit_note_date && (
                       <span className="text-xs text-red-500">

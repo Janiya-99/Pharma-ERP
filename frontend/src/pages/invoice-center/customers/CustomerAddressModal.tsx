@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 interface Address {
   id: number;
@@ -151,19 +158,23 @@ const CustomerAddressModal: React.FC<CustomerAddressModalProps> = ({
               <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
                 Address Type
               </label>
-              <select
+              <Select
                 value={formData.address_type}
-                onChange={(e) =>
-                  setFormData({ ...formData, address_type: e.target.value })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, address_type: value })
                 }
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
               >
-                <option value="billing">Billing</option>
-                <option value="shipping">Shipping</option>
-                <option value="office">Office</option>
-                <option value="warehouse">Warehouse</option>
-                <option value="other">Other</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select address type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="billing">Billing</SelectItem>
+                  <SelectItem value="shipping">Shipping</SelectItem>
+                  <SelectItem value="office">Office</SelectItem>
+                  <SelectItem value="warehouse">Warehouse</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

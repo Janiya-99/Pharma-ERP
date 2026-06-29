@@ -9,6 +9,7 @@ import {
   FinancePostingActionButtons,
 } from "../../../components/invoice-center";
 import { Button } from "../../../components/ui/button";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Skeleton } from "../../../components/ui/skeleton";
@@ -104,11 +105,11 @@ const PendingFinancePostingsPage: React.FC<Props> = ({ onPostingComplete }) => {
         </div>
         <div className="space-y-1">
           <label className="text-xs text-gray-500 font-medium">Date From</label>
-          <Input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1); }} className="w-40 h-9 text-sm" />
+          <DatePicker value={dateFrom} onChange={(value) => { setDateFrom(value); setPage(1); }} triggerClassName="w-40 h-9 text-sm" placeholder="Date from" />
         </div>
         <div className="space-y-1">
           <label className="text-xs text-gray-500 font-medium">Date To</label>
-          <Input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1); }} className="w-40 h-9 text-sm" />
+          <DatePicker value={dateTo} onChange={(value) => { setDateTo(value); setPage(1); }} triggerClassName="w-40 h-9 text-sm" placeholder="Date to" />
         </div>
         <Button variant="outline" size="sm" onClick={() => { setDocumentTypeFilter(""); setDateFrom(""); setDateTo(""); setPage(1); }} className="h-9">
           <Filter className="h-3.5 w-3.5 mr-1" />

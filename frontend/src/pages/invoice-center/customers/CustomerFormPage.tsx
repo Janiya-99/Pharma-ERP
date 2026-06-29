@@ -7,6 +7,13 @@ import {
 } from "../../../components/invoice-center";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save, AlertCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 const CustomerFormPage: React.FC = () => {
   const { activeSoftware } = useAuth();
@@ -253,23 +260,27 @@ const CustomerFormPage: React.FC = () => {
               <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
                 Customer Type *
               </label>
-              <select
+              <Select
                 value={formData.customer_type}
-                onChange={(e) =>
-                  setFormData({ ...formData, customer_type: e.target.value })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, customer_type: value })
                 }
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
               >
-                <option value="pharmacy">Pharmacy</option>
-                <option value="hospital">Hospital</option>
-                <option value="clinic">Clinic</option>
-                <option value="doctor">Doctor</option>
-                <option value="distributor">Distributor</option>
-                <option value="retailer">Retailer</option>
-                <option value="wholesaler">Wholesaler</option>
-                <option value="individual">Individual</option>
-                <option value="other">Other</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select customer type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pharmacy">Pharmacy</SelectItem>
+                  <SelectItem value="hospital">Hospital</SelectItem>
+                  <SelectItem value="clinic">Clinic</SelectItem>
+                  <SelectItem value="doctor">Doctor</SelectItem>
+                  <SelectItem value="distributor">Distributor</SelectItem>
+                  <SelectItem value="retailer">Retailer</SelectItem>
+                  <SelectItem value="wholesaler">Wholesaler</SelectItem>
+                  <SelectItem value="individual">Individual</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
@@ -533,18 +544,22 @@ const CustomerFormPage: React.FC = () => {
               <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
                 Account Status
               </label>
-              <select
+              <Select
                 value={formData.status}
-                onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, status: value })
                 }
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
               >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="blocked">Blocked</option>
-                <option value="on_hold">On Hold</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="blocked">Blocked</SelectItem>
+                  <SelectItem value="on_hold">On Hold</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         )}

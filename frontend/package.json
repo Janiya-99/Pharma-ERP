@@ -2,6 +2,7 @@
   "name": "horizon-ui-tailwind-react-ts",
   "version": "2.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@chakra-ui/hooks": "^2.1.4",
     "@chakra-ui/modal": "^2.2.9",

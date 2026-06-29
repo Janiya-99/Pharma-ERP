@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import {
@@ -246,54 +247,54 @@ const SalesOrdersPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Order Date From</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.sales_order_date_from ?? ""}
-                onChange={(event) =>
+                onChange={(value) =>
                   setFilters((current) => ({
                     ...current,
-                    sales_order_date_from: event.target.value,
+                    sales_order_date_from: value,
                   }))
                 }
+                placeholder="Order date from"
               />
             </div>
             <div className="space-y-1">
               <Label>Order Date To</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.sales_order_date_to ?? ""}
-                onChange={(event) =>
+                onChange={(value) =>
                   setFilters((current) => ({
                     ...current,
-                    sales_order_date_to: event.target.value,
+                    sales_order_date_to: value,
                   }))
                 }
+                placeholder="Order date to"
               />
             </div>
             <div className="space-y-1">
               <Label>Delivery From</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.expected_delivery_date_from ?? ""}
-                onChange={(event) =>
+                onChange={(value) =>
                   setFilters((current) => ({
                     ...current,
-                    expected_delivery_date_from: event.target.value,
+                    expected_delivery_date_from: value,
                   }))
                 }
+                placeholder="Delivery from"
               />
             </div>
             <div className="space-y-1">
               <Label>Delivery To</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.expected_delivery_date_to ?? ""}
-                onChange={(event) =>
+                onChange={(value) =>
                   setFilters((current) => ({
                     ...current,
-                    expected_delivery_date_to: event.target.value,
+                    expected_delivery_date_to: value,
                   }))
                 }
+                placeholder="Delivery to"
               />
             </div>
           </CardContent>

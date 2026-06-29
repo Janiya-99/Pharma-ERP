@@ -2,7 +2,7 @@
 -- Platform: Software Catalog
 -- Stores all software/modules available in the ERP platform.
 CREATE TABLE IF NOT EXISTS `software_catalog` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     `software_code` VARCHAR(50) NOT NULL,
     `software_name` VARCHAR(150) NOT NULL,

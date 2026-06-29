@@ -7,6 +7,7 @@ import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
@@ -274,19 +275,19 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Invoice Date From</Label>
-              <Input type="date" value={filters.invoice_date_from} onChange={(event) => updateFilter("invoice_date_from", event.target.value)} />
+              <DatePicker value={filters.invoice_date_from} onChange={(value) => updateFilter("invoice_date_from", value)} placeholder="Invoice date from" />
             </div>
             <div className="space-y-1">
               <Label>Invoice Date To</Label>
-              <Input type="date" value={filters.invoice_date_to} onChange={(event) => updateFilter("invoice_date_to", event.target.value)} />
+              <DatePicker value={filters.invoice_date_to} onChange={(value) => updateFilter("invoice_date_to", value)} placeholder="Invoice date to" />
             </div>
             <div className="space-y-1">
               <Label>Due Date From</Label>
-              <Input type="date" value={filters.due_date_from} onChange={(event) => updateFilter("due_date_from", event.target.value)} />
+              <DatePicker value={filters.due_date_from} onChange={(value) => updateFilter("due_date_from", value)} placeholder="Due date from" />
             </div>
             <div className="space-y-1">
               <Label>Due Date To</Label>
-              <Input type="date" value={filters.due_date_to} onChange={(event) => updateFilter("due_date_to", event.target.value)} />
+              <DatePicker value={filters.due_date_to} onChange={(value) => updateFilter("due_date_to", value)} placeholder="Due date to" />
             </div>
           </CardContent>
         </Card>

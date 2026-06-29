@@ -7,9 +7,9 @@ import {
   FileCheck, Settings, BookOpen,
   Package, ChevronRight, Pin, PinOff, LogOut, User,
   Landmark, BarChart3, Building2, Warehouse, ClipboardList,
-  RotateCcw, Repeat, Users, FileText, Receipt, Printer
+  RotateCcw, Repeat, Users, FileText, Receipt, Printer,
+  Pill, X,
 } from "lucide-react";
-import { MdLocalPharmacy } from "react-icons/md";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Sheet, SheetContent } from "../ui/sheet";
+import { useSidebarState } from "./AppLayout";
 
 type MenuItem = {
   name: string;
@@ -40,6 +42,11 @@ const Sidebar = () => {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const effectiveExpanded = isExpanded || isPinned;
   const location = useLocation();
+  const { mobileOpen, setMobileOpen, setDesktopExpanded } = useSidebarState();
+
+  React.useEffect(() => {
+    setDesktopExpanded(effectiveExpanded);
+  }, [effectiveExpanded, setDesktopExpanded]);
 
   const controlCenterMenus: MenuItem[] = [
     { name: "Dashboard", path: "/control-center/dashboard", icon: LayoutDashboard },
@@ -294,7 +301,7 @@ const Sidebar = () => {
   };
 
   const menus = getMenus();
-  
+
   React.useEffect(() => {
     const match = menus.find(
       (m) => m.children && m.children.some((c) => location.pathname.includes(c.path))
@@ -304,6 +311,11 @@ const Sidebar = () => {
     }
   }, [location.pathname, activeSoftware]);
 
+  // Close mobile drawer on nav
+  React.useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   const initials = (user?.name || user?.full_name || "U")
     .split(" ")
     .map((n: string) => n[0])
@@ -311,26 +323,27 @@ const Sidebar = () => {
     .toUpperCase()
     .slice(0, 2);
 
-  const renderMenu = (menu: MenuItem) => {
+  const renderMenu = (menu: MenuItem, isMobile = false) => {
     const hasChildren = !!menu.children && menu.children.length > 0;
     const isAccordionOpen = openAccordion === menu.name;
-    const isActiveParent = hasChildren 
+    const isActiveParent = hasChildren
       ? menu.children!.some((c) => location.pathname.includes(c.path))
       : location.pathname.includes(menu.path || "");
+    const showExpanded = isMobile || effectiveExpanded;
 
     if (!hasChildren) {
       return (
         <PermissionGuard key={menu.path} permission={menu.permission}>
           <NavLink
             to={menu.path || "#"}
-            title={!effectiveExpanded ? menu.name : undefined}
+            title={!showExpanded ? menu.name : undefined}
             className={({ isActive }) =>
               `relative flex items-center gap-3 rounded-xl transition-all duration-150 group ${
-                effectiveExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
+                showExpanded ? "h-10 px-3" : "mx-auto h-10 w-10 justify-center"
               } ${
                 isActive
-                  ? "bg-blueMono-200/50 text-blueMono-900 font-semibold shadow-sm"
-                  : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
+                  ? "border border-transparent bg-[#0077B6] text-white font-semibold shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
+                  : "text-[#002137] hover:bg-[#0077B6]/10 hover:text-[#002137]"
               }`
             }
           >
@@ -338,18 +351,18 @@ const Sidebar = () => {
               <>
                 <menu.icon
                   className={`h-4 w-4 shrink-0 transition-colors ${
-                    isActive ? "text-blueMono-800" : "text-blueMono-700/80 group-hover:text-blueMono-900"
+                    isActive ? "text-white" : "text-[#002137] group-hover:text-[#002137]"
                   }`}
                 />
-                {effectiveExpanded && (
-                  <span className={`text-[13px] font-medium truncate transition-colors ${
-                    isActive ? "text-blueMono-900" : "text-blueMono-900 group-hover:text-blueMono-900"
+                {showExpanded && (
+                  <span className={`truncate text-sm font-medium transition-colors ${
+                    isActive ? "text-white" : "text-[#1F2937] group-hover:text-[#1F2937]"
                   }`}>
                     {menu.name}
                   </span>
                 )}
-                {!effectiveExpanded && isActive && (
-                  <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-blueMono-700" />
+                {!showExpanded && isActive && (
+                  <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-white/90" />
                 )}
               </>
             )}
@@ -363,47 +376,47 @@ const Sidebar = () => {
       <div key={menu.name} className="flex flex-col gap-0.5">
         <button
           onClick={() => {
-            if (!effectiveExpanded) setIsExpanded(true);
+            if (!showExpanded && !isMobile) setIsExpanded(true);
             setOpenAccordion(isAccordionOpen ? null : menu.name);
           }}
           className={`w-full relative flex items-center gap-3 rounded-xl transition-all duration-150 group ${
-            effectiveExpanded ? "px-3.5 py-2.5" : "justify-center p-2.5"
+            showExpanded ? "h-10 px-3" : "mx-auto h-10 w-10 justify-center"
           } ${
             isActiveParent
-              ? "text-blueMono-900 font-semibold bg-blueMono-200/50 shadow-sm"
-              : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
+              ? "border border-transparent bg-[#0077B6] text-white font-semibold shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
+              : "text-[#002137] hover:bg-[#0077B6]/10 hover:text-[#002137]"
           }`}
         >
           <menu.icon
             className={`h-4 w-4 shrink-0 transition-colors ${
-              isActiveParent ? "text-blueMono-800" : "text-blueMono-700/80 group-hover:text-blueMono-900"
+              isActiveParent ? "text-white" : "text-[#002137] group-hover:text-[#002137]"
             }`}
           />
-          {effectiveExpanded && (
+          {showExpanded && (
             <>
-              <span className="text-[13px] font-medium truncate flex-1 text-left">
+              <span className={`flex-1 truncate text-left text-sm font-medium ${isActiveParent ? "text-white" : "text-[#1F2937]"}`}>
                 {menu.name}
               </span>
               <ChevronRight
-                className={`h-3.5 w-3.5 text-blueMono-700/80 transition-transform duration-200 ${
-                  isAccordionOpen ? "rotate-90 text-blueMono-900" : ""
+                className={`h-3.5 w-3.5 text-[#6B7280] transition-transform duration-200 ${
+                  isAccordionOpen ? isActiveParent ? "rotate-90 text-white" : "rotate-90 text-[#002137]" : ""
                 }`}
               />
             </>
           )}
         </button>
-        {effectiveExpanded && isAccordionOpen && (
-          <div className="pl-6 pr-1.5 mt-0.5 space-y-0.5 border-l border-white/30 ml-5.5 flex flex-col gap-0.5">
+        {showExpanded && isAccordionOpen && (
+          <div className="ml-5.5 mt-1 flex flex-col gap-1 border-l border-slate-200/80 pl-6 pr-1.5">
             {menu.children!.map((child) => {
               if (child.disabled) {
                 return (
                   <PermissionGuard key={child.path} permission={child.permission}>
-                    <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[12px] font-medium text-blueMono-800/40 cursor-not-allowed opacity-60">
+                    <div className="flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium text-[#9CA3AF] cursor-not-allowed opacity-60">
                       <div className="flex items-center gap-2.5 overflow-hidden">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blueMono-300/30 shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20 shrink-0" />
                         <span className="truncate">{child.name}</span>
                       </div>
-                      <span className="text-[9px] bg-white/30 text-blueMono-800/60 px-1.5 py-0.5 rounded ml-1 shrink-0">Soon</span>
+                      <span className="ml-1 shrink-0 rounded-full border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[9px] text-[#374151]">Soon</span>
                     </div>
                   </PermissionGuard>
                 );
@@ -413,16 +426,16 @@ const Sidebar = () => {
                   <NavLink
                     to={child.path}
                     className={({ isActive }) =>
-                      `flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150 ${
+                      `flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                         isActive
-                          ? "bg-white/40 text-blueMono-900 font-semibold shadow-sm"
-                          : "text-blueMono-800/80 hover:bg-white/30 hover:text-blueMono-900"
+                          ? "bg-[#0077B6] text-white font-semibold shadow-[0_6px_16px_rgba(0,119,182,0.22)]"
+                          : "text-[#6B7280] hover:bg-[#0077B6]/10 hover:text-[#1F2937]"
                       }`
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-blueMono-700" : "bg-blueMono-300/50"}`} />
+                        <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-white" : "bg-[#9CA3AF]/50"}`} />
                         <span className="truncate">{child.name}</span>
                       </>
                     )}
@@ -436,107 +449,137 @@ const Sidebar = () => {
     );
   };
 
-  return (
-    <div
-      className={`relative z-30 h-full shrink-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-        effectiveExpanded ? "w-60" : "w-[68px]"
-      }`}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => {
-        if (!isPinned) setIsExpanded(false);
-      }}
-    >
-      <div
-        className={`fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-white border-r border-[#E5E7EB] shadow-soft h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
-          effectiveExpanded ? "w-60" : "w-[68px]"
-        }`}
-      >
-        {/* Logo area */}
-        <div className={`flex items-center gap-3 pt-5 pb-4 shrink-0 border-b border-white/20 transition-all duration-300 ${
-          effectiveExpanded ? "px-5" : "justify-center px-2"
-        }`}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blueMono-700 shadow-md shadow-blueMono-900/30">
-            <MdLocalPharmacy className="h-5 w-5 text-white" />
-          </div>
-          {effectiveExpanded && (
-            <div className="flex-1 min-w-0 overflow-hidden flex items-center justify-between">
-              <div className="min-w-0">
-                <p className="text-[14px] font-bold text-blueMono-900 leading-tight tracking-tight truncate">
-                  Pharma ERP
-                </p>
-                <p className="text-[10px] font-semibold text-blueMono-600 uppercase tracking-[0.08em] truncate">
-                  {activeSoftware?.software_name || "Platform"}
-                </p>
-              </div>
-              <button 
+  // ── Sidebar Content (shared between desktop & mobile) ──
+  const sidebarContent = (isMobile = false) => (
+    <>
+      {/* Logo area */}
+      <div className={`flex items-center gap-3 border-b border-slate-200/70 pb-4 pt-4 shrink-0 transition-all duration-300 ${
+        (isMobile || effectiveExpanded) ? "px-5" : "justify-center px-2"
+      }`}>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] shadow-sm">
+          <Pill className="h-5 w-5 text-white" />
+        </div>
+        {(isMobile || effectiveExpanded) && (
+          <div className="flex-1 min-w-0 overflow-hidden flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold leading-tight tracking-tight text-[#111827]">
+                Pharma ERP
+              </p>
+              <p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6B7280]">
+                {activeSoftware?.software_name || "Platform"}
+              </p>
+            </div>
+            {isMobile ? (
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg p-1.5 text-[#6B7280] transition-colors hover:bg-slate-100/80 hover:text-[#002137]"
+                aria-label="Close sidebar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
                 onClick={() => setIsPinned(!isPinned)}
-                className="text-blueMono-600 hover:text-blueMono-800 p-1.5 hover:bg-white/30 rounded-lg transition-colors"
+                className="rounded-lg p-1.5 text-[#6B7280] transition-colors hover:bg-slate-100/80 hover:text-[#002137]"
                 title={isPinned ? "Unpin sidebar" : "Pin sidebar"}
               >
                 {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
               </button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
+      </div>
 
-        {/* Navigation */}
-        <nav className={`flex-1 py-3 space-y-0.5 overflow-y-auto scrollbar-none transition-all duration-300 ${
-          effectiveExpanded ? "px-3" : "px-2"
-        }`}>
-          {menus.map(renderMenu)}
-        </nav>
+      {/* Navigation */}
+      <nav className={`flex-1 space-y-1 overflow-y-auto scrollbar-none py-3 transition-all duration-300 ${
+        (isMobile || effectiveExpanded) ? "px-3" : "px-2"
+      }`}>
+        {menus.map((m) => renderMenu(m, isMobile))}
+      </nav>
 
-        {/* User info at bottom */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className={`mt-auto mb-5 border-t border-white/20 hover:bg-white/10 cursor-pointer transition-all duration-300 ${
-              effectiveExpanded ? "px-4 py-3" : "px-2 py-3 flex justify-center"
-            }`}>
-              {effectiveExpanded ? (
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold">
-                    {initials}
-                  </div>
-                  <div className="min-w-0 overflow-hidden">
-                    <p className="text-[12px] font-semibold text-blueMono-900 truncate leading-tight">
-                      {user?.name || user?.full_name || "User"}
-                    </p>
-                    <p className="text-[10px] text-blueMono-700/90 truncate leading-tight">
-                      {activeBranch?.branch_name || activeBranch?.branch?.branch_name || "Head Office"}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blueMono-700 text-white text-xs font-bold shadow-sm">
+      {/* User info at bottom */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className={`mb-4 mt-auto cursor-pointer border-t border-slate-200/70 transition-all duration-300 hover:bg-slate-100/80 ${
+            (isMobile || effectiveExpanded) ? "px-4 py-3" : "px-2 py-3 flex justify-center"
+          }`}>
+            {(isMobile || effectiveExpanded) ? (
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] text-xs font-bold text-white">
                   {initials}
                 </div>
-              )}
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            side="top" 
-            align={effectiveExpanded ? "start" : "center"}
-            className="w-56 mb-2 border-white/20 bg-white/60 backdrop-blur-xl shadow-lg"
-          >
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/20" />
-            <DropdownMenuItem className="cursor-pointer hover:bg-white/40">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile Settings</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer hover:bg-white/40">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Preferences</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/20" />
-            <DropdownMenuItem className="cursor-pointer hover:bg-red-500/20 text-red-600 hover:text-red-700">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <div className="min-w-0 overflow-hidden">
+                  <p className="truncate text-xs font-semibold leading-tight text-[#111827]">
+                    {user?.name || user?.full_name || "User"}
+                  </p>
+                  <p className="truncate text-[10px] leading-tight text-[#6B7280]">
+                    {activeBranch?.branch_name || activeBranch?.branch?.branch_name || "Head Office"}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] text-xs font-bold text-white shadow-sm">
+                {initials}
+              </div>
+            )}
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          side="top"
+          align={(isMobile || effectiveExpanded) ? "start" : "center"}
+          className="mb-2 w-56 border-slate-200/80 bg-white/90 shadow-[0_8px_30px_rgba(2,62,138,0.08)] backdrop-blur-xl"
+        >
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-slate-200/80" />
+          <DropdownMenuItem className="cursor-pointer hover:bg-slate-100/80">
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile Settings</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer hover:bg-slate-100/80">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Preferences</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-slate-200/80" />
+          <DropdownMenuItem className="cursor-pointer hover:bg-red-50 text-red-600 hover:text-red-700 dark:hover:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Logout</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+
+  return (
+    <>
+      {/* ── Desktop Sidebar (hidden on mobile) ── */}
+      <div
+        className={`relative z-30 hidden h-full shrink-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:block ${
+          effectiveExpanded ? "w-60" : "w-[68px]"
+        }`}
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => {
+          if (!isPinned) setIsExpanded(false);
+        }}
+      >
+        <div
+          className={`fixed left-0 top-0 bottom-0 z-30 flex h-full flex-col overflow-hidden border-r border-slate-200/70 bg-white/70 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] backdrop-blur-xl ${
+            effectiveExpanded ? "w-60" : "w-[68px]"
+          }`}
+        >
+          {sidebarContent(false)}
+        </div>
       </div>
-    </div>
+
+      {/* ── Mobile Sidebar Drawer (hidden on desktop) ── */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent
+          side="left"
+          className="flex w-72 flex-col border-r border-slate-200/70 bg-white/70 p-0 backdrop-blur-xl"
+        >
+          {sidebarContent(true)}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 

@@ -9,6 +9,7 @@ import {
   FinancePostingTotalsBadge,
 } from "../../../components/invoice-center";
 import { Button } from "../../../components/ui/button";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import {
   Select,
@@ -157,26 +158,26 @@ const FinancePostingHistoryPage: React.FC<Props> = ({ refreshKey }) => {
         </div>
         <div className="space-y-1">
           <label className="text-xs font-medium text-gray-500">Date From</label>
-          <Input
-            type="date"
+          <DatePicker
             value={dateFrom}
-            onChange={(e) => {
-              setDateFrom(e.target.value);
+            onChange={(value) => {
+              setDateFrom(value);
               setPage(1);
             }}
-            className="h-9 w-40 text-sm"
+            triggerClassName="h-9 w-40 text-sm"
+            placeholder="Date from"
           />
         </div>
         <div className="space-y-1">
           <label className="text-xs font-medium text-gray-500">Date To</label>
-          <Input
-            type="date"
+          <DatePicker
             value={dateTo}
-            onChange={(e) => {
-              setDateTo(e.target.value);
+            onChange={(value) => {
+              setDateTo(value);
               setPage(1);
             }}
-            className="h-9 w-40 text-sm"
+            triggerClassName="h-9 w-40 text-sm"
+            placeholder="Date to"
           />
         </div>
         <Button

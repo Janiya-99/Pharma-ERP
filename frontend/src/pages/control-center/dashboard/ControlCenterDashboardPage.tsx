@@ -1,23 +1,28 @@
 import { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { 
-  MdOutlineCorporateFare, 
-  MdOutlineSecurity, 
-  MdOutlineSupervisedUserCircle, 
-  MdOutlineVerifiedUser, 
-  MdApps, 
-  MdWarningAmber,
-  MdSearch,
-  MdRefresh,
-  MdDownload,
-  MdPersonAdd,
-  MdDomainAdd,
-  MdVpnKey,
-  MdOutlinePolicy,
-  MdGavel,
-  MdCheckCircle,
-  MdCloudDone
-} from "react-icons/md";
+  PageShell, 
+  PageHeader, 
+  KPICard, 
+  DashboardGrid, 
+  SectionCard 
+} from "@/components/erp";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Building2, 
+  ShieldAlert, 
+  Users, 
+  UserCheck, 
+  Blocks, 
+  AlertTriangle,
+  Search,
+  RefreshCw,
+  Download,
+  Plus,
+  TrendingUp,
+  Activity,
+  HeartPulse,
+} from "lucide-react";
 import { 
   LineChart, 
   Line, 
@@ -48,124 +53,143 @@ const moduleData = [
   { name: "Compliance", value: 200 },
 ];
 
-const COLORS = ["#3B82F6", "#60A5FA", "#93C5FD", "#BFDBFE"];
+const COLORS = ["#0077B6", "#005F95", "#023E8A", "#002137"];
 
 const ControlCenterDashboardPage = () => {
   const [dateFilter, setDateFilter] = useState("This Week");
 
   return (
-    <div className="page-content text-slate-800 font-sans min-h-full">
-      {/* Top Area */}
-      <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <div className="mb-1 text-sm text-slate-500 font-medium tracking-wide">
-            Home / Admin / Control Center
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Control Center Overview</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            System administration, security monitoring, organization overview, and access control
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative">
-            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
-            <input 
-              type="text" 
-              placeholder="Search users or modules..." 
-              className="h-10 rounded-full border border-slate-200 bg-white/60 pl-10 pr-4 text-sm text-slate-700 placeholder-slate-400 backdrop-blur-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
-            />
-          </div>
-          <Select defaultValue="all">
-            <SelectTrigger className="h-10 rounded-full border border-slate-200 bg-white/60 px-4 text-sm text-slate-700 backdrop-blur-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm w-[150px]">
-              <SelectValue placeholder="All Branches" />
-            </SelectTrigger>
-            <SelectContent className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-xl shadow-lg">
-              <SelectItem value="all">All Branches</SelectItem>
-              <SelectItem value="hq">Headquarters</SelectItem>
-              <SelectItem value="ny">NY Branch</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={dateFilter} onValueChange={setDateFilter}>
-            <SelectTrigger className="h-10 rounded-full border border-slate-200 bg-white/60 px-4 text-sm text-slate-700 backdrop-blur-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm w-[130px]">
-              <SelectValue placeholder="This Week" />
-            </SelectTrigger>
-            <SelectContent className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-xl shadow-lg">
-              <SelectItem value="Today">Today</SelectItem>
-              <SelectItem value="This Week">This Week</SelectItem>
-              <SelectItem value="This Month">This Month</SelectItem>
-            </SelectContent>
-          </Select>
-          <button className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/60 backdrop-blur-md hover:bg-slate-50 transition-colors shadow-sm">
-            <MdRefresh className="h-5 w-5 text-slate-600" />
-          </button>
-          <button className="flex h-10 items-center gap-2 rounded-full border border-blue-600 bg-blue-600 px-4 hover:bg-blue-700 transition-colors text-white font-medium shadow-sm shadow-blue-200">
-            <MdDownload className="h-5 w-5" />
-            Export
-          </button>
-        </div>
-      </div>
+    <PageShell>
+      {/* Page Header */}
+      <PageHeader
+        title="Control Center Overview"
+        description="System administration, security monitoring, organization overview, and access control"
+        actions={
+          <>
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                className="h-9 rounded-xl border border-slate-300 bg-background pl-9 pr-4 text-sm text-foreground placeholder-muted-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 transition-all shadow-sm"
+              />
+            </div>
+
+            {/* Branch Switcher Select */}
+            <Select defaultValue="all">
+              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 shadow-sm w-[140px]">
+                <SelectValue placeholder="All Branches" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border border-slate-200/80 rounded-xl shadow-lg">
+                <SelectItem value="all">All Branches</SelectItem>
+                <SelectItem value="hq">Headquarters</SelectItem>
+                <SelectItem value="ny">NY Branch</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Date Filter Select */}
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 shadow-sm w-[120px]">
+                <SelectValue placeholder="This Week" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border border-slate-200/80 rounded-xl shadow-lg">
+                <SelectItem value="Today">Today</SelectItem>
+                <SelectItem value="This Week">This Week</SelectItem>
+                <SelectItem value="This Month">This Month</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Refresh Button */}
+            <Button variant="filter" size="icon" aria-label="Refresh Dashboard">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+
+            {/* Export Button */}
+            <Button variant="export" size="sm">
+              <Download className="h-4 w-4" /> Export
+            </Button>
+          </>
+        }
+      />
 
       {/* Row 1 - KPI Cards */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {[
-          { label: "Total Companies", value: "4", icon: MdOutlineCorporateFare, trend: "+1 this year", color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "Total Branches", value: "24", icon: MdOutlineCorporateFare, trend: "+3 this quarter", color: "text-indigo-600", bg: "bg-indigo-50" },
-          { label: "Total Users", value: "1,248", icon: MdOutlineSupervisedUserCircle, trend: "+12% vs last month", color: "text-purple-600", bg: "bg-purple-50" },
-          { label: "Active Users", value: "942", icon: MdOutlineVerifiedUser, trend: "75% engagement", color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Software Modules", value: "8", icon: MdApps, trend: "All systems operational", color: "text-cyan-600", bg: "bg-cyan-50" },
-          { label: "Security Alerts", value: "3", icon: MdWarningAmber, trend: "Requires attention", color: "text-rose-600", bg: "bg-rose-50", alert: true },
-        ].map((kpi, i) => (
-          <div key={i} className="relative overflow-hidden rounded-2xl p-5 shadow-embossed shadow-embossed-hover">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-slate-500">{kpi.label}</span>
-              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${kpi.bg}`}>
-                <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
-              </div>
-            </div>
-            <div className="mb-1 text-3xl font-bold text-slate-800">{kpi.value}</div>
-            <div className={`text-xs font-medium ${kpi.alert ? 'text-rose-500' : 'text-slate-400'}`}>{kpi.trend}</div>
-          </div>
-        ))}
-      </div>
+      <DashboardGrid columns={4} className="lg:grid-cols-6">
+        <KPICard
+          title="Total Companies"
+          value="4"
+          icon={<Building2 className="h-5 w-5 text-[#0077B6]" />}
+          trend="up"
+          trendValue="+1 this year"
+        />
+        <KPICard
+          title="Total Branches"
+          value="24"
+          icon={<Building2 className="h-5 w-5 text-[#0096C7]" />}
+          trend="up"
+          trendValue="+3 this quarter"
+        />
+        <KPICard
+          title="Total Users"
+          value="1,248"
+          icon={<Users className="h-5 w-5 text-[#005F95]" />}
+          trend="up"
+          trendValue="+12% vs last month"
+        />
+        <KPICard
+          title="Active Users"
+          value="942"
+          icon={<UserCheck className="h-5 w-5 text-green-500" />}
+          trend="neutral"
+          trendValue="75% engagement"
+        />
+        <KPICard
+          title="Software Modules"
+          value="8"
+          icon={<Blocks className="h-5 w-5 text-[#002137]" />}
+          trend="neutral"
+          trendValue="All active"
+        />
+        <KPICard
+          title="Security Alerts"
+          value="3"
+          icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
+          trend="down"
+          trendValue="Needs attention"
+          className="border-red-200/50 dark:border-red-900/30"
+          iconBg="bg-red-50 dark:bg-red-950/20"
+        />
+      </DashboardGrid>
 
-      {/* Row 2 - Analytics */}
-      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="col-span-1 lg:col-span-2 rounded-2xl p-6 shadow-embossed">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-800">User Activity Trend</h2>
-            <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 border border-slate-200">
-              {dateFilter}
-            </div>
-          </div>
-          <div className="h-72 w-full">
+      {/* Row 2 - Analytics Charts */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <SectionCard title="User Activity Trend" actions={<span className="text-xs font-semibold text-muted-foreground">{dateFilter}</span>} className="lg:col-span-2">
+          <div className="h-72 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={activityData} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-muted/30" vertical={false} />
+                <XAxis dataKey="name" stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#1e293b', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: '#3b82f6' }}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)' }}
+                  itemStyle={{ color: '#0077B6' }}
                 />
-                <Line type="monotone" dataKey="users" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#ffffff', stroke: '#3b82f6', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#3b82f6' }} />
+                <Line type="monotone" dataKey="users" stroke="#0077B6" strokeWidth={3} dot={{ r: 4, fill: '#ffffff', stroke: '#0077B6', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#0077B6' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </SectionCard>
 
-        <div className="rounded-2xl p-6 shadow-embossed">
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-slate-800">Users by Module</h2>
-          </div>
-          <div className="h-64 w-full">
+        <SectionCard title="Users by Module">
+          <div className="h-72 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={moduleData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
-                <XAxis type="number" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis dataKey="name" type="category" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+              <BarChart data={moduleData} layout="vertical" margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-muted/30" horizontal={false} />
+                <XAxis type="number" stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis dataKey="name" type="category" stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip 
-                  cursor={{fill: '#f1f5f9'}}
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#1e293b', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  cursor={{fill: 'var(--muted)'}}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)' }}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
                   {moduleData.map((entry, index) => (
@@ -175,105 +199,97 @@ const ControlCenterDashboardPage = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </SectionCard>
       </div>
 
-      {/* Row 3 - Operations */}
-      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      {/* Row 3 - Operations & Security Logs */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Security Logs */}
-        <div className="rounded-2xl p-6 shadow-embossed flex flex-col">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <MdOutlineSecurity className="h-5 w-5 text-blue-600" />
-              Recent Security Logs
-            </h2>
-            <button className="text-xs text-blue-600 font-medium hover:underline">View All</button>
-          </div>
-          <div className="flex-1 space-y-3">
+        <SectionCard 
+          title="Recent Security Logs" 
+          actions={<Button variant="link" size="xs">View All</Button>}
+        >
+          <div className="space-y-3 pt-2">
             {[
               { time: "10 mins ago", event: "Failed login attempt", user: "admin@ny.corp", type: "warning" },
               { time: "1 hour ago", event: "Role permissions changed", user: "System Admin", type: "info" },
               { time: "3 hours ago", event: "Multiple failed logins", user: "Unknown IP", type: "critical" },
               { time: "Yesterday", event: "New API key generated", user: "dev@hq.corp", type: "info" },
             ].map((log, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl bg-white/50 p-3 border border-slate-100 hover:bg-white transition-colors">
-                <div className={`mt-0.5 h-2 w-2 rounded-full flex-shrink-0 ${log.type === 'critical' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' : log.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+              <div key={i} className="flex items-start gap-3 rounded-xl bg-muted/20 p-3 border border-slate-200/80 hover:bg-muted/40 transition-colors">
+                <div className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 ${log.type === 'critical' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : log.type === 'warning' ? 'bg-amber-500' : 'bg-[#0077B6]'}`} />
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">{log.event}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{log.user} • {log.time}</p>
+                  <p className="text-sm font-semibold text-foreground">{log.event}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{log.user} • {log.time}</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
 
         {/* Audit Logs */}
-        <div className="rounded-2xl p-6 shadow-embossed flex flex-col">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <MdOutlinePolicy className="h-5 w-5 text-indigo-600" />
-              Recent Audit Logs
-            </h2>
-            <button className="text-xs text-blue-600 font-medium hover:underline">View All</button>
-          </div>
-          <div className="flex-1 space-y-3">
+        <SectionCard 
+          title="Recent Audit Logs" 
+          actions={<Button variant="link" size="xs">View All</Button>}
+        >
+          <div className="space-y-3 pt-2">
             {[
               { time: "2 mins ago", action: "Created new user account", module: "User Management" },
               { time: "15 mins ago", action: "Updated branch settings", module: "Organization" },
               { time: "2 hours ago", action: "Assigned Inventory module", module: "Access Control" },
               { time: "4 hours ago", action: "Modified financial year", module: "Finance" },
             ].map((log, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl bg-white/50 p-3 border border-slate-100 hover:bg-white transition-colors">
-                <div className="mt-1 h-1.5 w-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+              <div key={i} className="flex items-start gap-3 rounded-xl bg-muted/20 p-3 border border-slate-200/80 hover:bg-muted/40 transition-colors">
+                <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-muted-foreground shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">{log.action}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{log.module} • {log.time}</p>
+                  <p className="text-sm font-semibold text-foreground">{log.action}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{log.module} • {log.time}</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
 
         {/* Quick Actions */}
-        <div className="rounded-2xl p-6 shadow-embossed">
-          <h2 className="mb-4 text-lg font-bold text-slate-800">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-3">
+        <SectionCard title="Quick Actions">
+          <div className="grid grid-cols-2 gap-3 pt-2">
             {[
-              { label: "Create User", icon: MdPersonAdd, color: "text-blue-600", bg: "group-hover:bg-blue-50" },
-              { label: "Add Branch", icon: MdDomainAdd, color: "text-indigo-600", bg: "group-hover:bg-indigo-50" },
-              { label: "Assign Access", icon: MdVpnKey, color: "text-purple-600", bg: "group-hover:bg-purple-50" },
-              { label: "Create Role", icon: MdOutlineVerifiedUser, color: "text-emerald-600", bg: "group-hover:bg-emerald-50" },
-              { label: "User Access", icon: MdApps, color: "text-cyan-600", bg: "group-hover:bg-cyan-50" },
-              { label: "View Audit", icon: MdGavel, color: "text-slate-600", bg: "group-hover:bg-slate-50" },
+              { label: "Create User", icon: Plus, variant: "default" },
+              { label: "Add Branch", icon: Plus, variant: "secondary" },
+              { label: "Assign Access", icon: ShieldAlert, variant: "outline" },
+              { label: "Create Role", icon: UserCheck, variant: "edit" },
+              { label: "User Access", icon: Activity, variant: "view" },
+              { label: "System Uptime", icon: HeartPulse, variant: "print" },
             ].map((action, i) => (
-              <button key={i} className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white/50 p-4 text-center transition-all hover:border-slate-200 hover:shadow-sm">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 transition-colors ${action.bg}`}>
-                  <action.icon className={`h-5 w-5 ${action.color}`} />
+              <button 
+                key={i} 
+                className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200/80 bg-card/45 p-4 text-center transition-all hover:bg-muted/20 shadow-sm"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted group-hover:bg-card transition-colors">
+                  <action.icon className="h-4.5 w-4.5 text-erp-primary" />
                 </div>
-                <span className="text-xs font-semibold text-slate-700">{action.label}</span>
+                <span className="text-xs font-semibold text-foreground">{action.label}</span>
               </button>
             ))}
           </div>
-        </div>
+        </SectionCard>
       </div>
 
-      {/* Row 4 - Admin Insights & System Health */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-        {/* Branch-wise Distribution */}
-        <div className="rounded-2xl p-6 shadow-embossed">
-          <h2 className="mb-4 text-lg font-bold text-slate-800">Branch Users</h2>
-          <div className="space-y-4">
+      {/* Row 4 - System Distribution & Health */}
+      <DashboardGrid columns={4}>
+        <SectionCard title="Branch Users">
+          <div className="space-y-4 pt-2">
             {[
-              { name: "Headquarters", users: 542, percentage: 65, color: "bg-blue-500" },
-              { name: "NY Branch", users: 210, percentage: 25, color: "bg-indigo-400" },
-              { name: "LA Branch", users: 84, percentage: 10, color: "bg-slate-300" },
+              { name: "Headquarters", users: 542, percentage: 65, color: "bg-[#0077B6]" },
+              { name: "NY Branch", users: 210, percentage: 25, color: "bg-[#005F95]" },
+              { name: "LA Branch", users: 84, percentage: 10, color: "bg-[#002137]" },
             ].map((branch, i) => (
               <div key={i}>
                 <div className="mb-1 flex justify-between text-sm">
-                  <span className="text-slate-700 font-semibold">{branch.name}</span>
-                  <span className="text-slate-500 font-medium">{branch.users}</span>
+                  <span className="text-foreground font-semibold">{branch.name}</span>
+                  <span className="text-muted-foreground font-medium">{branch.users}</span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div 
                     className={`h-full rounded-full ${branch.color}`} 
                     style={{ width: `${branch.percentage}%` }} 
@@ -282,81 +298,75 @@ const ControlCenterDashboardPage = () => {
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
 
-        {/* Role Distribution */}
-        <div className="rounded-2xl p-6 shadow-embossed">
-          <h2 className="mb-4 text-lg font-bold text-slate-800">Role Distribution</h2>
-          <div className="space-y-3">
+        <SectionCard title="Role Distribution">
+          <div className="space-y-3 pt-2">
             {[
               { name: "Regular Users", count: 850 },
               { name: "Managers", count: 124 },
               { name: "System Admins", count: 12 },
               { name: "Auditors", count: 8 },
             ].map((role, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg border border-slate-100 bg-white/50 p-3">
-                <span className="text-sm font-semibold text-slate-700">{role.name}</span>
-                <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-600 border border-slate-200">
+              <div key={i} className="flex items-center justify-between rounded-lg border border-slate-200/80 bg-muted/20 p-3">
+                <span className="text-sm font-semibold text-foreground">{role.name}</span>
+                <span className="rounded-md bg-muted px-2.5 py-1 text-xs font-bold text-foreground border border-slate-200/80">
                   {role.count}
                 </span>
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
 
-        {/* Pending Tasks / Alerts */}
-        <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-6 shadow-embossed">
-          <h2 className="mb-4 text-lg font-bold text-slate-850">Pending Actions</h2>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between rounded-lg border border-rose-200 bg-white p-3 shadow-sm">
-              <span className="text-sm font-semibold text-rose-750">Locked Users</span>
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-700">3</span>
+        <SectionCard title="Pending Actions" className="border-red-200/50 dark:border-red-900/30">
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between rounded-lg border border-red-200 dark:border-red-900/30 bg-muted/20 p-3">
+              <span className="text-sm font-semibold text-foreground">Locked Users</span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50 text-xs font-bold text-red-600 dark:text-red-400">3</span>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-white p-3 shadow-sm">
-              <span className="text-sm font-semibold text-amber-750">Users w/o Roles</span>
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">12</span>
+            <div className="flex items-center justify-between rounded-lg border border-amber-200 dark:border-amber-900/30 bg-muted/20 p-3">
+              <span className="text-sm font-semibold text-foreground">Users w/o Roles</span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50 text-xs font-bold text-amber-600 dark:text-amber-400">12</span>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white p-3 shadow-sm">
-              <span className="text-sm font-semibold text-blue-750">Pending Approvals</span>
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">5</span>
+            <div className="flex items-center justify-between rounded-lg border border-erp-primary/30 bg-muted/20 p-3">
+              <span className="text-sm font-semibold text-foreground">Pending Approvals</span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-erp-200 dark:bg-erp-900/50 text-xs font-bold text-erp-800 dark:text-erp-400">5</span>
             </div>
           </div>
-        </div>
+        </SectionCard>
 
-        {/* System Health */}
-        <div className="rounded-2xl border border-blue-100 bg-gradient-to-b from-blue-50/80 to-white/80 p-6 shadow-embossed relative overflow-hidden">
-          <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-blue-200 opacity-20 blur-2xl"></div>
-          <h2 className="mb-4 text-lg font-bold text-slate-900 flex items-center gap-2 relative z-10">
-            <MdCloudDone className="h-5 w-5 text-blue-500" />
-            System Health
-          </h2>
-          <div className="grid grid-cols-2 gap-4 relative z-10">
+        <SectionCard title="System Health" className="relative overflow-hidden">
+          <div className="grid grid-cols-2 gap-4 pt-2">
             <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Status</p>
-              <div className="flex items-center gap-1.5 text-sm font-bold text-slate-700">
-                <MdCheckCircle className="h-4 w-4 text-emerald-500" /> Operational
+              <p className="text-xs text-muted-foreground mb-1 font-medium">Status</p>
+              <div className="flex items-center gap-1.5 text-sm font-bold text-green-500">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                Active
               </div>
             </div>
             <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Uptime</p>
-              <p className="text-sm font-bold text-slate-700">99.98%</p>
+              <p className="text-xs text-muted-foreground mb-1 font-medium">Uptime</p>
+              <p className="text-sm font-bold text-foreground">99.98%</p>
             </div>
             <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Active Modules</p>
-              <p className="text-sm font-bold text-slate-700">8 / 8</p>
+              <p className="text-xs text-muted-foreground mb-1 font-medium">Active Modules</p>
+              <p className="text-sm font-bold text-foreground">8 / 8</p>
             </div>
             <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Last Backup</p>
-              <p className="text-sm font-bold text-slate-700">2 hrs ago</p>
+              <p className="text-xs text-muted-foreground mb-1 font-medium">Last Backup</p>
+              <p className="text-sm font-bold text-foreground">2 hrs ago</p>
             </div>
           </div>
-          <div className="mt-5 pt-4 border-t border-slate-200 flex justify-between items-center relative z-10">
-             <span className="text-xs text-slate-500 font-medium">DB Sync</span>
-             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Synced</span>
+          <div className="mt-5 pt-4 border-t border-erp-border-soft flex justify-between items-center">
+             <span className="text-xs text-muted-foreground font-medium">DB Sync</span>
+             <span className="text-xs font-bold text-green-600 dark:text-green-400">Synced</span>
           </div>
-        </div>
-      </div>
-    </div>
+        </SectionCard>
+      </DashboardGrid>
+    </PageShell>
   );
 };
 

@@ -1,5 +1,5 @@
-import Input from "./Input";
 import { X } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const DateRangeFilter = ({ dateFrom, dateTo, onChange }: { dateFrom?: any; dateTo?: any; onChange?: (dates: { dateFrom: any; dateTo: any }) => void }) => {
   const handleClear = () => {
@@ -12,22 +12,20 @@ const DateRangeFilter = ({ dateFrom, dateTo, onChange }: { dateFrom?: any; dateT
     <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 shadow-sm sm:flex-row sm:flex-wrap sm:items-end">
       <div className="min-w-0">
         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Date From</label>
-        <Input
-          type="date"
-          name="dateFrom"
+        <DatePicker
           value={dateFrom}
-          onChange={(e: any) => onChange?.({ dateFrom: e.target.value, dateTo })}
-          className="w-full sm:w-40"
+          onChange={(value) => onChange?.({ dateFrom: value, dateTo })}
+          triggerClassName="w-full sm:w-40"
+          placeholder="Date from"
         />
       </div>
       <div className="min-w-0">
         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Date To</label>
-        <Input
-          type="date"
-          name="dateTo"
+        <DatePicker
           value={dateTo}
-          onChange={(e: any) => onChange?.({ dateFrom, dateTo: e.target.value })}
-          className="w-full sm:w-40"
+          onChange={(value) => onChange?.({ dateFrom, dateTo: value })}
+          triggerClassName="w-full sm:w-40"
+          placeholder="Date to"
         />
       </div>
       {hasValues && (

@@ -8,8 +8,16 @@ import { toast } from "sonner";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { useAuth } from "../../../auth/AuthContext";
 import { Button } from "../../../components/ui/button";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { CustomerSelect } from "../../../components/invoice-center";
 import { CustomerReceiptAllocationsTable } from "./CustomerReceiptAllocationsTable";
@@ -205,23 +213,44 @@ const CustomerReceiptFormPage = () => {
 
             <div className="space-y-2">
               <Label>Receipt Date <span className="text-red-500">*</span></Label>
-              <Input type="date" {...register("receipt_date")} className={errors.receipt_date ? "border-red-500" : ""} />
+              <Controller
+                name="receipt_date"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Receipt date"
+                    clearable={false}
+                    triggerClassName={errors.receipt_date ? "border-red-500" : ""}
+                    aria-label="Receipt date"
+                  />
+                )}
+              />
               {errors.receipt_date && <p className="text-red-500 text-sm mt-1">{errors.receipt_date.message}</p>}
             </div>
 
             <div className="space-y-2">
               <Label>Payment Method <span className="text-red-500">*</span></Label>
-              <select
-                {...register("payment_method")}
-                className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
-              >
-                <option value="cash">Cash</option>
-                <option value="bank_transfer">Bank Transfer</option>
-                <option value="cheque">Cheque</option>
-                <option value="card">Credit/Debit Card</option>
-                <option value="online">Online Payment</option>
-                <option value="other">Other</option>
-              </select>
+              <Controller
+                name="payment_method"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className={errors.payment_method ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="cheque">Cheque</SelectItem>
+                      <SelectItem value="card">Credit/Debit Card</SelectItem>
+                      <SelectItem value="online">Online Payment</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.payment_method && <p className="text-red-500 text-sm mt-1">{errors.payment_method.message}</p>}
             </div>
 

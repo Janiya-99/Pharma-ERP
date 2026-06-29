@@ -2,6 +2,13 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Plus, Trash } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { toast } from "sonner";
 import { formatCurrency, formatDate } from "../../../lib/utils";
@@ -144,19 +151,22 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
           <div className="flex-1">
             <label className="text-sm font-medium text-gray-700 mb-1 block">Add Invoice to Allocation</label>
             <div className="relative">
-              <select
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white"
-                value={selectedInvoiceId}
-                onChange={(e) => setSelectedInvoiceId(Number(e.target.value) || "")}
+              <Select
+                value={selectedInvoiceId ? String(selectedInvoiceId) : ""}
+                onValueChange={(value) => setSelectedInvoiceId(Number(value) || "")}
                 disabled={!customerId || loading}
               >
-                <option value="">Select an invoice to allocate...</option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an invoice to allocate..." />
+                </SelectTrigger>
+                <SelectContent>
                 {invoices.map((inv) => (
-                  <option key={inv.id} value={inv.id}>
+                  <SelectItem key={inv.id} value={String(inv.id)}>
                     {inv.invoice_number} ({formatDate(inv.invoice_date)}) - Balance: {formatCurrency(inv.balance_amount)}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Button

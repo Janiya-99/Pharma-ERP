@@ -9,6 +9,7 @@ import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
@@ -318,13 +319,36 @@ const SalesInvoiceFormPage: React.FC = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="invoice_date" className={errors.invoice_date ? "text-red-500" : ""}>Invoice Date *</Label>
-                    <Input type="date" id="invoice_date" {...register("invoice_date")} className={errors.invoice_date ? "border-red-500" : ""} />
+                    <DatePicker
+                      value={watch("invoice_date")}
+                      onChange={(value) =>
+                        setValue("invoice_date", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      placeholder="Invoice date"
+                      clearable={false}
+                      triggerClassName={errors.invoice_date ? "border-red-500" : ""}
+                      aria-label="Invoice date"
+                    />
                     {errors.invoice_date && <span className="text-xs text-red-500">{errors.invoice_date.message}</span>}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="due_date" className={errors.due_date ? "text-red-500" : ""}>Due Date</Label>
-                    <Input type="date" id="due_date" {...register("due_date")} className={errors.due_date ? "border-red-500" : ""} />
+                    <DatePicker
+                      value={watch("due_date")}
+                      onChange={(value) =>
+                        setValue("due_date", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      placeholder="Due date"
+                      triggerClassName={errors.due_date ? "border-red-500" : ""}
+                      aria-label="Due date"
+                    />
                     {errors.due_date && <span className="text-xs text-red-500">{errors.due_date.message}</span>}
                   </div>
                 </div>

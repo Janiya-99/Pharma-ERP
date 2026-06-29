@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 interface Category {
   id: number;
@@ -250,16 +257,20 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
               <label className="mb-1 block text-xs font-bold uppercase text-gray-500">
                 Status
               </label>
-              <select
+              <Select
                 value={formData.status}
-                onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, status: value })
                 }
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
               >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
