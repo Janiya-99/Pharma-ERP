@@ -26,6 +26,7 @@ import {
   DebitNoteRegisterReportParams,
   DebitNoteRegisterReportRow,
 } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import { FileUp, Coins, UploadCloud, DownloadCloud } from "lucide-react";
 
@@ -71,7 +72,7 @@ export const DebitNoteRegisterReportPage: React.FC = () => {
       const res = await invoiceCenterApi.getDebitNoteRegisterReport(
         cleanFilters
       );
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, DebitNoteRegisterReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

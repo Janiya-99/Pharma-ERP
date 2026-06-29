@@ -19,6 +19,7 @@ import {
   SalesByProductReportParams,
   SalesByProductReportRow,
 } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import { Package, Hash, Coins, Percent } from "lucide-react";
 
@@ -49,7 +50,7 @@ export const SalesByProductReportPage: React.FC = () => {
       setHasPermission(true);
 
       const res = await invoiceCenterApi.getSalesByProductReport(filters);
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, SalesByProductReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

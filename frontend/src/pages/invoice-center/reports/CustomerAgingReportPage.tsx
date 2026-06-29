@@ -41,7 +41,7 @@ export const CustomerAgingReportPage: React.FC = () => {
       setHasPermission(true);
 
       const res = await invoiceCenterApi.getCustomerAgingReport(filters);
-      setData(res.data?.data || []);
+      setData(Array.isArray(res.data?.data?.rows) ? res.data.data.rows : []);
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

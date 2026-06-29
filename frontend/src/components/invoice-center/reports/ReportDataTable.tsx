@@ -52,7 +52,9 @@ export function ReportDataTable<T>({
     );
   }
 
-  if (!data || data.length === 0) {
+  const rows = Array.isArray(data) ? data : [];
+
+  if (rows.length === 0) {
     return <ReportEmptyState message={emptyMessage} />;
   }
 
@@ -80,7 +82,7 @@ export function ReportDataTable<T>({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((row, rowIndex) => (
+              {rows.map((row, rowIndex) => (
                 <TableRow key={rowIndex} className="hover:bg-slate-50">
                   {columns.map((col, colIndex) => (
                     <TableCell

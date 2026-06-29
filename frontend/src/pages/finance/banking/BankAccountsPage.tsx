@@ -118,6 +118,23 @@ type BankAccountForm = {
   bank_code: string;
   branch_code: string;
   is_default: boolean;
+  province: string;
+  district: string;
+};
+
+type SriLankaBankReference = {
+  name: string;
+  code: string;
+  short_name: string;
+  swift_code: string;
+  category: string;
+  display_name: string;
+};
+
+type SriLankaProvinceReference = {
+  name: string;
+  code: string;
+  districts: string[];
 };
 
 const emptyForm: BankAccountForm = {
@@ -138,6 +155,8 @@ const emptyForm: BankAccountForm = {
   bank_code: "",
   branch_code: "",
   is_default: false,
+  province: "",
+  district: "",
 };
 
 const accountTypeOptions = [
@@ -173,6 +192,12 @@ const BankAccountsPage = () => {
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [branches, setBranches] = useState<ApiRecord[]>([]);
   const [ledgerAccounts, setLedgerAccounts] = useState<ApiRecord[]>([]);
+  const [bankReferences, setBankReferences] = useState<SriLankaBankReference[]>(
+    []
+  );
+  const [provinceReferences, setProvinceReferences] = useState<
+    SriLankaProvinceReference[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
@@ -221,18 +246,23 @@ const BankAccountsPage = () => {
 
   const fetchLookups = async () => {
     try {
-      const [branchesRes, accountsRes] = await Promise.all([
-        getBranches({ limit: 100 }),
-        financeApi.getChartOfAccounts({
-          limit: 1000,
-          status: "active",
-          is_bank_account: true,
-          company_id: companyId,
-        }),
-      ]);
+      const [branchesRes, accountsRes, banksRes, provincesRes] =
+        await Promise.all([
+          getBranches({ limit: 100 }),
+          financeApi.getChartOfAccounts({
+            limit: 1000,
+            status: "active",
+            is_bank_account: true,
+            company_id: companyId,
+          }),
+          financeApi.getSriLankaBanks(),
+          financeApi.getSriLankaProvinces(),
+        ]);
 
       setBranches(branchesRes?.data || []);
       setLedgerAccounts(accountsRes.data?.data || []);
+      setBankReferences(banksRes.data?.data || []);
+      setProvinceReferences(provincesRes.data?.data || []);
     } catch (error) {
       toast.error(
         getErrorMessage(error, "Failed to load bank account lookups")
@@ -265,6 +295,24 @@ const BankAccountsPage = () => {
     setErrors((current) => ({ ...current, [key]: "" }));
   };
 
+  const selectedProvince = useMemo(
+    () =>
+      provinceReferences.find((province) => province.name === form.province) ||
+      null,
+    [form.province, provinceReferences]
+  );
+
+  const handleBankChange = (bankName: string) => {
+    const bank = bankReferences.find((item) => item.name === bankName);
+    setForm((current) => ({
+      ...current,
+      bank_name: bankName,
+      bank_code: bank?.code || current.bank_code,
+      swift_code: bank?.swift_code || current.swift_code,
+    }));
+    setErrors((current) => ({ ...current, bank_name: "" }));
+  };
+
   const openCreateDialog = () => {
     setEditingAccount(null);
     setForm({
@@ -293,6 +341,8 @@ const BankAccountsPage = () => {
       bank_code: account.bank_code || "",
       branch_code: account.branch_code || "",
       is_default: !!account.is_default,
+      province: "",
+      district: "",
     });
     setErrors({});
     setDialogOpen(true);
@@ -464,16 +514,16 @@ const BankAccountsPage = () => {
   }
 
   return (
-    <div className="text-slate-900 min-h-full bg-[#F8FAFC] p-6">
+    <div className="min-h-full bg-[#F8FAFC] p-6 text-slate-900">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
             Finance / Banking & Cash
           </p>
-          <h1 className="text-slate-900 mt-1 text-3xl font-bold tracking-tight">
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
             Bank Accounts
           </h1>
-          <p className="text-slate-500 mt-2 max-w-3xl text-sm">
+          <p className="mt-2 max-w-3xl text-sm text-slate-500">
             Create and manage company bank accounts used for payments, receipts,
             bank book, and reconciliation.
           </p>
@@ -481,7 +531,7 @@ const BankAccountsPage = () => {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
-            className="border-slate-200 text-slate-700 bg-white"
+            className="border-slate-200 bg-white text-slate-700"
           >
             <Download className="h-4 w-4" />
             Export
@@ -497,31 +547,31 @@ const BankAccountsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="border-slate-200 border bg-white shadow-sm">
+        <Card className="border border-slate-200 bg-white shadow-sm">
           <CardContent className="flex items-center gap-4">
             <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
               <Landmark className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-slate-500 text-sm font-medium">
+              <p className="text-sm font-medium text-slate-500">
                 Bank Accounts
               </p>
-              <p className="text-slate-900 mt-1 text-2xl font-bold">
+              <p className="mt-1 text-2xl font-bold text-slate-900">
                 {accounts.length}
               </p>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-slate-200 border bg-white shadow-sm md:col-span-2">
+        <Card className="border border-slate-200 bg-white shadow-sm md:col-span-2">
           <CardContent className="flex items-center gap-4">
             <div className="rounded-xl bg-green-50 p-3 text-green-600">
               <FileText className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-slate-500 text-sm font-medium">
+              <p className="text-sm font-medium text-slate-500">
                 Visible Current Balance
               </p>
-              <p className="text-slate-900 mt-1 text-2xl font-bold">
+              <p className="mt-1 text-2xl font-bold text-slate-900">
                 {money(totalBalance)}
               </p>
             </div>
@@ -529,8 +579,8 @@ const BankAccountsPage = () => {
         </Card>
       </div>
 
-      <Card className="border-slate-200 mt-4 border bg-white shadow-sm">
-        <CardHeader className="border-slate-100 border-b">
+      <Card className="mt-4 border border-slate-200 bg-white shadow-sm">
+        <CardHeader className="border-b border-slate-100">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <CardTitle>Company Bank Accounts</CardTitle>
@@ -541,7 +591,7 @@ const BankAccountsPage = () => {
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative">
-                <Search className="text-slate-400 pointer-events-none absolute left-2.5 top-2 h-4 w-4" />
+                <Search className="pointer-events-none absolute left-2.5 top-2 h-4 w-4 text-slate-400" />
                 <Input
                   value={filters.search}
                   onChange={(event) =>
@@ -551,7 +601,7 @@ const BankAccountsPage = () => {
                     }))
                   }
                   placeholder="Search accounts"
-                  className="border-slate-200 h-9 w-full bg-white pl-8 sm:w-64"
+                  className="h-9 w-full border-slate-200 bg-white pl-8 sm:w-64"
                 />
               </div>
               <Select
@@ -560,7 +610,7 @@ const BankAccountsPage = () => {
                   setFilters((current) => ({ ...current, status: value }))
                 }
               >
-                <SelectTrigger className="border-slate-200 h-9 w-full bg-white sm:w-40">
+                <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -575,7 +625,7 @@ const BankAccountsPage = () => {
                   setFilters((current) => ({ ...current, branch_id: value }))
                 }
               >
-                <SelectTrigger className="border-slate-200 h-9 w-full bg-white sm:w-44">
+                <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-44">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -608,7 +658,7 @@ const BankAccountsPage = () => {
                 <TableRow>
                   <TableCell
                     colSpan={7}
-                    className="text-slate-500 h-28 text-center"
+                    className="h-28 text-center text-slate-500"
                   >
                     <Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />
                     Loading bank accounts...
@@ -618,7 +668,7 @@ const BankAccountsPage = () => {
                 <TableRow>
                   <TableCell
                     colSpan={7}
-                    className="text-slate-500 h-28 text-center"
+                    className="h-28 text-center text-slate-500"
                   >
                     No bank accounts found.
                   </TableCell>
@@ -632,25 +682,25 @@ const BankAccountsPage = () => {
                           <Landmark className="h-4 w-4" />
                         </div>
                         <div>
-                          <p className="text-slate-900 font-semibold">
+                          <p className="font-semibold text-slate-900">
                             {account.bank_name}
                           </p>
-                          <p className="text-slate-500 text-xs">
+                          <p className="text-xs text-slate-500">
                             {account.bank_branch_name || "No branch name"}
                           </p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-slate-800 font-medium">
+                    <TableCell className="font-medium text-slate-800">
                       {account.account_name}
                     </TableCell>
-                    <TableCell className="text-slate-600 font-mono text-xs">
+                    <TableCell className="font-mono text-xs text-slate-600">
                       {account.account_number}
                     </TableCell>
-                    <TableCell className="text-slate-900 text-right font-semibold">
+                    <TableCell className="text-right font-semibold text-slate-900">
                       {money(account.current_balance)}
                     </TableCell>
-                    <TableCell className="text-slate-600 max-w-[260px] truncate">
+                    <TableCell className="max-w-[260px] truncate text-slate-600">
                       {account.chart_account
                         ? `${account.chart_account.account_code} - ${account.chart_account.account_name}`
                         : `#${account.chart_account_id}`}
@@ -731,12 +781,18 @@ const BankAccountsPage = () => {
           >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Bank Name" error={errors.bank_name} required>
-                <Input
-                  value={form.bank_name}
-                  onChange={(event) =>
-                    setField("bank_name", event.target.value)
-                  }
-                />
+                <Select value={form.bank_name} onValueChange={handleBankChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Sri Lankan bank" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bankReferences.map((bank) => (
+                      <SelectItem key={bank.code} value={bank.name}>
+                        {bank.display_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
               <Field label="Branch Name">
                 <Input
@@ -744,7 +800,61 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("bank_branch_name", event.target.value)
                   }
+                  placeholder="e.g. Colombo 03, Kandy City"
                 />
+              </Field>
+              <Field label="Province">
+                <Select
+                  value={form.province || "none"}
+                  onValueChange={(value) =>
+                    setForm((current) => ({
+                      ...current,
+                      province: value === "none" ? "" : value,
+                      district: "",
+                    }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select province" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Not Selected</SelectItem>
+                    {provinceReferences.map((province) => (
+                      <SelectItem key={province.code} value={province.name}>
+                        {province.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="District">
+                <Select
+                  value={form.district || "none"}
+                  onValueChange={(value) => {
+                    const district = value === "none" ? "" : value;
+                    setForm((current) => ({
+                      ...current,
+                      district,
+                      bank_branch_name:
+                        district && !current.bank_branch_name
+                          ? district
+                          : current.bank_branch_name,
+                    }));
+                  }}
+                  disabled={!selectedProvince}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select district" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Not Selected</SelectItem>
+                    {selectedProvince?.districts.map((district) => (
+                      <SelectItem key={district} value={district}>
+                        {district}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
               <Field label="Account Name" error={errors.account_name} required>
                 <Input
@@ -807,7 +917,7 @@ const BankAccountsPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-slate-500 mt-1 text-xs">
+                <p className="mt-1 text-xs text-slate-500">
                   The backend requires this ledger to be flagged as a bank
                   account.
                 </p>
@@ -877,10 +987,10 @@ const BankAccountsPage = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <div className="border-slate-200 bg-slate-50 flex items-center justify-between rounded-xl border p-4">
+              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div>
                   <Label>Default Bank Account</Label>
-                  <p className="text-slate-500 mt-1 text-xs">
+                  <p className="mt-1 text-xs text-slate-500">
                     Marks this as the default bank account in Finance.
                   </p>
                 </div>
@@ -944,7 +1054,7 @@ const BankAccountsPage = () => {
         <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-xl">
           {selectedAccount && (
             <>
-              <SheetHeader className="border-slate-100 border-b">
+              <SheetHeader className="border-b border-slate-100">
                 <SheetTitle>{selectedAccount.account_name}</SheetTitle>
                 <SheetDescription>
                   {selectedAccount.bank_name} / {selectedAccount.account_number}
@@ -1044,11 +1154,11 @@ const Field = ({
 );
 
 const Detail = ({ label, value }: { label: string; value: string }) => (
-  <div className="border-slate-200 rounded-xl border bg-white p-3">
-    <p className="text-slate-500 text-xs font-medium uppercase tracking-wide">
+  <div className="rounded-xl border border-slate-200 bg-white p-3">
+    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
       {label}
     </p>
-    <p className="text-slate-900 mt-1 text-sm font-semibold">{value}</p>
+    <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
   </div>
 );
 

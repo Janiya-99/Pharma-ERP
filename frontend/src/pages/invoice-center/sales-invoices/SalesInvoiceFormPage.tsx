@@ -5,6 +5,8 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
+import { getBranches } from "../../../api/controlApi";
+import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
@@ -12,6 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui
 import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "sonner";
 import { Customer } from "../../../types/invoice-center";
@@ -68,6 +77,10 @@ const SalesInvoiceFormPage: React.FC = () => {
   
   // Lookup states
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [warehouses, setWarehouses] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [lookupsLoading, setLookupsLoading] = useState(false);
   const [salesOrderInfo, setSalesOrderInfo] = useState<any | null>(null);
 
   const { register, control, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormValues>({
@@ -88,7 +101,18 @@ const SalesInvoiceFormPage: React.FC = () => {
 
   const lines = useWatch({ control, name: "lines" }) || [];
   const watchedCustomerId = watch("customer_id");
+  const watchedBranchId = watch("branch_id");
   const watchedSalesOrderId = watch("sales_order_id");
+
+  const listFromResponse = (response: any) => {
+    const payload = response?.data ?? response;
+    return payload?.data?.items || payload?.data || payload?.items || [];
+  };
+
+  const filteredWarehouses = warehouses.filter(
+    (warehouse) =>
+      !watchedBranchId || String(warehouse.branch_id || "") === String(watchedBranchId)
+  );
 
   // Calculated totals
   const totals = useMemo(() => {
@@ -110,10 +134,34 @@ const SalesInvoiceFormPage: React.FC = () => {
   }, [lines]);
 
   useEffect(() => {
+    loadLookups();
+  }, []);
+
+  useEffect(() => {
     if (isEdit && id) {
       loadInvoice();
     }
   }, [id, isEdit]);
+
+  const loadLookups = async () => {
+    setLookupsLoading(true);
+    try {
+      const [branchRes, warehouseRes, customerRes] = await Promise.all([
+        getBranches({ limit: 500, status: "active" }),
+        inventoryApi.getWarehouses({ limit: 1000, status: "active" }),
+        invoiceCenterApi.getCustomers({ limit: 1000, status: "active" }),
+      ]);
+
+      setBranches(listFromResponse(branchRes));
+      setWarehouses(listFromResponse(warehouseRes));
+      setCustomers(listFromResponse(customerRes));
+    } catch (err) {
+      console.error("Failed to load invoice form dropdowns", err);
+      toast.error("Failed to load form dropdowns.");
+    } finally {
+      setLookupsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (watchedCustomerId) {
@@ -307,13 +355,73 @@ const SalesInvoiceFormPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="branch_id" className={errors.branch_id ? "text-red-500" : ""}>Branch *</Label>
-                    <Input id="branch_id" {...register("branch_id")} placeholder="Branch ID" className={errors.branch_id ? "border-red-500" : ""} />
+                    <Select
+                      value={watch("branch_id")}
+                      onValueChange={(value) => {
+                        setValue("branch_id", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("warehouse_id", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }}
+                      disabled={lookupsLoading}
+                    >
+                      <SelectTrigger id="branch_id" className={errors.branch_id ? "border-red-500" : ""}>
+                        <SelectValue placeholder={lookupsLoading ? "Loading branches..." : "Select branch"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {branches.map((branch) => {
+                          const branchId = String(branch.id || branch.branch_id);
+                          return (
+                            <SelectItem key={branchId} value={branchId}>
+                              {branch.branch_code ? `${branch.branch_code} - ` : ""}
+                              {branch.branch_name || branch.name || `Branch ${branchId}`}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                     {errors.branch_id && <span className="text-xs text-red-500">{errors.branch_id.message}</span>}
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="warehouse_id" className={errors.warehouse_id ? "text-red-500" : ""}>Warehouse *</Label>
-                    <Input id="warehouse_id" {...register("warehouse_id")} placeholder="Warehouse ID" className={errors.warehouse_id ? "border-red-500" : ""} />
+                    <Select
+                      value={watch("warehouse_id")}
+                      onValueChange={(value) =>
+                        setValue("warehouse_id", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      disabled={lookupsLoading || !watchedBranchId}
+                    >
+                      <SelectTrigger id="warehouse_id" className={errors.warehouse_id ? "border-red-500" : ""}>
+                        <SelectValue
+                          placeholder={
+                            !watchedBranchId
+                              ? "Select branch first"
+                              : lookupsLoading
+                              ? "Loading warehouses..."
+                              : "Select warehouse"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredWarehouses.map((warehouse) => {
+                          const warehouseId = String(warehouse.id || warehouse.warehouse_id);
+                          return (
+                            <SelectItem key={warehouseId} value={warehouseId}>
+                              {warehouse.warehouse_code ? `${warehouse.warehouse_code} - ` : ""}
+                              {warehouse.warehouse_name || warehouse.name || `Warehouse ${warehouseId}`}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                     {errors.warehouse_id && <span className="text-xs text-red-500">{errors.warehouse_id.message}</span>}
                   </div>
 
@@ -363,7 +471,34 @@ const SalesInvoiceFormPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="customer_id" className={errors.customer_id ? "text-red-500" : ""}>Customer *</Label>
-                    <Input id="customer_id" {...register("customer_id")} placeholder="Customer ID" className={errors.customer_id ? "border-red-500" : ""} />
+                    <Select
+                      value={watch("customer_id")}
+                      onValueChange={(value) =>
+                        setValue("customer_id", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      disabled={lookupsLoading}
+                    >
+                      <SelectTrigger id="customer_id" className={errors.customer_id ? "border-red-500" : ""}>
+                        <SelectValue placeholder={lookupsLoading ? "Loading customers..." : "Select customer"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {customers.map((customerItem) => {
+                          const customerId = String(customerItem.id || customerItem.customer_id);
+                          return (
+                            <SelectItem key={customerId} value={customerId}>
+                              {customerItem.customer_code ? `${customerItem.customer_code} - ` : ""}
+                              {customerItem.company_name ||
+                                customerItem.customer_name ||
+                                customerItem.name ||
+                                `Customer ${customerId}`}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                     {errors.customer_id && <span className="text-xs text-red-500">{errors.customer_id.message}</span>}
                   </div>
 

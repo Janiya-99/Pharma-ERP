@@ -26,6 +26,7 @@ import {
   CreditNoteRegisterReportParams,
   CreditNoteRegisterReportRow,
 } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import { FileDown, Coins, UploadCloud, DownloadCloud } from "lucide-react";
 
@@ -71,7 +72,7 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
       const res = await invoiceCenterApi.getCreditNoteRegisterReport(
         cleanFilters
       );
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, CreditNoteRegisterReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

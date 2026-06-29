@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SalesInvoiceRegisterReportParams, SalesInvoiceRegisterReportRow } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import { FileText, Coins, CreditCard, Banknote } from "lucide-react";
 
@@ -42,7 +43,7 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
       if (cleanFilters.finance_post_status === "all") delete cleanFilters.finance_post_status;
 
       const res = await invoiceCenterApi.getSalesInvoiceRegisterReport(cleanFilters);
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, SalesInvoiceRegisterReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

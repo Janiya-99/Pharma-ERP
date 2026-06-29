@@ -299,9 +299,9 @@ export const invoiceCenterApi = {
   // ---- Reports ----
   getInvoiceCenterDashboardSummary: (
     params: DashboardSummaryReportParams = {}
-  ) => apiClient.get("/invoice-center/reports/dashboard-summary", { params }),
+  ) => apiClient.get("/invoice-center/dashboard/summary", { params }),
   getCustomerBalanceReport: (params: CustomerBalanceReportParams = {}) =>
-    apiClient.get("/invoice-center/reports/customer-balances", { params }),
+    apiClient.get("/invoice-center/reports/customer-balance", { params }),
   getCustomerStatementReport: (params: CustomerStatementReportParams) =>
     apiClient.get("/invoice-center/reports/customer-statement", { params }),
   getCustomerAgingReport: (params: CustomerAgingReportParams = {}) =>

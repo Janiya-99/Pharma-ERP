@@ -26,6 +26,7 @@ import {
   FinancePostingStatusReportParams,
   FinancePostingStatusReportRow,
 } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import {
   UploadCloud,
@@ -70,7 +71,7 @@ export const FinancePostingStatusReportPage: React.FC = () => {
       const res = await invoiceCenterApi.getFinancePostingStatusReport(
         cleanFilters
       );
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, FinancePostingStatusReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

@@ -63,56 +63,61 @@ const CustomerReceiptsPage = () => {
       {
         accessorKey: "receipt_number",
         header: "Receipt #",
-        cell: (info: any) => (
+        cell: (row: any) => (
           <Link
-            to={`/invoice-center/customer-receipts/${info.row.original.id}`}
+            to={`/invoice-center/customer-receipts/${row.id}`}
             className="font-medium text-brand-500 hover:underline"
           >
-            {info.getValue()}
+            {row.receipt_number || "—"}
           </Link>
         ),
       },
       {
         accessorKey: "receipt_date",
         header: "Date",
-        cell: (info: any) => formatDate(info.getValue()),
+        cell: (row: any) => formatDate(row.receipt_date),
       },
       {
         accessorKey: "customer.name",
         header: "Customer",
-        cell: (info: any) => info.getValue() || info.row.original.customer_id,
+        cell: (row: any) =>
+          row.customer?.customer_name ||
+          row.customer?.name ||
+          row.customer_name ||
+          row.customer_id ||
+          "—",
       },
       {
         accessorKey: "payment_method",
         header: "Payment Method",
-        cell: (info: any) => (
-          <CustomerReceiptPaymentMethodBadge method={info.getValue()} />
+        cell: (row: any) => (
+          <CustomerReceiptPaymentMethodBadge method={row.payment_method} />
         ),
       },
       {
         accessorKey: "receipt_amount",
         header: "Amount",
-        cell: (info: any) => formatCurrency(info.getValue()),
+        cell: (row: any) => formatCurrency(row.receipt_amount),
       },
       {
         accessorKey: "receipt_status",
         header: "Status",
-        cell: (info: any) => (
-          <CustomerReceiptStatusBadge status={info.getValue()} />
+        cell: (row: any) => (
+          <CustomerReceiptStatusBadge status={row.receipt_status} />
         ),
       },
       {
         accessorKey: "approval_status",
         header: "Approval",
-        cell: (info: any) => (
-          <CustomerReceiptApprovalStatusBadge status={info.getValue()} />
+        cell: (row: any) => (
+          <CustomerReceiptApprovalStatusBadge status={row.approval_status} />
         ),
       },
       {
         accessorKey: "posted_status",
         header: "Posted",
-        cell: (info: any) => (
-          <CustomerReceiptPostedStatusBadge status={info.getValue()} />
+        cell: (row: any) => (
+          <CustomerReceiptPostedStatusBadge status={row.posted_status} />
         ),
       },
     ],

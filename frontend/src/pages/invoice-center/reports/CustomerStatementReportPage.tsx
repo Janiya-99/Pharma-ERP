@@ -76,7 +76,15 @@ export const CustomerStatementReportPage: React.FC = () => {
       const res = await invoiceCenterApi.getCustomerStatementReport(
         payload as any
       );
-      setData(res.data?.data || null);
+      const report = res.data?.data;
+      setData(
+        report
+          ? {
+              header: report.summary,
+              lines: Array.isArray(report.rows) ? report.rows : [],
+            }
+          : null
+      );
     } catch (err: any) {
       if (err.response?.status === 403) {
         setHasPermission(false);

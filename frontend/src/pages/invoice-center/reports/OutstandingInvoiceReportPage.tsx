@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { OutstandingInvoiceReportParams, OutstandingInvoiceReportRow } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import { FileText, Coins, AlertTriangle, CalendarDays } from "lucide-react";
 
@@ -37,7 +38,7 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
       if (cleanFilters.payment_status === "all") delete cleanFilters.payment_status;
 
       const res = await invoiceCenterApi.getOutstandingInvoiceReport(cleanFilters);
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, OutstandingInvoiceReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

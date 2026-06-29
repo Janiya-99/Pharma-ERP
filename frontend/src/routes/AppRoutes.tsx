@@ -130,6 +130,7 @@ import SalesOrderDetailsPage from "../pages/invoice-center/sales-orders/SalesOrd
 import SalesInvoicesPage from "../pages/invoice-center/sales-invoices/SalesInvoicesPage";
 import SalesInvoiceFormPage from "../pages/invoice-center/sales-invoices/SalesInvoiceFormPage";
 import SalesInvoiceDetailsPage from "../pages/invoice-center/sales-invoices/SalesInvoiceDetailsPage";
+import ProformaInvoicesPage from "../pages/invoice-center/proforma-invoices/ProformaInvoicesPage";
 import CreditNotesPage from "../pages/invoice-center/credit-notes/CreditNotesPage";
 import CreditNoteFormPage from "../pages/invoice-center/credit-notes/CreditNoteFormPage";
 import CreditNoteDetailsPage from "../pages/invoice-center/credit-notes/CreditNoteDetailsPage";
@@ -139,6 +140,9 @@ import DebitNoteDetailsPage from "../pages/invoice-center/debit-notes/DebitNoteD
 import CustomerReceiptsPage from "../pages/invoice-center/customer-receipts/CustomerReceiptsPage";
 import CustomerReceiptFormPage from "../pages/invoice-center/customer-receipts/CustomerReceiptFormPage";
 import CustomerReceiptDetailsPage from "../pages/invoice-center/customer-receipts/CustomerReceiptDetailsPage";
+import InvoiceCenterFinanceSettingsPage from "../pages/invoice-center/finance-settings/InvoiceCenterFinanceSettingsPage";
+import InvoiceCenterFinancePostingPage from "../pages/invoice-center/finance-posting/InvoiceCenterFinancePostingPage";
+import ApprovalWorkspacePage from "../pages/invoice-center/approvals/ApprovalWorkspacePage";
 import { InvoiceCenterReportsDashboardPage } from "../pages/invoice-center/reports/InvoiceCenterReportsDashboardPage";
 import { CustomerBalanceReportPage } from "../pages/invoice-center/reports/CustomerBalanceReportPage";
 import { CustomerStatementReportPage } from "../pages/invoice-center/reports/CustomerStatementReportPage";
@@ -346,6 +350,9 @@ const AppRoutes = () => {
           <Route path="/invoice-center/sales-invoices/create" element={<SalesInvoiceFormPage />} />
           <Route path="/invoice-center/sales-invoices/:id" element={<SalesInvoiceDetailsPage />} />
           <Route path="/invoice-center/sales-invoices/:id/edit" element={<SalesInvoiceFormPage />} />
+          <Route path="/invoice-center/proforma-invoices" element={<ProformaInvoicesPage />} />
+          <Route path="/invoice-center/proforma-invoices/create" element={<Navigate to="/invoice-center/sales-invoices/create" replace />} />
+          <Route path="/invoice-center/proforma-invoices/:id" element={<Navigate to="/invoice-center/proforma-invoices" replace />} />
           
           <Route path="/invoice-center/credit-notes" element={<CreditNotesPage />} />
           <Route path="/invoice-center/credit-notes/create" element={<CreditNoteFormPage />} />
@@ -361,6 +368,13 @@ const AppRoutes = () => {
           <Route path="/invoice-center/customer-receipts/create" element={<CustomerReceiptFormPage />} />
           <Route path="/invoice-center/customer-receipts/:id" element={<CustomerReceiptDetailsPage />} />
           <Route path="/invoice-center/customer-receipts/:id/edit" element={<CustomerReceiptFormPage />} />
+
+          <Route path="/invoice-center/finance-settings" element={<InvoiceCenterFinanceSettingsPage />} />
+          <Route path="/invoice-center/finance-posting" element={<InvoiceCenterFinancePostingPage />} />
+
+          <Route path="/invoice-center/approvals/inbox" element={<ApprovalWorkspacePage mode="inbox" />} />
+          <Route path="/invoice-center/approvals/submitted" element={<ApprovalWorkspacePage mode="submitted" />} />
+          <Route path="/invoice-center/approvals/history" element={<ApprovalWorkspacePage mode="history" />} />
 
           <Route path="/invoice-center/settings/print-formats" element={<PrintFormatListPage />} />
           <Route path="/invoice-center/settings/print-formats/create" element={<PrintFormatFormPage />} />

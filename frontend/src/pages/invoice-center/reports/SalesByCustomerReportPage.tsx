@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SalesByCustomerReportParams, SalesByCustomerReportRow } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import { Users, FileText, Coins, CreditCard } from "lucide-react";
 
@@ -32,7 +33,7 @@ export const SalesByCustomerReportPage: React.FC = () => {
       setHasPermission(true);
       
       const res = await invoiceCenterApi.getSalesByCustomerReport(filters);
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, SalesByCustomerReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

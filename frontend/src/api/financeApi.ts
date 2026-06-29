@@ -170,6 +170,9 @@ export const financeApi = {
     id: string | number,
     payload: Record<string, unknown>
   ) => apiClient.patch(`/finance/bank-accounts/${id}/deactivate`, payload),
+  getSriLankaBanks: () => apiClient.get("/finance/reference/sri-lanka-banks"),
+  getSriLankaProvinces: () =>
+    apiClient.get("/finance/reference/sri-lanka-provinces"),
 
   // Cash Accounts
   getCashAccounts: (params: Record<string, unknown>) =>

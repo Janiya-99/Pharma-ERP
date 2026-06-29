@@ -225,7 +225,7 @@ const Sidebar = () => {
       icon: FileText,
       children: [
         { name: "Sales Orders", path: "/invoice-center/sales-orders", permission: "invoice_center.sales_order.view" },
-        { name: "Proforma Invoices", path: "/invoice-center/proforma-invoices", permission: "invoice_center.sales_invoice.view", disabled: true },
+        { name: "Proforma Invoices", path: "/invoice-center/proforma-invoices", permission: "invoice_center.sales_invoice.view" },
         { name: "Sales Invoices", path: "/invoice-center/sales-invoices", permission: "invoice_center.sales_invoice.view" },
       ],
     },
@@ -249,9 +249,9 @@ const Sidebar = () => {
       name: "Approvals",
       icon: FileCheck,
       children: [
-        { name: "Approval Inbox", path: "/invoice-center/approvals/inbox", disabled: true },
-        { name: "My Submitted Documents", path: "/invoice-center/approvals/submitted", disabled: true },
-        { name: "Approval History", path: "/invoice-center/approvals/history", disabled: true },
+        { name: "Approval Inbox", path: "/invoice-center/approvals/inbox" },
+        { name: "My Submitted Documents", path: "/invoice-center/approvals/submitted" },
+        { name: "Approval History", path: "/invoice-center/approvals/history" },
       ],
     },
     {

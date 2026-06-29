@@ -5,6 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
+import { getBranches } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
@@ -85,6 +86,9 @@ const DebitNoteFormPage: React.FC = () => {
 
   // Lookup states
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [lookupsLoading, setLookupsLoading] = useState(false);
   const [salesInvoiceInfo, setSalesInvoiceInfo] = useState<any | null>(null);
 
   const {
@@ -114,6 +118,11 @@ const DebitNoteFormPage: React.FC = () => {
   const watchedCustomerId = watch("customer_id");
   const watchedSalesInvoiceId = watch("sales_invoice_id");
 
+  const listFromResponse = (response: any) => {
+    const payload = response?.data ?? response;
+    return payload?.data?.items || payload?.data || payload?.items || [];
+  };
+
   // Calculated totals
   const totals = useMemo(() => {
     return lines.reduce(
@@ -135,6 +144,28 @@ const DebitNoteFormPage: React.FC = () => {
       { subtotal: 0, discount: 0, tax: 0, total: 0 }
     );
   }, [lines]);
+
+  useEffect(() => {
+    loadLookups();
+  }, []);
+
+  const loadLookups = async () => {
+    setLookupsLoading(true);
+    try {
+      const [branchRes, customerRes] = await Promise.all([
+        getBranches({ limit: 500, status: "active" }),
+        invoiceCenterApi.getCustomers({ limit: 1000, status: "active" }),
+      ]);
+
+      setBranches(listFromResponse(branchRes));
+      setCustomers(listFromResponse(customerRes));
+    } catch (err) {
+      console.error("Failed to load debit note dropdowns", err);
+      toast.error("Failed to load form dropdowns.");
+    } finally {
+      setLookupsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isEdit && id) {
@@ -372,12 +403,34 @@ const DebitNoteFormPage: React.FC = () => {
                     >
                       Branch *
                     </Label>
-                    <Input
-                      id="branch_id"
-                      {...register("branch_id")}
-                      placeholder="Branch ID"
-                      className={errors.branch_id ? "border-red-500" : ""}
-                    />
+                    <Select
+                      value={watch("branch_id")}
+                      onValueChange={(value) =>
+                        setValue("branch_id", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      disabled={lookupsLoading}
+                    >
+                      <SelectTrigger
+                        id="branch_id"
+                        className={errors.branch_id ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder={lookupsLoading ? "Loading branches..." : "Select branch"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {branches.map((branch) => {
+                          const branchId = String(branch.id || branch.branch_id);
+                          return (
+                            <SelectItem key={branchId} value={branchId}>
+                              {branch.branch_code ? `${branch.branch_code} - ` : ""}
+                              {branch.branch_name || branch.name || `Branch ${branchId}`}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                     {errors.branch_id && (
                       <span className="text-xs text-red-500">
                         {errors.branch_id.message}
@@ -483,12 +536,37 @@ const DebitNoteFormPage: React.FC = () => {
                     >
                       Customer *
                     </Label>
-                    <Input
-                      id="customer_id"
-                      {...register("customer_id")}
-                      placeholder="Customer ID"
-                      className={errors.customer_id ? "border-red-500" : ""}
-                    />
+                    <Select
+                      value={watch("customer_id")}
+                      onValueChange={(value) =>
+                        setValue("customer_id", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      disabled={lookupsLoading}
+                    >
+                      <SelectTrigger
+                        id="customer_id"
+                        className={errors.customer_id ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder={lookupsLoading ? "Loading customers..." : "Select customer"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {customers.map((customerItem) => {
+                          const customerId = String(customerItem.id || customerItem.customer_id);
+                          return (
+                            <SelectItem key={customerId} value={customerId}>
+                              {customerItem.customer_code ? `${customerItem.customer_code} - ` : ""}
+                              {customerItem.company_name ||
+                                customerItem.customer_name ||
+                                customerItem.name ||
+                                `Customer ${customerId}`}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                     {errors.customer_id && (
                       <span className="text-xs text-red-500">
                         {errors.customer_id.message}

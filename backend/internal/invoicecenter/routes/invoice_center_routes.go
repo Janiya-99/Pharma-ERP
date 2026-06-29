@@ -262,7 +262,9 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	// Reports Routes
 	reports := r.Group("/reports")
 	{
+		reports.GET("/dashboard-summary", middleware.RequirePermission("invoice_center.dashboard.view"), reportHdl.GetDashboardSummary)
 		reports.GET("/customer-balance", middleware.RequirePermission("invoice_center.report.customer_balance"), reportHdl.GetCustomerBalances)
+		reports.GET("/customer-balances", middleware.RequirePermission("invoice_center.report.customer_balance"), reportHdl.GetCustomerBalances)
 		reports.GET("/customer-statement", middleware.RequirePermission("invoice_center.report.customer_statement"), reportHdl.GetCustomerStatement)
 		reports.GET("/customer-aging", middleware.RequirePermission("invoice_center.report.customer_aging"), reportHdl.GetCustomerAging)
 		reports.GET("/sales-order-register", middleware.RequirePermission("invoice_center.report.sales_order_register"), reportHdl.GetSalesOrderRegister)

@@ -18,6 +18,7 @@ import {
   CollectionSummaryReportParams,
   CollectionSummaryReportRow,
 } from "@/types/invoice-center-reports";
+import { normalizeReportEnvelope } from "@/utils/reportResponse";
 import { toast } from "sonner";
 import { Wallet, Banknote, CreditCard, Building } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -49,7 +50,7 @@ export const CollectionSummaryReportPage: React.FC = () => {
       setHasPermission(true);
 
       const res = await invoiceCenterApi.getCollectionSummaryReport(filters);
-      setData(res.data?.data || null);
+      setData(normalizeReportEnvelope<any, CollectionSummaryReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

@@ -51,7 +51,7 @@ export const CustomerBalanceReportPage: React.FC = () => {
       if (cleanFilters.status === "all") delete cleanFilters.status;
 
       const res = await invoiceCenterApi.getCustomerBalanceReport(cleanFilters);
-      setData(res.data?.data || []);
+      setData(Array.isArray(res.data?.data?.rows) ? res.data.data.rows : []);
       if (res.data?.pagination) {
         setPagination({
           total: res.data.pagination.total,

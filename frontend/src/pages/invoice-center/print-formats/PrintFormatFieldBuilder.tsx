@@ -18,11 +18,11 @@ export function PrintFormatFieldBuilder({ control, register, setValue, watch }: 
   const { fields, append, remove, move, replace } = useFieldArray({ control, name: "fields" });
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white/75 p-4 shadow-[0_8px_30px_rgba(2,62,138,0.08)] backdrop-blur-xl">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">Line Columns</h3>
-          <p className="text-xs text-slate-500">Visible columns are used by document print pages.</p>
+          <h3 className="text-base font-semibold text-[#111827]">Line Columns</h3>
+          <p className="mt-1 text-sm text-[#6B7280]">Visible columns are used by document print pages.</p>
         </div>
         <div className="flex gap-2">
           <Button type="button" variant="outline" size="sm" onClick={() => replace(defaultPrintFields)}>
@@ -39,36 +39,36 @@ export function PrintFormatFieldBuilder({ control, register, setValue, watch }: 
           </Button>
         </div>
       </div>
-      <div className="overflow-x-auto rounded-md border">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-20"></TableHead>
-              <TableHead>Key</TableHead>
-              <TableHead>Label</TableHead>
-              <TableHead className="w-28">Visible</TableHead>
-              <TableHead className="w-32">Width</TableHead>
-              <TableHead className="w-36">Align</TableHead>
-              <TableHead className="w-16"></TableHead>
+              <TableHead className="w-28">Order</TableHead>
+              <TableHead className="min-w-44">Key</TableHead>
+              <TableHead className="min-w-52">Label</TableHead>
+              <TableHead className="w-28 text-center">Visible</TableHead>
+              <TableHead className="w-36">Width</TableHead>
+              <TableHead className="w-40">Align</TableHead>
+              <TableHead className="w-16 text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {fields.map((field, index) => (
               <TableRow key={field.id}>
                 <TableCell>
-                  <div className="flex items-center gap-1 text-slate-400">
-                    <GripVertical className="h-4 w-4" />
-                    <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => index > 0 && move(index, index - 1)}>
+                  <div className="flex items-center gap-1 text-slate-500">
+                    <GripVertical className="h-4 w-4 text-slate-400" />
+                    <Button type="button" variant="ghost" size="icon-sm" onClick={() => index > 0 && move(index, index - 1)} disabled={index === 0}>
                       <ChevronUp className="h-4 w-4" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => index < fields.length - 1 && move(index, index + 1)}>
+                    <Button type="button" variant="ghost" size="icon-sm" onClick={() => index < fields.length - 1 && move(index, index + 1)} disabled={index === fields.length - 1}>
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
                 <TableCell><Input {...register(`fields.${index}.field_key`)} /></TableCell>
                 <TableCell><Input {...register(`fields.${index}.field_label`)} /></TableCell>
-                <TableCell>
+                <TableCell className="text-center">
                   <Switch
                     checked={Boolean(watch(`fields.${index}.is_visible`))}
                     onCheckedChange={(checked) => setValue(`fields.${index}.is_visible`, checked)}

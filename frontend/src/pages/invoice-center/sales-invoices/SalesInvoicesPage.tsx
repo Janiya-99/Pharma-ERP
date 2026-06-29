@@ -3,6 +3,8 @@ import { Plus, RefreshCw, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
+import { getBranches } from "../../../api/controlApi";
+import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
@@ -109,6 +111,14 @@ const SalesInvoicesPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedInvoice, setSelectedInvoice] = useState<SalesInvoice | null>(null);
   const [modal, setModal] = useState<ModalName>(null);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [warehouses, setWarehouses] = useState<any[]>([]);
+
+  const listFromResponse = (response: any) => {
+    const payload = response?.data ?? response;
+    return payload?.data?.items || payload?.data || payload?.items || [];
+  };
 
   const params = useMemo<SalesInvoiceListParams>(() => {
     const next: SalesInvoiceListParams = { page, limit: 10 };
@@ -145,6 +155,26 @@ const SalesInvoicesPage: React.FC = () => {
   useEffect(() => {
     fetchInvoices();
   }, [activeSoftware, params]);
+
+  useEffect(() => {
+    const loadFilterOptions = async () => {
+      try {
+        const [branchRes, customerRes, warehouseRes] = await Promise.all([
+          getBranches({ limit: 500, status: "active" }),
+          invoiceCenterApi.getCustomers({ limit: 1000, status: "active" }),
+          inventoryApi.getWarehouses({ limit: 1000, status: "active" }),
+        ]);
+
+        setBranches(listFromResponse(branchRes));
+        setCustomers(listFromResponse(customerRes));
+        setWarehouses(listFromResponse(warehouseRes));
+      } catch (error) {
+        console.error("Failed to load sales invoice filter dropdowns", error);
+      }
+    };
+
+    loadFilterOptions();
+  }, []);
 
   const openModal = (name: ModalName, invoice: SalesInvoice) => {
     setSelectedInvoice(invoice);
@@ -214,11 +244,43 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Branch</Label>
-              <Input value={filters.branch_id} onChange={(event) => updateFilter("branch_id", event.target.value)} placeholder="Branch ID" />
+              <Select value={filters.branch_id || "all"} onValueChange={(value) => updateFilter("branch_id", value === "all" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All branches" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Branches</SelectItem>
+                  {branches.map((branch) => {
+                    const branchId = String(branch.id || branch.branch_id);
+                    return (
+                      <SelectItem key={branchId} value={branchId}>
+                        {branch.branch_code ? `${branch.branch_code} - ` : ""}
+                        {branch.branch_name || branch.name || `Branch ${branchId}`}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label>Customer</Label>
-              <Input value={filters.customer_id} onChange={(event) => updateFilter("customer_id", event.target.value)} placeholder="Customer ID" />
+              <Select value={filters.customer_id || "all"} onValueChange={(value) => updateFilter("customer_id", value === "all" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All customers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Customers</SelectItem>
+                  {customers.map((customer) => {
+                    const customerId = String(customer.id || customer.customer_id);
+                    return (
+                      <SelectItem key={customerId} value={customerId}>
+                        {customer.customer_code ? `${customer.customer_code} - ` : ""}
+                        {customer.company_name || customer.customer_name || customer.name || `Customer ${customerId}`}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label>Sales Order</Label>
@@ -226,7 +288,23 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Warehouse</Label>
-              <Input value={filters.warehouse_id} onChange={(event) => updateFilter("warehouse_id", event.target.value)} placeholder="Warehouse ID" />
+              <Select value={filters.warehouse_id || "all"} onValueChange={(value) => updateFilter("warehouse_id", value === "all" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All warehouses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Warehouses</SelectItem>
+                  {warehouses.map((warehouse) => {
+                    const warehouseId = String(warehouse.id || warehouse.warehouse_id);
+                    return (
+                      <SelectItem key={warehouseId} value={warehouseId}>
+                        {warehouse.warehouse_code ? `${warehouse.warehouse_code} - ` : ""}
+                        {warehouse.warehouse_name || warehouse.name || `Warehouse ${warehouseId}`}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label>Approval Status</Label>

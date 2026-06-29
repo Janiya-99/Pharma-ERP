@@ -150,6 +150,14 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		ba.DELETE("/:id", middleware.RequirePermission("finance.bank_account.delete"), baHandler.DeleteBankAccount)
 	}
 
+	// Banking Reference Data
+	bankingRefHandler := handlers.NewBankingReferenceHandler(logger)
+	bankingRef := finance.Group("/reference")
+	{
+		bankingRef.GET("/sri-lanka-banks", middleware.RequirePermission("finance.bank_account.view"), bankingRefHandler.ListSriLankaBanks)
+		bankingRef.GET("/sri-lanka-provinces", middleware.RequirePermission("finance.bank_account.view"), bankingRefHandler.ListSriLankaProvinces)
+	}
+
 	// Cash Accounts
 	cashHandler := handlers.NewCashAccountHandler(logger)
 	cash := finance.Group("/cash-accounts")
