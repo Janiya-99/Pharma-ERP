@@ -156,24 +156,16 @@ export const invoiceCenterApi = {
   ) => apiClient.put(`/invoice-center/sales-invoices/${id}`, payload),
   deleteSalesInvoice: (id: number | string) =>
     apiClient.delete(`/invoice-center/sales-invoices/${id}`),
-  submitSalesInvoice: (
-    id: number | string,
-    payload: WorkflowActionPayload
-  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/submit`, payload),
-  approveSalesInvoice: (
-    id: number | string,
-    payload: WorkflowActionPayload
-  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/approve`, payload),
-  rejectSalesInvoice: (
-    id: number | string,
-    payload: WorkflowActionPayload
-  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/reject`, payload),
+  submitSalesInvoice: (id: number | string, payload: WorkflowActionPayload) =>
+    apiClient.post(`/invoice-center/sales-invoices/${id}/submit`, payload),
+  approveSalesInvoice: (id: number | string, payload: WorkflowActionPayload) =>
+    apiClient.post(`/invoice-center/sales-invoices/${id}/approve`, payload),
+  rejectSalesInvoice: (id: number | string, payload: WorkflowActionPayload) =>
+    apiClient.post(`/invoice-center/sales-invoices/${id}/reject`, payload),
   postSalesInvoice: (id: number | string) =>
     apiClient.post(`/invoice-center/sales-invoices/${id}/post`),
-  cancelSalesInvoice: (
-    id: number | string,
-    payload: WorkflowActionPayload
-  ) => apiClient.post(`/invoice-center/sales-invoices/${id}/cancel`, payload),
+  cancelSalesInvoice: (id: number | string, payload: WorkflowActionPayload) =>
+    apiClient.post(`/invoice-center/sales-invoices/${id}/cancel`, payload),
 
   // ---- Invoice Center-safe lookup fallbacks ----
   getWarehouseLookups: (params: Record<string, unknown> = {}) =>
@@ -280,6 +272,10 @@ export const invoiceCenterApi = {
       `/invoice-center/finance-posting/customer-receipt/${id}/post`
     ),
 
+  // ---- Invoice Center-safe Lookups ----
+  getInvoiceCenterChartOfAccounts: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/invoice-center/lookups/chart-of-accounts", { params }),
+
   // ---- Print Formats ----
   getPrintFormats: (params: Record<string, unknown> = {}) =>
     apiClient.get("/invoice-center/print-formats", { params }),
@@ -295,6 +291,8 @@ export const invoiceCenterApi = {
     apiClient.post(`/invoice-center/print-formats/${id}/set-default`),
   getDefaultPrintFormat: (params: Record<string, unknown> = {}) =>
     apiClient.get("/invoice-center/print-formats/default", { params }),
+  duplicatePrintFormat: (id: number | string) =>
+    apiClient.post(`/invoice-center/print-formats/${id}/duplicate`),
 
   // ---- Reports ----
   getInvoiceCenterDashboardSummary: (

@@ -126,6 +126,8 @@ export interface InvoicePrintFormat {
   is_default: boolean;
   is_active: boolean;
   fields: InvoicePrintFormatField[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 // ---- Sales Order Line (for form) ----------------------------

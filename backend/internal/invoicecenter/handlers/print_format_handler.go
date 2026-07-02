@@ -139,6 +139,24 @@ func (h *PrintFormatHandler) SetDefault(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
 
+func (h *PrintFormatHandler) Duplicate(c *gin.Context) {
+	db, companyID, userID, ok := printFormatContext(c)
+	if !ok {
+		return
+	}
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
+		return
+	}
+	data, err := h.svc.Duplicate(db, companyID, userID, id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Failed to duplicate print format", "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"success": true, "data": data})
+}
+
 func (h *PrintFormatHandler) Default(c *gin.Context) {
 	db, companyID, _, ok := printFormatContext(c)
 	if !ok {

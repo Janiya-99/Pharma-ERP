@@ -24,6 +24,11 @@ var validPrintDocumentTypes = map[string]bool{
 	"credit_note":      true,
 	"debit_note":       true,
 	"customer_receipt": true,
+	"grn":              true,
+	"purchase_return":  true,
+	"sales_return":     true,
+	"stock_transfer":   true,
+	"stock_adjustment": true,
 }
 
 func defaultPrintFields() []models.InvoicePrintFormatField {
@@ -189,6 +194,37 @@ func (s *PrintFormatService) Delete(db *gorm.DB, companyID, id uint64) error {
 
 func (s *PrintFormatService) SetDefault(db *gorm.DB, companyID, id uint64) error {
 	return s.repo.SetDefault(db, companyID, id)
+}
+
+func (s *PrintFormatService) Duplicate(db *gorm.DB, companyID, userID, id uint64) (*models.InvoicePrintFormat, error) {
+	existing, err := s.repo.Get(db, companyID, id)
+	if err != nil {
+		return nil, err
+	}
+	if existing == nil {
+		return nil, errors.New("print format not found")
+	}
+
+	copyFormat := *existing
+	copyFormat.ID = 0
+	copyFormat.FormatName = existing.FormatName + " Copy"
+	copyFormat.IsDefault = false
+	copyFormat.CreatedBy = &userID
+	copyFormat.UpdatedBy = &userID
+
+	fields := make([]models.InvoicePrintFormatField, 0, len(existing.Fields))
+	for _, field := range existing.Fields {
+		copyField := field
+		copyField.ID = 0
+		copyField.PrintFormatID = 0
+		fields = append(fields, copyField)
+	}
+	copyFormat.Fields = fields
+
+	if err := s.repo.SaveWithFields(db, &copyFormat); err != nil {
+		return nil, err
+	}
+	return s.repo.Get(db, companyID, copyFormat.ID)
 }
 
 func (s *PrintFormatService) Default(db *gorm.DB, companyID uint64, branchID *uint64, documentType string) (*models.InvoicePrintFormat, error) {

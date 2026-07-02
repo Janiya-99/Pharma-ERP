@@ -114,3 +114,43 @@ func (h *InventoryLookupHandler) WarehouseLocations(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 }
+
+func (h *InventoryLookupHandler) ChartOfAccounts(c *gin.Context) {
+	db, companyID, _, ok := lookupContext(c)
+	if !ok {
+		return
+	}
+
+	type accountOption struct {
+		ID          uint64 `json:"id"`
+		AccountCode string `json:"account_code"`
+		AccountName string `json:"account_name"`
+		AccountType string `json:"account_type"`
+		Status      string `json:"status"`
+	}
+
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "100"))
+	if limit <= 0 || limit > 500 {
+		limit = 100
+	}
+
+	query := db.Table("chart_of_accounts").
+		Select("id, account_code, account_name, account_type, status").
+		Where("company_id = ? AND status = ?", companyID, "active")
+
+	if search := c.Query("search"); search != "" {
+		like := "%" + search + "%"
+		query = query.Where("account_code LIKE ? OR account_name LIKE ?", like, like)
+	}
+	if accountType := c.Query("account_type"); accountType != "" {
+		query = query.Where("account_type = ?", accountType)
+	}
+
+	var data []accountOption
+	if err := query.Order("account_code ASC").Limit(limit).Scan(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to load chart of accounts", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+}

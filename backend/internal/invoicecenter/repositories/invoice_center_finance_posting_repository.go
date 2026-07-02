@@ -53,7 +53,7 @@ func (r *InvoiceCenterFinancePostingRepository) FindPendingFinancePostings(db *g
 			UNION ALL
 			SELECT 'debit_note', id, debit_note_number, debit_note_date, branch_id, customer_id, total_amount, approval_status, posted_status, finance_post_status, created_by, created_at FROM debit_notes WHERE company_id = ? AND posted_status = 'posted' AND finance_post_status = 'unposted' AND deleted_at IS NULL
 			UNION ALL
-			SELECT 'customer_receipt', id, receipt_number, receipt_date, branch_id, customer_id, receipt_amount, approval_status, posted_status, finance_post_status, created_by, created_at FROM customer_receipts WHERE company_id = ? AND posted_status = 'posted' AND finance_post_status = 'unposted' AND deleted_at IS NULL
+			SELECT 'customer_receipt', id, receipt_number, receipt_date, branch_id, customer_id, received_amount, approval_status, posted_status, finance_post_status, created_by, created_at FROM customer_receipts WHERE company_id = ? AND posted_status = 'posted' AND finance_post_status = 'unposted' AND deleted_at IS NULL
 		) as docs WHERE 1=1
 	`
 	args := []interface{}{companyID, companyID, companyID, companyID}

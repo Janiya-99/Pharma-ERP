@@ -245,6 +245,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		lookups.GET("/stock-availability", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.StockAvailability)
 		lookups.GET("/warehouses", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.Warehouses)
 		lookups.GET("/warehouse-locations", middleware.RequirePermission("invoice_center.lookup.inventory.view"), lookupHdl.WarehouseLocations)
+		lookups.GET("/chart-of-accounts", middleware.RequirePermission("invoice_center.finance_settings.view"), lookupHdl.ChartOfAccounts)
 	}
 
 	// Print Format Designer Routes
@@ -257,6 +258,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 		printFormats.PUT("/:id", middleware.RequirePermission("invoice_center.print_format.update"), printFormatHdl.Update)
 		printFormats.DELETE("/:id", middleware.RequirePermission("invoice_center.print_format.delete"), printFormatHdl.Delete)
 		printFormats.POST("/:id/set-default", middleware.RequirePermission("invoice_center.print_format.set_default"), printFormatHdl.SetDefault)
+		printFormats.POST("/:id/duplicate", middleware.RequirePermission("invoice_center.print_format.create"), printFormatHdl.Duplicate)
 	}
 
 	// Reports Routes

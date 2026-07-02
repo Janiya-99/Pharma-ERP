@@ -139,7 +139,7 @@ func (r *invoiceCenterReportRepository) GetDashboardSummary(db *gorm.DB, company
 		UnallocatedAmount float64
 	}
 	var crT ReceiptTotals
-	crQuery.Select("COALESCE(SUM(receipt_amount), 0) as receipt_amount, COALESCE(SUM(allocated_amount), 0) as allocated_amount, COALESCE(SUM(unallocated_amount), 0) as unallocated_amount").Scan(&crT)
+	crQuery.Select("COALESCE(SUM(received_amount), 0) as receipt_amount, COALESCE(SUM(allocated_amount), 0) as allocated_amount, COALESCE(SUM(unallocated_amount), 0) as unallocated_amount").Scan(&crT)
 	summary.TotalReceiptAmount = crT.ReceiptAmount
 	summary.TotalAllocatedReceiptAmount = crT.AllocatedAmount
 	summary.TotalUnallocatedReceiptAmount = crT.UnallocatedAmount
@@ -192,9 +192,8 @@ func (r *invoiceCenterReportRepository) GetDashboardSummary(db *gorm.DB, company
 func (r *invoiceCenterReportRepository) GetCustomerBalanceSummary(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, int64, error) {
 	query := db.Table("customers").Where("company_id = ? AND deleted_at IS NULL", companyID)
 
-	if filters.BranchID != nil {
-		query = query.Where("branch_id = ?", *filters.BranchID)
-	}
+	// Customers are company-level in the current schema. Branch filtering applies
+	// to document reports, not to the customer master balance summary.
 	if filters.CustomerID != nil {
 		query = query.Where("id = ?", *filters.CustomerID)
 	}
@@ -212,7 +211,7 @@ func (r *invoiceCenterReportRepository) GetCustomerBalanceSummary(db *gorm.DB, c
 	}
 	if filters.Search != "" {
 		search := "%" + filters.Search + "%"
-		query = query.Where("(customer_code ILIKE ? OR customer_name ILIKE ? OR primary_email ILIKE ?)", search, search, search)
+		query = query.Where("(LOWER(customer_code) LIKE LOWER(?) OR LOWER(customer_name) LIKE LOWER(?) OR LOWER(primary_email) LIKE LOWER(?))", search, search, search)
 	}
 
 	var total int64
