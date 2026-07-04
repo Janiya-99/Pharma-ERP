@@ -480,6 +480,58 @@ const Sidebar = () => {
     },
   ];
 
+  const complianceCenterMenus: MenuItem[] = [
+    {
+      name: "Compliance Dashboard",
+      path: "/compliance-center/dashboard",
+      icon: LayoutDashboard,
+      permission: "compliance.dashboard.view",
+    },
+    {
+      name: "Licensing & Registration",
+      icon: FileCheck,
+      children: [
+        {
+          name: "License Documents",
+          path: "/compliance-center/licenses",
+          permission: "compliance.license.view",
+        },
+      ],
+    },
+    {
+      name: "Quality & Quarantine",
+      icon: Pill,
+      children: [
+        {
+          name: "Batch Holds & Quarantine",
+          path: "/compliance-center/batch-holds",
+          permission: "compliance.batch_hold.view",
+        },
+        {
+          name: "Product Recalls",
+          path: "/compliance-center/recalls",
+          permission: "compliance.recall.view",
+        },
+      ],
+    },
+    {
+      name: "Disposal & Archives",
+      icon: BookOpen,
+      children: [
+        {
+          name: "Expiry & Disposal Logs",
+          path: "/compliance-center/disposals",
+          permission: "compliance.disposal.view",
+        },
+        {
+          name: "Regulatory Records",
+          path: "/compliance-center/records",
+          permission: "compliance.record.view",
+        },
+      ],
+    },
+  ];
+
   const getMenus = (): MenuItem[] => {
     const code = activeSoftware?.software_code;
     
@@ -522,6 +574,7 @@ const Sidebar = () => {
     if (code === "FINANCE") return financeMenus;
     if (code === "INVENTORY") return inventoryMenus;
     if (code === "INVOICE_CENTER") return invoiceCenterMenus;
+    if (code === "COMPLIANCE_CENTER" || code === "COMPLIANCE") return complianceCenterMenus;
     return [
       {
         name: "Dashboard",

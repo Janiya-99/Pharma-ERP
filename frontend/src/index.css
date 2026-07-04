@@ -288,6 +288,8 @@
 	border-radius: 1rem;
 }
 
+/* Removed Bento Box Design System in favor of clean ERP cards */
+
 /* ── Glass Modal / Sheet Panel ── */
 .glass-modal {
 	background: rgba(255, 255, 255, 0.75);
@@ -335,67 +337,12 @@
 
 /* ── Page Content Container ── */
 .page-content {
-	@apply px-3 md:px-4 lg:px-6 py-4 pb-8 w-full;
+	@apply px-4 md:px-6 lg:px-8 py-6 pb-12 w-full max-w-[1800px] mx-auto;
 }
 
-.page-content > .page-content {
-	margin: 0;
-	max-width: none;
-	padding: 0;
-	width: 100%;
-}
-
-.page-content > .p-6,
-.page-content > .p-8 {
-	padding: 0;
-}
-
-.page-content > .mx-auto {
-	margin-left: 0;
-	margin-right: 0;
-	max-width: none;
-	width: 100%;
-}
-
-.page-content > [class~="px-4"],
-.page-content > [class~="px-6"],
-.page-content > [class~="px-8"],
-.page-content > [class~="sm:px-6"],
-.page-content > [class~="lg:px-8"] {
-	padding-left: 0;
-	padding-right: 0;
-}
-
-.page-content > [class~="py-5"],
-.page-content > [class~="py-6"],
-.page-content > [class~="py-8"] {
-	padding-top: 0;
-	padding-bottom: 0;
-}
-
-.page-content > [class~="max-w-5xl"],
-.page-content > [class~="max-w-6xl"],
-.page-content > [class~="max-w-7xl"],
-.page-content > [class~="max-w-[1600px]"] {
-	max-width: none;
-}
-
-@media (min-width: 768px) {
-	.page-content {
-		padding: 1.25rem 1rem 2rem;
-	}
-}
-
-@media (min-width: 1024px) {
-	.page-content {
-		padding: 1.25rem 1.5rem 2rem;
-	}
-}
-
-@media (min-width: 1280px) {
-	.page-content {
-		padding: 1.25rem 1.5rem 2rem;
-	}
+.page-content > [class*="max-w-"],
+.page-content > * > [class*="max-w-"] {
+	max-width: none !important;
 }
 
 /* ── Status Badges — glassmorphic ── */
@@ -591,7 +538,17 @@ input:checked.defaultCheckbox::before {
 .sidebar-item-default { @apply text-muted-foreground hover:bg-accent hover:text-foreground; }
 .sidebar-item-active { @apply bg-accent text-foreground font-semibold; }
 
-.card-premium { @apply glass-card; }
+.card-premium {
+	background: #ffffff;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 0.75rem;
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+	transition: all 0.2s ease;
+}
+.dark .card-premium {
+	background: #1e1b4b;
+	border-color: rgba(129, 140, 248, 0.15);
+}
 .card-premium-header { @apply px-6 py-4 border-b flex items-center justify-between; border-color: rgba(148, 163, 184, 0.15); }
 .card-premium-body { @apply p-6; }
 
@@ -661,27 +618,4 @@ select.select-premium:focus {
 .toggle-switch-dot-on { @apply translate-x-6; }
 .toggle-switch-dot-off { @apply translate-x-1; }
 
-/* ═══════════════════════════════════════════════
-   Global Overrides — Apply glass effect to
-   common hardcoded bg-white patterns
-   ═══════════════════════════════════════════════ */
-
-/* Make bg-white elements inside page content translucent glass */
-.page-content .bg-white {
-	background: rgba(255, 255, 255, 0.5) !important;
-	backdrop-filter: blur(16px) saturate(180%);
-	-webkit-backdrop-filter: blur(16px) saturate(180%);
-}
-
-/* Glass effect for inline selects used in filter bars */
-.page-content select {
-	background: rgba(255, 255, 255, 0.55) !important;
-	backdrop-filter: blur(8px);
-	border-color: rgba(148, 163, 184, 0.3);
-}
-
-.page-content select:focus {
-	background: rgba(255, 255, 255, 0.7) !important;
-	border-color: rgba(72, 84, 204, 0.4);
-	box-shadow: 0 0 0 3px rgba(72, 84, 204, 0.12);
-}
+/* Removed global bg-white overrides to allow crisp, clean card rendering */

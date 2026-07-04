@@ -70,6 +70,12 @@ import AccessMatrixPage from "../pages/control-center/access-matrix/AccessMatrix
 
 import AuditLogsPage from "../pages/control-center/logs/AuditLogsPage";
 import LoginLogsPage from "../pages/control-center/logs/LoginLogsPage";
+import EffectiveAccessPage from "../pages/control-center/effective-access/EffectiveAccessPage";
+import AccessAuditPage from "../pages/control-center/access-audit/AccessAuditPage";
+import SecuritySettingsPage from "../pages/control-center/security-settings/SecuritySettingsPage";
+import ApprovalSettingsPage from "../pages/control-center/approval-settings/ApprovalSettingsPage";
+import DocumentNumberingPage from "../pages/control-center/document-numbering/DocumentNumberingPage";
+import GeneralSettingsPage from "../pages/control-center/settings/GeneralSettingsPage";
 
 // Finance General Ledger & Reports
 import FinanceDashboardPage from "../pages/finance/dashboard/FinanceDashboardPage";
@@ -183,6 +189,14 @@ import PrintFormatFormPage from "../pages/invoice-center/print-formats/PrintForm
 import PrintFormatPreviewPage from "../pages/invoice-center/print-formats/PrintFormatPreviewPage";
 import DocumentPrintPage from "../pages/invoice-center/print-formats/DocumentPrintPage";
 
+// Compliance Center Modules
+import ComplianceDashboardPage from "../pages/compliance-center/dashboard/ComplianceDashboardPage";
+import LicenseDocumentsPage from "../pages/compliance-center/licenses/LicenseDocumentsPage";
+import BatchHoldPage from "../pages/compliance-center/batch-holds/BatchHoldPage";
+import BatchRecallPage from "../pages/compliance-center/recalls/BatchRecallPage";
+import ExpiryDisposalPage from "../pages/compliance-center/disposals/ExpiryDisposalPage";
+import RegulatoryRecordsPage from "../pages/compliance-center/records/RegulatoryRecordsPage";
+
 const PlatformProtectedRoute = ({
   children,
 }: {
@@ -285,7 +299,7 @@ const AppRoutes = () => {
           />
           <Route
             path="/control-center/effective-access"
-            element={<PlaceholderPage title="Effective Access" />}
+            element={<EffectiveAccessPage />}
           />
           <Route
             path="/control-center/audit-logs"
@@ -293,7 +307,7 @@ const AppRoutes = () => {
           />
           <Route
             path="/control-center/access-audit"
-            element={<PlaceholderPage title="Access Audit" />}
+            element={<AccessAuditPage />}
           />
           <Route
             path="/control-center/login-history"
@@ -301,19 +315,19 @@ const AppRoutes = () => {
           />
           <Route
             path="/control-center/security-settings"
-            element={<PlaceholderPage title="Security Settings" />}
+            element={<SecuritySettingsPage />}
           />
           <Route
             path="/control-center/approval-settings"
-            element={<PlaceholderPage title="Approval Settings" />}
+            element={<ApprovalSettingsPage />}
           />
           <Route
             path="/control-center/document-numbering"
-            element={<PlaceholderPage title="Document Numbering" />}
+            element={<DocumentNumberingPage />}
           />
           <Route
             path="/control-center/settings"
-            element={<PlaceholderPage title="General Settings" />}
+            element={<GeneralSettingsPage />}
           />
 
           {/* Finance Module */}
@@ -1037,7 +1051,27 @@ const AppRoutes = () => {
 
           <Route
             path="/compliance-center/dashboard"
-            element={<PlaceholderPage title="Compliance Center Dashboard" />}
+            element={<ComplianceDashboardPage />}
+          />
+          <Route
+            path="/compliance-center/licenses"
+            element={<LicenseDocumentsPage />}
+          />
+          <Route
+            path="/compliance-center/batch-holds"
+            element={<BatchHoldPage />}
+          />
+          <Route
+            path="/compliance-center/recalls"
+            element={<BatchRecallPage />}
+          />
+          <Route
+            path="/compliance-center/disposals"
+            element={<ExpiryDisposalPage />}
+          />
+          <Route
+            path="/compliance-center/records"
+            element={<RegulatoryRecordsPage />}
           />
         </Route>
         <Route

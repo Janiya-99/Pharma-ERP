@@ -1,436 +1,806 @@
 import { useState } from "react";
-import { 
-  PageShell, 
-  PageHeader, 
-  KPICard, 
-  DashboardGrid, 
-  SectionCard 
-} from "@/components/erp";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Building2, 
-  ShieldAlert, 
-  Users, 
-  UserCheck, 
-  Blocks, 
+import {
+  Building2,
+  ShieldAlert,
+  Users,
+  UserCheck,
+  Blocks,
   AlertTriangle,
   Search,
   RefreshCw,
   Download,
   Plus,
-  TrendingUp,
   Activity,
   HeartPulse,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  CheckCircle2,
+  Clock,
+  ArrowUpRight,
+  ShieldCheck,
+  Database,
+  Server,
+  Key,
+  ExternalLink,
+  AlertCircle,
+  FileText,
+  UserPlus,
+  Settings,
+  Lock,
 } from "lucide-react";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Cell
-} from "recharts";
+import { AreaChart, BarChart, DonutChart } from "@tremor/react";
 
-const activityData = [
-  { name: "Mon", users: 120 },
-  { name: "Tue", users: 200 },
-  { name: "Wed", users: 150 },
-  { name: "Thu", users: 280 },
-  { name: "Fri", users: 250 },
-  { name: "Sat", users: 90 },
-  { name: "Sun", users: 60 },
+/* ─────────────────────────────────────────────────
+   Type Declarations
+───────────────────────────────────────────────── */
+
+interface ActivityDataPoint {
+  name: string;
+  "Active Users": number;
+  "API Calls": number;
+}
+
+interface ModuleDataPoint {
+  name: string;
+  Users: number;
+}
+
+interface SecurityLog {
+  id: string;
+  time: string;
+  event: string;
+  user: string;
+  ip: string;
+  type: "warning" | "info" | "critical";
+}
+
+interface AuditLog {
+  id: string;
+  time: string;
+  action: string;
+  module: string;
+  user: string;
+}
+
+interface QuickAction {
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  href?: string;
+  badge?: string;
+}
+
+interface BranchUser {
+  name: string;
+  users: number;
+  percentage: number;
+  color: string;
+}
+
+interface RoleDistribution {
+  name: string;
+  count: number;
+}
+
+interface PendingAction {
+  label: string;
+  count: number;
+  severity: "high" | "medium" | "low";
+  description: string;
+}
+
+type TrendDirection = "up" | "down" | "neutral";
+
+interface KPIData {
+  title: string;
+  value: string;
+  icon: React.ElementType;
+  trend: TrendDirection;
+  trendValue: string;
+  description: string;
+  accent?: boolean;
+}
+
+/* ─────────────────────────────────────────────────
+   Static Data
+───────────────────────────────────────────────── */
+
+const activityData: ActivityDataPoint[] = [
+  { name: "Mon", "Active Users": 820, "API Calls": 14200 },
+  { name: "Tue", "Active Users": 940, "API Calls": 18500 },
+  { name: "Wed", "Active Users": 890, "API Calls": 16800 },
+  { name: "Thu", "Active Users": 1120, "API Calls": 22400 },
+  { name: "Fri", "Active Users": 1050, "API Calls": 21000 },
+  { name: "Sat", "Active Users": 420, "API Calls": 8400 },
+  { name: "Sun", "Active Users": 380, "API Calls": 7200 },
 ];
 
-const moduleData = [
-  { name: "Inventory", value: 400 },
-  { name: "Finance", value: 300 },
-  { name: "HR", value: 300 },
-  { name: "Compliance", value: 200 },
+const moduleData: ModuleDataPoint[] = [
+  { name: "Inventory", Users: 640 },
+  { name: "Finance", Users: 520 },
+  { name: "HR & Payroll", Users: 480 },
+  { name: "Compliance", Users: 340 },
+  { name: "Control Center", Users: 120 },
+  { name: "CRM", Users: 290 },
 ];
 
-const COLORS = ["#4f46e5", "#0ea5e9", "#1d4ed8", "#334155"];
-const BAR_GRADIENTS = ["url(#barGrad0)", "url(#barGrad1)", "url(#barGrad2)", "url(#barGrad3)"];
-const glassBlueBg = "bg-white border border-slate-100 shadow-sm rounded-xl transition-all duration-300 hover:shadow-md";
+const roleData: RoleDistribution[] = [
+  { name: "Regular Users", count: 850 },
+  { name: "Department Mgrs", count: 124 },
+  { name: "System Admins", count: 12 },
+  { name: "Auditors", count: 18 },
+  { name: "Compliance Officers", count: 24 },
+];
 
-const ControlCenterDashboardPage = () => {
-  const [dateFilter, setDateFilter] = useState("This Week");
+const kpiCards: KPIData[] = [
+  {
+    title: "Total Companies",
+    value: "4",
+    icon: Building2,
+    trend: "up",
+    trendValue: "+1 this year",
+    description: "Active corporate entities",
+  },
+  {
+    title: "Total Branches",
+    value: "24",
+    icon: Building2,
+    trend: "up",
+    trendValue: "+3 this quarter",
+    description: "Regional office locations",
+  },
+  {
+    title: "Total Users",
+    value: "1,248",
+    icon: Users,
+    trend: "up",
+    trendValue: "+12% vs last month",
+    description: "Registered employee accounts",
+  },
+  {
+    title: "Active Users (24h)",
+    value: "942",
+    icon: UserCheck,
+    trend: "up",
+    trendValue: "75.5% engagement",
+    description: "Unique logins today",
+  },
+  {
+    title: "Software Modules",
+    value: "8",
+    icon: Blocks,
+    trend: "neutral",
+    trendValue: "All systems online",
+    description: "Licensed ERP suites",
+  },
+  {
+    title: "Security Alerts",
+    value: "3",
+    icon: AlertTriangle,
+    trend: "down",
+    trendValue: "-5 vs last week",
+    description: "Requires immediate review",
+    accent: true,
+  },
+];
+
+const securityLogs: SecurityLog[] = [
+  { id: "SEC-101", time: "10 mins ago", event: "Multiple failed login attempts", user: "admin@ny.corp", ip: "192.168.1.104", type: "critical" },
+  { id: "SEC-102", time: "1 hour ago", event: "Elevated role permissions assigned", user: "System Admin", ip: "10.0.0.12", type: "warning" },
+  { id: "SEC-103", time: "3 hours ago", event: "New API access key generated", user: "dev.ops@hq.corp", ip: "10.0.0.45", type: "info" },
+  { id: "SEC-104", time: "Yesterday", event: "Firewall rules updated successfully", user: "sec.ops@hq.corp", ip: "10.0.0.18", type: "info" },
+];
+
+const auditLogs: AuditLog[] = [
+  { id: "AUD-201", time: "2 mins ago", action: "Created new employee account", module: "HR & Payroll", user: "sarah.m@hq.corp" },
+  { id: "AUD-202", time: "15 mins ago", action: "Modified tax calculation rules", module: "Finance", user: "robert.f@hq.corp" },
+  { id: "AUD-203", time: "2 hours ago", action: "Updated warehouse stock threshold", module: "Inventory", user: "david.k@ny.corp" },
+  { id: "AUD-204", time: "4 hours ago", action: "Approved compliance audit report #402", module: "Compliance", user: "elena.r@hq.corp" },
+];
+
+const quickActions: QuickAction[] = [
+  { label: "Create User Account", description: "Provision new employee credentials", icon: UserPlus, badge: "HR" },
+  { label: "Assign Module Access", description: "Manage role-based permissions", icon: ShieldAlert, badge: "Security" },
+  { label: "Add New Branch", description: "Register physical office location", icon: Building2 },
+  { label: "Audit System Access", description: "Review user privilege matrix", icon: Activity, badge: "Compliance" },
+  { label: "Generate API Keys", description: "Configure system integrations", icon: Key },
+  { label: "System Health Report", description: "Export diagnostics and logs", icon: HeartPulse },
+];
+
+const branchUsers: BranchUser[] = [
+  { name: "Headquarters (HQ)", users: 642, percentage: 65, color: "#4854CC" },
+  { name: "New York Regional", users: 240, percentage: 24, color: "#6366f1" },
+  { name: "Los Angeles Hub", users: 110, percentage: 11, color: "#818cf8" },
+];
+
+const pendingActions: PendingAction[] = [
+  { label: "Locked User Accounts", count: 3, severity: "high", description: "Accounts suspended due to failed authentication" },
+  { label: "Users Without Assigned Roles", count: 12, severity: "medium", description: "New accounts awaiting permission assignment" },
+  { label: "Pending Access Requests", count: 5, severity: "low", description: "Requests for financial and inventory reports" },
+];
+
+/* ─────────────────────────────────────────────────
+   Sub-components
+───────────────────────────────────────────────── */
+
+interface TrendBadgeProps {
+  trend: TrendDirection;
+  value: string;
+}
+
+function TrendBadge({ trend, value }: TrendBadgeProps) {
+  const isUp = trend === "up";
+  const isDown = trend === "down";
 
   return (
-    <PageShell className="relative">
-      {/* Page Header */}
-      <PageHeader
-        title="Control Center Overview"
-        description="System administration, security monitoring, organization overview, and access control"
-        actions={
-          <>
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="h-9 rounded-xl border border-slate-200 bg-white pl-9 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+        isUp
+          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60"
+          : isDown
+          ? "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60"
+          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+      }`}
+    >
+      {isUp ? (
+        <TrendingUp className="h-3 w-3" />
+      ) : isDown ? (
+        <TrendingDown className="h-3 w-3" />
+      ) : (
+        <Minus className="h-3 w-3" />
+      )}
+      {value}
+    </span>
+  );
+}
+
+function SeverityBadge({ type }: { type: SecurityLog["type"] }) {
+  const styles = {
+    critical: "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-300 dark:border-rose-800",
+    warning: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-800",
+    info: "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-300 dark:border-blue-800",
+  }[type];
+
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border ${styles}`}>
+      {type}
+    </span>
+  );
+}
+
+/* ─────────────────────────────────────────────────
+   Main Page Component
+───────────────────────────────────────────────── */
+
+const ControlCenterDashboardPage = () => {
+  const [dateFilter, setDateFilter] = useState<string>("This week");
+  const [activeTab, setActiveTab] = useState<"security" | "audit">("security");
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => setIsRefreshing(false), 800);
+  };
+
+  return (
+    <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
+      {/* ── Page Header ── */}
+      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+                Control Center
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                System administration, global security governance, and organizational access matrix
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Global Action Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search audit logs, users..."
+              className="h-10 w-56 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
+            />
+          </div>
+
+          {/* Branch Filter */}
+          <select className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer">
+            <option value="all">All Branches (Global)</option>
+            <option value="hq">Headquarters (HQ)</option>
+            <option value="ny">New York Regional</option>
+            <option value="la">Los Angeles Hub</option>
+          </select>
+
+          {/* Timeframe Filter */}
+          <select
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer"
+          >
+            <option value="Today">Today (24h)</option>
+            <option value="This week">This Week</option>
+            <option value="This month">This Month</option>
+            <option value="This quarter">This Quarter</option>
+          </select>
+
+          {/* Refresh Button */}
+          <button
+            onClick={handleRefresh}
+            title="Refresh dashboard telemetry"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          TIER 1: High-Level KPI Metric Cards
+      ══════════════════════════════════════════════ */}
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Executive Summary & System Metrics
+          </h2>
+          <span className="text-xs text-slate-400">Updated just now</span>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {kpiCards.map((kpi) => {
+            const Icon = kpi.icon;
+            const isAlert = kpi.accent;
+
+            return (
+              <div
+                key={kpi.title}
+                className={`group relative overflow-hidden rounded-xl border p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                  isAlert
+                    ? "border-rose-200 dark:border-rose-900/50 bg-gradient-to-br from-rose-50/50 to-white dark:from-rose-950/20 dark:to-slate-900 shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-500/30 dark:hover:border-indigo-500/30"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    {kpi.title}
+                  </span>
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                      isAlert
+                        ? "bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400"
+                        : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 dark:group-hover:bg-indigo-950/50 dark:group-hover:text-indigo-400"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-baseline justify-between">
+                  <span className={`text-2xl font-bold tracking-tight ${isAlert ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white"}`}>
+                    {kpi.value}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-3">
+                  <TrendBadge trend={kpi.trend} value={kpi.trendValue} />
+                  <span className="text-[11px] text-slate-400 truncate max-w-[100px]" title={kpi.description}>
+                    {kpi.description}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          TIER 2: Telemetry & Module Adoption Charts
+      ══════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left: Interactive Area Chart (2/3 width) */}
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  System Traffic & User Telemetry
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Real-time active concurrency and API request volume across all connected modules
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Stream
+                </span>
+                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  {dateFilter}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <AreaChart
+                className="h-72 w-full"
+                data={activityData}
+                index="name"
+                categories={["Active Users", "API Calls"]}
+                colors={["indigo", "violet"]}
+                valueFormatter={(number: number) => Intl.NumberFormat("us").format(number)}
+                showLegend={true}
+                showGridLines={true}
+                curveType="monotone"
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
+            <span>Peak concurrency: 1,120 users (Thu 14:00 UTC)</span>
+            <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-medium cursor-pointer hover:underline">
+              View telemetry breakdown <ArrowUpRight className="h-3 w-3" />
+            </span>
+          </div>
+        </div>
+
+        {/* Right: Module Adoption Bar Chart (1/3 width) */}
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Module Adoption Matrix
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Active employee seat distribution across ERP suites
+              </p>
+            </div>
+
+            <div className="mt-6">
+              <BarChart
+                className="h-72 w-full"
+                data={moduleData}
+                index="name"
+                categories={["Users"]}
+                colors={["indigo"]}
+                valueFormatter={(number: number) => `${Intl.NumberFormat("us").format(number)} seats`}
+                layout="vertical"
+                showLegend={false}
+                showGridLines={true}
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
+            <span>Total assigned seats: 2,390</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300">100% License Utilization</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          TIER 3: Governance, Audit Logs & System Health
+      ══════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left 2 Cols: Interactive Audit & Security Logs Table */}
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Security Governance & Audit Trail
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Real-time logging of authentication events, privilege escalations, and data modifications
+                </p>
+              </div>
+
+              {/* Tab Switcher */}
+              <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-1">
+                <button
+                  onClick={() => setActiveTab("security")}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                    activeTab === "security"
+                      ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <ShieldAlert className="h-3.5 w-3.5" />
+                  Security Alerts ({securityLogs.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab("audit")}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                    activeTab === "audit"
+                      ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  Audit Logs ({auditLogs.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Table Content */}
+            <div className="overflow-x-auto">
+              {activeTab === "security" ? (
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <th className="pb-3 pl-2">Severity</th>
+                      <th className="pb-3">Event Description</th>
+                      <th className="pb-3">Target User</th>
+                      <th className="pb-3">Source IP</th>
+                      <th className="pb-3 text-right pr-2">Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                    {securityLogs.map((log) => (
+                      <tr key={log.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="py-3.5 pl-2">
+                          <SeverityBadge type={log.type} />
+                        </td>
+                        <td className="py-3.5 font-medium text-slate-800 dark:text-slate-200">
+                          {log.event}
+                        </td>
+                        <td className="py-3.5 text-slate-600 dark:text-slate-400 font-mono text-xs">
+                          {log.user}
+                        </td>
+                        <td className="py-3.5 text-slate-500 dark:text-slate-400 font-mono text-xs">
+                          {log.ip}
+                        </td>
+                        <td className="py-3.5 text-right pr-2 text-xs text-slate-400 whitespace-nowrap">
+                          {log.time}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <th className="pb-3 pl-2">Module</th>
+                      <th className="pb-3">Action Performed</th>
+                      <th className="pb-3">Actor Account</th>
+                      <th className="pb-3 text-right pr-2">Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                    {auditLogs.map((log) => (
+                      <tr key={log.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="py-3.5 pl-2">
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-md border border-indigo-100 dark:border-indigo-900/50">
+                            {log.module}
+                          </span>
+                        </td>
+                        <td className="py-3.5 font-medium text-slate-800 dark:text-slate-200">
+                          {log.action}
+                        </td>
+                        <td className="py-3.5 text-slate-600 dark:text-slate-400 font-mono text-xs">
+                          {log.user}
+                        </td>
+                        <td className="py-3.5 text-right pr-2 text-xs text-slate-400 whitespace-nowrap">
+                          {log.time}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 text-xs">
+            <span className="text-slate-500 dark:text-slate-400">
+              Showing top 4 recent {activeTab === "security" ? "security events" : "audit records"}
+            </span>
+            <button className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+              Open comprehensive audit explorer <ArrowUpRight className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+
+        {/* Right 1 Col: User & Role Distribution Card */}
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Role Privilege Distribution
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Breakdown of active users across permission tiers
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-col items-center">
+              <DonutChart
+                className="h-48 w-full"
+                data={roleData}
+                category="count"
+                index="name"
+                valueFormatter={(val: number) => `${val} accounts`}
+                colors={["indigo", "violet", "blue", "slate", "emerald"]}
               />
             </div>
 
-            {/* Branch Switcher Select */}
-            <Select defaultValue="all">
-              <SelectTrigger className="h-9 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm w-[140px]">
-                <SelectValue placeholder="All Branches" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-slate-100 rounded-xl shadow-lg">
-                <SelectItem value="all">All Branches</SelectItem>
-                <SelectItem value="hq">Headquarters</SelectItem>
-                <SelectItem value="ny">NY Branch</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Date Filter Select */}
-            <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="h-9 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm w-[120px]">
-                <SelectValue placeholder="This Week" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-slate-100 rounded-xl shadow-lg">
-                <SelectItem value="Today">Today</SelectItem>
-                <SelectItem value="This Week">This Week</SelectItem>
-                <SelectItem value="This Month">This Month</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Refresh Button */}
-            <Button variant="filter" size="icon" aria-label="Refresh Dashboard" className="h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-
-            {/* Export Button */}
-            <Button variant="export" size="sm" className="h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm">
-              <Download className="h-4 w-4" /> Export
-            </Button>
-          </>
-        }
-      />
-
-      {/* Row 1 - KPI Cards */}
-      <DashboardGrid columns={4} className="lg:grid-cols-6">
-        <KPICard
-          title="Total Companies"
-          value="4"
-          icon={<Building2 className="h-5 w-5 text-indigo-600" />}
-          trend="up"
-          trendValue="+1 this year"
-          className={glassBlueBg}
-          iconBg="bg-indigo-50"
-        />
-        <KPICard
-          title="Total Branches"
-          value="24"
-          icon={<Building2 className="h-5 w-5 text-sky-600" />}
-          trend="up"
-          trendValue="+3 this quarter"
-          className={glassBlueBg}
-          iconBg="bg-sky-50"
-        />
-        <KPICard
-          title="Total Users"
-          value="1,248"
-          icon={<Users className="h-5 w-5 text-blue-700" />}
-          trend="up"
-          trendValue="+12% vs last month"
-          className={glassBlueBg}
-          iconBg="bg-blue-50"
-        />
-        <KPICard
-          title="Active Users"
-          value="942"
-          icon={<UserCheck className="h-5 w-5 text-emerald-600" />}
-          trend="neutral"
-          trendValue="75% engagement"
-          className={glassBlueBg}
-          iconBg="bg-emerald-50"
-        />
-        <KPICard
-          title="Software Modules"
-          value="8"
-          icon={<Blocks className="h-5 w-5 text-slate-700" />}
-          trend="neutral"
-          trendValue="All active"
-          className={glassBlueBg}
-          iconBg="bg-slate-100"
-        />
-        <KPICard
-          title="Security Alerts"
-          value="3"
-          icon={<AlertTriangle className="h-5 w-5 text-rose-500" />}
-          trend="down"
-          trendValue="Needs attention"
-          className="bg-rose-50/30 border border-rose-100 shadow-sm rounded-xl transition-all duration-300 hover:shadow-md"
-          iconBg="bg-rose-50"
-        />
-      </DashboardGrid>
-
-      {/* Row 2 - Analytics Charts */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <SectionCard title="User Activity Trend" actions={<span className="text-xs font-semibold text-slate-500">{dateFilter}</span>} className={`lg:col-span-2 ${glassBlueBg}`}>
-          <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={activityData} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
-                <defs>
-                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.01}/>
-                  </linearGradient>
-                  <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#4f46e5" />
-                    <stop offset="50%" stopColor="#6366f1" />
-                    <stop offset="100%" stopColor="#4f46e5" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="name" stroke="currentColor" className="text-slate-400" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="currentColor" className="text-slate-400" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#ffffff', 
-                    borderColor: '#f1f5f9', 
-                    borderRadius: '12px', 
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' 
-                  }}
-                  itemStyle={{ color: '#4f46e5', fontWeight: 500 }}
-                  labelStyle={{ color: '#1e293b', fontWeight: 600 }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="users" 
-                  stroke="url(#lineGrad)" 
-                  strokeWidth={2.5} 
-                  fill="url(#colorUsers)" 
-                  dot={{ r: 4, fill: '#ffffff', stroke: '#4f46e5', strokeWidth: 2 }} 
-                  activeDot={{ r: 5, fill: '#4f46e5', strokeWidth: 2, stroke: '#ffffff' }} 
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {/* Branch Progress Breakdown */}
+            <div className="mt-6 space-y-4 border-t border-slate-100 dark:border-slate-800 pt-5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Regional Hub Utilization
+              </h4>
+              <div className="space-y-3">
+                {branchUsers.map((branch) => (
+                  <div key={branch.name} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{branch.name}</span>
+                      <span className="font-mono font-semibold text-slate-900 dark:text-white">
+                        {branch.users} ({branch.percentage}%)
+                      </span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${branch.percentage}%`, backgroundColor: branch.color }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </SectionCard>
 
-        <SectionCard title="Users by Module" className={glassBlueBg}>
-          <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={moduleData} layout="vertical" margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="barGrad0" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#4f46e5" />
-                    <stop offset="100%" stopColor="#818cf8" />
-                  </linearGradient>
-                  <linearGradient id="barGrad1" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#0ea5e9" />
-                    <stop offset="100%" stopColor="#38bdf8" />
-                  </linearGradient>
-                  <linearGradient id="barGrad2" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#1d4ed8" />
-                    <stop offset="100%" stopColor="#3b82f6" />
-                  </linearGradient>
-                  <linearGradient id="barGrad3" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#334155" />
-                    <stop offset="100%" stopColor="#64748b" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                <XAxis type="number" stroke="currentColor" className="text-slate-400" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis dataKey="name" type="category" stroke="currentColor" className="text-slate-400" fontSize={12} tickLine={false} axisLine={false} width={80} />
-                <Tooltip 
-                  cursor={{ fill: '#f8fafc', radius: 4 }}
-                  contentStyle={{ 
-                    backgroundColor: '#ffffff', 
-                    borderColor: '#f1f5f9', 
-                    borderRadius: '12px', 
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' 
-                  }}
-                  itemStyle={{ fontWeight: 500 }}
-                  labelStyle={{ color: '#1e293b', fontWeight: 600 }}
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={14}>
-                  {moduleData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={BAR_GRADIENTS[index % BAR_GRADIENTS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-center">
+            <span className="text-slate-500 dark:text-slate-400">Need to modify access matrix? </span>
+            <a href="#effective-access" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+              Go to Effective Access
+            </a>
           </div>
-        </SectionCard>
+        </div>
       </div>
 
-      {/* Row 3 - Operations & Security Logs */}
+      {/* ══════════════════════════════════════════════
+          TIER 4: Quick Actions & System Health Matrix
+      ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Security Logs */}
-        <SectionCard 
-          title="Recent Security Logs" 
-          actions={<Button variant="link" size="xs" className="text-indigo-600 hover:text-indigo-700">View All</Button>}
-          className={glassBlueBg}
-        >
-          <div className="space-y-3 pt-2">
-            {[
-              { time: "10 mins ago", event: "Failed login attempt", user: "admin@ny.corp", type: "warning" },
-              { time: "1 hour ago", event: "Role permissions changed", user: "System Admin", type: "info" },
-              { time: "3 hours ago", event: "Multiple failed logins", user: "Unknown IP", type: "critical" },
-              { time: "Yesterday", event: "New API key generated", user: "dev@hq.corp", type: "info" },
-            ].map((log, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl bg-slate-50/50 p-3 border border-slate-100 hover:bg-slate-50 transition-colors">
-                <div className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 ${log.type === 'critical' ? 'bg-rose-500' : log.type === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'}`} />
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">{log.event}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{log.user} • {log.time}</p>
-                </div>
-              </div>
-            ))}
+        {/* Quick Actions (2 Cols) */}
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-2">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Administrative Quick Actions
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Direct shortcuts to frequently accessed governance and provisioning tasks
+              </p>
+            </div>
+            <Settings className="h-5 w-5 text-slate-400" />
           </div>
-        </SectionCard>
 
-        {/* Audit Logs */}
-        <SectionCard 
-          title="Recent Audit Logs" 
-          actions={<Button variant="link" size="xs" className="text-indigo-600 hover:text-indigo-700">View All</Button>}
-          className={glassBlueBg}
-        >
-          <div className="space-y-3 pt-2">
-            {[
-              { time: "2 mins ago", action: "Created new user account", module: "User Management" },
-              { time: "15 mins ago", action: "Updated branch settings", module: "Organization" },
-              { time: "2 hours ago", action: "Assigned Inventory module", module: "Access Control" },
-              { time: "4 hours ago", action: "Modified financial year", module: "Finance" },
-            ].map((log, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl bg-slate-50/50 p-3 border border-slate-100 hover:bg-slate-50 transition-colors">
-                <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-slate-400 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">{log.action}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{log.module} • {log.time}</p>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <button
+                  key={action.label}
+                  className="group relative flex flex-col items-start justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 text-left transition-all hover:border-indigo-500/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm"
+                >
+                  <div className="flex w-full items-start justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white dark:bg-slate-900 shadow-sm border border-slate-200/60 dark:border-slate-700/60 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 text-slate-700 dark:text-slate-300 transition-colors">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    {action.badge && (
+                      <span className="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900">
+                        {action.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {action.label}
+                    </h4>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                      {action.description}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
-        </SectionCard>
+        </div>
 
-        {/* Quick Actions */}
-        <SectionCard title="Quick Actions" className={glassBlueBg}>
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            {[
-              { label: "Create User", icon: Plus },
-              { label: "Add Branch", icon: Plus },
-              { label: "Assign Access", icon: ShieldAlert },
-              { label: "Create Role", icon: UserCheck },
-              { label: "User Access", icon: Activity },
-              { label: "System Uptime", icon: HeartPulse },
-            ].map((action, i) => (
-              <button 
-                key={i} 
-                className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white p-4 text-center transition-all hover:bg-slate-50/50 hover:border-slate-200 shadow-sm"
-              >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 group-hover:bg-indigo-100 transition-colors">
-                  <action.icon className="h-4.5 w-4.5 text-indigo-600" />
+        {/* System Health & Pending Actions (1 Col) */}
+        <div className="space-y-6">
+          {/* Pending Actions Card */}
+          <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-gradient-to-br from-amber-50/50 to-white dark:from-amber-950/20 dark:to-slate-900 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Pending Administrative Action
+                </h3>
+              </div>
+              <span className="rounded-full bg-amber-100 dark:bg-amber-900/60 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-300">
+                20 items
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {pendingActions.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-2xs hover:border-amber-400 transition-colors"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          item.severity === "high"
+                            ? "bg-rose-500"
+                            : item.severity === "medium"
+                            ? "bg-amber-400"
+                            : "bg-blue-400"
+                        }`}
+                      />
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        {item.label}
+                      </h4>
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 pl-4">
+                      {item.description}
+                    </p>
+                  </div>
+                  <button className="ml-2 shrink-0 rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-colors">
+                    Resolve ({item.count})
+                  </button>
                 </div>
-                <span className="text-xs font-semibold text-slate-600">{action.label}</span>
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
-        </SectionCard>
+
+          {/* System Health Status Card */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Server className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                Infrastructure Health
+              </h3>
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                All Systems Operational
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800">
+                <span className="text-slate-400 block mb-1">Global Uptime</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">99.989%</span>
+              </div>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800">
+                <span className="text-slate-400 block mb-1">Database Sync</span>
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">0.02s latency</span>
+              </div>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800">
+                <span className="text-slate-400 block mb-1">Active Suites</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">8 / 8 Online</span>
+              </div>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800">
+                <span className="text-slate-400 block mb-1">Last Snapshot</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">2 hrs ago (Encrypted)</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Row 4 - System Distribution & Health */}
-      <DashboardGrid columns={4}>
-        <SectionCard title="Branch Users" className={glassBlueBg}>
-          <div className="space-y-4 pt-2">
-            {[
-              { name: "Headquarters", users: 542, percentage: 65, color: "bg-indigo-600" },
-              { name: "NY Branch", users: 210, percentage: 25, color: "bg-sky-600" },
-              { name: "LA Branch", users: 84, percentage: 10, color: "bg-slate-700" },
-            ].map((branch, i) => (
-              <div key={i}>
-                <div className="mb-1 flex justify-between text-sm">
-                  <span className="text-slate-800 font-semibold">{branch.name}</span>
-                  <span className="text-slate-500 font-medium">{branch.users}</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div 
-                    className={`h-full rounded-full ${branch.color}`} 
-                    style={{ width: `${branch.percentage}%` }} 
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Role Distribution" className={glassBlueBg}>
-          <div className="space-y-3 pt-2">
-            {[
-              { name: "Regular Users", count: 850 },
-              { name: "Managers", count: 124 },
-              { name: "System Admins", count: 12 },
-              { name: "Auditors", count: 8 },
-            ].map((role, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/50 p-3">
-                <span className="text-sm font-semibold text-slate-700">{role.name}</span>
-                <span className="rounded-md bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 border border-slate-200 shadow-sm">
-                  {role.count}
-                </span>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Pending Actions" className="bg-white border border-slate-100 shadow-sm rounded-xl transition-all duration-300 hover:shadow-md">
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between rounded-lg border border-rose-100 bg-rose-50/20 p-3">
-              <span className="text-sm font-semibold text-slate-700">Locked Users</span>
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-700">3</span>
-            </div>
-            <div className="flex items-center justify-between rounded-lg border border-amber-100 bg-amber-50/20 p-3">
-              <span className="text-sm font-semibold text-slate-700">Users w/o Roles</span>
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">12</span>
-            </div>
-            <div className="flex items-center justify-between rounded-lg border border-indigo-100 bg-indigo-50/20 p-3">
-              <span className="text-sm font-semibold text-slate-700">Pending Approvals</span>
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">5</span>
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard title="System Health" className={`${glassBlueBg} relative overflow-hidden`}>
-          <div className="grid grid-cols-2 gap-4 pt-2">
-            <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Status</p>
-              <div className="flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                Active
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Uptime</p>
-              <p className="text-sm font-semibold text-slate-800">99.98%</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Active Modules</p>
-              <p className="text-sm font-semibold text-slate-800">8 / 8</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 mb-1 font-medium">Last Backup</p>
-              <p className="text-sm font-semibold text-slate-800">2 hrs ago</p>
-            </div>
-          </div>
-          <div className="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center">
-             <span className="text-xs text-slate-500 font-medium">DB Sync</span>
-             <span className="text-xs font-semibold text-emerald-600">Synced</span>
-          </div>
-        </SectionCard>
-      </DashboardGrid>
-    </PageShell>
+    </div>
   );
 };
 
