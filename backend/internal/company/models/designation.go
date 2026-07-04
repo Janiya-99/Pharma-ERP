@@ -22,6 +22,9 @@ type Designation struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 
 	Company Company `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
+
+	AllowedDepartments []DesignationDepartment  `gorm:"foreignKey:DesignationID" json:"allowed_departments,omitempty"`
+	DefaultRoles       []DesignationDefaultRole `gorm:"foreignKey:DesignationID" json:"default_roles,omitempty"`
 }
 
 // TableName overrides the default table name

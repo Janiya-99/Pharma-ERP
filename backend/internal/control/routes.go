@@ -14,6 +14,9 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	desigHandler := handlers.NewDesignationHandler(logger)
 	moduleHandler := handlers.NewSoftwareModuleHandler(logger)
 	logHandler := handlers.NewLogHandler(logger)
+	userOrgHandler := handlers.NewUserOrganizationHandler(logger)
+	desigMappingHandler := handlers.NewDesignationMappingHandler(logger)
+	accessPreviewHandler := handlers.NewUserAccessPreviewHandler(logger)
 
 	// --- Company Profile ---
 	router.GET("/company", middleware.RequirePermission("control.company.view"), companyHandler.GetCompanyProfile)
@@ -32,6 +35,7 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	router.GET("/departments/:id", middleware.RequirePermission("control.department.view"), deptHandler.Get)
 	router.PUT("/departments/:id", middleware.RequirePermission("control.department.update"), deptHandler.Update)
 	router.DELETE("/departments/:id", middleware.RequirePermission("control.department.delete"), deptHandler.Delete)
+	router.GET("/departments/:id/designations", middleware.RequirePermission("control.designation.view"), desigMappingHandler.GetDesignationsForDepartment)
 
 	// --- Designations ---
 	router.GET("/designations", middleware.RequirePermission("control.designation.view"), desigHandler.List)
@@ -39,6 +43,11 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	router.GET("/designations/:id", middleware.RequirePermission("control.designation.view"), desigHandler.Get)
 	router.PUT("/designations/:id", middleware.RequirePermission("control.designation.update"), desigHandler.Update)
 	router.DELETE("/designations/:id", middleware.RequirePermission("control.designation.delete"), desigHandler.Delete)
+	
+	router.GET("/designations/:id/default-roles", middleware.RequirePermission("control.designation.view"), desigMappingHandler.GetDefaultRolesForDesignation)
+	router.PUT("/designations/:id/default-roles", middleware.RequirePermission("control.designation.update"), desigMappingHandler.SetDefaultRolesForDesignation)
+	router.GET("/designations/:id/departments", middleware.RequirePermission("control.designation.view"), desigMappingHandler.GetDepartmentsForDesignation)
+	router.PUT("/designations/:id/departments", middleware.RequirePermission("control.designation.update"), desigMappingHandler.SetDepartmentsForDesignation)
 
 	// --- Software Modules ---
 	router.GET("/software-modules", middleware.RequirePermission("control.permission.view"), moduleHandler.List)
@@ -62,6 +71,14 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 
 		usersGrp.POST("/:id/change-status", middleware.RequirePermission("control.user.change_status"), userHandler.ChangeStatus)
 		usersGrp.POST("/:id/reset-password", middleware.RequirePermission("control.user.reset_password"), userHandler.ResetPassword)
+
+		usersGrp.GET("/:id/organization-assignments", middleware.RequirePermission("control.user.view"), userOrgHandler.ListAssignments)
+		usersGrp.POST("/:id/organization-assignments", middleware.RequirePermission("control.user.update"), userOrgHandler.CreateAssignment)
+		usersGrp.PUT("/:id/organization-assignments/:assignmentId", middleware.RequirePermission("control.user.update"), userOrgHandler.UpdateAssignment)
+		usersGrp.DELETE("/:id/organization-assignments/:assignmentId", middleware.RequirePermission("control.user.update"), userOrgHandler.DeleteAssignment)
+
+		usersGrp.GET("/:id/access-preview", middleware.RequirePermission("control.user.view"), accessPreviewHandler.GetAccessPreview)
+		usersGrp.GET("/:id/effective-access", middleware.RequirePermission("control.user.view"), accessPreviewHandler.GetEffectiveAccess)
 
 		usersGrp.GET("/:id/branches", middleware.RequirePermission("control.access.branch.view"), accessHandler.GetBranches)
 		usersGrp.POST("/:id/branches", middleware.RequirePermission("control.access.branch.assign"), accessHandler.AssignBranches)

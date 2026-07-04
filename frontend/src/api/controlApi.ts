@@ -99,6 +99,31 @@ export const deleteDesignation = async (id: string | number) => {
   return res.data;
 };
 
+export const getDesignationsForDepartment = async (deptId: string | number) => {
+  const res = await apiClient.get(`/control/departments/${deptId}/designations`);
+  return res.data;
+};
+
+export const getDesignationDefaultRoles = async (desigId: string | number) => {
+  const res = await apiClient.get(`/control/designations/${desigId}/default-roles`);
+  return res.data;
+};
+
+export const setDesignationDefaultRoles = async (desigId: string | number, payload: { role_ids: string[] | number[] }) => {
+  const res = await apiClient.put(`/control/designations/${desigId}/default-roles`, payload);
+  return res.data;
+};
+
+export const getDesignationDepartments = async (desigId: string | number) => {
+  const res = await apiClient.get(`/control/designations/${desigId}/departments`);
+  return res.data;
+};
+
+export const setDesignationDepartments = async (desigId: string | number, payload: { department_ids: string[] | number[] }) => {
+  const res = await apiClient.put(`/control/designations/${desigId}/departments`, payload);
+  return res.data;
+};
+
 // --- Software Modules ---
 export const getSoftwareModules = async () => {
   const res = await apiClient.get("/control/software-modules");
@@ -152,6 +177,54 @@ export const resetUserPassword = async (
   const res = await apiClient.post(
     `/control/users/${id}/reset-password`,
     payload
+  );
+  return res.data;
+};
+
+export const getUserAccessPreview = async (userId: string | number) => {
+  const res = await apiClient.get(`/control/users/${userId}/access-preview`);
+  return res.data;
+};
+
+export const getUserEffectiveAccess = async (userId: string | number) => {
+  const res = await apiClient.get(`/control/users/${userId}/effective-access`);
+  return res.data;
+};
+
+export const getUserOrganizationAssignments = async (userId: string | number) => {
+  const res = await apiClient.get(`/control/users/${userId}/organization-assignments`);
+  return res.data;
+};
+
+export const createUserOrganizationAssignment = async (
+  userId: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.post(
+    `/control/users/${userId}/organization-assignments`,
+    payload
+  );
+  return res.data;
+};
+
+export const updateUserOrganizationAssignment = async (
+  userId: string | number,
+  assignmentId: string | number,
+  payload: Record<string, unknown>
+) => {
+  const res = await apiClient.put(
+    `/control/users/${userId}/organization-assignments/${assignmentId}`,
+    payload
+  );
+  return res.data;
+};
+
+export const deleteUserOrganizationAssignment = async (
+  userId: string | number,
+  assignmentId: string | number
+) => {
+  const res = await apiClient.delete(
+    `/control/users/${userId}/organization-assignments/${assignmentId}`
   );
   return res.data;
 };

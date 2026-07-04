@@ -40,6 +40,8 @@ type User struct {
 	Department    *Department  `gorm:"foreignKey:DepartmentID" json:"department,omitempty"`
 	Designation   *Designation `gorm:"foreignKey:DesignationID" json:"designation,omitempty"`
 	DefaultBranch *Branch      `gorm:"foreignKey:DefaultBranchID" json:"default_branch,omitempty"`
+
+	OrganizationAssignments []UserOrganizationAssignment `gorm:"foreignKey:UserID" json:"organization_assignments,omitempty"`
 }
 
 // TableName overrides the default table name

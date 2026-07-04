@@ -23,6 +23,8 @@ type Department struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 
 	Company Company `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
+
+	DesignationDepartments []DesignationDepartment `gorm:"foreignKey:DepartmentID" json:"designation_departments,omitempty"`
 }
 
 // TableName overrides the default table name
