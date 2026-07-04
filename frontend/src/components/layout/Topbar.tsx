@@ -31,7 +31,7 @@ const Topbar = () => {
     .slice(0, 2);
 
   return (
-    <header className="glass-header sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between px-3 md:px-5">
+    <header className="glass-header sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between px-3 md:px-4 lg:px-6">
       {/* Left: Mobile menu toggle + Breadcrumb */}
       <div className="flex min-w-0 items-center gap-3">
         {/* Mobile menu toggle — hidden on lg+ */}
