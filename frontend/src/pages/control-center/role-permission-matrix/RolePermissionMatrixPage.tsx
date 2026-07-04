@@ -156,12 +156,7 @@ const RolePermissionMatrixPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
-        title="Role Permission Matrix"
-        description="Manage the exact permissions assigned to each role across software modules."
-      />
-
+    <div className="space-y-6">
       <FormError message={error} />
       {successMsg && (
         <div className="mb-6 bg-green-50 text-green-800 p-3 rounded-md text-sm border border-green-200 flex items-center">

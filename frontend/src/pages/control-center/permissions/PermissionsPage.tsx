@@ -134,11 +134,7 @@ const PermissionsPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
-        title="Permissions"
-        description="View system permissions. Permissions are system-seeded and read-only."
-      />
+    <div className="space-y-6">
 
       <FormError message={error} />
 

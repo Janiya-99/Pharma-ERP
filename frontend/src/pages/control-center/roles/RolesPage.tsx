@@ -191,19 +191,15 @@ const RolesPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
-        title="Roles"
-        description="Manage system roles and their properties."
-        action={
-          <PermissionGuard permission="control.role.create">
-            <Button onClick={openCreateModal}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Role
-            </Button>
-          </PermissionGuard>
-        }
-      />
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <PermissionGuard permission="control.role.create">
+          <Button onClick={openCreateModal}>
+            <Plus className="w-4 h-4 mr-2" />
+            Create Role
+          </Button>
+        </PermissionGuard>
+      </div>
 
       <FormError message={error} />
 
