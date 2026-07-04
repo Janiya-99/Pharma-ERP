@@ -55,13 +55,13 @@ export function DataTableToolbar({
         {/* Search */}
         {onSearchChange && (
           <div className="relative max-w-xs flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#0077B6]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4854CC]" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="h-9 w-full rounded-xl border border-slate-300 bg-white/70 py-2 pl-9 pr-4 text-sm text-[#1F2937] transition-all placeholder:text-[#9CA3AF] focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20"
+              className="h-9 w-full rounded-xl border border-slate-300 bg-white/70 py-2 pl-9 pr-4 text-sm text-[#1F2937] transition-all placeholder:text-[#9CA3AF] focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20"
               aria-label="Search records"
             />
           </div>

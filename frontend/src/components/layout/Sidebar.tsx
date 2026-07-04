@@ -574,8 +574,8 @@ const Sidebar = () => {
                 showExpanded ? "h-10 px-3" : "mx-auto h-10 w-10 justify-center"
               } ${
                 isActive
-                  ? "border border-transparent bg-[#0077B6] font-semibold text-white shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
-                  : "text-[#002137] hover:bg-[#0077B6]/10 hover:text-[#002137]"
+                  ? "border border-transparent bg-[#4854CC] font-semibold text-white shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
+                  : "text-[#002137] hover:bg-[#4854CC]/10 hover:text-[#002137]"
               }`
             }
           >
@@ -621,8 +621,8 @@ const Sidebar = () => {
             showExpanded ? "h-10 px-3" : "mx-auto h-10 w-10 justify-center"
           } ${
             isActiveParent
-              ? "border border-transparent bg-[#0077B6] font-semibold text-white shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
-              : "text-[#002137] hover:bg-[#0077B6]/10 hover:text-[#002137]"
+              ? "border border-transparent bg-[#4854CC] font-semibold text-white shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
+              : "text-[#002137] hover:bg-[#4854CC]/10 hover:text-[#002137]"
           }`}
         >
           <menu.icon
@@ -681,8 +681,8 @@ const Sidebar = () => {
                     className={({ isActive }) =>
                       `flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                         isActive
-                          ? "bg-[#0077B6] font-semibold text-white shadow-[0_6px_16px_rgba(0,119,182,0.22)]"
-                          : "text-[#6B7280] hover:bg-[#0077B6]/10 hover:text-[#1F2937]"
+                          ? "bg-[#4854CC] font-semibold text-white shadow-[0_6px_16px_rgba(0,119,182,0.22)]"
+                          : "text-[#6B7280] hover:bg-[#4854CC]/10 hover:text-[#1F2937]"
                       }`
                     }
                   >
@@ -725,7 +725,7 @@ const Sidebar = () => {
           isMobile || effectiveExpanded ? "px-5" : "justify-center px-2"
         }`}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] shadow-sm overflow-hidden">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#4854CC] shadow-sm overflow-hidden">
           {collapsed ? (
             <span className="text-white font-bold text-sm tracking-wider">{companyInitials}</span>
           ) : company?.logo_url ? (
@@ -790,7 +790,7 @@ const Sidebar = () => {
           >
             {isMobile || effectiveExpanded ? (
               <div className="flex min-w-0 items-center gap-2.5">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] text-xs font-bold text-white">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#4854CC] text-xs font-bold text-white">
                   {initials}
                 </div>
                 <div className="min-w-0 overflow-hidden">
@@ -805,7 +805,7 @@ const Sidebar = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] text-xs font-bold text-white shadow-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-[#4854CC] text-xs font-bold text-white shadow-sm">
                 {initials}
               </div>
             )}

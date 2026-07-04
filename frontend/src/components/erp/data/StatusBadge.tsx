@@ -31,8 +31,8 @@ const statusBadgeVariants = cva(
         recalled: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700/50",
         error: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700/50",
 
-        info: "bg-[#0077B6] text-white border-transparent dark:bg-[#0077B6] dark:text-white dark:border-transparent",
-        "in-progress": "bg-[#0077B6] text-white border-transparent dark:bg-[#0077B6] dark:text-white dark:border-transparent",
+        info: "bg-[#4854CC] text-white border-transparent dark:bg-[#4854CC] dark:text-white dark:border-transparent",
+        "in-progress": "bg-[#4854CC] text-white border-transparent dark:bg-[#4854CC] dark:text-white dark:border-transparent",
 
         default: "bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700/50",
       },

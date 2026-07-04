@@ -18,7 +18,7 @@ const config = {
           900: "#312e81",
           800: "#3730a3",
           700: "#4338ca",
-          600: "#4f46e5",
+          600: "#4854CC",
           500: "#6366f1",
           400: "#818cf8",
           300: "#a5b4fc",
@@ -173,7 +173,7 @@ const config = {
         },
         indigo: {
           50: "#eef2ff", 100: "#e0e7ff", 200: "#c7d2fe", 300: "#a5b4fc",
-          400: "#818cf8", 500: "#6366f1", 600: "#4f46e5", 700: "#4338ca",
+          400: "#818cf8", 500: "#6366f1", 600: "#4854CC", 700: "#4338ca",
           800: "#3730a3", 900: "#312e81",
         },
         purple: {
@@ -206,11 +206,11 @@ const config = {
         "3xl": "14px 17px 40px 4px",
         inset: "inset 0px 18px 22px",
         darkinset: "0px 4px 4px inset",
-        soft: "0 2px 15px -3px rgba(79, 70, 229, 0.06), 0 1px 4px -1px rgba(79, 70, 229, 0.04)",
+        soft: "0 2px 15px -3px rgba(72, 84, 204, 0.06), 0 1px 4px -1px rgba(72, 84, 204, 0.04)",
         "erp-sm": "0 1px 3px rgba(30, 27, 75, 0.06), 0 1px 2px rgba(30, 27, 75, 0.04)",
         "erp-md": "0 4px 6px -1px rgba(30, 27, 75, 0.06), 0 2px 4px -2px rgba(30, 27, 75, 0.04)",
         "erp-lg": "0 10px 15px -3px rgba(30, 27, 75, 0.06), 0 4px 6px -4px rgba(30, 27, 75, 0.04)",
-        "erp-glow": "0 0 20px rgba(79, 70, 229, 0.15)",
+        "erp-glow": "0 0 20px rgba(72, 84, 204, 0.15)",
         "erp-glow-cyan": "0 0 20px rgba(72, 202, 228, 0.2)",
       },
       borderRadius: {
@@ -229,8 +229,8 @@ const config = {
           to: { height: "0" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 8px rgba(79, 70, 229, 0.2)" },
-          "50%": { boxShadow: "0 0 20px rgba(79, 70, 229, 0.4)" },
+          "0%, 100%": { boxShadow: "0 0 8px rgba(72, 84, 204, 0.2)" },
+          "50%": { boxShadow: "0 0 20px rgba(72, 84, 204, 0.4)" },
         },
         "slide-in-right": {
           from: { transform: "translateX(100%)" },

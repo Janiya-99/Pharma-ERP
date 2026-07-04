@@ -13,9 +13,9 @@ func NewCompanyRepository(db *gorm.DB) *CompanyRepository {
 	return &CompanyRepository{db: db}
 }
 
-func (r *CompanyRepository) GetFirst() (*models.Company, error) {
+func (r *CompanyRepository) GetByCode(companyCode string) (*models.Company, error) {
 	var company models.Company
-	if err := r.db.First(&company).Error; err != nil {
+	if err := r.db.Where("company_code = ?", companyCode).First(&company).Error; err != nil {
 		return nil, err
 	}
 	return &company, nil

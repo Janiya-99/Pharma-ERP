@@ -49,7 +49,7 @@ export function FormField({
           className={cn(
             "w-full rounded-lg border bg-background px-3.5 py-2.5 text-sm text-foreground shadow-sm transition-all duration-150",
             "placeholder:text-muted-foreground",
-            "focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20",
+            "focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20",
             error
               ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
               : "border-slate-300 focus:border-slate-500",

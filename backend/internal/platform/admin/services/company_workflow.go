@@ -244,7 +244,8 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 	defer sqlComp.Close()
 
 	// 9. Run Migrations & Seeding in Company Database context
-	if err := companyMigrations.RunCompanyMigrations(companyDB, logger); err != nil {
+	// We pass 'true' to skipAdminSeeder so it doesn't seed the default 'OMACX' company and user.
+	if err := companyMigrations.RunCompanyMigrations(companyDB, logger, true); err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to run company migrations: %w", err)
 	}

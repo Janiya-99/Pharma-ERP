@@ -17,12 +17,12 @@ func NewCompanyService(repo *repositories.CompanyRepository, auditService *Audit
 	return &CompanyService{repo: repo, auditService: auditService}
 }
 
-func (s *CompanyService) GetCompanyProfile() (*models.Company, error) {
-	return s.repo.GetFirst()
+func (s *CompanyService) GetCompanyProfile(companyCode string) (*models.Company, error) {
+	return s.repo.GetByCode(companyCode)
 }
 
-func (s *CompanyService) UpdateCompanyProfile(req dto.UpdateCompanyProfileRequest, activeUserID uint64, activeBranchID uint64, ipAddress, userAgent string) (*models.Company, error) {
-	company, err := s.repo.GetFirst()
+func (s *CompanyService) UpdateCompanyProfile(companyCode string, req dto.UpdateCompanyProfileRequest, activeUserID uint64, activeBranchID uint64, ipAddress, userAgent string) (*models.Company, error) {
+	company, err := s.repo.GetByCode(companyCode)
 	if err != nil {
 		return nil, errors.New("company not found")
 	}

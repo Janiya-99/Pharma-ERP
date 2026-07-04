@@ -50,7 +50,7 @@ export function DatePicker({
             triggerClassName
           )}
         >
-          <CalendarIcon className="h-4 w-4 text-[#0077B6]" />
+          <CalendarIcon className="h-4 w-4 text-[#4854CC]" />
           <span className="min-w-0 flex-1 truncate">
             {selected ? format(selected, "yyyy-MM-dd") : placeholder}
           </span>

@@ -9,10 +9,10 @@ export const colors = {
   erp: {
     950: "#03045E",
     900: "#023E8A",
-    800: "#0077B6",
+    800: "#4854CC",
     700: "#0096C7",
     600: "#006AA3",
-    500: "#0077B6",
+    500: "#4854CC",
     400: "#0A5F8F",
     300: "#E2E8F0",
     200: "#F1F5F9",
@@ -23,13 +23,13 @@ export const colors = {
 
 // ── Semantic Color Tokens ──
 export const semanticColors = {
-  primary: "#0077B6",
+  primary: "#4854CC",
   primaryHover: "#0096C7",
   primaryDark: "#03045E",
   secondary: "#023E8A",
-  accent: "#0077B6",
+  accent: "#4854CC",
   accentSoft: "rgba(0, 119, 182, 0.1)",
-  info: "#0077B6",
+  info: "#4854CC",
   success: "#16A34A",
   warning: "#F59E0B",
   danger: "#DC2626",

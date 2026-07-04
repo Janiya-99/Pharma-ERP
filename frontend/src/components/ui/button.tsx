@@ -5,25 +5,25 @@ import { Slot } from "radix-ui";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center gap-2 border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all duration-200 outline-none select-none focus-visible:ring-2 focus-visible:ring-[#0077B6]/30 focus-visible:ring-offset-1 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center gap-2 border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all duration-200 outline-none select-none focus-visible:ring-2 focus-visible:ring-[#4854CC]/30 focus-visible:ring-offset-1 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         /* ── Primary / Save / Submit ── */
         default:
-          "border-transparent bg-[#0077B6] text-white shadow-sm hover:bg-[#005F95] hover:shadow-md",
+          "border-transparent bg-[#4854CC] text-white shadow-sm hover:bg-[#005F95] hover:shadow-md",
 
         /* ── Secondary ── */
         secondary:
-          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-slate-100/80 [&_svg]:text-[#0077B6]",
+          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-slate-100/80 [&_svg]:text-[#4854CC]",
 
         /* ── Outline ── */
         outline:
-          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-slate-100/80 [&_svg]:text-[#0077B6]",
+          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-slate-100/80 [&_svg]:text-[#4854CC]",
 
         /* ── Edit ── */
         edit:
-          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-[#0077B6]/10 [&_svg]:text-[#0077B6]",
+          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-[#4854CC]/10 [&_svg]:text-[#4854CC]",
 
         /* ── Destructive / Delete / Remove / Logout ── */
         destructive:
@@ -39,7 +39,7 @@ const buttonVariants = cva(
 
         /* ── View ── */
         view:
-          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-[#0077B6]/10 [&_svg]:text-[#0077B6]",
+          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-[#4854CC]/10 [&_svg]:text-[#4854CC]",
 
         /* ── Print ── */
         print:
@@ -47,23 +47,23 @@ const buttonVariants = cva(
 
         /* ── Export / Import ── */
         export:
-          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-[#0077B6]/10 [&_svg]:text-[#0077B6]",
+          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-[#4854CC]/10 [&_svg]:text-[#4854CC]",
 
         /* ── Ghost ── */
         ghost:
-          "border-transparent bg-transparent text-[#374151] hover:bg-slate-100/80 hover:text-[#1F2937] [&_svg]:text-[#0077B6]",
+          "border-transparent bg-transparent text-[#374151] hover:bg-slate-100/80 hover:text-[#1F2937] [&_svg]:text-[#4854CC]",
 
         /* ── Link ── */
         link:
-          "border-transparent bg-transparent text-[#0077B6] underline-offset-4 hover:underline",
+          "border-transparent bg-transparent text-[#4854CC] underline-offset-4 hover:underline",
 
         /* ── Search / Filter ── */
         filter:
-          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-slate-100/80 [&_svg]:text-[#0077B6]",
+          "border-slate-200/80 bg-white/70 text-[#1F2937] shadow-sm backdrop-blur-xl hover:bg-slate-100/80 [&_svg]:text-[#4854CC]",
 
         /* ── Notification Badge ── */
         notification:
-          "rounded-full border-transparent bg-[#0077B6] text-white shadow-sm hover:bg-[#005F95] [&_svg]:text-white",
+          "rounded-full border-transparent bg-[#4854CC] text-white shadow-sm hover:bg-[#005F95] [&_svg]:text-white",
       },
       size: {
         xs: "h-8 gap-1 rounded-lg px-2.5 text-xs [&_svg:not([class*='size-'])]:size-3",

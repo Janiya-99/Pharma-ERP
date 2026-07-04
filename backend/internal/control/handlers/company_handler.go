@@ -24,11 +24,18 @@ func (h *CompanyHandler) GetCompanyProfile(c *gin.Context) {
 	companyDB, _ := c.Get("companyDB")
 	db := companyDB.(*gorm.DB)
 
+	authCtx, exists := c.Get("authContext")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, dto.ErrorResponse("Auth context missing", nil))
+		return
+	}
+	ctx := authCtx.(*middleware.AuthContext)
+
 	repo := repositories.NewCompanyRepository(db)
 	auditService := services.NewAuditService(db, h.logger)
 	service := services.NewCompanyService(repo, auditService)
 
-	company, err := service.GetCompanyProfile()
+	company, err := service.GetCompanyProfile(ctx.CompanyCode)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse(err.Error(), nil))
 		return
@@ -61,7 +68,7 @@ func (h *CompanyHandler) UpdateCompanyProfile(c *gin.Context) {
 	auditService := services.NewAuditService(db, h.logger)
 	service := services.NewCompanyService(repo, auditService)
 
-	company, err := service.UpdateCompanyProfile(req, ctx.UserID, ctx.ActiveBranchID, ipAddress, userAgent)
+	company, err := service.UpdateCompanyProfile(ctx.CompanyCode, req, ctx.UserID, ctx.ActiveBranchID, ipAddress, userAgent)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse(err.Error(), nil))
 		return

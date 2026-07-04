@@ -53,7 +53,7 @@ const moduleData = [
   { name: "Compliance", value: 200 },
 ];
 
-const COLORS = ["#0077B6", "#005F95", "#023E8A", "#002137"];
+const COLORS = ["#4854CC", "#005F95", "#023E8A", "#002137"];
 
 const ControlCenterDashboardPage = () => {
   const [dateFilter, setDateFilter] = useState("This Week");
@@ -72,13 +72,13 @@ const ControlCenterDashboardPage = () => {
               <input 
                 type="text" 
                 placeholder="Search..." 
-                className="h-9 rounded-xl border border-slate-300 bg-background pl-9 pr-4 text-sm text-foreground placeholder-muted-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 transition-all shadow-sm"
+                className="h-9 rounded-xl border border-slate-300 bg-background pl-9 pr-4 text-sm text-foreground placeholder-muted-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 transition-all shadow-sm"
               />
             </div>
 
             {/* Branch Switcher Select */}
             <Select defaultValue="all">
-              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 shadow-sm w-[140px]">
+              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 shadow-sm w-[140px]">
                 <SelectValue placeholder="All Branches" />
               </SelectTrigger>
               <SelectContent className="bg-card border border-slate-200/80 rounded-xl shadow-lg">
@@ -90,7 +90,7 @@ const ControlCenterDashboardPage = () => {
 
             {/* Date Filter Select */}
             <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 shadow-sm w-[120px]">
+              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 shadow-sm w-[120px]">
                 <SelectValue placeholder="This Week" />
               </SelectTrigger>
               <SelectContent className="bg-card border border-slate-200/80 rounded-xl shadow-lg">
@@ -118,7 +118,7 @@ const ControlCenterDashboardPage = () => {
         <KPICard
           title="Total Companies"
           value="4"
-          icon={<Building2 className="h-5 w-5 text-[#0077B6]" />}
+          icon={<Building2 className="h-5 w-5 text-[#4854CC]" />}
           trend="up"
           trendValue="+1 this year"
         />
@@ -172,9 +172,9 @@ const ControlCenterDashboardPage = () => {
                 <YAxis stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)' }}
-                  itemStyle={{ color: '#0077B6' }}
+                  itemStyle={{ color: '#4854CC' }}
                 />
-                <Line type="monotone" dataKey="users" stroke="#0077B6" strokeWidth={3} dot={{ r: 4, fill: '#ffffff', stroke: '#0077B6', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#0077B6' }} />
+                <Line type="monotone" dataKey="users" stroke="#4854CC" strokeWidth={3} dot={{ r: 4, fill: '#ffffff', stroke: '#4854CC', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#4854CC' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -217,7 +217,7 @@ const ControlCenterDashboardPage = () => {
               { time: "Yesterday", event: "New API key generated", user: "dev@hq.corp", type: "info" },
             ].map((log, i) => (
               <div key={i} className="flex items-start gap-3 rounded-xl bg-muted/20 p-3 border border-slate-200/80 hover:bg-muted/40 transition-colors">
-                <div className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 ${log.type === 'critical' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : log.type === 'warning' ? 'bg-amber-500' : 'bg-[#0077B6]'}`} />
+                <div className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 ${log.type === 'critical' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : log.type === 'warning' ? 'bg-amber-500' : 'bg-[#4854CC]'}`} />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{log.event}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{log.user} • {log.time}</p>
@@ -280,7 +280,7 @@ const ControlCenterDashboardPage = () => {
         <SectionCard title="Branch Users">
           <div className="space-y-4 pt-2">
             {[
-              { name: "Headquarters", users: 542, percentage: 65, color: "bg-[#0077B6]" },
+              { name: "Headquarters", users: 542, percentage: 65, color: "bg-[#4854CC]" },
               { name: "NY Branch", users: 210, percentage: 25, color: "bg-[#005F95]" },
               { name: "LA Branch", users: 84, percentage: 10, color: "bg-[#002137]" },
             ].map((branch, i) => (
