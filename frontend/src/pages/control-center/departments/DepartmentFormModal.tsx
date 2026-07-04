@@ -8,10 +8,23 @@ import { createDepartment, updateDepartment } from "../../../api/controlApi";
 
 import { toast } from "sonner";
 
-const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: { isOpen?: boolean; onClose?: unknown; department?: unknown; onSuccess?: unknown }) => {
+const DepartmentFormModal = ({
+  isOpen,
+  onClose,
+  department = null,
+  onSuccess,
+  existingDepartments = [],
+}: {
+  isOpen?: boolean;
+  onClose?: any;
+  department?: any;
+  onSuccess?: any;
+  existingDepartments?: any[];
+}) => {
   const isEdit = !!department;
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
     department_code: "",
@@ -38,6 +51,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
         });
       }
       setError(null);
+      setFieldErrors({});
     }
   }, [isOpen, department]);
 
@@ -51,7 +65,48 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
     setLoading(true);
+
+    const errors: Record<string, string> = {};
+
+    if (!formData.department_code.trim()) {
+      errors.department_code = "Department Code is required.";
+    }
+    if (!formData.department_name.trim()) {
+      errors.department_name = "Department Name is required.";
+    }
+
+    if (existingDepartments && Array.isArray(existingDepartments)) {
+      if (formData.department_code && formData.department_code.trim() !== "" && !isEdit) {
+        const duplicateCode = existingDepartments.find(
+          (d: any) =>
+            d.department_code &&
+            d.department_code.trim().toLowerCase() === formData.department_code.trim().toLowerCase()
+        );
+        if (duplicateCode) {
+          errors.department_code = "Department Code is already in use.";
+        }
+      }
+
+      if (formData.department_name && formData.department_name.trim() !== "") {
+        const duplicateName = existingDepartments.find(
+          (d: any) =>
+            d.department_name &&
+            d.department_name.trim().toLowerCase() === formData.department_name.trim().toLowerCase() &&
+            (!isEdit || d.id !== department.id)
+        );
+        if (duplicateName) {
+          errors.department_name = "Department Name is already in use.";
+        }
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isEdit) {
@@ -62,8 +117,16 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
         toast.success("Department created successfully!");
       }
       onSuccess();
-    } catch (err) {
-      setError(err.response?.data?.message || "An error occurred");
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || "An error occurred";
+      const normalizedMsg = errMsg.toLowerCase();
+      if (normalizedMsg.includes("department code") || normalizedMsg.includes("code already exists")) {
+        setFieldErrors({ department_code: errMsg });
+      } else if (normalizedMsg.includes("department name") || normalizedMsg.includes("name already exists")) {
+        setFieldErrors({ department_name: errMsg });
+      } else {
+        setError(errMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -75,7 +138,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
       onClose={onClose}
       title={isEdit ? "Edit Department" : "Create New Department"}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <FormError message={error} />
         
         <Input
@@ -86,6 +149,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
           required
           disabled={isEdit}
           placeholder="e.g. IT"
+          error={fieldErrors.department_code}
         />
         
         <Input
@@ -94,6 +158,8 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
           value={formData.department_name}
           onChange={handleChange}
           required
+          placeholder="e.g. Information Technology"
+          error={fieldErrors.department_name}
         />
         
         <div>
@@ -103,6 +169,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
             value={formData.description}
             onChange={handleChange}
             rows={3}
+            placeholder="e.g. Handles company software and hardware assets"
             className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
           />
         </div>
@@ -117,6 +184,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department = null, onSuccess }: 
             { value: "active", label: "Active" },
             { value: "inactive", label: "Inactive" },
           ]}
+          error={fieldErrors.status}
         />
 
         <div className="mt-6 flex justify-end space-x-3 border-t border-gray-200 pt-4">

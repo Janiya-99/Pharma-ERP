@@ -44,8 +44,8 @@ const AppLayout = () => {
             <div className="page-content flex-grow space-y-8 pb-32 font-sans">
               <Outlet />
             </div>
-            <footer className="mt-auto border-t px-3 pt-4 pb-6 md:px-6" style={{ borderColor: 'rgba(148, 163, 184, 0.15)', background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(16px) saturate(180%)' }}>
-              <div className="flex flex-col items-center justify-between gap-2 text-xs text-[#6B7280] sm:flex-row">
+            <footer className="mt-auto h-14 border-t px-3 md:px-6 flex items-center" style={{ borderColor: 'rgba(148, 163, 184, 0.15)', background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(16px) saturate(180%)' }}>
+              <div className="w-full flex flex-col items-center justify-between gap-2 text-xs text-[#6B7280] sm:flex-row">
                 <span>© {new Date().getFullYear()} Pharma ERP. All rights reserved.</span>
                 <span>
                   Developed by{" "}

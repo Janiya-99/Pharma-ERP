@@ -782,10 +782,10 @@ const Sidebar = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div
-            className={`mb-6 mt-auto cursor-pointer border-t border-slate-200/70 transition-all duration-300 hover:bg-slate-100/80 ${
+            className={`mt-auto h-14 cursor-pointer border-t border-slate-200/70 transition-all duration-300 hover:bg-slate-100/80 flex items-center ${
               isMobile || effectiveExpanded
-                ? "px-4 py-3"
-                : "flex justify-center px-2 py-3"
+                ? "px-4"
+                : "justify-center px-2"
             }`}
           >
             {isMobile || effectiveExpanded ? (

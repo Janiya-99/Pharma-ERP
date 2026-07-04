@@ -76,6 +76,20 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		return nil, fmt.Errorf("company code %s is already registered", req.CompanyCode)
 	}
 
+	// Check if company name already exists in platform DB
+	var nameCount int64
+	platformDB.Model(&models.TenantCompany{}).Where("company_name = ?", req.CompanyName).Count(&nameCount)
+	if nameCount > 0 {
+		return nil, fmt.Errorf("company name %s is already registered", req.CompanyName)
+	}
+
+	// Check if company email already exists in platform DB
+	var emailCount int64
+	platformDB.Model(&models.TenantCompany{}).Where("company_email = ?", req.CompanyEmail).Count(&emailCount)
+	if emailCount > 0 {
+		return nil, fmt.Errorf("company email %s is already registered", req.CompanyEmail)
+	}
+
 	dbName := "erp_" + strings.ToLower(req.CompanyCode)
 
 	// Fetch subscription plan

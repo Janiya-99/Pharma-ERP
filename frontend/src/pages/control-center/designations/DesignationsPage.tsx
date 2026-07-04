@@ -11,6 +11,7 @@ import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import DesignationFormModal from "./DesignationFormModal";
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const DesignationsPage = () => {
   const [designations, setDesignations] = useState([]);
@@ -117,6 +118,7 @@ const DesignationsPage = () => {
     },
     {
       header: "Actions",
+      className: "text-right",
       cellClassName: "text-right",
       cell: (row: unknown) => (
         <div className="flex justify-end space-x-2">
@@ -173,16 +175,19 @@ const DesignationsPage = () => {
             <Search className="w-4 h-4" />
           </Button>
         </form>
-        <select
-          name="status"
-          value={filters.status}
-          onChange={(e: any) => setFilters({ ...filters, status: e.target.value, page: 1 })}
-          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
+        <Select
+          value={filters.status || "all"}
+          onValueChange={(val) => setFilters({ ...filters, status: val === "all" ? "" : val, page: 1 })}
         >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+          <SelectTrigger className="w-[140px] h-[38px] bg-white border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-slate-100/50">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border-slate-200 rounded-xl">
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <DataTable

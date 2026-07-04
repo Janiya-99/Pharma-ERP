@@ -24,6 +24,7 @@ const BranchFormModal = ({
   const isEdit = !!branch;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
     branch_code: "",
@@ -62,6 +63,7 @@ const BranchFormModal = ({
         });
       }
       setError(null);
+      setFieldErrors({});
     }
   }, [isOpen, branch]);
 
@@ -76,15 +78,30 @@ const BranchFormModal = ({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
     setLoading(true);
+
+    const errors: Record<string, string> = {};
+
+    // Required fields check
+    if (!formData.branch_code.trim()) {
+      errors.branch_code = "Branch Code is required.";
+    }
+    if (!formData.branch_name.trim()) {
+      errors.branch_name = "Branch Name is required.";
+    }
+    if (!formData.branch_type.trim()) {
+      errors.branch_type = "Branch Type is required.";
+    }
+    if (!formData.status.trim()) {
+      errors.status = "Status is required.";
+    }
 
     // Email format validation
     if (formData.email && formData.email.trim() !== "") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email.trim())) {
-        setError("Please enter a valid email address.");
-        setLoading(false);
-        return;
+        errors.email = "Please enter a valid email address.";
       }
     }
 
@@ -92,14 +109,24 @@ const BranchFormModal = ({
     if (formData.phone && formData.phone.trim() !== "") {
       const phoneRegex = /^\+?[0-9\s\-()]{7,20}$/;
       if (!phoneRegex.test(formData.phone.trim())) {
-        setError("Please enter a valid contact number (7-20 digits).");
-        setLoading(false);
-        return;
+        errors.phone = "Please enter a valid contact number (7-20 digits).";
       }
     }
 
     // Uniqueness validation across existing branches
     if (existingBranches && Array.isArray(existingBranches)) {
+      if (formData.branch_name && formData.branch_name.trim() !== "") {
+        const duplicateName = existingBranches.find(
+          (b: any) =>
+            b.branch_name &&
+            b.branch_name.trim().toLowerCase() === formData.branch_name.trim().toLowerCase() &&
+            (!isEdit || b.id !== branch.id)
+        );
+        if (duplicateName) {
+          errors.branch_name = "Branch Name is already in use.";
+        }
+      }
+
       if (formData.phone && formData.phone.trim() !== "") {
         const duplicatePhone = existingBranches.find(
           (b: any) =>
@@ -108,9 +135,7 @@ const BranchFormModal = ({
             (!isEdit || b.id !== branch.id)
         );
         if (duplicatePhone) {
-          setError(`Contact number is already registered to branch "${duplicatePhone.branch_name}".`);
-          setLoading(false);
-          return;
+          errors.phone = `Contact number is already registered to branch "${duplicatePhone.branch_name}".`;
         }
       }
 
@@ -122,11 +147,15 @@ const BranchFormModal = ({
             (!isEdit || b.id !== branch.id)
         );
         if (duplicateEmail) {
-          setError(`Email address is already registered to branch "${duplicateEmail.branch_name}".`);
-          setLoading(false);
-          return;
+          errors.email = `Email address is already registered to branch "${duplicateEmail.branch_name}".`;
         }
       }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
     }
 
     try {
@@ -144,7 +173,15 @@ const BranchFormModal = ({
       }
       onSuccess();
     } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred");
+      const errMsg = err.response?.data?.message || "An error occurred";
+      const normalizedMsg = errMsg.toLowerCase();
+      if (normalizedMsg.includes("branch code") || normalizedMsg.includes("code already exists")) {
+        setFieldErrors({ branch_code: errMsg });
+      } else if (normalizedMsg.includes("branch name") || normalizedMsg.includes("name already exists")) {
+        setFieldErrors({ branch_name: errMsg });
+      } else {
+        setError(errMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -157,7 +194,7 @@ const BranchFormModal = ({
       title={isEdit ? "Edit Branch" : "Create New Branch"}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <FormError message={error} />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -169,6 +206,7 @@ const BranchFormModal = ({
             required
             disabled={isEdit}
             placeholder="e.g. CMB-01"
+            error={fieldErrors.branch_code}
           />
           <Input
             label="Branch Name *"
@@ -177,6 +215,7 @@ const BranchFormModal = ({
             onChange={handleChange}
             required
             placeholder="e.g. Colombo Headquarters"
+            error={fieldErrors.branch_name}
           />
           
           <Select
@@ -192,6 +231,7 @@ const BranchFormModal = ({
               { value: "Distribution Center", label: "Distribution Center" },
               { value: "Admin Office", label: "Admin Office" },
             ]}
+            error={fieldErrors.branch_type}
           />
           
           <Select
@@ -204,14 +244,16 @@ const BranchFormModal = ({
               { value: "active", label: "Active" },
               { value: "inactive", label: "Inactive" },
             ]}
+            error={fieldErrors.status}
           />
-
+ 
           <Input
             label="Phone"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             placeholder="e.g. +94 11 234 5678"
+            error={fieldErrors.phone}
           />
           <Input
             label="Email"
@@ -220,8 +262,9 @@ const BranchFormModal = ({
             value={formData.email}
             onChange={handleChange}
             placeholder="e.g. branch@company.com"
+            error={fieldErrors.email}
           />
-
+ 
           <div className="sm:col-span-2">
             <label className="block text-xs font-semibold text-slate-950 mb-1.5">Address</label>
             <textarea
@@ -232,8 +275,9 @@ const BranchFormModal = ({
               placeholder="e.g. 123 Galle Road, Colombo 03"
               className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100/50 transition-all duration-150"
             />
+            {fieldErrors.address && <p className="mt-1 text-xs text-red-500">{fieldErrors.address}</p>}
           </div>
-
+ 
           <div className="sm:col-span-2 flex items-center mt-2">
             <input
               id="is_main_branch"

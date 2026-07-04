@@ -11,6 +11,7 @@ import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import DepartmentFormModal from "./DepartmentFormModal";
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const DepartmentsPage = () => {
   const [departments, setDepartments] = useState([]);
@@ -47,7 +48,7 @@ const DepartmentsPage = () => {
         setDepartments(res.data);
         setPagination(res.pagination);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.message || "Failed to load departments");
     } finally {
       setLoading(false);
@@ -89,7 +90,7 @@ const DepartmentsPage = () => {
       await deleteDepartment(departmentToDelete.id);
       setIsDeleteOpen(false);
       fetchDepartments();
-    } catch (err) {
+    } catch (err: any) {
       setDeleteError(err.response?.data?.message || "Failed to delete department");
     } finally {
       setIsDeleting(false);
@@ -109,20 +110,21 @@ const DepartmentsPage = () => {
     {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => <span className="text-gray-500 truncate block max-w-xs">{row.description || "-"}</span>,
+      cell: (row: any) => <span className="text-gray-500 truncate block max-w-xs">{row.description || "-"}</span>,
     },
     {
       header: "Status",
-      cell: (row: unknown) => (
-        <Badge variant={row.status === "active" ? "success" : "default"}>
+      cell: (row: any) => (
+        <Badge variant={row?.status === "active" ? "success" : "default"}>
           {row.status}
         </Badge>
       ),
     },
     {
       header: "Actions",
+      className: "text-right",
       cellClassName: "text-right",
-      cell: (row: unknown) => (
+      cell: (row: any) => (
         <div className="flex justify-end space-x-2">
           <PermissionGuard permission="control.department.update">
             <button
@@ -177,16 +179,19 @@ const DepartmentsPage = () => {
             <Search className="w-4 h-4" />
           </Button>
         </form>
-        <select
-          name="status"
-          value={filters.status}
-          onChange={(e: any) => setFilters({ ...filters, status: e.target.value, page: 1 })}
-          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
+        <Select
+          value={filters.status || "all"}
+          onValueChange={(val) => setFilters({ ...filters, status: val === "all" ? "" : val, page: 1 })}
         >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+          <SelectTrigger className="w-[140px] h-[38px] bg-white border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-slate-100/50">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border-slate-200 rounded-xl">
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <DataTable
@@ -198,13 +203,14 @@ const DepartmentsPage = () => {
 
       <Pagination
         pagination={pagination}
-        onPageChange={(page: unknown) => setFilters({ ...filters, page })}
+        onPageChange={(page: number) => setFilters({ ...filters, page })}
       />
 
       <DepartmentFormModal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         department={selectedDepartment}
+        existingDepartments={departments}
         onSuccess={handleFormSuccess}
       />
 

@@ -70,6 +70,8 @@ const CompanyCreatePage = () => {
     setValue,
     watch,
     getValues,
+    setError,
+    trigger,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(createCompanySchema),
@@ -125,14 +127,45 @@ const CompanyCreatePage = () => {
         toast.error(res.message || "Failed to create company");
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "An error occurred during database creation");
+      const errMsg = err.response?.data?.message || "";
+      if (errMsg.toLowerCase().includes("company code") || errMsg.toLowerCase().includes("database name")) {
+        setError("company_code", { type: "manual", message: errMsg });
+        setCurrentStep(1);
+      } else if (errMsg.toLowerCase().includes("company name")) {
+        setError("company_name", { type: "manual", message: errMsg });
+        setCurrentStep(1);
+      } else if (errMsg.toLowerCase().includes("company email")) {
+        setError("company_email", { type: "manual", message: errMsg });
+        setCurrentStep(1);
+      } else if (errMsg.toLowerCase().includes("first user email") || errMsg.toLowerCase().includes("admin email")) {
+        setError("first_user.email", { type: "manual", message: errMsg });
+        setCurrentStep(5);
+      } else {
+        toast.error(errMsg || "An error occurred during database creation");
+      }
     } finally {
       setSubmitting(false);
     }
   };
 
-  const nextStep = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  const nextStep = async () => {
+    let fieldsToValidate: any[] = [];
+    if (currentStep === 1) {
+      fieldsToValidate = ["company_code", "company_name", "company_email"];
+    } else if (currentStep === 2) {
+      fieldsToValidate = ["subscription_plan_id"];
+    } else if (currentStep === 3) {
+      fieldsToValidate = ["modules"];
+    } else if (currentStep === 4) {
+      fieldsToValidate = ["billing_profile.billing_email"];
+    } else if (currentStep === 5) {
+      fieldsToValidate = ["first_user.name", "first_user.email", "first_user.temporary_password"];
+    }
+
+    const isValid = fieldsToValidate.length > 0 ? await trigger(fieldsToValidate) : true;
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+    }
   };
 
   const prevStep = () => {
@@ -226,6 +259,7 @@ const CompanyCreatePage = () => {
                   placeholder="e.g. OMACX Pvt Ltd"
                   className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
+                {errors.legal_name && <p className="text-xs text-red-400 mt-1">{errors.legal_name.message}</p>}
               </div>
 
               <div>
@@ -247,6 +281,7 @@ const CompanyCreatePage = () => {
                   placeholder="e.g. 0770000000"
                   className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
+                {errors.company_phone && <p className="text-xs text-red-400 mt-1">{errors.company_phone.message}</p>}
               </div>
 
               <div>
@@ -257,6 +292,7 @@ const CompanyCreatePage = () => {
                   placeholder="e.g. Pharmaceuticals"
                   className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
+                {errors.industry && <p className="text-xs text-red-400 mt-1">{errors.industry.message}</p>}
               </div>
             </div>
           </div>
@@ -343,6 +379,9 @@ const CompanyCreatePage = () => {
                   placeholder="e.g. OMACX Financials"
                   className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none"
                 />
+                {errors.billing_profile?.billing_name && (
+                  <p className="text-xs text-red-400 mt-1">{errors.billing_profile.billing_name.message}</p>
+                )}
               </div>
 
               <div>
@@ -366,6 +405,9 @@ const CompanyCreatePage = () => {
                   placeholder="Colombo, Sri Lanka"
                   className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none"
                 />
+                {errors.billing_profile?.billing_address && (
+                  <p className="text-xs text-red-400 mt-1">{errors.billing_profile.billing_address.message}</p>
+                )}
               </div>
 
               <div>
@@ -378,6 +420,9 @@ const CompanyCreatePage = () => {
                   <option value="USD">USD (US Dollar)</option>
                   <option value="EUR">EUR (Euro)</option>
                 </select>
+                {errors.billing_profile?.currency && (
+                  <p className="text-xs text-red-400 mt-1">{errors.billing_profile.currency.message}</p>
+                )}
               </div>
             </div>
           </div>
