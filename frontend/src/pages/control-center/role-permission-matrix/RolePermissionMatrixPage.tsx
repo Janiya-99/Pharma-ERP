@@ -166,7 +166,7 @@ const RolePermissionMatrixPage = () => {
       )}
 
       {/* Top Filter Bar */}
-      <div className="bg-white p-5 rounded-lg border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 shadow-sm items-end justify-between">
+      <div className="glass-filter-bar p-5 mb-6 flex flex-col md:flex-row gap-4 items-end justify-between">
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           <div className="w-full md:w-64">
             <label className="block text-sm font-medium text-gray-700 mb-1">1. Select Software Module</label>

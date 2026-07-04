@@ -38,16 +38,16 @@ const Button = ({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-sm shadow-green-100 focus-visible:ring-green-500",
+      "bg-gradient-to-br from-[#4854CC] to-[#3730a3] text-white hover:from-[#5b66d6] hover:to-[#4854CC] active:from-[#3730a3] active:to-[#312e81] shadow-sm shadow-indigo-200/50 focus-visible:ring-indigo-500",
     secondary:
-      "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-400",
+      "bg-white/50 text-gray-700 hover:bg-white/70 active:bg-white/80 backdrop-blur-sm border border-white/50 focus-visible:ring-gray-400",
     outline:
-      "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 shadow-sm focus-visible:ring-gray-400",
+      "border bg-white/40 text-gray-700 hover:bg-white/60 active:bg-white/70 backdrop-blur-sm shadow-sm focus-visible:ring-gray-400" + " border-[rgba(148,163,184,0.3)]",
     danger:
-      "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm shadow-red-100 focus-visible:ring-red-500",
+      "bg-gradient-to-br from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800 active:from-red-700 active:to-red-900 shadow-sm shadow-red-200/50 focus-visible:ring-red-500",
     ghost:
-      "bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800 focus-visible:ring-gray-400",
-    info: "bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-blue-100 focus-visible:ring-indigo-500",
+      "bg-transparent text-gray-600 hover:bg-white/40 hover:text-gray-800 backdrop-blur-sm focus-visible:ring-gray-400",
+    info: "bg-gradient-to-br from-indigo-500 to-indigo-700 text-white hover:from-indigo-600 hover:to-indigo-800 active:from-indigo-700 active:to-indigo-900 shadow-sm shadow-indigo-200/50 focus-visible:ring-indigo-500",
   };
 
   const sizes: Record<ButtonSize, string> = {

@@ -67,7 +67,7 @@ const Select = ({
           <PopoverTrigger asChild disabled={disabled}>
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-left hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-100/50 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-colors shadow-sm"
+              className="flex w-full items-center justify-between gap-1.5 rounded-xl border px-3.5 py-2.5 text-sm text-left focus:outline-none disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-all glass-input"
             >
               <span className={selectedOption ? "text-slate-900 truncate" : "text-slate-400 truncate"}>
                 {selectedOption ? selectedOption.label : placeholder}
@@ -75,8 +75,8 @@ const Select = ({
               <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="p-0 bg-white border border-gray-200 shadow-lg rounded-md z-50 w-[var(--radix-popover-trigger-width)]">
-            <div className="flex items-center border-b border-gray-100 px-3 py-2 bg-gray-50/50">
+          <PopoverContent className="p-0 border shadow-lg rounded-md z-50 w-[var(--radix-popover-trigger-width)]" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px) saturate(180%)', borderColor: 'rgba(148,163,184,0.25)' }}>
+            <div className="flex items-center border-b px-3 py-2" style={{ borderColor: 'rgba(148,163,184,0.15)', background: 'rgba(238,242,255,0.5)' }}>
               <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
               <input
                 className="flex w-full bg-transparent text-sm outline-none placeholder:text-gray-400 disabled:cursor-not-allowed"
@@ -129,10 +129,10 @@ const Select = ({
         onValueChange={handleSelectChange}
         disabled={disabled}
       >
-        <SelectTrigger className="w-full bg-white border border-slate-200 focus:ring-2 focus:ring-slate-100/50 rounded-xl text-sm text-left py-2.5 px-3.5 flex justify-between items-center text-slate-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-colors shadow-sm">
+        <SelectTrigger className="w-full border focus:ring-2 focus:ring-slate-100/50 rounded-xl text-sm text-left py-2.5 px-3.5 flex justify-between items-center text-slate-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-all glass-input">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className="bg-white border border-gray-200 shadow-md rounded-md z-50 max-h-60 overflow-y-auto">
+        <SelectContent className="border shadow-md rounded-md z-50 max-h-60 overflow-y-auto" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px) saturate(180%)', borderColor: 'rgba(148,163,184,0.25)' }}>
           {options.map((opt: any) => (
             <SelectItem
               key={opt.value}

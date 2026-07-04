@@ -48,9 +48,9 @@ function DataTable<TData = any>({
 }: DataTableProps<TData>) {
   if (loading) {
     return (
-      <div className="border-slate-100 flex flex-col items-center justify-center gap-3 rounded-2xl border bg-white py-20 shadow-sm">
+      <div className="glass-card flex flex-col items-center justify-center gap-3 py-20">
         <div className="relative">
-          <div className="border-slate-100 h-10 w-10 rounded-full border-2" />
+          <div className="h-10 w-10 rounded-full border-2" style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
           <Loader2 className="text-slate-900 absolute inset-0 h-10 w-10 animate-spin" />
         </div>
         <p className="text-slate-500 text-sm font-semibold">Loading data...</p>
@@ -60,8 +60,8 @@ function DataTable<TData = any>({
 
   if (!data || data.length === 0) {
     return (
-      <div className="border-slate-100 flex flex-col items-center justify-center gap-3 rounded-2xl border bg-white py-20 shadow-sm">
-        <div className="bg-slate-50 border-slate-100 flex h-14 w-14 items-center justify-center rounded-2xl border">
+      <div className="glass-card flex flex-col items-center justify-center gap-3 py-20">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: 'rgba(238,242,255,0.5)', border: '1px solid rgba(148,163,184,0.15)' }}>
           <Inbox className="text-slate-400 h-6 w-6" />
         </div>
         <div className="text-center">
@@ -84,9 +84,9 @@ function DataTable<TData = any>({
 
   return (
     <div>
-      <div className="border-slate-150 overflow-hidden rounded-2xl border bg-white shadow-sm">
+      <div className="glass-table overflow-hidden">
         <Table>
-          <TableHeader className="bg-slate-50/75 border-slate-100 border-b">
+          <TableHeader style={{ background: 'rgba(238,242,255,0.5)', borderBottom: '1px solid rgba(148,163,184,0.15)' }}>
             <TableRow className="hover:bg-transparent">
               {columns.map((col, index) => (
                 <TableHead
@@ -110,7 +110,7 @@ function DataTable<TData = any>({
               <TableRow
                 key={((row as any).id as string) || rowIndex}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={`hover:bg-slate-50/50 group border-none transition-colors duration-150 ${
+                className={`group border-none transition-colors duration-150 hover:bg-[rgba(238,242,255,0.35)] ${
                   onRowClick ? "cursor-pointer" : ""
                 }`}
               >

@@ -203,7 +203,7 @@ const RolesPage = () => {
 
       <FormError message={error} />
 
-      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6 flex flex-col sm:flex-row gap-4 shadow-sm">
+      <div className="glass-filter-bar p-4 mb-6 flex flex-col sm:flex-row gap-4">
         <form onSubmit={handleSearch} className="flex-1 flex gap-2">
           <Input
             placeholder="Search roles..."

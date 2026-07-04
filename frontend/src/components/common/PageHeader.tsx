@@ -9,7 +9,7 @@ interface PageHeaderProps {
 
 const PageHeader = ({ title, description, action, badge }: PageHeaderProps) => {
   return (
-    <div className="sticky top-0 z-10 flex flex-col gap-4 border-b border-gray-100 bg-white/60 px-6 py-5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
+    <div className="sticky top-0 z-10 flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between" style={{ background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(16px) saturate(180%)', borderBottom: '1px solid rgba(148,163,184,0.15)' }}>
       <div className="flex min-w-0 items-start gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">

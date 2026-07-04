@@ -30,7 +30,7 @@ const AppLayout = () => {
       value={{ mobileOpen, setMobileOpen, desktopExpanded, setDesktopExpanded }}
     >
       <div
-        className="grid h-screen grid-cols-[0_1fr] gap-0 overflow-hidden bg-slate-50 font-sans text-[#1F2937] transition-[grid-template-columns] duration-300 lg:grid-cols-[var(--sidebar-width)_1fr]"
+        className="grid h-screen grid-cols-[0_1fr] gap-0 overflow-hidden font-sans text-[#1F2937] transition-[grid-template-columns] duration-300 lg:grid-cols-[var(--sidebar-width)_1fr]"
         style={
           {
             "--sidebar-width": desktopExpanded ? "15rem" : "68px",
@@ -40,11 +40,11 @@ const AppLayout = () => {
         <Sidebar />
         <div className="flex min-w-0 flex-col overflow-hidden">
           <Topbar />
-          <main className="flex flex-1 flex-col overflow-y-auto scroll-smooth bg-slate-50">
+          <main className="flex flex-1 flex-col overflow-y-auto scroll-smooth">
             <div className="page-content flex-grow space-y-8 pb-32 font-sans">
               <Outlet />
             </div>
-            <footer className="mt-auto border-t border-slate-200/70 bg-white/55 px-3 pt-4 pb-6 backdrop-blur-xl md:px-6">
+            <footer className="mt-auto border-t px-3 pt-4 pb-6 md:px-6" style={{ borderColor: 'rgba(148, 163, 184, 0.15)', background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(16px) saturate(180%)' }}>
               <div className="flex flex-col items-center justify-between gap-2 text-xs text-[#6B7280] sm:flex-row">
                 <span>© {new Date().getFullYear()} Pharma ERP. All rights reserved.</span>
                 <span>
