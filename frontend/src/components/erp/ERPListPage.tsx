@@ -28,7 +28,7 @@ const defaultStatusColors: StatusConfig = {
   Inactive: "bg-gray-500 text-white dark:bg-gray-600",
   Draft: "bg-gray-500 text-white dark:bg-gray-600",
   "Pending Approval": "bg-yellow-500 text-white dark:bg-yellow-600",
-  Approved: "bg-blue-500 text-white dark:bg-blue-600",
+  Approved: "bg-indigo-500 text-white dark:bg-indigo-600",
   Posted: "bg-green-500 text-white dark:bg-green-600",
   Rejected: "bg-red-500 text-white dark:bg-red-600",
   Cancelled: "bg-red-500 text-white dark:bg-red-600",
@@ -40,7 +40,7 @@ const defaultStatusColors: StatusConfig = {
   Recalled: "bg-red-500 text-white dark:bg-red-600",
   Expired: "bg-red-600 text-white dark:bg-red-700",
   Success: "bg-green-500 text-white dark:bg-green-600",
-  "In Progress": "bg-blue-500 text-white dark:bg-blue-600",
+  "In Progress": "bg-indigo-500 text-white dark:bg-indigo-600",
   Completed: "bg-green-500 text-white dark:bg-green-600",
 };
 

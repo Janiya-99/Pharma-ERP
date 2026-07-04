@@ -140,7 +140,7 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
     { title: "Invoice Count", value: summary.invoice_count || 0, format: "number", icon: <FileText className="h-4 w-4" /> },
     { title: "Total Balance", value: summary.balance_amount || 0, format: "currency", icon: <Coins className="h-4 w-4 text-emerald-500" /> },
     { title: "Overdue Amount", value: summary.overdue_amount || 0, format: "currency", icon: <AlertTriangle className="h-4 w-4 text-red-500" /> },
-    { title: "Not Due Amount", value: summary.not_due_amount || 0, format: "currency", icon: <CalendarDays className="h-4 w-4 text-blue-500" /> },
+    { title: "Not Due Amount", value: summary.not_due_amount || 0, format: "currency", icon: <CalendarDays className="h-4 w-4 text-indigo-500" /> },
   ];
 
   return (

@@ -105,7 +105,7 @@ const CustomerContactInlineTable: React.FC<CustomerContactInlineTableProps> = ({
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
                     {c.department || "—"}
                   </td>
-                  <td className="px-4 py-3 font-medium text-blue-600 dark:text-blue-400">
+                  <td className="px-4 py-3 font-medium text-indigo-600 dark:text-indigo-400">
                     {c.email || "—"}
                   </td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
@@ -121,7 +121,7 @@ const CustomerContactInlineTable: React.FC<CustomerContactInlineTableProps> = ({
                           onClick={() =>
                             setModalState({ isOpen: true, contact: c })
                           }
-                          className="rounded-lg p-1.5 text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-navy-700"
+                          className="rounded-lg p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50 dark:hover:bg-navy-700"
                           title="Edit Contact"
                         >
                           <Edit className="h-4 w-4" />

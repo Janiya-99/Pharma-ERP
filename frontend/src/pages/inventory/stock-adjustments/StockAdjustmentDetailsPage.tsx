@@ -133,7 +133,7 @@ const StockAdjustmentDetailsPage = () => {
             {/* Warehouse Info */}
             <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-5">
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
+                <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-indigo-600 dark:text-indigo-400">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>

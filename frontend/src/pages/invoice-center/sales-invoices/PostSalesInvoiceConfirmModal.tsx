@@ -64,7 +64,7 @@ export const PostSalesInvoiceConfirmModal: React.FC<Props> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-blue-800">
+          <DialogTitle className="text-indigo-800">
             Post Sales Invoice
           </DialogTitle>
           <DialogDescription>
@@ -73,7 +73,7 @@ export const PostSalesInvoiceConfirmModal: React.FC<Props> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 space-y-2 rounded-md border border-blue-100 bg-blue-50/50 p-4 text-sm">
+        <div className="mt-2 space-y-2 rounded-md border border-indigo-100 bg-indigo-50/50 p-4 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">Invoice Number</span>
             <span className="font-semibold">{invoiceNumber}</span>
@@ -94,9 +94,9 @@ export const PostSalesInvoiceConfirmModal: React.FC<Props> = ({
             <span className="text-gray-600">Total Quantity</span>
             <span className="font-medium">{totalQuantity.toFixed(3)}</span>
           </div>
-          <div className="mt-2 flex justify-between border-t border-blue-200 pt-2">
+          <div className="mt-2 flex justify-between border-t border-indigo-200 pt-2">
             <span className="font-semibold">Total Amount</span>
-            <span className="font-bold text-blue-700">
+            <span className="font-bold text-indigo-700">
               {formatLKR(totalAmount)}
             </span>
           </div>
@@ -120,7 +120,7 @@ export const PostSalesInvoiceConfirmModal: React.FC<Props> = ({
           </Button>
           <Button
             onClick={handlePost}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-indigo-600 hover:bg-indigo-700"
             disabled={loading}
           >
             {loading ? "Posting..." : "Confirm Post"}

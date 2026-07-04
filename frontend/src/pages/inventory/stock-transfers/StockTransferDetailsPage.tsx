@@ -187,7 +187,7 @@ const StockTransferDetailsPage = () => {
                     </div>
                     <div className="flex items-center gap-2 mb-2">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        appr.action === "submitted" ? "bg-blue-100 text-blue-800" :
+                        appr.action === "submitted" ? "bg-indigo-100 text-indigo-800" :
                         appr.action === "approved" ? "bg-green-100 text-green-800" :
                         "bg-red-100 text-red-800"
                       }`}>

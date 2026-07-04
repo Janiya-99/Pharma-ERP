@@ -32,7 +32,7 @@ export default function JournalActionButtons({ journal, onAction }: { journal?: 
       {canSubmit && (
         <button
           onClick={() => onAction("submit", journal)}
-          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
+          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700"
         >
           <MdSend className="mr-1.5 h-4 w-4" /> Submit
         </button>

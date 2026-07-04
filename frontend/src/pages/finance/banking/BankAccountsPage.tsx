@@ -549,7 +549,7 @@ const BankAccountsPage = () => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card className="border border-slate-200 bg-white shadow-sm">
           <CardContent className="flex items-center gap-4">
-            <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+            <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
               <Landmark className="h-5 w-5" />
             </div>
             <div>
@@ -678,7 +678,7 @@ const BankAccountsPage = () => {
                   <TableRow key={account.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="rounded-lg bg-blue-50 p-2 text-blue-600">
+                        <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600">
                           <Landmark className="h-4 w-4" />
                         </div>
                         <div>

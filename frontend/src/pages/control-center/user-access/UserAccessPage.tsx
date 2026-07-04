@@ -589,7 +589,7 @@ const UserAccessPage = () => {
           <Card className="border-slate-200 border bg-white shadow-sm">
             <CardHeader className="border-slate-100 border-b">
               <CardTitle className="text-slate-900 flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-600" />
+                <Users className="h-5 w-5 text-indigo-600" />
                 Users
               </CardTitle>
               <CardDescription>Select a user to update access.</CardDescription>
@@ -645,13 +645,13 @@ const UserAccessPage = () => {
                           onClick={() => setSelectedUser(user)}
                           className={`w-full rounded-xl border p-3 text-left transition-all ${
                             isSelected
-                              ? "border-blue-200 bg-blue-50 shadow-sm"
-                              : "border-slate-200 hover:bg-slate-50 bg-white hover:border-blue-200"
+                              ? "border-indigo-200 bg-indigo-50 shadow-sm"
+                              : "border-slate-200 hover:bg-slate-50 bg-white hover:border-indigo-200"
                           }`}
                         >
                           <div className="flex items-start gap-3">
                             <Avatar className="h-10 w-10">
-                              <AvatarFallback className="bg-blue-100 font-semibold text-blue-700">
+                              <AvatarFallback className="bg-indigo-100 font-semibold text-indigo-700">
                                 {initialsFor(fullName)}
                               </AvatarFallback>
                             </Avatar>
@@ -695,7 +695,7 @@ const UserAccessPage = () => {
           <Card className="border-slate-200 border bg-white shadow-sm">
             <CardHeader className="border-slate-100 border-b">
               <CardTitle className="text-slate-900 flex items-center gap-2">
-                <UserCog className="h-5 w-5 text-blue-600" />
+                <UserCog className="h-5 w-5 text-indigo-600" />
                 Access Setup
               </CardTitle>
               <CardDescription>
@@ -707,7 +707,7 @@ const UserAccessPage = () => {
               {!selectedUser ? (
                 <div className="border-slate-200 bg-slate-50 flex min-h-[620px] items-center justify-center rounded-xl border border-dashed p-8 text-center">
                   <div className="max-w-sm">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm">
                       <Users className="h-6 w-6" />
                     </div>
                     <h2 className="text-slate-900 text-lg font-semibold">
@@ -731,7 +731,7 @@ const UserAccessPage = () => {
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-4">
                         <Avatar className="h-14 w-14">
-                          <AvatarFallback className="bg-blue-100 text-lg font-bold text-blue-700">
+                          <AvatarFallback className="bg-indigo-100 text-lg font-bold text-indigo-700">
                             {initialsFor(selectedUserName)}
                           </AvatarFallback>
                         </Avatar>
@@ -776,7 +776,7 @@ const UserAccessPage = () => {
                   <section className="space-y-3">
                     <div>
                       <h3 className="text-slate-900 flex items-center gap-2 text-base font-semibold">
-                        <Building2 className="h-5 w-5 text-blue-600" />
+                        <Building2 className="h-5 w-5 text-indigo-600" />
                         Branch Access
                       </h3>
                       <p className="text-slate-500 mt-1 text-sm">
@@ -789,7 +789,7 @@ const UserAccessPage = () => {
                         return (
                           <label
                             key={value}
-                            className="border-slate-200 hover:bg-slate-50 flex cursor-pointer items-center gap-3 rounded-xl border bg-white p-3 hover:border-blue-200"
+                            className="border-slate-200 hover:bg-slate-50 flex cursor-pointer items-center gap-3 rounded-xl border bg-white p-3 hover:border-indigo-200"
                           >
                             <Checkbox
                               checked={selectedBranchIds.includes(value)}
@@ -815,7 +815,7 @@ const UserAccessPage = () => {
                   <section className="space-y-3">
                     <div>
                       <h3 className="text-slate-900 flex items-center gap-2 text-base font-semibold">
-                        <Boxes className="h-5 w-5 text-blue-600" />
+                        <Boxes className="h-5 w-5 text-indigo-600" />
                         Software Access
                       </h3>
                     </div>
@@ -836,12 +836,12 @@ const UserAccessPage = () => {
                             }
                             className={`rounded-xl border p-4 text-left transition-all ${
                               checked
-                                ? "border-blue-200 bg-blue-50"
-                                : "border-slate-200 hover:bg-slate-50 bg-white hover:border-blue-200"
+                                ? "border-indigo-200 bg-indigo-50"
+                                : "border-slate-200 hover:bg-slate-50 bg-white hover:border-indigo-200"
                             }`}
                           >
                             <div className="flex gap-3">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm">
                                 <Boxes className="h-5 w-5" />
                               </div>
                               <div className="min-w-0 flex-1">
@@ -880,7 +880,7 @@ const UserAccessPage = () => {
                   <section className="space-y-3">
                     <div>
                       <h3 className="text-slate-900 flex items-center gap-2 text-base font-semibold">
-                        <ShieldCheck className="h-5 w-5 text-blue-600" />
+                        <ShieldCheck className="h-5 w-5 text-indigo-600" />
                         Role
                       </h3>
                       <p className="text-slate-500 mt-1 text-sm">
@@ -958,7 +958,7 @@ const UserAccessPage = () => {
                                   <Badge
                                     key={item}
                                     variant="outline"
-                                    className="text-slate-600 border-blue-100 bg-white"
+                                    className="text-slate-600 border-indigo-100 bg-white"
                                   >
                                     {item}
                                   </Badge>
@@ -984,7 +984,7 @@ const UserAccessPage = () => {
                       Cancel
                     </Button>
                     <Button
-                      className="h-10 bg-blue-600 text-white hover:bg-blue-700"
+                      className="h-10 bg-indigo-600 text-white hover:bg-indigo-700"
                       disabled={
                         saving ||
                         selectedBranches.length === 0 ||

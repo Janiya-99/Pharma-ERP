@@ -216,7 +216,7 @@ const PostToFinanceConfirmModal: React.FC<Props> = ({
               <Button
                 onClick={handlePost}
                 disabled={posting}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-indigo-600 hover:bg-indigo-700"
               >
                 {posting ? "Posting..." : "Confirm Post to Finance"}
               </Button>

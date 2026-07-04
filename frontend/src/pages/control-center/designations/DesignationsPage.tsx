@@ -123,7 +123,7 @@ const DesignationsPage = () => {
           <PermissionGuard permission="control.designation.update">
             <button
               onClick={() => openEditModal(row)}
-              className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+              className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50"
               title="Edit"
             >
               <Edit2 className="w-4 h-4" />
@@ -177,7 +177,7 @@ const DesignationsPage = () => {
           name="status"
           value={filters.status}
           onChange={(e: any) => setFilters({ ...filters, status: e.target.value, page: 1 })}
-          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
         >
           <option value="">All Statuses</option>
           <option value="active">Active</option>

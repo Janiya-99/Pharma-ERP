@@ -185,7 +185,7 @@ const InvoiceCenterDashboard: React.FC = () => {
               title="Total Customers"
               value={summary.total_customers || 0}
               icon={Users}
-              colorClass="bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+              colorClass="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
               subtitle={`${summary.total_customer_categories || 0} categories`}
             />
             <StatCard

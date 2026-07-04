@@ -319,7 +319,7 @@ const AuditLogsPage = () => {
             value={Number(totalResults || 0).toLocaleString()}
             helper="Current filtered total"
             icon={Activity}
-            iconClassName="bg-blue-50 text-blue-600"
+            iconClassName="bg-indigo-50 text-indigo-600"
           />
           <MetricCard
             label="Users"

@@ -109,7 +109,7 @@ export default function ChequeBookDetailsPage() {
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Used Leaves</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{book.used_leaves}</p>
+          <p className="text-2xl font-bold text-indigo-600 mt-1">{book.used_leaves}</p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Cancelled Leaves</p>
@@ -137,7 +137,7 @@ export default function ChequeBookDetailsPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Status</p>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-1 ${book.status === "active" ? "bg-green-100 text-green-800" : book.status === "completed" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"}`}>
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-1 ${book.status === "active" ? "bg-green-100 text-green-800" : book.status === "completed" ? "bg-indigo-100 text-indigo-800" : "bg-red-100 text-red-800"}`}>
                   {book.status}
                 </span>
               </div>

@@ -215,7 +215,7 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
       title: "Finance Posted",
       value: summary.finance_posted_count || 0,
       format: "number",
-      icon: <UploadCloud className="h-4 w-4 text-blue-500" />,
+      icon: <UploadCloud className="h-4 w-4 text-indigo-500" />,
     },
     {
       title: "Finance Unposted",

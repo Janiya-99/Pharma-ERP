@@ -80,7 +80,7 @@ const SalesReturnsPage: React.FC = () => {
         header: "Return No",
         accessorKey: "sales_return_number",
         cell: ({ row }: { row: { original: SalesReturn } }) => (
-          <span className="font-medium text-blue-600">
+          <span className="font-medium text-indigo-600">
             {row.original.sales_return_number}
           </span>
         ),
@@ -237,7 +237,7 @@ const SalesReturnsPage: React.FC = () => {
         </div>
         <PermissionGuard permission="inventory.sales_return.create">
           <Link to="/inventory/sales-returns/create">
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-indigo-600 hover:bg-indigo-700">
               <Plus className="mr-2 h-4 w-4" />
               Create Return
             </Button>

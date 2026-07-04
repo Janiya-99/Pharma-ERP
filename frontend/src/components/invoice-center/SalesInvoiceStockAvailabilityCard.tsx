@@ -49,7 +49,7 @@ export const SalesInvoiceStockAvailabilityCard: React.FC<Props> = ({
         ) : isExact ? (
           <AlertTriangle className="h-4 w-4 text-yellow-500" />
         ) : (
-          <Info className="h-4 w-4 text-blue-500" />
+          <Info className="h-4 w-4 text-indigo-500" />
         )}
       </CardHeader>
       <CardContent>
@@ -68,7 +68,7 @@ export const SalesInvoiceStockAvailabilityCard: React.FC<Props> = ({
               {formatQty(quantityAvailable)}
             </span>
           </div>
-          <div className="mt-2 flex justify-between text-xs text-blue-600">
+          <div className="mt-2 flex justify-between text-xs text-indigo-600">
             <span>Required Quantity</span>
             <span>{formatQty(requiredQuantity)}</span>
           </div>

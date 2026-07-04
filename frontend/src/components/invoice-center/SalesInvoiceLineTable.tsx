@@ -87,7 +87,7 @@ export const SalesInvoiceLineTable: React.FC<Props> = ({ lines = [] }) => {
                 <TableCell className="text-right">
                   {formatMoney(line.tax_amount)}
                 </TableCell>
-                <TableCell className="text-right font-semibold text-blue-700">
+                <TableCell className="text-right font-semibold text-indigo-700">
                   {formatMoney(line.line_total)}
                 </TableCell>
                 <TableCell

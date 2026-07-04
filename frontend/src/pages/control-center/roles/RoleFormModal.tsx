@@ -112,7 +112,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
         <FormError message={error} />
 
         {isEdit && role?.is_system && (
-          <div className="bg-blue-50 text-blue-800 p-3 rounded-md text-sm border border-blue-100">
+          <div className="bg-indigo-50 text-indigo-800 p-3 rounded-md text-sm border border-indigo-100">
             <strong>System Role:</strong> This role is required by the system. Some properties may be restricted from changes.
           </div>
         )}
@@ -153,7 +153,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
             value={formData.description}
             onChange={handleChange}
             rows="3"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
             placeholder="Role description..."
           />
         </div>

@@ -17,7 +17,7 @@ const AuditLogDetailModal = ({ isOpen, onClose, log }: { isOpen?: boolean; onClo
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-2">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Action</p>
-              <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700">
+              <span className="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-700">
                 {log.action || "UNKNOWN"}
               </span>
               <div>

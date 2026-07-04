@@ -48,7 +48,7 @@ const PlatformAdminDashboardPage = () => {
   }, []);
 
   const cards = [
-    { name: "Total Tenants", value: metrics.totalCompanies, icon: Building2, color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+    { name: "Total Tenants", value: metrics.totalCompanies, icon: Building2, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
     { name: "Active Licenses", value: metrics.activeSubscribers, icon: ShieldCheck, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
     { name: "SaaS Revenue (LKR)", value: metrics.totalRevenue.toLocaleString(), icon: Landmark, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
     { name: "Pending Tickets", value: metrics.pendingTickets, icon: Ticket, color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },

@@ -47,9 +47,9 @@ export const SalesInvoiceSalesOrderLinkCard: React.FC<Props> = ({
   };
 
   return (
-    <Card className="border-blue-200 bg-blue-50/30">
+    <Card className="border-indigo-200 bg-indigo-50/30">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-blue-800">
+        <CardTitle className="text-sm font-medium text-indigo-800">
           Linked Sales Order
         </CardTitle>
       </CardHeader>
@@ -57,7 +57,7 @@ export const SalesInvoiceSalesOrderLinkCard: React.FC<Props> = ({
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">Order Number</span>
-            <span className="font-medium text-blue-700">
+            <span className="font-medium text-indigo-700">
               {salesOrder.sales_order_number}
             </span>
           </div>
@@ -73,7 +73,7 @@ export const SalesInvoiceSalesOrderLinkCard: React.FC<Props> = ({
           </div>
 
           {salesOrder.total_amount !== undefined && (
-            <div className="mt-2 flex justify-between border-t border-blue-100 pt-2">
+            <div className="mt-2 flex justify-between border-t border-indigo-100 pt-2">
               <span className="text-gray-600">Total Amount</span>
               <span>{formatLKR(salesOrder.total_amount)}</span>
             </div>
@@ -81,7 +81,7 @@ export const SalesInvoiceSalesOrderLinkCard: React.FC<Props> = ({
           {salesOrder.pending_amount !== undefined && (
             <div className="flex justify-between font-semibold">
               <span className="text-gray-600">Pending Amount</span>
-              <span className="text-blue-700">
+              <span className="text-indigo-700">
                 {formatLKR(salesOrder.pending_amount)}
               </span>
             </div>

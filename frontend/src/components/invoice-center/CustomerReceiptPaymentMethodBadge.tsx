@@ -16,7 +16,7 @@ export const CustomerReceiptPaymentMethodBadge: React.FC<Props> = ({
       case "cash":
         return "bg-green-100 text-green-800 border-green-200";
       case "bank_transfer":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-indigo-100 text-indigo-800 border-indigo-200";
       case "cheque":
         return "bg-purple-100 text-purple-800 border-purple-200";
       case "card":

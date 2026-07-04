@@ -174,7 +174,7 @@ export const CollectionSummaryReportPage: React.FC = () => {
       title: "Total Allocated",
       value: summary.allocated_amount || 0,
       format: "currency",
-      icon: <CreditCard className="h-4 w-4 text-blue-500" />,
+      icon: <CreditCard className="h-4 w-4 text-indigo-500" />,
     },
     {
       title: "Total Unallocated",

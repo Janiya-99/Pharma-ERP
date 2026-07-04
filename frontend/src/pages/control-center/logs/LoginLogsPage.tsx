@@ -356,7 +356,7 @@ const LoginLogsPage = () => {
             value={Number(totalResults || 0).toLocaleString()}
             helper="Current filtered total"
             icon={Clock3}
-            iconClassName="bg-blue-50 text-blue-600"
+            iconClassName="bg-indigo-50 text-indigo-600"
           />
           <MetricCard
             label="Success"

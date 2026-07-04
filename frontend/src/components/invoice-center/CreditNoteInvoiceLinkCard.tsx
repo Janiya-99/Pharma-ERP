@@ -33,8 +33,8 @@ export const CreditNoteInvoiceLinkCard: React.FC<Props> = ({
 
   return (
     <Card>
-      <CardHeader className="bg-blue-50 pb-2">
-        <CardTitle className="text-lg text-blue-900">
+      <CardHeader className="bg-indigo-50 pb-2">
+        <CardTitle className="text-lg text-indigo-900">
           Linked Sales Invoice
         </CardTitle>
       </CardHeader>

@@ -42,7 +42,7 @@ export const SalesReturnTotalsCard: React.FC<TotalsProps> = ({
             })}
           </span>
         </div>
-        <div className="flex justify-between text-sm text-blue-600">
+        <div className="flex justify-between text-sm text-indigo-600">
           <span>Tax Amount:</span>
           <span>
             +

@@ -7,7 +7,7 @@ interface AddressTypeBadgeProps {
 const AddressTypeBadge: React.FC<AddressTypeBadgeProps> = ({ type }) => {
   const colors: Record<string, string> = {
     billing:
-      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
+      "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800",
     shipping:
       "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
     office:

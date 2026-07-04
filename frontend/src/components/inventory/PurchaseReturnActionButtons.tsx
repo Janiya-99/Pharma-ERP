@@ -127,7 +127,7 @@ export const PurchaseReturnActionButtons: React.FC<Props> = ({
             size="sm"
             onClick={onPost}
             disabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-indigo-600 hover:bg-indigo-700"
           >
             <FileArchive className="mr-1 h-4 w-4" /> Post Return
           </Button>

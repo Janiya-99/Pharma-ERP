@@ -181,9 +181,9 @@ const BalanceSheetReportPage = () => {
                   {renderSectionLines(data.assets?.lines)}
                 </ReportSection>
 
-                <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 rounded-lg px-4 py-3 flex justify-between items-center mt-4">
-                  <span className="font-bold text-blue-800 dark:text-blue-400 text-lg">Total Assets</span>
-                  <span className="font-bold text-blue-800 dark:text-blue-400 text-lg">
+                <div className="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-900/30 rounded-lg px-4 py-3 flex justify-between items-center mt-4">
+                  <span className="font-bold text-indigo-800 dark:text-indigo-400 text-lg">Total Assets</span>
+                  <span className="font-bold text-indigo-800 dark:text-indigo-400 text-lg">
                     <ReportAmountCell amount={data.total_assets} />
                   </span>
                 </div>
@@ -199,9 +199,9 @@ const BalanceSheetReportPage = () => {
                   {renderSectionLines(data.equity?.lines)}
                 </ReportSection>
 
-                <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 rounded-lg px-4 py-3 flex justify-between items-center mt-4">
-                  <span className="font-bold text-blue-800 dark:text-blue-400 text-lg">Total Liabilities + Equity</span>
-                  <span className="font-bold text-blue-800 dark:text-blue-400 text-lg">
+                <div className="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-900/30 rounded-lg px-4 py-3 flex justify-between items-center mt-4">
+                  <span className="font-bold text-indigo-800 dark:text-indigo-400 text-lg">Total Liabilities + Equity</span>
+                  <span className="font-bold text-indigo-800 dark:text-indigo-400 text-lg">
                     <ReportAmountCell amount={data.total_liabilities_and_equity} />
                   </span>
                 </div>

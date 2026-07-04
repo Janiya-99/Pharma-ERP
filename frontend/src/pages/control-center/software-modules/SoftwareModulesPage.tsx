@@ -70,9 +70,9 @@ const SoftwareModulesPage = () => {
 
       <FormError message={error} />
 
-      <div className="mb-4 flex bg-blue-50 border border-blue-100 p-4 rounded-md">
-        <LayoutGrid className="h-5 w-5 text-blue-800 mr-3 shrink-0" />
-        <p className="text-sm text-blue-800">
+      <div className="mb-4 flex bg-indigo-50 border border-indigo-100 p-4 rounded-md">
+        <LayoutGrid className="h-5 w-5 text-indigo-800 mr-3 shrink-0" />
+        <p className="text-sm text-indigo-800">
           Software modules are system-level components seeded by the platform. You cannot create or delete them from the frontend.
         </p>
       </div>

@@ -205,7 +205,7 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
                       })}
                     />
                   </TableCell>
-                  <TableCell className="bg-gray-50 text-right font-semibold text-blue-700">
+                  <TableCell className="bg-gray-50 text-right font-semibold text-indigo-700">
                     {formatMoney(total)}
                   </TableCell>
                   <TableCell>
@@ -222,7 +222,7 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-blue-500"
+                        className="h-8 w-8 text-indigo-500"
                         onClick={() => insert(index + 1, lines[index])}
                         title="Duplicate Line"
                       >

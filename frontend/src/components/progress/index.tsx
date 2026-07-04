@@ -29,7 +29,7 @@ const Progress = (props: {
           color === "red"
             ? "bg-red-500 dark:bg-red-400"
             : color === "blue"
-            ? "bg-blue-500 dark:bg-blue-400"
+            ? "bg-indigo-500 dark:bg-indigo-400"
             : color === "green"
             ? "bg-green-500 dark:bg-green-400"
             : color === "yellow"

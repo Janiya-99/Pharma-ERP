@@ -204,7 +204,7 @@ const PurchaseReturnDetailsPage: React.FC = () => {
                 {data.goods_receipt_note && (
                   <div>
                     <span className="mb-1 block text-gray-500">Linked GRN</span>
-                    <span className="cursor-pointer font-medium text-blue-600 hover:underline">
+                    <span className="cursor-pointer font-medium text-indigo-600 hover:underline">
                       {data.goods_receipt_note.grn_number}
                     </span>
                   </div>
@@ -300,7 +300,7 @@ const PurchaseReturnDetailsPage: React.FC = () => {
                     >
                       <div className="bg-slate-100 flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
                         {approval.action === "submitted" && (
-                          <span className="text-xs text-blue-500">SB</span>
+                          <span className="text-xs text-indigo-500">SB</span>
                         )}
                         {approval.action === "approved" && (
                           <span className="text-xs text-green-500">AP</span>

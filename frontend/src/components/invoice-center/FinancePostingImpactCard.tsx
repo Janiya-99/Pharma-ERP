@@ -51,17 +51,17 @@ export const FinancePostingImpactCard: React.FC<Props> = ({ documentType }) => {
   if (!impact) return null;
 
   return (
-    <Card className="border-blue-200 bg-blue-50/50">
+    <Card className="border-indigo-200 bg-indigo-50/50">
       <CardHeader className="px-4 pb-2 pt-3">
-        <CardTitle className="text-sm font-semibold text-blue-800">
+        <CardTitle className="text-sm font-semibold text-indigo-800">
           {impact.title}
         </CardTitle>
       </CardHeader>
-      <Separator className="bg-blue-200" />
+      <Separator className="bg-indigo-200" />
       <CardContent className="px-4 pb-3 pt-3">
         <div className="space-y-1">
           {impact.entries.map((entry, i) => (
-            <p key={i} className="font-mono text-xs text-blue-700">
+            <p key={i} className="font-mono text-xs text-indigo-700">
               {entry}
             </p>
           ))}

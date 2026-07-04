@@ -213,7 +213,7 @@ const OpeningStockEntryDetailsPage = () => {
                       <div className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                         approval.action === "approved" ? "bg-green-100 text-green-600" :
                         approval.action === "rejected" ? "bg-red-100 text-red-600" :
-                        "bg-blue-100 text-blue-600"
+                        "bg-indigo-100 text-indigo-600"
                       }`}>
                         <div className="h-2 w-2 rounded-full fill-current" />
                       </div>

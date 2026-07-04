@@ -140,7 +140,7 @@ export default function BankAccountDetailsPage() {
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Used Leaves</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{summary.usedChequeLeaves}</p>
+          <p className="text-2xl font-bold text-indigo-600 mt-1">{summary.usedChequeLeaves}</p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Cancelled Leaves</p>

@@ -186,7 +186,7 @@ export const SalesByProductReportPage: React.FC = () => {
           ? summary.total_revenue / summary.product_count
           : 0,
       format: "currency",
-      icon: <Percent className="h-4 w-4 text-blue-500" />,
+      icon: <Percent className="h-4 w-4 text-indigo-500" />,
     },
   ];
 

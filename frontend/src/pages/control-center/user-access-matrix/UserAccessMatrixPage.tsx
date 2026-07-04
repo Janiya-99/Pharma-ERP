@@ -137,7 +137,7 @@ const UserAccessMatrixPage = () => {
           {selectedUser && (
             <div className="mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
                   {(selectedUser.name || selectedUser.full_name || "U").charAt(0)}
                 </div>
                 <div>
@@ -169,7 +169,7 @@ const UserAccessMatrixPage = () => {
                   <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider flex items-center gap-2">
                     <Shield className="w-4 h-4 text-gray-400" /> Current Access
                   </h2>
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-medium">
+                  <span className="text-xs bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-full font-medium">
                     {accessRecords.length} Records
                   </span>
                 </div>

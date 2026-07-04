@@ -145,8 +145,8 @@ const FixedAssetCategoryFormPage = () => {
         </div>
 
         {isEdit && (
-          <div className="p-4 mb-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
-            <p className="text-sm text-blue-700 dark:text-blue-400">
+          <div className="p-4 mb-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
+            <p className="text-sm text-indigo-700 dark:text-indigo-400">
               <span className="font-bold">Note:</span> Updating category default accounts or useful life will <span className="font-bold">not</span> automatically update existing fixed assets linked to this category.
             </p>
           </div>

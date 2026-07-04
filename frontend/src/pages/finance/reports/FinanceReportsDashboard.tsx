@@ -15,7 +15,7 @@ const FinanceReportsDashboard = () => {
       description: "Detailed chronological record of all transactions for a specific account.",
       path: "/finance/general-ledger/account-ledger",
       permission: "finance.report.account_ledger.view",
-      icon: <BookOpen className="h-6 w-6 text-blue-500" />
+      icon: <BookOpen className="h-6 w-6 text-indigo-500" />
     },
     {
       title: "Trial Balance",

@@ -28,8 +28,8 @@ const SubmitOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOp
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="w-full max-w-md bg-white dark:bg-navy-800 rounded-2xl shadow-xl border border-gray-100 dark:border-navy-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-navy-700 bg-gray-50/50 dark:bg-navy-900/50 flex items-center gap-3">
-          <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-            <MdSend className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
+            <MdSend className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
           </div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Submit for Approval</h2>
         </div>
@@ -63,7 +63,7 @@ const SubmitOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOp
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
+              className="px-6 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm"
             >
               {submitting ? "Submitting..." : "Submit Entry"}
             </button>

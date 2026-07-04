@@ -68,7 +68,7 @@ const InventoryDashboard = () => {
 
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Total Products" value={stats.total_products} icon={Package} colorClass="bg-blue-50 text-blue-600" subtitle={`${stats.active_products} active products`} />
+          <StatCard title="Total Products" value={stats.total_products} icon={Package} colorClass="bg-indigo-50 text-indigo-600" subtitle={`${stats.active_products} active products`} />
           <StatCard title="Total Stock Value" value={`Rs. ${Number(stats.total_stock_value || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={DollarSign} colorClass="bg-emerald-50 text-emerald-600" />
           <StatCard title="Total Warehouses" value={stats.total_warehouses} icon={Database} colorClass="bg-indigo-50 text-indigo-600" />
           <StatCard title="Low Stock Products" value={stats.low_stock_products} icon={TrendingDown} colorClass="bg-orange-50 text-orange-600" subtitle="Below reorder level" />

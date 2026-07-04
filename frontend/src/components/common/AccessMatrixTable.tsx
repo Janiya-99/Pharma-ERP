@@ -21,7 +21,7 @@ const AccessMatrixTable = ({ data, loading, onRemove }: { data?: Record<string, 
         <div>
           <span className="font-medium text-gray-900">{row.role_name || row.role?.role_name || "Unknown Role"}</span>
           {row.role?.is_system && (
-            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
               System
             </span>
           )}

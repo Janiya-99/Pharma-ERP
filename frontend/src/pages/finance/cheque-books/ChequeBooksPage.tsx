@@ -109,7 +109,7 @@ export default function ChequeBooksPage() {
                 <th className="px-4 py-3">Bank Account</th>
                 <th className="px-4 py-3">Start - End</th>
                 <th className="px-4 py-3 text-center">Total</th>
-                <th className="px-4 py-3 text-center text-blue-600">Used</th>
+                <th className="px-4 py-3 text-center text-indigo-600">Used</th>
                 <th className="px-4 py-3 text-center text-red-600">Cancelled</th>
                 <th className="px-4 py-3 text-center text-green-600">Available</th>
                 <th className="px-4 py-3 text-center">Issued Date</th>
@@ -140,12 +140,12 @@ export default function ChequeBooksPage() {
                     <td className="px-4 py-3">{book.bank_account?.bank_name} - {book.bank_account?.account_number}</td>
                     <td className="px-4 py-3">{book.start_leaf_number} - {book.end_leaf_number}</td>
                     <td className="px-4 py-3 text-center font-medium">{book.total_leaves}</td>
-                    <td className="px-4 py-3 text-center text-blue-600 font-medium">{book.used_leaves}</td>
+                    <td className="px-4 py-3 text-center text-indigo-600 font-medium">{book.used_leaves}</td>
                     <td className="px-4 py-3 text-center text-red-600 font-medium">{book.cancelled_leaves}</td>
                     <td className="px-4 py-3 text-center text-green-600 font-medium">{book.available_leaves}</td>
                     <td className="px-4 py-3 text-center">{new Date(book.issued_date).toLocaleDateString()}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${book.status === "active" ? "bg-green-100 text-green-800" : book.status === "completed" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"}`}>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${book.status === "active" ? "bg-green-100 text-green-800" : book.status === "completed" ? "bg-indigo-100 text-indigo-800" : "bg-red-100 text-red-800"}`}>
                         {book.status}
                       </span>
                     </td>

@@ -161,7 +161,7 @@ const PermissionsPage = () => {
             name="software_id"
             value={filters.software_id}
             onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
           >
             <option value="">All Software Modules</option>
             {softwareModules.map((s: unknown) => (
@@ -183,7 +183,7 @@ const PermissionsPage = () => {
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
@@ -196,7 +196,7 @@ const PermissionsPage = () => {
             <button
               onClick={() => setViewMode("flat")}
               className={`px-3 py-1 text-sm font-medium rounded flex items-center transition-colors ${
-                viewMode === "flat" ? "bg-white text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                viewMode === "flat" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               <LayoutList className="w-4 h-4 mr-1.5" /> List
@@ -204,7 +204,7 @@ const PermissionsPage = () => {
             <button
               onClick={() => setViewMode("grouped")}
               className={`px-3 py-1 text-sm font-medium rounded flex items-center transition-colors ${
-                viewMode === "grouped" ? "bg-white text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                viewMode === "grouped" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               <Layers className="w-4 h-4 mr-1.5" /> Grouped
@@ -248,7 +248,7 @@ const PermissionsPage = () => {
                 <div key={softwareGroup?.software_code || idx} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                   <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
                     <h3 className="font-semibold text-gray-800 capitalize flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
                       {formatLabel(softwareGroup?.software_code)}
                     </h3>
                     <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">

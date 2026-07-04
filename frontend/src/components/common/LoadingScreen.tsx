@@ -21,7 +21,7 @@ const LoadingScreen = ({ text = "Preparing workspace" }: { text?: string }) => {
           </div>
 
           <div className="text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Pharma ERP</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-indigo-600">Pharma ERP</p>
             <h1 className="mt-1.5 text-xl font-bold tracking-tight text-slate-950">{text}</h1>
             <p className="mt-1 text-sm text-slate-500">Loading your secure business environment...</p>
           </div>
@@ -33,7 +33,7 @@ const LoadingScreen = ({ text = "Preparing workspace" }: { text?: string }) => {
               { label: "Modules", icon: Sparkles },
             ].map((item) => (
               <div key={item.label} className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50/80 py-2.5 px-2 text-center transition-all hover:bg-slate-100/80">
-                <item.icon className="h-4 w-4 text-blue-600" />
+                <item.icon className="h-4 w-4 text-indigo-600" />
                 <span className="text-[11px] font-semibold text-slate-600">{item.label}</span>
               </div>
             ))}

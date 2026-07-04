@@ -272,7 +272,7 @@ const SalesReturnDetailsPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-600">
+                          <span className="rounded bg-indigo-100 px-2 py-0.5 text-xs text-indigo-600">
                             {line.return_condition
                               ? line.return_condition.replace(/_/g, " ")
                               : "N/A"}
@@ -312,7 +312,7 @@ const SalesReturnDetailsPage: React.FC = () => {
                     >
                       <div className="bg-slate-100 flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
                         {approval.action === "submitted" && (
-                          <span className="text-xs text-blue-500">SB</span>
+                          <span className="text-xs text-indigo-500">SB</span>
                         )}
                         {approval.action === "approved" && (
                           <span className="text-xs text-green-500">AP</span>

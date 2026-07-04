@@ -44,7 +44,7 @@ const MultiSelect = ({
   return (
     <div className="relative w-full" ref={wrapperRef}>
       <div 
-        className="min-h-[42px] w-full flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white cursor-text focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow"
+        className="min-h-[42px] w-full flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white cursor-text focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-shadow"
         onClick={() => setIsOpen(true)}
       >
         {selectedValues.length === 0 && !searchTerm && (
@@ -54,12 +54,12 @@ const MultiSelect = ({
         {selectedValues.map((selected: any) => (
           <span 
             key={selected[valueKey]} 
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
           >
             {selected[displayKey]}
             <button
               type="button"
-              className="hover:bg-blue-200 rounded-full p-0.5 focus:outline-none"
+              className="hover:bg-indigo-200 rounded-full p-0.5 focus:outline-none"
               onClick={(e: any) => handleRemove(e, selected)}
             >
               <X className="h-3 w-3" />
@@ -93,14 +93,14 @@ const MultiSelect = ({
               return (
                 <div
                   key={option[valueKey]}
-                  className={`cursor-pointer select-none relative py-2 pl-10 pr-4 hover:bg-blue-50 ${isSelected ? 'bg-blue-50/50' : ''}`}
+                  className={`cursor-pointer select-none relative py-2 pl-10 pr-4 hover:bg-indigo-50 ${isSelected ? 'bg-indigo-50/50' : ''}`}
                   onClick={() => handleSelect(option)}
                 >
-                  <span className={`block truncate ${isSelected ? 'font-medium text-blue-900' : 'font-normal'}`}>
+                  <span className={`block truncate ${isSelected ? 'font-medium text-indigo-900' : 'font-normal'}`}>
                     {option[displayKey]}
                   </span>
                   {isSelected && (
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
                       <Check className="h-4 w-4" />
                     </span>
                   )}

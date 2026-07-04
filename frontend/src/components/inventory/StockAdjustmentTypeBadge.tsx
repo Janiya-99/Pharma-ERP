@@ -13,7 +13,7 @@ const StockAdjustmentTypeBadge = ({ type }: { type?: unknown }) => {
       display = "Negative";
       break;
     case "mixed":
-      bgColor = "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+      bgColor = "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400";
       display = "Mixed";
       break;
     case "physical_count":

@@ -92,7 +92,7 @@ export const SalesInvoiceActionButtons: React.FC<Props> = ({
         <PermissionGuard permission="invoice_center.sales_invoice.post">
           <Button
             variant="default"
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-indigo-600 hover:bg-indigo-700"
             onClick={onPost}
             size="sm"
           >

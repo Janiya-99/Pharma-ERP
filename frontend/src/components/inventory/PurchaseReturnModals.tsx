@@ -291,7 +291,7 @@ export const PostPurchaseReturnConfirmModal: React.FC<PostModalProps> = ({
           <Button
             onClick={onConfirm}
             disabled={loading}
-            className="bg-blue-600 text-white hover:bg-blue-700"
+            className="bg-indigo-600 text-white hover:bg-indigo-700"
           >
             {loading ? "Posting..." : "Confirm & Post"}
           </Button>

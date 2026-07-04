@@ -7,7 +7,7 @@ interface CustomerTypeBadgeProps {
 const CustomerTypeBadge: React.FC<CustomerTypeBadgeProps> = ({ type }) => {
   const colors: Record<string, string> = {
     pharmacy:
-      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
+      "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800",
     hospital:
       "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800",
     clinic:

@@ -257,7 +257,7 @@ const PurchaseReturnFormPage: React.FC = () => {
           </div>
         </div>
         <PermissionGuard permission={isEdit ? "inventory.purchase_return.update" : "inventory.purchase_return.create"}>
-          <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
             <Save className="w-4 h-4 mr-2" />
             {saving ? "Saving..." : "Save Draft"}
           </Button>

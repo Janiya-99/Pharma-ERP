@@ -258,14 +258,14 @@ const CustomerDetailsPage: React.FC = () => {
 
           <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
             <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900 dark:border-navy-700 dark:text-white">
-              <Mail className="h-4 w-4 text-blue-500" /> Primary Contact Info
+              <Mail className="h-4 w-4 text-indigo-500" /> Primary Contact Info
             </h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between border-b border-gray-50 py-1 dark:border-navy-700/50">
                 <span className="text-gray-500 dark:text-gray-400">
                   Email Address
                 </span>
-                <span className="font-medium text-blue-600 dark:text-blue-400">
+                <span className="font-medium text-indigo-600 dark:text-indigo-400">
                   {customer.email || "—"}
                 </span>
               </div>

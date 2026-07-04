@@ -34,7 +34,7 @@ const PermissionCheckboxGroup = ({ groupName, permissions, selectedIds, onSelect
           <button
             type="button"
             onClick={handleSelectAll}
-            className="text-xs font-medium text-blue-600 hover:text-blue-800 focus:outline-none transition-colors"
+            className="text-xs font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none transition-colors"
           >
             {isAllSelected ? "Clear All" : "Select All"}
           </button>
@@ -52,7 +52,7 @@ const PermissionCheckboxGroup = ({ groupName, permissions, selectedIds, onSelect
                 checked={selectedIds.includes(permission.id)}
                 onChange={() => handleCheckboxChange(permission.id)}
                 disabled={readOnly}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50"
+                className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 disabled:opacity-50"
               />
             </div>
             <div className="flex flex-col">

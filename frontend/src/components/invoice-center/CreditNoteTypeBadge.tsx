@@ -13,7 +13,7 @@ export const CreditNoteTypeBadge: React.FC<Props> = ({ type, className }) => {
       case "sales_return":
         return "bg-green-100 text-green-800 hover:bg-green-200";
       case "price_adjustment":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-200";
+        return "bg-indigo-100 text-indigo-800 hover:bg-indigo-200";
       case "discount_adjustment":
         return "bg-purple-100 text-purple-800 hover:bg-purple-200";
       case "billing_error":

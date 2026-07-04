@@ -40,12 +40,12 @@ const StockAdjustmentTotalsCard = ({
           </p>
         </div>
 
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
-          <div className="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400">
+        <div className="p-4 bg-indigo-50 dark:bg-indigo-900/10 rounded-lg border border-indigo-100 dark:border-indigo-900/30">
+          <div className="flex items-center gap-2 mb-2 text-indigo-600 dark:text-indigo-400">
             <DollarSign className="w-4 h-4" />
             <span className="text-sm font-medium">Total Value Impact</span>
           </div>
-          <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+          <p className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">
             {formatCurrency(totalStockValue || 0)}
           </p>
         </div>

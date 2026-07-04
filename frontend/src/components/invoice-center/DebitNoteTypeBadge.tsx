@@ -11,7 +11,7 @@ export const DebitNoteTypeBadge: React.FC<Props> = ({ type, className }) => {
   const getBadgeColor = () => {
     switch (type) {
       case "price_adjustment":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-200";
+        return "bg-indigo-100 text-indigo-800 hover:bg-indigo-200";
       case "additional_charge":
         return "bg-orange-100 text-orange-800 hover:bg-orange-200";
       case "billing_error":

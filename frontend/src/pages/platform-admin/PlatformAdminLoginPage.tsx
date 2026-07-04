@@ -46,13 +46,13 @@ const PlatformAdminLoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 font-sans text-slate-100">
-      <div className="w-full max-w-md space-y-8 bg-slate-900/40 p-8 rounded-2xl border border-slate-800 backdrop-blur-xl shadow-2xl">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 font-sans text-slate-900">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl border border-slate-200 shadow-xl">
         <div className="text-center space-y-3">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-400 border border-indigo-500/20">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
             <Shield className="h-6 w-6" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">Platform Owner Log In</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Platform Owner Log In</h2>
           <p className="text-sm text-slate-500">
             Admin access point to manage ERP tenants and plans.
           </p>
@@ -61,22 +61,22 @@ const PlatformAdminLoginPage = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                 SMTP Email Address
               </label>
               <input
                 type="email"
                 {...register("email")}
                 placeholder="admin@platform.com"
-                className="w-full px-4 py-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-550 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.email && (
-                <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>
+                <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                 Secret Access Key
               </label>
               <div className="relative">
@@ -84,18 +84,18 @@ const PlatformAdminLoginPage = () => {
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-550 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-slate-500 hover:text-slate-300"
+                  className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
                 >
                   {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>
+                <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
               )}
             </div>
           </div>

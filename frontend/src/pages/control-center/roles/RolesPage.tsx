@@ -163,7 +163,7 @@ const RolesPage = () => {
         <div className="flex items-center gap-2">
           {row.role_name}
           {row.is_system && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
               System
             </span>
           )}
@@ -226,7 +226,7 @@ const RolesPage = () => {
             name="software_id"
             value={filters.software_id}
             onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
           >
             <option value="">All Software Modules</option>
             {softwareModules.map((s: unknown) => (
@@ -238,7 +238,7 @@ const RolesPage = () => {
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>

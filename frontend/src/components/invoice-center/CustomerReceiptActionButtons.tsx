@@ -69,7 +69,7 @@ export const CustomerReceiptActionButtons: React.FC<Props> = ({
             variant="outline"
             size="sm"
             onClick={onSubmit}
-            className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+            className="text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
           >
             <Send className="mr-2 h-4 w-4" />
             Submit

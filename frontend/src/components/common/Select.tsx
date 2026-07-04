@@ -100,11 +100,11 @@ const Select = ({
                       setOpen(false);
                       setSearchTerm("");
                     }}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors"
+                    className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-left hover:bg-indigo-50 focus:bg-indigo-50 focus:outline-none transition-colors"
                   >
                     <span className="truncate">{opt.label}</span>
                     {String(value) === String(opt.value) && (
-                      <Check className="h-4 w-4 text-blue-600 shrink-0" />
+                      <Check className="h-4 w-4 text-indigo-600 shrink-0" />
                     )}
                   </button>
                 ))
@@ -137,7 +137,7 @@ const Select = ({
             <SelectItem
               key={opt.value}
               value={String(opt.value)}
-              className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer text-gray-900"
+              className="hover:bg-indigo-50 focus:bg-indigo-50 cursor-pointer text-gray-900"
             >
               {opt.label}
             </SelectItem>

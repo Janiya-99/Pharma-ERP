@@ -93,7 +93,7 @@ export const PostCustomerReceiptConfirmModal: React.FC<Props> = ({
         <div className="space-y-3 py-2 text-sm">
           <div className="grid grid-cols-2 gap-2 rounded-md border border-gray-100 bg-gray-50 p-3">
             <div className="text-gray-500">Receipt Amount:</div>
-            <div className="text-right font-medium text-blue-700">
+            <div className="text-right font-medium text-indigo-700">
               {formatLKR(receiptAmount)}
             </div>
 
@@ -117,16 +117,16 @@ export const PostCustomerReceiptConfirmModal: React.FC<Props> = ({
             <div className="text-right font-medium">{allocationCount}</div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 rounded-md border border-blue-100 bg-blue-50 p-3">
-            <div className="text-blue-800">Customer Current Balance:</div>
-            <div className="text-right font-medium text-blue-900">
+          <div className="grid grid-cols-2 gap-2 rounded-md border border-indigo-100 bg-indigo-50 p-3">
+            <div className="text-indigo-800">Customer Current Balance:</div>
+            <div className="text-right font-medium text-indigo-900">
               {formatLKR(currentBalance)}
             </div>
 
-            <div className="font-semibold text-blue-800">
+            <div className="font-semibold text-indigo-800">
               Balance After Posting:
             </div>
-            <div className="text-right font-bold text-blue-900">
+            <div className="text-right font-bold text-indigo-900">
               {formatLKR(balanceAfterReceipt)}
             </div>
           </div>

@@ -279,7 +279,7 @@ const CompanyProfilePage = () => {
                     fileInputRef.current?.click();
                   }
                 }}
-                className="border-slate-200 bg-slate-50/50 hover:bg-slate-100/50 group relative mb-4 flex h-48 w-48 cursor-pointer items-center justify-center overflow-hidden rounded-xl border transition-all duration-200 hover:border-blue-500/50"
+                className="border-slate-200 bg-slate-50/50 hover:bg-slate-100/50 group relative mb-4 flex h-48 w-48 cursor-pointer items-center justify-center overflow-hidden rounded-xl border transition-all duration-200 hover:border-indigo-500/50"
               >
                 {formData.logo_url ? (
                   <>
@@ -295,7 +295,7 @@ const CompanyProfilePage = () => {
                   </>
                 ) : (
                   <>
-                    <div className="text-slate-500 flex flex-col items-center transition-colors duration-200 group-hover:text-blue-600">
+                    <div className="text-slate-500 flex flex-col items-center transition-colors duration-200 group-hover:text-indigo-600">
                       <Building2 className="h-12 w-12 stroke-[1.5]" />
                       <span className="mt-2 text-xs font-semibold">
                         No Logo Uploaded
@@ -383,8 +383,8 @@ const CompanyProfilePage = () => {
                 <label className="text-slate-950 mb-1.5 block text-xs font-bold">
                   Account Status
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-blue-100/60 bg-blue-50/30 p-3 text-sm font-semibold text-blue-900">
-                  <ShieldCheck className="h-5 w-5 shrink-0 text-blue-600" />
+                <div className="flex items-center gap-2 rounded-xl border border-indigo-100/60 bg-indigo-50/30 p-3 text-sm font-semibold text-indigo-900">
+                  <ShieldCheck className="h-5 w-5 shrink-0 text-indigo-600" />
                   <span>Premium Enterprise Plan</span>
                 </div>
               </div>
@@ -418,7 +418,7 @@ const CompanyProfilePage = () => {
                   disabled={!canUpdate}
                   required
                   placeholder="e.g. Acme Corp Ltd"
-                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -437,7 +437,7 @@ const CompanyProfilePage = () => {
                     disabled={!canUpdate}
                     required
                     placeholder="e.g. hq@company.com"
-                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -456,7 +456,7 @@ const CompanyProfilePage = () => {
                     onChange={handleChange}
                     disabled={!canUpdate}
                     placeholder="e.g. +1 (555) 019-2834"
-                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -473,7 +473,7 @@ const CompanyProfilePage = () => {
                   onChange={handleChange}
                   disabled={!canUpdate}
                   placeholder="e.g. REG-12345678"
-                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -489,7 +489,7 @@ const CompanyProfilePage = () => {
                   onChange={handleChange}
                   disabled={!canUpdate}
                   placeholder="e.g. TAX-98765432"
-                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white px-3 text-sm shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -507,7 +507,7 @@ const CompanyProfilePage = () => {
                     onChange={handleChange}
                     disabled={!canUpdate}
                     placeholder="e.g. https://company.com"
-                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 h-10 w-full rounded-lg border bg-white pl-10 pr-3 text-sm shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -524,7 +524,7 @@ const CompanyProfilePage = () => {
                   onChange={handleChange}
                   disabled={!canUpdate}
                   placeholder="Street address, City, State, ZIP, Country"
-                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="border-slate-200 text-slate-700 placeholder-slate-400 disabled:bg-slate-50 w-full rounded-lg border bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
             </div>

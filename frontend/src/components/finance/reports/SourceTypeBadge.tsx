@@ -7,7 +7,7 @@ const formatSourceType = (type: unknown) => {
 const SourceTypeBadge = ({ type }: { type?: unknown }) => {
   const colors = {
     opening_balance: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-    journal_entry: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+    journal_entry: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
     payment_voucher: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
     receipt_voucher: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
     petty_cash_voucher: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",

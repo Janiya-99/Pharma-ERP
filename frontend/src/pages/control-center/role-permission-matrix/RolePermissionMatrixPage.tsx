@@ -220,7 +220,7 @@ const RolePermissionMatrixPage = () => {
         </div>
       ) : loading ? (
         <div className="bg-white p-12 text-center rounded-lg border border-gray-200 shadow-sm text-gray-500 flex flex-col items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
           <p>Loading permissions...</p>
         </div>
       ) : groupedPermissions.length === 0 ? (
@@ -231,8 +231,8 @@ const RolePermissionMatrixPage = () => {
       ) : (
         <div className="space-y-6 pb-20">
           {!canAssign && (
-            <div className="bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 mb-6 flex items-start">
-              <Shield className="w-5 h-5 mr-3 mt-0.5 text-blue-500" />
+            <div className="bg-indigo-50 text-indigo-800 p-4 rounded-lg border border-indigo-200 mb-6 flex items-start">
+              <Shield className="w-5 h-5 mr-3 mt-0.5 text-indigo-500" />
               <div>
                 <p className="font-semibold">View-Only Mode</p>
                 <p className="text-sm mt-1">You do not have permission to assign or modify permissions. The matrix below is read-only.</p>

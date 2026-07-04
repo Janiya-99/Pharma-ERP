@@ -34,7 +34,7 @@ const CustomerActionButtons: React.FC<CustomerActionButtonsProps> = ({
           <button
             onClick={onEdit}
             title="Edit Customer"
-            className="rounded-lg p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-800 dark:hover:bg-navy-700"
+            className="rounded-lg p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-800 dark:hover:bg-navy-700"
           >
             <Edit className="h-4 w-4" />
           </button>

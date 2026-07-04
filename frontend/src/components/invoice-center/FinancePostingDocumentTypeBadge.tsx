@@ -13,7 +13,7 @@ const typeConfig: Record<
 > = {
   sales_invoice: {
     label: "Sales Invoice",
-    color: "bg-blue-600 hover:bg-blue-700 text-white",
+    color: "bg-indigo-600 hover:bg-indigo-700 text-white",
   },
   credit_note: {
     label: "Credit Note",

@@ -57,7 +57,7 @@ const GRNActionButtons = ({
               to={`/inventory/grns/${grn.id}/edit`}
               className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
             >
-              <Edit className="w-4 h-4 text-blue-500" /> Edit GRN
+              <Edit className="w-4 h-4 text-indigo-500" /> Edit GRN
             </Link>
           )}
 
@@ -119,7 +119,7 @@ const GRNActionButtons = ({
       {canEdit && (
         <Link
           to={`/inventory/grns/${grn.id}/edit`}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800/50"
         >
           <Edit className="w-4 h-4" /> Edit
         </Link>

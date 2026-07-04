@@ -152,7 +152,7 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
   const summaryCards: SummaryCardItem[] = [
     { title: "Receipt Count", value: summary.receipt_count || 0, format: "number", icon: <Banknote className="h-4 w-4" /> },
     { title: "Receipt Amount", value: summary.receipt_amount || 0, format: "currency", icon: <Coins className="h-4 w-4 text-emerald-500" /> },
-    { title: "Allocated Amount", value: summary.allocated_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-blue-500" /> },
+    { title: "Allocated Amount", value: summary.allocated_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-indigo-500" /> },
     { title: "Unallocated Amount", value: summary.unallocated_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-amber-500" /> },
   ];
 

@@ -124,7 +124,7 @@ const FixedAssetDisposalDetailsPage = () => {
                 {hasPermission("finance.fixed_asset_disposal.submit") && (
                   <button
                     onClick={() => setSubmitModalOpen(true)}
-                    className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-white transition-all bg-blue-500 rounded-xl hover:bg-blue-600 shadow-sm"
+                    className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-white transition-all bg-indigo-500 rounded-xl hover:bg-indigo-600 shadow-sm"
                   >
                     <Send className="w-4 h-4" /> Submit
                   </button>
@@ -189,7 +189,7 @@ const FixedAssetDisposalDetailsPage = () => {
                 {/* Custom Status Badge */}
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border capitalize
                   ${disposal.status === "draft" ? "bg-gray-100 text-gray-700 border-gray-200" :
-                    disposal.status === "submitted" ? "bg-blue-100 text-blue-700 border-blue-200" :
+                    disposal.status === "submitted" ? "bg-indigo-100 text-indigo-700 border-indigo-200" :
                     disposal.status === "approved" ? "bg-green-100 text-green-700 border-green-200" :
                     disposal.status === "rejected" ? "bg-red-100 text-red-700 border-red-200" :
                     "bg-emerald-100 text-emerald-700 border-emerald-200"
@@ -321,7 +321,7 @@ const FixedAssetDisposalDetailsPage = () => {
         loading={actionLoading}
         title="Submit Disposal for Approval"
         actionLabel="Submit"
-        colorClass="bg-blue-500 hover:bg-blue-600"
+        colorClass="bg-indigo-500 hover:bg-indigo-600"
         requireRemarks={false}
       />
 

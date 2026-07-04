@@ -89,7 +89,7 @@ export default function FinancialYearsPage() {
       accessor: "is_active",
       render: (val: boolean) => (
         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-          val ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+          val ? "bg-indigo-100 text-indigo-800" : "bg-gray-100 text-gray-800"
         }`}>
           {val ? "Yes" : "No"}
         </span>

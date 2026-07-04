@@ -25,7 +25,7 @@ const StockAdjustmentActionButtons = ({
       {isDraftOrRejected && hasPermission("inventory.stock_adjustment.update") && (
         <button
           onClick={() => navigate(`/inventory/stock-adjustments/${adjustment.id}/edit`)}
-          className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-transparent hover:border-blue-100 dark:hover:border-blue-800"
+          className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800"
           title="Edit"
         >
           <Edit className="w-4 h-4" />

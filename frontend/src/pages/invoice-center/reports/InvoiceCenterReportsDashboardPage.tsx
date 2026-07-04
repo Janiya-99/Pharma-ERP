@@ -84,7 +84,7 @@ export const InvoiceCenterReportsDashboardPage: React.FC = () => {
 
   const invoiceCards: SummaryCardItem[] = [
     { title: "Total Invoices", value: data?.total_sales_invoices || 0, format: "number", icon: <FileText className="h-4 w-4" /> },
-    { title: "Posted Invoices", value: data?.posted_sales_invoices || 0, format: "number", icon: <UploadCloud className="h-4 w-4 text-blue-500" /> },
+    { title: "Posted Invoices", value: data?.posted_sales_invoices || 0, format: "number", icon: <UploadCloud className="h-4 w-4 text-indigo-500" /> },
     { title: "Unpaid Invoices", value: data?.unpaid_invoices || 0, format: "number", icon: <AlertTriangle className="h-4 w-4 text-amber-500" /> },
     { title: "Paid Invoices", value: data?.paid_invoices || 0, format: "number", icon: <CheckCircle className="h-4 w-4 text-emerald-500" /> },
   ];
@@ -93,7 +93,7 @@ export const InvoiceCenterReportsDashboardPage: React.FC = () => {
     { title: "Total Invoice Amount", value: data?.total_invoice_amount || 0, format: "currency", icon: <Coins className="h-4 w-4" /> },
     { title: "Total Paid Amount", value: data?.total_paid_amount || 0, format: "currency", icon: <Wallet className="h-4 w-4 text-emerald-500" /> },
     { title: "Total Balance Amount", value: data?.total_balance_amount || 0, format: "currency", icon: <Banknote className="h-4 w-4 text-amber-500" /> },
-    { title: "Allocated Receipts", value: data?.total_allocated_receipt_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-blue-500" /> },
+    { title: "Allocated Receipts", value: data?.total_allocated_receipt_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-indigo-500" /> },
   ];
 
   const financeCards: SummaryCardItem[] = [

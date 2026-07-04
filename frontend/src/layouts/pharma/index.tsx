@@ -7,7 +7,7 @@ export default function PharmaLayout() {
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-pharmaBgLight p-4 font-dm sm:p-8">
       {/* Decorative Ambient Blobs */}
-      <div className="pointer-events-none absolute left-0 top-0 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-200/50 mix-blend-multiply blur-3xl filter" />
+      <div className="pointer-events-none absolute left-0 top-0 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-200/50 mix-blend-multiply blur-3xl filter" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-[600px] w-[600px] translate-x-1/3 translate-y-1/3 rounded-full bg-purple-200/50 mix-blend-multiply blur-3xl filter" />
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-[400px] w-[400px] rounded-full bg-pink-100/40 mix-blend-multiply blur-3xl filter" />
 
@@ -88,7 +88,7 @@ export default function PharmaLayout() {
         <div className="pointer-events-none absolute bottom-6 left-8 z-20 flex w-[calc(100%-6rem)] items-end justify-between lg:left-12">
           {/* Support Widget */}
           <div className="pointer-events-auto flex cursor-pointer items-center gap-3 rounded-full bg-white p-2 pr-6 shadow-xl transition-transform hover:scale-105">
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-100">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-indigo-100">
               <img
                 src="https://i.pravatar.cc/150?img=47"
                 alt="Support Agent"

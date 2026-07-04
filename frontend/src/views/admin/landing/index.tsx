@@ -252,7 +252,7 @@ export default function LandingPage() {
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: "Active Users", value: "18", color: "text-blue-400", bg: "bg-blue-500/10" },
+                    { label: "Active Users", value: "18", color: "text-indigo-400", bg: "bg-indigo-500/10" },
                     { label: "Invoices", value: "24", color: "text-emerald-400", bg: "bg-emerald-500/10" },
                     { label: "Pending", value: "12", color: "text-amber-400", bg: "bg-amber-500/10" },
                     { label: "Alerts", value: "3", color: "text-rose-400", bg: "bg-rose-500/10" },

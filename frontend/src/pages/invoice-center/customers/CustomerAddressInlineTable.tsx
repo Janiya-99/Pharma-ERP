@@ -125,7 +125,7 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
                           onClick={() =>
                             setModalState({ isOpen: true, address: addr })
                           }
-                          className="rounded-lg p-1.5 text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-navy-700"
+                          className="rounded-lg p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50 dark:hover:bg-navy-700"
                           title="Edit Address"
                         >
                           <Edit className="h-4 w-4" />

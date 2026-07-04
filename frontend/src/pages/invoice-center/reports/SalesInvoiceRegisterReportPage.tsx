@@ -154,7 +154,7 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
   const summaryCards: SummaryCardItem[] = [
     { title: "Invoice Count", value: summary.invoice_count || 0, format: "number", icon: <FileText className="h-4 w-4" /> },
     { title: "Total Amount", value: summary.total_amount || 0, format: "currency", icon: <Coins className="h-4 w-4 text-emerald-500" /> },
-    { title: "Paid Amount", value: summary.paid_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-blue-500" /> },
+    { title: "Paid Amount", value: summary.paid_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-indigo-500" /> },
     { title: "Balance Amount", value: summary.balance_amount || 0, format: "currency", icon: <Banknote className="h-4 w-4 text-amber-500" /> },
   ];
 

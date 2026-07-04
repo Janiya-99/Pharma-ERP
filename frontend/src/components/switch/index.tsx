@@ -29,7 +29,7 @@ const Switch = (props: {
         color === "red"
           ? "checked:bg-red-500 dark:checked:bg-red-400"
           : color === "blue"
-          ? "checked:bg-blue-500 dark:checked:bg-blue-400"
+          ? "checked:bg-indigo-500 dark:checked:bg-indigo-400"
           : color === "green"
           ? "checked:bg-green-500 dark:checked:bg-green-400"
           : color === "yellow"

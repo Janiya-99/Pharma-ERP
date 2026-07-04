@@ -55,7 +55,7 @@ export const SalesInvoiceCustomerCreditCard: React.FC<Props> = ({
             <span className="text-gray-500">Current Balance</span>
             <span className="font-medium">{formatLKR(current_balance)}</span>
           </div>
-          <div className="flex justify-between text-blue-600">
+          <div className="flex justify-between text-indigo-600">
             <span>Invoice Total</span>
             <span>+{formatLKR(invoiceTotal)}</span>
           </div>

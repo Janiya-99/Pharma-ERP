@@ -50,8 +50,8 @@ export const RoleAssignment: React.FC<RoleAssignmentProps> = ({
       </div>
 
       {designationRoles.length > 0 && (
-        <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-          <p className="text-xs text-blue-800 font-medium mb-2">Suggested by Designation:</p>
+        <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg">
+          <p className="text-xs text-indigo-800 font-medium mb-2">Suggested by Designation:</p>
           <div className="flex flex-wrap gap-2">
             {designationRoles.map(rId => {
               const role = roles.find(r => String(r.id) === String(rId));
@@ -70,8 +70,8 @@ export const RoleAssignment: React.FC<RoleAssignmentProps> = ({
                   }}
                   className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${
                     isSelected 
-                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                      : 'bg-white border border-blue-200 text-blue-700 hover:bg-blue-100'
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                      : 'bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-100'
                   }`}
                 >
                   {role.name} {isSelected ? '✓' : '+'}

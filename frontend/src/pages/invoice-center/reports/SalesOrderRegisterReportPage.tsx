@@ -144,7 +144,7 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
   const summaryCards: SummaryCardItem[] = [
     { title: "Order Count", value: summary.order_count || 0, format: "number", icon: <ShoppingCart className="h-4 w-4" /> },
     { title: "Total Amount", value: summary.total_amount || 0, format: "currency", icon: <Coins className="h-4 w-4 text-emerald-500" /> },
-    { title: "Approved Orders", value: summary.approved_count || 0, format: "number", icon: <CheckCircle className="h-4 w-4 text-blue-500" /> },
+    { title: "Approved Orders", value: summary.approved_count || 0, format: "number", icon: <CheckCircle className="h-4 w-4 text-indigo-500" /> },
     { title: "Pending Orders", value: summary.pending_count || 0, format: "number", icon: <Clock className="h-4 w-4 text-amber-500" /> },
   ];
 

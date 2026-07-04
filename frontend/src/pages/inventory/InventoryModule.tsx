@@ -120,7 +120,7 @@ const toneClasses: Record<StatusTone, string> = {
   success: "border-green-100 bg-green-50 text-green-700",
   warning: "border-amber-100 bg-amber-50 text-amber-700",
   danger: "border-red-100 bg-red-50 text-red-700",
-  info: "border-blue-100 bg-blue-50 text-blue-700",
+  info: "border-indigo-100 bg-indigo-50 text-indigo-700",
   neutral: "border-slate-200 bg-slate-50 text-slate-700",
 };
 
@@ -378,7 +378,7 @@ function InventoryPage({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             {Icon ? (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-blue-600 shadow-sm">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-indigo-600 shadow-sm">
                 <Icon className="h-5 w-5" />
               </div>
             ) : null}
@@ -474,7 +474,7 @@ function DataGrid({
             </TableRow>
           ) : (
             data.map((row, index) => (
-              <TableRow key={getId(row) || index} className="hover:bg-blue-50/30">
+              <TableRow key={getId(row) || index} className="hover:bg-indigo-50/30">
                 {columns.map((column) => (
                   <TableCell key={column.header} className="px-4 py-3 text-sm tracking-normal text-slate-700">
                     {column.render(row)}
@@ -669,7 +669,7 @@ function DrawerForm({
           </Button>
           {secondaryAction}
           {readOnly ? null : (
-            <Button type="button" onClick={onSubmit} disabled={submitting} className="bg-blue-600 text-white hover:bg-blue-700">
+            <Button type="button" onClick={onSubmit} disabled={submitting} className="bg-indigo-600 text-white hover:bg-indigo-700">
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {primaryLabel}
             </Button>
@@ -864,10 +864,10 @@ export function InventoryDashboardPage() {
 
       <Tabs defaultValue="low-stock" className="gap-4">
         <TabsList className="inline-flex h-10 w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="low-stock">Low Stock</TabsTrigger>
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="expiry">Expiring Batches</TabsTrigger>
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="movements">Recent Movements</TabsTrigger>
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-blue-50 data-active:text-blue-700 data-active:shadow-none" value="grns">Recent GRNs</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="low-stock">Low Stock</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="expiry">Expiring Batches</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="movements">Recent Movements</TabsTrigger>
+          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="grns">Recent GRNs</TabsTrigger>
         </TabsList>
         <TabsContent value="low-stock">
           <DataGrid
@@ -1187,7 +1187,7 @@ function BackendCrudPage({
   return (
     <InventoryPage title={title} description={description} icon={icon}>
       <SearchToolbar search={search} setSearch={setSearch}>
-        <Button onClick={openCreate} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+        <Button onClick={openCreate} className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
           <Plus className="h-4 w-4" />
           {addLabel}
         </Button>
@@ -1326,7 +1326,7 @@ export function ProductSetupPage() {
                   className="h-9 w-full rounded-lg border-slate-200 bg-white pl-9 tracking-normal"
                 />
               </div>
-              <Button onClick={() => openSetup("create")} className="h-9 rounded-lg bg-blue-600 px-3 text-white hover:bg-blue-700">
+              <Button onClick={() => openSetup("create")} className="h-9 rounded-lg bg-indigo-600 px-3 text-white hover:bg-indigo-700">
                 <Plus className="h-4 w-4" />
                 Add {activeConfig.singular}
               </Button>
@@ -1340,7 +1340,7 @@ export function ProductSetupPage() {
                 <TabsTrigger
                   key={config.key}
                   value={config.key}
-                  className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-blue-200 focus-visible:outline-none data-active:bg-white data-active:text-blue-700 data-active:shadow-sm"
+                  className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-white data-active:text-indigo-700 data-active:shadow-sm"
                 >
                   {config.label}
                 </TabsTrigger>
@@ -1725,7 +1725,7 @@ export function WarehousesAndLocationsPage() {
             setWarehouseDrawerRequest(null);
             setDrawerType("warehouse");
           }}
-          className="rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+          className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
         >
           <Plus className="h-4 w-4" />
           Add Warehouse
@@ -1748,7 +1748,7 @@ export function WarehousesAndLocationsPage() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") loadWarehouse(warehouse);
                 }}
-                className={`w-full rounded-xl border p-4 text-left transition ${getId(selected || {}) === getId(warehouse) ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
+                className={`w-full rounded-xl border p-4 text-left transition ${getId(selected || {}) === getId(warehouse) ? "border-indigo-200 bg-indigo-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -2328,7 +2328,7 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
       description={config.description}
       icon={config.icon}
       actions={
-        <Button onClick={openCreate} className="rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+        <Button onClick={openCreate} className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
           <Plus className="h-4 w-4" />
           New
         </Button>
