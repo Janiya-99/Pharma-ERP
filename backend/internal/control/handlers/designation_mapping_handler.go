@@ -72,8 +72,8 @@ func (h *DesignationMappingHandler) SetDefaultRolesForDesignation(c *gin.Context
 		return
 	}
 	companyDB := db.(*gorm.DB)
-	companyID, _ := c.Get("companyID")
-	reqUserID, _ := c.Get("userID")
+	companyID, _ := c.Get("company_id")
+	reqUserID, _ := c.Get("user_id")
 
 	desigIDStr := c.Param("id")
 	desigID, err := strconv.ParseUint(desigIDStr, 10, 64)
@@ -151,8 +151,8 @@ func (h *DesignationMappingHandler) SetDepartmentsForDesignation(c *gin.Context)
 		return
 	}
 	companyDB := db.(*gorm.DB)
-	companyID, _ := c.Get("companyID")
-	reqUserID, _ := c.Get("userID")
+	companyID, _ := c.Get("company_id")
+	reqUserID, _ := c.Get("user_id")
 
 	desigIDStr := c.Param("id")
 	desigID, err := strconv.ParseUint(desigIDStr, 10, 64)

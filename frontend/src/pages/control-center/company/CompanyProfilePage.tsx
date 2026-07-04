@@ -44,7 +44,7 @@ const SkeletonField = () => (
 );
 
 const CompanyProfilePage = () => {
-  const { hasPermission, user } = useAuth();
+  const { hasPermission, user, refreshContext } = useAuth();
   const canUpdate = hasPermission("control.company.update");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -193,6 +193,7 @@ const CompanyProfilePage = () => {
           now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         );
         toast.success("Company profile updated successfully!");
+        await refreshContext();
       } else {
         setError(res.message);
         toast.error("Failed to update profile: " + res.message);

@@ -60,7 +60,8 @@ const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }
         getRoles({ limit: 200 })
       ]);
       setAllDepartments(deptRes.data || deptRes.items || deptRes || []);
-      setAllRoles(roleRes.data || roleRes.items || roleRes || []);
+      const rawRoles = roleRes.data || roleRes.items || roleRes || [];
+      setAllRoles(rawRoles.filter((r: any) => r.role_code !== "SUPER_ADMIN"));
     } catch (err) {
       console.error("Failed to fetch dropdowns", err);
     }
@@ -169,7 +170,7 @@ const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }
             selectedValues={selectedRoles}
             onChange={setSelectedRoles}
             placeholder="Select default roles..."
-            displayKey="name"
+            displayKey="role_name"
           />
         </div>
 

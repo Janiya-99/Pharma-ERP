@@ -738,7 +738,7 @@ const Sidebar = () => {
           <div className="flex min-w-0 flex-1 items-center justify-between overflow-hidden">
             <div className="min-w-0">
               <p className="truncate text-sm font-bold leading-tight tracking-tight text-[#111827]">
-                Pharma ERP
+                {company?.company_name || "Pharma ERP"}
               </p>
               <p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6B7280]">
                 {activeSoftware?.software_name || "Platform"}
@@ -782,7 +782,7 @@ const Sidebar = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div
-            className={`mb-4 mt-auto cursor-pointer border-t border-slate-200/70 transition-all duration-300 hover:bg-slate-100/80 ${
+            className={`mb-6 mt-auto cursor-pointer border-t border-slate-200/70 transition-all duration-300 hover:bg-slate-100/80 ${
               isMobile || effectiveExpanded
                 ? "px-4 py-3"
                 : "flex justify-center px-2 py-3"

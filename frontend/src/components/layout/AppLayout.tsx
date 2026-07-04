@@ -44,7 +44,7 @@ const AppLayout = () => {
             <div className="page-content flex-grow space-y-8 pb-32 font-sans">
               <Outlet />
             </div>
-            <footer className="mt-auto border-t border-slate-200/70 bg-white/55 px-3 py-4 backdrop-blur-xl md:px-6">
+            <footer className="mt-auto border-t border-slate-200/70 bg-white/55 px-3 pt-4 pb-6 backdrop-blur-xl md:px-6">
               <div className="flex flex-col items-center justify-between gap-2 text-xs text-[#6B7280] sm:flex-row">
                 <span>© {new Date().getFullYear()} Pharma ERP. All rights reserved.</span>
                 <span>

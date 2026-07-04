@@ -22,6 +22,7 @@ type CompanyDTO struct {
 	ID          uint64 `json:"id"`
 	CompanyCode string `json:"company_code"`
 	CompanyName string `json:"company_name"`
+	LogoURL     string `json:"logo_url"`
 }
 
 type BranchDTO struct {

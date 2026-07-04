@@ -133,6 +133,11 @@ func (s *AuthService) BuildLoginContext(token string, user models.User, company 
 		})
 	}
 
+	var tenantCompany models.Company
+	if s.db != nil {
+		s.db.Where("company_code = ?", company.CompanyCode).First(&tenantCompany)
+	}
+
 	return &dto.LoginResponse{
 		Token: token,
 		User: dto.UserDTO{
@@ -145,6 +150,7 @@ func (s *AuthService) BuildLoginContext(token string, user models.User, company 
 			ID:          user.CompanyID, // Should ideally be platformCompany.ID if we return platform ID, but usually it's the internal company ID
 			CompanyCode: company.CompanyCode,
 			CompanyName: company.CompanyName,
+			LogoURL:     tenantCompany.LogoURL,
 		},
 		ActiveBranch: dto.BranchDTO{
 			ID:         activeBranch.ID,

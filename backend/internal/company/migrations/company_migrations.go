@@ -31,6 +31,8 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bo
 		&models.Branch{},
 		&models.Department{},
 		&models.Designation{},
+		&models.DesignationDepartment{},
+		&models.DesignationDefaultRole{},
 		&models.SoftwareModule{},
 		&models.User{},
 		&models.UserBranchAccess{},

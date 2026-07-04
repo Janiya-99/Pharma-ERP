@@ -149,5 +149,5 @@ func (h *RoleHandler) GetAvailableRolesForSoftware(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, roles)
+	c.JSON(http.StatusOK, dto.SuccessResponse("Roles loaded successfully", roles))
 }

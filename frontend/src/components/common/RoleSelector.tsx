@@ -34,7 +34,7 @@ const RoleSelector = ({ softwareId, value, onChange, disabled = false, required 
           });
         }
       }
-      setRoles(combined);
+      setRoles(combined.filter((r: any) => r.role_code !== "SUPER_ADMIN"));
     } catch (err) {
       console.error("Failed to fetch roles", err);
       setRoles([]);

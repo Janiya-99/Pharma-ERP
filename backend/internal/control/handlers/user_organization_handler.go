@@ -49,14 +49,14 @@ func (h *UserOrganizationHandler) CreateAssignment(c *gin.Context) {
 	}
 	companyDB := db.(*gorm.DB)
 
-	companyID, _ := c.Get("companyID")
+	companyID, _ := c.Get("company_id")
 	userIDStr := c.Param("id")
 	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
-	reqUserID, _ := c.Get("userID")
+	reqUserID, _ := c.Get("user_id")
 
 	var req struct {
 		BranchID      uint64  `json:"branch_id" binding:"required"`
@@ -142,10 +142,10 @@ func (h *UserOrganizationHandler) UpdateAssignment(c *gin.Context) {
 	}
 	companyDB := db.(*gorm.DB)
 
-	companyID, _ := c.Get("companyID")
+	companyID, _ := c.Get("company_id")
 	userIDStr := c.Param("id")
 	assignmentIDStr := c.Param("assignmentId")
-	reqUserID, _ := c.Get("userID")
+	reqUserID, _ := c.Get("user_id")
 	
 	assignmentID, err := strconv.ParseUint(assignmentIDStr, 10, 64)
 	if err != nil {
@@ -234,10 +234,10 @@ func (h *UserOrganizationHandler) DeleteAssignment(c *gin.Context) {
 	}
 	companyDB := db.(*gorm.DB)
 
-	companyID, _ := c.Get("companyID")
+	companyID, _ := c.Get("company_id")
 	userIDStr := c.Param("id")
 	assignmentIDStr := c.Param("assignmentId")
-	reqUserID, _ := c.Get("userID")
+	reqUserID, _ := c.Get("user_id")
 
 	var assignment models.UserOrganizationAssignment
 	if err := companyDB.Where("id = ? AND user_id = ?", assignmentIDStr, userIDStr).First(&assignment).Error; err != nil {
