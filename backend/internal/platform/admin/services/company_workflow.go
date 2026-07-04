@@ -8,6 +8,8 @@ import (
 
 	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	companyModels "github.com/pixandco/erp-phrma/internal/company/models"
+	inventorySeeders "github.com/pixandco/erp-phrma/internal/inventory/seeders"
+	invoiceCenterSeeders "github.com/pixandco/erp-phrma/internal/invoicecenter/seeders"
 	"github.com/pixandco/erp-phrma/internal/platform/models"
 	"github.com/pixandco/erp-phrma/internal/security"
 	"go.uber.org/zap"
@@ -272,6 +274,23 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		tenantCo.Email = req.CompanyEmail
 		tenantCo.Phone = req.CompanyPhone
 		companyDB.Save(&tenantCo)
+	}
+
+	// Seed structural inventory and invoice center data for the new company
+	if err := inventorySeeders.SeedProductUnits(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Error("Product unit seeder failed", zap.Error(err))
+	}
+	if err := inventorySeeders.SeedDosageForms(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Error("Dosage form seeder failed", zap.Error(err))
+	}
+	if err := inventorySeeders.SeedProductCategories(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Error("Product category seeder failed", zap.Error(err))
+	}
+	if err := inventorySeeders.SeedWarehouses(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Error("Warehouse seeder failed", zap.Error(err))
+	}
+	if err := invoiceCenterSeeders.RunInvoiceCenterSeeders(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Error("Invoice Center seeder failed", zap.Error(err))
 	}
 
 	// Seed branch

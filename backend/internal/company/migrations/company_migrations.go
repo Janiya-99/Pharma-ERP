@@ -17,7 +17,12 @@ import (
 //
 // This must be run on a company-specific database connection (e.g. erp_omacx),
 // NEVER on the platform database.
-func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
+func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bool) error {
+	skipAdmin := false
+	if len(skipAdminSeeder) > 0 && skipAdminSeeder[0] {
+		skipAdmin = true
+	}
+
 	logger.Info("Running company database AutoMigrate...")
 
 	// AutoMigrate company foundation tables
@@ -67,9 +72,11 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger) error {
 		return err
 	}
 
-	if err := seeders.SeedAdminUser(db, logger); err != nil {
-		logger.Error("Admin user seeder failed", zap.Error(err))
-		return err
+	if !skipAdmin {
+		if err := seeders.SeedAdminUser(db, logger); err != nil {
+			logger.Error("Admin user seeder failed", zap.Error(err))
+			return err
+		}
 	}
 
 	if err := seeders.SeedUserAccessMatrix(db, logger); err != nil {
