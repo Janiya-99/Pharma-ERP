@@ -268,6 +268,10 @@ const AppRoutes = () => {
             element={<UserSoftwareAccessPage />}
           />
           <Route
+            path="/control-center/roles-permissions"
+            element={<RolesPermissionsPage />}
+          />
+          <Route
             path="/control-center/roles"
             element={<RolesPermissionsPage />}
           />

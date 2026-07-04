@@ -33,12 +33,12 @@ const AppLayout = () => {
         className="grid h-screen grid-cols-[0_1fr] gap-0 overflow-hidden bg-slate-50 font-sans text-[#1F2937] transition-[grid-template-columns] duration-300 lg:grid-cols-[var(--sidebar-width)_1fr]"
         style={
           {
-            "--sidebar-width": desktopExpanded ? "16rem" : "72px",
+            "--sidebar-width": desktopExpanded ? "15rem" : "68px",
           } as CSSProperties
         }
       >
         <Sidebar />
-        <div className="flex min-w-0 flex-col overflow-hidden border-l border-slate-200/70">
+        <div className="flex min-w-0 flex-col overflow-hidden">
           <Topbar />
           <main className="flex flex-1 flex-col overflow-y-auto scroll-smooth bg-slate-50">
             <div className="page-content flex-grow space-y-8 pb-32 font-sans">

@@ -56,7 +56,7 @@ type MenuItem = {
 };
 
 const Sidebar = () => {
-  const { activeSoftware, user, activeBranch, hasPermission } = useAuth();
+  const { activeSoftware, user, company, activeBranch, hasPermission } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
@@ -707,7 +707,17 @@ const Sidebar = () => {
   };
 
   // ── Sidebar Content (shared between desktop & mobile) ──
-  const sidebarContent = (isMobile = false) => (
+  const companyInitials = (company?.company_name || "Pharma ERP")
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+
+  const sidebarContent = (isMobile = false) => {
+    const collapsed = !isMobile && !effectiveExpanded;
+    return (
     <>
       {/* Logo area */}
       <div
@@ -715,8 +725,14 @@ const Sidebar = () => {
           isMobile || effectiveExpanded ? "px-5" : "justify-center px-2"
         }`}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] shadow-sm">
-          <Pill className="h-5 w-5 text-white" />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] shadow-sm overflow-hidden">
+          {collapsed ? (
+            <span className="text-white font-bold text-sm tracking-wider">{companyInitials}</span>
+          ) : company?.logo_url ? (
+            <img src={company.logo_url} alt="Company Logo" className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-white font-bold text-sm tracking-wider">{companyInitials}</span>
+          )}
         </div>
         {(isMobile || effectiveExpanded) && (
           <div className="flex min-w-0 flex-1 items-center justify-between overflow-hidden">
@@ -818,7 +834,8 @@ const Sidebar = () => {
         </DropdownMenuContent>
       </DropdownMenu>
     </>
-  );
+    );
+  };
 
   return (
     <>

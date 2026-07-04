@@ -73,8 +73,12 @@ const Topbar = () => {
       {/* Right: User info + Logout */}
       <div className="flex shrink-0 items-center gap-2 md:gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] text-xs font-bold text-white shadow-sm">
-            {initials}
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-[#0077B6] text-xs font-bold text-white shadow-sm overflow-hidden">
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              initials
+            )}
           </div>
           <div className="hidden text-right sm:block">
             <p className="text-sm font-semibold leading-none text-[#111827]">
