@@ -39,7 +39,12 @@ const LoginPage = () => {
     const res = await loginUser(formData.email, formData.password);
 
     if (res.success) {
-      navigate("/control-center/dashboard");
+      if (res.softwareModules && res.softwareModules.length === 1) {
+        const moduleCode = res.softwareModules[0].software_code;
+        navigate(`/${moduleCode.toLowerCase().replace(/_/g, "-")}/dashboard`);
+      } else {
+        navigate("/modules");
+      }
     } else {
       setError(res.message);
       setLoading(false);

@@ -711,7 +711,7 @@ const Sidebar = () => {
     <>
       {/* Logo area */}
       <div
-        className={`flex shrink-0 items-center gap-3 border-b border-slate-200/70 pb-4 pt-4 transition-all duration-300 ${
+        className={`flex h-14 shrink-0 items-center gap-3 border-b border-slate-200/70 transition-all duration-300 ${
           isMobile || effectiveExpanded ? "px-5" : "justify-center px-2"
         }`}
       >

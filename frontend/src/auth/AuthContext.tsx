@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
           setPermissions(data.permissions || []);
         }
 
-        return { success: true };
+        return { success: true, softwareModules: data.software_modules || [] };
       }
       return { success: false, message: res.message || "Login failed" };
     } catch (error) {
