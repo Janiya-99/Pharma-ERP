@@ -39,6 +39,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useSidebarState } from "./AppLayout";
+import { controlCenterNavigation } from "../../config/controlCenterNavigation";
 
 type MenuItem = {
   name: string;
@@ -55,7 +56,7 @@ type MenuItem = {
 };
 
 const Sidebar = () => {
-  const { activeSoftware, user, activeBranch } = useAuth();
+  const { activeSoftware, user, activeBranch, hasPermission } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
@@ -67,92 +68,6 @@ const Sidebar = () => {
     setDesktopExpanded(effectiveExpanded);
   }, [effectiveExpanded, setDesktopExpanded]);
 
-  const controlCenterMenus: MenuItem[] = [
-    {
-      name: "Dashboard",
-      path: "/control-center/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      name: "Organization Setup",
-      icon: Building,
-      children: [
-        {
-          name: "Company",
-          path: "/control-center/company",
-          permission: "control.company.view",
-        },
-        {
-          name: "Branches",
-          path: "/control-center/branches",
-          permission: "control.branch.view",
-        },
-        {
-          name: "Departments",
-          path: "/control-center/departments",
-          permission: "control.department.view",
-        },
-        {
-          name: "Designations",
-          path: "/control-center/designations",
-          permission: "control.designation.view",
-        },
-      ],
-    },
-    {
-      name: "User & Access Center",
-      icon: Shield,
-      children: [
-        {
-          name: "Users",
-          path: "/control-center/users",
-          permission: "control.user.view",
-        },
-        {
-          name: "Roles & Permissions",
-          path: "/control-center/roles-permissions",
-          permission: "control.role.view",
-        },
-        {
-          name: "User Access",
-          path: "/control-center/user-access",
-          permission: "control.access_matrix.view",
-        },
-      ],
-    },
-    {
-      name: "System Setup",
-      icon: Settings,
-      children: [
-        {
-          name: "Software Modules",
-          path: "/control-center/software-modules",
-          permission: "control.permission.view",
-        },
-        {
-          name: "Module Connections",
-          path: "/control-center/module-connections",
-        },
-        { name: "Settings", path: "/control-center/settings" },
-      ],
-    },
-    {
-      name: "Audit & Security",
-      icon: FileCheck,
-      children: [
-        {
-          name: "Audit Logs",
-          path: "/control-center/audit-logs",
-          permission: "control.audit.view",
-        },
-        {
-          name: "Login Logs",
-          path: "/control-center/login-logs",
-          permission: "control.login_logs.view",
-        },
-      ],
-    },
-  ];
 
   const financeMenus: MenuItem[] = [
     { name: "Dashboard", path: "/finance/dashboard", icon: LayoutDashboard },
@@ -567,7 +482,43 @@ const Sidebar = () => {
 
   const getMenus = (): MenuItem[] => {
     const code = activeSoftware?.software_code;
-    if (code === "CONTROL_CENTER") return controlCenterMenus;
+    
+    if (code === "CONTROL_CENTER") {
+      const filteredMenus = controlCenterNavigation
+        .map((group) => {
+          // Filter items based on permissions
+          const items = group.items.filter(
+            (item) => !item.permission || hasPermission(item.permission)
+          );
+
+          if (items.length === 0) return null;
+
+          // If group only has a single item and it matches the group name exactly, treat it as a top-level link
+          if (items.length === 1 && items[0].label === group.label) {
+            return {
+              name: group.label,
+              icon: group.icon,
+              path: items[0].route,
+              permission: items[0].permission,
+            } as MenuItem;
+          }
+
+          // Return group with children
+          return {
+            name: group.label,
+            icon: group.icon,
+            children: items.map((item) => ({
+              name: item.label,
+              path: item.route,
+              permission: item.permission,
+              disabled: item.disabled,
+            })),
+          } as MenuItem;
+        })
+        .filter(Boolean) as MenuItem[];
+
+      return filteredMenus;
+    }
     if (code === "FINANCE") return financeMenus;
     if (code === "INVENTORY") return inventoryMenus;
     if (code === "INVOICE_CENTER") return invoiceCenterMenus;

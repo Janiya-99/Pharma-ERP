@@ -264,32 +264,48 @@ const AppRoutes = () => {
             element={<UserSoftwareAccessPage />}
           />
           <Route
-            path="/control-center/roles-permissions"
+            path="/control-center/roles"
             element={<RolesPermissionsPage />}
           />
           <Route
-            path="/control-center/user-access"
+            path="/control-center/permissions"
+            element={<RolesPermissionsPage />}
+          />
+          <Route
+            path="/control-center/user-assignments"
             element={<AccessMatrixPage />}
           />
           <Route
-            path="/control-center/access-matrix"
-            element={<AccessMatrixPage />}
-          />
-          <Route
-            path="/control-center/user-access-management"
-            element={<AccessMatrixPage />}
+            path="/control-center/effective-access"
+            element={<PlaceholderPage title="Effective Access" />}
           />
           <Route
             path="/control-center/audit-logs"
             element={<AuditLogsPage />}
           />
           <Route
-            path="/control-center/login-logs"
+            path="/control-center/access-audit"
+            element={<PlaceholderPage title="Access Audit" />}
+          />
+          <Route
+            path="/control-center/login-history"
             element={<LoginLogsPage />}
           />
           <Route
+            path="/control-center/security-settings"
+            element={<PlaceholderPage title="Security Settings" />}
+          />
+          <Route
+            path="/control-center/approval-settings"
+            element={<PlaceholderPage title="Approval Settings" />}
+          />
+          <Route
+            path="/control-center/document-numbering"
+            element={<PlaceholderPage title="Document Numbering" />}
+          />
+          <Route
             path="/control-center/settings"
-            element={<PlaceholderPage title="Settings" />}
+            element={<PlaceholderPage title="General Settings" />}
           />
 
           {/* Finance Module */}
