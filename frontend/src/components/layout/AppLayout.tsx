@@ -40,16 +40,16 @@ const AppLayout = () => {
         <Sidebar />
         <div className="flex min-w-0 flex-col overflow-hidden">
           <Topbar />
-          <main className="flex flex-1 flex-col overflow-y-auto scroll-smooth">
-            <div className="page-content flex-grow space-y-8 pb-32 font-sans">
+          <main className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scroll-smooth">
+            <div className="page-content flex-grow space-y-8 pb-20 font-sans">
               <Outlet />
             </div>
-            <footer className="mt-auto h-14 border-t px-3 md:px-6 flex items-center" style={{ borderColor: 'rgba(148, 163, 184, 0.15)', background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(16px) saturate(180%)' }}>
-              <div className="w-full flex flex-col items-center justify-between gap-2 text-xs text-[#6B7280] sm:flex-row">
+            <footer className="sticky bottom-0 z-40 mt-auto h-14 shrink-0 border-t px-6 md:px-8 flex items-center shadow-[0_-1px_3px_rgba(0,0,0,0.02)]" style={{ borderColor: 'rgba(148, 163, 184, 0.15)', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(12px)' }}>
+              <div className="w-full flex flex-col items-center justify-between gap-2 text-xs text-slate-500 sm:flex-row">
                 <span>© {new Date().getFullYear()} Pharma ERP. All rights reserved.</span>
                 <span>
                   Developed by{" "}
-                  <span className="font-semibold text-[#1F2937]">PIXANDCO</span>
+                  <span className="font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-default">PIXANDCO</span>
                 </span>
               </div>
             </footer>

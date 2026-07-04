@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1",
@@ -8,26 +9,29 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(
-  (config: unknown) => {
-    const token = localStorage.getItem("erp_token");
+  (config: any) => {
+    const token = Cookies.get("erp_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error: unknown) => {
+  (error: any) => {
     return Promise.reject(error);
   }
 );
 
 apiClient.interceptors.response.use(
-  (response: unknown) => {
+  (response: any) => {
     return response;
   },
-  (error: unknown) => {
+  (error: any) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem("erp_token");
-      window.location.href = "/login";
+      const token = Cookies.get("erp_token");
+      if (token) {
+        Cookies.remove("erp_token");
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

@@ -24,8 +24,8 @@ import {
   HeartPulse,
 } from "lucide-react";
 import { 
-  LineChart, 
-  Line, 
+  AreaChart, 
+  Area, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -54,12 +54,20 @@ const moduleData = [
 ];
 
 const COLORS = ["#4854CC", "#005F95", "#023E8A", "#002137"];
+const BAR_GRADIENTS = ["url(#barGrad0)", "url(#barGrad1)", "url(#barGrad2)", "url(#barGrad3)"];
+const glassBlueBg = "bg-[#4854CC]/5 dark:bg-[#4854CC]/5 border-[#4854CC]/20 backdrop-blur-xl shadow-[0_8px_30px_rgba(72,84,204,0.06)] hover:bg-[#4854CC]/10 hover:border-[#4854CC]/30 transition-all duration-300";
 
 const ControlCenterDashboardPage = () => {
   const [dateFilter, setDateFilter] = useState("This Week");
 
   return (
-    <PageShell>
+    <PageShell className="relative">
+      {/* Background ambient glowing shapes */}
+      <div className="absolute top-[-16px] bottom-[-32px] left-[-12px] right-[-12px] md:top-[-20px] md:left-[-16px] md:right-[-16px] lg:left-[-24px] lg:right-[-24px] overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-[#4854CC]/10 blur-[120px]" />
+        <div className="absolute bottom-[20%] right-0 w-[400px] h-[400px] rounded-full bg-indigo-400/8 blur-[100px]" />
+      </div>
+
       {/* Page Header */}
       <PageHeader
         title="Control Center Overview"
@@ -72,13 +80,13 @@ const ControlCenterDashboardPage = () => {
               <input 
                 type="text" 
                 placeholder="Search..." 
-                className="h-9 rounded-xl border border-slate-300 bg-background pl-9 pr-4 text-sm text-foreground placeholder-muted-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 transition-all shadow-sm"
+                className="h-9 rounded-xl border border-[#4854CC]/20 bg-background pl-9 pr-4 text-sm text-foreground placeholder-muted-foreground focus:border-[#4854CC] focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 transition-all shadow-sm"
               />
             </div>
 
             {/* Branch Switcher Select */}
             <Select defaultValue="all">
-              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 shadow-sm w-[140px]">
+              <SelectTrigger className="h-9 rounded-xl border border-[#4854CC]/20 bg-background px-4 text-sm text-foreground focus:border-[#4854CC] focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 shadow-sm w-[140px]">
                 <SelectValue placeholder="All Branches" />
               </SelectTrigger>
               <SelectContent className="bg-card border border-slate-200/80 rounded-xl shadow-lg">
@@ -90,7 +98,7 @@ const ControlCenterDashboardPage = () => {
 
             {/* Date Filter Select */}
             <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="h-9 rounded-xl border border-slate-300 bg-background px-4 text-sm text-foreground focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 shadow-sm w-[120px]">
+              <SelectTrigger className="h-9 rounded-xl border border-[#4854CC]/20 bg-background px-4 text-sm text-foreground focus:border-[#4854CC] focus:outline-none focus:ring-2 focus:ring-[#4854CC]/20 shadow-sm w-[120px]">
                 <SelectValue placeholder="This Week" />
               </SelectTrigger>
               <SelectContent className="bg-card border border-slate-200/80 rounded-xl shadow-lg">
@@ -121,6 +129,8 @@ const ControlCenterDashboardPage = () => {
           icon={<Building2 className="h-5 w-5 text-[#4854CC]" />}
           trend="up"
           trendValue="+1 this year"
+          className={glassBlueBg}
+          iconBg="bg-[#4854CC]/10"
         />
         <KPICard
           title="Total Branches"
@@ -128,6 +138,8 @@ const ControlCenterDashboardPage = () => {
           icon={<Building2 className="h-5 w-5 text-[#0096C7]" />}
           trend="up"
           trendValue="+3 this quarter"
+          className={glassBlueBg}
+          iconBg="bg-[#0096C7]/10"
         />
         <KPICard
           title="Total Users"
@@ -135,6 +147,8 @@ const ControlCenterDashboardPage = () => {
           icon={<Users className="h-5 w-5 text-[#005F95]" />}
           trend="up"
           trendValue="+12% vs last month"
+          className={glassBlueBg}
+          iconBg="bg-[#005F95]/10"
         />
         <KPICard
           title="Active Users"
@@ -142,6 +156,8 @@ const ControlCenterDashboardPage = () => {
           icon={<UserCheck className="h-5 w-5 text-green-500" />}
           trend="neutral"
           trendValue="75% engagement"
+          className={glassBlueBg}
+          iconBg="bg-green-500/10"
         />
         <KPICard
           title="Software Modules"
@@ -149,6 +165,8 @@ const ControlCenterDashboardPage = () => {
           icon={<Blocks className="h-5 w-5 text-[#002137]" />}
           trend="neutral"
           trendValue="All active"
+          className={glassBlueBg}
+          iconBg="bg-[#002137]/10"
         />
         <KPICard
           title="Security Alerts"
@@ -156,44 +174,96 @@ const ControlCenterDashboardPage = () => {
           icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
           trend="down"
           trendValue="Needs attention"
-          className="border-red-200/50 dark:border-red-900/30"
-          iconBg="bg-red-50 dark:bg-red-950/20"
+          className="bg-red-500/5 dark:bg-red-500/5 border-red-500/20 backdrop-blur-xl shadow-[0_8px_30px_rgba(239,68,68,0.06)] hover:bg-red-500/10 hover:border-red-500/30 transition-all duration-300"
+          iconBg="bg-red-500/10"
         />
       </DashboardGrid>
 
       {/* Row 2 - Analytics Charts */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <SectionCard title="User Activity Trend" actions={<span className="text-xs font-semibold text-muted-foreground">{dateFilter}</span>} className="lg:col-span-2">
+        <SectionCard title="User Activity Trend" actions={<span className="text-xs font-semibold text-muted-foreground">{dateFilter}</span>} className={`lg:col-span-2 ${glassBlueBg}`}>
           <div className="h-72 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={activityData} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-muted/30" vertical={false} />
+              <AreaChart data={activityData} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4854CC" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="#4854CC" stopOpacity={0.01}/>
+                  </linearGradient>
+                  <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#4854CC" />
+                    <stop offset="50%" stopColor="#6366f1" />
+                    <stop offset="100%" stopColor="#4854CC" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(72, 84, 204, 0.08)" vertical={false} />
                 <XAxis dataKey="name" stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)' }}
-                  itemStyle={{ color: '#4854CC' }}
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.75)', 
+                    backdropFilter: 'blur(12px)', 
+                    borderColor: 'rgba(72, 84, 204, 0.2)', 
+                    borderRadius: '16px', 
+                    boxShadow: '0 8px 32px rgba(72, 84, 204, 0.08)' 
+                  }}
+                  itemStyle={{ color: '#4854CC', fontWeight: 600 }}
+                  labelStyle={{ color: '#111827', fontWeight: 700 }}
                 />
-                <Line type="monotone" dataKey="users" stroke="#4854CC" strokeWidth={3} dot={{ r: 4, fill: '#ffffff', stroke: '#4854CC', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#4854CC' }} />
-              </LineChart>
+                <Area 
+                  type="monotone" 
+                  dataKey="users" 
+                  stroke="url(#lineGrad)" 
+                  strokeWidth={3} 
+                  fill="url(#colorUsers)" 
+                  dot={{ r: 4, fill: '#ffffff', stroke: '#4854CC', strokeWidth: 2 }} 
+                  activeDot={{ r: 6, fill: '#4854CC', strokeWidth: 2, stroke: '#ffffff' }} 
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </SectionCard>
 
-        <SectionCard title="Users by Module">
+        <SectionCard title="Users by Module" className={glassBlueBg}>
           <div className="h-72 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={moduleData} layout="vertical" margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-muted/30" horizontal={false} />
+                <defs>
+                  <linearGradient id="barGrad0" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#4854CC" />
+                    <stop offset="100%" stopColor="#818cf8" />
+                  </linearGradient>
+                  <linearGradient id="barGrad1" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#005F95" />
+                    <stop offset="100%" stopColor="#00b4d8" />
+                  </linearGradient>
+                  <linearGradient id="barGrad2" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#023E8A" />
+                    <stop offset="100%" stopColor="#0077b6" />
+                  </linearGradient>
+                  <linearGradient id="barGrad3" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#002137" />
+                    <stop offset="100%" stopColor="#023e8a" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(72, 84, 204, 0.08)" horizontal={false} />
                 <XAxis type="number" stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis dataKey="name" type="category" stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis dataKey="name" type="category" stroke="currentColor" className="text-muted-foreground" fontSize={12} tickLine={false} axisLine={false} width={80} />
                 <Tooltip 
-                  cursor={{fill: 'var(--muted)'}}
-                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)' }}
+                  cursor={{ fill: 'rgba(72, 84, 204, 0.04)', radius: 8 }}
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.75)', 
+                    backdropFilter: 'blur(12px)', 
+                    borderColor: 'rgba(72, 84, 204, 0.2)', 
+                    borderRadius: '16px', 
+                    boxShadow: '0 8px 32px rgba(72, 84, 204, 0.08)' 
+                  }}
+                  itemStyle={{ fontWeight: 600 }}
+                  labelStyle={{ color: '#111827', fontWeight: 700 }}
                 />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={16}>
                   {moduleData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={BAR_GRADIENTS[index % BAR_GRADIENTS.length]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -208,6 +278,7 @@ const ControlCenterDashboardPage = () => {
         <SectionCard 
           title="Recent Security Logs" 
           actions={<Button variant="link" size="xs">View All</Button>}
+          className={glassBlueBg}
         >
           <div className="space-y-3 pt-2">
             {[
@@ -216,7 +287,7 @@ const ControlCenterDashboardPage = () => {
               { time: "3 hours ago", event: "Multiple failed logins", user: "Unknown IP", type: "critical" },
               { time: "Yesterday", event: "New API key generated", user: "dev@hq.corp", type: "info" },
             ].map((log, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl bg-muted/20 p-3 border border-slate-200/80 hover:bg-muted/40 transition-colors">
+              <div key={i} className="flex items-start gap-3 rounded-xl bg-[#4854CC]/5 p-3 border border-[#4854CC]/10 hover:bg-[#4854CC]/10 transition-colors">
                 <div className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 ${log.type === 'critical' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : log.type === 'warning' ? 'bg-amber-500' : 'bg-[#4854CC]'}`} />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{log.event}</p>
@@ -231,6 +302,7 @@ const ControlCenterDashboardPage = () => {
         <SectionCard 
           title="Recent Audit Logs" 
           actions={<Button variant="link" size="xs">View All</Button>}
+          className={glassBlueBg}
         >
           <div className="space-y-3 pt-2">
             {[
@@ -239,7 +311,7 @@ const ControlCenterDashboardPage = () => {
               { time: "2 hours ago", action: "Assigned Inventory module", module: "Access Control" },
               { time: "4 hours ago", action: "Modified financial year", module: "Finance" },
             ].map((log, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl bg-muted/20 p-3 border border-slate-200/80 hover:bg-muted/40 transition-colors">
+              <div key={i} className="flex items-start gap-3 rounded-xl bg-[#4854CC]/5 p-3 border border-[#4854CC]/10 hover:bg-[#4854CC]/10 transition-colors">
                 <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-muted-foreground shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{log.action}</p>
@@ -251,7 +323,7 @@ const ControlCenterDashboardPage = () => {
         </SectionCard>
 
         {/* Quick Actions */}
-        <SectionCard title="Quick Actions">
+        <SectionCard title="Quick Actions" className={glassBlueBg}>
           <div className="grid grid-cols-2 gap-3 pt-2">
             {[
               { label: "Create User", icon: Plus, variant: "default" },
@@ -263,10 +335,10 @@ const ControlCenterDashboardPage = () => {
             ].map((action, i) => (
               <button 
                 key={i} 
-                className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200/80 bg-card/45 p-4 text-center transition-all hover:bg-muted/20 shadow-sm"
+                className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-[#4854CC]/10 bg-[#4854CC]/5 p-4 text-center transition-all hover:bg-[#4854CC]/10 hover:border-[#4854CC]/20 shadow-sm"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted group-hover:bg-card transition-colors">
-                  <action.icon className="h-4.5 w-4.5 text-erp-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#4854CC]/10 group-hover:bg-card transition-colors">
+                  <action.icon className="h-4.5 w-4.5 text-[#4854CC]" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">{action.label}</span>
               </button>
@@ -277,7 +349,7 @@ const ControlCenterDashboardPage = () => {
 
       {/* Row 4 - System Distribution & Health */}
       <DashboardGrid columns={4}>
-        <SectionCard title="Branch Users">
+        <SectionCard title="Branch Users" className={glassBlueBg}>
           <div className="space-y-4 pt-2">
             {[
               { name: "Headquarters", users: 542, percentage: 65, color: "bg-[#4854CC]" },
@@ -300,7 +372,7 @@ const ControlCenterDashboardPage = () => {
           </div>
         </SectionCard>
 
-        <SectionCard title="Role Distribution">
+        <SectionCard title="Role Distribution" className={glassBlueBg}>
           <div className="space-y-3 pt-2">
             {[
               { name: "Regular Users", count: 850 },
@@ -308,7 +380,7 @@ const ControlCenterDashboardPage = () => {
               { name: "System Admins", count: 12 },
               { name: "Auditors", count: 8 },
             ].map((role, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg border border-slate-200/80 bg-muted/20 p-3">
+              <div key={i} className="flex items-center justify-between rounded-lg border border-[#4854CC]/10 bg-[#4854CC]/5 p-3">
                 <span className="text-sm font-semibold text-foreground">{role.name}</span>
                 <span className="rounded-md bg-muted px-2.5 py-1 text-xs font-bold text-foreground border border-slate-200/80">
                   {role.count}
@@ -318,7 +390,7 @@ const ControlCenterDashboardPage = () => {
           </div>
         </SectionCard>
 
-        <SectionCard title="Pending Actions" className="border-red-200/50 dark:border-red-900/30">
+        <SectionCard title="Pending Actions" className="bg-amber-500/5 dark:bg-amber-500/5 border-amber-500/20 backdrop-blur-xl shadow-[0_8px_30px_rgba(245,158,11,0.06)] hover:bg-amber-500/10 hover:border-amber-500/30 transition-all duration-300">
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between rounded-lg border border-red-200 dark:border-red-900/30 bg-muted/20 p-3">
               <span className="text-sm font-semibold text-foreground">Locked Users</span>
@@ -335,7 +407,7 @@ const ControlCenterDashboardPage = () => {
           </div>
         </SectionCard>
 
-        <SectionCard title="System Health" className="relative overflow-hidden">
+        <SectionCard title="System Health" className={`${glassBlueBg} relative overflow-hidden`}>
           <div className="grid grid-cols-2 gap-4 pt-2">
             <div>
               <p className="text-xs text-muted-foreground mb-1 font-medium">Status</p>

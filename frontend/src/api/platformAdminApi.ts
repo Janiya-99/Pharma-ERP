@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1";
 
@@ -11,7 +12,7 @@ const platformAdminClient = axios.create({
 
 platformAdminClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("platform_admin_token");
+    const token = Cookies.get("platform_admin_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,7 +29,7 @@ platformAdminClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem("platform_admin_token");
+      Cookies.remove("platform_admin_token");
       // Redirect to platform-admin login
       if (!window.location.pathname.startsWith("/platform-admin/login")) {
         window.location.href = "/platform-admin/login";

@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 // Base API client for communicating with the Go backend
 const API_BASE_URL =
@@ -14,20 +15,20 @@ const apiClient = axios.create({
 
 // Request interceptor — attach auth token if available
 apiClient.interceptors.request.use(
-  (config: unknown) => {
-    const token = localStorage.getItem("erp_token") || localStorage.getItem("access_token");
+  (config: any) => {
+    const token = Cookies.get("erp_token") || Cookies.get("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error: unknown) => Promise.reject(error)
+  (error: any) => Promise.reject(error)
 );
 
 // Response interceptor — handle common errors
 apiClient.interceptors.response.use(
-  (response: unknown) => response,
-  (error: unknown) => {
+  (response: any) => response,
+  (error: any) => {
     if (error.response?.status === 401) {
       // Token expired or invalid — future: redirect to login
       console.warn("Unauthorized — token may be expired");

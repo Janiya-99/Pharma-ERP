@@ -223,16 +223,16 @@
 }
 
 .glass-header {
-	background: rgba(255, 255, 255, 0.5);
-	backdrop-filter: var(--glass-blur);
-	-webkit-backdrop-filter: var(--glass-blur);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-	box-shadow: 0 4px 16px rgba(72, 84, 204, 0.04);
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	transition: all 0.3s ease;
 }
 
 .dark .glass-header {
-	background: rgba(2, 4, 32, 0.8);
+	background: rgba(15, 23, 42, 0.95);
 	border-bottom-color: rgba(72, 202, 228, 0.1);
 }
 

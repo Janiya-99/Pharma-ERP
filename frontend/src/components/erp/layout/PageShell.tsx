@@ -24,7 +24,7 @@ export function PageShell({
   return (
     <div
       className={cn(
-        "page-content flex flex-col gap-8 pb-32 font-sans",
+        "page-content flex flex-col gap-8 pb-8 font-sans",
         maxWidth,
         className
       )}

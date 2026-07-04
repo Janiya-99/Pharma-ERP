@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import Cookies from "js-cookie";
 import {
   login,
   getAuthContext,
@@ -37,7 +38,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
-  const [token, setToken] = useState(localStorage.getItem("erp_token") || null);
+  const [token, setToken] = useState(Cookies.get("erp_token") || null);
   const [user, setUser] = useState(null);
   const [company, setCompany] = useState(null);
   const [activeBranch, setActiveBranch] = useState(null);
@@ -96,7 +97,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
       const isSuccess = res.success !== false;
 
       if (isSuccess && tokenStr) {
-        localStorage.setItem("erp_token", tokenStr);
+        Cookies.set("erp_token", tokenStr, { expires: 7, secure: true, sameSite: "strict" });
         setToken(tokenStr);
 
         // If login returns the context, set it immediately to prevent redirect loops
@@ -123,7 +124,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
   };
 
   const logoutUser = () => {
-    localStorage.removeItem("erp_token");
+    const hadToken = !!Cookies.get("erp_token");
+    Cookies.remove("erp_token");
     setToken(null);
     setUser(null);
     setCompany(null);
@@ -132,7 +134,9 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     setBranches([]);
     setSoftwareModules([]);
     setPermissions([]);
-    window.location.href = "/login";
+    if (hadToken && window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
   };
 
   const switchActiveBranch = async (branchId: string | number) => {
@@ -143,7 +147,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         res.data?.tokens?.access_token || res.token || res.data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
-        localStorage.setItem("erp_token", token);
+        Cookies.set("erp_token", token, { expires: 7, secure: true, sameSite: "strict" });
         setToken(token);
         await refreshContext();
         return true;
@@ -165,7 +169,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         res.data?.tokens?.access_token || res.token || res.data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
-        localStorage.setItem("erp_token", token);
+        Cookies.set("erp_token", token, { expires: 7, secure: true, sameSite: "strict" });
         setToken(token);
         await refreshContext();
         return true;

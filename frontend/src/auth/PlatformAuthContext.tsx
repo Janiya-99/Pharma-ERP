@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import Cookies from "js-cookie";
 import { platformLogin, platformGetMe } from "../api/platformAdminApi";
 
 export interface PlatformAuthContextType {
@@ -22,14 +23,14 @@ const PlatformAuthContext = createContext<PlatformAuthContextType>({} as Platfor
 export const usePlatformAuth = () => useContext(PlatformAuthContext);
 
 export const PlatformAuthProvider = ({ children }: { children?: React.ReactNode }) => {
-  const [token, setToken] = useState(localStorage.getItem("platform_admin_token") || null);
+  const [token, setToken] = useState(Cookies.get("platform_admin_token") || null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const isAuthenticated = !!token && !!user;
 
   const logoutUser = useCallback(() => {
-    localStorage.removeItem("platform_admin_token");
+    Cookies.remove("platform_admin_token");
     setToken(null);
     setUser(null);
     setLoading(false);
@@ -65,7 +66,7 @@ export const PlatformAuthProvider = ({ children }: { children?: React.ReactNode 
     try {
       const res = await platformLogin({ email, password });
       if (res.success && res.token) {
-        localStorage.setItem("platform_admin_token", res.token);
+        Cookies.set("platform_admin_token", res.token, { expires: 7, secure: true, sameSite: "strict" });
         setToken(res.token);
         setUser(res.user);
         return { success: true };
