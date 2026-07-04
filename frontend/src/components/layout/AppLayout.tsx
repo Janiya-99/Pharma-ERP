@@ -40,7 +40,7 @@ const AppLayout = () => {
         <Sidebar />
         <div className="flex min-w-0 flex-col overflow-hidden">
           <Topbar />
-          <main className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scroll-smooth">
+          <main className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scroll-smooth bg-[#fafafa]">
             <div className="page-content flex-grow space-y-8 pb-20 font-sans">
               <Outlet />
             </div>

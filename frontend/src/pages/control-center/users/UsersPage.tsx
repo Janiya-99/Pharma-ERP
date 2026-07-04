@@ -204,32 +204,41 @@ const UsersPage = () => {
     {
       header: "User Code",
       accessor: "employee_code",
-      cellClassName: "font-mono text-xs text-indigo-600 font-semibold",
+      cell: (row: any) => {
+        const code = row.employee_code;
+        if (!code) return <span className="text-slate-300 select-none">—</span>;
+        return (
+          <span className="font-mono text-xs font-semibold bg-slate-100 text-slate-700 px-2 py-1 rounded">
+            {code}
+          </span>
+        );
+      },
     },
     {
       header: "Full Name",
       accessor: "name",
-      cellClassName: "font-semibold text-gray-900",
+      cellClassName: "font-semibold text-slate-900",
     },
     {
       header: "Email",
       accessor: "email",
-      cellClassName: "text-gray-600",
+      cellClassName: "text-slate-600",
     },
     {
       header: "Phone",
       accessor: "phone",
+      cell: (row: any) => row.phone || <span className="text-slate-300 select-none">—</span>,
     },
     {
       header: "Designation",
       cell: (row: any) => {
-        return row.designation || "—";
+        return row.designation || <span className="text-slate-300 select-none">—</span>;
       },
     },
     {
       header: "Department",
       cell: (row: any) => {
-        return row.department || "—";
+        return row.department || <span className="text-slate-300 select-none">—</span>;
       },
     },
     {
@@ -237,8 +246,8 @@ const UsersPage = () => {
       cell: (row: any) => {
         const role = row.primary_role || row.user_type;
         return (
-          <span className="text-xs font-medium text-gray-600 capitalize">
-            {role?.replace(/_/g, " ") || "—"}
+          <span className="text-xs font-medium text-slate-600 capitalize">
+            {role?.replace(/_/g, " ") || <span className="text-slate-300 select-none">—</span>}
           </span>
         );
       },
@@ -250,9 +259,9 @@ const UsersPage = () => {
     {
       header: "Last Login",
       cell: (row: any) => {
-        if (!row.last_login_at) return <span className="text-xs text-gray-400">Never</span>;
+        if (!row.last_login_at) return <span className="text-xs text-slate-400">Never</span>;
         return (
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-slate-500">
             {new Date(row.last_login_at).toLocaleDateString()}
           </span>
         );
@@ -279,8 +288,8 @@ const UsersPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">User & Access Center</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">User & Access Center</h1>
+          <p className="text-sm text-slate-500 mt-1">
             Manage system users, access controls, and permissions
           </p>
         </div>
@@ -308,24 +317,24 @@ const UsersPage = () => {
       <div className="filter-bar">
         <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <input
               type="text"
               placeholder="Search by name, email, or code..."
               name="search"
               value={searchVal}
               onChange={(e: any) => setSearchVal(e.target.value)}
-              className="input-premium pl-9"
+              className="w-full h-9 rounded-xl border border-slate-200 bg-white pl-9 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
             />
           </div>
-          <Button type="submit" variant="secondary" size="sm">
+          <Button type="submit" variant="secondary" size="sm" className="h-9 rounded-xl">
             <Search className="w-3.5 h-3.5" />
           </Button>
         </form>
 
         <div className="flex flex-wrap gap-2">
           <Select value={filters.branch_id || "all"} onValueChange={(val) => setFilters({ ...filters, branch_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[150px] h-[38px] bg-white border-gray-200">
+            <SelectTrigger className="w-[150px] h-9 bg-white border-slate-200 text-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <SelectValue placeholder="All Branches" />
             </SelectTrigger>
             <SelectContent className="bg-white">
@@ -335,7 +344,7 @@ const UsersPage = () => {
           </Select>
 
           <Select value={filters.software_id || "all"} onValueChange={(val) => setFilters({ ...filters, software_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[150px] h-[38px] bg-white border-gray-200">
+            <SelectTrigger className="w-[150px] h-9 bg-white border-slate-200 text-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <SelectValue placeholder="All Modules" />
             </SelectTrigger>
             <SelectContent className="bg-white">
@@ -345,7 +354,7 @@ const UsersPage = () => {
           </Select>
 
           <Select value={filters.role_id || "all"} onValueChange={(val) => setFilters({ ...filters, role_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[140px] h-[38px] bg-white border-gray-200">
+            <SelectTrigger className="w-[140px] h-9 bg-white border-slate-200 text-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
             <SelectContent className="bg-white">
@@ -355,7 +364,7 @@ const UsersPage = () => {
           </Select>
 
           <Select value={filters.department_id || "all"} onValueChange={(val) => setFilters({ ...filters, department_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[160px] h-[38px] bg-white border-gray-200">
+            <SelectTrigger className="w-[160px] h-9 bg-white border-slate-200 text-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <SelectValue placeholder="All Departments" />
             </SelectTrigger>
             <SelectContent className="bg-white">
@@ -365,7 +374,7 @@ const UsersPage = () => {
           </Select>
 
           <Select value={filters.designation_id || "all"} onValueChange={(val) => setFilters({ ...filters, designation_id: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[160px] h-[38px] bg-white border-gray-200">
+            <SelectTrigger className="w-[160px] h-9 bg-white border-slate-200 text-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <SelectValue placeholder="All Designations" />
             </SelectTrigger>
             <SelectContent className="bg-white">
@@ -375,7 +384,7 @@ const UsersPage = () => {
           </Select>
 
           <Select value={filters.status || "all"} onValueChange={(val) => setFilters({ ...filters, status: val === "all" ? "" : val, page: 1 })}>
-            <SelectTrigger className="w-[130px] h-[38px] bg-white border-gray-200">
+            <SelectTrigger className="w-[130px] h-9 bg-white border-slate-200 text-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent className="bg-white">

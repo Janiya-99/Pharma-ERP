@@ -84,14 +84,14 @@ function DataTable<TData = any>({
 
   return (
     <div>
-      <div className="glass-table overflow-hidden">
+      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-sm rounded-xl">
         <Table>
-          <TableHeader style={{ background: 'rgba(238,242,255,0.5)', borderBottom: '1px solid rgba(148,163,184,0.15)' }}>
+          <TableHeader className="border-b border-slate-100 bg-slate-50/30">
             <TableRow className="hover:bg-transparent">
               {columns.map((col, index) => (
                 <TableHead
                   key={col.id || col.accessorKey || col.accessor || index}
-                  className={`text-slate-500 h-auto whitespace-nowrap border-none px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider ${
+                  className={`text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4.5 text-left text-xs font-semibold uppercase tracking-wider ${
                     col.className || ""
                   }`}
                 >
@@ -99,7 +99,7 @@ function DataTable<TData = any>({
                 </TableHead>
               ))}
               {hasActions && (
-                <TableHead className="text-slate-500 h-auto whitespace-nowrap border-none px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider">
+                <TableHead className="text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4.5 text-right text-xs font-semibold uppercase tracking-wider">
                   Actions
                 </TableHead>
               )}
@@ -110,7 +110,7 @@ function DataTable<TData = any>({
               <TableRow
                 key={((row as any).id as string) || rowIndex}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={`group border-none transition-colors duration-150 hover:bg-[rgba(238,242,255,0.35)] ${
+                className={`group border-none transition-colors duration-150 hover:bg-slate-50/50 ${
                   onRowClick ? "cursor-pointer" : ""
                 }`}
               >
@@ -121,28 +121,34 @@ function DataTable<TData = any>({
                       key={
                         col.id || col.accessorKey || col.accessor || colIndex
                       }
-                      className={`text-slate-900 border-none px-5 py-4 text-sm font-medium ${
+                      className={`text-slate-600 border-none px-6 py-4.5 text-sm font-medium ${
                         col.cellClassName || ""
                       }`}
                     >
                       {col.cell
                         ? col.cell(row)
                         : accessorPath
-                        ? String(resolveAccessor(row, accessorPath) ?? "—")
-                        : "—"}
+                        ? (() => {
+                            const val = resolveAccessor(row, accessorPath);
+                            if (val === null || val === undefined || val === "") {
+                              return <span className="text-slate-300 select-none">—</span>;
+                            }
+                            return String(val);
+                          })()
+                        : <span className="text-slate-300 select-none">—</span>}
                     </TableCell>
                   );
                 })}
                 {hasActions && (
-                  <TableCell className="border-none px-5 py-4 text-sm">
-                    <div className="flex items-center gap-1">
+                  <TableCell className="border-none px-6 py-4.5 text-sm">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                       {onEdit && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onEdit(row);
                           }}
-                          className="text-slate-400 hover:bg-slate-100 hover:text-slate-900 inline-flex h-8 w-8 items-center justify-center rounded-xl transition-colors"
+                          className="text-slate-400 hover:bg-slate-100 hover:text-slate-900 inline-flex h-8 w-8 items-center justify-center rounded-xl transition-colors opacity-80 hover:opacity-100"
                           title="Edit"
                         >
                           <svg
@@ -165,7 +171,7 @@ function DataTable<TData = any>({
                             e.stopPropagation();
                             onDelete(row);
                           }}
-                          className="text-slate-400 hover:bg-rose-50 hover:text-rose-600 inline-flex h-8 w-8 items-center justify-center rounded-xl transition-colors"
+                          className="text-slate-400 hover:bg-rose-50 hover:text-rose-600 inline-flex h-8 w-8 items-center justify-center rounded-xl transition-colors opacity-80 hover:opacity-100"
                           title="Delete"
                         >
                           <svg

@@ -46,7 +46,7 @@
 		--glass-blur-subtle: blur(12px) saturate(160%);
 
 		/* ── Shadcn CSS Variable Tokens (Light Mode) ── */
-		--background: #F0F4FF;
+		--background: #fafafa;
 		--foreground: #111827;
 		--card: rgba(255, 255, 255, 0.45);
 		--card-foreground: #1F2937;
@@ -141,12 +141,7 @@
 		@apply text-foreground;
 		color: var(--erp-text-secondary);
 		letter-spacing: 0;
-		/* ── Gradient Mesh Background — gives glass surfaces something to blur against ── */
-		background:
-			radial-gradient(ellipse 80% 50% at 15% 20%, rgba(72, 84, 204, 0.08) 0%, transparent 60%),
-			radial-gradient(ellipse 60% 40% at 85% 80%, rgba(99, 102, 241, 0.07) 0%, transparent 55%),
-			radial-gradient(ellipse 50% 60% at 50% 50%, rgba(129, 140, 248, 0.04) 0%, transparent 70%),
-			linear-gradient(135deg, #F0F4FF 0%, #E8EDFF 30%, #F5F3FF 60%, #EEF2FF 100%);
+		background: #fafafa;
 		background-attachment: fixed;
 		min-height: 100vh;
 	}
@@ -256,13 +251,11 @@
 
 /* ── Glass Table — frosted data tables ── */
 .glass-table {
-	background: rgba(255, 255, 255, 0.38);
-	backdrop-filter: var(--glass-blur);
-	-webkit-backdrop-filter: var(--glass-blur);
-	border: 1px solid rgba(255, 255, 255, 0.5);
+	background: #ffffff;
+	border: 1px solid #f1f5f9;
 	box-shadow:
-		0 8px 32px rgba(72, 84, 204, 0.06),
-		inset 0 1px 0 rgba(255, 255, 255, 0.5);
+		0 1px 3px 0 rgba(0, 0, 0, 0.1),
+		0 1px 2px -1px rgba(0, 0, 0, 0.1);
 	border-radius: 1rem;
 	overflow: hidden;
 }
@@ -287,13 +280,11 @@
 
 /* ── Glass Filter Bar ── */
 .glass-filter-bar {
-	background: rgba(255, 255, 255, 0.4);
-	backdrop-filter: var(--glass-blur-subtle);
-	-webkit-backdrop-filter: var(--glass-blur-subtle);
-	border: 1px solid rgba(255, 255, 255, 0.5);
+	background: #ffffff;
+	border: 1px solid #f1f5f9;
 	box-shadow:
-		0 4px 16px rgba(72, 84, 204, 0.04),
-		inset 0 1px 0 rgba(255, 255, 255, 0.5);
+		0 1px 3px 0 rgba(0, 0, 0, 0.1),
+		0 1px 2px -1px rgba(0, 0, 0, 0.1);
 	border-radius: 1rem;
 }
 
