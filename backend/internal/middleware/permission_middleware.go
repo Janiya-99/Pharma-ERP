@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pixandco/erp-phrma/internal/auth/services"
+	"github.com/pixandco/erp-phrma/internal/company/models"
 	"gorm.io/gorm"
 )
 
@@ -25,6 +26,14 @@ func RequirePermission(permissionKey string) gin.HandlerFunc {
 			return
 		}
 		ctx := authCtx.(*AuthContext)
+
+		var user models.User
+		if err := db.Select("user_type").First(&user, ctx.UserID).Error; err == nil {
+			if user.UserType == "super_admin" {
+				c.Next()
+				return
+			}
+		}
 
 		permService := services.NewPermissionService(db)
 		permissions := permService.GetPermissionsForUserContext(ctx.UserID, ctx.ActiveBranchID, ctx.ActiveSoftwareCode)

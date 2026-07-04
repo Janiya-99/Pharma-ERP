@@ -26,6 +26,15 @@ func BranchAccessMiddleware() gin.HandlerFunc {
 		}
 		ctx := authCtx.(*AuthContext)
 
+		var user models.User
+		if err := db.Select("user_type").First(&user, ctx.UserID).Error; err == nil {
+			if user.UserType == "super_admin" {
+				c.Set("branch_id", ctx.ActiveBranchID)
+				c.Next()
+				return
+			}
+		}
+
 		var ba models.UserBranchAccess
 		if err := db.Preload("Branch").Where("user_id = ? AND branch_id = ? AND status = ?", ctx.UserID, ctx.ActiveBranchID, "active").First(&ba).Error; err != nil {
 			c.JSON(http.StatusForbidden, gin.H{"message": "Active branch access is no longer valid"})

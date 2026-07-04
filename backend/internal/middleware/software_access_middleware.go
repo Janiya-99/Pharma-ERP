@@ -26,6 +26,14 @@ func SoftwareAccessMiddleware() gin.HandlerFunc {
 		}
 		ctx := authCtx.(*AuthContext)
 
+		var user models.User
+		if err := db.Select("user_type").First(&user, ctx.UserID).Error; err == nil {
+			if user.UserType == "super_admin" {
+				c.Next()
+				return
+			}
+		}
+
 		var software models.SoftwareModule
 		if err := db.Where("software_code = ? AND status = ?", ctx.ActiveSoftwareCode, "active").First(&software).Error; err != nil {
 			c.JSON(http.StatusForbidden, gin.H{"message": "Active software access is no longer valid"})

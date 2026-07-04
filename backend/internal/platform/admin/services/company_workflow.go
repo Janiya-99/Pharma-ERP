@@ -355,6 +355,43 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		}
 	}
 
+	// Seed User Access Matrix (Roles) for the First Admin User
+	roleMappings := map[string]string{
+		"CONTROL_CENTER":    "SUPER_ADMIN",
+		"FINANCE":           "FINANCE_MANAGER",
+		"INVENTORY":         "WAREHOUSE_MANAGER",
+		"INVOICE_CENTER":    "INVOICE_MANAGER",
+		"COMPLIANCE_CENTER": "COMPLIANCE_MANAGER",
+	}
+
+	for _, m := range companyModules {
+		isEnabled := false
+		for _, reqMod := range req.Modules {
+			if reqMod == m.SoftwareCode {
+				isEnabled = true
+				break
+			}
+		}
+
+		if isEnabled {
+			roleCode, ok := roleMappings[m.SoftwareCode]
+			if ok {
+				var role companyModels.Role
+				if err := companyDB.Where("software_id = ? AND role_code = ?", m.ID, roleCode).First(&role).Error; err == nil {
+					matrix := companyModels.UserBranchSoftwareRole{
+						UserID:     companyUser.ID,
+						BranchID:   tenantBranch.ID,
+						SoftwareID: m.ID,
+						RoleID:     role.ID,
+						Status:     "active",
+					}
+					companyDB.Where("user_id = ? AND branch_id = ? AND software_id = ? AND role_id = ?",
+						companyUser.ID, tenantBranch.ID, m.ID, role.ID).FirstOrCreate(&matrix)
+				}
+			}
+		}
+	}
+
 	// 12. Save First User Details Log in Platform DB
 	platformFirstUser := models.TenantCompanyFirstUser{
 		TenantCompanyID:         tenantCompany.ID,
