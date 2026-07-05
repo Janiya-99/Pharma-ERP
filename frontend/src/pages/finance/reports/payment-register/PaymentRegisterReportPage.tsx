@@ -60,11 +60,11 @@ const PaymentRegisterReportPage = () => {
 
       const response = await financeApi.getPaymentRegisterReport(params);
       if (response.data?.success) {
-        setData(response.data.data);
+        setData(response.data.data || []);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch payment register report");
-      setData(null);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -314,10 +314,10 @@ const PaymentRegisterReportPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden">
             <DataTable
               columns={columns}
-              data={(data?.lines) || []}
+              data={(Array.isArray(data) ? data : data?.lines) || []}
               loading={loading}
               emptyMessage="No payment vouchers found."
-              pagination={{ page: 1, limit: data.lines?.length || 10, total: data.lines?.length || 0 }}
+              pagination={{ page: 1, limit: (Array.isArray(data) ? data.length : data?.lines?.length) || 10, total: (Array.isArray(data) ? data.length : data?.lines?.length) || 0 }}
             />
           </div>
         </div>

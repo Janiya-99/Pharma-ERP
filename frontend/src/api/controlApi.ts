@@ -549,4 +549,10 @@ export const getEffectiveAccess = async (userId: string | number) => {
   return res.data;
 };
 
+export const getCountries = async () => {
+  const res = await apiClient.get("/control/countries");
+  return res.data;
+};
+
+
 

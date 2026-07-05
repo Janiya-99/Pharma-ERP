@@ -52,17 +52,17 @@ const JournalRegisterReportPage = () => {
     setLoading(true);
     try {
       const params = { ...filters };
-      Object.keys(params).forEach((key: unknown) => {
+      Object.keys(params).forEach((key: any) => {
         if (params[key] === "") delete params[key];
       });
 
       const response = await financeApi.getJournalRegisterReport(params);
       if (response.data?.success) {
-        setData(response.data.data);
+        setData(response.data.data || []);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch journal register report");
-      setData(null);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -74,8 +74,8 @@ const JournalRegisterReportPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
 
-  const handleFilterChange = (key: unknown, value: unknown) => {
-    setFilters((prev: unknown) => ({ ...prev, [key]: value }));
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters((prev: any) => ({ ...prev, [key]: value }));
   };
 
   const handleApplyFilters = () => {
@@ -121,12 +121,12 @@ const JournalRegisterReportPage = () => {
     {
       header: "Journal No",
       accessor: "journal_number",
-      cell: (row: unknown) => <div className="font-medium text-navy-800 dark:text-white">{row.journal_number}</div>
+      cell: (row: any) => <div className="font-medium text-navy-800 dark:text-white">{row.journal_number}</div>
     },
     {
       header: "Date",
       accessor: "journal_date",
-      cell: (row: unknown) => format(new Date(row.journal_date), 'yyyy-MM-dd')
+      cell: (row: any) => format(new Date(row.journal_date), 'yyyy-MM-dd')
     },
     {
       header: "Ref No",
@@ -135,27 +135,27 @@ const JournalRegisterReportPage = () => {
     {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => <div className="max-w-[150px] truncate" title={row.description}>{row.description || '-'}</div>
+      cell: (row: any) => <div className="max-w-[150px] truncate" title={row.description}>{row.description || '-'}</div>
     },
     {
       header: <div className="text-right">Total Debit</div>,
       accessor: "total_debit",
-      cell: (row: unknown) => <ReportAmountCell amount={row.total_debit} />
+      cell: (row: any) => <ReportAmountCell amount={row.total_debit} />
     },
     {
       header: <div className="text-right">Total Credit</div>,
       accessor: "total_credit",
-      cell: (row: unknown) => <ReportAmountCell amount={row.total_credit} />
+      cell: (row: any) => <ReportAmountCell amount={row.total_credit} />
     },
     {
       header: "Approval Status",
       accessor: "approval_status",
-      cell: (row: unknown) => <StatusBadge status={row.approval_status} />
+      cell: (row: any) => <StatusBadge status={row.approval_status} />
     },
     {
       header: "Posted Status",
       accessor: "posted_status",
-      cell: (row: unknown) => <StatusBadge status={row.posted_status} />
+      cell: (row: any) => <StatusBadge status={row.posted_status} />
     },
     {
       header: "Created By",
@@ -179,14 +179,14 @@ const JournalRegisterReportPage = () => {
           <Label>Financial Year</Label>
           <Select 
             value={filters.financial_year_id} 
-            onValueChange={(val: unknown) => handleFilterChange('financial_year_id', val)}
+            onValueChange={(val: any) => handleFilterChange('financial_year_id', val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Years" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Years</SelectItem>
-              {(financialYears || []).map((fy: unknown) => (
+              {(financialYears || []).map((fy: any) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -197,14 +197,14 @@ const JournalRegisterReportPage = () => {
           <Label>Accounting Period</Label>
           <Select 
             value={filters.accounting_period_id} 
-            onValueChange={(val: unknown) => handleFilterChange('accounting_period_id', val)}
+            onValueChange={(val: any) => handleFilterChange('accounting_period_id', val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Periods" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Periods</SelectItem>
-              {(accountingPeriods || []).map((ap: unknown) => (
+              {(accountingPeriods || []).map((ap: any) => (
                 <SelectItem key={ap.id} value={ap.id.toString()}>{ap.period_name}</SelectItem>
               ))}
             </SelectContent>
@@ -215,7 +215,7 @@ const JournalRegisterReportPage = () => {
           <Label>Approval Status</Label>
           <Select 
             value={filters.approval_status} 
-            onValueChange={(val: unknown) => handleFilterChange('approval_status', val)}
+            onValueChange={(val: any) => handleFilterChange('approval_status', val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
@@ -223,7 +223,6 @@ const JournalRegisterReportPage = () => {
             <SelectContent>
               <SelectItem value="">All Statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
@@ -234,7 +233,7 @@ const JournalRegisterReportPage = () => {
           <Label>Posted Status</Label>
           <Select 
             value={filters.posted_status} 
-            onValueChange={(val: unknown) => handleFilterChange('posted_status', val)}
+            onValueChange={(val: any) => handleFilterChange('posted_status', val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
@@ -243,7 +242,7 @@ const JournalRegisterReportPage = () => {
               <SelectItem value="">All Statuses</SelectItem>
               <SelectItem value="unposted">Unposted</SelectItem>
               <SelectItem value="posted">Posted</SelectItem>
-              <SelectItem value="reversed">Reversed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -285,10 +284,10 @@ const JournalRegisterReportPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden">
             <DataTable
               columns={columns}
-              data={(data?.lines) || []}
+              data={(Array.isArray(data) ? data : data?.lines) || []}
               loading={loading}
               emptyMessage="No journal entries found."
-              pagination={{ page: 1, limit: data.lines?.length || 10, total: data.lines?.length || 0 }}
+              pagination={{ page: 1, limit: (Array.isArray(data) ? data.length : data?.lines?.length) || 10, total: (Array.isArray(data) ? data.length : data?.lines?.length) || 0 }}
             />
           </div>
         </div>

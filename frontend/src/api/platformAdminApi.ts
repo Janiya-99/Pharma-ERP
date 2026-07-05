@@ -232,3 +232,9 @@ export const getPlatformLoginLogs = async () => {
   const res = await platformAdminClient.get("/login-logs");
   return res.data;
 };
+
+export const getCountries = async () => {
+  const res = await platformAdminClient.get("/countries");
+  return res.data;
+};
+

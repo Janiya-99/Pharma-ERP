@@ -86,8 +86,8 @@ export function PrintFormatLayoutPreview({ format, zoom = 82 }: Props) {
       : 680;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/85 p-4 shadow-sm backdrop-blur-xl">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-[#111827]">
             Live Preview
@@ -96,20 +96,20 @@ export function PrintFormatLayoutPreview({ format, zoom = 82 }: Props) {
             {format.paper_size} / {format.orientation} / {zoom}%
           </p>
         </div>
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#374151]">
+        <span className="rounded-full bg-[#EEF5FA] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#002137]">
           {documentLabel}
         </span>
       </div>
 
-      <div className="max-h-[calc(100vh-220px)] overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="max-h-[calc(100vh-220px)] overflow-auto rounded-lg border border-slate-200 bg-[#F8FAFC] p-4">
         <div
-          className="origin-top rounded-lg border border-slate-200 bg-white p-5 text-sm shadow-sm"
+          className="origin-top rounded-lg border border-slate-200 bg-white p-5 text-sm shadow-[0_18px_45px_rgba(15,23,42,0.10)]"
           style={{
             width: paperWidth,
             minHeight: format.paper_size === "Thermal 80mm" ? 620 : 900,
             transform: `scale(${zoom / 100})`,
             transformOrigin: "top left",
-            marginBottom: `-${Math.max(0, 100 - zoom) * 6}px`,
+            marginBottom: `-${Math.max(0, 100 - zoom) * 5}px`,
             fontFamily: format.font_family || "Inter",
           }}
         >

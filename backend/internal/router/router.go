@@ -80,6 +80,11 @@ func Setup(
 			})
 		})
 
+		commonCtrl := controller.NewCommonController()
+		v1.GET("/countries", commonCtrl.GetCountries)
+		v1.GET("/common/countries", commonCtrl.GetCountries)
+		platformAdminGrp.GET("/countries", commonCtrl.GetCountries)
+
 		// Public Auth routes
 		auth := v1.Group("/auth")
 		{
@@ -105,6 +110,7 @@ func Setup(
 		controlGrp.Use(middleware.BranchAccessMiddleware())
 		controlGrp.Use(middleware.SoftwareAccessMiddleware())
 		control.SetupRoutes(controlGrp, logger)
+		controlGrp.GET("/countries", commonCtrl.GetCountries)
 
 		// Admin & Access Management routes
 		admin := v1.Group("/admin")
@@ -170,6 +176,7 @@ func Setup(
 		financeGrp.Use(middleware.BranchAccessMiddleware())
 		financeGrp.Use(middleware.SoftwareAccessMiddleware())
 		financeModule.SetupRoutes(financeGrp, logger)
+		financeGrp.GET("/countries", commonCtrl.GetCountries)
 
 		// Inventory routes
 		inventoryGrp := v1.Group("/inventory")
@@ -179,6 +186,7 @@ func Setup(
 
 		// Initialize the audit log service to pass down to inventory routes
 		inventoryModule.SetupRoutes(inventoryGrp, service.NewAuditService(nil, logger), logger)
+		inventoryGrp.GET("/countries", commonCtrl.GetCountries)
 
 		// Invoice Center routes
 		invoiceCenterGrp := v1.Group("/invoice-center")
@@ -186,6 +194,7 @@ func Setup(
 		invoiceCenterGrp.Use(middleware.BranchAccessMiddleware())
 		invoiceCenterGrp.Use(middleware.SoftwareAccessMiddleware())
 		invoiceCenterRoutes.SetupRoutes(invoiceCenterGrp, logger)
+		invoiceCenterGrp.GET("/countries", commonCtrl.GetCountries)
 	}
 
 	return r

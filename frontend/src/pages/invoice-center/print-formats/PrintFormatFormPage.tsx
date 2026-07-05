@@ -9,7 +9,15 @@ import {
   Eye,
   FileText,
   Maximize2,
+  Monitor,
+  Palette,
+  PanelTop,
+  PenLine,
+  ReceiptText,
+  Rows3,
   Save,
+  Settings2,
+  SlidersHorizontal,
   Star,
 } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
@@ -146,6 +154,57 @@ const headerSwitches: [keyof InvoicePrintFormat, string][] = [
   ["show_payment_terms", "Show Payment Terms"],
   ["show_bank_details", "Show Bank / Payment Details"],
   ["show_qr_code", "Show QR Code"],
+];
+
+const editorTabs = [
+  {
+    value: "setup",
+    label: "Setup",
+    description: "Document scope",
+    icon: Settings2,
+  },
+  {
+    value: "header",
+    label: "Header",
+    description: "Logo and company",
+    icon: PanelTop,
+  },
+  {
+    value: "details",
+    label: "Details",
+    description: "Customer fields",
+    icon: SlidersHorizontal,
+  },
+  {
+    value: "lines",
+    label: "Line Table",
+    description: "Columns and order",
+    icon: Rows3,
+  },
+  {
+    value: "totals",
+    label: "Totals",
+    description: "Summary blocks",
+    icon: ReceiptText,
+  },
+  {
+    value: "footer",
+    label: "Footer",
+    description: "Notes and signs",
+    icon: PenLine,
+  },
+  {
+    value: "branding",
+    label: "Branding",
+    description: "Colors and font",
+    icon: Palette,
+  },
+  {
+    value: "preview",
+    label: "Preview",
+    description: "Zoom controls",
+    icon: Monitor,
+  },
 ];
 
 export default function PrintFormatFormPage() {
@@ -342,28 +401,69 @@ export default function PrintFormatFormPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,65fr)_minmax(360px,35fr)]">
-        <Tabs defaultValue="setup" className="min-w-0">
-          <TabsList className="grid h-auto grid-cols-2 gap-2 bg-white/80 p-2 md:grid-cols-4 xl:grid-cols-8">
-            {[
-              "setup",
-              "header",
-              "details",
-              "lines",
-              "totals",
-              "footer",
-              "branding",
-              "preview",
-            ].map((tab) => (
-              <TabsTrigger
-                key={tab}
-                value={tab}
-                className="rounded-xl capitalize"
-              >
-                {tab === "lines" ? "Line Table" : tab}
-              </TabsTrigger>
-            ))}
+      <Tabs
+        defaultValue="setup"
+        className="grid items-start gap-4 xl:grid-cols-[238px_minmax(0,1fr)_minmax(390px,0.78fr)]"
+      >
+        <aside className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm xl:sticky xl:top-32">
+          <div className="px-2 pb-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#64748B]">
+              Template Builder
+            </p>
+            <p className="mt-1 text-sm text-[#475569]">
+              Configure the print layout section by section.
+            </p>
+          </div>
+          <TabsList className="flex h-auto flex-col gap-1 bg-transparent p-0">
+            {editorTabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="group h-auto w-full justify-start gap-3 rounded-lg border border-transparent px-3 py-3 text-left data-[state=active]:border-[#BFD7EA] data-[state=active]:bg-[#F1F7FB] data-[state=active]:text-[#002137] data-[state=active]:shadow-none"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-[#475569] group-data-[state=active]:bg-white group-data-[state=active]:text-[#002137]">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold">
+                      {tab.label}
+                    </span>
+                    <span className="mt-0.5 block text-xs font-normal text-[#64748B]">
+                      {tab.description}
+                    </span>
+                  </span>
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
+          <div className="mt-4 rounded-lg border border-slate-200 bg-[#F8FAFC] p-3">
+            <div className="flex items-center justify-between text-xs text-[#64748B]">
+              <span>Visible columns</span>
+              <span className="font-semibold text-[#0F172A]">
+                {(watch("fields") || []).filter((field) => field.is_visible)
+                  .length}
+              </span>
+            </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full bg-[#002137]"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    ((watch("fields") || []).filter((field) => field.is_visible)
+                      .length /
+                      Math.max(1, (watch("fields") || []).length)) *
+                      100
+                  )}%`,
+                }}
+              />
+            </div>
+          </div>
+        </aside>
+
+        <div className="min-w-0 space-y-4">
 
           <TabsContent value="setup" className="mt-4">
             <Section
@@ -776,12 +876,12 @@ export default function PrintFormatFormPage() {
               </div>
             </Section>
           </TabsContent>
-        </Tabs>
+        </div>
 
         <aside className="xl:sticky xl:top-32 xl:self-start">
           <PrintFormatLayoutPreview format={previewFormat} zoom={zoom} />
         </aside>
-      </div>
+      </Tabs>
     </form>
   );
 }
@@ -795,14 +895,16 @@ const Section = ({
   description: string;
   children: ReactNode;
 }) => (
-  <Card className="rounded-2xl border-slate-200 bg-white/80 shadow-sm">
-    <CardHeader className="pb-3">
+  <Card className="rounded-xl border-slate-200 bg-white shadow-sm">
+    <CardHeader className="border-b border-slate-100 pb-4">
       <CardTitle className="text-lg font-semibold text-[#111827]">
         {title}
       </CardTitle>
-      <p className="text-sm text-[#6B7280]">{description}</p>
+      <p className="max-w-2xl text-sm leading-6 text-[#64748B]">
+        {description}
+      </p>
     </CardHeader>
-    <CardContent>{children}</CardContent>
+    <CardContent className="pt-5">{children}</CardContent>
   </Card>
 );
 
@@ -815,7 +917,7 @@ const Field = ({
   required?: boolean;
   children: ReactNode;
 }) => (
-  <div className="space-y-2">
+  <div className="space-y-2.5">
     <Label className="text-sm font-medium text-[#1F2937]">
       {label}
       {required && <span className="text-red-500">*</span>}
@@ -833,8 +935,10 @@ const Toggle = ({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) => (
-  <div className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2">
-    <Label className="text-sm font-medium text-[#1F2937]">{label}</Label>
+  <div className="flex min-h-[58px] items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 shadow-[0_1px_0_rgba(15,23,42,0.03)]">
+    <Label className="text-sm font-medium leading-5 text-[#1F2937]">
+      {label}
+    </Label>
     <Switch checked={checked} onCheckedChange={onChange} />
   </div>
 );

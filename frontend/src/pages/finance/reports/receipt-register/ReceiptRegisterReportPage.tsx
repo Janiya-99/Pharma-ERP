@@ -60,11 +60,11 @@ const ReceiptRegisterReportPage = () => {
 
       const response = await financeApi.getReceiptRegisterReport(params);
       if (response.data?.success) {
-        setData(response.data.data);
+        setData(response.data.data || []);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch receipt register report");
-      setData(null);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -88,13 +88,13 @@ const ReceiptRegisterReportPage = () => {
     setFilters({
       financial_year_id: "",
       accounting_period_id: "",
-      receipt_type: "",
-      receipt_method: "",
       approval_status: "",
       posted_status: "",
       date_from: "",
       date_to: "",
       search: "",
+      receipt_type: "",
+      receipt_method: "",
       branch_id: activeBranch?.id || ""
     });
     setTimeout(() => fetchReport(), 0);
@@ -133,23 +133,18 @@ const ReceiptRegisterReportPage = () => {
       cell: (row: unknown) => format(new Date(row.receipt_date), 'yyyy-MM-dd')
     },
     {
+      header: "Ref No",
+      accessor: "reference_number"
+    },
+    {
       header: "Type",
       accessor: "receipt_type",
       cell: (row: unknown) => (row.receipt_type || '').split('_').map((w: unknown) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
     },
     {
-      header: "Method",
-      accessor: "receipt_method",
-      cell: (row: unknown) => (row.receipt_method || '').charAt(0).toUpperCase() + (row.receipt_method || '').slice(1)
-    },
-    {
-      header: "Received To",
-      accessor: "received_to_account_name",
-      cell: (row: unknown) => <div className="max-w-[150px] truncate" title={row.received_to_account_name}>{row.received_to_account_name || '-'}</div>
-    },
-    {
-      header: "Ref No",
-      accessor: "reference_number"
+      header: "Received From",
+      accessor: "received_from",
+      cell: (row: unknown) => <div className="max-w-[150px] truncate" title={row.received_from}>{row.received_from || '-'}</div>
     },
     {
       header: <div className="text-right">Total Amount</div>,
@@ -157,12 +152,12 @@ const ReceiptRegisterReportPage = () => {
       cell: (row: unknown) => <ReportAmountCell amount={row.total_amount} />
     },
     {
-      header: "Approval",
+      header: "Approval Status",
       accessor: "approval_status",
       cell: (row: unknown) => <StatusBadge status={row.approval_status} />
     },
     {
-      header: "Posted",
+      header: "Posted Status",
       accessor: "posted_status",
       cell: (row: unknown) => <StatusBadge status={row.posted_status} />
     },
@@ -259,25 +254,25 @@ const ReceiptRegisterReportPage = () => {
         </div>
 
         <div className="space-y-2">
-          <Label>Date From</Label>
-          <Input 
-            type="date" 
-            value={filters.date_from}
-            onChange={(e: any) => handleFilterChange('date_from', e.target.value)}
-          />
+          <Label>Approval Status</Label>
+          <Select 
+            value={filters.approval_status} 
+            onValueChange={(val: unknown) => handleFilterChange('approval_status', val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
-          <Label>Date To</Label>
-          <Input 
-            type="date" 
-            value={filters.date_to}
-            onChange={(e: any) => handleFilterChange('date_to', e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Status</Label>
+          <Label>Posted Status</Label>
           <Select 
             value={filters.posted_status} 
             onValueChange={(val: unknown) => handleFilterChange('posted_status', val)}
@@ -295,6 +290,24 @@ const ReceiptRegisterReportPage = () => {
         </div>
 
         <div className="space-y-2">
+          <Label>Date From</Label>
+          <Input 
+            type="date" 
+            value={filters.date_from}
+            onChange={(e: any) => handleFilterChange('date_from', e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Date To</Label>
+          <Input 
+            type="date" 
+            value={filters.date_to}
+            onChange={(e: any) => handleFilterChange('date_to', e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2 lg:col-span-2">
           <Label>Search</Label>
           <Input 
             type="text" 
@@ -313,10 +326,10 @@ const ReceiptRegisterReportPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden">
             <DataTable
               columns={columns}
-              data={(data?.lines) || []}
+              data={(Array.isArray(data) ? data : data?.lines) || []}
               loading={loading}
               emptyMessage="No receipt vouchers found."
-              pagination={{ page: 1, limit: data.lines?.length || 10, total: data.lines?.length || 0 }}
+              pagination={{ page: 1, limit: (Array.isArray(data) ? data.length : data?.lines?.length) || 10, total: (Array.isArray(data) ? data.length : data?.lines?.length) || 0 }}
             />
           </div>
         </div>
