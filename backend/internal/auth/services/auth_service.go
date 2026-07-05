@@ -135,7 +135,22 @@ func (s *AuthService) BuildLoginContext(token string, user models.User, company 
 
 	var tenantCompany models.Company
 	if s.db != nil {
-		s.db.Where("company_code = ?", company.CompanyCode).First(&tenantCompany)
+		if err := s.db.Where("company_code = ?", company.CompanyCode).First(&tenantCompany).Error; err != nil || tenantCompany.ID == 0 {
+			s.db.First(&tenantCompany)
+		}
+	}
+
+	companyID := tenantCompany.ID
+	if companyID == 0 {
+		companyID = user.CompanyID
+	}
+	companyCode := tenantCompany.CompanyCode
+	if companyCode == "" {
+		companyCode = company.CompanyCode
+	}
+	companyName := tenantCompany.CompanyName
+	if companyName == "" {
+		companyName = company.CompanyName
 	}
 
 	return &dto.LoginResponse{
@@ -147,9 +162,9 @@ func (s *AuthService) BuildLoginContext(token string, user models.User, company 
 			UserType: user.UserType,
 		},
 		Company: dto.CompanyDTO{
-			ID:          user.CompanyID, // Should ideally be platformCompany.ID if we return platform ID, but usually it's the internal company ID
-			CompanyCode: company.CompanyCode,
-			CompanyName: company.CompanyName,
+			ID:          companyID,
+			CompanyCode: companyCode,
+			CompanyName: companyName,
 			LogoURL:     tenantCompany.LogoURL,
 		},
 		ActiveBranch: dto.BranchDTO{
