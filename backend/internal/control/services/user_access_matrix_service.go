@@ -79,16 +79,18 @@ func (s *UserAccessMatrixService) AssignUserAccessMatrix(userID uint64, req dto.
 			return nil, errors.New("user does not have access to one of the selected branches")
 		}
 
-		// 2. Verify user has software access
-		sAccess, err := s.softwareRepo.FindUserSoftwareByID(userID, accessReq.SoftwareID)
-		if err != nil || sAccess.Status != "active" || !sAccess.CanAccess {
-			return nil, errors.New("user does not have access to one of the selected software modules")
-		}
-
-		// 3. Verify role exists
+		// 2. Verify role exists
 		role, err := s.roleRepo.FindRoleByID(accessReq.RoleID)
 		if err != nil || role.Status != "active" {
 			return nil, errors.New("role not found or inactive")
+		}
+
+		// 3. Verify user has software access (unless role is ALL_MODULES)
+		if role.Software.SoftwareCode != "ALL_MODULES" {
+			sAccess, err := s.softwareRepo.FindUserSoftwareByID(userID, accessReq.SoftwareID)
+			if err != nil || sAccess.Status != "active" || !sAccess.CanAccess {
+				return nil, errors.New("user does not have access to one of the selected software modules")
+			}
 		}
 
 		// 4. Create or Reactivate
@@ -125,7 +127,7 @@ func (s *UserAccessMatrixService) RemoveUserAccessMatrix(accessID uint64, userID
 	}
 
 	// System rule: Do not allow removing active Super Admin access for Control Center
-	if record.Role.RoleCode == "SUPER_ADMIN" && record.Software.SoftwareCode == "CONTROL_CENTER" {
+	if (record.Role.RoleCode == "SUPER_ADMIN" || record.Role.RoleCode == "GLOBAL_SUPER_ADMIN") && (record.Software.SoftwareCode == "CONTROL_CENTER" || record.Software.SoftwareCode == "ALL_MODULES") {
 		if record.UserID == activeUserID {
 			return errors.New("cannot remove your own active Super Admin access")
 		}

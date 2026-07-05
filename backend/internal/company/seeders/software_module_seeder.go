@@ -11,6 +11,15 @@ import (
 func SeedSoftwareModules(db *gorm.DB, logger *zap.Logger) error {
 	modules := []models.SoftwareModule{
 		{
+			SoftwareCode: "ALL_MODULES",
+			SoftwareName: "All Modules (Global)",
+			Description:  "Global access across all software modules and permissions",
+			IconName:     "globe",
+			RoutePath:    "/control-center",
+			DisplayOrder: 0,
+			Status:       "active",
+		},
+		{
 			SoftwareCode: "CONTROL_CENTER",
 			SoftwareName: "Control Center",
 			Description:  "Central administration and company management hub",

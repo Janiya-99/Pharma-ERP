@@ -22,6 +22,10 @@ func SeedRoles(db *gorm.DB, logger *zap.Logger) error {
 		RoleName     string
 		RoleCode     string
 	}{
+		// ALL MODULES (GLOBAL)
+		{"ALL_MODULES", "Global Super Admin", "GLOBAL_SUPER_ADMIN"},
+		{"ALL_MODULES", "Global Viewer", "GLOBAL_VIEWER"},
+
 		// CONTROL CENTER
 		{"CONTROL_CENTER", "Super Admin", "SUPER_ADMIN"},
 		{"CONTROL_CENTER", "Company Admin", "COMPANY_ADMIN"},

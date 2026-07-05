@@ -61,6 +61,41 @@ func (s *PermissionService) ListPermissionsGrouped(softwareID, softwareCode stri
 		return nil, err
 	}
 
+	isAllModules := s.repo.IsAllModules(softwareID, softwareCode)
+
+	if isAllModules {
+		var groupOrder []string
+		groupMap := make(map[string][]dto.PermissionItem)
+
+		for _, p := range permissions {
+			gname := p.Software.SoftwareName + " - " + p.PermissionGroup
+			if _, ok := groupMap[gname]; !ok {
+				groupOrder = append(groupOrder, gname)
+			}
+			item := dto.PermissionItem{
+				ID:             p.ID,
+				PermissionKey:  p.PermissionKey,
+				PermissionName: p.PermissionName,
+			}
+			groupMap[gname] = append(groupMap[gname], item)
+		}
+
+		var groups []dto.PermissionGroupResponse
+		for _, gname := range groupOrder {
+			groups = append(groups, dto.PermissionGroupResponse{
+				PermissionGroup: gname,
+				Permissions:     groupMap[gname],
+			})
+		}
+
+		return []dto.SoftwarePermissionsResponse{
+			{
+				SoftwareCode: "ALL_MODULES",
+				Groups:       groups,
+			},
+		}, nil
+	}
+
 	// Group by SoftwareCode then PermissionGroup
 	groupedMap := make(map[string]map[string][]dto.PermissionItem)
 

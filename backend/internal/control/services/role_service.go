@@ -12,13 +12,15 @@ import (
 type RoleService struct {
 	repo         *repositories.RoleRepository
 	moduleRepo   *repositories.SoftwareModuleRepository
+	rolePermRepo *repositories.RolePermissionRepository
 	auditService *AuditService
 }
 
-func NewRoleService(repo *repositories.RoleRepository, moduleRepo *repositories.SoftwareModuleRepository, auditService *AuditService) *RoleService {
+func NewRoleService(repo *repositories.RoleRepository, moduleRepo *repositories.SoftwareModuleRepository, rolePermRepo *repositories.RolePermissionRepository, auditService *AuditService) *RoleService {
 	return &RoleService{
 		repo:         repo,
 		moduleRepo:   moduleRepo,
+		rolePermRepo: rolePermRepo,
 		auditService: auditService,
 	}
 }
@@ -48,16 +50,22 @@ func (s *RoleService) ListRoles(softwareID, softwareCode, status, search string,
 
 	var res []dto.RoleResponse
 	for _, r := range roles {
+		rolePerms, _ := s.rolePermRepo.FindRolePermissions(r.ID)
+		var permIDs []uint64
+		for _, rp := range rolePerms {
+			permIDs = append(permIDs, rp.PermissionID)
+		}
 		res = append(res, dto.RoleResponse{
-			ID:           r.ID,
-			SoftwareID:   r.SoftwareID,
-			SoftwareCode: r.Software.SoftwareCode,
-			SoftwareName: r.Software.SoftwareName,
-			RoleName:     r.RoleName,
-			RoleCode:     r.RoleCode,
-			Description:  r.Description,
-			IsSystemRole: r.IsSystemRole,
-			Status:       r.Status,
+			ID:            r.ID,
+			SoftwareID:    r.SoftwareID,
+			SoftwareCode:  r.Software.SoftwareCode,
+			SoftwareName:  r.Software.SoftwareName,
+			RoleName:      r.RoleName,
+			RoleCode:      r.RoleCode,
+			Description:   r.Description,
+			IsSystemRole:  r.IsSystemRole,
+			Status:        r.Status,
+			PermissionIDs: permIDs,
 		})
 	}
 
@@ -70,16 +78,23 @@ func (s *RoleService) GetRoleByID(id uint64) (*dto.RoleResponse, error) {
 		return nil, errors.New("role not found")
 	}
 
+	rolePerms, _ := s.rolePermRepo.FindRolePermissions(id)
+	var permIDs []uint64
+	for _, rp := range rolePerms {
+		permIDs = append(permIDs, rp.PermissionID)
+	}
+
 	return &dto.RoleResponse{
-		ID:           r.ID,
-		SoftwareID:   r.SoftwareID,
-		SoftwareCode: r.Software.SoftwareCode,
-		SoftwareName: r.Software.SoftwareName,
-		RoleName:     r.RoleName,
-		RoleCode:     r.RoleCode,
-		Description:  r.Description,
-		IsSystemRole: r.IsSystemRole,
-		Status:       r.Status,
+		ID:            r.ID,
+		SoftwareID:    r.SoftwareID,
+		SoftwareCode:  r.Software.SoftwareCode,
+		SoftwareName:  r.Software.SoftwareName,
+		RoleName:      r.RoleName,
+		RoleCode:      r.RoleCode,
+		Description:   r.Description,
+		IsSystemRole:  r.IsSystemRole,
+		Status:        r.Status,
+		PermissionIDs: permIDs,
 	}, nil
 }
 
@@ -106,6 +121,17 @@ func (s *RoleService) CreateRole(req dto.CreateRoleRequest, companyID, activeUse
 
 	if err := s.repo.CreateRole(role); err != nil {
 		return nil, errors.New("failed to create role")
+	}
+
+	if len(req.PermissionIDs) > 0 {
+		var newRolePermissions []models.RolePermission
+		for _, pID := range req.PermissionIDs {
+			newRolePermissions = append(newRolePermissions, models.RolePermission{
+				RoleID:       role.ID,
+				PermissionID: pID,
+			})
+		}
+		_ = s.rolePermRepo.ReplaceRolePermissions(role.ID, newRolePermissions)
 	}
 
 	s.auditService.LogAction(
@@ -148,6 +174,17 @@ func (s *RoleService) UpdateRole(id uint64, req dto.UpdateRoleRequest, companyID
 
 	if err := s.repo.UpdateRole(role); err != nil {
 		return nil, errors.New("failed to update role")
+	}
+
+	if req.PermissionIDs != nil {
+		var newRolePermissions []models.RolePermission
+		for _, pID := range req.PermissionIDs {
+			newRolePermissions = append(newRolePermissions, models.RolePermission{
+				RoleID:       role.ID,
+				PermissionID: pID,
+			})
+		}
+		_ = s.rolePermRepo.ReplaceRolePermissions(role.ID, newRolePermissions)
 	}
 
 	s.auditService.LogAction(

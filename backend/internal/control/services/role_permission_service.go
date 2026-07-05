@@ -48,6 +48,7 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 	}
 
 	// Group map
+	var groupOrder []string
 	groupedMap := make(map[string][]dto.RolePermissionItem)
 
 	for _, p := range allSoftwarePermissions {
@@ -57,14 +58,21 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 			PermissionName: p.PermissionName,
 			Assigned:       assignedMap[p.ID],
 		}
-		groupedMap[p.PermissionGroup] = append(groupedMap[p.PermissionGroup], item)
+		groupName := p.PermissionGroup
+		if role.Software.SoftwareCode == "ALL_MODULES" {
+			groupName = p.Software.SoftwareName + " - " + p.PermissionGroup
+		}
+		if _, ok := groupedMap[groupName]; !ok {
+			groupOrder = append(groupOrder, groupName)
+		}
+		groupedMap[groupName] = append(groupedMap[groupName], item)
 	}
 
 	var groups []dto.RolePermissionGroup
-	for gname, items := range groupedMap {
+	for _, gname := range groupOrder {
 		groups = append(groups, dto.RolePermissionGroup{
 			PermissionGroup: gname,
-			Permissions:     items,
+			Permissions:     groupedMap[gname],
 		})
 	}
 
@@ -91,7 +99,7 @@ func (s *RolePermissionService) AssignRolePermissions(roleID uint64, req dto.Ass
 		return nil, errors.New("role not found or inactive")
 	}
 
-	if role.RoleCode == "SUPER_ADMIN" && role.Software.SoftwareCode == "CONTROL_CENTER" {
+	if (role.RoleCode == "SUPER_ADMIN" || role.RoleCode == "GLOBAL_SUPER_ADMIN") && (role.Software.SoftwareCode == "CONTROL_CENTER" || role.Software.SoftwareCode == "ALL_MODULES") {
 		if len(req.PermissionIDs) == 0 {
 			return nil, errors.New("cannot remove all permissions from Super Admin")
 		}
@@ -103,7 +111,7 @@ func (s *RolePermissionService) AssignRolePermissions(roleID uint64, req dto.Ass
 	}
 
 	for _, p := range permissionsToAssign {
-		if p.SoftwareID != role.SoftwareID || p.Status != "active" {
+		if (role.Software.SoftwareCode != "ALL_MODULES" && p.SoftwareID != role.SoftwareID) || p.Status != "active" {
 			return nil, errors.New("cannot assign permissions that do not belong to the role's software module")
 		}
 	}

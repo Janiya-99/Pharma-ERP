@@ -12,13 +12,15 @@ const Modal = ({
   onClose?: () => void;
   title?: any;
   children?: React.ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "half" | "full";
 }) => {
-  const sizes = {
-    sm: "sm:max-w-md",
-    md: "sm:max-w-lg",
-    lg: "sm:max-w-2xl",
-    xl: "sm:max-w-4xl",
+  const sizes: Record<string, string> = {
+    sm: "!max-w-md !w-full sm:!max-w-md",
+    md: "!max-w-lg !w-full sm:!max-w-lg",
+    lg: "!max-w-2xl !w-full sm:!max-w-2xl",
+    xl: "!max-w-4xl !w-full sm:!max-w-4xl",
+    half: "!max-w-[50vw] !w-[50vw] sm:!max-w-[50vw] sm:!w-[50vw]",
+    full: "!max-w-full !w-full sm:!max-w-full sm:!w-full",
   };
 
   const sizeClass = sizes[size] || "sm:max-w-lg";

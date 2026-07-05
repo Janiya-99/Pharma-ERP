@@ -168,9 +168,18 @@ func (s *AuthService) BuildLoginContext(token string, user models.User, company 
 }
 
 func (s *AuthService) GetUserPermissionsForActiveContext(userID, branchID, softwareID uint64) []string {
-	// Find roles assigned to user for this branch and software
+	var allModulesSoftware models.SoftwareModule
+	s.db.Where("software_code = ?", "ALL_MODULES").First(&allModulesSoftware)
+
+	var softwareIDs []uint64
+	softwareIDs = append(softwareIDs, softwareID)
+	if allModulesSoftware.ID != 0 && allModulesSoftware.ID != softwareID {
+		softwareIDs = append(softwareIDs, allModulesSoftware.ID)
+	}
+
+	// Find roles assigned to user for this branch and software (or ALL_MODULES)
 	var matrix []models.UserBranchSoftwareRole
-	s.db.Where("user_id = ? AND branch_id = ? AND software_id = ? AND status = ?", userID, branchID, softwareID, "active").Find(&matrix)
+	s.db.Where("user_id = ? AND branch_id = ? AND software_id IN ? AND status = ?", userID, branchID, softwareIDs, "active").Find(&matrix)
 
 	if len(matrix) == 0 {
 		return []string{}

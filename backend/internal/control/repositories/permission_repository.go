@@ -52,21 +52,38 @@ func (r *PermissionRepository) FindPermissions(softwareID string, softwareCode s
 	return permissions, count, nil
 }
 
+func (r *PermissionRepository) IsAllModules(softwareID string, softwareCode string) bool {
+	if softwareCode == "ALL_MODULES" {
+		return true
+	}
+	if softwareID != "" {
+		var sm models.SoftwareModule
+		if err := r.db.Select("software_code").First(&sm, "id = ?", softwareID).Error; err == nil && sm.SoftwareCode == "ALL_MODULES" {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *PermissionRepository) FindPermissionsGrouped(softwareID string, softwareCode string) ([]models.Permission, error) {
 	var permissions []models.Permission
 
 	query := r.db.Model(&models.Permission{}).Preload("Software").Where("permissions.status = ?", "active")
 
-	if softwareID != "" {
-		query = query.Where("software_id = ?", softwareID)
+	isAllModules := r.IsAllModules(softwareID, softwareCode)
+
+	if !isAllModules {
+		if softwareID != "" {
+			query = query.Where("software_id = ?", softwareID)
+		}
+
+		if softwareCode != "" {
+			query = query.Joins("JOIN software_modules sm ON sm.id = permissions.software_id").
+				Where("sm.software_code = ?", softwareCode)
+		}
 	}
 
-	if softwareCode != "" {
-		query = query.Joins("JOIN software_modules sm ON sm.id = permissions.software_id").
-			Where("sm.software_code = ?", softwareCode)
-	}
-
-	query = query.Order("permissions.permission_group ASC, permissions.id ASC")
+	query = query.Order("permissions.software_id ASC, permissions.permission_group ASC, permissions.id ASC")
 
 	if err := query.Find(&permissions).Error; err != nil {
 		return nil, err

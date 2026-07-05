@@ -27,9 +27,10 @@ func (h *RoleHandler) getService(c *gin.Context) *services.RoleService {
 
 	repo := repositories.NewRoleRepository(db)
 	moduleRepo := repositories.NewSoftwareModuleRepository(db)
+	rolePermRepo := repositories.NewRolePermissionRepository(db)
 	auditService := services.NewAuditService(db, h.logger)
 
-	return services.NewRoleService(repo, moduleRepo, auditService)
+	return services.NewRoleService(repo, moduleRepo, rolePermRepo, auditService)
 }
 
 func (h *RoleHandler) List(c *gin.Context) {
