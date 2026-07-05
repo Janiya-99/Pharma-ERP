@@ -398,39 +398,16 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		}
 	}
 
-	// Seed User Access Matrix (Roles) for the First Admin User
-	// Only assign SUPER_ADMIN and GLOBAL_SUPER_ADMIN
-	roleMappings := map[string]string{
-		"CONTROL_CENTER": "SUPER_ADMIN",
-		"ALL_MODULES":    "GLOBAL_SUPER_ADMIN",
-	}
-
-	for _, m := range companyModules {
-		isEnabled := false
-		for _, reqMod := range req.Modules {
-			if reqMod == m.SoftwareCode || m.SoftwareCode == "ALL_MODULES" || m.SoftwareCode == "CONTROL_CENTER" {
-				isEnabled = true
-				break
-			}
+	var role companyModels.Role
+	if err := companyDB.Where("role_code = ?", "SUPER_ADMIN").First(&role).Error; err == nil {
+		matrix := companyModels.UserBranchRole{
+			UserID:   companyUser.ID,
+			BranchID: tenantBranch.ID,
+			RoleID:   role.ID,
+			Status:   "active",
 		}
-
-		if isEnabled {
-			roleCode, ok := roleMappings[m.SoftwareCode]
-			if ok {
-				var role companyModels.Role
-				if err := companyDB.Where("software_id = ? AND role_code = ?", m.ID, roleCode).First(&role).Error; err == nil {
-					matrix := companyModels.UserBranchSoftwareRole{
-						UserID:     companyUser.ID,
-						BranchID:   tenantBranch.ID,
-						SoftwareID: m.ID,
-						RoleID:     role.ID,
-						Status:     "active",
-					}
-					companyDB.Where("user_id = ? AND branch_id = ? AND software_id = ? AND role_id = ?",
-						companyUser.ID, tenantBranch.ID, m.ID, role.ID).FirstOrCreate(&matrix)
-				}
-			}
-		}
+		companyDB.Where("user_id = ? AND branch_id = ? AND role_id = ?",
+			companyUser.ID, tenantBranch.ID, role.ID).FirstOrCreate(&matrix)
 	}
 
 	// 12. Save First User Details Log in Platform DB

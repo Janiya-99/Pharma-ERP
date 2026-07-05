@@ -51,6 +51,6 @@ func (r *UserBranchAccessRepository) CountActiveUserBranches(userID uint64) (int
 
 func (r *UserBranchAccessRepository) HasActiveRolesInBranch(userID, branchID uint64) (bool, error) {
 	var count int64
-	err := r.db.Model(&models.UserBranchSoftwareRole{}).Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").Count(&count).Error
+	err := r.db.Model(&models.UserBranchRole{}).Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").Count(&count).Error
 	return count > 0, err
 }

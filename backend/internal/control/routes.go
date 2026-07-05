@@ -115,9 +115,8 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 
 		rolesGrp.GET("/:id/permissions", middleware.RequirePermission("control.permission.view"), rolePermHandler.GetMatrix)
 		rolesGrp.POST("/:id/permissions", middleware.RequirePermission("control.permission.assign"), rolePermHandler.Assign)
+		rolesGrp.GET("/available", middleware.RequirePermission("control.roles.view"), roleHandler.GetAllRoles)
 	}
-
-	router.GET("/software-modules/:software_id/roles", middleware.RequirePermission("control.role.view"), roleHandler.GetAvailableRolesForSoftware)
 
 	// --- System Settings & Configuration (Step 71) ---
 	router.GET("/settings/groups", middleware.RequirePermission("control.settings.view"), settingsHandler.ListGroups)

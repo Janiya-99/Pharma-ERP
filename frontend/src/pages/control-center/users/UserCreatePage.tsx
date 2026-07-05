@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { toast } from "sonner";
 import {
-  ArrowLeft, User, Building2, Shield, ChevronRight,
-  Save, Key, Network, Camera, Info, Clock, Lock, CheckCircle2, Eye, EyeOff
+  ArrowLeft, User, Building2, Shield,
+  Save, Key, Camera, Clock, Lock, Eye, EyeOff
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -361,15 +361,13 @@ const UserCreatePage: React.FC = () => {
               </FieldWrap>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">System Role Assignments</h3>
-                <button className="text-sm font-bold text-slate-700 hover:text-slate-900">View Roles</button>
-              </div>
-              
-              <div className="mb-4 mt-2">
-                 <RoleAssignment selectedRoleIds={form.role_ids} onChange={v => sf("role_ids", v)} />
-              </div>
+            <div className="mt-2">
+               <RoleAssignment
+                 selectedRoleIds={form.role_ids}
+                 onChange={v => sf("role_ids", v)}
+                 designationId={form.designation_id || undefined}
+                 branchName={branches.find(b => String(b.id) === form.primary_branch_id)?.branch_name || branches.find(b => String(b.id) === form.primary_branch_id)?.name || "Main Branch"}
+               />
             </div>
           </section>
 
@@ -430,36 +428,11 @@ const UserCreatePage: React.FC = () => {
 
           {/* Access Preview Box */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Info className="h-5 w-5 text-slate-700" />
-              <h3 className="text-sm font-bold text-slate-900">Access Preview</h3>
-            </div>
-            <p className="text-xs text-slate-500 mb-4 leading-relaxed">Calculated based on selected branch and role.</p>
-            
-            {isEdit ? (
-               <EffectiveAccessPreview userId={id} />
-            ) : (
-               <>
-                 <ul className="space-y-3 mb-6">
-                   <li className="flex items-center gap-2 text-sm text-slate-700">
-                     <CheckCircle2 className="h-4 w-4 text-slate-400" /> View Corporate Dashboards
-                   </li>
-                   <li className="flex items-center gap-2 text-sm text-slate-700">
-                     <CheckCircle2 className="h-4 w-4 text-slate-400" /> Manage Personal Profile
-                   </li>
-                   <li className="flex items-center gap-2 text-sm text-slate-700">
-                     <CheckCircle2 className="h-4 w-4 text-slate-400" /> Access Internal KB
-                   </li>
-                   <li className="flex items-center gap-2 text-sm text-slate-700">
-                     <CheckCircle2 className="h-4 w-4 text-slate-400" /> Request Support Credits
-                   </li>
-                 </ul>
-                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-[10px] text-slate-600 font-medium leading-relaxed mb-4">
-                   Security Note: Some administrative permissions are currently locked until the profile is verified.
-                 </div>
-                 <button className="w-full text-xs font-bold text-slate-600 hover:text-slate-900">Download Full Access Report</button>
-               </>
-            )}
+            <EffectiveAccessPreview
+              userId={isEdit ? id : undefined}
+              roleIds={form.role_ids}
+              branchName={branches.find(b => String(b.id) === form.primary_branch_id)?.branch_name || branches.find(b => String(b.id) === form.primary_branch_id)?.name || "Main Branch"}
+            />
           </div>
           
         </div>

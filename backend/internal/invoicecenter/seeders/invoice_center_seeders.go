@@ -119,27 +119,7 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 		db.Where("permission_key = ?", p.Key).FirstOrCreate(&perm)
 	}
 
-	// Seed Invoice Center roles
-	icRoles := []struct {
-		RoleName string
-		RoleCode string
-	}{
-		{"Invoice Manager", "INVOICE_MANAGER"},
-		{"Invoice Executive", "INVOICE_EXECUTIVE"},
-		{"Invoice Approver", "INVOICE_APPROVER"},
-		{"Invoice Viewer", "INVOICE_VIEWER"},
-	}
-
-	for _, r := range icRoles {
-		role := companyModels.Role{
-			SoftwareID:   invoiceModule.ID,
-			RoleName:     r.RoleName,
-			RoleCode:     r.RoleCode,
-			IsSystemRole: true,
-			Status:       "active",
-		}
-		db.Where("software_id = ? AND role_code = ?", invoiceModule.ID, r.RoleCode).FirstOrCreate(&role)
-	}
+	// Removed module-specific roles and mappings as roles are now global and SUPER_ADMIN handles all.
 
 	// Fetch roles mapping
 	var roles []companyModels.Role
@@ -170,79 +150,6 @@ func SeedInvoiceCenterPermissions(db *gorm.DB, logger *zap.Logger) error {
 
 	// Assign roles
 	assignPermission("SUPER_ADMIN", func(k string) bool { return strings.HasPrefix(k, "invoice_center.") })
-	assignPermission("COMPANY_ADMIN", func(k string) bool { return strings.HasPrefix(k, "invoice_center.") })
-	assignPermission("INVOICE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "invoice_center.") })
-
-	assignPermission("INVOICE_EXECUTIVE", func(k string) bool {
-		return k == "invoice_center.dashboard.view" ||
-			k == "invoice_center.customer.view" ||
-			k == "invoice_center.customer.create" ||
-			k == "invoice_center.customer.update" ||
-			k == "invoice_center.customer_category.view" ||
-			k == "invoice_center.sales_order.view" ||
-			k == "invoice_center.sales_order.create" ||
-			k == "invoice_center.sales_order.update" ||
-			k == "invoice_center.sales_order.submit" ||
-			k == "invoice_center.sales_order.cancel" ||
-			k == "invoice_center.sales_invoice.view" ||
-			k == "invoice_center.sales_invoice.create" ||
-			k == "invoice_center.sales_invoice.update" ||
-			k == "invoice_center.sales_invoice.submit" ||
-			k == "invoice_center.credit_note.view" ||
-			k == "invoice_center.credit_note.create" ||
-			k == "invoice_center.credit_note.update" ||
-			k == "invoice_center.credit_note.submit" ||
-			k == "invoice_center.debit_note.view" ||
-			k == "invoice_center.debit_note.create" ||
-			k == "invoice_center.debit_note.update" ||
-			k == "invoice_center.debit_note.submit" ||
-			k == "invoice_center.customer_receipt.view" ||
-			k == "invoice_center.customer_receipt.create" ||
-			k == "invoice_center.customer_receipt.update" ||
-			k == "invoice_center.customer_receipt.submit"
-	})
-
-	assignPermission("INVOICE_APPROVER", func(k string) bool {
-		return k == "invoice_center.dashboard.view" ||
-			k == "invoice_center.customer.view" ||
-			k == "invoice_center.customer_category.view" ||
-			k == "invoice_center.sales_order.view" ||
-			k == "invoice_center.sales_order.approve" ||
-			k == "invoice_center.sales_order.reject" ||
-			k == "invoice_center.sales_order.close" ||
-			k == "invoice_center.sales_order.cancel" ||
-			k == "invoice_center.sales_invoice.view" ||
-			k == "invoice_center.sales_invoice.approve" ||
-			k == "invoice_center.sales_invoice.reject" ||
-			k == "invoice_center.sales_invoice.post" ||
-			k == "invoice_center.credit_note.view" ||
-			k == "invoice_center.credit_note.approve" ||
-			k == "invoice_center.credit_note.reject" ||
-			k == "invoice_center.credit_note.post" ||
-			k == "invoice_center.debit_note.view" ||
-			k == "invoice_center.debit_note.approve" ||
-			k == "invoice_center.debit_note.reject" ||
-			k == "invoice_center.debit_note.post" ||
-			k == "invoice_center.customer_receipt.view" ||
-			k == "invoice_center.customer_receipt.approve" ||
-			k == "invoice_center.customer_receipt.reject" ||
-			k == "invoice_center.customer_receipt.post" ||
-			k == "invoice_center.finance_settings.view" ||
-			k == "invoice_center.finance_settings.update" ||
-			k == "invoice_center.finance_posting.view" ||
-			k == "invoice_center.finance_posting.post"
-	})
-
-	assignPermission("INVOICE_VIEWER", func(k string) bool {
-		return k == "invoice_center.dashboard.view" ||
-			k == "invoice_center.customer.view" ||
-			k == "invoice_center.customer_category.view" ||
-			k == "invoice_center.sales_order.view" ||
-			k == "invoice_center.sales_invoice.view" ||
-			k == "invoice_center.credit_note.view" ||
-			k == "invoice_center.debit_note.view" ||
-			k == "invoice_center.customer_receipt.view"
-	})
 
 	logger.Info("Invoice Center Permissions and Roles seeding completed")
 	return nil

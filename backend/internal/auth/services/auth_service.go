@@ -193,8 +193,8 @@ func (s *AuthService) GetUserPermissionsForActiveContext(userID, branchID, softw
 	}
 
 	// Find roles assigned to user for this branch and software (or ALL_MODULES)
-	var matrix []models.UserBranchSoftwareRole
-	s.db.Where("user_id = ? AND branch_id = ? AND software_id IN ? AND status = ?", userID, branchID, softwareIDs, "active").Find(&matrix)
+	var matrix []models.UserBranchRole
+	s.db.Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").Find(&matrix)
 
 	if len(matrix) == 0 {
 		return []string{}
@@ -251,8 +251,8 @@ func (s *AuthService) SwitchBranch(userID uint64, reqBranchID uint64, activeSoft
 
 	// 3. Check role access for new branch + active software
 	var matrixCount int64
-	s.db.Model(&models.UserBranchSoftwareRole{}).
-		Where("user_id = ? AND branch_id = ? AND software_id = ? AND status = ?", userID, reqBranchID, activeSoftware.ID, "active").
+	s.db.Model(&models.UserBranchRole{}).
+		Where("user_id = ? AND branch_id = ? AND status = ?", userID, reqBranchID, "active").
 		Count(&matrixCount)
 
 	// Even if matrixCount == 0, they can switch to the branch. But they'll have no permissions.

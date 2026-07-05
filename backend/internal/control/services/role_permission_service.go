@@ -30,8 +30,8 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 		return nil, errors.New("role not found")
 	}
 
-	// Get all permissions for this role's software
-	allSoftwarePermissions, err := s.permissionRepo.FindPermissionsGrouped("", role.Software.SoftwareCode)
+	// Get all permissions for all software modules
+	allSoftwarePermissions, err := s.permissionRepo.FindPermissionsGrouped("", "ALL_MODULES")
 	if err != nil {
 		return nil, err
 	}
@@ -58,10 +58,7 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 			PermissionName: p.PermissionName,
 			Assigned:       assignedMap[p.ID],
 		}
-		groupName := p.PermissionGroup
-		if role.Software.SoftwareCode == "ALL_MODULES" {
-			groupName = p.Software.SoftwareName + " - " + p.PermissionGroup
-		}
+		groupName := p.Software.SoftwareName + " - " + p.PermissionGroup
 		if _, ok := groupedMap[groupName]; !ok {
 			groupOrder = append(groupOrder, groupName)
 		}
@@ -82,11 +79,6 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 			RoleName: role.RoleName,
 			RoleCode: role.RoleCode,
 		},
-		Software: dto.SoftwareReference{
-			ID:           role.SoftwareID,
-			SoftwareCode: role.Software.SoftwareCode,
-			SoftwareName: role.Software.SoftwareName,
-		},
 		Groups: groups,
 	}
 
@@ -99,7 +91,7 @@ func (s *RolePermissionService) AssignRolePermissions(roleID uint64, req dto.Ass
 		return nil, errors.New("role not found or inactive")
 	}
 
-	if (role.RoleCode == "SUPER_ADMIN" || role.RoleCode == "GLOBAL_SUPER_ADMIN") && (role.Software.SoftwareCode == "CONTROL_CENTER" || role.Software.SoftwareCode == "ALL_MODULES") {
+	if role.RoleCode == "SUPER_ADMIN" {
 		if len(req.PermissionIDs) == 0 {
 			return nil, errors.New("cannot remove all permissions from Super Admin")
 		}
@@ -111,8 +103,8 @@ func (s *RolePermissionService) AssignRolePermissions(roleID uint64, req dto.Ass
 	}
 
 	for _, p := range permissionsToAssign {
-		if (role.Software.SoftwareCode != "ALL_MODULES" && p.SoftwareID != role.SoftwareID) || p.Status != "active" {
-			return nil, errors.New("cannot assign permissions that do not belong to the role's software module")
+		if p.Status != "active" {
+			return nil, errors.New("cannot assign inactive permissions")
 		}
 	}
 

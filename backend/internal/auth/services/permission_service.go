@@ -21,10 +21,8 @@ func (s *PermissionService) GetPermissionsForUserContext(userID, branchID uint64
 	}
 
 	// 2. Find active roles from user_branch_software_roles
-	var matrix []models.UserBranchSoftwareRole
-	s.db.Preload("Role").
-		Where("user_id = ? AND branch_id = ? AND software_id = ? AND status = ?", userID, branchID, software.ID, "active").
-		Find(&matrix)
+	var matrix []models.UserBranchRole
+	s.db.Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").Find(&matrix)
 
 	if len(matrix) == 0 {
 		return []string{}
@@ -41,9 +39,13 @@ func (s *PermissionService) GetPermissionsForUserContext(userID, branchID uint64
 		return []string{}
 	}
 
-	// 3. Join roles -> role_permissions -> permissions
+	// 3. Join roles -> role_permissions -> permissions -> software_modules
 	var rolePermissions []models.RolePermission
-	s.db.Preload("Permission").Where("role_id IN ?", roleIDs).Find(&rolePermissions)
+	s.db.Preload("Permission.Software").
+		Joins("JOIN permissions p ON p.id = role_permissions.permission_id").
+		Joins("JOIN software_modules sm ON sm.id = p.software_id").
+		Where("role_permissions.role_id IN ? AND sm.software_code = ?", roleIDs, softwareCode).
+		Find(&rolePermissions)
 
 	permMap := make(map[string]bool)
 	var permissions []string

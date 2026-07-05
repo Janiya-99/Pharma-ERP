@@ -34,15 +34,13 @@ func (h *RoleHandler) getService(c *gin.Context) *services.RoleService {
 }
 
 func (h *RoleHandler) List(c *gin.Context) {
-	softwareID := c.Query("software_id")
-	softwareCode := c.Query("software_code")
 	status := c.Query("status")
 	search := c.Query("search")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
 	service := h.getService(c)
-	roles, pagination, err := service.ListRoles(softwareID, softwareCode, status, search, page, limit)
+	roles, pagination, err := service.ListRoles("", "", status, search, page, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse(err.Error(), nil))
 		return
@@ -136,15 +134,9 @@ func (h *RoleHandler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.SuccessResponse("Role deleted successfully", nil))
 }
 
-func (h *RoleHandler) GetAvailableRolesForSoftware(c *gin.Context) {
-	softwareID, err := strconv.ParseUint(c.Param("software_id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse("Invalid Software ID", nil))
-		return
-	}
-
+func (h *RoleHandler) GetAllRoles(c *gin.Context) {
 	service := h.getService(c)
-	roles, err := service.GetRolesBySoftware(softwareID)
+	roles, err := service.GetAllRoles()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse(err.Error(), nil))
 		return

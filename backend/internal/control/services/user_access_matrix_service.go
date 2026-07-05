@@ -45,9 +45,6 @@ func (s *UserAccessMatrixService) GetUserAccessMatrix(userID uint64) (*dto.UserA
 			ID:           m.ID,
 			BranchID:     m.BranchID,
 			BranchName:   m.Branch.BranchName,
-			SoftwareID:   m.SoftwareID,
-			SoftwareCode: m.Software.SoftwareCode,
-			SoftwareName: m.Software.SoftwareName,
 			RoleID:       m.RoleID,
 			RoleName:     m.Role.RoleName,
 			Status:       m.Status,
@@ -85,19 +82,10 @@ func (s *UserAccessMatrixService) AssignUserAccessMatrix(userID uint64, req dto.
 			return nil, errors.New("role not found or inactive")
 		}
 
-		// 3. Verify user has software access (unless role is ALL_MODULES)
-		if role.Software.SoftwareCode != "ALL_MODULES" {
-			sAccess, err := s.softwareRepo.FindUserSoftwareByID(userID, accessReq.SoftwareID)
-			if err != nil || sAccess.Status != "active" || !sAccess.CanAccess {
-				return nil, errors.New("user does not have access to one of the selected software modules")
-			}
-		}
-
-		// 4. Create or Reactivate
-		record := &models.UserBranchSoftwareRole{
+		// 3. Create or Reactivate
+		record := &models.UserBranchRole{
 			UserID:     userID,
 			BranchID:   accessReq.BranchID,
-			SoftwareID: accessReq.SoftwareID,
 			RoleID:     accessReq.RoleID,
 			Status:     "active",
 			CreatedBy:  &activeUserID,
@@ -126,15 +114,15 @@ func (s *UserAccessMatrixService) RemoveUserAccessMatrix(accessID uint64, userID
 		return errors.New("access record does not belong to this user")
 	}
 
-	// System rule: Do not allow removing active Super Admin access for Control Center
-	if (record.Role.RoleCode == "SUPER_ADMIN" || record.Role.RoleCode == "GLOBAL_SUPER_ADMIN") && (record.Software.SoftwareCode == "CONTROL_CENTER" || record.Software.SoftwareCode == "ALL_MODULES") {
+	// System rule: Do not allow removing active Super Admin access
+	if (record.Role.RoleCode == "SUPER_ADMIN") {
 		if record.UserID == activeUserID {
 			return errors.New("cannot remove your own active Super Admin access")
 		}
 
 		count, _ := s.repo.CountActiveSuperAdminAccess()
 		if count <= 1 {
-			return errors.New("cannot remove the last active Super Admin access for Control Center")
+			return errors.New("cannot remove the last active Super Admin access")
 		}
 	}
 

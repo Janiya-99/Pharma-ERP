@@ -42,7 +42,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bo
 		&models.Role{},
 		&models.Permission{},
 		&models.RolePermission{},
-		&models.UserBranchSoftwareRole{},
+		&models.UserBranchRole{},
 		&models.AuditLog{},
 		&models.UserOrganizationAssignment{},
 		&models.SystemSettingGroup{},
@@ -95,19 +95,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bo
 		return err
 	}
 
-	if !isNewTenant {
-		if err := seeders.SeedAdminUser(db, logger); err != nil {
-			logger.Error("Admin user seeder failed", zap.Error(err))
-			return err
-		}
-	}
 
-	if !isNewTenant {
-		if err := seeders.SeedUserAccessMatrix(db, logger); err != nil {
-			logger.Error("User access matrix seeder failed", zap.Error(err))
-			return err
-		}
-	}
 
 	logger.Info("Running finance migrations and seeders...")
 	if err := financeMigrations.RunFinanceMigrations(db, logger, isNewTenant); err != nil {

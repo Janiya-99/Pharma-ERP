@@ -34,7 +34,7 @@ func (s *RoleService) ListRoles(softwareID, softwareCode, status, search string,
 	}
 	offset := (page - 1) * limit
 
-	roles, count, err := s.repo.FindRoles(softwareID, softwareCode, status, search, offset, limit)
+	roles, count, err := s.repo.FindRoles(status, search, offset, limit)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -57,9 +57,6 @@ func (s *RoleService) ListRoles(softwareID, softwareCode, status, search string,
 		}
 		res = append(res, dto.RoleResponse{
 			ID:            r.ID,
-			SoftwareID:    r.SoftwareID,
-			SoftwareCode:  r.Software.SoftwareCode,
-			SoftwareName:  r.Software.SoftwareName,
 			RoleName:      r.RoleName,
 			RoleCode:      r.RoleCode,
 			Description:   r.Description,
@@ -86,9 +83,6 @@ func (s *RoleService) GetRoleByID(id uint64) (*dto.RoleResponse, error) {
 
 	return &dto.RoleResponse{
 		ID:            r.ID,
-		SoftwareID:    r.SoftwareID,
-		SoftwareCode:  r.Software.SoftwareCode,
-		SoftwareName:  r.Software.SoftwareName,
 		RoleName:      r.RoleName,
 		RoleCode:      r.RoleCode,
 		Description:   r.Description,
@@ -99,18 +93,13 @@ func (s *RoleService) GetRoleByID(id uint64) (*dto.RoleResponse, error) {
 }
 
 func (s *RoleService) CreateRole(req dto.CreateRoleRequest, companyID, activeUserID, activeBranchID uint64, ipAddress, userAgent string) (*dto.RoleResponse, error) {
-	software, err := s.moduleRepo.FindByID(req.SoftwareID)
-	if err != nil || software.Status != "active" {
-		return nil, errors.New("software module not found or inactive")
-	}
 
-	existing, _ := s.repo.FindRoleByCode(req.SoftwareID, req.RoleCode)
+	existing, _ := s.repo.FindRoleByCode(req.RoleCode)
 	if existing != nil {
-		return nil, errors.New("role code already exists for this software module")
+		return nil, errors.New("role code already exists")
 	}
 
 	role := &models.Role{
-		SoftwareID:   req.SoftwareID,
 		RoleName:     req.RoleName,
 		RoleCode:     req.RoleCode,
 		Description:  req.Description,
@@ -155,9 +144,9 @@ func (s *RoleService) UpdateRole(id uint64, req dto.UpdateRoleRequest, companyID
 		}
 	} else {
 		if req.RoleCode != role.RoleCode {
-			existing, _ := s.repo.FindRoleByCode(role.SoftwareID, req.RoleCode)
+			existing, _ := s.repo.FindRoleByCode(req.RoleCode)
 			if existing != nil && existing.ID != id {
-				return nil, errors.New("role code already exists for this software module")
+				return nil, errors.New("role code already exists")
 			}
 		}
 	}
@@ -222,8 +211,8 @@ func (s *RoleService) DeleteRole(id uint64, companyID, activeUserID, activeBranc
 	return nil
 }
 
-func (s *RoleService) GetRolesBySoftware(softwareID uint64) ([]dto.RoleResponse, error) {
-	roles, err := s.repo.FindRolesBySoftware(softwareID)
+func (s *RoleService) GetAllRoles() ([]dto.RoleResponse, error) {
+	roles, err := s.repo.FindAllRoles()
 	if err != nil {
 		return nil, err
 	}

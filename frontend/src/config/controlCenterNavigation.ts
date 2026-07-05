@@ -77,16 +77,16 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
         route: "/control-center/permissions",
         permission: "control_center.permission.view",
       },
-      {
-        label: "User Assignments",
-        route: "/control-center/user-assignments",
-        permission: "control_center.user_assignment.view",
-      },
-      {
-        label: "Effective Access",
-        route: "/control-center/effective-access",
-        permission: "control_center.effective_access.view",
-      },
+      // {
+      //   label: "User Assignments",
+      //   route: "/control-center/user-assignments",
+      //   permission: "control_center.user_assignment.view",
+      // },
+      // {
+      //   label: "Effective Access",
+      //   route: "/control-center/effective-access",
+      //   permission: "control_center.effective_access.view",
+      // },
     ],
   },
   {

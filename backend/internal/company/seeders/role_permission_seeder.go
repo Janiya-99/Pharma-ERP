@@ -46,11 +46,7 @@ func SeedRolePermissions(db *gorm.DB, logger *zap.Logger) error {
 		}
 	}
 
-	// Global Super Admin: all permissions across all modules
-	assignPermission("GLOBAL_SUPER_ADMIN", func(k string) bool { return true })
 
-	// Global Viewer: all view permissions across all modules
-	assignPermission("GLOBAL_VIEWER", func(k string) bool { return strings.HasSuffix(k, ".view") })
 
 	// Super Admin: all permissions
 	assignPermission("SUPER_ADMIN", func(k string) bool { return true })

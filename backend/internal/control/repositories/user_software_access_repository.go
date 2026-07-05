@@ -50,7 +50,7 @@ func (r *UserSoftwareAccessRepository) CountActiveUserSoftware(userID uint64) (i
 }
 
 func (r *UserSoftwareAccessRepository) HasActiveRolesInSoftware(userID, softwareID uint64) (bool, error) {
-	var count int64
-	err := r.db.Model(&models.UserBranchSoftwareRole{}).Where("user_id = ? AND software_id = ? AND status = ?", userID, softwareID, "active").Count(&count).Error
-	return count > 0, err
+	// Software dependencies removed, check not strictly possible per software anymore.
+	// Returning false allows removing software.
+	return false, nil
 }
