@@ -22,13 +22,13 @@ import {
   CardTitle,
 } from "../../../components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "../../../components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -134,7 +134,7 @@ const AccountGroupsPage = () => {
           filters.account_type === "all" ? "" : filters.account_type,
         status: filters.status === "all" ? "" : filters.status,
       });
-      setGroups(res.data?.data || []);
+      setGroups((Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []));
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to load account groups"));
     } finally {
@@ -466,17 +466,17 @@ const AccountGroupsPage = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl">
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-2xl">
           <form onSubmit={handleSubmit}>
-            <DialogHeader>
-              <DialogTitle>
+            <SheetHeader>
+              <SheetTitle>
                 {editingGroup ? "Update Account Group" : "Create Account Group"}
-              </DialogTitle>
-              <DialogDescription>
+              </SheetTitle>
+              <SheetDescription>
                 Required fields are marked with an asterisk.
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
 
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Group Code" required error={errors.group_code}>
@@ -563,7 +563,7 @@ const AccountGroupsPage = () => {
               </div>
             </div>
 
-            <DialogFooter className="mt-6">
+            <SheetFooter className="mt-6">
               <Button
                 type="button"
                 variant="outline"
@@ -582,10 +582,10 @@ const AccountGroupsPage = () => {
                 ) : null}
                 {editingGroup ? "Update Account Group" : "Create Account Group"}
               </Button>
-            </DialogFooter>
+            </SheetFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       <ERPConfirmDialog
         open={confirmOpen}

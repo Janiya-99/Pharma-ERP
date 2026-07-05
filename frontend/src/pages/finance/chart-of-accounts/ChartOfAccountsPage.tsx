@@ -7,13 +7,13 @@ import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "../../../components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,13 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "../../../components/ui/sheet";
 import { Switch } from "../../../components/ui/switch";
 import {
   Table,
@@ -151,7 +144,7 @@ const ChartOfAccountsPage = () => {
         account_type: filters.account_type === "all" ? "" : filters.account_type,
         status: filters.status === "all" ? "" : filters.status,
       });
-      setAccounts(res.data?.data || []);
+      setAccounts((Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []));
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to load chart of accounts"));
     } finally {
@@ -162,7 +155,7 @@ const ChartOfAccountsPage = () => {
   const fetchClassifications = async () => {
     try {
       const res = await financeApi.getAccountClassifications({ limit: 1000, status: "active", company_id: companyId });
-      setClassifications(res.data?.data || []);
+      setClassifications((Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []));
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to load account classifications"));
     }
@@ -488,12 +481,12 @@ const ChartOfAccountsPage = () => {
         </Card>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto bg-white sm:max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>{editingAccount ? "Update Account" : "Create Account"}</DialogTitle>
-            <DialogDescription>Accounts with transactions should be deactivated instead of deleted.</DialogDescription>
-          </DialogHeader>
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-3xl">
+          <SheetHeader>
+            <SheetTitle>{editingAccount ? "Update Account" : "Create Account"}</SheetTitle>
+            <SheetDescription>Accounts with transactions should be deactivated instead of deleted.</SheetDescription>
+          </SheetHeader>
           <form id="account-form" onSubmit={submitForm} className="space-y-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Account Code" error={errors.account_code} required>
@@ -579,7 +572,7 @@ const ChartOfAccountsPage = () => {
               <Toggle label="Cash account ledger" checked={form.is_cash_account} onChange={(checked) => setField("is_cash_account", checked)} />
             </div>
           </form>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" type="button" onClick={() => setDialogOpen(false)} disabled={submitting}>
               Cancel
             </Button>
@@ -587,9 +580,9 @@ const ChartOfAccountsPage = () => {
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {editingAccount ? "Update Account" : "Create Account"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <Sheet open={detailsOpen} onOpenChange={setDetailsOpen}>
         <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-xl">

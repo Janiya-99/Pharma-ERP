@@ -68,7 +68,7 @@ export default function BankReconciliationFormPage() {
     try {
       const res = await financeApi.getUnreconciledTransactions(bankAccountId, { limit: 1000 });
       if (res.data?.success) {
-        let txs = res.data.data || [];
+        let txs = (Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []);
         // If edit, include the currently mapped transactions in the list so they can be deselected
         if (isEdit && existingLines.length > 0) {
           const currentTxs = existingLines.map((line: unknown) => line.bank_transaction);

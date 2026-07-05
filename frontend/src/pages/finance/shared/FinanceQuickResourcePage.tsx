@@ -23,13 +23,13 @@ import {
   CardTitle,
 } from "../../../components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "../../../components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -121,8 +121,9 @@ const labelize = (value: unknown) =>
     .replace(/_/g, " ")
     .replace(/\b\w/g, (match) => match.toUpperCase());
 
-const unwrapRows = (response: any) =>
-  response?.data?.data || response?.data || [];
+const unwrapRows = (response: any) => {
+  return normalizeRows(response);
+};
 
 const normalizeRows = (value: any) => {
   if (Array.isArray(value)) return value;
@@ -617,18 +618,18 @@ export function FinanceQuickResourcePage({
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-3xl">
           <form onSubmit={handleSubmit}>
-            <DialogHeader>
-              <DialogTitle>
+            <SheetHeader>
+              <SheetTitle>
                 {editingRow ? `Update ${config.title}` : config.createLabel}
-              </DialogTitle>
-              <DialogDescription>
+              </SheetTitle>
+              <SheetDescription>
                 Required fields are marked with an asterisk. JSON fields are
                 sent as structured arrays.
-              </DialogDescription>
-            </DialogHeader>
+              </SheetDescription>
+            </SheetHeader>
 
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               {config.fields.map((field) => (
@@ -656,7 +657,7 @@ export function FinanceQuickResourcePage({
               ))}
             </div>
 
-            <DialogFooter className="mt-6">
+            <SheetFooter className="mt-6">
               <Button
                 type="button"
                 variant="outline"
@@ -675,10 +676,10 @@ export function FinanceQuickResourcePage({
                 ) : null}
                 {editingRow ? `Update ${config.title}` : config.createLabel}
               </Button>
-            </DialogFooter>
+            </SheetFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       <ERPConfirmDialog
         open={confirmOpen}

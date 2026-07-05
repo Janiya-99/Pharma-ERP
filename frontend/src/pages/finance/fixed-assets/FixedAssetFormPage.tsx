@@ -55,7 +55,7 @@ const FixedAssetFormPage = () => {
   const fetchBranches = async () => {
     try {
       const res = await controlApi.getBranches({ limit: 100 });
-      setBranches(res.data?.data || []);
+      setBranches((Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []));
     } catch (err) {
       console.error("Failed to load branches");
     }

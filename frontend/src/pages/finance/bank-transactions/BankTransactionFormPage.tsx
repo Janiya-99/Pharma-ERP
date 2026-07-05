@@ -80,7 +80,7 @@ export default function BankTransactionFormPage() {
     setLoading(true);
     try {
       const branchesRes = await getBranches({ limit: 100 });
-      setBranches(branchesRes?.data || []);
+      setBranches((Array.isArray(branchesRes?.data?.data) ? branchesRes.data.data : Array.isArray(branchesRes?.data) ? branchesRes.data : Array.isArray(branchesRes) ? branchesRes : []));
 
       if (isEdit) {
         const res = await financeApi.getBankTransactionById(id);

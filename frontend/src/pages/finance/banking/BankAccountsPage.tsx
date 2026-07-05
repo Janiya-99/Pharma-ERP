@@ -31,14 +31,6 @@ import {
   CardTitle,
 } from "../../../components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -59,6 +51,7 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "../../../components/ui/sheet";
@@ -236,7 +229,7 @@ const BankAccountsPage = () => {
         branch_id: filters.branch_id === "all" ? "" : filters.branch_id,
         company_id: companyId,
       });
-      setAccounts(res.data?.data || []);
+      setAccounts((Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []));
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to load bank accounts"));
     } finally {
@@ -259,10 +252,10 @@ const BankAccountsPage = () => {
           financeApi.getSriLankaProvinces(),
         ]);
 
-      setBranches(branchesRes?.data || []);
-      setLedgerAccounts(accountsRes.data?.data || []);
-      setBankReferences(banksRes.data?.data || []);
-      setProvinceReferences(provincesRes.data?.data || []);
+      setBranches((Array.isArray(branchesRes?.data?.data) ? branchesRes.data.data : Array.isArray(branchesRes?.data) ? branchesRes.data : Array.isArray(branchesRes) ? branchesRes : []));
+      setLedgerAccounts((Array.isArray(accountsRes?.data?.data) ? accountsRes.data.data : Array.isArray(accountsRes?.data) ? accountsRes.data : Array.isArray(accountsRes) ? accountsRes : []));
+      setBankReferences((Array.isArray(banksRes?.data?.data) ? banksRes.data.data : Array.isArray(banksRes?.data) ? banksRes.data : Array.isArray(banksRes) ? banksRes : []));
+      setProvinceReferences((Array.isArray(provincesRes?.data?.data) ? provincesRes.data.data : Array.isArray(provincesRes?.data) ? provincesRes.data : Array.isArray(provincesRes) ? provincesRes : []));
     } catch (error) {
       toast.error(
         getErrorMessage(error, "Failed to load bank account lookups")
@@ -757,17 +750,17 @@ const BankAccountsPage = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto bg-white sm:max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-3xl">
+          <SheetHeader>
+            <SheetTitle>
               {editingAccount ? "Edit Bank Account" : "Add Bank Account"}
-            </DialogTitle>
-            <DialogDescription>
+            </SheetTitle>
+            <SheetDescription>
               Link each bank account to an active bank ledger account from Chart
               of Accounts.
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           {errors.company_id && (
             <Alert variant="destructive">
               <AlertTitle>Company context required</AlertTitle>
@@ -1028,7 +1021,7 @@ const BankAccountsPage = () => {
               </Field>
             </div>
           </form>
-          <DialogFooter>
+          <SheetFooter>
             <Button
               variant="outline"
               type="button"
@@ -1046,9 +1039,9 @@ const BankAccountsPage = () => {
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {editingAccount ? "Save Bank Account" : "Save Bank Account"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <Sheet open={detailsOpen} onOpenChange={setDetailsOpen}>
         <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-xl">

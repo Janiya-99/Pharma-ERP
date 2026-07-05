@@ -43,7 +43,7 @@ export default function BankAccountDetailsPage() {
       let cancelled = 0;
 
       if (cbRes.data?.success) {
-        const books = cbRes.data.data || [];
+        const books = (Array.isArray(cbRes?.data?.data) ? cbRes.data.data : Array.isArray(cbRes?.data) ? cbRes.data : Array.isArray(cbRes) ? cbRes : []);
         totalCB = books.length;
         books.forEach((b: unknown) => {
           avail += (b.available_leaves || 0);
@@ -54,7 +54,7 @@ export default function BankAccountDetailsPage() {
 
       let unreconciled = 0;
       if (urRes.data?.success) {
-        unreconciled = (urRes.data.data || []).length;
+        unreconciled = ((Array.isArray(urRes?.data?.data) ? urRes.data.data : Array.isArray(urRes?.data) ? urRes.data : Array.isArray(urRes) ? urRes : [])).length;
       }
 
       setSummary({

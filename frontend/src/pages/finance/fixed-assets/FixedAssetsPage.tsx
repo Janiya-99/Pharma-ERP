@@ -36,7 +36,7 @@ const FixedAssetsPage = () => {
       if (statusFilter) params.asset_status = statusFilter;
 
       const res = await financeApi.getFixedAssets(params);
-      setAssets(res.data?.data || []);
+      setAssets((Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []));
       setTotalCount(res.data?.meta?.total || 0);
     } catch (err) {
       console.error("Failed to fetch assets:", err);

@@ -39,8 +39,8 @@ const FixedAssetDepreciationRunFormPage = () => {
         controlApi.getBranches({ limit: 100 }),
         financeApi.getFinancialYears({ limit: 100, status: "open" })
       ]);
-      setBranches(brRes.data?.data || []);
-      setFinancialYears(fyRes.data?.data || []);
+      setBranches((Array.isArray(brRes?.data?.data) ? brRes.data.data : Array.isArray(brRes?.data) ? brRes.data : Array.isArray(brRes) ? brRes : []));
+      setFinancialYears((Array.isArray(fyRes?.data?.data) ? fyRes.data.data : Array.isArray(fyRes?.data) ? fyRes.data : Array.isArray(fyRes) ? fyRes : []));
     } catch (err) {
       console.error("Failed to load initial data");
     }
@@ -52,7 +52,7 @@ const FixedAssetDepreciationRunFormPage = () => {
     if (fyId) {
       try {
         const res = await financeApi.getAccountingPeriods({ financial_year_id: fyId, limit: 100, status: "open" });
-        setAccountingPeriods(res.data?.data || []);
+        setAccountingPeriods((Array.isArray(res?.data?.data) ? res.data.data : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []));
       } catch (err) {
         console.error("Failed to load accounting periods");
       }
