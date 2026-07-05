@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/pixandco/erp-phrma/internal/auth/handlers"
 	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	"github.com/pixandco/erp-phrma/internal/config"
@@ -32,8 +34,12 @@ func main() {
 	logger.Info("Platform database ready", zap.String("db", cfg.PlatformDB.Name))
 
 	// 3.1. Run Platform AutoMigrate + Seeder
-	if err := platformMigrations.RunPlatformMigrations(platformDB, logger); err != nil {
-		logger.Fatal("Failed to run platform migrations", zap.Error(err))
+	if os.Getenv("SKIP_MIGRATIONS") != "true" {
+		if err := platformMigrations.RunPlatformMigrations(platformDB, logger); err != nil {
+			logger.Fatal("Failed to run platform migrations", zap.Error(err))
+		}
+	} else {
+		logger.Info("Skipping platform migrations and seeders (SKIP_MIGRATIONS=true)")
 	}
 
 	// 4. Init Company Database (legacy single-company connection)
@@ -43,8 +49,12 @@ func main() {
 	}
 
 	// 4.1. Run Company AutoMigrate + Seeder (Development only)
-	if err := companyMigrations.RunCompanyMigrations(db, logger); err != nil {
-		logger.Fatal("Failed to run company migrations", zap.Error(err))
+	if os.Getenv("SKIP_MIGRATIONS") != "true" {
+		if err := companyMigrations.RunCompanyMigrations(db, logger); err != nil {
+			logger.Fatal("Failed to run company migrations", zap.Error(err))
+		}
+	} else {
+		logger.Info("Skipping company migrations and seeders (SKIP_MIGRATIONS=true)")
 	}
 
 	// 5. Setup Repositories

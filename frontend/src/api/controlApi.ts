@@ -544,3 +544,9 @@ export const terminateAllOtherSessions = async () => {
   return res.data;
 };
 
+export const getEffectiveAccess = async (userId: string | number) => {
+  const res = await apiClient.get(`/control/users/${userId}/effective-access`);
+  return res.data;
+};
+
+
