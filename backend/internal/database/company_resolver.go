@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/pixandco/erp-phrma/internal/platform/models"
+	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -130,8 +131,14 @@ func (r *CompanyResolver) GetOrCreateCompanyDBConnection(company models.Platform
 		sqlDB.SetConnMaxLifetime(5 * time.Minute)
 	}
 
+	// Run migrations
+	if err := companyMigrations.RunCompanyMigrations(newDB, r.logger); err != nil {
+		r.logger.Error("Failed to run migrations for company database", zap.String("db_name", company.DatabaseName), zap.Error(err))
+		return nil, err
+	}
+
 	r.dbs[company.DatabaseName] = newDB
-	r.logger.Info("Established new company database connection", zap.String("company_code", company.CompanyCode), zap.String("db_name", company.DatabaseName))
+	r.logger.Info("Established new company database connection and migrated schema", zap.String("company_code", company.CompanyCode), zap.String("db_name", company.DatabaseName))
 
 	return newDB, nil
 }

@@ -29,7 +29,7 @@ interface FormData {
   status: string; login_enabled: boolean;
   password: string; confirm_password: string;
   force_password_change: boolean; two_factor_enabled: boolean;
-  primary_branch_id: string; department_id: string; additional_branches: string[];
+  primary_branch_id: string; department_id: string; designation_id: string; additional_branches: string[];
   role_ids: string[];
   avatar_url?: string;
 }
@@ -39,7 +39,7 @@ const BLANK: FormData = {
   email: "", phone: "", status: "active",
   login_enabled: true, password: "", confirm_password: "",
   force_password_change: true, two_factor_enabled: false,
-  primary_branch_id: "", department_id: "", additional_branches: [],
+  primary_branch_id: "", department_id: "", designation_id: "", additional_branches: [],
   role_ids: [], avatar_url: ""
 };
 
@@ -82,6 +82,7 @@ const UserCreatePage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [departments, setDepartments] = useState<any[]>([]);
   const [branches, setBranches] = useState<any[]>([]);
+  const [designations, setDesignations] = useState<any[]>([]);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
@@ -92,12 +93,14 @@ const UserCreatePage: React.FC = () => {
   }, [id]);
 
   const fetchDropdowns = async () => {
-    const [dR, bR] = await Promise.all([
-      getDepartments({ limit: 200 }).catch(() => ({ data: [] })),
-      getBranches({ limit: 200 }).catch(() => ({ data: [] }))
+    const [dR, bR, desR] = await Promise.all([
+      getDepartments({ limit: 200 }).catch(() => ({ data: [] as any[] })),
+      getBranches({ limit: 200 }).catch(() => ({ data: [] as any[] })),
+      getDesignations({ limit: 200 }).catch(() => ({ data: [] as any[] }))
     ]);
     setDepartments(dR.data?.items || dR.data || dR || []);
     setBranches(bR.data?.items || bR.data || bR || []);
+    setDesignations(desR.data?.items || desR.data || desR || []);
   };
 
   const fetchUser = async () => {
@@ -107,8 +110,8 @@ const UserCreatePage: React.FC = () => {
       const u = res.data || res;
       
       const [brRes, orgRes, accRes] = await Promise.all([
-        getUserBranches(id!).catch(() => ({ data: [] })),
-        getUserOrganizationAssignments(id!).catch(() => ({ data: [] })),
+        getUserBranches(id!).catch(() => ({ data: [] as any[] })),
+        getUserOrganizationAssignments(id!).catch(() => ({ data: [] as any[] })),
         getUserAccessMatrix(id!).catch(() => ({ data: {} }))
       ]);
 
@@ -131,7 +134,8 @@ const UserCreatePage: React.FC = () => {
         two_factor_enabled: u.two_factor_enabled || false,
         force_password_change: u.force_password_change || false,
         primary_branch_id: String(primaryBranch),
-        department_id: String(primaryOrg.department_id || ""),
+        department_id: String(primaryOrg.department_id || u.department_id || ""),
+        designation_id: String(u.designation_id || ""),
         additional_branches: addBranches,
         role_ids: roleData.map((r: any) => String(r.id)),
         avatar_url: u.avatar_url || ""
@@ -184,6 +188,7 @@ const UserCreatePage: React.FC = () => {
         force_password_change: form.force_password_change, two_factor_enabled: form.two_factor_enabled,
         default_branch_id: +form.primary_branch_id,
         department_id: form.department_id ? +form.department_id : 0,
+        designation_id: form.designation_id ? +form.designation_id : 0,
         user_type: "company_user",
         avatar_url: form.avatar_url,
         ...(!isEdit && { password: form.password, confirm_password: form.password }) // sync passwords based on UI
@@ -218,7 +223,14 @@ const UserCreatePage: React.FC = () => {
       toast.success(isEdit ? "User updated successfully!" : "User created successfully!");
       navigate("/control-center/users");
     } catch (e: any) { 
-      if (e?.response?.status === 422 && e?.response?.data?.errors) {
+      const msg = (e?.response?.data?.message || e?.message || "").toLowerCase();
+      if (msg.includes("email already exists") || msg.includes("email")) {
+        setErrors((prev) => ({ ...prev, email: e?.response?.data?.message || "Email address is already registered" }));
+        toast.error("Please fix highlighted fields");
+      } else if (msg.includes("employee code already exists") || msg.includes("employee code") || msg.includes("employee id")) {
+        setErrors((prev) => ({ ...prev, employee_code: e?.response?.data?.message || "Employee code already exists" }));
+        toast.error("Please fix highlighted fields");
+      } else if (e?.response?.status === 422 && e?.response?.data?.errors) {
         const validationErrors: Record<string, string> = {};
         for (const [key, val] of Object.entries(e.response.data.errors)) {
           validationErrors[key] = Array.isArray(val) ? val[0] : String(val);
@@ -303,8 +315,8 @@ const UserCreatePage: React.FC = () => {
                 <FieldWrap label="Phone Number">
                   <Input value={form.phone} onChange={e => sf("phone", e.target.value)} className={inp()} placeholder="+1 (555) 000-0000" />
                 </FieldWrap>
-                <FieldWrap label="Employee ID / Code">
-                  <Input value={form.employee_code} onChange={e => sf("employee_code", e.target.value)} className={inp()} placeholder="EMP-2024-001" />
+                <FieldWrap label="Employee ID / Code" error={errors.employee_code}>
+                  <Input value={form.employee_code} onChange={e => sf("employee_code", e.target.value)} className={inp(errors.employee_code)} placeholder="EMP-2024-001" />
                 </FieldWrap>
               </div>
             </div>
@@ -318,11 +330,11 @@ const UserCreatePage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Organization & Role</h2>
-                <p className="text-sm text-slate-500">Assign the user to their primary work location and functional group.</p>
+                <p className="text-sm text-slate-500">Assign the user to their primary work location, functional department, and job title.</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
               <FieldWrap label="Primary Branch" required error={errors.primary_branch_id}>
                 <Select value={form.primary_branch_id} onValueChange={v => sf("primary_branch_id", v)}>
                   <SelectTrigger className="h-10 border-slate-200 bg-white shadow-sm rounded-lg"><SelectValue placeholder="Select Branch Location..." /></SelectTrigger>
@@ -333,9 +345,17 @@ const UserCreatePage: React.FC = () => {
               </FieldWrap>
               <FieldWrap label="Department / Group">
                 <Select value={form.department_id} onValueChange={v => sf("department_id", v)}>
-                  <SelectTrigger className="h-10 border-slate-200 bg-white shadow-sm rounded-lg"><SelectValue placeholder="Search departments..." /></SelectTrigger>
+                  <SelectTrigger className="h-10 border-slate-200 bg-white shadow-sm rounded-lg"><SelectValue placeholder="Select Department..." /></SelectTrigger>
                   <SelectContent>
-                    {departments.map(d => <SelectItem key={d.id} value={String(d.id)}>{d.name}</SelectItem>)}
+                    {departments.map(d => <SelectItem key={d.id} value={String(d.id)}>{d.department_name || d.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </FieldWrap>
+              <FieldWrap label="Designation / Title">
+                <Select value={form.designation_id} onValueChange={v => sf("designation_id", v)}>
+                  <SelectTrigger className="h-10 border-slate-200 bg-white shadow-sm rounded-lg"><SelectValue placeholder="Select Designation..." /></SelectTrigger>
+                  <SelectContent>
+                    {designations.map(des => <SelectItem key={des.id} value={String(des.id)}>{des.designation_name || des.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </FieldWrap>

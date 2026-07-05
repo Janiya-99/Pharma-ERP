@@ -17,7 +17,7 @@ type UserOrganizationAssignment struct {
 	DesignationID uint64 `gorm:"not null;index" json:"designation_id"`
 
 	IsPrimary     bool       `gorm:"default:false" json:"is_primary"`
-	EffectiveFrom time.Time  `gorm:"not null;default:CURRENT_TIMESTAMP" json:"effective_from"`
+	EffectiveFrom time.Time  `gorm:"type:datetime;not null;default:CURRENT_TIMESTAMP" json:"effective_from"`
 	EffectiveTo   *time.Time `json:"effective_to,omitempty"`
 
 	Status string `gorm:"type:varchar(30);default:active" json:"status"` // active, inactive, scheduled, expired

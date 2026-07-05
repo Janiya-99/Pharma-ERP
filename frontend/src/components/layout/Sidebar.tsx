@@ -586,10 +586,17 @@ const Sidebar = () => {
 
   const menus = getMenus();
 
+  const isPathActive = (path?: string) => {
+    if (!path) return false;
+    if (location.pathname === path) return true;
+    if (path !== "/" && location.pathname.startsWith(path + "/")) return true;
+    return false;
+  };
+
   React.useEffect(() => {
     const match = menus.find(
       (m) =>
-        m.children && m.children.some((c) => location.pathname.includes(c.path))
+        m.children && m.children.some((c) => isPathActive(c.path))
     );
     if (match) {
       setOpenAccordion(match.name);
@@ -612,17 +619,18 @@ const Sidebar = () => {
     const hasChildren = !!menu.children && menu.children.length > 0;
     const isAccordionOpen = openAccordion === menu.name;
     const isActiveParent = hasChildren
-      ? menu.children!.some((c) => location.pathname.includes(c.path))
-      : location.pathname.includes(menu.path || "");
+      ? menu.children!.some((c) => isPathActive(c.path))
+      : isPathActive(menu.path);
     const showExpanded = isMobile || effectiveExpanded;
 
     if (!hasChildren) {
+      const isActive = isPathActive(menu.path);
       return (
         <PermissionGuard key={menu.path} permission={menu.permission}>
           <NavLink
             to={menu.path || "#"}
             title={!showExpanded ? menu.name : undefined}
-            className={({ isActive }) =>
+            className={() =>
               `group relative flex items-center gap-3 rounded-xl transition-all duration-150 ${
                 showExpanded ? "h-10 px-3" : "mx-auto h-10 w-10 justify-center"
               } ${
@@ -632,7 +640,7 @@ const Sidebar = () => {
               }`
             }
           >
-            {({ isActive }) => (
+            {() => (
               <>
                 <menu.icon
                   className={`h-4 w-4 shrink-0 transition-colors ${
@@ -727,11 +735,12 @@ const Sidebar = () => {
                   </PermissionGuard>
                 );
               }
+              const isActive = isPathActive(child.path);
               return (
                 <PermissionGuard key={child.path} permission={child.permission}>
                   <NavLink
                     to={child.path}
-                    className={({ isActive }) =>
+                    className={() =>
                       `flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                         isActive
                           ? "bg-[#4854CC] font-semibold text-white shadow-[0_6px_16px_rgba(0,119,182,0.22)]"
@@ -739,7 +748,7 @@ const Sidebar = () => {
                       }`
                     }
                   >
-                    {({ isActive }) => (
+                    {() => (
                       <>
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${

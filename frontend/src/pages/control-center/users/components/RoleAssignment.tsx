@@ -23,7 +23,11 @@ export const RoleAssignment: React.FC<RoleAssignmentProps> = ({
     try {
       setLoading(true);
       const res = await getRoles({ limit: 200 });
-      const items = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const raw = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const items = raw.map((r: any) => ({
+        ...r,
+        name: r.role_name || r.name || "Unnamed Role"
+      }));
       setRoles(items);
     } catch (err) {
       console.error("Failed to fetch roles", err);

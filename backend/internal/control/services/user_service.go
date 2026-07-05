@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"math"
+	"time"
 
 	"github.com/pixandco/erp-phrma/internal/company/models"
 	"github.com/pixandco/erp-phrma/internal/control/dto"
@@ -27,6 +28,61 @@ func NewUserService(repo *repositories.UserRepository, branchRepo *repositories.
 		desigRepo:    desigRepo,
 		auditService: auditService,
 	}
+}
+
+func mapUserToResponse(user *models.User, branches []models.UserBranchAccess) dto.UserResponse {
+	deptName := ""
+	if user.Department != nil {
+		deptName = user.Department.DepartmentName
+	}
+	desigName := ""
+	if user.Designation != nil {
+		desigName = user.Designation.DesignationName
+	}
+	branchName := ""
+	if user.DefaultBranch != nil {
+		branchName = user.DefaultBranch.BranchName
+	}
+
+	res := dto.UserResponse{
+		ID:                  user.ID,
+		EmployeeCode:        user.EmployeeCode,
+		Name:                user.Name,
+		FullName:            user.Name,
+		DisplayName:         user.Name,
+		Email:               user.Email,
+		Phone:               user.Phone,
+		Department:          deptName,
+		Designation:         desigName,
+		DefaultBranch:       branchName,
+		DepartmentID:        user.DepartmentID,
+		DesignationID:       user.DesignationID,
+		DefaultBranchID:     user.DefaultBranchID,
+		UserType:            user.UserType,
+		Status:              user.Status,
+		ProfileImageURL:     user.ProfileImageURL,
+		AvatarURL:           user.ProfileImageURL,
+		LoginCount:          user.LoginCount,
+		LoginEnabled:        user.LoginEnabled,
+		TwoFactorEnabled:    user.TwoFactorEnabled,
+		ForcePasswordChange: user.ForcePasswordChange,
+		AssignedBranches:    branches,
+	}
+
+	if user.LastLoginAt != nil {
+		s := user.LastLoginAt.Format(time.RFC3339)
+		res.LastLoginAt = &s
+	}
+	if !user.CreatedAt.IsZero() {
+		s := user.CreatedAt.Format(time.RFC3339)
+		res.CreatedAt = &s
+	}
+	if !user.UpdatedAt.IsZero() {
+		s := user.UpdatedAt.Format(time.RFC3339)
+		res.UpdatedAt = &s
+	}
+
+	return res
 }
 
 func (s *UserService) ListUsers(search, departmentID, designationID, status, userType string, page, limit int) ([]dto.UserResponse, *dto.Pagination, error) {
@@ -54,31 +110,7 @@ func (s *UserService) ListUsers(search, departmentID, designationID, status, use
 
 	var userResponses []dto.UserResponse
 	for _, user := range users {
-		deptName := ""
-		if user.Department != nil {
-			deptName = user.Department.DepartmentName
-		}
-		desigName := ""
-		if user.Designation != nil {
-			desigName = user.Designation.DesignationName
-		}
-		branchName := ""
-		if user.DefaultBranch != nil {
-			branchName = user.DefaultBranch.BranchName
-		}
-
-		userResponses = append(userResponses, dto.UserResponse{
-			ID:            user.ID,
-			EmployeeCode:  user.EmployeeCode,
-			Name:          user.Name,
-			Email:         user.Email,
-			Phone:         user.Phone,
-			Department:    deptName,
-			Designation:   desigName,
-			DefaultBranch: branchName,
-			UserType:      user.UserType,
-			Status:        user.Status,
-		})
+		userResponses = append(userResponses, mapUserToResponse(&user, nil))
 	}
 
 	return userResponses, pagination, nil
@@ -91,35 +123,8 @@ func (s *UserService) GetUserByID(id uint64) (*dto.UserResponse, error) {
 	}
 
 	branches, _ := s.branchRepo.FindUserBranches(id)
-
-	deptName := ""
-	if user.Department != nil {
-		deptName = user.Department.DepartmentName
-	}
-	desigName := ""
-	if user.Designation != nil {
-		desigName = user.Designation.DesignationName
-	}
-	branchName := ""
-	if user.DefaultBranch != nil {
-		branchName = user.DefaultBranch.BranchName
-	}
-
-	res := &dto.UserResponse{
-		ID:               user.ID,
-		EmployeeCode:     user.EmployeeCode,
-		Name:             user.Name,
-		Email:            user.Email,
-		Phone:            user.Phone,
-		Department:       deptName,
-		Designation:      desigName,
-		DefaultBranch:    branchName,
-		UserType:         user.UserType,
-		Status:           user.Status,
-		AssignedBranches: branches,
-	}
-
-	return res, nil
+	res := mapUserToResponse(user, branches)
+	return &res, nil
 }
 
 func (s *UserService) CreateUser(req dto.CreateUserRequest, companyID, activeUserID, activeBranchID uint64, ipAddress, userAgent string) (*dto.UserResponse, error) {
@@ -168,17 +173,21 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest, companyID, activeUse
 	}
 
 	user := &models.User{
-		CompanyID:       companyID,
-		EmployeeCode:    req.EmployeeCode,
-		Name:            req.Name,
-		Email:           req.Email,
-		Phone:           req.Phone,
-		PasswordHash:    string(hashedPassword),
-		DepartmentID:    deptID,
-		DesignationID:   desigID,
-		DefaultBranchID: defaultBranchID,
-		UserType:        req.UserType,
-		Status:          req.Status,
+		CompanyID:           companyID,
+		EmployeeCode:        req.EmployeeCode,
+		Name:                req.Name,
+		Email:               req.Email,
+		Phone:               req.Phone,
+		PasswordHash:        string(hashedPassword),
+		DepartmentID:        deptID,
+		DesignationID:       desigID,
+		DefaultBranchID:     defaultBranchID,
+		UserType:            req.UserType,
+		Status:              req.Status,
+		ProfileImageURL:     req.AvatarURL,
+		LoginEnabled:        req.LoginEnabled,
+		TwoFactorEnabled:    req.TwoFactorEnabled,
+		ForcePasswordChange: req.ForcePasswordChange,
 	}
 
 	if err := s.repo.CreateUser(user); err != nil {
@@ -227,8 +236,15 @@ func (s *UserService) UpdateUser(id uint64, req dto.UpdateUserRequest, companyID
 
 	if req.DefaultBranchID > 0 {
 		access, err := s.branchRepo.FindUserBranchAccess(id, req.DefaultBranchID)
-		if err != nil || access.Status != "active" {
-			return nil, errors.New("default branch must be assigned in user branch access first")
+		if err != nil || access == nil {
+			access = &models.UserBranchAccess{
+				UserID:    id,
+				BranchID:  req.DefaultBranchID,
+				IsDefault: true,
+				Status:    "active",
+				CreatedBy: &activeUserID,
+			}
+			_ = s.branchRepo.CreateOrUpdateUserBranchAccess(access)
 		}
 	}
 
@@ -240,6 +256,12 @@ func (s *UserService) UpdateUser(id uint64, req dto.UpdateUserRequest, companyID
 	user.Phone = req.Phone
 	user.UserType = req.UserType
 	user.Status = req.Status
+	user.LoginEnabled = req.LoginEnabled
+	user.TwoFactorEnabled = req.TwoFactorEnabled
+	user.ForcePasswordChange = req.ForcePasswordChange
+	if req.AvatarURL != "" {
+		user.ProfileImageURL = req.AvatarURL
+	}
 
 	if req.DepartmentID > 0 {
 		user.DepartmentID = &req.DepartmentID
