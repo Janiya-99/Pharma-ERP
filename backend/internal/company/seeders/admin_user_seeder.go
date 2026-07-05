@@ -10,10 +10,10 @@ import (
 // SeedAdminUser creates a default 'System Administrator' for the company if it doesn't exist,
 // assigns the user to the main branch, and gives access to all software modules.
 func SeedAdminUser(db *gorm.DB, logger *zap.Logger) error {
-	// 1. Find company by company_code = OMACX
+	// 1. Find company
 	var company models.Company
-	if err := db.Where("company_code = ?", "OMACX").First(&company).Error; err != nil {
-		logger.Warn("Company OMACX not found, attempting to create one", zap.Error(err))
+	if err := db.First(&company).Error; err != nil {
+		logger.Warn("Company not found, attempting to create default one", zap.Error(err))
 		company = models.Company{
 			CompanyCode: "OMACX",
 			CompanyName: "OMACX Pharmaceuticals",
@@ -23,7 +23,7 @@ func SeedAdminUser(db *gorm.DB, logger *zap.Logger) error {
 			logger.Error("Failed to create company, skipping admin seeder", zap.Error(createErr))
 			return nil
 		}
-		logger.Info("Created default company OMACX")
+		logger.Info("Created default company")
 	}
 
 	// 2. Find main branch where is_main_branch = true

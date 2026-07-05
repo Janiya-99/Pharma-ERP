@@ -121,9 +121,9 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bo
 		return err
 	}
 
-	// For company-specific seeders that need company ID, we can get the OMACX ID
+	// For company-specific seeders that need company ID, we can get the main company ID
 	var mainCompany models.Company
-	if err := db.Where("company_code = ?", "OMACX").First(&mainCompany).Error; err == nil {
+	if err := db.First(&mainCompany).Error; err == nil {
 		if err := inventorySeeders.SeedProductUnits(db, mainCompany.ID, logger); err != nil {
 			logger.Error("Product unit seeder failed", zap.Error(err))
 		}
@@ -137,7 +137,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bo
 			logger.Error("Warehouse seeder failed", zap.Error(err))
 		}
 	} else {
-		logger.Warn("OMACX company not found, skipping inventory structural seeders")
+		logger.Warn("Main company not found, skipping inventory structural seeders")
 	}
 
 	if err := inventorySeeders.SeedInventoryPermissions(db, logger); err != nil {
@@ -158,7 +158,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bo
 			}
 		}
 	} else {
-		logger.Warn("OMACX company not found, running invoice center permission seeder only")
+		logger.Warn("Main company not found, running invoice center permission seeder only")
 		if err := invoiceCenterSeeders.SeedInvoiceCenterPermissions(db, logger); err != nil {
 			logger.Error("Invoice Center permission seeder failed", zap.Error(err))
 			return err

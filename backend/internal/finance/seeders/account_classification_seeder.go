@@ -10,8 +10,8 @@ import (
 // SeedAccountClassifications inserts the default account classifications structure.
 func SeedAccountClassifications(db *gorm.DB, logger *zap.Logger) error {
 	var company models.Company
-	if err := db.Where("company_code = ?", "OMACX").First(&company).Error; err != nil {
-		logger.Warn("Company OMACX not found, skipping account classification seeder", zap.Error(err))
+	if err := db.First(&company).Error; err != nil {
+		logger.Warn("Main company not found, skipping account classification seeder", zap.Error(err))
 		return nil
 	}
 

@@ -16,6 +16,13 @@ func SeedSystemSettings(db *gorm.DB, companyID uint64, logger *zap.Logger) error
 
 	logger.Info("Seeding default system settings and localization for company...", zap.Uint64("company_id", companyID))
 
+	// Fetch the company to get its name
+	var company models.Company
+	if err := db.First(&company, companyID).Error; err != nil {
+		logger.Warn("Failed to find company for system settings, using default name", zap.Error(err))
+		company.CompanyName = "Company Name"
+	}
+
 	// 1. Seed Groups
 	groups := []models.SystemSettingGroup{
 		{CompanyID: companyID, GroupCode: "GENERAL", GroupName: "General Settings", Description: "Company profile and system defaults"},
@@ -66,11 +73,11 @@ func SeedSystemSettings(db *gorm.DB, companyID uint64, logger *zap.Logger) error
 		{"FISCAL", "tax.svat_enabled", true},
 		{"FISCAL", "tax.default_vat_rate", 18.0},
 		// GENERAL
-		{"GENERAL", "company.name", "OMACX Pharmaceuticals (Pvt) Ltd"},
+		{"GENERAL", "company.name", company.CompanyName},
 		{"GENERAL", "company.registration_number", "PV-1029384"},
 		{"GENERAL", "company.address", "No. 125, Galle Road, Colombo 03, Sri Lanka"},
 		{"GENERAL", "company.phone", "+94 11 234 5678"},
-		{"GENERAL", "company.email", "info@omacx.com"},
+		{"GENERAL", "company.email", "info@example.com"},
 	}
 
 	now := time.Now()

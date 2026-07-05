@@ -7,9 +7,9 @@ import (
 )
 
 func SeedUserAccessMatrix(db *gorm.DB, logger *zap.Logger) error {
-	// 1. Find admin user by email
+	// 1. Find the primary admin user
 	var admin models.User
-	if err := db.Where("email = ?", "admin@omacx.com").First(&admin).Error; err != nil {
+	if err := db.Where("user_type = ?", "super_admin").First(&admin).Error; err != nil {
 		logger.Warn("Admin user not found, skipping access matrix seeder", zap.Error(err))
 		return nil
 	}

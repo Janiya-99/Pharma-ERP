@@ -100,7 +100,7 @@ func (h *UserHandler) Update(c *gin.Context) {
 
 	var req dto.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse("Invalid request format", nil))
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse("Invalid request format: "+err.Error(), nil))
 		return
 	}
 
