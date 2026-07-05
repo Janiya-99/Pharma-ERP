@@ -32,7 +32,7 @@ const TrialBalanceReportPage = () => {
   const fetchFiltersData = async () => {
     try {
       const fyRes = await financeApi.getFinancialYears({ limit: 100 });
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data);
+      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -167,7 +167,7 @@ const TrialBalanceReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Years</SelectItem>
-              {financialYears.map((fy: unknown) => (
+              {(financialYears || []).map((fy: unknown) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -205,7 +205,7 @@ const TrialBalanceReportPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden mb-6">
             <DataTable
               columns={columns}
-              data={data.lines || []}
+              data={(data?.lines) || []}
               loading={loading}
               emptyMessage="No accounts found with activity for the selected period."
             />

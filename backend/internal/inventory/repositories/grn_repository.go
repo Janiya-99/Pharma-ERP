@@ -76,7 +76,7 @@ func (r *grnRepository) FindGRNs(db *gorm.DB, filter dto.GRNFilter) ([]dto.GRNRe
 	}
 
 	offset := (filter.Page - 1) * filter.Limit
-	if err := query.Order("created_at desc").Offset(offset).Limit(filter.Limit).Find(&grns).Error; err != nil {
+	if err := query.Preload("Supplier").Preload("Warehouse").Order("created_at desc").Offset(offset).Limit(filter.Limit).Find(&grns).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -89,6 +89,10 @@ func (r *grnRepository) FindGRNs(db *gorm.DB, filter dto.GRNFilter) ([]dto.GRNRe
 			BranchID:              grn.BranchID,
 			SupplierID:            grn.SupplierID,
 			WarehouseID:           grn.WarehouseID,
+			SupplierName:          grn.Supplier.SupplierName,
+			WarehouseName:         grn.Warehouse.WarehouseName,
+			Supplier:              &grn.Supplier,
+			Warehouse:             &grn.Warehouse,
 			SupplierInvoiceNumber: grn.SupplierInvoiceNumber,
 			TotalQuantity:         grn.TotalQuantity,
 			TotalFreeQuantity:     grn.TotalFreeQuantity,

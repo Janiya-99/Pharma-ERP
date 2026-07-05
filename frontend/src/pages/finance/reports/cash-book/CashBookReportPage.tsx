@@ -34,7 +34,7 @@ const CashBookReportPage = () => {
   const fetchFiltersData = async () => {
     try {
       const accRes = await financeApi.getChartOfAccounts({ limit: 500, status: 'active', is_cash_account: true });
-      if (accRes.data?.success) setCashAccounts(accRes.data.data);
+      if (accRes.data?.success) setCashAccounts(accRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -168,7 +168,7 @@ const CashBookReportPage = () => {
               <SelectValue placeholder="Select Cash Account" />
             </SelectTrigger>
             <SelectContent>
-              {cashAccounts.map((acc: unknown) => (
+              {(cashAccounts || []).map((acc: unknown) => (
                 <SelectItem key={acc.id} value={acc.id.toString()}>{acc.account_code} - {acc.account_name}</SelectItem>
               ))}
             </SelectContent>
@@ -213,7 +213,7 @@ const CashBookReportPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700">
             <DataTable
               columns={columns}
-              data={data.lines || []}
+              data={(data?.lines) || []}
               loading={loading}
               emptyMessage="No cash transactions found for the selected period."
             />

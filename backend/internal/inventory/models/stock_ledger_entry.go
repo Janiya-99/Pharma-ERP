@@ -26,4 +26,9 @@ type StockLedgerEntry struct {
 	Remarks             string    `gorm:"type:text" json:"remarks"`
 	CreatedBy           *uint64   `json:"created_by"`
 	CreatedAt           time.Time `json:"created_at"`
+
+	Product           *Product           `gorm:"foreignKey:ProductID" json:"product"`
+	ProductBatch      *ProductBatch      `gorm:"foreignKey:ProductBatchID" json:"product_batch"`
+	Warehouse         *Warehouse         `gorm:"foreignKey:WarehouseID" json:"warehouse"`
+	WarehouseLocation *WarehouseLocation `gorm:"foreignKey:WarehouseLocationID" json:"warehouse_location"`
 }

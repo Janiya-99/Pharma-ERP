@@ -159,7 +159,7 @@ const DayBookReportPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden mb-6">
             {data.days && data.days.length > 0 ? (
               <div className="divide-y divide-gray-200 dark:divide-navy-700">
-                {data.days.map((day: unknown, idx: unknown) => (
+                {(data.days || []).map((day: unknown, idx: unknown) => (
                   <div key={idx} className="p-0">
                     <div className="bg-gray-50 dark:bg-navy-900 px-6 py-3 border-b border-gray-200 dark:border-navy-700">
                       <h3 className="font-bold text-navy-800 dark:text-white">
@@ -181,7 +181,7 @@ const DayBookReportPage = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-navy-700/50">
-                          {day.lines.map((line: unknown, lidx: unknown) => (
+                          {(day.lines || []).map((line: unknown, lidx: unknown) => (
                             <tr key={lidx} className="hover:bg-gray-50 dark:hover:bg-navy-900/50">
                               <td className="px-6 py-3 whitespace-nowrap"><SourceTypeBadge type={line.source_type} /></td>
                               <td className="px-6 py-3 whitespace-nowrap font-medium">{line.source_number}</td>

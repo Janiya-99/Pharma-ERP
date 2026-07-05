@@ -41,8 +41,8 @@ const JournalRegisterReportPage = () => {
         financeApi.getFinancialYears({ limit: 100 }),
         financeApi.getAccountingPeriods({ limit: 100 })
       ]);
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data);
-      if (apRes.data?.success) setAccountingPeriods(apRes.data.data);
+      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
+      if (apRes.data?.success) setAccountingPeriods(apRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -186,7 +186,7 @@ const JournalRegisterReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Years</SelectItem>
-              {financialYears.map((fy: unknown) => (
+              {(financialYears || []).map((fy: unknown) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -204,7 +204,7 @@ const JournalRegisterReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Periods</SelectItem>
-              {accountingPeriods.map((ap: unknown) => (
+              {(accountingPeriods || []).map((ap: unknown) => (
                 <SelectItem key={ap.id} value={ap.id.toString()}>{ap.period_name}</SelectItem>
               ))}
             </SelectContent>
@@ -285,7 +285,7 @@ const JournalRegisterReportPage = () => {
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden">
             <DataTable
               columns={columns}
-              data={data.lines || []}
+              data={(data?.lines) || []}
               loading={loading}
               emptyMessage="No journal entries found."
               pagination={{ page: 1, limit: data.lines?.length || 10, total: data.lines?.length || 0 }}

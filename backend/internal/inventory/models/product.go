@@ -36,4 +36,10 @@ type Product struct {
 	CreatedAt                time.Time      `json:"created_at"`
 	UpdatedAt                time.Time      `json:"updated_at"`
 	DeletedAt                gorm.DeletedAt `gorm:"index" json:"-"`
+
+	ProductCategory *ProductCategory `gorm:"foreignKey:ProductCategoryID" json:"product_category"`
+	GenericName     *GenericName     `gorm:"foreignKey:GenericNameID" json:"generic_name"`
+	DosageForm      *DosageForm      `gorm:"foreignKey:DosageFormID" json:"dosage_form"`
+	Manufacturer    *Manufacturer    `gorm:"foreignKey:ManufacturerID" json:"manufacturer"`
+	BaseUnit        *ProductUnit     `gorm:"foreignKey:BaseUnitID" json:"base_unit"`
 }

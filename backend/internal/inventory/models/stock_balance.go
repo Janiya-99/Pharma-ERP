@@ -20,4 +20,9 @@ type StockBalance struct {
 	LastMovementDate    *time.Time `json:"last_movement_date"`
 	CreatedAt           time.Time  `json:"created_at"`
 	UpdatedAt           time.Time  `json:"updated_at"`
+
+	Product           *Product           `gorm:"foreignKey:ProductID" json:"product"`
+	ProductBatch      *ProductBatch      `gorm:"foreignKey:ProductBatchID" json:"product_batch"`
+	Warehouse         *Warehouse         `gorm:"foreignKey:WarehouseID" json:"warehouse"`
+	WarehouseLocation *WarehouseLocation `gorm:"foreignKey:WarehouseLocationID" json:"warehouse_location"`
 }

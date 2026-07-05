@@ -45,19 +45,19 @@ func (r *ProductBatchRepository) List(db *gorm.DB, companyID uint64, filters map
 
 	var batches []models.ProductBatch
 	offset := (page - 1) * limit
-	err := query.Offset(offset).Limit(limit).Find(&batches).Error
+	err := query.Preload("Product.BaseUnit").Preload("Product").Preload("Supplier").Preload("Manufacturer").Offset(offset).Limit(limit).Find(&batches).Error
 	return batches, total, err
 }
 
 func (r *ProductBatchRepository) GetByID(db *gorm.DB, companyID, id uint64) (*models.ProductBatch, error) {
 	var batch models.ProductBatch
-	err := db.Where("company_id = ? AND id = ?", companyID, id).First(&batch).Error
+	err := db.Preload("Product.BaseUnit").Preload("Product").Preload("Supplier").Preload("Manufacturer").Where("company_id = ? AND id = ?", companyID, id).First(&batch).Error
 	return &batch, err
 }
 
 func (r *ProductBatchRepository) GetByNumber(db *gorm.DB, companyID, productID uint64, batchNumber string) (*models.ProductBatch, error) {
 	var batch models.ProductBatch
-	err := db.Where("company_id = ? AND product_id = ? AND batch_number = ?", companyID, productID, batchNumber).First(&batch).Error
+	err := db.Preload("Product.BaseUnit").Preload("Product").Preload("Supplier").Preload("Manufacturer").Where("company_id = ? AND product_id = ? AND batch_number = ?", companyID, productID, batchNumber).First(&batch).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}

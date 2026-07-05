@@ -1,6 +1,10 @@
 package dto
 
-import "time"
+import (
+	"time"
+
+	"github.com/pixandco/erp-phrma/internal/inventory/models"
+)
 
 type GRNLinePayload struct {
 	WarehouseLocationID *uint64 `json:"warehouse_location_id"`
@@ -84,19 +88,23 @@ type GRNFilter struct {
 }
 
 type GRNResponse struct {
-	ID                    uint64    `json:"id"`
-	GRNNumber             string    `json:"grn_number"`
-	GRNDate               time.Time `json:"grn_date"`
-	BranchID              uint64    `json:"branch_id"`
-	SupplierID            uint64    `json:"supplier_id"`
-	WarehouseID           uint64    `json:"warehouse_id"`
-	SupplierInvoiceNumber string    `json:"supplier_invoice_number"`
-	TotalQuantity         float64   `json:"total_quantity"`
-	TotalFreeQuantity     float64   `json:"total_free_quantity"`
-	TotalStockQuantity    float64   `json:"total_stock_quantity"`
-	TotalAmount           float64   `json:"total_amount"`
-	ApprovalStatus        string    `json:"approval_status"`
-	PostedStatus          string    `json:"posted_status"`
-	CreatedBy             uint64    `json:"created_by"`
-	CreatedAt             time.Time `json:"created_at"`
+	ID                    uint64            `json:"id"`
+	GRNNumber             string            `json:"grn_number"`
+	GRNDate               time.Time         `json:"grn_date"`
+	BranchID              uint64            `json:"branch_id"`
+	SupplierID            uint64            `json:"supplier_id"`
+	WarehouseID           uint64            `json:"warehouse_id"`
+	SupplierName          string            `json:"supplier_name"`
+	WarehouseName         string            `json:"warehouse_name"`
+	Supplier              *models.Supplier  `json:"supplier,omitempty"`
+	Warehouse             *models.Warehouse `json:"warehouse,omitempty"`
+	SupplierInvoiceNumber string            `json:"supplier_invoice_number"`
+	TotalQuantity         float64           `json:"total_quantity"`
+	TotalFreeQuantity     float64           `json:"total_free_quantity"`
+	TotalStockQuantity    float64           `json:"total_stock_quantity"`
+	TotalAmount           float64           `json:"total_amount"`
+	ApprovalStatus        string            `json:"approval_status"`
+	PostedStatus          string            `json:"posted_status"`
+	CreatedBy             uint64            `json:"created_by"`
+	CreatedAt             time.Time         `json:"created_at"`
 }

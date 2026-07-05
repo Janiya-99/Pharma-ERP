@@ -39,8 +39,8 @@ const BankBookReportPage = () => {
         financeApi.getBankAccounts({ limit: 100 }),
         financeApi.getChartOfAccounts({ limit: 500, status: 'active', is_bank_account: true })
       ]);
-      if (bankRes.data?.success) setBankAccounts(bankRes.data.data);
-      if (chartRes.data?.success) setChartAccounts(chartRes.data.data);
+      if (bankRes.data?.success) setBankAccounts(bankRes.data.data || []);
+      if (chartRes.data?.success) setChartAccounts(chartRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -183,7 +183,7 @@ const BankBookReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Select Bank Account</SelectItem>
-              {bankAccounts.map((acc: unknown) => (
+              {(bankAccounts || []).map((acc: unknown) => (
                 <SelectItem key={acc.id} value={acc.id.toString()}>{acc.bank_name} - {acc.account_number}</SelectItem>
               ))}
             </SelectContent>
@@ -204,7 +204,7 @@ const BankBookReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Select Chart Account</SelectItem>
-              {chartAccounts.map((acc: unknown) => (
+              {(chartAccounts || []).map((acc: unknown) => (
                 <SelectItem key={acc.id} value={acc.id.toString()}>{acc.account_code} - {acc.account_name}</SelectItem>
               ))}
             </SelectContent>

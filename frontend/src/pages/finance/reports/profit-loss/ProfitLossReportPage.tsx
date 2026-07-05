@@ -32,7 +32,7 @@ const ProfitLossReportPage = () => {
   const fetchFiltersData = async () => {
     try {
       const fyRes = await financeApi.getFinancialYears({ limit: 100 });
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data);
+      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -147,7 +147,7 @@ const ProfitLossReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Years</SelectItem>
-              {financialYears.map((fy: unknown) => (
+              {(financialYears || []).map((fy: unknown) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>

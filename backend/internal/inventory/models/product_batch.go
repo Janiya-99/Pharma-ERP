@@ -26,4 +26,8 @@ type ProductBatch struct {
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
+
+	Product      *Product      `gorm:"foreignKey:ProductID" json:"product"`
+	Supplier     *Supplier     `gorm:"foreignKey:SupplierID" json:"supplier"`
+	Manufacturer *Manufacturer `gorm:"foreignKey:ManufacturerID" json:"manufacturer"`
 }

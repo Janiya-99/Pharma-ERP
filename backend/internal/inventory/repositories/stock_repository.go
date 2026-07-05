@@ -33,7 +33,7 @@ func (r *StockRepository) ListBalances(db *gorm.DB, companyID uint64, filters ma
 
 	var balances []models.StockBalance
 	offset := (page - 1) * limit
-	err := query.Offset(offset).Limit(limit).Find(&balances).Error
+	err := query.Preload("Product.BaseUnit").Preload("Product").Preload("ProductBatch").Preload("Warehouse").Preload("WarehouseLocation").Offset(offset).Limit(limit).Find(&balances).Error
 	return balances, total, err
 }
 
@@ -57,7 +57,7 @@ func (r *StockRepository) ListLedgerEntries(db *gorm.DB, companyID uint64, filte
 
 	var entries []models.StockLedgerEntry
 	offset := (page - 1) * limit
-	err := query.Offset(offset).Limit(limit).Order("stock_ledger_entries.id desc").Find(&entries).Error
+	err := query.Preload("Product.BaseUnit").Preload("Product").Preload("ProductBatch").Preload("Warehouse").Preload("WarehouseLocation").Offset(offset).Limit(limit).Order("stock_ledger_entries.id desc").Find(&entries).Error
 	return entries, total, err
 }
 

@@ -37,19 +37,19 @@ func (r *ProductRepository) List(db *gorm.DB, companyID uint64, filters map[stri
 
 	var products []models.Product
 	offset := (page - 1) * limit
-	err := query.Offset(offset).Limit(limit).Find(&products).Error
+	err := query.Preload("ProductCategory").Preload("GenericName").Preload("DosageForm").Preload("Manufacturer").Preload("BaseUnit").Offset(offset).Limit(limit).Find(&products).Error
 	return products, total, err
 }
 
 func (r *ProductRepository) GetByID(db *gorm.DB, companyID, id uint64) (*models.Product, error) {
 	var product models.Product
-	err := db.Where("company_id = ? AND id = ?", companyID, id).First(&product).Error
+	err := db.Preload("ProductCategory").Preload("GenericName").Preload("DosageForm").Preload("Manufacturer").Preload("BaseUnit").Where("company_id = ? AND id = ?", companyID, id).First(&product).Error
 	return &product, err
 }
 
 func (r *ProductRepository) GetByCode(db *gorm.DB, companyID uint64, code string) (*models.Product, error) {
 	var product models.Product
-	err := db.Where("company_id = ? AND product_code = ?", companyID, code).First(&product).Error
+	err := db.Preload("ProductCategory").Preload("GenericName").Preload("DosageForm").Preload("Manufacturer").Preload("BaseUnit").Where("company_id = ? AND product_code = ?", companyID, code).First(&product).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}

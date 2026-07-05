@@ -68,7 +68,7 @@ func (r *openingStockRepository) FindOpeningStockEntries(db *gorm.DB, filter dto
 	}
 
 	offset := (filter.Page - 1) * filter.Limit
-	err = query.Order("created_at desc").Offset(offset).Limit(filter.Limit).Find(&entries).Error
+	err = query.Preload("Warehouse").Order("created_at desc").Offset(offset).Limit(filter.Limit).Find(&entries).Error
 
 	return entries, total, err
 }

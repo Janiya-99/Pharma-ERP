@@ -42,9 +42,9 @@ const AccountLedgerReportPage = () => {
         financeApi.getAccountingPeriods({ limit: 100 }),
         financeApi.getChartOfAccounts({ limit: 500, status: 'active' })
       ]);
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data);
-      if (apRes.data?.success) setAccountingPeriods(apRes.data.data);
-      if (accRes.data?.success) setAccounts(accRes.data.data);
+      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
+      if (apRes.data?.success) setAccountingPeriods(apRes.data.data || []);
+      if (accRes.data?.success) setAccounts(accRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -184,7 +184,7 @@ const AccountLedgerReportPage = () => {
               <SelectValue placeholder="Select Account" />
             </SelectTrigger>
             <SelectContent>
-              {accounts.map((acc: unknown) => (
+              {(accounts || []).map((acc: unknown) => (
                 <SelectItem key={acc.id} value={acc.id.toString()}>{acc.account_code} - {acc.account_name}</SelectItem>
               ))}
             </SelectContent>
@@ -202,7 +202,7 @@ const AccountLedgerReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Years</SelectItem>
-              {financialYears.map((fy: unknown) => (
+              {(financialYears || []).map((fy: unknown) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -220,7 +220,7 @@ const AccountLedgerReportPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Periods</SelectItem>
-              {accountingPeriods.map((ap: unknown) => (
+              {(accountingPeriods || []).map((ap: unknown) => (
                 <SelectItem key={ap.id} value={ap.id.toString()}>{ap.period_name}</SelectItem>
               ))}
             </SelectContent>
