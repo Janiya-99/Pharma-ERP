@@ -1,6 +1,10 @@
 import apiClient from "./apiClient";
 
 export const financeApi = {
+  // Dashboard
+  getDashboardData: (params?: Record<string, unknown>) =>
+    apiClient.get("/finance/dashboard", { params }),
+
   // Financial Years
   getFinancialYears: (params: Record<string, unknown>) =>
     apiClient.get("/finance/financial-years", { params }),

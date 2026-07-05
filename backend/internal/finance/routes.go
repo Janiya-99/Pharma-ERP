@@ -23,6 +23,13 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	// Routes
 	finance := r.Group("")
 
+	// Dashboard
+	dashboardHandler := handlers.NewDashboardHandler(logger)
+	dashboard := finance.Group("/dashboard")
+	{
+		dashboard.GET("", middleware.RequirePermission("finance.dashboard.view"), dashboardHandler.GetDashboardData)
+	}
+
 	// Financial Years
 	fy := finance.Group("/financial-years")
 	{
