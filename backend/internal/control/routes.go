@@ -17,6 +17,10 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	userOrgHandler := handlers.NewUserOrganizationHandler(logger)
 	desigMappingHandler := handlers.NewDesignationMappingHandler(logger)
 	accessPreviewHandler := handlers.NewUserAccessPreviewHandler(logger)
+	settingsHandler := handlers.NewSettingsHandler(logger)
+	workflowHandler := handlers.NewApprovalWorkflowHandler(logger)
+	docNumHandler := handlers.NewDocumentNumberingHandler(logger)
+	secSettingsHandler := handlers.NewSecuritySettingsHandler(logger)
 
 	// --- Company Profile ---
 	router.GET("/company", middleware.RequirePermission("control.company.view"), companyHandler.GetCompanyProfile)
@@ -114,4 +118,46 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	}
 
 	router.GET("/software-modules/:software_id/roles", middleware.RequirePermission("control.role.view"), roleHandler.GetAvailableRolesForSoftware)
+
+	// --- System Settings & Configuration (Step 71) ---
+	router.GET("/settings/groups", middleware.RequirePermission("control.settings.view"), settingsHandler.ListGroups)
+	router.GET("/settings", middleware.RequirePermission("control.settings.view"), settingsHandler.ListSettings)
+	router.POST("/settings", middleware.RequirePermission("control.settings.update"), settingsHandler.SaveSetting)
+	router.POST("/settings/publish", middleware.RequirePermission("control.settings.publish"), settingsHandler.PublishSetting)
+	router.POST("/settings/branch-override", middleware.RequirePermission("control.settings.update"), settingsHandler.SaveBranchOverride)
+	router.POST("/settings/impact-preview", middleware.RequirePermission("control.settings.view"), settingsHandler.GetImpactPreview)
+
+	// --- Approval Workflows ---
+	router.GET("/approval-workflows", middleware.RequirePermission("control.approval_workflow.view"), workflowHandler.ListWorkflows)
+	router.GET("/approval-workflows/:id", middleware.RequirePermission("control.approval_workflow.view"), workflowHandler.GetWorkflow)
+	router.POST("/approval-workflows", middleware.RequirePermission("control.approval_workflow.create"), workflowHandler.SaveWorkflow)
+	router.POST("/approval-workflows/:id/publish", middleware.RequirePermission("control.approval_workflow.publish"), workflowHandler.PublishWorkflow)
+	router.DELETE("/approval-workflows/:id", middleware.RequirePermission("control.approval_workflow.delete"), workflowHandler.DeleteWorkflow)
+	router.GET("/approval-workflows/:id/versions", middleware.RequirePermission("control.approval_workflow.view"), workflowHandler.ListVersions)
+
+	// --- Document Numbering ---
+	router.GET("/document-numbering", middleware.RequirePermission("control.document_numbering.view"), docNumHandler.ListRules)
+	router.POST("/document-numbering", middleware.RequirePermission("control.document_numbering.update"), docNumHandler.SaveRule)
+	router.POST("/document-numbering/:id/publish", middleware.RequirePermission("control.document_numbering.publish"), docNumHandler.PublishRule)
+	router.DELETE("/document-numbering/:id", middleware.RequirePermission("control.document_numbering.update"), docNumHandler.DeleteRule)
+	router.POST("/document-numbering/preview", middleware.RequirePermission("control.document_numbering.view"), docNumHandler.PreviewNumber)
+
+	// --- Security Settings & Backups ---
+	router.GET("/security/policy", middleware.RequirePermission("control.security_settings.view"), secSettingsHandler.GetPolicy)
+	router.POST("/security/policy", middleware.RequirePermission("control.security_settings.update"), secSettingsHandler.SavePolicy)
+	router.POST("/security/policy/publish", middleware.RequirePermission("control.security_settings.publish"), secSettingsHandler.PublishPolicy)
+
+	router.GET("/security/trusted-ips", middleware.RequirePermission("control.security_settings.view"), secSettingsHandler.ListTrustedIPRules)
+	router.POST("/security/trusted-ips", middleware.RequirePermission("control.security_settings.update"), secSettingsHandler.SaveTrustedIPRule)
+	router.DELETE("/security/trusted-ips/:id", middleware.RequirePermission("control.security_settings.update"), secSettingsHandler.DeleteTrustedIPRule)
+
+	router.GET("/security/backups/policies", middleware.RequirePermission("control.security_settings.view"), secSettingsHandler.ListBackupPolicies)
+	router.POST("/security/backups/policies", middleware.RequirePermission("control.security_settings.update"), secSettingsHandler.SaveBackupPolicy)
+	router.GET("/security/backups/logs", middleware.RequirePermission("control.security_settings.view"), secSettingsHandler.ListBackupLogs)
+	router.POST("/security/backups/trigger", middleware.RequirePermission("control.security_settings.update"), secSettingsHandler.TriggerManualBackup)
+
+	router.GET("/security/sessions", middleware.RequirePermission("control.security_sessions.manage"), secSettingsHandler.ListActiveSessions)
+	router.DELETE("/security/sessions/:id", middleware.RequirePermission("control.security_sessions.manage"), secSettingsHandler.TerminateSession)
+	router.DELETE("/security/sessions/terminate-all", middleware.RequirePermission("control.security_sessions.manage"), secSettingsHandler.TerminateAllSessions)
 }
+

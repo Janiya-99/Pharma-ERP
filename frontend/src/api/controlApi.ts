@@ -386,3 +386,161 @@ export const getLoginLogs = async (params: Record<string, unknown>) => {
   const res = await apiClient.get("/control/login-logs", { params });
   return res.data;
 };
+
+// --- System Settings & Configuration (Step 71) ---
+export const getSettingsGroups = async () => {
+  const res = await apiClient.get("/control/settings/groups");
+  return res.data;
+};
+
+export const getSettings = async (params?: Record<string, unknown>) => {
+  const res = await apiClient.get("/control/settings", { params });
+  return res.data;
+};
+
+export const saveSetting = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/settings", payload);
+  return res.data;
+};
+
+export const publishSetting = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/settings/publish", payload);
+  return res.data;
+};
+
+export const saveBranchOverride = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/settings/branch-override", payload);
+  return res.data;
+};
+
+export const getSettingsImpactPreview = async (settingKey: string, proposedValue: unknown) => {
+  const res = await apiClient.post(
+    `/control/settings/impact-preview?setting_key=${encodeURIComponent(settingKey)}`,
+    { proposed_value: proposedValue, setting_key: settingKey }
+  );
+  return res.data;
+};
+
+// --- Approval Workflows ---
+export const getApprovalWorkflows = async (params?: Record<string, unknown>) => {
+  const res = await apiClient.get("/control/approval-workflows", { params });
+  return res.data;
+};
+
+export const getApprovalWorkflowById = async (id: string | number) => {
+  const res = await apiClient.get(`/control/approval-workflows/${id}`);
+  return res.data;
+};
+
+export const saveApprovalWorkflow = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/approval-workflows", payload);
+  return res.data;
+};
+
+export const publishApprovalWorkflow = async (id: string | number) => {
+  const res = await apiClient.post(`/control/approval-workflows/${id}/publish`);
+  return res.data;
+};
+
+export const deleteApprovalWorkflow = async (id: string | number) => {
+  const res = await apiClient.delete(`/control/approval-workflows/${id}`);
+  return res.data;
+};
+
+export const getApprovalWorkflowVersions = async (id: string | number) => {
+  const res = await apiClient.get(`/control/approval-workflows/${id}/versions`);
+  return res.data;
+};
+
+// --- Document Numbering ---
+export const getDocumentNumberingRules = async (params?: Record<string, unknown>) => {
+  const res = await apiClient.get("/control/document-numbering", { params });
+  return res.data;
+};
+
+export const saveDocumentNumberingRule = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/document-numbering", payload);
+  return res.data;
+};
+
+export const publishDocumentNumberingRule = async (id: string | number) => {
+  const res = await apiClient.post(`/control/document-numbering/${id}/publish`);
+  return res.data;
+};
+
+export const deleteDocumentNumberingRule = async (id: string | number) => {
+  const res = await apiClient.delete(`/control/document-numbering/${id}`);
+  return res.data;
+};
+
+export const previewDocumentNumber = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/document-numbering/preview", payload);
+  return res.data;
+};
+
+// --- Security Settings & Backups ---
+export const getSecurityPolicy = async (params?: Record<string, unknown>) => {
+  const res = await apiClient.get("/control/security/policy", { params });
+  return res.data;
+};
+
+export const saveSecurityPolicy = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/security/policy", payload);
+  return res.data;
+};
+
+export const publishSecurityPolicy = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/security/policy/publish", payload);
+  return res.data;
+};
+
+export const getTrustedIPRules = async () => {
+  const res = await apiClient.get("/control/security/trusted-ips");
+  return res.data;
+};
+
+export const saveTrustedIPRule = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/security/trusted-ips", payload);
+  return res.data;
+};
+
+export const deleteTrustedIPRule = async (id: string | number) => {
+  const res = await apiClient.delete(`/control/security/trusted-ips/${id}`);
+  return res.data;
+};
+
+export const getBackupPolicies = async () => {
+  const res = await apiClient.get("/control/security/backups/policies");
+  return res.data;
+};
+
+export const saveBackupPolicy = async (payload: Record<string, unknown>) => {
+  const res = await apiClient.post("/control/security/backups/policies", payload);
+  return res.data;
+};
+
+export const getBackupLogs = async (params?: Record<string, unknown>) => {
+  const res = await apiClient.get("/control/security/backups/logs", { params });
+  return res.data;
+};
+
+export const triggerManualBackup = async () => {
+  const res = await apiClient.post("/control/security/backups/trigger");
+  return res.data;
+};
+
+export const getActiveSessions = async () => {
+  const res = await apiClient.get("/control/security/sessions");
+  return res.data;
+};
+
+export const terminateSession = async (id: string | number) => {
+  const res = await apiClient.delete(`/control/security/sessions/${id}`);
+  return res.data;
+};
+
+export const terminateAllOtherSessions = async () => {
+  const res = await apiClient.delete("/control/security/sessions/terminate-all");
+  return res.data;
+};
+

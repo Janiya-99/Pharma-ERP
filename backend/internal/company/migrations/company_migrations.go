@@ -45,8 +45,26 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bo
 		&models.UserBranchSoftwareRole{},
 		&models.AuditLog{},
 		&models.UserOrganizationAssignment{},
-		&models.DesignationDepartment{},
-		&models.DesignationDefaultRole{},
+		&models.SystemSettingGroup{},
+		&models.SystemSetting{},
+		&models.SystemSettingVersion{},
+		&models.BranchSettingOverride{},
+		&models.ApprovalWorkflow{},
+		&models.ApprovalWorkflowVersion{},
+		&models.ApprovalWorkflowStage{},
+		&models.ApprovalWorkflowStageApprover{},
+		&models.ApprovalWorkflowEscalation{},
+		&models.ApprovalWorkflowInstance{},
+		&models.ApprovalWorkflowInstanceLog{},
+		&models.DocumentNumberingRule{},
+		&models.DocumentNumberSequence{},
+		&models.NotificationRule{},
+		&models.NotificationRecipient{},
+		&models.NotificationLog{},
+		&models.SecurityPolicy{},
+		&models.TrustedIPRule{},
+		&models.BackupPolicy{},
+		&models.BackupExecutionLog{},
 	)
 	if err != nil {
 		logger.Error("Company AutoMigrate failed", zap.Error(err))
@@ -140,6 +158,25 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bo
 		if err := invoiceCenterSeeders.SeedInvoiceCenterPermissions(db, logger); err != nil {
 			logger.Error("Invoice Center permission seeder failed", zap.Error(err))
 			return err
+		}
+	}
+
+	if mainCompany.ID != 0 {
+		logger.Info("Running Step 71 configuration seeders...")
+		if err := seeders.SeedSystemSettings(db, mainCompany.ID, logger); err != nil {
+			logger.Error("System settings seeder failed", zap.Error(err))
+		}
+		if err := seeders.SeedDocumentNumberingRules(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Document numbering seeder failed", zap.Error(err))
+		}
+		if err := seeders.SeedApprovalWorkflows(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Approval workflow seeder failed", zap.Error(err))
+		}
+		if err := seeders.SeedSecurityPolicies(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Security policy seeder failed", zap.Error(err))
+		}
+		if err := seeders.SeedBackupPolicies(db, mainCompany.ID, logger); err != nil {
+			logger.Error("Backup policy seeder failed", zap.Error(err))
 		}
 	}
 

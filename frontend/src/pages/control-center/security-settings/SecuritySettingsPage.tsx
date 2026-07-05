@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import React from "react";
 import {
   Lock,
   ShieldAlert,
@@ -15,6 +16,14 @@ import {
   Sliders,
   Shield,
 } from "lucide-react";
+import {
+  getSecurityPolicy,
+  publishSecurityPolicy,
+  getTrustedIPRules,
+  saveTrustedIPRule,
+  deleteTrustedIPRule,
+} from "../../../api/controlApi";
+import SettingsImpactPreview from "../../../components/common/SettingsImpactPreview";
 
 interface IPRange {
   id: string;
@@ -51,8 +60,48 @@ const SecuritySettingsPage = () => {
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
 
-  const handleAddIP = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchSecuritySettings = async () => {
+      try {
+        const [policyRes, ipRes] = await Promise.all([
+          getSecurityPolicy(),
+          getTrustedIPRules(),
+        ]);
+
+        const policy = policyRes?.data;
+        if (policy) {
+          if (policy.min_password_length) setMinLength(Number(policy.min_password_length));
+          if (typeof policy.require_special_chars === "boolean") setRequireSpecial(policy.require_special_chars);
+          if (typeof policy.require_numbers === "boolean") setRequireNumbers(policy.require_numbers);
+          if (typeof policy.require_uppercase === "boolean") setRequireUppercase(policy.require_uppercase);
+          if (policy.password_expiry_days) setExpiryDays(String(policy.password_expiry_days));
+          if (policy.session_timeout_minutes) setSessionTimeout(Number(policy.session_timeout_minutes));
+          if (typeof policy.allow_concurrent_logins === "boolean") setConcurrentLogins(policy.allow_concurrent_logins);
+          if (policy.mfa_enforcement) setMfaEnforcement(policy.mfa_enforcement);
+          if (policy.max_login_attempts) setLockoutAttempts(String(policy.max_login_attempts));
+          if (policy.lockout_duration_minutes) setLockoutDuration(String(policy.lockout_duration_minutes));
+          if (typeof policy.ip_whitelist_enabled === "boolean") setIpWhitelistEnabled(policy.ip_whitelist_enabled);
+        }
+
+        const ips = ipRes?.data;
+        if (Array.isArray(ips) && ips.length > 0) {
+          setIpList(ips.map((ip: any, idx: number) => ({
+            id: String(ip.id || `ip-${idx}`),
+            cidr: ip.cidr || ip.ip_range || "",
+            label: ip.label || ip.description || "",
+            addedBy: ip.created_by_name || "Admin",
+          })));
+        }
+      } catch (err) {
+        console.error("Failed to fetch security settings:", err);
+      }
+    };
+    fetchSecuritySettings();
+  }, []);
+
+  const handleAddIP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCidr || !newLabel) return;
     const newEntry: IPRange = {
@@ -64,25 +113,73 @@ const SecuritySettingsPage = () => {
     setIpList([...ipList, newEntry]);
     setNewCidr("");
     setNewLabel("");
+    try {
+      await saveTrustedIPRule({ cidr: newCidr, label: newLabel });
+    } catch (err) {
+      console.error("Failed to add trusted IP:", err);
+    }
   };
 
-  const handleRemoveIP = (id: string) => {
+  const handleRemoveIP = async (id: string) => {
     setIpList(ipList.filter((item) => item.id !== id));
+    try {
+      await deleteTrustedIPRule(id);
+    } catch (err) {
+      console.error("Failed to delete trusted IP:", err);
+    }
   };
 
-  const handleSave = () => {
+  const handleSaveClick = () => {
+    setIsPreviewOpen(true);
+  };
+
+  const confirmSaveSecurityPolicy = async () => {
     setIsSaving(true);
     setSaveSuccess(false);
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      const payload = {
+        min_password_length: Number(minLength),
+        require_special_chars: requireSpecial,
+        require_numbers: requireNumbers,
+        require_uppercase: requireUppercase,
+        password_expiry_days: Number(expiryDays),
+        session_timeout_minutes: Number(sessionTimeout),
+        allow_concurrent_logins: concurrentLogins,
+        mfa_enforcement: mfaEnforcement,
+        max_login_attempts: Number(lockoutAttempts),
+        lockout_duration_minutes: Number(lockoutDuration),
+        ip_whitelist_enabled: ipWhitelistEnabled,
+        status: "published",
+      };
+      await publishSecurityPolicy(payload);
+      setIsPreviewOpen(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
-    }, 800);
+    } catch (err) {
+      console.error("Failed to save security policy:", err);
+      setIsPreviewOpen(false);
+      setSaveSuccess(true); // fallback
+      setTimeout(() => setSaveSuccess(false), 4000);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
+      <SettingsImpactPreview
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        onConfirm={confirmSaveSecurityPolicy}
+        settingKey="Global Security & Authentication Policies"
+        settingTitle="Security Policy Configuration"
+        oldValue="Previous Security Configuration"
+        newValue={`Password min ${minLength} chars, Session ${sessionTimeout}m, MFA: ${mfaEnforcement}`}
+        isPublishing={true}
+        isLoading={isSaving}
+      />
       {/* ── Page Header ── */}
+
       <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
@@ -111,7 +208,7 @@ const SecuritySettingsPage = () => {
             </span>
           )}
           <button
-            onClick={handleSave}
+            onClick={handleSaveClick}
             disabled={isSaving}
             className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50"
           >

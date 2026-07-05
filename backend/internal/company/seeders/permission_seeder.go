@@ -62,6 +62,42 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"CONTROL_CENTER", "Audit Logs", "control.audit.view", "View Audit Logs"},
 		{"CONTROL_CENTER", "Login Logs", "control.login_logs.view", "View Login Logs"},
 
+		// SYSTEM SETTINGS & APPROVAL WORKFLOWS (STEP 71)
+		{"CONTROL_CENTER", "Approval Workflows", "control_center.approval_workflow.view", "View Approval Workflows"},
+		{"CONTROL_CENTER", "Approval Workflows", "control_center.approval_workflow.create", "Create Approval Workflows"},
+		{"CONTROL_CENTER", "Approval Workflows", "control_center.approval_workflow.update", "Update Approval Workflows"},
+		{"CONTROL_CENTER", "Approval Workflows", "control_center.approval_workflow.publish", "Publish Approval Workflows"},
+		{"CONTROL_CENTER", "Approval Workflows", "control_center.approval_workflow.delete", "Delete Approval Workflows"},
+		{"CONTROL_CENTER", "Approval Workflows", "control.approval_workflow.view", "View Approval Workflows (Alias)"},
+		{"CONTROL_CENTER", "Approval Workflows", "control.approval_workflow.create", "Create Approval Workflows (Alias)"},
+		{"CONTROL_CENTER", "Approval Workflows", "control.approval_workflow.update", "Update Approval Workflows (Alias)"},
+		{"CONTROL_CENTER", "Approval Workflows", "control.approval_workflow.publish", "Publish Approval Workflows (Alias)"},
+		{"CONTROL_CENTER", "Approval Workflows", "control.approval_workflow.delete", "Delete Approval Workflows (Alias)"},
+
+		{"CONTROL_CENTER", "Document Numbering", "control_center.document_numbering.view", "View Document Numbering"},
+		{"CONTROL_CENTER", "Document Numbering", "control_center.document_numbering.update", "Update Document Numbering"},
+		{"CONTROL_CENTER", "Document Numbering", "control_center.document_numbering.publish", "Publish Document Numbering"},
+		{"CONTROL_CENTER", "Document Numbering", "control.document_numbering.view", "View Document Numbering (Alias)"},
+		{"CONTROL_CENTER", "Document Numbering", "control.document_numbering.update", "Update Document Numbering (Alias)"},
+		{"CONTROL_CENTER", "Document Numbering", "control.document_numbering.publish", "Publish Document Numbering (Alias)"},
+
+		{"CONTROL_CENTER", "General Settings", "control_center.settings.view", "View General Settings"},
+		{"CONTROL_CENTER", "General Settings", "control_center.settings.update", "Update General Settings"},
+		{"CONTROL_CENTER", "General Settings", "control_center.settings.publish", "Publish General Settings"},
+		{"CONTROL_CENTER", "General Settings", "control.settings.view", "View General Settings (Alias)"},
+		{"CONTROL_CENTER", "General Settings", "control.settings.update", "Update General Settings (Alias)"},
+		{"CONTROL_CENTER", "General Settings", "control.settings.publish", "Publish General Settings (Alias)"},
+
+		{"CONTROL_CENTER", "Security Settings", "control_center.security_settings.view", "View Security Settings"},
+		{"CONTROL_CENTER", "Security Settings", "control_center.security_settings.update", "Update Security Settings"},
+		{"CONTROL_CENTER", "Security Settings", "control_center.security_settings.publish", "Publish Security Settings"},
+		{"CONTROL_CENTER", "Security Settings", "control_center.security_sessions.manage", "Manage Security Sessions"},
+		{"CONTROL_CENTER", "Security Settings", "control.security_settings.view", "View Security Settings (Alias)"},
+		{"CONTROL_CENTER", "Security Settings", "control.security_settings.update", "Update Security Settings (Alias)"},
+		{"CONTROL_CENTER", "Security Settings", "control.security_settings.publish", "Publish Security Settings (Alias)"},
+		{"CONTROL_CENTER", "Security Settings", "control.security_sessions.manage", "Manage Security Sessions (Alias)"},
+
+
 		// FINANCE
 		{"FINANCE", "Dashboard", "finance.dashboard.view", "View Finance Dashboard"},
 		{"FINANCE", "Setup", "finance.financial_year.view", "View Financial Year"},

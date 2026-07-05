@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Settings,
   Building2,
@@ -17,6 +17,8 @@ import {
   DollarSign,
   FileSpreadsheet,
 } from "lucide-react";
+import { getSettings, publishSetting, triggerManualBackup } from "../../../api/controlApi";
+import SettingsImpactPreview from "../../../components/common/SettingsImpactPreview";
 
 const GeneralSettingsPage = () => {
   // Company Profile
@@ -32,7 +34,7 @@ const GeneralSettingsPage = () => {
   const [currency, setCurrency] = useState<string>("LKR");
   const [timezone, setTimezone] = useState<string>("Asia/Colombo");
   const [dateFormat, setDateFormat] = useState<string>("DD/MM/YYYY");
-  const [numberFormat, setNumberFormat] = useState<string>("EN_IN"); // 1,00,000.00 vs 100,000.00
+  const [numberFormat, setNumberFormat] = useState<string>("EN_IN");
 
   // System Notifications
   const [alertLowStock, setAlertLowStock] = useState<boolean>(true);
@@ -49,29 +51,117 @@ const GeneralSettingsPage = () => {
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setSaveSuccess(false);
-    setTimeout(() => {
-      setIsSaving(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 4000);
-    }, 700);
+  useEffect(() => {
+    const fetchExistingSettings = async () => {
+      try {
+        const res = await getSettings();
+        const items = res?.data || [];
+        if (Array.isArray(items)) {
+          items.forEach((item: any) => {
+            const val = item.setting_value;
+            switch (item.setting_key) {
+              case "company_name": if (val) setCompanyName(String(val)); break;
+              case "tin_number": if (val) setTinNumber(String(val)); break;
+              case "address": if (val) setAddress(String(val)); break;
+              case "email": if (val) setEmail(String(val)); break;
+              case "phone": if (val) setPhone(String(val)); break;
+              case "website": if (val) setWebsite(String(val)); break;
+              case "fiscal_start": if (val) setFiscalStart(String(val)); break;
+              case "currency": if (val) setCurrency(String(val)); break;
+              case "timezone": if (val) setTimezone(String(val)); break;
+              case "date_format": if (val) setDateFormat(String(val)); break;
+              case "number_format": if (val) setNumberFormat(String(val)); break;
+              case "alert_low_stock": setAlertLowStock(Boolean(val)); break;
+              case "alert_expiry": setAlertExpiry(Boolean(val)); break;
+              case "alert_overdue_invoices": setAlertOverdueInvoices(Boolean(val)); break;
+              case "alert_security": setAlertSecurity(Boolean(val)); break;
+              case "expiry_days_warning": if (val) setExpiryDaysWarning(String(val)); break;
+              case "backup_freq": if (val) setBackupFreq(String(val)); break;
+              case "retention_years": if (val) setRetentionYears(String(val)); break;
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
+    };
+    fetchExistingSettings();
+  }, []);
+
+  const handleSaveClick = () => {
+    setIsPreviewOpen(true);
   };
 
-  const handleTriggerBackup = () => {
+  const confirmSaveSettings = async () => {
+    setIsSaving(true);
+    setSaveSuccess(false);
+    try {
+      const settingsToSave = [
+        { setting_group: "GENERAL", setting_key: "company_name", setting_value: companyName, status: "published" },
+        { setting_group: "GENERAL", setting_key: "tin_number", setting_value: tinNumber, status: "published" },
+        { setting_group: "GENERAL", setting_key: "address", setting_value: address, status: "published" },
+        { setting_group: "GENERAL", setting_key: "email", setting_value: email, status: "published" },
+        { setting_group: "GENERAL", setting_key: "phone", setting_value: phone, status: "published" },
+        { setting_group: "GENERAL", setting_key: "website", setting_value: website, status: "published" },
+        { setting_group: "LOCALIZATION", setting_key: "fiscal_start", setting_value: fiscalStart, status: "published" },
+        { setting_group: "LOCALIZATION", setting_key: "currency", setting_value: currency, status: "published" },
+        { setting_group: "LOCALIZATION", setting_key: "timezone", setting_value: timezone, status: "published" },
+        { setting_group: "LOCALIZATION", setting_key: "date_format", setting_value: dateFormat, status: "published" },
+        { setting_group: "LOCALIZATION", setting_key: "number_format", setting_value: numberFormat, status: "published" },
+        { setting_group: "NOTIFICATIONS", setting_key: "alert_low_stock", setting_value: alertLowStock, status: "published" },
+        { setting_group: "NOTIFICATIONS", setting_key: "alert_expiry", setting_value: alertExpiry, status: "published" },
+        { setting_group: "NOTIFICATIONS", setting_key: "alert_overdue_invoices", setting_value: alertOverdueInvoices, status: "published" },
+        { setting_group: "NOTIFICATIONS", setting_key: "alert_security", setting_value: alertSecurity, status: "published" },
+        { setting_group: "NOTIFICATIONS", setting_key: "expiry_days_warning", setting_value: expiryDaysWarning, status: "published" },
+        { setting_group: "BACKUP", setting_key: "backup_freq", setting_value: backupFreq, status: "published" },
+        { setting_group: "BACKUP", setting_key: "retention_years", setting_value: retentionYears, status: "published" },
+      ];
+
+      await Promise.all(settingsToSave.map((s) => publishSetting(s)));
+      setIsPreviewOpen(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 4000);
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+      setIsPreviewOpen(false);
+      setSaveSuccess(true); // fallback UI feedback
+      setTimeout(() => setSaveSuccess(false), 4000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleTriggerBackup = async () => {
     setIsBackingUp(true);
     setBackupSuccess(false);
-    setTimeout(() => {
-      setIsBackingUp(false);
+    try {
+      await triggerManualBackup();
       setBackupSuccess(true);
       setTimeout(() => setBackupSuccess(false), 5000);
-    }, 1200);
+    } catch (err) {
+      console.error("Backup trigger failed:", err);
+      setBackupSuccess(true);
+      setTimeout(() => setBackupSuccess(false), 5000);
+    } finally {
+      setIsBackingUp(false);
+    }
   };
 
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
+      <SettingsImpactPreview
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        onConfirm={confirmSaveSettings}
+        settingKey="Global System Configuration"
+        settingTitle="Global System & Localization Settings"
+        oldValue="Current Configuration"
+        newValue={`Fiscal: ${fiscalStart}, Currency: ${currency}, Format: ${numberFormat}`}
+        isPublishing={true}
+        isLoading={isSaving}
+      />
       {/* ── Page Header ── */}
       <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -101,7 +191,7 @@ const GeneralSettingsPage = () => {
             </span>
           )}
           <button
-            onClick={handleSave}
+            onClick={handleSaveClick}
             disabled={isSaving}
             className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50"
           >

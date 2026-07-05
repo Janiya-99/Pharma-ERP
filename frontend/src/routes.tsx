@@ -7,7 +7,10 @@ import LandingPage from "views/admin/landing";
 
 // Control Center — new pages
 import SoftwareModulesPage from "pages/control-center/software-modules/SoftwareModulesPage";
-import SettingsPage from "pages/control-center/settings/SettingsPage";
+import GeneralSettingsPage from "pages/control-center/settings/GeneralSettingsPage";
+import ApprovalSettingsPage from "pages/control-center/approval-settings/ApprovalSettingsPage";
+import DocumentNumberingPage from "pages/control-center/document-numbering/DocumentNumberingPage";
+import SecuritySettingsPage from "pages/control-center/security-settings/SecuritySettingsPage";
 
 // Control Center — new pages
 import ControlCenterDashboardPage from "pages/control-center/dashboard/ControlCenterDashboardPage";
@@ -176,8 +179,11 @@ const routes: ERPRoute[] = [
     path: "system-setup",
     icon: <MdOutlineAdminPanelSettings className="h-5 w-5" />,
     children: [
+      { name: "General Settings", path: "control-center/settings", component: <GeneralSettingsPage /> },
+      { name: "Approval Workflows", path: "control-center/approval-settings", component: <ApprovalSettingsPage /> },
+      { name: "Document Numbering", path: "control-center/document-numbering", component: <DocumentNumberingPage /> },
+      { name: "Security & Backups", path: "control-center/security-settings", component: <SecuritySettingsPage /> },
       { name: "Software Modules", path: "control-center/software-modules", component: <SoftwareModulesPage /> },
-      { name: "Settings", path: "control-center/settings", component: <SettingsPage /> },
     ],
   },
   {
