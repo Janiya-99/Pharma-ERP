@@ -17,10 +17,10 @@ import (
 //
 // This must be run on a company-specific database connection (e.g. erp_omacx),
 // NEVER on the platform database.
-func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bool) error {
-	skipAdmin := false
-	if len(skipAdminSeeder) > 0 && skipAdminSeeder[0] {
-		skipAdmin = true
+func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bool) error {
+	isNewTenant := false
+	if len(isNewTenantFlag) > 0 && isNewTenantFlag[0] {
+		isNewTenant = true
 	}
 
 	logger.Info("Running company database AutoMigrate...")
@@ -85,7 +85,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bo
 		return err
 	}
 
-	if err := seeders.SeedRoles(db, logger); err != nil {
+	if err := seeders.SeedRoles(db, logger, isNewTenant); err != nil {
 		logger.Error("Company role seeder failed", zap.Error(err))
 		return err
 	}
@@ -95,20 +95,22 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bo
 		return err
 	}
 
-	if !skipAdmin {
+	if !isNewTenant {
 		if err := seeders.SeedAdminUser(db, logger); err != nil {
 			logger.Error("Admin user seeder failed", zap.Error(err))
 			return err
 		}
 	}
 
-	if err := seeders.SeedUserAccessMatrix(db, logger); err != nil {
-		logger.Error("User access matrix seeder failed", zap.Error(err))
-		return err
+	if !isNewTenant {
+		if err := seeders.SeedUserAccessMatrix(db, logger); err != nil {
+			logger.Error("User access matrix seeder failed", zap.Error(err))
+			return err
+		}
 	}
 
 	logger.Info("Running finance migrations and seeders...")
-	if err := financeMigrations.RunFinanceMigrations(db, logger); err != nil {
+	if err := financeMigrations.RunFinanceMigrations(db, logger, isNewTenant); err != nil {
 		logger.Error("Finance migrations failed", zap.Error(err))
 		return err
 	}
@@ -149,9 +151,11 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bo
 		return err
 	}
 	if mainCompany.ID != 0 {
-		if err := invoiceCenterSeeders.RunInvoiceCenterSeeders(db, mainCompany.ID, logger); err != nil {
-			logger.Error("Invoice Center seeder failed", zap.Error(err))
-			return err
+		if !isNewTenant {
+			if err := invoiceCenterSeeders.RunInvoiceCenterSeeders(db, mainCompany.ID, logger); err != nil {
+				logger.Error("Invoice Center seeder failed", zap.Error(err))
+				return err
+			}
 		}
 	} else {
 		logger.Warn("OMACX company not found, running invoice center permission seeder only")
@@ -161,7 +165,7 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, skipAdminSeeder ...bo
 		}
 	}
 
-	if mainCompany.ID != 0 {
+	if mainCompany.ID != 0 && !isNewTenant {
 		logger.Info("Running Step 71 configuration seeders...")
 		if err := seeders.SeedSystemSettings(db, mainCompany.ID, logger); err != nil {
 			logger.Error("System settings seeder failed", zap.Error(err))

@@ -9,7 +9,11 @@ import (
 
 // RunFinanceMigrations runs AutoMigrate for the finance models
 // and seeds the initial finance data.
-func RunFinanceMigrations(db *gorm.DB, logger *zap.Logger) error {
+func RunFinanceMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bool) error {
+	isNewTenant := false
+	if len(isNewTenantFlag) > 0 && isNewTenantFlag[0] {
+		isNewTenant = true
+	}
 	logger.Info("Running finance database AutoMigrate...")
 
 	// AutoMigrate finance tables
@@ -72,9 +76,11 @@ func RunFinanceMigrations(db *gorm.DB, logger *zap.Logger) error {
 		return err
 	}
 
-	if err := seeders.SeedFinancialYear(db, logger); err != nil {
-		logger.Error("Finance financial year seeder failed", zap.Error(err))
-		return err
+	if !isNewTenant {
+		if err := seeders.SeedFinancialYear(db, logger); err != nil {
+			logger.Error("Finance financial year seeder failed", zap.Error(err))
+			return err
+		}
 	}
 
 	logger.Info("Finance migrations and seeding complete")

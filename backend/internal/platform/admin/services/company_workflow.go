@@ -8,8 +8,6 @@ import (
 
 	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	companyModels "github.com/pixandco/erp-phrma/internal/company/models"
-	inventorySeeders "github.com/pixandco/erp-phrma/internal/inventory/seeders"
-	invoiceCenterSeeders "github.com/pixandco/erp-phrma/internal/invoicecenter/seeders"
 	"github.com/pixandco/erp-phrma/internal/platform/models"
 	"github.com/pixandco/erp-phrma/internal/security"
 	"go.uber.org/zap"
@@ -291,22 +289,8 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		companyDB.Save(&tenantCo)
 	}
 
-	// Seed structural inventory and invoice center data for the new company
-	if err := inventorySeeders.SeedProductUnits(companyDB, tenantCo.ID, logger); err != nil {
-		logger.Error("Product unit seeder failed", zap.Error(err))
-	}
-	if err := inventorySeeders.SeedDosageForms(companyDB, tenantCo.ID, logger); err != nil {
-		logger.Error("Dosage form seeder failed", zap.Error(err))
-	}
-	if err := inventorySeeders.SeedProductCategories(companyDB, tenantCo.ID, logger); err != nil {
-		logger.Error("Product category seeder failed", zap.Error(err))
-	}
-	if err := inventorySeeders.SeedWarehouses(companyDB, tenantCo.ID, logger); err != nil {
-		logger.Error("Warehouse seeder failed", zap.Error(err))
-	}
-	if err := invoiceCenterSeeders.RunInvoiceCenterSeeders(companyDB, tenantCo.ID, logger); err != nil {
-		logger.Error("Invoice Center seeder failed", zap.Error(err))
-	}
+	// Remove structural inventory and invoice center data seeders for new company as requested
+
 
 	// Seed branch
 	var tenantBranch companyModels.Branch
@@ -332,6 +316,29 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		return nil, err
 	}
 
+	// Seed Department
+	var defaultDept companyModels.Department
+	if err := companyDB.Where("company_id = ? AND department_code = ?", tenantCo.ID, "ADMIN").First(&defaultDept).Error; err != nil {
+		defaultDept = companyModels.Department{
+			CompanyID:      tenantCo.ID,
+			DepartmentCode: "ADMIN",
+			DepartmentName: "Administration",
+			Status:         "active",
+		}
+		companyDB.Create(&defaultDept)
+	}
+
+	// Seed Designation
+	var defaultDesig companyModels.Designation
+	if err := companyDB.Where("company_id = ? AND designation_name = ?", tenantCo.ID, "Director").First(&defaultDesig).Error; err != nil {
+		defaultDesig = companyModels.Designation{
+			CompanyID:       tenantCo.ID,
+			DesignationName: "Director",
+			Status:          "active",
+		}
+		companyDB.Create(&defaultDesig)
+	}
+
 	// Create user
 	var companyUser companyModels.User
 	if err := companyDB.Where("email = ?", req.FirstUser.Email).First(&companyUser).Error; err != nil {
@@ -344,6 +351,8 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 			UserType:        "super_admin",
 			Status:          "active",
 			DefaultBranchID: &tenantBranch.ID,
+			DepartmentID:    &defaultDept.ID,
+			DesignationID:   &defaultDesig.ID,
 		}
 		if err := companyDB.Create(&companyUser).Error; err != nil {
 			tx.Rollback()
@@ -390,18 +399,16 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 	}
 
 	// Seed User Access Matrix (Roles) for the First Admin User
+	// Only assign SUPER_ADMIN and GLOBAL_SUPER_ADMIN
 	roleMappings := map[string]string{
-		"CONTROL_CENTER":    "SUPER_ADMIN",
-		"FINANCE":           "FINANCE_MANAGER",
-		"INVENTORY":         "WAREHOUSE_MANAGER",
-		"INVOICE_CENTER":    "INVOICE_MANAGER",
-		"COMPLIANCE_CENTER": "COMPLIANCE_MANAGER",
+		"CONTROL_CENTER": "SUPER_ADMIN",
+		"ALL_MODULES":    "GLOBAL_SUPER_ADMIN",
 	}
 
 	for _, m := range companyModules {
 		isEnabled := false
 		for _, reqMod := range req.Modules {
-			if reqMod == m.SoftwareCode {
+			if reqMod == m.SoftwareCode || m.SoftwareCode == "ALL_MODULES" || m.SoftwareCode == "CONTROL_CENTER" {
 				isEnabled = true
 				break
 			}

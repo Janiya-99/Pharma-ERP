@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SeedRoles(db *gorm.DB, logger *zap.Logger) error {
+func SeedRoles(db *gorm.DB, logger *zap.Logger, isNewTenant bool) error {
 	var modules []models.SoftwareModule
 	if err := db.Find(&modules).Error; err != nil {
 		return err
@@ -55,6 +55,21 @@ func SeedRoles(db *gorm.DB, logger *zap.Logger) error {
 		{"COMPLIANCE_CENTER", "Compliance Officer", "COMPLIANCE_OFFICER"},
 		{"COMPLIANCE_CENTER", "Compliance Approver", "COMPLIANCE_APPROVER"},
 		{"COMPLIANCE_CENTER", "Compliance Viewer", "COMPLIANCE_VIEWER"},
+	}
+
+	if isNewTenant {
+		// Only keep Global Super Admin and Super Admin for new tenants
+		var filteredRoles []struct {
+			SoftwareCode string
+			RoleName     string
+			RoleCode     string
+		}
+		for _, r := range roles {
+			if r.RoleCode == "GLOBAL_SUPER_ADMIN" || r.RoleCode == "SUPER_ADMIN" {
+				filteredRoles = append(filteredRoles, r)
+			}
+		}
+		roles = filteredRoles
 	}
 
 	for _, r := range roles {
