@@ -8,13 +8,31 @@ import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 import {
   SalesInvoiceActionButtons,
   SalesInvoiceApprovalStatusBadge,
@@ -38,7 +56,14 @@ import {
   SubmitSalesInvoiceModal,
 } from "./";
 
-type ModalName = "submit" | "approve" | "reject" | "post" | "cancel" | "delete" | null;
+type ModalName =
+  | "submit"
+  | "approve"
+  | "reject"
+  | "post"
+  | "cancel"
+  | "delete"
+  | null;
 
 type FilterState = {
   search: string;
@@ -82,20 +107,24 @@ const formatDate = (value?: string | null) => {
 };
 
 const getCustomerName = (invoice: SalesInvoice) =>
-  invoice.customer?.customer_name || invoice.customer_name || `Customer #${invoice.customer_id}`;
+  invoice.customer?.customer_name ||
+  invoice.customer_name ||
+  `Customer #${invoice.customer_id}`;
 
 const getCustomerCode = (invoice: SalesInvoice) =>
   invoice.customer?.customer_code || invoice.customer_code || "-";
 
 const getSalesOrderNumber = (invoice: SalesInvoice) =>
-  invoice.sales_order?.sales_order_number || (invoice.sales_order_id ? `SO #${invoice.sales_order_id}` : "-");
+  invoice.sales_order?.sales_order_number ||
+  (invoice.sales_order_id ? `SO #${invoice.sales_order_id}` : "-");
 
 const getWarehouseName = (invoice: SalesInvoice) =>
   invoice.warehouse?.warehouse_name || `Warehouse #${invoice.warehouse_id}`;
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (typeof error === "object" && error !== null && "response" in error) {
-    const response = (error as { response?: { data?: { message?: string } } }).response;
+    const response = (error as { response?: { data?: { message?: string } } })
+      .response;
     return response?.data?.message || fallback;
   }
   return fallback;
@@ -109,7 +138,9 @@ const SalesInvoicesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedInvoice, setSelectedInvoice] = useState<SalesInvoice | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<SalesInvoice | null>(
+    null
+  );
   const [modal, setModal] = useState<ModalName>(null);
   const [branches, setBranches] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
@@ -125,12 +156,17 @@ const SalesInvoicesPage: React.FC = () => {
     if (filters.search) next.search = filters.search;
     if (filters.branch_id) next.branch_id = Number(filters.branch_id);
     if (filters.customer_id) next.customer_id = Number(filters.customer_id);
-    if (filters.sales_order_id) next.sales_order_id = Number(filters.sales_order_id);
+    if (filters.sales_order_id)
+      next.sales_order_id = Number(filters.sales_order_id);
     if (filters.warehouse_id) next.warehouse_id = Number(filters.warehouse_id);
-    if (filters.approval_status !== "all") next.approval_status = filters.approval_status;
-    if (filters.posted_status !== "all") next.posted_status = filters.posted_status;
-    if (filters.payment_status !== "all") next.payment_status = filters.payment_status;
-    if (filters.invoice_date_from) next.invoice_date_from = filters.invoice_date_from;
+    if (filters.approval_status !== "all")
+      next.approval_status = filters.approval_status;
+    if (filters.posted_status !== "all")
+      next.posted_status = filters.posted_status;
+    if (filters.payment_status !== "all")
+      next.payment_status = filters.payment_status;
+    if (filters.invoice_date_from)
+      next.invoice_date_from = filters.invoice_date_from;
     if (filters.invoice_date_to) next.invoice_date_to = filters.invoice_date_to;
     if (filters.due_date_from) next.due_date_from = filters.due_date_from;
     if (filters.due_date_to) next.due_date_to = filters.due_date_to;
@@ -191,7 +227,10 @@ const SalesInvoicesPage: React.FC = () => {
     fetchInvoices();
   };
 
-  const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+  const updateFilter = <K extends keyof FilterState>(
+    key: K,
+    value: FilterState[K]
+  ) => {
     setPage(1);
     setFilters((current) => ({ ...current, [key]: value }));
   };
@@ -209,15 +248,33 @@ const SalesInvoicesPage: React.FC = () => {
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
         <div className="flex flex-col gap-4 rounded-xl border bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-navy-900">Sales Invoices</h1>
-            <p className="text-sm text-muted-foreground">Create, approve, post, and monitor customer billing documents.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-navy-900">
+              Sales Invoices
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Create, approve, post, and monitor customer billing documents.
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" size="icon" onClick={fetchInvoices} disabled={loading} title="Refresh">
-              <RefreshCw className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={fetchInvoices}
+              disabled={loading}
+              title="Refresh"
+            >
+              <RefreshCw
+                className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"}
+              />
             </Button>
             <PermissionGuard permission="invoice_center.sales_invoice.create">
-              <Button type="button" onClick={() => navigate("/invoice-center/sales-invoices/create")}>
+              <Button
+                type="button"
+                onClick={() =>
+                  navigate("/invoice-center/sales-invoices/create")
+                }
+              >
                 <Plus className="h-4 w-4" />
                 Create Sales Invoice
               </Button>
@@ -236,7 +293,9 @@ const SalesInvoicesPage: React.FC = () => {
                 <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
                 <Input
                   value={filters.search}
-                  onChange={(event) => updateFilter("search", event.target.value)}
+                  onChange={(event) =>
+                    updateFilter("search", event.target.value)
+                  }
                   className="pl-8"
                   placeholder="Invoice, customer, order, reference"
                 />
@@ -244,7 +303,12 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Branch</Label>
-              <Select value={filters.branch_id || "all"} onValueChange={(value) => updateFilter("branch_id", value === "all" ? "" : value)}>
+              <Select
+                value={filters.branch_id || "all"}
+                onValueChange={(value) =>
+                  updateFilter("branch_id", value === "all" ? "" : value)
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="All branches" />
                 </SelectTrigger>
@@ -255,7 +319,9 @@ const SalesInvoicesPage: React.FC = () => {
                     return (
                       <SelectItem key={branchId} value={branchId}>
                         {branch.branch_code ? `${branch.branch_code} - ` : ""}
-                        {branch.branch_name || branch.name || `Branch ${branchId}`}
+                        {branch.branch_name ||
+                          branch.name ||
+                          `Branch ${branchId}`}
                       </SelectItem>
                     );
                   })}
@@ -264,18 +330,30 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Customer</Label>
-              <Select value={filters.customer_id || "all"} onValueChange={(value) => updateFilter("customer_id", value === "all" ? "" : value)}>
+              <Select
+                value={filters.customer_id || "all"}
+                onValueChange={(value) =>
+                  updateFilter("customer_id", value === "all" ? "" : value)
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="All customers" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Customers</SelectItem>
                   {customers.map((customer) => {
-                    const customerId = String(customer.id || customer.customer_id);
+                    const customerId = String(
+                      customer.id || customer.customer_id
+                    );
                     return (
                       <SelectItem key={customerId} value={customerId}>
-                        {customer.customer_code ? `${customer.customer_code} - ` : ""}
-                        {customer.company_name || customer.customer_name || customer.name || `Customer ${customerId}`}
+                        {customer.customer_code
+                          ? `${customer.customer_code} - `
+                          : ""}
+                        {customer.company_name ||
+                          customer.customer_name ||
+                          customer.name ||
+                          `Customer ${customerId}`}
                       </SelectItem>
                     );
                   })}
@@ -284,22 +362,39 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Sales Order</Label>
-              <Input value={filters.sales_order_id} onChange={(event) => updateFilter("sales_order_id", event.target.value)} placeholder="Sales Order ID" />
+              <Input
+                value={filters.sales_order_id}
+                onChange={(event) =>
+                  updateFilter("sales_order_id", event.target.value)
+                }
+                placeholder="Sales Order ID"
+              />
             </div>
             <div className="space-y-1">
               <Label>Warehouse</Label>
-              <Select value={filters.warehouse_id || "all"} onValueChange={(value) => updateFilter("warehouse_id", value === "all" ? "" : value)}>
+              <Select
+                value={filters.warehouse_id || "all"}
+                onValueChange={(value) =>
+                  updateFilter("warehouse_id", value === "all" ? "" : value)
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="All warehouses" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Warehouses</SelectItem>
                   {warehouses.map((warehouse) => {
-                    const warehouseId = String(warehouse.id || warehouse.warehouse_id);
+                    const warehouseId = String(
+                      warehouse.id || warehouse.warehouse_id
+                    );
                     return (
                       <SelectItem key={warehouseId} value={warehouseId}>
-                        {warehouse.warehouse_code ? `${warehouse.warehouse_code} - ` : ""}
-                        {warehouse.warehouse_name || warehouse.name || `Warehouse ${warehouseId}`}
+                        {warehouse.warehouse_code
+                          ? `${warehouse.warehouse_code} - `
+                          : ""}
+                        {warehouse.warehouse_name ||
+                          warehouse.name ||
+                          `Warehouse ${warehouseId}`}
                       </SelectItem>
                     );
                   })}
@@ -308,7 +403,15 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Approval Status</Label>
-              <Select value={filters.approval_status} onValueChange={(value) => updateFilter("approval_status", value as FilterState["approval_status"])}>
+              <Select
+                value={filters.approval_status}
+                onValueChange={(value) =>
+                  updateFilter(
+                    "approval_status",
+                    value as FilterState["approval_status"]
+                  )
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -324,7 +427,15 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Posted Status</Label>
-              <Select value={filters.posted_status} onValueChange={(value) => updateFilter("posted_status", value as FilterState["posted_status"])}>
+              <Select
+                value={filters.posted_status}
+                onValueChange={(value) =>
+                  updateFilter(
+                    "posted_status",
+                    value as FilterState["posted_status"]
+                  )
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -337,7 +448,15 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Payment Status</Label>
-              <Select value={filters.payment_status} onValueChange={(value) => updateFilter("payment_status", value as FilterState["payment_status"])}>
+              <Select
+                value={filters.payment_status}
+                onValueChange={(value) =>
+                  updateFilter(
+                    "payment_status",
+                    value as FilterState["payment_status"]
+                  )
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -353,19 +472,35 @@ const SalesInvoicesPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <Label>Invoice Date From</Label>
-              <DatePicker value={filters.invoice_date_from} onChange={(value) => updateFilter("invoice_date_from", value)} placeholder="Invoice date from" />
+              <DatePicker
+                value={filters.invoice_date_from}
+                onChange={(value) => updateFilter("invoice_date_from", value)}
+                placeholder="Invoice date from"
+              />
             </div>
             <div className="space-y-1">
               <Label>Invoice Date To</Label>
-              <DatePicker value={filters.invoice_date_to} onChange={(value) => updateFilter("invoice_date_to", value)} placeholder="Invoice date to" />
+              <DatePicker
+                value={filters.invoice_date_to}
+                onChange={(value) => updateFilter("invoice_date_to", value)}
+                placeholder="Invoice date to"
+              />
             </div>
             <div className="space-y-1">
               <Label>Due Date From</Label>
-              <DatePicker value={filters.due_date_from} onChange={(value) => updateFilter("due_date_from", value)} placeholder="Due date from" />
+              <DatePicker
+                value={filters.due_date_from}
+                onChange={(value) => updateFilter("due_date_from", value)}
+                placeholder="Due date from"
+              />
             </div>
             <div className="space-y-1">
               <Label>Due Date To</Label>
-              <DatePicker value={filters.due_date_to} onChange={(value) => updateFilter("due_date_to", value)} placeholder="Due date to" />
+              <DatePicker
+                value={filters.due_date_to}
+                onChange={(value) => updateFilter("due_date_to", value)}
+                placeholder="Due date to"
+              />
             </div>
           </CardContent>
         </Card>
@@ -406,46 +541,83 @@ const SalesInvoicesPage: React.FC = () => {
                   </TableRow>
                 ) : invoices.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={20} className="h-28 text-center text-muted-foreground">
+                    <TableCell
+                      colSpan={20}
+                      className="h-28 text-center text-muted-foreground"
+                    >
                       No sales invoices found.
                     </TableCell>
                   </TableRow>
                 ) : (
                   invoices.map((invoice) => (
                     <TableRow key={invoice.id}>
-                      <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+                      <TableCell className="font-medium">
+                        {invoice.invoice_number}
+                      </TableCell>
                       <TableCell>{formatDate(invoice.invoice_date)}</TableCell>
                       <TableCell>{formatDate(invoice.due_date)}</TableCell>
-                      <TableCell>{invoice.branch?.branch_name || invoice.branch_id}</TableCell>
+                      <TableCell>
+                        {invoice.branch?.branch_name || invoice.branch_id}
+                      </TableCell>
                       <TableCell>{getCustomerCode(invoice)}</TableCell>
                       <TableCell>{getCustomerName(invoice)}</TableCell>
                       <TableCell>{getSalesOrderNumber(invoice)}</TableCell>
                       <TableCell>{getWarehouseName(invoice)}</TableCell>
-                      <TableCell className="text-right">{formatMoney(invoice.subtotal_amount)}</TableCell>
-                      <TableCell className="text-right">{formatMoney(invoice.discount_amount)}</TableCell>
-                      <TableCell className="text-right">{formatMoney(invoice.tax_amount)}</TableCell>
-                      <TableCell className="text-right font-semibold">{formatMoney(invoice.total_amount)}</TableCell>
-                      <TableCell className="text-right">{formatMoney(invoice.paid_amount)}</TableCell>
-                      <TableCell className="text-right font-semibold text-rose-700">{formatMoney(invoice.balance_amount)}</TableCell>
-                      <TableCell>
-                        <SalesInvoiceApprovalStatusBadge status={invoice.approval_status} />
+                      <TableCell className="text-right">
+                        {formatMoney(invoice.subtotal_amount)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatMoney(invoice.discount_amount)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatMoney(invoice.tax_amount)}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {formatMoney(invoice.total_amount)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatMoney(invoice.paid_amount)}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold text-rose-700">
+                        {formatMoney(invoice.balance_amount)}
                       </TableCell>
                       <TableCell>
-                        <SalesInvoicePostedStatusBadge status={invoice.posted_status} />
+                        <SalesInvoiceApprovalStatusBadge
+                          status={invoice.approval_status}
+                        />
                       </TableCell>
                       <TableCell>
-                        <SalesInvoicePaymentStatusBadge status={invoice.payment_status} />
+                        <SalesInvoicePostedStatusBadge
+                          status={invoice.posted_status}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <SalesInvoicePaymentStatusBadge
+                          status={invoice.payment_status}
+                        />
                       </TableCell>
                       <TableCell>{invoice.created_by || "-"}</TableCell>
                       <TableCell>{formatDate(invoice.created_at)}</TableCell>
                       <TableCell>
                         <div className="flex flex-col items-end gap-2">
-                          <Button variant="outline" size="sm" onClick={() => navigate(`/invoice-center/sales-invoices/${invoice.id}`)}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              navigate(
+                                `/invoice-center/sales-invoices/${invoice.id}`
+                              )
+                            }
+                          >
                             View
                           </Button>
                           <SalesInvoiceActionButtons
                             invoice={invoice}
-                            onEdit={() => navigate(`/invoice-center/sales-invoices/${invoice.id}/edit`)}
+                            onEdit={() =>
+                              navigate(
+                                `/invoice-center/sales-invoices/${invoice.id}/edit`
+                              )
+                            }
                             onDelete={() => openModal("delete", invoice)}
                             onSubmit={() => openModal("submit", invoice)}
                             onApprove={() => openModal("approve", invoice)}
@@ -462,12 +634,26 @@ const SalesInvoicesPage: React.FC = () => {
             </Table>
           </CardContent>
           <div className="flex items-center justify-between border-t px-4 py-4">
-            <div className="text-sm text-muted-foreground">Page {page} of {totalPages}</div>
+            <div className="text-sm text-muted-foreground">
+              Page {page} of {totalPages}
+            </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1 || loading}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={page === 1 || loading}
+              >
                 Previous
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setPage((current) => Math.min(totalPages, current + 1))} disabled={page === totalPages || loading}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setPage((current) => Math.min(totalPages, current + 1))
+                }
+                disabled={page === totalPages || loading}
+              >
                 Next
               </Button>
             </div>
@@ -476,7 +662,12 @@ const SalesInvoicesPage: React.FC = () => {
 
         {selectedInvoice && (
           <>
-            <SubmitSalesInvoiceModal isOpen={modal === "submit"} onClose={closeModal} invoiceId={selectedInvoice.id} onSuccess={refreshAfterAction} />
+            <SubmitSalesInvoiceModal
+              isOpen={modal === "submit"}
+              onClose={closeModal}
+              invoiceId={selectedInvoice.id}
+              onSuccess={refreshAfterAction}
+            />
             <ApproveSalesInvoiceModal
               isOpen={modal === "approve"}
               onClose={closeModal}
@@ -484,22 +675,39 @@ const SalesInvoicesPage: React.FC = () => {
               onSuccess={refreshAfterAction}
               showCreditWarning={
                 (selectedInvoice.customer?.credit_limit || 0) > 0 &&
-                ((selectedInvoice.customer?.current_balance || 0) + selectedInvoice.total_amount) > (selectedInvoice.customer?.credit_limit || 0)
+                (selectedInvoice.customer?.current_balance || 0) +
+                  selectedInvoice.total_amount >
+                  (selectedInvoice.customer?.credit_limit || 0)
               }
             />
-            <RejectSalesInvoiceModal isOpen={modal === "reject"} onClose={closeModal} invoiceId={selectedInvoice.id} onSuccess={refreshAfterAction} />
+            <RejectSalesInvoiceModal
+              isOpen={modal === "reject"}
+              onClose={closeModal}
+              invoiceId={selectedInvoice.id}
+              onSuccess={refreshAfterAction}
+            />
             <PostSalesInvoiceConfirmModal
               isOpen={modal === "post"}
               onClose={closeModal}
               invoiceId={selectedInvoice.id}
               invoiceNumber={selectedInvoice.invoice_number}
               totalAmount={selectedInvoice.total_amount}
-              totalQuantity={selectedInvoice.lines?.reduce((sum, line) => sum + Number(line.quantity || 0), 0) || 0}
+              totalQuantity={
+                selectedInvoice.lines?.reduce(
+                  (sum, line) => sum + Number(line.quantity || 0),
+                  0
+                ) || 0
+              }
               customerName={getCustomerName(selectedInvoice)}
               warehouseName={getWarehouseName(selectedInvoice)}
               onSuccess={refreshAfterAction}
             />
-            <CancelSalesInvoiceModal isOpen={modal === "cancel"} onClose={closeModal} invoiceId={selectedInvoice.id} onSuccess={refreshAfterAction} />
+            <CancelSalesInvoiceModal
+              isOpen={modal === "cancel"}
+              onClose={closeModal}
+              invoiceId={selectedInvoice.id}
+              onSuccess={refreshAfterAction}
+            />
             <DeleteSalesInvoiceConfirmModal
               isOpen={modal === "delete"}
               onClose={closeModal}

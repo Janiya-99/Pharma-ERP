@@ -134,11 +134,12 @@ export const SidebarLinks = ({
 
             {/* Sub-menu accordion */}
             <div
-              className={`overflow-hidden transition-all duration-200 ease-in-out ${
-                isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+              className={`grid transition-all duration-200 ease-in-out ${
+                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
               }`}
             >
-              <div className="ml-3 mt-0.5 border-l border-gray-100 pl-2 dark:border-navy-600">
+              <div className="overflow-hidden">
+                <div className="ml-3 mt-0.5 border-l border-gray-100 pl-2 dark:border-navy-600">
                 {sectionGroups.map((group, groupIdx) => (
                   <div key={groupIdx}>
                     {/* Section header */}
@@ -186,6 +187,7 @@ export const SidebarLinks = ({
                     </ul>
                   </div>
                 ))}
+              </div>
               </div>
             </div>
           </li>

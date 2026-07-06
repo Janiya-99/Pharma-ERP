@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "../../../components/ui/dialog";
+} from "../../../components/invoice-center/InvoiceCenterActionDrawer";
 import { Button } from "../../../components/ui/button";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { toast } from "sonner";

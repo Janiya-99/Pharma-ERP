@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "../../../components/ui/dialog";
+} from "../../../components/invoice-center/InvoiceCenterActionDrawer";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Label } from "../../../components/ui/label";

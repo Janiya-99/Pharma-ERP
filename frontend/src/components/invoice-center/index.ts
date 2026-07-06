@@ -30,6 +30,7 @@ export * from "./SalesInvoicePaymentSummaryCard";
 export * from "./SalesInvoiceLineTable";
 export * from "./SalesInvoiceLineProductSelect";
 export * from "./SalesInvoiceLineBatchSelect";
+export * from "./InvoiceCenterFormLayout";
 
 // Credit Notes
 export * from "./CreditNoteApprovalStatusBadge";

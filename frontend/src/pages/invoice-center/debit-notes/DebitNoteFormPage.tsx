@@ -358,8 +358,8 @@ const DebitNoteFormPage: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 pb-20">
-      <div className="flex items-center justify-between">
+    <div className="page-content mx-auto w-full max-w-7xl space-y-5 pb-12">
+      <div className="sticky top-14 z-30 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
@@ -387,14 +387,14 @@ const DebitNoteFormPage: React.FC = () => {
         </PermissionGuard>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="space-y-6 md:col-span-2">
-            <Card>
-              <CardHeader className="pb-3">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
+          <div className="space-y-5">
+            <Card className="rounded-xl border-slate-200 bg-white shadow-sm">
+              <CardHeader className="border-b border-slate-100 pb-4">
                 <CardTitle>Debit Note Header</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-5">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label
@@ -417,15 +417,27 @@ const DebitNoteFormPage: React.FC = () => {
                         id="branch_id"
                         className={errors.branch_id ? "border-red-500" : ""}
                       >
-                        <SelectValue placeholder={lookupsLoading ? "Loading branches..." : "Select branch"} />
+                        <SelectValue
+                          placeholder={
+                            lookupsLoading
+                              ? "Loading branches..."
+                              : "Select branch"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {branches.map((branch) => {
-                          const branchId = String(branch.id || branch.branch_id);
+                          const branchId = String(
+                            branch.id || branch.branch_id
+                          );
                           return (
                             <SelectItem key={branchId} value={branchId}>
-                              {branch.branch_code ? `${branch.branch_code} - ` : ""}
-                              {branch.branch_name || branch.name || `Branch ${branchId}`}
+                              {branch.branch_code
+                                ? `${branch.branch_code} - `
+                                : ""}
+                              {branch.branch_name ||
+                                branch.name ||
+                                `Branch ${branchId}`}
                             </SelectItem>
                           );
                         })}
@@ -455,7 +467,9 @@ const DebitNoteFormPage: React.FC = () => {
                       }
                       placeholder="Debit note date"
                       clearable={false}
-                      triggerClassName={errors.debit_note_date ? "border-red-500" : ""}
+                      triggerClassName={
+                        errors.debit_note_date ? "border-red-500" : ""
+                      }
                       aria-label="Debit note date"
                     />
                     {errors.debit_note_date && (
@@ -523,11 +537,11 @@ const DebitNoteFormPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
+            <Card className="rounded-xl border-slate-200 bg-white shadow-sm">
+              <CardHeader className="border-b border-slate-100 pb-4">
                 <CardTitle>Customer</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-5">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label
@@ -550,14 +564,24 @@ const DebitNoteFormPage: React.FC = () => {
                         id="customer_id"
                         className={errors.customer_id ? "border-red-500" : ""}
                       >
-                        <SelectValue placeholder={lookupsLoading ? "Loading customers..." : "Select customer"} />
+                        <SelectValue
+                          placeholder={
+                            lookupsLoading
+                              ? "Loading customers..."
+                              : "Select customer"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {customers.map((customerItem) => {
-                          const customerId = String(customerItem.id || customerItem.customer_id);
+                          const customerId = String(
+                            customerItem.id || customerItem.customer_id
+                          );
                           return (
                             <SelectItem key={customerId} value={customerId}>
-                              {customerItem.customer_code ? `${customerItem.customer_code} - ` : ""}
+                              {customerItem.customer_code
+                                ? `${customerItem.customer_code} - `
+                                : ""}
                               {customerItem.company_name ||
                                 customerItem.customer_name ||
                                 customerItem.name ||
@@ -597,8 +621,8 @@ const DebitNoteFormPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <Card className="rounded-xl border-slate-200 bg-white shadow-sm">
+              <CardHeader className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle>Sales Invoice Link</CardTitle>
                 <div className="flex gap-2">
                   <Button
@@ -612,7 +636,7 @@ const DebitNoteFormPage: React.FC = () => {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-5">
                 <div className="space-y-2">
                   <Label htmlFor="sales_invoice_id">Sales Invoice ID</Label>
                   <Input
@@ -637,7 +661,7 @@ const DebitNoteFormPage: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5 xl:sticky xl:top-36 xl:self-start">
             <DebitNoteTotalsCard
               subtotal={totals.subtotal}
               discount={totals.discount}
@@ -680,11 +704,11 @@ const DebitNoteFormPage: React.FC = () => {
               }
             />
 
-            <Card>
-              <CardHeader className="pb-3">
+            <Card className="rounded-xl border-slate-200 bg-white shadow-sm">
+              <CardHeader className="border-b border-slate-100 pb-4">
                 <CardTitle>Accounting (Optional)</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-5">
                 <div className="space-y-2">
                   <Label htmlFor="financial_year_id">Financial Year</Label>
                   <Input

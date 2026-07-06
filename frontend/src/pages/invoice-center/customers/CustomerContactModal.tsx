@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
-import { X } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "../../../components/ui/sheet";
 
 interface Contact {
   id: number;
@@ -69,7 +74,7 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
     setError(null);
   }, [contact, isOpen]);
 
-  if (!isOpen || !customerId) return null;
+  if (!customerId) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,23 +107,20 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl dark:border-navy-700 dark:bg-navy-800">
-        <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 p-6 dark:border-navy-700 dark:bg-navy-900/50">
-          <h3 className="text-lg font-bold text-navy-900 dark:text-white">
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent
+        side="right"
+        className="w-[calc(100vw-1rem)] overflow-y-auto rounded-l-xl border-slate-200 bg-white p-0 shadow-2xl sm:max-w-xl"
+      >
+        <SheetHeader className="border-b border-gray-100 bg-gray-50 px-6 py-5 dark:border-navy-700 dark:bg-navy-900/50">
+          <SheetTitle className="text-lg font-bold text-navy-900 dark:text-white">
             {contact ? "Edit Contact Person" : "Add Contact Person"}
-          </h3>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+          </SheetTitle>
+        </SheetHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 p-6">
           {error && (
-            <div className="bg-rose-50 border-rose-200 text-rose-600 rounded-xl border p-3 text-sm">
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-600">
               {error}
             </div>
           )}
@@ -268,8 +270,8 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

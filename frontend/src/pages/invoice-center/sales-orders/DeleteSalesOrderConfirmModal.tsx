@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog";
+} from "../../../components/invoice-center/InvoiceCenterActionDrawer";
 
 type DeleteSalesOrderConfirmModalProps = {
   open: boolean;

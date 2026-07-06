@@ -180,9 +180,9 @@ export default function DocumentPrintPage({ documentType }: Props) {
             }}
           >
             <tr>
-              {visibleFields.map((field) => (
+              {visibleFields.map((field, fieldIndex) => (
                 <th
-                  key={field.field_key}
+                  key={`${field.field_key}-${fieldIndex}`}
                   className="px-2 py-2 font-medium"
                   style={{ textAlign: field.alignment }}
                 >
@@ -194,9 +194,9 @@ export default function DocumentPrintPage({ documentType }: Props) {
           <tbody>
             {(lines.length ? lines : [{}]).map((line: any, index: number) => (
               <tr key={line.id || index}>
-                {visibleFields.map((field) => (
+                {visibleFields.map((field, fieldIndex) => (
                   <td
-                    key={field.field_key}
+                    key={`${field.field_key}-${fieldIndex}`}
                     className="border px-2 py-2"
                     style={{
                       textAlign: field.alignment,

@@ -85,9 +85,15 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Line Items</h3>
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-[#111827]">Line Items</h3>
+          <p className="mt-1 text-sm text-[#64748B]">
+            Add products from inventory and confirm quantities, pricing, and
+            tax.
+          </p>
+        </div>
         <Button
           type="button"
           variant="outline"
@@ -99,13 +105,13 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
         </Button>
       </div>
 
-      <div className="overflow-x-auto rounded-md border">
+      <div className="hidden overflow-x-auto rounded-lg border border-slate-200 xl:block">
         <Table>
-          <TableHeader className="bg-gray-50">
+          <TableHeader className="bg-[#F8FAFC]">
             <TableRow>
               <TableHead className="w-10">#</TableHead>
-              <TableHead className="w-[200px]">Product *</TableHead>
-              <TableHead className="w-[150px]">Batch</TableHead>
+              <TableHead className="min-w-[230px]">Product *</TableHead>
+              <TableHead className="min-w-[170px]">Batch</TableHead>
               <TableHead className="w-[100px] text-right">Qty *</TableHead>
               <TableHead className="w-[120px] text-right">Unit Price</TableHead>
               <TableHead className="w-[100px] text-right">Discount</TableHead>
@@ -152,7 +158,11 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
                       productId={watch(`lines.${index}.product_id`)}
                       onBatchSelected={(batch) => {
                         if (batch.selling_price) {
-                          setValue(`lines.${index}.unit_price`, Number(batch.selling_price), { shouldValidate: true });
+                          setValue(
+                            `lines.${index}.unit_price`,
+                            Number(batch.selling_price),
+                            { shouldValidate: true }
+                          );
                         }
                       }}
                     />
@@ -261,8 +271,161 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
         )}
       </div>
 
+      <div className="space-y-3 xl:hidden">
+        {fields.map((field, index) => {
+          const qty = Number(watch(`lines.${index}.quantity`) || 0);
+          const price = Number(watch(`lines.${index}.unit_price`) || 0);
+          const discount = Number(watch(`lines.${index}.discount_amount`) || 0);
+          const tax = Number(watch(`lines.${index}.tax_amount`) || 0);
+          const total = calculateLineTotal(qty, price, discount, tax);
+          const lineError = errors?.lines?.[index];
+
+          return (
+            <div
+              key={field.id}
+              className={`rounded-lg border p-3 ${
+                lineError
+                  ? "border-red-200 bg-red-50/40"
+                  : "border-slate-200 bg-[#F8FAFC]"
+              }`}
+            >
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="text-sm font-semibold text-[#111827]">
+                  Line {index + 1}
+                </div>
+                <div className="text-sm font-bold text-[#4854CC]">
+                  {formatMoney(total)}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1 sm:col-span-2">
+                  <Label>Product *</Label>
+                  <SalesInvoiceLineProductSelect
+                    value={watch(`lines.${index}.product_id`)}
+                    onChange={(val) => handleProductChange(index, val)}
+                  />
+                  {lineError?.product_id && (
+                    <span className="text-xs text-red-500">
+                      {lineError.product_id.message}
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <Label>Batch</Label>
+                  <SalesInvoiceLineBatchSelect
+                    value={watch(`lines.${index}.product_batch_id`)}
+                    onChange={(val) => handleBatchChange(index, val)}
+                    productId={watch(`lines.${index}.product_id`)}
+                    onBatchSelected={(batch) => {
+                      if (batch.selling_price) {
+                        setValue(
+                          `lines.${index}.unit_price`,
+                          Number(batch.selling_price),
+                          { shouldValidate: true }
+                        );
+                      }
+                    }}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Qty *</Label>
+                  <Input
+                    type="number"
+                    step="0.001"
+                    className={lineError?.quantity ? "border-red-500" : ""}
+                    {...register(`lines.${index}.quantity`, {
+                      valueAsNumber: true,
+                    })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Unit Price</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    className={lineError?.unit_price ? "border-red-500" : ""}
+                    {...register(`lines.${index}.unit_price`, {
+                      valueAsNumber: true,
+                    })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Discount</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    className={
+                      lineError?.discount_amount ? "border-red-500" : ""
+                    }
+                    {...register(`lines.${index}.discount_amount`, {
+                      valueAsNumber: true,
+                    })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Tax</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    className={lineError?.tax_amount ? "border-red-500" : ""}
+                    {...register(`lines.${index}.tax_amount`, {
+                      valueAsNumber: true,
+                    })}
+                  />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <Label>Remarks</Label>
+                  <Textarea
+                    rows={2}
+                    placeholder="Remarks..."
+                    {...register(`lines.${index}.line_remarks`)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-3 flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insert(index + 1, lines[index])}
+                >
+                  <Copy className="mr-2 h-4 w-4" />
+                  Duplicate
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700"
+                  onClick={() => remove(index)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Remove
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+
+        {fields.length === 0 && (
+          <div className="rounded-lg border border-dashed border-slate-300 py-8 text-center text-[#64748B]">
+            <p className="mb-4">No line items added yet.</p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => append(createBlankSalesInvoiceLine())}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add First Line
+            </Button>
+          </div>
+        )}
+      </div>
+
       {errors?.lines?.root && (
-        <div className="text-sm font-medium text-red-500">
+        <div className="mt-3 text-sm font-medium text-red-500">
           {errors.lines.root.message}
         </div>
       )}

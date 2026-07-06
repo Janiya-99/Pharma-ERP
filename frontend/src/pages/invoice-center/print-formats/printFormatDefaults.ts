@@ -27,6 +27,274 @@ export const themePresets = [
   { name: "Thermal Simple", color: "#1F2937" },
 ];
 
+export type PrintDataFieldPlacement =
+  | "header"
+  | "details"
+  | "line_table"
+  | "totals"
+  | "footer";
+
+export type PrintDataField = {
+  key: string;
+  label: string;
+  table: string;
+  column: string;
+  group: string;
+  placements: PrintDataFieldPlacement[];
+  documentTypes?: string[];
+  width?: number;
+  alignment?: "left" | "center" | "right";
+};
+
+export const printDataFieldCatalog: PrintDataField[] = [
+  {
+    key: "customer_name",
+    label: "Customer Name",
+    table: "invoice_center_customers",
+    column: "customer_name",
+    group: "Customer",
+    placements: ["details", "header"],
+  },
+  {
+    key: "customer_code",
+    label: "Customer Code",
+    table: "invoice_center_customers",
+    column: "customer_code",
+    group: "Customer",
+    placements: ["details", "header"],
+  },
+  {
+    key: "billing_address",
+    label: "Billing Address",
+    table: "invoice_center_customers",
+    column: "billing_address",
+    group: "Customer",
+    placements: ["details"],
+  },
+  {
+    key: "shipping_address",
+    label: "Delivery Address",
+    table: "invoice_center_customers",
+    column: "shipping_address",
+    group: "Customer",
+    placements: ["details"],
+  },
+  {
+    key: "payment_terms",
+    label: "Payment Terms",
+    table: "invoice_center_customers",
+    column: "payment_terms",
+    group: "Customer",
+    placements: ["details", "footer"],
+  },
+  {
+    key: "sales_invoice_number",
+    label: "Invoice Number",
+    table: "invoice_center_sales_invoices",
+    column: "sales_invoice_number",
+    group: "Document Header",
+    placements: ["header", "details"],
+    documentTypes: ["sales_invoice", "proforma_invoice"],
+  },
+  {
+    key: "sales_invoice_date",
+    label: "Invoice Date",
+    table: "invoice_center_sales_invoices",
+    column: "sales_invoice_date",
+    group: "Document Header",
+    placements: ["header", "details"],
+    documentTypes: ["sales_invoice", "proforma_invoice"],
+  },
+  {
+    key: "due_date",
+    label: "Due Date",
+    table: "invoice_center_sales_invoices",
+    column: "due_date",
+    group: "Document Header",
+    placements: ["details"],
+    documentTypes: ["sales_invoice", "proforma_invoice"],
+  },
+  {
+    key: "sales_order_number",
+    label: "Sales Order Number",
+    table: "invoice_center_sales_orders",
+    column: "sales_order_number",
+    group: "Document Header",
+    placements: ["header", "details"],
+    documentTypes: ["sales_order"],
+  },
+  {
+    key: "receipt_number",
+    label: "Receipt Number",
+    table: "invoice_center_customer_receipts",
+    column: "receipt_number",
+    group: "Document Header",
+    placements: ["header", "details"],
+    documentTypes: ["customer_receipt"],
+  },
+  {
+    key: "payment_method",
+    label: "Payment Method",
+    table: "invoice_center_customer_receipts",
+    column: "payment_method",
+    group: "Document Header",
+    placements: ["details"],
+    documentTypes: ["customer_receipt"],
+  },
+  {
+    key: "line_no",
+    label: "Line No",
+    table: "document_lines",
+    column: "line_no",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 56,
+    alignment: "center",
+  },
+  {
+    key: "product_code",
+    label: "Product Code",
+    table: "inventory_products",
+    column: "product_code",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 110,
+  },
+  {
+    key: "product_name",
+    label: "Product Name",
+    table: "inventory_products",
+    column: "product_name",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 190,
+  },
+  {
+    key: "generic_name",
+    label: "Generic Name",
+    table: "inventory_products",
+    column: "generic_name",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 140,
+  },
+  {
+    key: "batch_number",
+    label: "Batch Number",
+    table: "inventory_product_batches",
+    column: "batch_number",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 110,
+  },
+  {
+    key: "expiry_date",
+    label: "Expiry Date",
+    table: "inventory_product_batches",
+    column: "expiry_date",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 100,
+    alignment: "center",
+  },
+  {
+    key: "quantity",
+    label: "Quantity",
+    table: "document_lines",
+    column: "quantity",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 90,
+    alignment: "right",
+  },
+  {
+    key: "unit_price",
+    label: "Unit Price",
+    table: "document_lines",
+    column: "unit_price",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 110,
+    alignment: "right",
+  },
+  {
+    key: "discount_amount",
+    label: "Discount",
+    table: "document_lines",
+    column: "discount_amount",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 100,
+    alignment: "right",
+  },
+  {
+    key: "tax_amount",
+    label: "Tax",
+    table: "document_lines",
+    column: "tax_amount",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 90,
+    alignment: "right",
+  },
+  {
+    key: "line_total",
+    label: "Line Total",
+    table: "document_lines",
+    column: "line_total",
+    group: "Line Items",
+    placements: ["line_table"],
+    width: 120,
+    alignment: "right",
+  },
+  {
+    key: "remarks",
+    label: "Remarks",
+    table: "document_lines",
+    column: "remarks",
+    group: "Line Items",
+    placements: ["line_table", "footer"],
+    width: 150,
+  },
+  {
+    key: "subtotal_amount",
+    label: "Subtotal",
+    table: "document_totals",
+    column: "subtotal_amount",
+    group: "Totals",
+    placements: ["totals"],
+    alignment: "right",
+  },
+  {
+    key: "tax_amount_total",
+    label: "Tax Total",
+    table: "document_totals",
+    column: "tax_amount",
+    group: "Totals",
+    placements: ["totals"],
+    alignment: "right",
+  },
+  {
+    key: "total_amount",
+    label: "Total Amount",
+    table: "document_totals",
+    column: "total_amount",
+    group: "Totals",
+    placements: ["totals"],
+    alignment: "right",
+  },
+];
+
+export const getPrintDataFields = (documentType: string) =>
+  printDataFieldCatalog.filter(
+    (field) =>
+      !field.documentTypes || field.documentTypes.includes(documentType)
+  );
+
+export const getPrintDataField = (key: string, documentType: string) =>
+  getPrintDataFields(documentType).find((field) => field.key === key) ||
+  printDataFieldCatalog.find((field) => field.key === key);
+
 const commonLineColumns: InvoicePrintFormatField[] = [
   ["line_no", "Line No", 56, "center"],
   ["product_code", "Product Code", 110, "left"],
@@ -102,9 +370,14 @@ const grnColumns: InvoicePrintFormatField[] = [
 }));
 
 export const getDefaultPrintFields = (documentType: string) => {
-  if (documentType === "customer_receipt") return receiptColumns;
-  if (documentType === "grn") return grnColumns;
-  return commonLineColumns;
+  const fields =
+    documentType === "customer_receipt"
+      ? receiptColumns
+      : documentType === "grn"
+      ? grnColumns
+      : commonLineColumns;
+
+  return fields.map((field) => ({ ...field }));
 };
 
 export const createDefaultPrintFormat = (

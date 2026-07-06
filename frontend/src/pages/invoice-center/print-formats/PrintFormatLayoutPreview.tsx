@@ -4,6 +4,8 @@ import { documentTypes } from "./printFormatDefaults";
 type Props = {
   format: InvoicePrintFormat;
   zoom?: number;
+  company?: Record<string, any> | null;
+  branch?: Record<string, any> | null;
 };
 
 const sampleLines: Record<string, Record<string, string>> = {
@@ -67,10 +69,38 @@ const detailText: Record<string, string[]> = {
   ],
 };
 
-export function PrintFormatLayoutPreview({ format, zoom = 82 }: Props) {
+export function PrintFormatLayoutPreview({
+  format,
+  zoom = 82,
+  company,
+  branch,
+}: Props) {
   const visibleFields = [...(format.fields || [])]
     .filter((field) => field.is_visible)
     .sort((a, b) => a.display_order - b.display_order);
+
+  const companyName =
+    company?.company_name ||
+    company?.legal_name ||
+    company?.name ||
+    "Your Company";
+  const companyInitials = companyName
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+  const branchName =
+    branch?.branch_name || branch?.name || branch?.branch_code || "Main Branch";
+  const branchLocation =
+    branch?.city || branch?.address_line_1 || branch?.address || "";
+  const licenseNumber =
+    company?.license_number ||
+    company?.registration_number ||
+    company?.tax_number ||
+    branch?.license_number ||
+    "";
 
   const documentLabel =
     documentTypes.find((type) => type.value === format.document_type)?.label ||
@@ -123,18 +153,28 @@ export function PrintFormatLayoutPreview({ format, zoom = 82 }: Props) {
           >
             <div>
               {format.show_company_logo && (
-                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold">
-                  OX
+                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold">
+                  {company?.logo_url ? (
+                    <img
+                      src={company.logo_url}
+                      alt={companyName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    companyInitials || "CO"
+                  )}
                 </div>
               )}
               {format.show_company_name && (
                 <div className="text-xl font-bold text-slate-900">
-                  OMACX Pharmacy
+                  {companyName}
                 </div>
               )}
               {format.show_branch_details && (
                 <div className="mt-1 text-xs text-slate-500">
-                  Main Branch, Colombo • NMRA/DL/20418
+                  {[branchName, branchLocation, licenseNumber]
+                    .filter(Boolean)
+                    .join(" • ")}
                 </div>
               )}
             </div>
@@ -174,9 +214,9 @@ export function PrintFormatLayoutPreview({ format, zoom = 82 }: Props) {
                 }}
               >
                 <tr>
-                  {visibleFields.map((field) => (
+                  {visibleFields.map((field, index) => (
                     <th
-                      key={field.field_key}
+                      key={`${field.field_key}-${index}`}
                       className="px-2 py-2 font-medium"
                       style={{
                         textAlign: field.alignment,
@@ -191,9 +231,9 @@ export function PrintFormatLayoutPreview({ format, zoom = 82 }: Props) {
               </thead>
               <tbody>
                 <tr>
-                  {visibleFields.map((field) => (
+                  {visibleFields.map((field, index) => (
                     <td
-                      key={field.field_key}
+                      key={`${field.field_key}-${index}`}
                       className="border-t px-2 py-2"
                       style={{ textAlign: field.alignment }}
                     >

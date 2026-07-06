@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog";
+} from "../../../components/invoice-center/InvoiceCenterActionDrawer";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";

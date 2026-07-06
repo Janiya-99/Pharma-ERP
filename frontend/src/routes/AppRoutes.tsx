@@ -225,14 +225,11 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/"
-        element={<Navigate to="/modules" replace />}
-      />
+      <Route path="/" element={<Navigate to="/modules" replace />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/modules" element={<ModuleSelectionPage />} />
-        
+
         <Route element={<AppLayout />}>
           {/* Control Center Routes */}
           <Route

@@ -444,4 +444,6 @@ export const financeApi = {
     apiClient.get("/finance/reports/payment-register", { params }),
   getReceiptRegisterReport: (params: Record<string, unknown>) =>
     apiClient.get("/finance/reports/receipt-register", { params }),
+  getCountries: () => apiClient.get("/finance/countries"),
 };
+
