@@ -16,7 +16,7 @@ export function FinanceQuickActions() {
   ];
 
   return (
-    <Card className="border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm  ">
+    <Card className="rounded-2xl border-slate-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50  ">
       <CardHeader className="pb-3">
         <CardTitle>Quick Actions</CardTitle>
         <CardDescription>Common finance tasks</CardDescription>

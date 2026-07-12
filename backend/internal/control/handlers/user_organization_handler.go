@@ -117,9 +117,9 @@ func (h *UserOrganizationHandler) CreateAssignment(c *gin.Context) {
 		}
 
 		middleware.LogAuditWithTx(tx, companyID.(uint64), reqUserID.(uint64), "USER_ORGANIZATION_ASSIGNMENT_CREATED", "UserOrganizationAssignment", assignment.ID, map[string]interface{}{
-			"user_id": userID,
-			"branch_id": assignment.BranchID,
-			"department_id": assignment.DepartmentID,
+			"user_id":        userID,
+			"branch_id":      assignment.BranchID,
+			"department_id":  assignment.DepartmentID,
 			"designation_id": assignment.DesignationID,
 		})
 		return nil
@@ -146,7 +146,7 @@ func (h *UserOrganizationHandler) UpdateAssignment(c *gin.Context) {
 	userIDStr := c.Param("id")
 	assignmentIDStr := c.Param("assignmentId")
 	reqUserID, _ := c.Get("user_id")
-	
+
 	assignmentID, err := strconv.ParseUint(assignmentIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid assignment ID"})

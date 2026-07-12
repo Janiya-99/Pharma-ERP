@@ -16,7 +16,7 @@ type DocumentNumberingRule struct {
 	Prefix         string         `gorm:"size:30;not null" json:"prefix"`
 	Suffix         string         `gorm:"size:30" json:"suffix"`
 	Padding        int            `gorm:"not null;default:6" json:"padding"`
-	ResetFrequency string         `gorm:"size:30;not null;default:'never'" json:"reset_frequency"` // never, monthly, yearly, financial_year, daily
+	ResetFrequency string         `gorm:"size:30;not null;default:'never'" json:"reset_frequency"`  // never, monthly, yearly, financial_year, daily
 	Status         string         `gorm:"size:20;not null;default:'published';index" json:"status"` // draft, published, archived
 	VersionNumber  int            `gorm:"not null;default:1" json:"version_number"`
 	IsDefault      bool           `gorm:"not null;default:false" json:"is_default"`

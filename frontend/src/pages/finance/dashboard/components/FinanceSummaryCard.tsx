@@ -18,7 +18,7 @@ export function FinanceSummaryCard({
   iconColorClass,
 }: FinanceSummaryCardProps) {
   return (
-    <div className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white/88 p-5 shadow-[0_2px_8px_rgb(0,0,0,0.04)] backdrop-blur-sm transition-all hover:shadow-[0_4px_12px_rgb(0,0,0,0.06)]  ">
+    <div className="flex flex-col justify-between rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-indigo-500/30 ring-1 ring-inset ring-slate-50 hover:ring-indigo-50  ">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-500 ">
           {label}

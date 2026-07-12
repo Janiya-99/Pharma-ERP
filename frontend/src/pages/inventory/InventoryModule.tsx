@@ -373,9 +373,9 @@ function InventoryPage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-full bg-[#F8FAFC] text-slate-900">
+    <div className="w-full text-slate-900 animate-in fade-in-50 duration-300">
       <div className="flex w-full flex-col gap-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             {Icon ? (
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-indigo-600 shadow-sm">

@@ -183,14 +183,14 @@ func (s *SecurityPolicyService) ListBackupLogs(companyID uint64, limit int) ([]m
 func (s *SecurityPolicyService) TriggerManualBackup(companyID uint64, activeUserID uint64, ipAddress, userAgent string) (*models.BackupExecutionLog, error) {
 	now := time.Now()
 	log := models.BackupExecutionLog{
-		CompanyID:          companyID,
-		BackupType:         "manual",
-		Status:             "success",
-		FileSizeBytes:      14285760, // Simulate ~14MB backup snapshot
-		StoragePath:        fmt.Sprintf("/var/backups/company_%d_%s.sql.gz", companyID, now.Format("20060102_150405")),
-		StartedAt:          now.Add(-2 * time.Second),
-		CompletedAt:        &now,
-		TriggeredByUserID:  &activeUserID,
+		CompanyID:         companyID,
+		BackupType:        "manual",
+		Status:            "success",
+		FileSizeBytes:     14285760, // Simulate ~14MB backup snapshot
+		StoragePath:       fmt.Sprintf("/var/backups/company_%d_%s.sql.gz", companyID, now.Format("20060102_150405")),
+		StartedAt:         now.Add(-2 * time.Second),
+		CompletedAt:       &now,
+		TriggeredByUserID: &activeUserID,
 	}
 
 	if err := s.repo.GetDB().Create(&log).Error; err != nil {
@@ -229,15 +229,15 @@ func (s *SecurityPolicyService) ListActiveSessions(companyID uint64) ([]map[stri
 	var result []map[string]interface{}
 	for _, sess := range sessions {
 		result = append(result, map[string]interface{}{
-			"id":          sess.ID,
-			"user_id":     sess.UserID,
-			"full_name":   sess.User.FullName,
-			"email":       sess.User.Email,
-			"ip_address":  sess.IPAddress,
-			"user_agent":  sess.UserAgent,
-			"created_at":  sess.CreatedAt,
-			"expires_at":  sess.ExpiresAt,
-			"is_current":  false, // Handler can set true if matches current token
+			"id":         sess.ID,
+			"user_id":    sess.UserID,
+			"full_name":  sess.User.FullName,
+			"email":      sess.User.Email,
+			"ip_address": sess.IPAddress,
+			"user_agent": sess.UserAgent,
+			"created_at": sess.CreatedAt,
+			"expires_at": sess.ExpiresAt,
+			"is_current": false, // Handler can set true if matches current token
 		})
 	}
 	return result, nil

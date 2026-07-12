@@ -16,7 +16,7 @@ func NewUserAccessPreviewHandler(logger *zap.Logger) *UserAccessPreviewHandler {
 }
 
 func (h *UserAccessPreviewHandler) GetAccessPreview(c *gin.Context) {
-	// Dummy implementation for now - this should ideally call the access resolver 
+	// Dummy implementation for now - this should ideally call the access resolver
 	// to merge roles, modules, and organization assignments.
 	// For step 70, we'll return a mock structure that the frontend can use to show the preview.
 
@@ -33,7 +33,7 @@ func (h *UserAccessPreviewHandler) GetAccessPreview(c *gin.Context) {
 		"access_by_branch": []gin.H{
 			{
 				"branch_name": "Main Branch",
-				"roles": []string{"Finance Manager"},
+				"roles":       []string{"Finance Manager"},
 			},
 		},
 	})
@@ -41,7 +41,7 @@ func (h *UserAccessPreviewHandler) GetAccessPreview(c *gin.Context) {
 
 func (h *UserAccessPreviewHandler) GetEffectiveAccess(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"modules": []string{"control_center", "finance"},
+		"modules":     []string{"control_center", "finance"},
 		"permissions": []string{"control.user.view", "finance.journal.create"},
 	})
 }

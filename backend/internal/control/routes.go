@@ -47,7 +47,7 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	router.GET("/designations/:id", middleware.RequirePermission("control.designation.view"), desigHandler.Get)
 	router.PUT("/designations/:id", middleware.RequirePermission("control.designation.update"), desigHandler.Update)
 	router.DELETE("/designations/:id", middleware.RequirePermission("control.designation.delete"), desigHandler.Delete)
-	
+
 	router.GET("/designations/:id/default-roles", middleware.RequirePermission("control.designation.view"), desigMappingHandler.GetDefaultRolesForDesignation)
 	router.PUT("/designations/:id/default-roles", middleware.RequirePermission("control.designation.update"), desigMappingHandler.SetDefaultRolesForDesignation)
 	router.GET("/designations/:id/departments", middleware.RequirePermission("control.designation.view"), desigMappingHandler.GetDepartmentsForDesignation)
@@ -159,4 +159,3 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	router.DELETE("/security/sessions/:id", middleware.RequirePermission("control.security_sessions.manage"), secSettingsHandler.TerminateSession)
 	router.DELETE("/security/sessions/terminate-all", middleware.RequirePermission("control.security_sessions.manage"), secSettingsHandler.TerminateAllSessions)
 }
-

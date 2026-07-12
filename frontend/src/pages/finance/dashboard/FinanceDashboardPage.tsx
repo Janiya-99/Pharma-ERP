@@ -48,9 +48,9 @@ const FinanceDashboardPage = () => {
   const dashboardData = response;
 
   return (
-    <div className="flex h-full w-full flex-col bg-[#F7F8FA] ">
+    <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
       {/* Page Header */}
-      <div className="sticky top-0 z-10 flex flex-col justify-between gap-4 border-b border-gray-200 bg-white/80 px-6 py-4 backdrop-blur-md sm:flex-row sm:items-center  ">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900 ">
             Finance Dashboard
@@ -70,10 +70,10 @@ const FinanceDashboardPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-6">
+      <div className="w-full">
         {isLoading && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <Skeleton key={i} className="h-[132px] w-full rounded-2xl" />
               ))}
@@ -101,9 +101,9 @@ const FinanceDashboardPage = () => {
         )}
 
         {!isLoading && !isError && dashboardData && (
-          <div className="mx-auto max-w-7xl space-y-6">
+          <div className="w-full space-y-6">
             {/* KPI Cards Row 1 (6 columns) */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
               <FinanceKpiCard
                 label="Cash Balance"
                 metric={dashboardData.summary.cash_balance}

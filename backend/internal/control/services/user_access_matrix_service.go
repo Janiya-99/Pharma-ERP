@@ -42,12 +42,12 @@ func (s *UserAccessMatrixService) GetUserAccessMatrix(userID uint64) (*dto.UserA
 	var items []dto.AccessMatrixResponseItem
 	for _, m := range matrix {
 		items = append(items, dto.AccessMatrixResponseItem{
-			ID:           m.ID,
-			BranchID:     m.BranchID,
-			BranchName:   m.Branch.BranchName,
-			RoleID:       m.RoleID,
-			RoleName:     m.Role.RoleName,
-			Status:       m.Status,
+			ID:         m.ID,
+			BranchID:   m.BranchID,
+			BranchName: m.Branch.BranchName,
+			RoleID:     m.RoleID,
+			RoleName:   m.Role.RoleName,
+			Status:     m.Status,
 		})
 	}
 
@@ -84,11 +84,11 @@ func (s *UserAccessMatrixService) AssignUserAccessMatrix(userID uint64, req dto.
 
 		// 3. Create or Reactivate
 		record := &models.UserBranchRole{
-			UserID:     userID,
-			BranchID:   accessReq.BranchID,
-			RoleID:     accessReq.RoleID,
-			Status:     "active",
-			CreatedBy:  &activeUserID,
+			UserID:    userID,
+			BranchID:  accessReq.BranchID,
+			RoleID:    accessReq.RoleID,
+			Status:    "active",
+			CreatedBy: &activeUserID,
 		}
 
 		if err := s.repo.CreateOrReactivateAccess(record); err != nil {
@@ -115,7 +115,7 @@ func (s *UserAccessMatrixService) RemoveUserAccessMatrix(accessID uint64, userID
 	}
 
 	// System rule: Do not allow removing active Super Admin access
-	if (record.Role.RoleCode == "SUPER_ADMIN") {
+	if record.Role.RoleCode == "SUPER_ADMIN" {
 		if record.UserID == activeUserID {
 			return errors.New("cannot remove your own active Super Admin access")
 		}

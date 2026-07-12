@@ -152,9 +152,9 @@ const ComplianceDashboardPage = () => {
       </div>
 
       {/* ── Tier 1: KPI Summary Cards ── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {/* Active Licenses */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Active NMRA & IRAS Licenses
@@ -175,7 +175,7 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Batches Under Quarantine */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Batches Under Quarantine
@@ -194,7 +194,7 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Active Product Recalls */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Active Product Recalls
@@ -213,7 +213,7 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Pending Expiry Disposals */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Pending Expiry Disposals

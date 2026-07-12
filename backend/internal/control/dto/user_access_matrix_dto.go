@@ -1,8 +1,8 @@
 package dto
 
 type AccessMatrixItem struct {
-	BranchID   uint64 `json:"branch_id" binding:"required"`
-	RoleID     uint64 `json:"role_id" binding:"required"`
+	BranchID uint64 `json:"branch_id" binding:"required"`
+	RoleID   uint64 `json:"role_id" binding:"required"`
 }
 
 type AssignUserAccessMatrixRequest struct {
@@ -16,12 +16,12 @@ type UserReference struct {
 }
 
 type AccessMatrixResponseItem struct {
-	ID           uint64 `json:"id"`
-	BranchID     uint64 `json:"branch_id"`
-	BranchName   string `json:"branch_name"`
-	RoleID       uint64 `json:"role_id"`
-	RoleName     string `json:"role_name"`
-	Status       string `json:"status"`
+	ID         uint64 `json:"id"`
+	BranchID   uint64 `json:"branch_id"`
+	BranchName string `json:"branch_name"`
+	RoleID     uint64 `json:"role_id"`
+	RoleName   string `json:"role_name"`
+	Status     string `json:"status"`
 }
 
 type UserAccessMatrixResponse struct {

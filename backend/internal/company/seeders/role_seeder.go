@@ -8,8 +8,8 @@ import (
 
 func SeedRoles(db *gorm.DB, logger *zap.Logger, isNewTenant bool) error {
 	roles := []struct {
-		RoleName     string
-		RoleCode     string
+		RoleName string
+		RoleCode string
 	}{
 		{"Super Admin", "SUPER_ADMIN"},
 	}

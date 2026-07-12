@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pixandco/erp-phrma/internal/platform/models"
 	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
+	"github.com/pixandco/erp-phrma/internal/platform/models"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

@@ -134,54 +134,39 @@ const roleData: RoleDistribution[] = [
 ];
 
 const kpiCards: KPIData[] = [
-  {
-    title: "Total Companies",
-    value: "4",
-    icon: Building2,
-    trend: "up",
-    trendValue: "+1 this year",
-    description: "Active corporate entities",
-  },
-  {
     title: "Total Branches",
     value: "24",
     icon: Building2,
     trend: "up",
     trendValue: "+3 this quarter",
     description: "Regional office locations",
+    tone: "blue",
   },
-  {
     title: "Total Users",
     value: "1,248",
     icon: Users,
     trend: "up",
     trendValue: "+12% vs last month",
     description: "Registered employee accounts",
+    tone: "indigo",
   },
-  {
-    title: "Active Users (24h)",
-    value: "942",
-    icon: UserCheck,
-    trend: "up",
-    trendValue: "75.5% engagement",
-    description: "Unique logins today",
-  },
-  {
     title: "Software Modules",
     value: "8",
     icon: Blocks,
     trend: "neutral",
     trendValue: "All systems online",
     description: "Licensed ERP suites",
+    tone: "emerald",
   },
   {
-    title: "Security Alerts",
+    title: "Active Incidents",
     value: "3",
-    icon: AlertTriangle,
+    icon: ShieldAlert,
     trend: "down",
-    trendValue: "-5 vs last week",
-    description: "Requires immediate review",
+    trendValue: "-2 from yesterday",
+    description: "Requires immediate attention",
     accent: true,
+    tone: "rose",
   },
 ];
 
@@ -356,7 +341,7 @@ const ControlCenterDashboardPage = () => {
           </h2>
           <span className="text-xs text-slate-400">Updated just now</span>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {kpiCards.map((kpi) => {
             const Icon = kpi.icon;
             const isAlert = kpi.accent;
@@ -364,21 +349,29 @@ const ControlCenterDashboardPage = () => {
             return (
               <div
                 key={kpi.title}
-                className={`group relative overflow-hidden rounded-2xl border p-5 sm:p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-                  isAlert
-                    ? "border-rose-200 bg-gradient-to-br from-rose-50/50 to-white shadow-sm"
-                    : "border-slate-200 bg-white shadow-sm hover:border-indigo-500/30"
+                className={`group relative overflow-hidden rounded-3xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                  kpi.tone === "rose"
+                    ? "border-rose-100 bg-gradient-to-br from-rose-50/80 to-white shadow-md ring-1 ring-inset ring-rose-100"
+                    : kpi.tone === "blue"
+                    ? "border-blue-100 bg-gradient-to-br from-blue-50/80 to-white shadow-md ring-1 ring-inset ring-blue-100"
+                    : kpi.tone === "emerald"
+                    ? "border-emerald-100 bg-gradient-to-br from-emerald-50/80 to-white shadow-md ring-1 ring-inset ring-emerald-100"
+                    : "border-indigo-100 bg-gradient-to-br from-indigo-50/80 to-white shadow-md ring-1 ring-inset ring-indigo-100"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500  truncate">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 truncate">
                     {kpi.title}
                   </span>
                   <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                      isAlert
-                        ? "bg-rose-100 text-rose-600  "
-                        : "bg-slate-100 text-slate-600   group-hover:bg-indigo-50 group-hover:text-indigo-600  "
+                      kpi.tone === "rose"
+                        ? "bg-rose-100 text-rose-600 group-hover:bg-rose-200"
+                        : kpi.tone === "blue"
+                        ? "bg-blue-100 text-blue-600 group-hover:bg-blue-200"
+                        : kpi.tone === "emerald"
+                        ? "bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200"
+                        : "bg-indigo-100 text-indigo-600 group-hover:bg-indigo-200"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -386,7 +379,7 @@ const ControlCenterDashboardPage = () => {
                 </div>
 
                 <div className="mt-3 flex items-baseline justify-between">
-                  <span className={`text-2xl font-bold tracking-tight truncate ${isAlert ? "text-rose-600 " : "text-slate-900 "}`}>
+                  <span className={`text-2xl font-bold tracking-tight truncate ${kpi.tone === "rose" ? "text-rose-600" : kpi.tone === "blue" ? "text-blue-600" : kpi.tone === "emerald" ? "text-emerald-600" : "text-indigo-600"}`}>
                     {kpi.value}
                   </span>
                 </div>
@@ -408,7 +401,7 @@ const ControlCenterDashboardPage = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Left: Interactive Area Chart (2/3 width on xl+) */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm xl:col-span-2 flex flex-col justify-between min-w-0">
+        <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 xl:col-span-2 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div className="min-w-0">
@@ -453,7 +446,7 @@ const ControlCenterDashboardPage = () => {
         </div>
 
         {/* Right: Module Adoption Bar Chart (1/3 width on xl+) */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="mb-4 min-w-0">
               <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
@@ -470,7 +463,7 @@ const ControlCenterDashboardPage = () => {
                 data={moduleData}
                 index="name"
                 categories={["Users"]}
-                colors={["brand"]}
+                colors={["indigo"]}
                 valueFormatter={(number: number) => `${Intl.NumberFormat("us").format(number)} seats`}
                 layout="vertical"
                 showLegend={false}
@@ -490,7 +483,7 @@ const ControlCenterDashboardPage = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Left 2 Cols: Interactive Audit & Security Logs Table */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm xl:col-span-2 flex flex-col justify-between min-w-0">
+        <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 xl:col-span-2 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-100  pb-4">
               <div className="min-w-0">
@@ -610,7 +603,7 @@ const ControlCenterDashboardPage = () => {
         </div>
 
         {/* Right 1 Col: User & Role Distribution Card */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="mb-4 min-w-0">
               <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
@@ -628,7 +621,7 @@ const ControlCenterDashboardPage = () => {
                 category="count"
                 index="name"
                 valueFormatter={(val: number) => `${val} accounts`}
-                colors={["brand", "blue", "cyan", "teal", "indigo"]}
+                colors={["sky", "blue", "cyan", "teal", "indigo"]}
               />
             </div>
 
@@ -672,7 +665,7 @@ const ControlCenterDashboardPage = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Quick Actions (2 Cols on xl+) */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm xl:col-span-2 min-w-0 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 xl:col-span-2 min-w-0 flex flex-col justify-between">
           <div className="mb-6 flex items-start sm:items-center justify-between gap-4">
             <div className="min-w-0">
               <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
@@ -767,7 +760,7 @@ const ControlCenterDashboardPage = () => {
           </div>
 
           {/* System Health Status Card */}
-          <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm min-w-0">
+          <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 min-w-0">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <h3 className="text-base font-bold text-slate-900  flex items-center gap-2 min-w-0">
                 <Server className="h-4 w-4 text-indigo-600  shrink-0" />

@@ -46,7 +46,7 @@ func (r *DocumentNumberingRepository) GetByID(id uint64) (*models.DocumentNumber
 func (r *DocumentNumberingRepository) GetRuleForDocument(companyID uint64, branchID *uint64, module string, docType string) (*models.DocumentNumberingRule, error) {
 	var rule models.DocumentNumberingRule
 	query := r.db.Where("company_id = ? AND module = ? AND document_type = ? AND status = ?", companyID, module, docType, "published")
-	
+
 	if branchID != nil && *branchID != 0 {
 		// Try branch specific first
 		err := query.Session(&gorm.Session{}).Where("branch_id = ?", *branchID).First(&rule).Error
@@ -54,7 +54,7 @@ func (r *DocumentNumberingRepository) GetRuleForDocument(companyID uint64, branc
 			return &rule, nil
 		}
 	}
-	
+
 	// Fallback to company-wide (branch_id IS NULL)
 	err := query.Where("branch_id IS NULL").First(&rule).Error
 	if err != nil {

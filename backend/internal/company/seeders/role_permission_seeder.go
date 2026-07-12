@@ -46,71 +46,8 @@ func SeedRolePermissions(db *gorm.DB, logger *zap.Logger) error {
 		}
 	}
 
-
-
 	// Super Admin: all permissions
 	assignPermission("SUPER_ADMIN", func(k string) bool { return true })
-
-	// Company Admin: all Control Center
-	assignPermission("COMPANY_ADMIN", func(k string) bool { return strings.HasPrefix(k, "control.") })
-
-	// User Manager: user, branch access, software access, access matrix
-	assignPermission("USER_MANAGER", func(k string) bool {
-		return strings.HasPrefix(k, "control.user.") ||
-			strings.HasPrefix(k, "control.access.") ||
-			strings.HasPrefix(k, "control.access_matrix.")
-	})
-
-	// Read Only Admin: only view permissions in Control Center
-	assignPermission("READ_ONLY_ADMIN", func(k string) bool {
-		return strings.HasPrefix(k, "control.") && strings.HasSuffix(k, ".view")
-	})
-
-	// Finance Manager: all Finance
-	assignPermission("FINANCE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "finance.") })
-
-	// Finance Executive: view, create, update, submit, export
-	assignPermission("FINANCE_EXECUTIVE", func(k string) bool {
-		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".create") || strings.HasSuffix(k, ".update") || strings.HasSuffix(k, ".submit") || strings.HasSuffix(k, ".export")) && k != "finance.ledger.rebuild"
-	})
-
-	// Finance Approver: view, approve, reject, post, complete, cancel
-	assignPermission("FINANCE_APPROVER", func(k string) bool {
-		return strings.HasPrefix(k, "finance.") && (strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post") || strings.HasSuffix(k, ".complete") || strings.HasSuffix(k, ".cancel")) && k != "finance.ledger.rebuild"
-	})
-
-	// Finance Viewer
-	assignPermission("FINANCE_VIEWER", func(k string) bool {
-		return strings.HasPrefix(k, "finance.") && strings.HasSuffix(k, ".view") && k != "finance.ledger.rebuild"
-	})
-
-	// Warehouse Manager: all Inventory
-	assignPermission("WAREHOUSE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "inventory.") })
-	// Inventory Viewer
-	assignPermission("INVENTORY_VIEWER", func(k string) bool {
-		return strings.HasPrefix(k, "inventory.") && strings.HasSuffix(k, ".view")
-	})
-
-	// Invoice Manager: all Invoice Center
-	assignPermission("INVOICE_MANAGER", func(k string) bool {
-		return strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.")
-	})
-	// Invoice Approver: view, approve, reject, post, complete, cancel, and reports
-	assignPermission("INVOICE_APPROVER", func(k string) bool {
-		return (strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.")) &&
-			(strings.HasSuffix(k, ".view") || strings.HasSuffix(k, ".approve") || strings.HasSuffix(k, ".reject") || strings.HasSuffix(k, ".post") || strings.HasSuffix(k, ".complete") || strings.HasSuffix(k, ".cancel"))
-	})
-	// Invoice Viewer: all view permissions (including reports)
-	assignPermission("INVOICE_VIEWER", func(k string) bool {
-		return (strings.HasPrefix(k, "invoice.") || strings.HasPrefix(k, "invoice_center.")) && strings.HasSuffix(k, ".view")
-	})
-
-	// Compliance Manager: all Compliance Center
-	assignPermission("COMPLIANCE_MANAGER", func(k string) bool { return strings.HasPrefix(k, "compliance.") })
-	// Compliance Viewer
-	assignPermission("COMPLIANCE_VIEWER", func(k string) bool {
-		return strings.HasPrefix(k, "compliance.") && strings.HasSuffix(k, ".view")
-	})
 
 	logger.Info("Role Permissions seeding completed")
 	return nil

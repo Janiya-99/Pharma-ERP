@@ -29,6 +29,6 @@ type SoftwareReference struct {
 }
 
 type RolePermissionMatrixResponse struct {
-	Role     RoleReference         `json:"role"`
-	Groups   []RolePermissionGroup `json:"groups"`
+	Role   RoleReference         `json:"role"`
+	Groups []RolePermissionGroup `json:"groups"`
 }

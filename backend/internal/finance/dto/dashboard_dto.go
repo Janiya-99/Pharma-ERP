@@ -20,17 +20,17 @@ type SummaryMetric struct {
 }
 
 type DashboardSummary struct {
-	CashBalance         KpiMetric `json:"cash_balance"`
-	BankBalance         KpiMetric `json:"bank_balance"`
-	AccountsReceivable  KpiMetric `json:"accounts_receivable"`
-	AccountsPayable     KpiMetric `json:"accounts_payable"`
-	MonthlyRevenue      KpiMetric `json:"monthly_revenue"`
-	MonthlyExpenses     KpiMetric `json:"monthly_expenses"`
-	
-	GrossProfit      SummaryMetric `json:"gross_profit"`
-	NetProfit        SummaryMetric `json:"net_profit"`
-	PendingPayments  SummaryMetric `json:"pending_payments"`
-	PendingReceipts  SummaryMetric `json:"pending_receipts"`
+	CashBalance        KpiMetric `json:"cash_balance"`
+	BankBalance        KpiMetric `json:"bank_balance"`
+	AccountsReceivable KpiMetric `json:"accounts_receivable"`
+	AccountsPayable    KpiMetric `json:"accounts_payable"`
+	MonthlyRevenue     KpiMetric `json:"monthly_revenue"`
+	MonthlyExpenses    KpiMetric `json:"monthly_expenses"`
+
+	GrossProfit     SummaryMetric `json:"gross_profit"`
+	NetProfit       SummaryMetric `json:"net_profit"`
+	PendingPayments SummaryMetric `json:"pending_payments"`
+	PendingReceipts SummaryMetric `json:"pending_receipts"`
 }
 
 type TrendPoint struct {
@@ -58,10 +58,10 @@ type ReceivablesSummary struct {
 }
 
 type PayablesSummary struct {
-	TotalPayable     float64       `json:"total_payable"`
-	SupplierCount    int           `json:"supplier_count"`
-	PaymentDueCount  int           `json:"payment_due_count"`
-	Aging            []AgingBucket `json:"aging"`
+	TotalPayable    float64       `json:"total_payable"`
+	SupplierCount   int           `json:"supplier_count"`
+	PaymentDueCount int           `json:"payment_due_count"`
+	Aging           []AgingBucket `json:"aging"`
 }
 
 type RecentTransaction struct {
@@ -76,22 +76,22 @@ type RecentTransaction struct {
 }
 
 type PendingApproval struct {
-	ID          uint64  `json:"id"`
-	Document    string  `json:"document"` // e.g., "Payment Voucher", "Journal Entry"
-	Reference   string  `json:"reference"`
-	Amount      float64 `json:"amount"`
-	SubmittedBy string  `json:"submitted_by"`
-	SubmittedAt string  `json:"submitted_at"`
-	CurrentStage string `json:"current_stage"`
-	Status      string  `json:"status"`
+	ID           uint64  `json:"id"`
+	Document     string  `json:"document"` // e.g., "Payment Voucher", "Journal Entry"
+	Reference    string  `json:"reference"`
+	Amount       float64 `json:"amount"`
+	SubmittedBy  string  `json:"submitted_by"`
+	SubmittedAt  string  `json:"submitted_at"`
+	CurrentStage string  `json:"current_stage"`
+	Status       string  `json:"status"`
 }
 
 type LiquiditySummary struct {
-	CashIn         float64 `json:"cash_in"`
-	CashOut        float64 `json:"cash_out"`
-	NetSurplus     float64 `json:"net_surplus"`
-	OutflowRatio   float64 `json:"outflow_ratio"`
-	LiquidityStatus string `json:"liquidity_status"` // e.g., "Healthy", "Warning"
+	CashIn          float64 `json:"cash_in"`
+	CashOut         float64 `json:"cash_out"`
+	NetSurplus      float64 `json:"net_surplus"`
+	OutflowRatio    float64 `json:"outflow_ratio"`
+	LiquidityStatus string  `json:"liquidity_status"` // e.g., "Healthy", "Warning"
 }
 
 type PeriodStatus struct {

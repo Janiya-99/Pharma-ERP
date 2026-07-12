@@ -16,19 +16,19 @@ import (
 )
 
 type CompanyCreationRequest struct {
-	CompanyCode        string               `json:"company_code"`
-	CompanyName        string               `json:"company_name"`
-	LegalName          string               `json:"legal_name"`
-	RegistrationNumber string               `json:"registration_number"`
-	TaxNumber          string               `json:"tax_number"`
-	Industry           string               `json:"industry"`
-	CompanyEmail       string               `json:"company_email"`
-	CompanyPhone       string               `json:"company_phone"`
-	Country            string               `json:"country"`
-	Timezone           string               `json:"timezone"`
-	SubscriptionPlanID uint                 `json:"subscription_plan_id"`
-	Modules            []string             `json:"modules"`
-	FirstUser          FirstUserRequest     `json:"first_user"`
+	CompanyCode        string                `json:"company_code"`
+	CompanyName        string                `json:"company_name"`
+	LegalName          string                `json:"legal_name"`
+	RegistrationNumber string                `json:"registration_number"`
+	TaxNumber          string                `json:"tax_number"`
+	Industry           string                `json:"industry"`
+	CompanyEmail       string                `json:"company_email"`
+	CompanyPhone       string                `json:"company_phone"`
+	Country            string                `json:"country"`
+	Timezone           string                `json:"timezone"`
+	SubscriptionPlanID uint                  `json:"subscription_plan_id"`
+	Modules            []string              `json:"modules"`
+	FirstUser          FirstUserRequest      `json:"first_user"`
 	BillingProfile     BillingProfileRequest `json:"billing_profile"`
 }
 
@@ -119,27 +119,27 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 	}
 
 	tenantCompany := models.TenantCompany{
-		CompanyCode:        req.CompanyCode,
-		CompanyName:        req.CompanyName,
-		LegalName:          req.LegalName,
-		RegistrationNumber: req.RegistrationNumber,
-		TaxNumber:          req.TaxNumber,
-		Industry:           req.Industry,
-		CompanyEmail:       req.CompanyEmail,
-		CompanyPhone:       req.CompanyPhone,
-		Country:            req.Country,
-		Timezone:           req.Timezone,
-		DatabaseName:       dbName,
-		DatabaseHost:       "127.0.0.1",
-		DatabasePort:       3306,
-		DatabaseUser:       "root",
+		CompanyCode:         req.CompanyCode,
+		CompanyName:         req.CompanyName,
+		LegalName:           req.LegalName,
+		RegistrationNumber:  req.RegistrationNumber,
+		TaxNumber:           req.TaxNumber,
+		Industry:            req.Industry,
+		CompanyEmail:        req.CompanyEmail,
+		CompanyPhone:        req.CompanyPhone,
+		Country:             req.Country,
+		Timezone:            req.Timezone,
+		DatabaseName:        dbName,
+		DatabaseHost:        "127.0.0.1",
+		DatabasePort:        3306,
+		DatabaseUser:        "root",
 		DatabasePasswordKey: encryptedDbPwd,
-		Status:             "active",
-		SubscriptionStatus: "active",
-		LicenseStartDate:   &now,
-		LicenseEndDate:     &expiryDate,
-		CreatedBy:          adminUserID,
-		UpdatedBy:          adminUserID,
+		Status:              "active",
+		SubscriptionStatus:  "active",
+		LicenseStartDate:    &now,
+		LicenseEndDate:      &expiryDate,
+		CreatedBy:           adminUserID,
+		UpdatedBy:           adminUserID,
 	}
 
 	if err := tx.Create(&tenantCompany).Error; err != nil {
@@ -290,7 +290,6 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 	}
 
 	// Remove structural inventory and invoice center data seeders for new company as requested
-
 
 	// Seed branch
 	var tenantBranch companyModels.Branch

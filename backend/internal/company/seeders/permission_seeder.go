@@ -97,7 +97,6 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"CONTROL_CENTER", "Security Settings", "control.security_settings.publish", "Publish Security Settings (Alias)"},
 		{"CONTROL_CENTER", "Security Settings", "control.security_sessions.manage", "Manage Security Sessions (Alias)"},
 
-
 		// FINANCE
 		{"FINANCE", "Dashboard", "finance.dashboard.view", "View Finance Dashboard"},
 		{"FINANCE", "Setup", "finance.financial_year.view", "View Financial Year"},

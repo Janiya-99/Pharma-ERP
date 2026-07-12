@@ -584,8 +584,31 @@ const Sidebar = () => {
     ];
   };
 
-  const menus = getMenus();
+  const filterMenusByPermission = (menuList: MenuItem[]): MenuItem[] => {
+    return menuList
+      .map((item) => {
+        // If it's a leaf node, check permission
+        if (!item.children) {
+          if (item.permission && !hasPermission(item.permission)) return null;
+          return item;
+        }
 
+        // If it has children, recursively filter them
+        const filteredChildren = item.children.filter((child) => 
+          !child.permission || hasPermission(child.permission)
+        );
+
+        if (filteredChildren.length === 0) {
+          // Hide parent if all children are restricted and it doesn't have a path
+          if (!item.path) return null;
+        }
+
+        return { ...item, children: filteredChildren };
+      })
+      .filter(Boolean) as MenuItem[];
+  };
+
+  const menus = filterMenusByPermission(getMenus());
   const isPathActive = (path?: string) => {
     if (!path) return false;
     if (location.pathname === path) return true;

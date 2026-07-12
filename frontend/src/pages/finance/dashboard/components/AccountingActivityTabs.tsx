@@ -43,7 +43,7 @@ const statusBadge = (status: string) => {
 
 export function AccountingActivityTabs({ recentTransactions, pendingApprovals }: AccountingActivityTabsProps) {
   return (
-    <Card className="col-span-1 h-full border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-8  ">
+    <Card className="col-span-1 h-full rounded-2xl border-slate-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-8  ">
       <CardHeader className="pb-0">
         <CardTitle>Accounting Activity</CardTitle>
         <CardDescription>Recent entries and pending workflow approvals</CardDescription>

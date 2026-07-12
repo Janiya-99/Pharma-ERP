@@ -303,11 +303,11 @@ func (s *ConfigurationResolverService) GetImpactPreview(companyID uint64, key st
 	}
 
 	return map[string]interface{}{
-		"setting_key":      key,
-		"current_value":    oldVal,
-		"proposed_value":   newValue,
-		"affected_modules": affectedModules,
-		"requires_logout":  strings.HasPrefix(key, "security."),
+		"setting_key":           key,
+		"current_value":         oldVal,
+		"proposed_value":        newValue,
+		"affected_modules":      affectedModules,
+		"requires_logout":       strings.HasPrefix(key, "security."),
 		"effective_immediately": true,
 	}, nil
 }

@@ -9,9 +9,9 @@ import (
 type UserBranchRole struct {
 	ID uint64 `gorm:"primaryKey;autoIncrement" json:"id"`
 
-	UserID     uint64 `gorm:"not null;uniqueIndex:idx_user_branch_role" json:"user_id"`
-	BranchID   uint64 `gorm:"not null;uniqueIndex:idx_user_branch_role" json:"branch_id"`
-	RoleID     uint64 `gorm:"not null;uniqueIndex:idx_user_branch_role" json:"role_id"`
+	UserID   uint64 `gorm:"not null;uniqueIndex:idx_user_branch_role" json:"user_id"`
+	BranchID uint64 `gorm:"not null;uniqueIndex:idx_user_branch_role" json:"branch_id"`
+	RoleID   uint64 `gorm:"not null;uniqueIndex:idx_user_branch_role" json:"role_id"`
 
 	Status string `gorm:"type:varchar(30);default:active" json:"status"`
 
@@ -20,9 +20,9 @@ type UserBranchRole struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	User     User           `gorm:"foreignKey:UserID" json:"user,omitempty"`
-	Branch   Branch         `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
-	Role     Role           `gorm:"foreignKey:RoleID" json:"role,omitempty"`
+	User   User   `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Branch Branch `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
+	Role   Role   `gorm:"foreignKey:RoleID" json:"role,omitempty"`
 }
 
 // TableName overrides the default table name

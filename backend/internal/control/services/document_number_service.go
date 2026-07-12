@@ -11,7 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 type DocumentNumberService struct {
 	repo         *repositories.DocumentNumberingRepository
 	auditService *AuditService

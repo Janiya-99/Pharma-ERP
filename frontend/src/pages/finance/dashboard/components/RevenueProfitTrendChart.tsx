@@ -23,7 +23,7 @@ export function RevenueProfitTrendChart({ data }: RevenueProfitTrendChartProps) 
   };
 
   return (
-    <Card className="col-span-1 border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-8  ">
+    <Card className="col-span-1 rounded-2xl border-slate-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-8  ">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="space-y-1">
           <CardTitle>Revenue & Profitability Trend</CardTitle>

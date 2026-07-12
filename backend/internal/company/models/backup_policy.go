@@ -32,7 +32,7 @@ type BackupExecutionLog struct {
 	CompanyID         uint64     `gorm:"not null;index" json:"company_id"`
 	PolicyID          *uint64    `gorm:"index" json:"policy_id,omitempty"`
 	BackupType        string     `gorm:"size:30;not null;default:'scheduled'" json:"backup_type"` // scheduled, manual
-	Status            string     `gorm:"size:30;not null;default:'in_progress'" json:"status"` // success, failed, in_progress
+	Status            string     `gorm:"size:30;not null;default:'in_progress'" json:"status"`    // success, failed, in_progress
 	FileSizeBytes     int64      `gorm:"not null;default:0" json:"file_size_bytes"`
 	StoragePath       string     `gorm:"size:255;not null" json:"storage_path"`
 	Checksum          string     `gorm:"size:100" json:"checksum,omitempty"`
@@ -41,7 +41,6 @@ type BackupExecutionLog struct {
 	CompletedAt       *time.Time `json:"completed_at,omitempty"`
 	ErrorMessage      string     `gorm:"size:500" json:"error_message,omitempty"`
 }
-
 
 func (BackupExecutionLog) TableName() string {
 	return "backup_execution_logs"

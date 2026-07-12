@@ -102,7 +102,7 @@ const money = (amount: number) =>
   }).format(amount);
 
 const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => (
-  <div className="group relative overflow-hidden rounded-xl border border-slate-200  bg-white  p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-500/30">
+  <div className="group relative overflow-hidden rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ring-1 ring-inset ring-slate-50 hover:ring-indigo-50 hover:border-indigo-500/30">
     <div className="flex items-start justify-between gap-2">
       <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
         {title}
@@ -214,7 +214,7 @@ const InventoryDashboard = () => {
           </h2>
           <span className="text-xs text-slate-400">Live warehouse sync</span>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             title="Total Products (SKUs)"
             value={stats.total_products.toLocaleString()}
@@ -295,7 +295,7 @@ const InventoryDashboard = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Stock Valuation Trajectory (2/3 width) */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
@@ -334,7 +334,7 @@ const InventoryDashboard = () => {
         </div>
 
         {/* Right: Warehouse Distribution Donut Chart (1/3 width) */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 flex flex-col justify-between">
           <div>
             <div className="mb-4">
               <h3 className="text-lg font-bold text-slate-900 ">
@@ -380,7 +380,7 @@ const InventoryDashboard = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left 2 Cols: Critical Batch Expiration Alerts */}
-        <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100  pb-4">
               <div>
@@ -452,7 +452,7 @@ const InventoryDashboard = () => {
         {/* Right 1 Col: Stock Health Index & Top Movers */}
         <div className="space-y-6">
           {/* Stock Health Card */}
-          <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-slate-900 ">
                 Overall Stock Health Index
@@ -497,7 +497,7 @@ const InventoryDashboard = () => {
           </div>
 
           {/* Top Movers Card */}
-          <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50">
             <h3 className="text-base font-bold text-slate-900  mb-4">
               Top Moving Pharmaceuticals
             </h3>

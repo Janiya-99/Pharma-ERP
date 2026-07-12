@@ -100,17 +100,17 @@ type TenantCompany = PlatformCompany
 
 // TenantCompanyDatabase maps company DB connection configurations
 type TenantCompanyDatabase struct {
-	ID                        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	TenantCompanyID           uint      `gorm:"not null" json:"tenant_company_id"`
-	DatabaseName              string    `gorm:"type:varchar(100);not null" json:"database_name"`
-	DatabaseHost              string    `gorm:"type:varchar(100);default:localhost" json:"database_host"`
-	DatabaseUsername          string    `gorm:"type:varchar(100)" json:"database_username"`
-	DatabasePasswordEncrypted string    `gorm:"type:text" json:"-"`
-	DatabaseStatus            string    `gorm:"type:varchar(50);default:pending" json:"database_status"` // pending, created, migration_pending, migration_completed, failed
-	MigrationStatus           string    `gorm:"type:varchar(50)" json:"migration_status"`
+	ID                        uint       `gorm:"primaryKey;autoIncrement" json:"id"`
+	TenantCompanyID           uint       `gorm:"not null" json:"tenant_company_id"`
+	DatabaseName              string     `gorm:"type:varchar(100);not null" json:"database_name"`
+	DatabaseHost              string     `gorm:"type:varchar(100);default:localhost" json:"database_host"`
+	DatabaseUsername          string     `gorm:"type:varchar(100)" json:"database_username"`
+	DatabasePasswordEncrypted string     `gorm:"type:text" json:"-"`
+	DatabaseStatus            string     `gorm:"type:varchar(50);default:pending" json:"database_status"` // pending, created, migration_pending, migration_completed, failed
+	MigrationStatus           string     `gorm:"type:varchar(50)" json:"migration_status"`
 	LastMigratedAt            *time.Time `json:"last_migrated_at"`
-	CreatedAt                 time.Time `json:"created_at"`
-	UpdatedAt                 time.Time `json:"updated_at"`
+	CreatedAt                 time.Time  `json:"created_at"`
+	UpdatedAt                 time.Time  `json:"updated_at"`
 }
 
 func (TenantCompanyDatabase) TableName() string {
@@ -194,17 +194,17 @@ func (TenantCompanyModule) TableName() string {
 
 // TenantCompanyFirstUser first system owner record
 type TenantCompanyFirstUser struct {
-	ID                        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	TenantCompanyID           uint      `gorm:"not null" json:"tenant_company_id"`
-	CompanyDatabaseName       string    `gorm:"type:varchar(100);not null" json:"company_database_name"`
-	FirstUserName             string    `gorm:"type:varchar(150);not null" json:"first_user_name"`
-	FirstUserEmail            string    `gorm:"type:varchar(150);not null" json:"first_user_email"`
-	FirstUserPhone            string    `gorm:"type:varchar(50)" json:"first_user_phone"`
-	TemporaryPasswordHash     string    `gorm:"type:varchar(255);not null" json:"-"`
-	IsCreatedInTenantDB       bool      `gorm:"default:false" json:"is_created_in_tenant_db"`
-	CreatedUserIDInTenantDB   uint64    `json:"created_user_id_in_tenant_db"`
-	CreatedAt                 time.Time `json:"created_at"`
-	UpdatedAt                 time.Time `json:"updated_at"`
+	ID                      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	TenantCompanyID         uint      `gorm:"not null" json:"tenant_company_id"`
+	CompanyDatabaseName     string    `gorm:"type:varchar(100);not null" json:"company_database_name"`
+	FirstUserName           string    `gorm:"type:varchar(150);not null" json:"first_user_name"`
+	FirstUserEmail          string    `gorm:"type:varchar(150);not null" json:"first_user_email"`
+	FirstUserPhone          string    `gorm:"type:varchar(50)" json:"first_user_phone"`
+	TemporaryPasswordHash   string    `gorm:"type:varchar(255);not null" json:"-"`
+	IsCreatedInTenantDB     bool      `gorm:"default:false" json:"is_created_in_tenant_db"`
+	CreatedUserIDInTenantDB uint64    `json:"created_user_id_in_tenant_db"`
+	CreatedAt               time.Time `json:"created_at"`
+	UpdatedAt               time.Time `json:"updated_at"`
 }
 
 func (TenantCompanyFirstUser) TableName() string {
@@ -405,15 +405,15 @@ func (SystemBrandingSetting) TableName() string {
 
 // SystemBackupSetting scheduled snapshot databases settings
 type SystemBackupSetting struct {
-	ID              uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	BackupProvider  string    `gorm:"type:varchar(50);default:'local'" json:"backup_provider"` // local, s3, gcs
-	BucketName      string    `gorm:"type:varchar(150)" json:"bucket_name"`
-	BackupFrequency string    `gorm:"type:varchar(50);default:'daily'" json:"backup_frequency"` // hourly, daily, weekly
-	RetentionDays   int       `gorm:"default:30" json:"retention_days"`
+	ID              uint       `gorm:"primaryKey;autoIncrement" json:"id"`
+	BackupProvider  string     `gorm:"type:varchar(50);default:'local'" json:"backup_provider"` // local, s3, gcs
+	BucketName      string     `gorm:"type:varchar(150)" json:"bucket_name"`
+	BackupFrequency string     `gorm:"type:varchar(50);default:'daily'" json:"backup_frequency"` // hourly, daily, weekly
+	RetentionDays   int        `gorm:"default:30" json:"retention_days"`
 	LastBackupAt    *time.Time `json:"last_backup_at"`
-	IsActive        bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	IsActive        bool       `gorm:"default:true" json:"is_active"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
 }
 
 func (SystemBackupSetting) TableName() string {

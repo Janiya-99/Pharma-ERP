@@ -95,8 +95,6 @@ func RunCompanyMigrations(db *gorm.DB, logger *zap.Logger, isNewTenantFlag ...bo
 		return err
 	}
 
-
-
 	logger.Info("Running finance migrations and seeders...")
 	if err := financeMigrations.RunFinanceMigrations(db, logger, isNewTenant); err != nil {
 		logger.Error("Finance migrations failed", zap.Error(err))
