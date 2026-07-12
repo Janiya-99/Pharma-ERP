@@ -148,7 +148,7 @@ func Load() (*Config, error) {
 			APIPerMinute:   getEnvInt("RATE_LIMIT_API_PER_MINUTE", 100),
 		},
 		CORS: CORSConfig{
-			AllowedOrigins: strings.Split(getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:3000"), ","),
+			AllowedOrigins: strings.Split(getEnv("CORS_ALLOWED_ORIGINS", "https://erp.pixandco.lk,http://erp.pixandco.lk"), ","),
 			AllowedMethods: strings.Split(getEnv("CORS_ALLOWED_METHODS", "GET,POST,PUT,PATCH,DELETE,OPTIONS"), ","),
 			AllowedHeaders: strings.Split(getEnv("CORS_ALLOWED_HEADERS", "Authorization,Content-Type,X-Request-ID"), ","),
 		},

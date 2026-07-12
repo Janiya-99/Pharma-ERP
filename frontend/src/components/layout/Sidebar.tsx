@@ -714,56 +714,64 @@ const Sidebar = () => {
             </>
           )}
         </button>
-        {showExpanded && isAccordionOpen && (
-          <div className="ml-5.5 mt-1 flex flex-col gap-1 border-l border-slate-200/80 pl-6 pr-1.5">
-            {menu.children!.map((child) => {
-              if (child.disabled) {
-                return (
-                  <PermissionGuard
-                    key={child.path}
-                    permission={child.permission}
-                  >
-                    <div className="flex cursor-not-allowed items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium text-[#9CA3AF] opacity-60">
-                      <div className="flex items-center gap-2.5 overflow-hidden">
-                        <span className="bg-muted-foreground/20 h-1.5 w-1.5 shrink-0 rounded-full" />
-                        <span className="truncate">{child.name}</span>
+        <div
+          className={`grid transition-all duration-300 ease-in-out ${
+            showExpanded && isAccordionOpen
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="ml-5.5 mt-1 flex flex-col gap-1 border-l border-slate-200/80 pl-6 pr-1.5">
+              {menu.children!.map((child) => {
+                if (child.disabled) {
+                  return (
+                    <PermissionGuard
+                      key={child.path}
+                      permission={child.permission}
+                    >
+                      <div className="flex cursor-not-allowed items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium text-[#9CA3AF] opacity-60">
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                          <span className="bg-muted-foreground/20 h-1.5 w-1.5 shrink-0 rounded-full" />
+                          <span className="truncate">{child.name}</span>
+                        </div>
+                        <span className="ml-1 shrink-0 rounded-full border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[9px] text-[#374151]">
+                          Soon
+                        </span>
                       </div>
-                      <span className="ml-1 shrink-0 rounded-full border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[9px] text-[#374151]">
-                        Soon
-                      </span>
-                    </div>
+                    </PermissionGuard>
+                  );
+                }
+                const isActive = isPathActive(child.path);
+                return (
+                  <PermissionGuard key={child.path} permission={child.permission}>
+                    <NavLink
+                      to={child.path}
+                      className={() =>
+                        `flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
+                          isActive
+                            ? "bg-[#4854CC] font-semibold text-white shadow-[0_6px_16px_rgba(0,119,182,0.22)]"
+                            : "text-[#6B7280] hover:bg-[#4854CC]/10 hover:text-[#1F2937]"
+                        }`
+                      }
+                    >
+                      {() => (
+                        <>
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              isActive ? "bg-white" : "bg-[#9CA3AF]/50"
+                            }`}
+                          />
+                          <span className="truncate">{child.name}</span>
+                        </>
+                      )}
+                    </NavLink>
                   </PermissionGuard>
                 );
-              }
-              const isActive = isPathActive(child.path);
-              return (
-                <PermissionGuard key={child.path} permission={child.permission}>
-                  <NavLink
-                    to={child.path}
-                    className={() =>
-                      `flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
-                        isActive
-                          ? "bg-[#4854CC] font-semibold text-white shadow-[0_6px_16px_rgba(0,119,182,0.22)]"
-                          : "text-[#6B7280] hover:bg-[#4854CC]/10 hover:text-[#1F2937]"
-                      }`
-                    }
-                  >
-                    {() => (
-                      <>
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            isActive ? "bg-white" : "bg-[#9CA3AF]/50"
-                          }`}
-                        />
-                        <span className="truncate">{child.name}</span>
-                      </>
-                    )}
-                  </NavLink>
-                </PermissionGuard>
-              );
-            })}
+              })}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     );
   };

@@ -90,6 +90,7 @@
     "@types/react-table": "^7.7.12",
     "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.4.8",
+    "esbuild": "^0.28.1",
     "jsdom": "^29.1.1",
     "postcss": "^8.4.16",
     "prettier": "^2.8.3",
