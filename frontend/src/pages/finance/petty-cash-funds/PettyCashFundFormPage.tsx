@@ -136,21 +136,21 @@ export default function PettyCashFundFormPage() {
       />
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200 dark:bg-red-900/30 dark:border-red-800">
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200  ">
           {error}
         </div>
       )}
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Branch *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Branch *</label>
               <select
                 name="branch_id"
                 value={formData.branch_id}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 required
               >
                 <option value="" disabled>Select Branch</option>
@@ -161,38 +161,38 @@ export default function PettyCashFundFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fund Code *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Fund Code *</label>
               <input
                 type="text"
                 name="fund_code"
                 value={formData.fund_code}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 placeholder="e.g. PCF-001"
                 required
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fund Name *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Fund Name *</label>
               <input
                 type="text"
                 name="fund_name"
                 value={formData.fund_name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 placeholder="e.g. Main Office Petty Cash"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cash Account *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Cash Account *</label>
               <select
                 name="chart_account_id"
                 value={formData.chart_account_id}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 required
               >
                 <option value="" disabled>Select Cash Account</option>
@@ -204,12 +204,12 @@ export default function PettyCashFundFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Custodian User *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Custodian User *</label>
               <select
                 name="custodian_user_id"
                 value={formData.custodian_user_id}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 required
               >
                 <option value="" disabled>Select Custodian</option>
@@ -220,7 +220,7 @@ export default function PettyCashFundFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Opening Balance (LKR) *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Opening Balance (LKR) *</label>
               <input
                 type="number"
                 min="0"
@@ -228,14 +228,14 @@ export default function PettyCashFundFormPage() {
                 name="opening_balance"
                 value={formData.opening_balance}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 required
               />
               {isEdit && <p className="text-xs text-orange-500 mt-1">Note: Modifying opening balance does not affect posted vouchers.</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fund Limit (LKR) *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Fund Limit (LKR) *</label>
               <input
                 type="number"
                 min="0"
@@ -243,18 +243,18 @@ export default function PettyCashFundFormPage() {
                 name="fund_limit"
                 value={formData.fund_limit}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Status *</label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   "
                 required
               >
                 <option value="active">Active</option>
@@ -263,11 +263,11 @@ export default function PettyCashFundFormPage() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-navy-700 mt-6">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100  mt-6">
             <button
               type="button"
               onClick={() => history.push("/admin/finance/petty-cash-funds")}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700 font-medium transition-colors"
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50     font-medium transition-colors"
             >
               Cancel
             </button>

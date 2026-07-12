@@ -116,7 +116,7 @@ const FixedAssetCategoryFormPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900 pb-10 overflow-y-auto">
+    <div className="flex flex-col h-full bg-gray-50  pb-10 overflow-y-auto">
       <PageHeader
         title={isEdit ? "Edit Category" : "Create Category"}
         breadcrumb={[
@@ -130,7 +130,7 @@ const FixedAssetCategoryFormPage = () => {
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => history.push("/admin/finance/fixed-asset-categories")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
           </button>
@@ -145,25 +145,25 @@ const FixedAssetCategoryFormPage = () => {
         </div>
 
         {isEdit && (
-          <div className="p-4 mb-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
-            <p className="text-sm text-indigo-700 dark:text-indigo-400">
+          <div className="p-4 mb-6 bg-indigo-50  rounded-xl border border-indigo-100 ">
+            <p className="text-sm text-indigo-700 ">
               <span className="font-bold">Note:</span> Updating category default accounts or useful life will <span className="font-bold">not</span> automatically update existing fixed assets linked to this category.
             </p>
           </div>
         )}
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6 mb-6">
+          <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
             Basic Information
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Category Code <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.category_code ? "border-red-500" : "border-gray-200"
                 }`}
                 placeholder="e.g., COMP"
@@ -173,12 +173,12 @@ const FixedAssetCategoryFormPage = () => {
               {errors.category_code && <span className="text-xs text-red-500 mt-1">{errors.category_code}</span>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Category Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.category_name ? "border-red-500" : "border-gray-200"
                 }`}
                 placeholder="e.g., Computers and IT Equipment"
@@ -188,11 +188,11 @@ const FixedAssetCategoryFormPage = () => {
               {errors.category_name && <span className="text-xs text-red-500 mt-1">{errors.category_name}</span>}
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Description
               </label>
               <textarea
-                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                 placeholder="Enter description..."
                 rows="2"
                 value={formData.description}
@@ -202,18 +202,18 @@ const FixedAssetCategoryFormPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6 mb-6">
+          <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
             Depreciation Setup
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Default Useful Life (Months) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.default_useful_life_months ? "border-red-500" : "border-gray-200"
                 }`}
                 placeholder="e.g., 36"
@@ -223,11 +223,11 @@ const FixedAssetCategoryFormPage = () => {
               {errors.default_useful_life_months && <span className="text-xs text-red-500 mt-1">{errors.default_useful_life_months}</span>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Default Depreciation Method <span className="text-red-500">*</span>
               </label>
               <select
-                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                 value={formData.default_depreciation_method}
                 onChange={(e: any) => setFormData({ ...formData, default_depreciation_method: e.target.value })}
               >
@@ -237,13 +237,13 @@ const FixedAssetCategoryFormPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6 mb-6">
+          <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
             Accounting Integration (Chart of Accounts)
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Default Asset Account <span className="text-red-500">*</span>
               </label>
               <ChartOfAccountSelect
@@ -253,7 +253,7 @@ const FixedAssetCategoryFormPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Default Accumulated Depreciation Account <span className="text-red-500">*</span>
               </label>
               <ChartOfAccountSelect
@@ -263,7 +263,7 @@ const FixedAssetCategoryFormPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Default Depreciation Expense Account <span className="text-red-500">*</span>
               </label>
               <ChartOfAccountSelect
@@ -274,7 +274,7 @@ const FixedAssetCategoryFormPage = () => {
             </div>
             <div></div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Default Gain on Disposal Account
               </label>
               <ChartOfAccountSelect
@@ -283,7 +283,7 @@ const FixedAssetCategoryFormPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Default Loss on Disposal Account
               </label>
               <ChartOfAccountSelect
@@ -294,14 +294,14 @@ const FixedAssetCategoryFormPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Status <span className="text-red-500">*</span>
               </label>
               <select
-                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                 value={formData.status}
                 onChange={(e: any) => setFormData({ ...formData, status: e.target.value })}
               >

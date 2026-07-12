@@ -98,7 +98,7 @@ const CustomerDetailsPage: React.FC = () => {
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
-      <div className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800 m-6 rounded-2xl border p-8 text-center font-medium">
+      <div className="bg-rose-50  text-rose-600  border-rose-200  m-6 rounded-2xl border p-8 text-center font-medium">
         Please switch to Invoice Center module to access this page.
       </div>
     );
@@ -114,7 +114,7 @@ const CustomerDetailsPage: React.FC = () => {
 
   if (!customer) {
     return (
-      <div className="m-6 rounded-2xl bg-gray-50 p-8 text-center font-medium text-gray-500 dark:bg-navy-800 dark:text-gray-400">
+      <div className="m-6 rounded-2xl bg-gray-50 p-8 text-center font-medium text-gray-500  ">
         {error || "Customer record not found."}
       </div>
     );
@@ -123,27 +123,27 @@ const CustomerDetailsPage: React.FC = () => {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
       {/* Top Banner */}
-      <div className="flex flex-col justify-between gap-6 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800 md:flex-row md:items-center">
+      <div className="flex flex-col justify-between gap-6 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm   md:flex-row md:items-center">
         <div className="flex items-start gap-4">
           <button
             onClick={() => navigate("/invoice-center/customers")}
-            className="mt-0.5 rounded-2xl bg-gray-50 p-2.5 text-gray-600 transition-colors hover:bg-gray-100 dark:bg-navy-700 dark:text-gray-300 dark:hover:bg-navy-600"
+            className="mt-0.5 rounded-2xl bg-gray-50 p-2.5 text-gray-600 transition-colors hover:bg-gray-100   "
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-extrabold text-navy-900 dark:text-white">
+              <h1 className="text-2xl font-extrabold text-navy-900 ">
                 {customer.customer_name}
               </h1>
-              <span className="rounded-lg bg-gray-100 px-2.5 py-1 font-mono text-sm font-bold text-gray-700 dark:bg-navy-700 dark:text-gray-300">
+              <span className="rounded-lg bg-gray-100 px-2.5 py-1 font-mono text-sm font-bold text-gray-700  ">
                 {customer.customer_code}
               </span>
               <CustomerTypeBadge type={customer.customer_type} />
               <CustomerStatusBadge status={customer.status} />
             </div>
             {customer.trade_name && (
-              <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm font-medium text-gray-500 ">
                 Trading as: {customer.trade_name}
               </p>
             )}
@@ -154,7 +154,7 @@ const CustomerDetailsPage: React.FC = () => {
           <PermissionGuard permission="invoice_center.customer.update">
             <button
               onClick={() => setStatusModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700 transition-all hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400"
+              className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700 transition-all hover:bg-amber-100   "
             >
               <ShieldAlert className="h-4 w-4" /> Change Status
             </button>
@@ -178,7 +178,7 @@ const CustomerDetailsPage: React.FC = () => {
       />
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto border-b border-gray-200 pb-1 dark:border-navy-700">
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-gray-200 pb-1 ">
         {[
           { key: "overview", label: "Overview", icon: Building2 },
           {
@@ -201,8 +201,8 @@ const CustomerDetailsPage: React.FC = () => {
               onClick={() => setActiveTab(tab.key as any)}
               className={`flex items-center gap-2 whitespace-nowrap rounded-t-2xl px-5 py-3 text-sm font-bold transition-all ${
                 isActive
-                  ? "border-t-2 border-brand-500 bg-white text-brand-600 shadow-sm dark:bg-navy-800 dark:text-brand-400"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  ? "border-t-2 border-brand-500 bg-white text-brand-600 shadow-sm  "
+                  : "text-gray-500 hover:text-gray-700  "
               }`}
             >
               <Icon className={`h-4 w-4 ${isActive ? "text-brand-500" : ""}`} />
@@ -215,81 +215,81 @@ const CustomerDetailsPage: React.FC = () => {
       {/* Tab Contents */}
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-            <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900 dark:border-navy-700 dark:text-white">
+          <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm  ">
+            <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900  ">
               <Building2 className="h-4 w-4 text-brand-500" /> Basic & Legal
               Profile
             </h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between border-b border-gray-50 py-1 dark:border-navy-700/50">
-                <span className="text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between border-b border-gray-50 py-1 ">
+                <span className="text-gray-500 ">
                   Category
                 </span>
-                <span className="font-semibold text-navy-900 dark:text-white">
+                <span className="font-semibold text-navy-900 ">
                   {customer.category?.category_name || "—"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 dark:border-navy-700/50">
-                <span className="text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between border-b border-gray-50 py-1 ">
+                <span className="text-gray-500 ">
                   Currency
                 </span>
-                <span className="font-semibold text-navy-900 dark:text-white">
+                <span className="font-semibold text-navy-900 ">
                   {customer.currency || "LKR"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 dark:border-navy-700/50">
-                <span className="text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between border-b border-gray-50 py-1 ">
+                <span className="text-gray-500 ">
                   Tax ID / VAT No
                 </span>
-                <span className="font-mono font-medium text-navy-900 dark:text-white">
+                <span className="font-mono font-medium text-navy-900 ">
                   {customer.tax_id || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-500 ">
                   Company Registration No
                 </span>
-                <span className="font-mono font-medium text-navy-900 dark:text-white">
+                <span className="font-mono font-medium text-navy-900 ">
                   {customer.registration_no || "—"}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-            <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900 dark:border-navy-700 dark:text-white">
+          <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm  ">
+            <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900  ">
               <Mail className="h-4 w-4 text-indigo-500" /> Primary Contact Info
             </h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between border-b border-gray-50 py-1 dark:border-navy-700/50">
-                <span className="text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between border-b border-gray-50 py-1 ">
+                <span className="text-gray-500 ">
                   Email Address
                 </span>
-                <span className="font-medium text-indigo-600 dark:text-indigo-400">
+                <span className="font-medium text-indigo-600 ">
                   {customer.email || "—"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 dark:border-navy-700/50">
-                <span className="text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between border-b border-gray-50 py-1 ">
+                <span className="text-gray-500 ">
                   Phone Number
                 </span>
-                <span className="font-medium text-navy-900 dark:text-white">
+                <span className="font-medium text-navy-900 ">
                   {customer.phone || "—"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 dark:border-navy-700/50">
-                <span className="text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between border-b border-gray-50 py-1 ">
+                <span className="text-gray-500 ">
                   Mobile Number
                 </span>
-                <span className="font-medium text-navy-900 dark:text-white">
+                <span className="font-medium text-navy-900 ">
                   {customer.mobile || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-500 ">
                   Website
                 </span>
-                <span className="font-medium text-navy-900 dark:text-white">
+                <span className="font-medium text-navy-900 ">
                   {customer.website || "—"}
                 </span>
               </div>
@@ -299,8 +299,8 @@ const CustomerDetailsPage: React.FC = () => {
           {(customer.billing_address ||
             customer.shipping_address ||
             customer.notes) && (
-            <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800 md:col-span-2">
-              <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900 dark:border-navy-700 dark:text-white">
+            <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm   md:col-span-2">
+              <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900  ">
                 <FileText className="h-4 w-4 text-amber-500" /> Default
                 Addresses & Notes
               </h3>
@@ -309,7 +309,7 @@ const CustomerDetailsPage: React.FC = () => {
                   <span className="mb-1 block text-xs font-bold uppercase text-gray-400">
                     Default Billing Address
                   </span>
-                  <p className="whitespace-pre-line text-gray-700 dark:text-gray-300">
+                  <p className="whitespace-pre-line text-gray-700 ">
                     {customer.billing_address || "—"}
                   </p>
                 </div>
@@ -317,7 +317,7 @@ const CustomerDetailsPage: React.FC = () => {
                   <span className="mb-1 block text-xs font-bold uppercase text-gray-400">
                     Default Shipping Address
                   </span>
-                  <p className="whitespace-pre-line text-gray-700 dark:text-gray-300">
+                  <p className="whitespace-pre-line text-gray-700 ">
                     {customer.shipping_address || "—"}
                   </p>
                 </div>
@@ -325,7 +325,7 @@ const CustomerDetailsPage: React.FC = () => {
                   <span className="mb-1 block text-xs font-bold uppercase text-gray-400">
                     Internal Notes
                   </span>
-                  <p className="whitespace-pre-line italic text-gray-700 dark:text-gray-300">
+                  <p className="whitespace-pre-line italic text-gray-700 ">
                     {customer.notes || "No special instructions recorded."}
                   </p>
                 </div>
@@ -352,40 +352,40 @@ const CustomerDetailsPage: React.FC = () => {
       )}
 
       {activeTab === "terms" && (
-        <div className="space-y-6 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-          <h3 className="border-b border-gray-100 pb-4 text-lg font-bold text-navy-900 dark:border-navy-700 dark:text-white">
+        <div className="space-y-6 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm  ">
+          <h3 className="border-b border-gray-100 pb-4 text-lg font-bold text-navy-900  ">
             Credit & Financial Policies
           </h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-navy-700">
+            <div className="rounded-2xl bg-gray-50 p-4 ">
               <span className="block text-xs font-bold uppercase text-gray-400">
                 Credit Limit
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 dark:text-white">
+              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
                 LKR {Number(customer.credit_limit || 0).toLocaleString()}
               </span>
             </div>
-            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-navy-700">
+            <div className="rounded-2xl bg-gray-50 p-4 ">
               <span className="block text-xs font-bold uppercase text-gray-400">
                 Credit Period
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 dark:text-white">
+              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
                 {customer.credit_days || 0} Days
               </span>
             </div>
-            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-navy-700">
+            <div className="rounded-2xl bg-gray-50 p-4 ">
               <span className="block text-xs font-bold uppercase text-gray-400">
                 Fixed Discount
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 dark:text-white">
+              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
                 {customer.discount_percentage || 0}%
               </span>
             </div>
-            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-navy-700">
+            <div className="rounded-2xl bg-gray-50 p-4 ">
               <span className="block text-xs font-bold uppercase text-gray-400">
                 Payment Terms
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 dark:text-white">
+              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
                 {customer.payment_terms || "Standard EOM"}
               </span>
             </div>

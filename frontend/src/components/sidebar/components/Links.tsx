@@ -139,7 +139,7 @@ export const SidebarLinks = ({
               }`}
             >
               <div className="overflow-hidden">
-                <div className="ml-3 mt-0.5 border-l border-gray-100 pl-2 dark:border-navy-600">
+                <div className="ml-3 mt-0.5 border-l border-gray-100 pl-2 ">
                 {sectionGroups.map((group, groupIdx) => (
                   <div key={groupIdx}>
                     {/* Section header */}

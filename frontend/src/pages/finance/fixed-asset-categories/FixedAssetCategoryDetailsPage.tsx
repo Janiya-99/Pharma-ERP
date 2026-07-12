@@ -60,7 +60,7 @@ const FixedAssetCategoryDetailsPage = () => {
   if (!category) return null;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900 overflow-y-auto pb-10">
+    <div className="flex flex-col h-full bg-gray-50  overflow-y-auto pb-10">
       <PageHeader
         title="Category Details"
         breadcrumb={[
@@ -74,7 +74,7 @@ const FixedAssetCategoryDetailsPage = () => {
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => history.push("/admin/finance/fixed-asset-categories")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
           </button>
@@ -83,7 +83,7 @@ const FixedAssetCategoryDetailsPage = () => {
             {hasPermission("finance.fixed_asset_category.update") && (
               <button
                 onClick={() => history.push(`/admin/finance/fixed-asset-categories/${id}/edit`)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-xl hover:bg-brand-100 dark:bg-navy-800 dark:text-brand-400 dark:hover:bg-navy-700 transition-all"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-xl hover:bg-brand-100    transition-all"
               >
                 <Edit className="w-4 h-4" /> Edit
               </button>
@@ -91,7 +91,7 @@ const FixedAssetCategoryDetailsPage = () => {
             {hasPermission("finance.fixed_asset_category.delete") && (
               <button
                 onClick={() => setDeleteModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 dark:bg-navy-800 dark:text-red-400 dark:hover:bg-navy-700 transition-all"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100    transition-all"
               >
                 <Trash2 className="w-4 h-4" /> Delete
               </button>
@@ -99,11 +99,11 @@ const FixedAssetCategoryDetailsPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6 mb-6">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white">{category.category_name}</h2>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Code: {category.category_code}</p>
+              <h2 className="text-2xl font-bold text-navy-700 ">{category.category_name}</h2>
+              <p className="text-sm font-medium text-gray-500  mt-1">Code: {category.category_code}</p>
             </div>
             <span
               className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
@@ -115,20 +115,20 @@ const FixedAssetCategoryDetailsPage = () => {
           </div>
           {category.description && (
             <div className="mb-4">
-              <p className="text-sm text-gray-700 dark:text-gray-300">{category.description}</p>
+              <p className="text-sm text-gray-700 ">{category.description}</p>
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b border-gray-100 dark:border-navy-700 pb-3">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-bold text-navy-700  mb-4 border-b border-gray-100  pb-3">
               Depreciation Defaults
             </h3>
             <div className="space-y-4">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Useful Life</p>
-                <p className="text-sm font-medium text-navy-700 dark:text-white">{category.default_useful_life_months} Months</p>
+                <p className="text-sm font-medium text-navy-700 ">{category.default_useful_life_months} Months</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Depreciation Method</p>
@@ -139,14 +139,14 @@ const FixedAssetCategoryDetailsPage = () => {
             </div>
           </div>
           
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b border-gray-100 dark:border-navy-700 pb-3">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-bold text-navy-700  mb-4 border-b border-gray-100  pb-3">
               System Info
             </h3>
             <div className="space-y-4">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Created At</p>
-                <p className="text-sm font-medium text-navy-700 dark:text-white">
+                <p className="text-sm font-medium text-navy-700 ">
                   {new Date(category.created_at).toLocaleString()}
                 </p>
               </div>
@@ -154,33 +154,33 @@ const FixedAssetCategoryDetailsPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6 mb-6">
+          <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
             Default Chart of Accounts Mapping
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Asset Account</p>
-              <p className="text-sm font-medium text-navy-700 dark:text-white">
+              <p className="text-sm font-medium text-navy-700 ">
                 {category.default_asset_account?.account_code} - {category.default_asset_account?.account_name}
               </p>
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Accumulated Depreciation Account</p>
-              <p className="text-sm font-medium text-navy-700 dark:text-white">
+              <p className="text-sm font-medium text-navy-700 ">
                 {category.default_accumulated_depreciation_account?.account_code} - {category.default_accumulated_depreciation_account?.account_name}
               </p>
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Depreciation Expense Account</p>
-              <p className="text-sm font-medium text-navy-700 dark:text-white">
+              <p className="text-sm font-medium text-navy-700 ">
                 {category.default_depreciation_expense_account?.account_code} - {category.default_depreciation_expense_account?.account_name}
               </p>
             </div>
             <div></div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Gain on Disposal Account</p>
-              <p className="text-sm font-medium text-navy-700 dark:text-white">
+              <p className="text-sm font-medium text-navy-700 ">
                 {category.default_gain_on_disposal_account ? 
                   `${category.default_gain_on_disposal_account.account_code} - ${category.default_gain_on_disposal_account.account_name}` : 
                   <span className="text-gray-400 italic">Not set</span>}
@@ -188,7 +188,7 @@ const FixedAssetCategoryDetailsPage = () => {
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Loss on Disposal Account</p>
-              <p className="text-sm font-medium text-navy-700 dark:text-white">
+              <p className="text-sm font-medium text-navy-700 ">
                 {category.default_loss_on_disposal_account ? 
                   `${category.default_loss_on_disposal_account.account_code} - ${category.default_loss_on_disposal_account.account_name}` : 
                   <span className="text-gray-400 italic">Not set</span>}
@@ -204,9 +204,9 @@ const FixedAssetCategoryDetailsPage = () => {
         onClose={() => setDeleteModalOpen(false)}
         title="Delete Category"
       >
-        <p className="text-gray-700 dark:text-gray-300 mb-6">
+        <p className="text-gray-700  mb-6">
           Are you sure you want to delete category{" "}
-          <span className="font-bold text-navy-700 dark:text-white">
+          <span className="font-bold text-navy-700 ">
             {category.category_code}
           </span>
           ?
@@ -214,7 +214,7 @@ const FixedAssetCategoryDetailsPage = () => {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setDeleteModalOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50    "
             disabled={deleting}
           >
             Cancel

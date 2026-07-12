@@ -34,15 +34,15 @@ const BranchSwitcher = () => {
           onValueChange={handleChange}
           disabled={loading}
         >
-          <SelectTrigger className="w-[180px] bg-gray-50 dark:bg-navy-900 border-gray-300 dark:border-navy-700 text-gray-700 dark:text-gray-200 h-9 rounded-xl focus:ring-brand-500 focus:border-brand-500">
+          <SelectTrigger className="w-[200px] bg-slate-100 hover:bg-slate-200 border-transparent text-slate-800 h-10 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-sm flex items-center gap-2 pl-4">
             <SelectValue placeholder="Select Branch" />
           </SelectTrigger>
-          <SelectContent className="bg-white dark:bg-navy-800 border border-gray-200 dark:border-navy-700 z-50">
-            {branches.map((b: unknown) => {
+          <SelectContent className="bg-white border border-slate-100 z-50 rounded-xl shadow-xl overflow-hidden p-1">
+            {branches.map((b: any) => {
               const id = b.id || b.branch_id;
               const name = b.branch_name || b.branch?.branch_name || "";
               return (
-                <SelectItem key={id} value={id.toString()} className="dark:text-gray-200">
+                <SelectItem key={id} value={id.toString()} className="">
                   {name}
                 </SelectItem>
               );

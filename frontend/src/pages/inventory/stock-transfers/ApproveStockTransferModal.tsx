@@ -42,12 +42,12 @@ const ApproveStockTransferModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Approve Stock Transfer">
       <div className="p-6">
-        <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+        <p className="mb-4 text-sm text-gray-600 ">
           Are you sure you want to approve this stock transfer?
         </p>
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="mb-1 block text-sm font-medium text-gray-700 ">
             Approval Remarks (Optional)
           </label>
           <textarea
@@ -56,7 +56,7 @@ const ApproveStockTransferModal = ({
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               setRemarks(e.target.value)
             }
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-500 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white sm:text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-brand-500 focus:ring-2 focus:ring-brand-500    sm:text-sm"
             placeholder="Add approval comments..."
           />
         </div>
@@ -65,7 +65,7 @@ const ApproveStockTransferModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-200 dark:hover:bg-navy-700"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50    "
             disabled={submitting}
           >
             Cancel

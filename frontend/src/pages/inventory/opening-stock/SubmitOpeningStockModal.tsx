@@ -26,37 +26,37 @@ const SubmitOpeningStockModal = ({ isOpen, onClose, entryId, onSuccess }: { isOp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-white dark:bg-navy-800 rounded-2xl shadow-xl border border-gray-100 dark:border-navy-700 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-navy-700 bg-gray-50/50 dark:bg-navy-900/50 flex items-center gap-3">
-          <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
-            <MdSend className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+      <div className="w-full max-w-md bg-white  rounded-2xl shadow-xl border border-gray-100  overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100  bg-gray-50/50  flex items-center gap-3">
+          <div className="p-2 bg-indigo-100  rounded-lg">
+            <MdSend className="h-5 w-5 text-indigo-600 " />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Submit for Approval</h2>
+          <h2 className="text-lg font-semibold text-gray-900 ">Submit for Approval</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
           <div className="mb-6">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-600  mb-4">
               Are you sure you want to submit this opening stock entry for approval? Once submitted, it can no longer be edited unless rejected.
             </p>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700  mb-1.5">
               Remarks (Optional)
             </label>
             <textarea
               value={remarks}
               onChange={(e: any) => setRemarks(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
               placeholder="Add optional notes..."
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-navy-700">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 ">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-navy-700 rounded-xl transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700  hover:bg-gray-100  rounded-xl transition-colors"
             >
               Cancel
             </button>

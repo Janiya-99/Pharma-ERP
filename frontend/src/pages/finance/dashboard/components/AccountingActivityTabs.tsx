@@ -27,11 +27,11 @@ interface AccountingActivityTabsProps {
 
 const statusBadge = (status: string) => {
   const classes: Record<string, string> = {
-    Posted: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800",
-    Approved: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-400 dark:border-indigo-800",
-    Draft: "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
-    Pending: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-800",
-    Review: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-800",
+    Posted: "bg-emerald-50 text-emerald-700 border-emerald-200   ",
+    Approved: "bg-indigo-50 text-indigo-700 border-indigo-200   ",
+    Draft: "bg-slate-50 text-slate-700 border-slate-200   ",
+    Pending: "bg-amber-50 text-amber-700 border-amber-200   ",
+    Review: "bg-blue-50 text-blue-700 border-blue-200   ",
   };
 
   return (
@@ -43,19 +43,19 @@ const statusBadge = (status: string) => {
 
 export function AccountingActivityTabs({ recentTransactions, pendingApprovals }: AccountingActivityTabsProps) {
   return (
-    <Card className="col-span-1 h-full border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-8 dark:border-slate-800 dark:bg-slate-900/80">
+    <Card className="col-span-1 h-full border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-8  ">
       <CardHeader className="pb-0">
         <CardTitle>Accounting Activity</CardTitle>
         <CardDescription>Recent entries and pending workflow approvals</CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
         <Tabs defaultValue="transactions" className="w-full">
-          <TabsList className="mb-4 bg-slate-100 dark:bg-slate-800/50">
+          <TabsList className="mb-4 bg-slate-100 ">
             <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
             <TabsTrigger value="approvals">
               Pending Approvals
               {pendingApprovals.length > 0 && (
-                <span className="ml-2 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                <span className="ml-2 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700  ">
                   {pendingApprovals.length}
                 </span>
               )}
@@ -63,10 +63,10 @@ export function AccountingActivityTabs({ recentTransactions, pendingApprovals }:
           </TabsList>
           
           <TabsContent value="transactions" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-            <div className="rounded-md border border-gray-200 dark:border-slate-800">
+            <div className="rounded-md border border-gray-200 ">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 dark:bg-slate-900/50 dark:hover:bg-slate-900/50">
+                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50  ">
                     <TableHead>Date</TableHead>
                     <TableHead>Voucher</TableHead>
                     <TableHead>Type</TableHead>
@@ -80,13 +80,13 @@ export function AccountingActivityTabs({ recentTransactions, pendingApprovals }:
                   {recentTransactions.map((tx, idx) => (
                     <TableRow key={idx}>
                       <TableCell className="whitespace-nowrap font-medium">{tx.date}</TableCell>
-                      <TableCell className="text-indigo-600 dark:text-indigo-400">{tx.voucher}</TableCell>
+                      <TableCell className="text-indigo-600 ">{tx.voucher}</TableCell>
                       <TableCell>{tx.type}</TableCell>
                       <TableCell>{tx.account}</TableCell>
-                      <TableCell className="text-right text-gray-600 dark:text-gray-400">
+                      <TableCell className="text-right text-gray-600 ">
                         {tx.debit > 0 ? money(tx.debit) : "-"}
                       </TableCell>
-                      <TableCell className="text-right text-gray-600 dark:text-gray-400">
+                      <TableCell className="text-right text-gray-600 ">
                         {tx.credit > 0 ? money(tx.credit) : "-"}
                       </TableCell>
                       <TableCell>{statusBadge(tx.status)}</TableCell>
@@ -98,10 +98,10 @@ export function AccountingActivityTabs({ recentTransactions, pendingApprovals }:
           </TabsContent>
 
           <TabsContent value="approvals" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-            <div className="rounded-md border border-gray-200 dark:border-slate-800">
+            <div className="rounded-md border border-gray-200 ">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 dark:bg-slate-900/50 dark:hover:bg-slate-900/50">
+                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50  ">
                     <TableHead>Document</TableHead>
                     <TableHead>Reference</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
@@ -115,7 +115,7 @@ export function AccountingActivityTabs({ recentTransactions, pendingApprovals }:
                   {pendingApprovals.map((app, idx) => (
                     <TableRow key={idx}>
                       <TableCell className="font-medium">{app.document}</TableCell>
-                      <TableCell className="text-indigo-600 dark:text-indigo-400">{app.reference}</TableCell>
+                      <TableCell className="text-indigo-600 ">{app.reference}</TableCell>
                       <TableCell className="text-right font-medium">{money(app.amount)}</TableCell>
                       <TableCell>{app.submitted_by}</TableCell>
                       <TableCell className="text-xs text-gray-500">{app.current_stage}</TableCell>

@@ -237,10 +237,10 @@ function TrendBadge({ trend, value }: TrendBadgeProps) {
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold shrink-0 max-w-full truncate ${
         isUp
-          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60"
+          ? "bg-emerald-50 text-emerald-700   border border-emerald-200/60 "
           : isDown
-          ? "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60"
-          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+          ? "bg-rose-50 text-rose-700   border border-rose-200/60 "
+          : "bg-slate-100 text-slate-600   border border-slate-200 "
       }`}
     >
       {isUp ? (
@@ -257,9 +257,9 @@ function TrendBadge({ trend, value }: TrendBadgeProps) {
 
 function SeverityBadge({ type }: { type: SecurityLog["type"] }) {
   const styles = {
-    critical: "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-300 dark:border-rose-800",
-    warning: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-800",
-    info: "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-300 dark:border-blue-800",
+    critical: "bg-rose-100 text-rose-800   border-rose-300 ",
+    warning: "bg-amber-100 text-amber-800   border-amber-300 ",
+    info: "bg-blue-100 text-blue-800   border-blue-300 ",
   }[type];
 
   return (
@@ -286,17 +286,17 @@ const ControlCenterDashboardPage = () => {
   return (
     <div className="w-full max-w-full space-y-6 sm:space-y-8 animate-in fade-in-50 duration-300">
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 xl:flex-row xl:items-center xl:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Control Center
               </h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-slate-500 ">
                 System administration, global security governance, and organizational access matrix
               </p>
             </div>
@@ -311,12 +311,12 @@ const ControlCenterDashboardPage = () => {
             <input
               type="text"
               placeholder="Search audit logs, users..."
-              className="h-10 w-full sm:w-56 md:w-64 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
+              className="h-10 w-full sm:w-56 md:w-64 rounded-xl border border-slate-200  bg-white  pl-10 pr-4 text-sm text-slate-900  placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
             />
           </div>
 
           {/* Branch Filter */}
-          <select className="h-10 w-full sm:w-auto flex-1 sm:flex-initial rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer">
+          <select className="h-10 w-full sm:w-auto flex-1 sm:flex-initial rounded-xl border border-slate-200  bg-white  px-3.5 text-sm font-medium text-slate-700  shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer">
             <option value="all">All Branches (Global)</option>
             <option value="hq">Headquarters (HQ)</option>
             <option value="ny">New York Regional</option>
@@ -327,7 +327,7 @@ const ControlCenterDashboardPage = () => {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="h-10 w-full sm:w-auto flex-1 sm:flex-initial rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer"
+            className="h-10 w-full sm:w-auto flex-1 sm:flex-initial rounded-xl border border-slate-200  bg-white  px-3.5 text-sm font-medium text-slate-700  shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer"
           >
             <option value="Today">Today (24h)</option>
             <option value="This week">This Week</option>
@@ -339,7 +339,7 @@ const ControlCenterDashboardPage = () => {
           <button
             onClick={handleRefresh}
             title="Refresh dashboard telemetry"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200  bg-white  text-slate-600  hover:bg-slate-50  hover:text-slate-900  transition-all shadow-sm"
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
           </button>
@@ -351,7 +351,7 @@ const ControlCenterDashboardPage = () => {
       ══════════════════════════════════════════════ */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 ">
             Executive Summary & System Metrics
           </h2>
           <span className="text-xs text-slate-400">Updated just now</span>
@@ -364,21 +364,21 @@ const ControlCenterDashboardPage = () => {
             return (
               <div
                 key={kpi.title}
-                className={`group relative overflow-hidden rounded-xl border p-4 sm:p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                className={`group relative overflow-hidden rounded-2xl border p-5 sm:p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                   isAlert
-                    ? "border-rose-200 dark:border-rose-900/50 bg-gradient-to-br from-rose-50/50 to-white dark:from-rose-950/20 dark:to-slate-900 shadow-sm"
-                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-500/30 dark:hover:border-indigo-500/30"
+                    ? "border-rose-200 bg-gradient-to-br from-rose-50/50 to-white shadow-sm"
+                    : "border-slate-200 bg-white shadow-sm hover:border-indigo-500/30"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500  truncate">
                     {kpi.title}
                   </span>
                   <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
                       isAlert
-                        ? "bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400"
-                        : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 dark:group-hover:bg-indigo-950/50 dark:group-hover:text-indigo-400"
+                        ? "bg-rose-100 text-rose-600  "
+                        : "bg-slate-100 text-slate-600   group-hover:bg-indigo-50 group-hover:text-indigo-600  "
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -386,12 +386,12 @@ const ControlCenterDashboardPage = () => {
                 </div>
 
                 <div className="mt-3 flex items-baseline justify-between">
-                  <span className={`text-2xl font-bold tracking-tight truncate ${isAlert ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white"}`}>
+                  <span className={`text-2xl font-bold tracking-tight truncate ${isAlert ? "text-rose-600 " : "text-slate-900 "}`}>
                     {kpi.value}
                   </span>
                 </div>
 
-                <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800/80 pt-3">
+                <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100  pt-3">
                   <TrendBadge trend={kpi.trend} value={kpi.trendValue} />
                   <span className="text-[11px] text-slate-400 truncate flex-1 text-right" title={kpi.description}>
                     {kpi.description}
@@ -408,35 +408,35 @@ const ControlCenterDashboardPage = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Left: Interactive Area Chart (2/3 width on xl+) */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-sm xl:col-span-2 flex flex-col justify-between min-w-0">
+        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm xl:col-span-2 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div className="min-w-0">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
                   System Traffic & User Telemetry
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 sm:line-clamp-1">
+                <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
                   Real-time active concurrency and API request volume across all connected modules
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50  px-2.5 py-1 text-xs font-semibold text-emerald-700  border border-emerald-200/60 ">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   Live Stream
                 </span>
-                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                <span className="rounded-lg bg-slate-100  px-2.5 py-1 text-xs font-semibold text-slate-600 ">
                   {dateFilter}
                 </span>
               </div>
             </div>
 
-            <div className="mt-4 w-full overflow-hidden min-w-0">
+            <div className="mt-6 w-full overflow-hidden min-w-0">
               <AreaChart
-                className="h-64 sm:h-72 w-full"
+                className="h-72 sm:h-80 w-full"
                 data={activityData}
                 index="name"
                 categories={["Active Users", "API Calls"]}
-                colors={["indigo", "violet"]}
+                colors={["blue", "indigo"]}
                 valueFormatter={(number: number) => Intl.NumberFormat("us").format(number)}
                 showLegend={true}
                 showGridLines={true}
@@ -444,33 +444,33 @@ const ControlCenterDashboardPage = () => {
               />
             </div>
           </div>
-          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100  pt-4 text-xs text-slate-500 ">
             <span>Peak concurrency: 1,120 users (Thu 14:00 UTC)</span>
-            <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-medium cursor-pointer hover:underline shrink-0">
+            <span className="flex items-center gap-1 text-indigo-600  font-medium cursor-pointer hover:underline shrink-0">
               View telemetry breakdown <ArrowUpRight className="h-3 w-3 shrink-0" />
             </span>
           </div>
         </div>
 
         {/* Right: Module Adoption Bar Chart (1/3 width on xl+) */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="mb-4 min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
                 Module Adoption Matrix
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 sm:line-clamp-1">
+              <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
                 Active employee seat distribution across ERP suites
               </p>
             </div>
 
-            <div className="mt-6 w-full overflow-hidden min-w-0">
+            <div className="mt-8 w-full overflow-hidden min-w-0">
               <BarChart
-                className="h-64 sm:h-72 w-full"
+                className="h-72 sm:h-80 w-full"
                 data={moduleData}
                 index="name"
                 categories={["Users"]}
-                colors={["indigo"]}
+                colors={["brand"]}
                 valueFormatter={(number: number) => `${Intl.NumberFormat("us").format(number)} seats`}
                 layout="vertical"
                 showLegend={false}
@@ -478,9 +478,9 @@ const ControlCenterDashboardPage = () => {
               />
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100  pt-4 text-xs text-slate-500 ">
             <span>Total assigned seats: 2,390</span>
-            <span className="font-semibold text-slate-700 dark:text-slate-300">100% License Utilization</span>
+            <span className="font-semibold text-slate-700 ">100% License Utilization</span>
           </div>
         </div>
       </div>
@@ -490,26 +490,26 @@ const ControlCenterDashboardPage = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Left 2 Cols: Interactive Audit & Security Logs Table */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-sm xl:col-span-2 flex flex-col justify-between min-w-0">
+        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm xl:col-span-2 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-100  pb-4">
               <div className="min-w-0">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
                   Security Governance & Audit Trail
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 sm:line-clamp-1">
+                <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
                   Real-time logging of authentication events, privilege escalations, and data modifications
                 </p>
               </div>
 
               {/* Tab Switcher */}
-              <div className="flex flex-wrap sm:flex-nowrap rounded-lg bg-slate-100 dark:bg-slate-800 p-1 w-full md:w-auto shrink-0">
+              <div className="flex flex-wrap sm:flex-nowrap rounded-lg bg-slate-100  p-1 w-full md:w-auto shrink-0">
                 <button
                   onClick={() => setActiveTab("security")}
                   className={`flex-1 sm:flex-initial justify-center flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
                     activeTab === "security"
-                      ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      ? "bg-white  text-indigo-600  shadow-sm"
+                      : "text-slate-600  hover:text-slate-900 "
                   }`}
                 >
                   <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
@@ -519,8 +519,8 @@ const ControlCenterDashboardPage = () => {
                   onClick={() => setActiveTab("audit")}
                   className={`flex-1 sm:flex-initial justify-center flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
                     activeTab === "audit"
-                      ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      ? "bg-white  text-indigo-600  shadow-sm"
+                      : "text-slate-600  hover:text-slate-900 "
                   }`}
                 >
                   <FileText className="h-3.5 w-3.5 shrink-0" />
@@ -534,7 +534,7 @@ const ControlCenterDashboardPage = () => {
               {activeTab === "security" ? (
                 <table className="w-full min-w-[640px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <tr className="border-b border-slate-200  text-xs font-bold uppercase tracking-wider text-slate-400">
                       <th className="pb-3 pl-2">Severity</th>
                       <th className="pb-3">Event Description</th>
                       <th className="pb-3">Target User</th>
@@ -542,19 +542,19 @@ const ControlCenterDashboardPage = () => {
                       <th className="pb-3 text-right pr-2">Timestamp</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  <tbody className="divide-y divide-slate-100 ">
                     {securityLogs.map((log) => (
-                      <tr key={log.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                      <tr key={log.id} className="group hover:bg-slate-50  transition-colors">
                         <td className="py-3.5 pl-2">
                           <SeverityBadge type={log.type} />
                         </td>
-                        <td className="py-3.5 font-medium text-slate-800 dark:text-slate-200">
+                        <td className="py-3.5 font-medium text-slate-800 ">
                           {log.event}
                         </td>
-                        <td className="py-3.5 text-slate-600 dark:text-slate-400 font-mono text-xs">
+                        <td className="py-3.5 text-slate-600  font-mono text-xs">
                           {log.user}
                         </td>
-                        <td className="py-3.5 text-slate-500 dark:text-slate-400 font-mono text-xs">
+                        <td className="py-3.5 text-slate-500  font-mono text-xs">
                           {log.ip}
                         </td>
                         <td className="py-3.5 text-right pr-2 text-xs text-slate-400 whitespace-nowrap">
@@ -567,25 +567,25 @@ const ControlCenterDashboardPage = () => {
               ) : (
                 <table className="w-full min-w-[550px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <tr className="border-b border-slate-200  text-xs font-bold uppercase tracking-wider text-slate-400">
                       <th className="pb-3 pl-2">Module</th>
                       <th className="pb-3">Action Performed</th>
                       <th className="pb-3">Actor Account</th>
                       <th className="pb-3 text-right pr-2">Timestamp</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  <tbody className="divide-y divide-slate-100 ">
                     {auditLogs.map((log) => (
-                      <tr key={log.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                      <tr key={log.id} className="group hover:bg-slate-50  transition-colors">
                         <td className="py-3.5 pl-2">
-                          <span className="inline-flex items-center gap-1.5 font-semibold text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-md border border-indigo-100 dark:border-indigo-900/50">
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-xs text-indigo-600  bg-indigo-50  px-2.5 py-1 rounded-md border border-indigo-100 ">
                             {log.module}
                           </span>
                         </td>
-                        <td className="py-3.5 font-medium text-slate-800 dark:text-slate-200">
+                        <td className="py-3.5 font-medium text-slate-800 ">
                           {log.action}
                         </td>
-                        <td className="py-3.5 text-slate-600 dark:text-slate-400 font-mono text-xs">
+                        <td className="py-3.5 text-slate-600  font-mono text-xs">
                           {log.user}
                         </td>
                         <td className="py-3.5 text-right pr-2 text-xs text-slate-400 whitespace-nowrap">
@@ -599,54 +599,54 @@ const ControlCenterDashboardPage = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs">
-            <span className="text-slate-500 dark:text-slate-400">
+          <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100  pt-4 text-xs">
+            <span className="text-slate-500 ">
               Showing top 4 recent {activeTab === "security" ? "security events" : "audit records"}
             </span>
-            <button className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 shrink-0">
+            <button className="font-semibold text-indigo-600  hover:underline flex items-center gap-1 shrink-0">
               Open comprehensive audit explorer <ArrowUpRight className="h-3 w-3 shrink-0" />
             </button>
           </div>
         </div>
 
         {/* Right 1 Col: User & Role Distribution Card */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="mb-4 min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
                 Role Privilege Distribution
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 sm:line-clamp-1">
+              <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
                 Breakdown of active users across permission tiers
               </p>
             </div>
 
-            <div className="mt-4 flex flex-col items-center w-full overflow-hidden min-w-0">
+            <div className="mt-8 flex flex-col items-center w-full overflow-hidden min-w-0">
               <DonutChart
-                className="h-48 w-full"
+                className="h-56 w-full"
                 data={roleData}
                 category="count"
                 index="name"
                 valueFormatter={(val: number) => `${val} accounts`}
-                colors={["indigo", "violet", "blue", "slate", "emerald"]}
+                colors={["brand", "blue", "cyan", "teal", "indigo"]}
               />
             </div>
 
             {/* Branch Progress Breakdown */}
-            <div className="mt-6 space-y-4 border-t border-slate-100 dark:border-slate-800 pt-5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="mt-8 space-y-5 border-t border-slate-100 pt-6">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
                 Regional Hub Utilization
               </h4>
               <div className="space-y-3">
                 {branchUsers.map((branch) => (
                   <div key={branch.name} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-slate-700 dark:text-slate-300 truncate pr-2">{branch.name}</span>
-                      <span className="font-mono font-semibold text-slate-900 dark:text-white shrink-0">
+                      <span className="font-medium text-slate-700  truncate pr-2">{branch.name}</span>
+                      <span className="font-mono font-semibold text-slate-900  shrink-0">
                         {branch.users} ({branch.percentage}%)
                       </span>
                     </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 ">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${branch.percentage}%`, backgroundColor: branch.color }}
@@ -658,9 +658,9 @@ const ControlCenterDashboardPage = () => {
             </div>
           </div>
 
-          <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-center">
-            <span className="text-slate-500 dark:text-slate-400">Need to modify access matrix? </span>
-            <a href="#effective-access" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+          <div className="mt-6 border-t border-slate-100  pt-4 text-xs text-center">
+            <span className="text-slate-500 ">Need to modify access matrix? </span>
+            <a href="#effective-access" className="font-semibold text-indigo-600  hover:underline">
               Go to Effective Access
             </a>
           </div>
@@ -672,13 +672,13 @@ const ControlCenterDashboardPage = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Quick Actions (2 Cols on xl+) */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-sm xl:col-span-2 min-w-0 flex flex-col justify-between">
+        <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm xl:col-span-2 min-w-0 flex flex-col justify-between">
           <div className="mb-6 flex items-start sm:items-center justify-between gap-4">
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
                 Administrative Quick Actions
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 sm:line-clamp-1">
+              <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
                 Direct shortcuts to frequently accessed governance and provisioning tasks
               </p>
             </div>
@@ -691,23 +691,23 @@ const ControlCenterDashboardPage = () => {
               return (
                 <button
                   key={action.label}
-                  className="group relative flex flex-col items-start justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 text-left transition-all hover:border-indigo-500/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm min-w-0"
+                  className="group relative flex flex-col items-start justify-between rounded-xl border border-slate-200  bg-slate-50/50  p-4 text-left transition-all hover:border-indigo-500/40 hover:bg-white  hover:shadow-sm min-w-0"
                 >
                   <div className="flex w-full items-start justify-between gap-2">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-slate-900 shadow-sm border border-slate-200/60 dark:border-slate-700/60 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 text-slate-700 dark:text-slate-300 transition-colors">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white  shadow-sm border border-slate-200/60  group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 text-slate-700  transition-colors">
                       <Icon className="h-5 w-5" />
                     </div>
                     {action.badge && (
-                      <span className="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900 shrink-0">
+                      <span className="inline-flex items-center rounded-md bg-indigo-50  px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-700  border border-indigo-100  shrink-0">
                         {action.badge}
                       </span>
                     )}
                   </div>
                   <div className="mt-4 min-w-0 w-full">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                    <h4 className="text-sm font-bold text-slate-900  group-hover:text-indigo-600  transition-colors truncate">
                       {action.label}
                     </h4>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                    <p className="mt-1 text-xs text-slate-500  line-clamp-2">
                       {action.description}
                     </p>
                   </div>
@@ -720,15 +720,15 @@ const ControlCenterDashboardPage = () => {
         {/* System Health & Pending Actions (1 Col) */}
         <div className="space-y-6 min-w-0">
           {/* Pending Actions Card */}
-          <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-gradient-to-br from-amber-50/50 to-white dark:from-amber-950/20 dark:to-slate-900 p-4 sm:p-6 shadow-sm min-w-0">
+          <div className="rounded-xl border border-amber-200  bg-gradient-to-br from-amber-50/50 to-white   p-4 sm:p-6 shadow-sm min-w-0">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <div className="flex items-center gap-2 min-w-0">
-                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
-                <h3 className="text-base font-bold text-slate-900 dark:text-white truncate">
+                <AlertCircle className="h-5 w-5 text-amber-600  shrink-0" />
+                <h3 className="text-base font-bold text-slate-900  truncate">
                   Pending Administrative Action
                 </h3>
               </div>
-              <span className="rounded-full bg-amber-100 dark:bg-amber-900/60 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-300 shrink-0">
+              <span className="rounded-full bg-amber-100  px-2.5 py-0.5 text-xs font-bold text-amber-800  shrink-0">
                 20 items
               </span>
             </div>
@@ -737,7 +737,7 @@ const ControlCenterDashboardPage = () => {
               {pendingActions.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-2xs hover:border-amber-400 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-slate-200/80  bg-white  p-3 shadow-2xs hover:border-amber-400 transition-colors"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -750,15 +750,15 @@ const ControlCenterDashboardPage = () => {
                             : "bg-blue-400"
                         }`}
                       />
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      <h4 className="text-xs font-bold text-slate-900  truncate">
                         {item.label}
                       </h4>
                     </div>
-                    <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 pl-4 line-clamp-2">
+                    <p className="mt-0.5 text-[11px] text-slate-500  pl-4 line-clamp-2">
                       {item.description}
                     </p>
                   </div>
-                  <button className="self-start sm:self-center shrink-0 rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-colors">
+                  <button className="self-start sm:self-center shrink-0 rounded-lg bg-slate-100  px-2.5 py-1 text-xs font-semibold text-slate-700  hover:bg-indigo-600 hover:text-white transition-colors">
                     Resolve ({item.count})
                   </button>
                 </div>
@@ -767,34 +767,34 @@ const ControlCenterDashboardPage = () => {
           </div>
 
           {/* System Health Status Card */}
-          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-sm min-w-0">
+          <div className="rounded-xl border border-slate-200  bg-white  p-4 sm:p-6 shadow-sm min-w-0">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 min-w-0">
-                <Server className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <h3 className="text-base font-bold text-slate-900  flex items-center gap-2 min-w-0">
+                <Server className="h-4 w-4 text-indigo-600  shrink-0" />
                 <span className="truncate">Infrastructure Health</span>
               </h3>
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600  shrink-0">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 All Systems Operational
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800 min-w-0">
+              <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Global Uptime</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-white truncate block">99.989%</span>
+                <span className="text-sm font-bold text-slate-900  truncate block">99.989%</span>
               </div>
-              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800 min-w-0">
+              <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Database Sync</span>
-                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 truncate block">0.02s latency</span>
+                <span className="text-sm font-bold text-emerald-600  truncate block">0.02s latency</span>
               </div>
-              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800 min-w-0">
+              <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Active Suites</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-white truncate block">8 / 8 Online</span>
+                <span className="text-sm font-bold text-slate-900  truncate block">8 / 8 Online</span>
               </div>
-              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800 min-w-0">
+              <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Last Snapshot</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-white truncate block">2 hrs ago (Encrypted)</span>
+                <span className="text-sm font-bold text-slate-900  truncate block">2 hrs ago (Encrypted)</span>
               </div>
             </div>
           </div>

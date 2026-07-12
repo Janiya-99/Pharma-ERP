@@ -14,7 +14,7 @@ const GRNLineCostSummary = ({ quantityReceived = 0, freeQuantity = 0, unitCost =
   const formatLKR = (val: unknown) => new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR' }).format(val || 0);
 
   return (
-    <div className="flex flex-col gap-1 text-[11px] min-w-[150px] bg-slate-50 dark:bg-navy-800 p-2 rounded border border-slate-100 dark:border-navy-700">
+    <div className="flex flex-col gap-1 text-[11px] min-w-[150px] bg-slate-50  p-2 rounded border border-slate-100 ">
       <div className="flex justify-between">
         <span className="text-slate-500">Subtotal:</span>
         <span className="font-medium">{formatLKR(subTotal)}</span>
@@ -27,12 +27,12 @@ const GRNLineCostSummary = ({ quantityReceived = 0, freeQuantity = 0, unitCost =
         <span className="text-slate-500">Tax:</span>
         <span className="font-medium">{formatLKR(tax)}</span>
       </div>
-      <div className="border-t border-slate-200 dark:border-navy-600 my-0.5" />
+      <div className="border-t border-slate-200  my-0.5" />
       <div className="flex justify-between font-bold text-brand-600">
         <span>Line Total:</span>
         <span>{formatLKR(lineTotal)}</span>
       </div>
-      <div className="flex justify-between pt-0.5 mt-0.5 border-t border-slate-200 dark:border-navy-600">
+      <div className="flex justify-between pt-0.5 mt-0.5 border-t border-slate-200 ">
         <span className="text-slate-500">Stock U.Cost:</span>
         <span className={`font-bold ${stockUnitCost === 0 ? "text-red-500" : "text-green-600"}`}>
           {formatLKR(stockUnitCost)}

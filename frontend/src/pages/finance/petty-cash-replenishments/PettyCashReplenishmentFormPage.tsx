@@ -151,40 +151,40 @@ export default function PettyCashReplenishmentFormPage() {
       />
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200 dark:bg-red-900/30 dark:border-red-800">
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200  ">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+        <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Branch *</label>
-              <select name="branch_id" value={formData.branch_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Branch *</label>
+              <select name="branch_id" value={formData.branch_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="" disabled>Select Branch</option>
                 {branches.map((b: unknown) => <option key={b.id} value={b.id}>{b.branch_name}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Petty Cash Fund *</label>
-              <select name="petty_cash_fund_id" value={formData.petty_cash_fund_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Petty Cash Fund *</label>
+              <select name="petty_cash_fund_id" value={formData.petty_cash_fund_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="" disabled>Select Fund</option>
                 {funds.map((f: unknown) => <option key={f.id} value={f.id}>{f.fund_code} - {f.fund_name}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Bank Account *</label>
-              <select name="bank_account_id" value={formData.bank_account_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Funding Bank Account *</label>
+              <select name="bank_account_id" value={formData.bank_account_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="" disabled>Select Bank Account</option>
                 {bankAccounts.map((b: unknown) => <option key={b.id} value={b.id}>{b.bank_name} - {b.account_number}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Date *</label>
               <DatePicker
                 value={formData.replenishment_date}
                 onChange={(value) => setFormData((prev: any) => ({ ...prev, replenishment_date: value }))}
@@ -194,30 +194,30 @@ export default function PettyCashReplenishmentFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (LKR) *</label>
-              <input type="number" min="0.01" step="0.01" name="replenishment_amount" value={formData.replenishment_amount} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required placeholder="e.g. 50000.00" />
+              <label className="block text-sm font-medium text-gray-700  mb-1">Amount (LKR) *</label>
+              <input type="number" min="0.01" step="0.01" name="replenishment_amount" value={formData.replenishment_amount} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required placeholder="e.g. 50000.00" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reference Number</label>
-              <input type="text" name="reference_number" value={formData.reference_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" placeholder="e.g. REF-5678" />
+              <label className="block text-sm font-medium text-gray-700  mb-1">Reference Number</label>
+              <input type="text" name="reference_number" value={formData.reference_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " placeholder="e.g. REF-5678" />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remarks</label>
-              <textarea name="remarks" value={formData.remarks} onChange={handleChange} rows="2" className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" placeholder="e.g. Monthly replenishment of main vault fund" />
+              <label className="block text-sm font-medium text-gray-700  mb-1">Remarks</label>
+              <textarea name="remarks" value={formData.remarks} onChange={handleChange} rows="2" className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " placeholder="e.g. Monthly replenishment of main vault fund" />
             </div>
           </div>
           
-          <div className="mt-8 border-t border-gray-100 dark:border-navy-700 pt-6">
-             <div className="bg-gray-50 dark:bg-navy-900/50 rounded-lg p-4 max-w-sm ml-auto border border-gray-200 dark:border-navy-700">
-               <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <div className="mt-8 border-t border-gray-100  pt-6">
+             <div className="bg-gray-50  rounded-lg p-4 max-w-sm ml-auto border border-gray-200 ">
+               <div className="flex justify-between items-center text-sm text-gray-600  mb-2">
                  <span>Current Fund Balance:</span>
-                 <span className="font-medium text-gray-900 dark:text-white">{selectedFundBalance !== undefined ? formatCurrency(selectedFundBalance) : '-'}</span>
+                 <span className="font-medium text-gray-900 ">{selectedFundBalance !== undefined ? formatCurrency(selectedFundBalance) : '-'}</span>
                </div>
-               <div className="flex justify-between items-center text-sm font-bold text-navy-700 dark:text-white pt-2 border-t border-gray-200 dark:border-navy-700">
+               <div className="flex justify-between items-center text-sm font-bold text-navy-700  pt-2 border-t border-gray-200 ">
                  <span>Projected Balance:</span>
-                 <span className="text-green-600 dark:text-green-400">{selectedFundBalance !== undefined ? formatCurrency(projectedBalance) : '-'}</span>
+                 <span className="text-green-600 ">{selectedFundBalance !== undefined ? formatCurrency(projectedBalance) : '-'}</span>
                </div>
              </div>
           </div>
@@ -227,7 +227,7 @@ export default function PettyCashReplenishmentFormPage() {
           <button
             type="button"
             onClick={() => history.push("/admin/finance/petty-cash-replenishments")}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700 font-medium transition-colors"
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50     font-medium transition-colors"
           >
             Cancel
           </button>

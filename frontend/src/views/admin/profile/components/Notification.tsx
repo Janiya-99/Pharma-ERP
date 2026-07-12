@@ -6,7 +6,7 @@ function Notification() {
   return (
     <Card extra={"w-full h-full p-3"}>
       <div className="relative mb-3 flex items-center justify-between pt-1">
-        <h4 className="text-xl font-bold text-navy-700 dark:text-white">
+        <h4 className="text-xl font-bold text-navy-700 ">
           Notifications
         </h4>
         <CardMenu />
@@ -17,7 +17,7 @@ function Notification() {
           <Switch id="switch1" />
           <label
             htmlFor="checkbox1"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Item comment notifications
           </label>
@@ -27,7 +27,7 @@ function Notification() {
           <Switch id="switch2" />
           <label
             htmlFor="checkbox2"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Buyer review notifications
           </label>
@@ -37,7 +37,7 @@ function Notification() {
           <Switch id="switch3" />
           <label
             htmlFor="checkbox3"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Rating reminders notifications
           </label>
@@ -47,7 +47,7 @@ function Notification() {
           <Switch id="switch4" />
           <label
             htmlFor="checkbox4"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Meetups near you notifications
           </label>
@@ -57,7 +57,7 @@ function Notification() {
           <Switch id="switch5" />
           <label
             htmlFor="checkbox5"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Company news notifications
           </label>
@@ -67,7 +67,7 @@ function Notification() {
           <Switch id="switch6" />
           <label
             htmlFor="checkbox6"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             New launches and projects
           </label>
@@ -76,7 +76,7 @@ function Notification() {
           <Switch id="switch7" />
           <label
             htmlFor="checkbox7"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Monthly product changes
           </label>
@@ -85,7 +85,7 @@ function Notification() {
           <Switch id="switch8" />
           <label
             htmlFor="checkbox8"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Subscribe to newsletter
           </label>
@@ -94,7 +94,7 @@ function Notification() {
           <Switch id="switch8" />
           <label
             htmlFor="checkbox8"
-            className="text-base font-medium text-navy-700 dark:text-white"
+            className="text-base font-medium text-navy-700 "
           >
             Email me when someone follows me
           </label>

@@ -9,13 +9,13 @@ const CustomerStatusBadge: React.FC<CustomerStatusBadgeProps> = ({
 }) => {
   const colors: Record<string, string> = {
     active:
-      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
+      "bg-emerald-50 text-emerald-700 border-emerald-200   ",
     inactive:
-      "bg-gray-100 text-gray-700 border-gray-300 dark:bg-navy-700 dark:text-gray-300 dark:border-navy-600",
+      "bg-gray-100 text-gray-700 border-gray-300   ",
     blocked:
-      "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800",
+      "bg-rose-50 text-rose-700 border-rose-200   ",
     on_hold:
-      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800",
+      "bg-amber-50 text-amber-700 border-amber-200   ",
   };
 
   const labels: Record<string, string> = {

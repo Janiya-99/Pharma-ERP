@@ -48,14 +48,14 @@ const FinanceDashboardPage = () => {
   const dashboardData = response;
 
   return (
-    <div className="flex h-full w-full flex-col bg-[#F7F8FA] dark:bg-slate-950">
+    <div className="flex h-full w-full flex-col bg-[#F7F8FA] ">
       {/* Page Header */}
-      <div className="sticky top-0 z-10 flex flex-col justify-between gap-4 border-b border-gray-200 bg-white/80 px-6 py-4 backdrop-blur-md sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900/80">
+      <div className="sticky top-0 z-10 flex flex-col justify-between gap-4 border-b border-gray-200 bg-white/80 px-6 py-4 backdrop-blur-md sm:flex-row sm:items-center  ">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 ">
             Finance Dashboard
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 ">
             {user?.company_name || "Company"} • Overview & Analytics
           </p>
         </div>
@@ -64,7 +64,7 @@ const FinanceDashboardPage = () => {
           <Button variant="outline" size="icon" onClick={() => refetch()} disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           </Button>
-          <Button className="bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700">
+          <Button className="bg-indigo-600 text-white hover:bg-indigo-700  ">
             New Journal Entry
           </Button>
         </div>
@@ -108,43 +108,43 @@ const FinanceDashboardPage = () => {
                 label="Cash Balance"
                 metric={dashboardData.summary.cash_balance}
                 icon={Wallet}
-                iconBgClass="bg-emerald-50 dark:bg-emerald-900/30"
-                iconColorClass="text-emerald-600 dark:text-emerald-400"
+                iconBgClass="bg-emerald-50 "
+                iconColorClass="text-emerald-600 "
               />
               <FinanceKpiCard
                 label="Bank Balance"
                 metric={dashboardData.summary.bank_balance}
                 icon={Landmark}
-                iconBgClass="bg-indigo-50 dark:bg-indigo-900/30"
-                iconColorClass="text-indigo-600 dark:text-indigo-400"
+                iconBgClass="bg-indigo-50 "
+                iconColorClass="text-indigo-600 "
               />
               <FinanceKpiCard
                 label="Accounts Receivable"
                 metric={dashboardData.summary.accounts_receivable}
                 icon={Receipt}
-                iconBgClass="bg-blue-50 dark:bg-blue-900/30"
-                iconColorClass="text-blue-600 dark:text-blue-400"
+                iconBgClass="bg-blue-50 "
+                iconColorClass="text-blue-600 "
               />
               <FinanceKpiCard
                 label="Accounts Payable"
                 metric={dashboardData.summary.accounts_payable}
                 icon={FileText}
-                iconBgClass="bg-amber-50 dark:bg-amber-900/30"
-                iconColorClass="text-amber-600 dark:text-amber-400"
+                iconBgClass="bg-amber-50 "
+                iconColorClass="text-amber-600 "
               />
               <FinanceKpiCard
                 label="Monthly Revenue"
                 metric={dashboardData.summary.monthly_revenue}
                 icon={TrendingUp}
-                iconBgClass="bg-emerald-50 dark:bg-emerald-900/30"
-                iconColorClass="text-emerald-600 dark:text-emerald-400"
+                iconBgClass="bg-emerald-50 "
+                iconColorClass="text-emerald-600 "
               />
               <FinanceKpiCard
                 label="Monthly Expenses"
                 metric={dashboardData.summary.monthly_expenses}
                 icon={TrendingDown}
-                iconBgClass="bg-rose-50 dark:bg-rose-900/30"
-                iconColorClass="text-rose-600 dark:text-rose-400"
+                iconBgClass="bg-rose-50 "
+                iconColorClass="text-rose-600 "
               />
             </div>
 
@@ -154,29 +154,29 @@ const FinanceDashboardPage = () => {
                 label="Gross Profit"
                 metric={dashboardData.summary.gross_profit}
                 icon={BarChart3}
-                iconBgClass="bg-emerald-50 dark:bg-emerald-900/30"
-                iconColorClass="text-emerald-600 dark:text-emerald-400"
+                iconBgClass="bg-emerald-50 "
+                iconColorClass="text-emerald-600 "
               />
               <FinanceSummaryCard
                 label="Net Profit"
                 metric={dashboardData.summary.net_profit}
                 icon={BadgeDollarSign}
-                iconBgClass="bg-indigo-50 dark:bg-indigo-900/30"
-                iconColorClass="text-indigo-600 dark:text-indigo-400"
+                iconBgClass="bg-indigo-50 "
+                iconColorClass="text-indigo-600 "
               />
               <FinanceSummaryCard
                 label="Pending Payments"
                 metric={dashboardData.summary.pending_payments}
                 icon={ClipboardCheck}
-                iconBgClass="bg-amber-50 dark:bg-amber-900/30"
-                iconColorClass="text-amber-600 dark:text-amber-400"
+                iconBgClass="bg-amber-50 "
+                iconColorClass="text-amber-600 "
               />
               <FinanceSummaryCard
                 label="Pending Receipts"
                 metric={dashboardData.summary.pending_receipts}
                 icon={CircleDollarSign}
-                iconBgClass="bg-blue-50 dark:bg-blue-900/30"
-                iconColorClass="text-blue-600 dark:text-blue-400"
+                iconBgClass="bg-blue-50 "
+                iconColorClass="text-blue-600 "
               />
             </div>
 

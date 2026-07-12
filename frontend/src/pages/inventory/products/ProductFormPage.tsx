@@ -149,10 +149,10 @@ const ProductFormPage = () => {
     <div className="p-6 max-w-6xl mx-auto pb-24">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/inventory/products")} className="p-2 hover:bg-gray-100 dark:hover:bg-navy-700 rounded-lg transition-colors">
+          <button onClick={() => navigate("/inventory/products")} className="p-2 hover:bg-gray-100  rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+          <h1 className="text-2xl font-bold text-navy-700 ">
             {isEdit ? "Edit Product" : "New Product"}
           </h1>
         </div>
@@ -163,20 +163,20 @@ const ProductFormPage = () => {
 
       <form className="space-y-6">
         {/* Basic Details */}
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-          <h2 className="text-lg font-bold mb-4 text-navy-700 dark:text-white">Basic Details</h2>
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+          <h2 className="text-lg font-bold mb-4 text-navy-700 ">Basic Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-medium mb-1">Product Code <span className="text-red-500">*</span></label>
-              <input type="text" name="product_code" value={formData.product_code} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. PRD-9876" />
+              <input type="text" name="product_code" value={formData.product_code} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. PRD-9876" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Product Name <span className="text-red-500">*</span></label>
-              <input type="text" name="product_name" value={formData.product_name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. Paracetamol 500mg" />
+              <input type="text" name="product_name" value={formData.product_name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. Paracetamol 500mg" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Product Type <span className="text-red-500">*</span></label>
-              <select name="product_type" value={formData.product_type} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700">
+              <select name="product_type" value={formData.product_type} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white ">
                 <option value="medicine">Medicine</option>
                 <option value="medical_device">Medical Device</option>
                 <option value="consumable">Consumable</option>
@@ -194,7 +194,7 @@ const ProductFormPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Status</label>
-              <select name="status" value={formData.status} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700">
+              <select name="status" value={formData.status} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white ">
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
@@ -203,8 +203,8 @@ const ProductFormPage = () => {
         </div>
 
         {/* Pharma Details */}
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-          <h2 className="text-lg font-bold mb-4 text-navy-700 dark:text-white">Pharma Details</h2>
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+          <h2 className="text-lg font-bold mb-4 text-navy-700 ">Pharma Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-medium mb-1">Generic Name</label>
@@ -220,15 +220,15 @@ const ProductFormPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Strength</label>
-              <input type="text" name="strength" value={formData.strength} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 500mg" />
+              <input type="text" name="strength" value={formData.strength} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. 500mg" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Pack Size</label>
-              <input type="text" name="pack_size" value={formData.pack_size} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 10x10 Blister Pack" />
+              <input type="text" name="pack_size" value={formData.pack_size} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. 10x10 Blister Pack" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">NMRA Reg Number</label>
-              <input type="text" name="nmra_registration_number" value={formData.nmra_registration_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. NMRA-REG-00123" />
+              <input type="text" name="nmra_registration_number" value={formData.nmra_registration_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. NMRA-REG-00123" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">NMRA Expiry Date</label>
@@ -242,8 +242,8 @@ const ProductFormPage = () => {
         </div>
 
         {/* Inventory Settings */}
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-          <h2 className="text-lg font-bold mb-4 text-navy-700 dark:text-white">Inventory Settings</h2>
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+          <h2 className="text-lg font-bold mb-4 text-navy-700 ">Inventory Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="flex flex-col gap-4">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -257,7 +257,7 @@ const ProductFormPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Storage Condition</label>
-              <select name="storage_condition" value={formData.storage_condition} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700">
+              <select name="storage_condition" value={formData.storage_condition} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white ">
                 <option value="normal">Normal</option>
                 <option value="cool">Cool</option>
                 <option value="cold_chain">Cold Chain</option>
@@ -268,19 +268,19 @@ const ProductFormPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Reorder Level</label>
-              <input type="number" step="0.001" name="reorder_level" value={formData.reorder_level} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 100" />
+              <input type="number" step="0.001" name="reorder_level" value={formData.reorder_level} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. 100" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Reorder Quantity</label>
-              <input type="number" step="0.001" name="reorder_quantity" value={formData.reorder_quantity} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 500" />
+              <input type="number" step="0.001" name="reorder_quantity" value={formData.reorder_quantity} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. 500" />
             </div>
           </div>
         </div>
 
         {/* Barcodes */}
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-navy-700 dark:text-white">Barcodes</h2>
+            <h2 className="text-lg font-bold text-navy-700 ">Barcodes</h2>
             <button type="button" onClick={addBarcode} className="flex items-center gap-1 text-sm text-brand-600 hover:text-brand-700">
               <Plus className="w-4 h-4" /> Add Barcode
             </button>
@@ -291,8 +291,8 @@ const ProductFormPage = () => {
             <div className="space-y-3">
               {formData.barcodes.map((bc: unknown, idx: unknown) => (
                 <div key={idx} className="flex items-center gap-3">
-                  <input type="text" placeholder="Barcode" value={bc.barcode} onChange={(e: any) => updateBarcode(idx, "barcode", e.target.value)} className="flex-1 px-3 py-2 border rounded-xl bg-white dark:bg-navy-700 text-sm" />
-                  <select value={bc.barcode_type} onChange={(e: any) => updateBarcode(idx, "barcode_type", e.target.value)} className="w-32 px-3 py-2 border rounded-xl bg-white dark:bg-navy-700 text-sm">
+                  <input type="text" placeholder="Barcode" value={bc.barcode} onChange={(e: any) => updateBarcode(idx, "barcode", e.target.value)} className="flex-1 px-3 py-2 border rounded-xl bg-white  text-sm" />
+                  <select value={bc.barcode_type} onChange={(e: any) => updateBarcode(idx, "barcode_type", e.target.value)} className="w-32 px-3 py-2 border rounded-xl bg-white  text-sm">
                     <option value="EAN13">EAN13</option>
                     <option value="UPCA">UPCA</option>
                     <option value="CODE128">CODE128</option>

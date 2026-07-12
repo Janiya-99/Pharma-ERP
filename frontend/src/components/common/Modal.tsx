@@ -38,7 +38,7 @@ const Modal = ({
         showCloseButton={true}
       >
         <SheetHeader className="glass-modal-header px-6 py-5">
-          <SheetTitle className="text-lg font-bold leading-tight text-navy-700 dark:text-white">
+          <SheetTitle className="text-lg font-bold leading-tight text-navy-700 ">
             {title}
           </SheetTitle>
         </SheetHeader>

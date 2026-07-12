@@ -163,22 +163,22 @@ const GeneralSettingsPage = () => {
         isLoading={isSaving}
       />
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <Settings className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Control Center • Platform Administration
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 General System & Localization Settings
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Manage corporate profile, fiscal year boundaries, currencies, regional localization, and backup policies
           </p>
         </div>
@@ -186,7 +186,7 @@ const GeneralSettingsPage = () => {
         {/* Action Bar */}
         <div className="flex items-center gap-3">
           {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 px-3.5 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 animate-in fade-in">
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50  px-3.5 py-2 text-xs font-bold text-emerald-700  border border-emerald-200/60  animate-in fade-in">
               <CheckCircle2 className="h-4 w-4" /> Global Settings Saved!
             </span>
           )}
@@ -205,16 +205,16 @@ const GeneralSettingsPage = () => {
         {/* ══════════════════════════════════════════════
             SECTION 1: Corporate Profile & Registration
         ══════════════════════════════════════════════ */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/50 p-2.5 text-indigo-600 dark:text-indigo-400">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-100  pb-4">
+            <div className="rounded-xl bg-indigo-50  p-2.5 text-indigo-600 ">
               <Building2 className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Corporate Profile & Registration
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Official entity details displayed on tax invoices, purchase orders, and compliance certificates
               </p>
             </div>
@@ -222,44 +222,44 @@ const GeneralSettingsPage = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                 Registered Company Name
               </label>
               <input
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 px-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none"
+                className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  px-3.5 text-sm font-semibold text-slate-900  focus:border-indigo-500 focus:outline-none"
               />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Tax Registration (TIN / VAT #)
                 </label>
                 <input
                   type="text"
                   value={tinNumber}
                   onChange={(e) => setTinNumber(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 px-3.5 text-sm font-mono font-bold text-indigo-600 dark:text-indigo-400 focus:border-indigo-500 focus:outline-none"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  px-3.5 text-sm font-mono font-bold text-indigo-600  focus:border-indigo-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Official Website
                 </label>
                 <input
                   type="text"
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 px-3.5 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  px-3.5 text-sm text-slate-900  focus:border-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                 Registered Headquarters Address
               </label>
               <div className="relative">
@@ -268,14 +268,14 @@ const GeneralSettingsPage = () => {
                   rows={2}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200  bg-slate-50/50  pl-10 pr-3.5 py-2 text-sm text-slate-900  focus:border-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Corporate Email Contact
                 </label>
                 <div className="relative">
@@ -284,12 +284,12 @@ const GeneralSettingsPage = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 pl-10 pr-3.5 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none"
+                    className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  pl-10 pr-3.5 text-sm text-slate-900  focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Official Phone Switchboard
                 </label>
                 <div className="relative">
@@ -298,7 +298,7 @@ const GeneralSettingsPage = () => {
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 pl-10 pr-3.5 text-sm font-mono text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none"
+                    className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  pl-10 pr-3.5 text-sm font-mono text-slate-900  focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -309,16 +309,16 @@ const GeneralSettingsPage = () => {
         {/* ══════════════════════════════════════════════
             SECTION 2: Fiscal Year & Regional Localization
         ══════════════════════════════════════════════ */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="rounded-xl bg-blue-50 dark:bg-blue-950/50 p-2.5 text-blue-600 dark:text-blue-400">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-100  pb-4">
+            <div className="rounded-xl bg-blue-50  p-2.5 text-blue-600 ">
               <Globe className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Fiscal Year & Regional Localization
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Define accounting period boundaries, base currency, and date/number formatting rules
               </p>
             </div>
@@ -327,13 +327,13 @@ const GeneralSettingsPage = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Fiscal Year Start Date
                 </label>
                 <select
                   value={fiscalStart}
                   onChange={(e) => setFiscalStart(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-sm font-semibold text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="APR_1">April 1st (Standard LK/IN Fiscal Year)</option>
                   <option value="JAN_1">January 1st (Calendar Year)</option>
@@ -343,13 +343,13 @@ const GeneralSettingsPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Base Accounting Currency
                 </label>
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-sm font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-sm font-bold text-indigo-600  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="LKR">LKR — Sri Lankan Rupee (₨)</option>
                   <option value="USD">USD — US Dollar ($)</option>
@@ -362,13 +362,13 @@ const GeneralSettingsPage = () => {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   System Timezone
                 </label>
                 <select
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-sm font-semibold text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="Asia/Colombo">Asia/Colombo (GMT+05:30)</option>
                   <option value="Asia/Kolkata">Asia/Kolkata (GMT+05:30)</option>
@@ -379,13 +379,13 @@ const GeneralSettingsPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Date Formatting Standard
                 </label>
                 <select
                   value={dateFormat}
                   onChange={(e) => setDateFormat(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-sm font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-sm font-mono font-bold text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="DD/MM/YYYY">DD/MM/YYYY (31/12/2026)</option>
                   <option value="YYYY-MM-DD">YYYY-MM-DD (2026-12-31 — ISO)</option>
@@ -395,13 +395,13 @@ const GeneralSettingsPage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                 Number & Currency Formatting System
               </label>
               <select
                 value={numberFormat}
                 onChange={(e) => setNumberFormat(e.target.value)}
-                className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-sm font-medium text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               >
                 <option value="EN_IN">South Asian Numbering — Lakhs & Crores (e.g., 15,50,000.00 LKR)</option>
                 <option value="EN_US">Western Numbering — Thousands & Millions (e.g., 1,550,000.00 LKR)</option>
@@ -414,25 +414,25 @@ const GeneralSettingsPage = () => {
         {/* ══════════════════════════════════════════════
             SECTION 3: System Notifications & Alerts
         ══════════════════════════════════════════════ */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="rounded-xl bg-amber-50 dark:bg-amber-950/50 p-2.5 text-amber-600 dark:text-amber-400">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-100  pb-4">
+            <div className="rounded-xl bg-amber-50  p-2.5 text-amber-600 ">
               <Bell className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Automated System Notifications & Alerts
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Configure automated email and push notifications for critical ERP events and thresholds
               </p>
             </div>
           </div>
 
           <div className="space-y-3">
-            <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+            <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
               <div>
-                <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Inventory Low Stock Alerts</span>
+                <span className="block text-sm font-semibold text-slate-800 ">Inventory Low Stock Alerts</span>
                 <span className="text-xs text-slate-400">Notify warehouse managers when stock drops below safety reorder levels</span>
               </div>
               <input
@@ -443,16 +443,16 @@ const GeneralSettingsPage = () => {
               />
             </label>
 
-            <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+            <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
               <div>
-                <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Pharmaceutical Batch Expiry Warning</span>
+                <span className="block text-sm font-semibold text-slate-800 ">Pharmaceutical Batch Expiry Warning</span>
                 <span className="text-xs text-slate-400">Trigger advance warnings prior to medicine expiration dates</span>
               </div>
               <div className="flex items-center gap-2">
                 <select
                   value={expiryDaysWarning}
                   onChange={(e) => setExpiryDaysWarning(e.target.value)}
-                  className="h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-xs font-bold text-indigo-600"
+                  className="h-8 rounded-lg border border-slate-200  bg-white  px-2 text-xs font-bold text-indigo-600"
                 >
                   <option value="30">30 Days</option>
                   <option value="60">60 Days</option>
@@ -468,9 +468,9 @@ const GeneralSettingsPage = () => {
               </div>
             </label>
 
-            <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+            <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
               <div>
-                <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Overdue Invoice Aging Notifications</span>
+                <span className="block text-sm font-semibold text-slate-800 ">Overdue Invoice Aging Notifications</span>
                 <span className="text-xs text-slate-400">Send weekly aging reports to billing supervisors for receivables &gt; 60 days</span>
               </div>
               <input
@@ -481,9 +481,9 @@ const GeneralSettingsPage = () => {
               />
             </label>
 
-            <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+            <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
               <div>
-                <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Security Anomaly & Brute Force Alerts</span>
+                <span className="block text-sm font-semibold text-slate-800 ">Security Anomaly & Brute Force Alerts</span>
                 <span className="text-xs text-slate-400">Immediate SMS/Email alert to security officers on locked out IPs</span>
               </div>
               <input
@@ -499,17 +499,17 @@ const GeneralSettingsPage = () => {
         {/* ══════════════════════════════════════════════
             SECTION 4: Data Backup & Retention Policies
         ══════════════════════════════════════════════ */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-800 pb-4 gap-4">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100  pb-4 gap-4">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/50 p-2.5 text-emerald-600 dark:text-emerald-400">
+              <div className="rounded-xl bg-emerald-50  p-2.5 text-emerald-600 ">
                 <Database className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   Data Backup & Retention Schedule
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 ">
                   Automated encrypted database snapshots and NMRA/IRAS audit archiving
                 </p>
               </div>
@@ -518,7 +518,7 @@ const GeneralSettingsPage = () => {
             <button
               onClick={handleTriggerBackup}
               disabled={isBackingUp}
-              className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-3.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-all shadow-2xs shrink-0"
+              className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200  bg-slate-50  px-3.5 text-xs font-bold text-emerald-600  hover:bg-emerald-50  transition-all shadow-2xs shrink-0"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isBackingUp ? "animate-spin" : ""}`} />
               {isBackingUp ? "Snapshotting..." : "Trigger Backup Now"}
@@ -526,7 +526,7 @@ const GeneralSettingsPage = () => {
           </div>
 
           {backupSuccess && (
-            <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3.5 text-xs font-medium text-emerald-800 dark:text-emerald-300 flex items-center gap-2 animate-in fade-in">
+            <div className="rounded-xl bg-emerald-50  border border-emerald-200  p-3.5 text-xs font-medium text-emerald-800  flex items-center gap-2 animate-in fade-in">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
               Encrypted snapshot created successfully! Saved to AWS S3 / Glacier storage bucket.
             </div>
@@ -535,13 +535,13 @@ const GeneralSettingsPage = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Automated Snapshot Frequency
                 </label>
                 <select
                   value={backupFreq}
                   onChange={(e) => setBackupFreq(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-sm font-semibold text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="HOURLY">Every Hour (Continuous Protection)</option>
                   <option value="DAILY">Daily at 02:00 AM LKR (Standard)</option>
@@ -551,13 +551,13 @@ const GeneralSettingsPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Audit Data Retention Period
                 </label>
                 <select
                   value={retentionYears}
                   onChange={(e) => setRetentionYears(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-sm font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-sm font-bold text-emerald-600  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="5">5 Years (Minimum Inland Revenue)</option>
                   <option value="7">7 Years (NMRA Pharmaceutical Standard)</option>
@@ -567,7 +567,7 @@ const GeneralSettingsPage = () => {
               </div>
             </div>
 
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-200/60 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 flex items-center justify-between">
+            <div className="rounded-xl bg-slate-50  p-4 border border-slate-200/60  text-xs text-slate-600  flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
                 <span>

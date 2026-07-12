@@ -38,12 +38,12 @@ const FixedAssetSelect = ({ value, onChange, error, disabled, className = "", st
   return (
     <div className={`relative ${className}`}>
       <div
-        className={`flex items-center justify-between w-full p-2.5 bg-white dark:bg-navy-800 border rounded-xl cursor-pointer ${
-          error ? "border-red-500" : "border-gray-200 dark:border-navy-600"
+        className={`flex items-center justify-between w-full p-2.5 bg-white  border rounded-xl cursor-pointer ${
+          error ? "border-red-500" : "border-gray-200 "
         } ${disabled ? "opacity-50 cursor-not-allowed bg-gray-50" : "hover:border-brand-500"}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
-        <span className={`truncate text-sm ${!selectedAsset ? "text-gray-400" : "text-gray-800 dark:text-white"}`}>
+        <span className={`truncate text-sm ${!selectedAsset ? "text-gray-400" : "text-gray-800 "}`}>
           {selectedAsset 
             ? `${selectedAsset.asset_code} - ${selectedAsset.asset_name} (NBV: ${Number(selectedAsset.net_book_value || 0).toLocaleString()})` 
             : "Select Fixed Asset..."}
@@ -52,12 +52,12 @@ const FixedAssetSelect = ({ value, onChange, error, disabled, className = "", st
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-navy-800 dark:border-navy-600">
-          <div className="p-2 border-b border-gray-100 dark:border-navy-700">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg  ">
+          <div className="p-2 border-b border-gray-100 ">
             <input
               type="text"
               placeholder="Search asset..."
-              className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+              className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-brand-500   "
               value={search}
               onChange={(e: any) => setSearch(e.target.value)}
               onClick={(e: any) => e.stopPropagation()}
@@ -72,8 +72,8 @@ const FixedAssetSelect = ({ value, onChange, error, disabled, className = "", st
               filteredAssets.map((asset: unknown) => (
                 <div
                   key={asset.id}
-                  className={`flex flex-col p-2 text-sm rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${
-                    value === asset.id ? "bg-brand-50 dark:bg-navy-700" : ""
+                  className={`flex flex-col p-2 text-sm rounded-lg cursor-pointer hover:bg-gray-50  ${
+                    value === asset.id ? "bg-brand-50 " : ""
                   }`}
                   onClick={() => {
                     onChange(asset.id, asset);
@@ -82,7 +82,7 @@ const FixedAssetSelect = ({ value, onChange, error, disabled, className = "", st
                   }}
                 >
                   <div className="flex justify-between items-center w-full">
-                    <span className={`font-medium ${value === asset.id ? "text-brand-600" : "text-gray-800 dark:text-gray-200"}`}>
+                    <span className={`font-medium ${value === asset.id ? "text-brand-600" : "text-gray-800 "}`}>
                       {asset.asset_code} - {asset.asset_name}
                     </span>
                     {value === asset.id && <Check className="w-4 h-4 text-brand-600" />}

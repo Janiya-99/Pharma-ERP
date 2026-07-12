@@ -11,7 +11,7 @@ const COLORS = ["#4F46E5", "#0F766E", "#16A34A", "#D97706", "#6B7280", "#DC2626"
 
 export function ExpenseDistributionChart({ data }: ExpenseDistributionChartProps) {
   return (
-    <Card className="col-span-1 border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-4 dark:border-slate-800 dark:bg-slate-900/80">
+    <Card className="col-span-1 border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-4  ">
       <CardHeader className="pb-2">
         <CardTitle>Expense Distribution</CardTitle>
         <CardDescription>Breakdown of operating costs</CardDescription>
@@ -56,10 +56,10 @@ export function ExpenseDistributionChart({ data }: ExpenseDistributionChartProps
                   className="h-3 w-3 rounded-full"
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 />
-                <span className="text-gray-600 dark:text-gray-400">{item.category}</span>
+                <span className="text-gray-600 ">{item.category}</span>
               </div>
               <div className="flex gap-4 font-medium">
-                <span className="text-gray-900 dark:text-gray-100">{money(item.amount)}</span>
+                <span className="text-gray-900 ">{money(item.amount)}</span>
                 <span className="w-10 text-right text-gray-500">{item.share}%</span>
               </div>
             </div>

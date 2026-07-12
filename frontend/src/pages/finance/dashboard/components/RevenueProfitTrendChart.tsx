@@ -23,13 +23,13 @@ export function RevenueProfitTrendChart({ data }: RevenueProfitTrendChartProps) 
   };
 
   return (
-    <Card className="col-span-1 border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-8 dark:border-slate-800 dark:bg-slate-900/80">
+    <Card className="col-span-1 border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm lg:col-span-8  ">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="space-y-1">
           <CardTitle>Revenue & Profitability Trend</CardTitle>
           <CardDescription>Monthly performance over the selected period</CardDescription>
         </div>
-        <Badge variant="outline" className="bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-400">
+        <Badge variant="outline" className="bg-indigo-50 text-indigo-700  ">
           Net Profit Margin: 26.0%
         </Badge>
       </CardHeader>

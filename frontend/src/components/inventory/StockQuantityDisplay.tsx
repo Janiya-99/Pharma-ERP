@@ -9,7 +9,7 @@ const StockQuantityDisplay = ({ quantity, unit = "" }: { quantity?: unknown; uni
 
   return (
     <div className="text-right tabular-nums whitespace-nowrap">
-      <span className="font-medium text-navy-700 dark:text-white">{formattedQuantity}</span>
+      <span className="font-medium text-navy-700 ">{formattedQuantity}</span>
       {unit && <span className="text-xs text-gray-500 ml-1">{unit}</span>}
     </div>
   );

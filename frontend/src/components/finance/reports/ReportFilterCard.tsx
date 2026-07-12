@@ -15,7 +15,7 @@ const ReportFilterCard = ({
   isLoading?: boolean;
 }) => {
   return (
-    <Card className="mb-6 border-gray-200 shadow-sm dark:border-navy-700 print:hidden">
+    <Card className="mb-6 border-gray-200 shadow-sm  print:hidden">
       <CardContent className="p-4">
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-4">
           {children}

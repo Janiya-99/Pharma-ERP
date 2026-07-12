@@ -82,7 +82,7 @@ const ManufacturersPage = () => {
     <div className="p-6">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Manufacturers</h1>
+          <h1 className="text-2xl font-bold text-navy-700 ">Manufacturers</h1>
           <p className="text-sm text-gray-500 mt-1">Manage manufacturers</p>
         </div>
         <div className="flex items-center gap-3">
@@ -93,7 +93,7 @@ const ManufacturersPage = () => {
               placeholder="Search..."
               value={search}
               onChange={(e: any) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+              className="pl-9 pr-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
             />
           </div>
           <PermissionGuard permission="inventory.product_master.create">
@@ -108,7 +108,7 @@ const ManufacturersPage = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
+      <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  overflow-hidden">
         <DataTable
           columns={columns}
           data={data}

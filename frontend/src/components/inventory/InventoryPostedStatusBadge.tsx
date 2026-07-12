@@ -6,8 +6,8 @@ const InventoryPostedStatusBadge = ({ status }: { status?: unknown }) => {
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
         isPosted
-          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"
-          : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+          ? "bg-emerald-100 text-emerald-800  "
+          : "bg-gray-100 text-gray-800  "
       }`}
     >
       {isPosted ? "Posted" : "Unposted"}

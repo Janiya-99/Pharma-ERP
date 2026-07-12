@@ -150,7 +150,7 @@ const GeneralLedgerPage = () => {
       accessor: "account_code",
       cell: (row: unknown) => (
         <div>
-          <div className="font-medium text-navy-800 dark:text-white">{row.account_code}</div>
+          <div className="font-medium text-navy-800 ">{row.account_code}</div>
           <div className="text-xs text-gray-500">{row.account_name}</div>
         </div>
       )
@@ -181,8 +181,8 @@ const GeneralLedgerPage = () => {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Access Denied</h2>
-        <p className="text-gray-500 dark:text-gray-400">You do not have permission to view the General Ledger.</p>
+        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
+        <p className="text-gray-500 ">You do not have permission to view the General Ledger.</p>
       </div>
     );
   }
@@ -315,7 +315,7 @@ const GeneralLedgerPage = () => {
         </div>
       </ReportFilterCard>
 
-      <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700">
+      <div className="bg-white  rounded-lg shadow border border-gray-200 ">
         <DataTable
           columns={columns}
           data={data}

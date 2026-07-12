@@ -34,19 +34,19 @@ const GRNActionButtons = ({
         button={
           <button 
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-navy-700"
+            className="p-2 text-gray-500 rounded-lg hover:bg-gray-100  "
           >
             <MoreVertical className="w-5 h-5" />
           </button>
         }
         animation="origin-top-right transition-all duration-300 ease-in-out"
-        classNames="top-10 right-0 w-48 bg-white dark:bg-navy-800 rounded-xl shadow-xl border border-gray-100 dark:border-navy-700 z-50 py-2"
+        classNames="top-10 right-0 w-48 bg-white  rounded-xl shadow-xl border border-gray-100  z-50 py-2"
       >
         <div className="flex flex-col">
           {showView && canView && (
             <Link
               to={`/inventory/grns/${grn.id}`}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100  "
             >
               <Eye className="w-4 h-4 text-brand-500" /> View Details
             </Link>
@@ -55,7 +55,7 @@ const GRNActionButtons = ({
           {canEdit && (
             <Link
               to={`/inventory/grns/${grn.id}/edit`}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100  "
             >
               <Edit className="w-4 h-4 text-indigo-500" /> Edit GRN
             </Link>
@@ -64,7 +64,7 @@ const GRNActionButtons = ({
           {canSubmit && (
             <button
               onClick={() => { setDropdownOpen(false); onSubmit(grn); }}
-              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100  "
             >
               <Send className="w-4 h-4 text-yellow-500" /> Submit
             </button>
@@ -73,7 +73,7 @@ const GRNActionButtons = ({
           {canApprove && (
             <button
               onClick={() => { setDropdownOpen(false); onApprove(grn); }}
-              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100  "
             >
               <CheckCircle className="w-4 h-4 text-green-500" /> Approve
             </button>
@@ -82,7 +82,7 @@ const GRNActionButtons = ({
           {canReject && (
             <button
               onClick={() => { setDropdownOpen(false); onReject(grn); }}
-              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100  "
             >
               <XCircle className="w-4 h-4 text-red-500" /> Reject
             </button>
@@ -91,7 +91,7 @@ const GRNActionButtons = ({
           {canPost && (
             <button
               onClick={() => { setDropdownOpen(false); onPost(grn); }}
-              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-navy-700 font-medium"
+              className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-brand-600 hover:bg-brand-50   font-medium"
             >
               <FileInput className="w-4 h-4" /> Post GRN
             </button>
@@ -99,10 +99,10 @@ const GRNActionButtons = ({
 
           {canDelete && (
             <>
-              <div className="h-px my-1 bg-gray-100 dark:bg-navy-700"></div>
+              <div className="h-px my-1 bg-gray-100 "></div>
               <button
                 onClick={() => { setDropdownOpen(false); onDelete(grn); }}
-                className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-navy-700/50"
+                className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50  "
               >
                 <Trash2 className="w-4 h-4" /> Delete
               </button>
@@ -119,7 +119,7 @@ const GRNActionButtons = ({
       {canEdit && (
         <Link
           to={`/inventory/grns/${grn.id}/edit`}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800/50"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100   "
         >
           <Edit className="w-4 h-4" /> Edit
         </Link>
@@ -128,7 +128,7 @@ const GRNActionButtons = ({
       {canSubmit && (
         <button
           onClick={() => onSubmit(grn)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg hover:bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800/50"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg hover:bg-yellow-100   "
         >
           <Send className="w-4 h-4" /> Submit
         </button>
@@ -137,7 +137,7 @@ const GRNActionButtons = ({
       {canApprove && (
         <button
           onClick={() => onApprove(grn)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100   "
         >
           <CheckCircle className="w-4 h-4" /> Approve
         </button>
@@ -146,7 +146,7 @@ const GRNActionButtons = ({
       {canReject && (
         <button
           onClick={() => onReject(grn)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100   "
         >
           <XCircle className="w-4 h-4" /> Reject
         </button>
@@ -164,7 +164,7 @@ const GRNActionButtons = ({
       {canDelete && (
         <button
           onClick={() => onDelete(grn)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50 ml-auto"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100    ml-auto"
         >
           <Trash2 className="w-4 h-4" /> Delete
         </button>

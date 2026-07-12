@@ -187,12 +187,12 @@ const OpeningStockEntryFormPage = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/inventory/opening-stock")}
-            className="p-2 bg-white dark:bg-navy-800 rounded-full shadow hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
+            className="p-2 bg-white  rounded-full shadow hover:bg-gray-50  transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            <ArrowLeft className="h-5 w-5 text-gray-600 " />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+            <h1 className="text-2xl font-bold text-navy-700 ">
               {isEdit ? "Edit Opening Stock" : "Create Opening Stock"}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
@@ -212,18 +212,18 @@ const OpeningStockEntryFormPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Document Details</h3>
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-semibold text-gray-900  mb-6">Document Details</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">
                   Branch *
                 </label>
                 <select
                   value={formData.branch_id}
                   onChange={(e: any) => setFormData({ ...formData, branch_id: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.branch_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${errors.branch_id ? "border-red-500" : "border-gray-200 "}`}
                 >
                   <option value="">Select Branch</option>
                   {branches.map((b: any) => <option key={b.id} value={b.id}>{b.branch_name}</option>)}
@@ -232,13 +232,13 @@ const OpeningStockEntryFormPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">
                   Warehouse *
                 </label>
                 <select
                   value={formData.warehouse_id}
                   onChange={(e: any) => setFormData({ ...formData, warehouse_id: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.warehouse_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${errors.warehouse_id ? "border-red-500" : "border-gray-200 "}`}
                 >
                   <option value="">Select Warehouse</option>
                   {warehouses
@@ -249,20 +249,20 @@ const OpeningStockEntryFormPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">
                   Date *
                 </label>
                 <input
                   type="date"
                   value={formData.opening_stock_date}
                   onChange={(e: any) => setFormData({ ...formData, opening_stock_date: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.opening_stock_date ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${errors.opening_stock_date ? "border-red-500" : "border-gray-200 "}`}
                 />
                 {errors.opening_stock_date && <p className="text-xs text-red-500 mt-1">{errors.opening_stock_date}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">
                   Reference Number
                 </label>
                 <input
@@ -270,26 +270,26 @@ const OpeningStockEntryFormPage = () => {
                   value={formData.reference_number}
                   onChange={(e: any) => setFormData({ ...formData, reference_number: e.target.value })}
                   placeholder="Optional reference"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                 />
               </div>
 
               <div className="md:col-span-2 lg:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">
                   Remarks
                 </label>
                 <textarea
                   value={formData.remarks}
                   onChange={(e: any) => setFormData({ ...formData, remarks: e.target.value })}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                   placeholder="Enter optional remarks..."
                 />
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
             <OpeningStockLinesTable 
               lines={lines} 
               setLines={setLines} 
@@ -306,17 +306,17 @@ const OpeningStockEntryFormPage = () => {
             lineCount={lines.length}
           />
           
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Financial Context (Optional)</h3>
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-sm font-semibold text-gray-900  mb-4">Financial Context (Optional)</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-400 mb-1">
+                <label className="block text-xs font-medium text-gray-700  mb-1">
                   Financial Year
                 </label>
                 <select
                   value={formData.financial_year_id}
                   onChange={(e: any) => setFormData({ ...formData, financial_year_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm bg-gray-50 dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-200  rounded-lg text-sm bg-gray-50  text-gray-900 "
                   disabled={financialYears.length === 0}
                 >
                   <option value="">None selected</option>
@@ -326,13 +326,13 @@ const OpeningStockEntryFormPage = () => {
               </div>
               
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-400 mb-1">
+                <label className="block text-xs font-medium text-gray-700  mb-1">
                   Accounting Period
                 </label>
                 <select
                   value={formData.accounting_period_id}
                   onChange={(e: any) => setFormData({ ...formData, accounting_period_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm bg-gray-50 dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-200  rounded-lg text-sm bg-gray-50  text-gray-900 "
                   disabled={accountingPeriods.length === 0}
                 >
                   <option value="">None selected</option>

@@ -31,7 +31,7 @@ export function FinanceDashboardFilters({ onFilterChange }: FinanceDashboardFilt
     <div className="flex flex-col sm:flex-row items-center gap-3">
       <div className="relative w-full sm:w-[200px]">
         <Select value={branch} onValueChange={handleBranchChange}>
-          <SelectTrigger className="h-9 w-full bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800">
+          <SelectTrigger className="h-9 w-full bg-white  border-gray-200 ">
             <SelectValue placeholder="All Branches" />
           </SelectTrigger>
           <SelectContent>
@@ -45,7 +45,7 @@ export function FinanceDashboardFilters({ onFilterChange }: FinanceDashboardFilt
 
       <div className="relative w-full sm:w-[160px]">
         <Select value={period} onValueChange={handlePeriodChange}>
-          <SelectTrigger className="h-9 w-full bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800">
+          <SelectTrigger className="h-9 w-full bg-white  border-gray-200 ">
             <SelectValue placeholder="Period" />
           </SelectTrigger>
           <SelectContent>

@@ -109,7 +109,7 @@ export default function ChartOfAccountsPage() {
         }
       />
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100 ">
         <DataTable
           columns={columns}
           data={data}

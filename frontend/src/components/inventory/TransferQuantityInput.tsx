@@ -12,8 +12,8 @@ const TransferQuantityInput = ({ value, onChange, availableQuantity, error }: { 
         step="0.001"
         value={value === 0 ? "" : value}
         onChange={(e: any) => onChange(e.target.value)}
-        className={`w-full px-2 py-1.5 border rounded text-xs text-right bg-white dark:bg-navy-900 focus:ring-1 focus:ring-brand-500 ${
-          isExceeding || error ? "border-red-500" : "border-gray-200 dark:border-navy-600"
+        className={`w-full px-2 py-1.5 border rounded text-xs text-right bg-white  focus:ring-1 focus:ring-brand-500 ${
+          isExceeding || error ? "border-red-500" : "border-gray-200 "
         }`}
         placeholder="Qty"
       />

@@ -96,24 +96,24 @@ const ProfitLossReportPage = () => {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Access Denied</h2>
-        <p className="text-gray-500 dark:text-gray-400">You do not have permission to view the Profit and Loss report.</p>
+        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
+        <p className="text-gray-500 ">You do not have permission to view the Profit and Loss report.</p>
       </div>
     );
   }
 
   const renderSectionLines = (lines: unknown) => {
     if (!lines || lines.length === 0) {
-      return <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 italic text-center">No accounts found in this section.</div>;
+      return <div className="px-4 py-3 text-sm text-gray-500  italic text-center">No accounts found in this section.</div>;
     }
 
     return (
-      <div className="divide-y divide-gray-100 dark:divide-navy-700">
+      <div className="divide-y divide-gray-100 ">
         {lines.map((line: unknown) => (
-          <div key={line.account_id} className="flex justify-between items-center px-4 py-2 hover:bg-gray-50 dark:hover:bg-navy-900/50 transition-colors">
+          <div key={line.account_id} className="flex justify-between items-center px-4 py-2 hover:bg-gray-50  transition-colors">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-navy-800 dark:text-white">{line.account_code}</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">{line.account_name}</span>
+              <span className="text-sm font-medium text-navy-800 ">{line.account_code}</span>
+              <span className="text-xs text-gray-500 ">{line.account_name}</span>
             </div>
             <div className="text-sm">
               <ReportAmountCell amount={line.balance} />
@@ -182,8 +182,8 @@ const ProfitLossReportPage = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-lg shadow-sm border border-gray-200 dark:border-navy-700 p-6 mb-8">
-            <h2 className="text-2xl font-bold text-center text-navy-800 dark:text-white mb-6">Income Statement</h2>
+          <div className="bg-white  rounded-lg shadow-sm border border-gray-200  p-6 mb-8">
+            <h2 className="text-2xl font-bold text-center text-navy-800  mb-6">Income Statement</h2>
             
             {/* Income Sections */}
             <ReportSection title="Revenue" totalLabel="Total Revenue" totalAmount={data.revenue?.total}>
@@ -194,9 +194,9 @@ const ProfitLossReportPage = () => {
               {renderSectionLines(data.other_income?.lines)}
             </ReportSection>
 
-            <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 rounded-lg px-4 py-3 flex justify-between items-center mb-8">
-              <span className="font-bold text-green-800 dark:text-green-400">Total Income</span>
-              <span className="font-bold text-green-800 dark:text-green-400">
+            <div className="bg-green-50  border border-green-200  rounded-lg px-4 py-3 flex justify-between items-center mb-8">
+              <span className="font-bold text-green-800 ">Total Income</span>
+              <span className="font-bold text-green-800 ">
                 <ReportAmountCell amount={data.total_income} />
               </span>
             </div>
@@ -220,9 +220,9 @@ const ProfitLossReportPage = () => {
               {renderSectionLines(data.finance_expenses?.lines)}
             </ReportSection>
 
-            <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg px-4 py-3 flex justify-between items-center mb-8">
-              <span className="font-bold text-red-800 dark:text-red-400">Total Expenses</span>
-              <span className="font-bold text-red-800 dark:text-red-400">
+            <div className="bg-red-50  border border-red-200  rounded-lg px-4 py-3 flex justify-between items-center mb-8">
+              <span className="font-bold text-red-800 ">Total Expenses</span>
+              <span className="font-bold text-red-800 ">
                 <ReportAmountCell amount={data.total_expense} />
               </span>
             </div>
@@ -230,18 +230,18 @@ const ProfitLossReportPage = () => {
             {/* Net Profit */}
             <div className={`rounded-lg px-6 py-4 flex justify-between items-center border-2 ${
               data.net_profit > 0 
-                ? "bg-green-100 dark:bg-green-900/20 border-green-300 dark:border-green-800" 
+                ? "bg-green-100  border-green-300 " 
                 : data.net_profit < 0 
-                  ? "bg-red-100 dark:bg-red-900/20 border-red-300 dark:border-red-800"
-                  : "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                  ? "bg-red-100  border-red-300 "
+                  : "bg-gray-100  border-gray-300 "
             }`}>
               <span className={`text-xl font-bold ${
-                data.net_profit > 0 ? "text-green-800 dark:text-green-400" : data.net_profit < 0 ? "text-red-800 dark:text-red-400" : "text-gray-800 dark:text-gray-300"
+                data.net_profit > 0 ? "text-green-800 " : data.net_profit < 0 ? "text-red-800 " : "text-gray-800 "
               }`}>
                 Net {data.net_profit > 0 ? "Profit" : data.net_profit < 0 ? "Loss" : "Profit/Loss"}
               </span>
               <span className={`text-2xl font-bold ${
-                data.net_profit > 0 ? "text-green-800 dark:text-green-400" : data.net_profit < 0 ? "text-red-800 dark:text-red-400" : "text-gray-800 dark:text-gray-300"
+                data.net_profit > 0 ? "text-green-800 " : data.net_profit < 0 ? "text-red-800 " : "text-gray-800 "
               }`}>
                 <ReportAmountCell amount={data.net_profit} />
               </span>
@@ -252,10 +252,10 @@ const ProfitLossReportPage = () => {
       )}
       
       {!data && !loading && (
-        <div className="bg-white dark:bg-navy-800 rounded-lg shadow p-8 text-center border border-gray-200 dark:border-navy-700">
+        <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
           <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">Run Report</h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="mt-4 text-lg font-medium text-gray-900 ">Run Report</h3>
+          <p className="mt-2 text-sm text-gray-500 ">
             Click Apply Filters to view the profit and loss statement.
           </p>
         </div>

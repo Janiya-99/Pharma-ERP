@@ -60,7 +60,7 @@ export default function RTL() {
     <div className="flex h-full w-full">
       <Sidebar open={open} onClose={() => setOpen(false)} />
       {/* Navbar & Main Content */}
-      <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
+      <div className="h-full w-full bg-lightPrimary ">
         {/* Main Content */}
         <main
           className={`mx-[12px] h-full flex-none transition-all md:pe-2 xl:mr-[313px]`}

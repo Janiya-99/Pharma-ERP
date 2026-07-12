@@ -5,13 +5,13 @@ export default function CompleteReconciliationModal({ isOpen, onClose, onComplet
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-lg w-full max-w-md">
-        <div className="flex items-center gap-3 mb-4 text-green-600 dark:text-green-500">
+      <div className="bg-white  p-6 rounded-xl shadow-lg w-full max-w-md">
+        <div className="flex items-center gap-3 mb-4 text-green-600 ">
           <MdCheckCircle className="h-6 w-6" />
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white">Complete Reconciliation</h3>
+          <h3 className="text-lg font-bold text-navy-700 ">Complete Reconciliation</h3>
         </div>
         
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+        <p className="text-sm text-gray-600  mb-6">
           Are you sure you want to complete this reconciliation? 
           Once completed, the reconciliation and its linked transactions will be locked from further edits.
         </p>

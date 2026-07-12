@@ -160,10 +160,10 @@ const LicenseDocumentsPage = () => {
         ),
         cell: ({ row }) => (
           <div>
-            <p className="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">
+            <p className="font-mono font-bold text-xs text-indigo-600 ">
               {row.getValue("licenseNumber")}
             </p>
-            <span className="text-[11px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-1 mt-0.5">
+            <span className="text-[11px] font-semibold text-slate-800  line-clamp-1 mt-0.5">
               {row.original.title}
             </span>
           </div>
@@ -174,7 +174,7 @@ const LicenseDocumentsPage = () => {
         header: "Issuing Authority & Scope",
         cell: ({ row }) => (
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{row.original.authority}</p>
+            <p className="font-semibold text-slate-800  text-xs">{row.original.authority}</p>
             <span className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
               <Building2 className="h-3 w-3" /> {row.original.facility}
             </span>
@@ -185,7 +185,7 @@ const LicenseDocumentsPage = () => {
         accessorKey: "category",
         header: "Category",
         cell: ({ row }) => (
-          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100  px-2 py-0.5 text-xs font-bold text-slate-700 ">
             {row.original.category}
           </span>
         ),
@@ -204,19 +204,19 @@ const LicenseDocumentsPage = () => {
           const days = row.original.daysRemaining;
           return (
             <div>
-              <p className="font-mono text-xs font-medium text-slate-700 dark:text-slate-300">
+              <p className="font-mono text-xs font-medium text-slate-700 ">
                 Expires: {row.original.expiryDate}
               </p>
               {days < 0 ? (
-                <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1 mt-0.5">
+                <span className="text-[11px] font-bold text-rose-600  flex items-center gap-1 mt-0.5">
                   <XCircle className="h-3 w-3" /> Expired {Math.abs(days)} days ago
                 </span>
               ) : days <= 30 ? (
-                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 mt-0.5">
+                <span className="text-[11px] font-bold text-amber-600  flex items-center gap-1 mt-0.5">
                   <AlertTriangle className="h-3 w-3" /> Expiring in {days} days!
                 </span>
               ) : (
-                <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
+                <span className="text-[11px] font-medium text-emerald-600  flex items-center gap-1 mt-0.5">
                   <Clock className="h-3 w-3" /> {days} days remaining
                 </span>
               )}
@@ -231,27 +231,27 @@ const LicenseDocumentsPage = () => {
           const st = row.original.status;
           if (st === "ACTIVE") {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 px-2.5 py-0.5 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700   border border-emerald-200/60  px-2.5 py-0.5 text-[11px] font-bold">
                 <CheckCircle2 className="h-3 w-3" /> ACTIVE
               </span>
             );
           }
           if (st === "EXPIRING_SOON") {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700   border border-amber-200/60  px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
                 <AlertTriangle className="h-3 w-3" /> EXPIRING SOON
               </span>
             );
           }
           if (st === "RENEWAL_PENDING") {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 px-2.5 py-0.5 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 text-indigo-700   border border-indigo-200/60  px-2.5 py-0.5 text-[11px] font-bold">
                 <RefreshCw className="h-3 w-3 animate-spin" /> RENEWAL IN PROGRESS
               </span>
             );
           }
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60 px-2.5 py-0.5 text-[11px] font-bold">
+            <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700   border border-rose-200/60  px-2.5 py-0.5 text-[11px] font-bold">
               <XCircle className="h-3 w-3" /> EXPIRED
             </span>
           );
@@ -262,7 +262,7 @@ const LicenseDocumentsPage = () => {
         header: () => <span className="text-right block pr-4">Actions</span>,
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-2 pr-4">
-            <button className="rounded-lg border border-slate-200 dark:border-slate-700 p-1.5 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Download Certificate PDF">
+            <button className="rounded-lg border border-slate-200  p-1.5 text-slate-600  hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Download Certificate PDF">
               <Download className="h-4 w-4" />
             </button>
             <button className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors shadow-2xs">
@@ -310,22 +310,22 @@ const LicenseDocumentsPage = () => {
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <FileCheck className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Compliance Center • Legal & Authorization
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 License Documents & Regulatory Permits
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Centralized archive of NMRA drug licenses, IRAS tax certificates, municipal health permits, and renewal tracking
           </p>
         </div>
@@ -344,28 +344,28 @@ const LicenseDocumentsPage = () => {
 
       {/* ── KPI Summary Cards ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Registered Permits</span>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{data.length}</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">{data.length}</p>
           <span className="text-xs text-indigo-600 font-semibold mt-1 block">Across 4 facility locations</span>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Active & Compliant</span>
-          <p className="mt-2 text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
+          <p className="mt-2 text-3xl font-extrabold text-emerald-600 ">
             {data.filter((l) => l.status === "ACTIVE").length}
           </p>
           <span className="text-xs text-emerald-600 font-semibold mt-1 block">Good standing</span>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Expiring / Renewal Needed</span>
-          <p className="mt-2 text-3xl font-extrabold text-amber-600 dark:text-amber-400">
+          <p className="mt-2 text-3xl font-extrabold text-amber-600 ">
             {data.filter((l) => l.status === "EXPIRING_SOON" || l.status === "RENEWAL_PENDING").length}
           </p>
           <span className="text-xs text-amber-600 font-semibold mt-1 block">Action required &lt; 30 days</span>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Expired / Lapsed</span>
-          <p className="mt-2 text-3xl font-extrabold text-rose-600 dark:text-rose-400">
+          <p className="mt-2 text-3xl font-extrabold text-rose-600 ">
             {data.filter((l) => l.status === "EXPIRED").length}
           </p>
           <span className="text-xs text-rose-600 font-semibold mt-1 block">Requires immediate reinstatement</span>
@@ -373,7 +373,7 @@ const LicenseDocumentsPage = () => {
       </div>
 
       {/* ── Filter Bar ── */}
-      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 rounded-xl border border-slate-200  bg-white  p-4 shadow-sm md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 items-center gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -382,7 +382,7 @@ const LicenseDocumentsPage = () => {
               placeholder="Search by license #, title, or issuing authority..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  pl-10 pr-4 text-sm text-slate-900  placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
             />
           </div>
         </div>
@@ -391,7 +391,7 @@ const LicenseDocumentsPage = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none"
+            className="h-10 rounded-xl border border-slate-200  bg-white  px-3.5 text-xs font-semibold text-slate-700  focus:outline-none"
           >
             <option value="ALL">All Categories</option>
             <option value="NMRA">NMRA Pharmaceutical</option>
@@ -403,7 +403,7 @@ const LicenseDocumentsPage = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none"
+            className="h-10 rounded-xl border border-slate-200  bg-white  px-3.5 text-xs font-semibold text-slate-700  focus:outline-none"
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active & Compliant</option>
@@ -415,12 +415,12 @@ const LicenseDocumentsPage = () => {
       </div>
 
       {/* ── TanStack Table ── */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-slate-200  bg-white  shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs font-bold uppercase tracking-wider text-slate-400">
+                <tr key={headerGroup.id} className="border-b border-slate-200  bg-slate-50/50  text-xs font-bold uppercase tracking-wider text-slate-400">
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} className="px-5 py-3.5">
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -429,16 +429,16 @@ const LicenseDocumentsPage = () => {
                 </tr>
               ))}
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100 ">
               {table.getRowModel().rows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="py-12 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan={columns.length} className="py-12 text-center text-slate-500 ">
                     No license documents match your search criteria.
                   </td>
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                  <tr key={row.id} className="hover:bg-slate-50  transition-colors">
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-5 py-4">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -452,22 +452,22 @@ const LicenseDocumentsPage = () => {
         </div>
 
         {/* Pagination Strip */}
-        <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 px-5 py-4 text-xs">
-          <span className="text-slate-500 dark:text-slate-400 font-medium">
+        <div className="flex items-center justify-between border-t border-slate-200  px-5 py-4 text-xs">
+          <span className="text-slate-500  font-medium">
             Showing {table.getRowModel().rows.length} of {filteredData.length} licenses
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-1.5 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+              className="rounded-lg border border-slate-200  px-3 py-1.5 font-semibold text-slate-600  hover:bg-slate-50 disabled:opacity-50 transition-colors"
             >
               Previous
             </button>
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-1.5 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+              className="rounded-lg border border-slate-200  px-3 py-1.5 font-semibold text-slate-600  hover:bg-slate-50 disabled:opacity-50 transition-colors"
             >
               Next
             </button>
@@ -478,13 +478,13 @@ const LicenseDocumentsPage = () => {
       {/* ── Modal: Register New License ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-in fade-in-50">
-          <div className="w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200  bg-white  p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100  pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/50 p-2 text-indigo-600 dark:text-indigo-400">
+                <div className="rounded-lg bg-indigo-50  p-2 text-indigo-600 ">
                   <FileCheck className="h-5 w-5" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Register New Regulatory License</h3>
+                <h3 className="text-lg font-bold text-slate-900 ">Register New Regulatory License</h3>
               </div>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-700 p-1">
                 ✕
@@ -500,7 +500,7 @@ const LicenseDocumentsPage = () => {
                   placeholder="e.g. NMRA Controlled Substance Operating License"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50  px-3.5 text-sm font-semibold text-slate-900  focus:outline-none"
                 />
               </div>
 
@@ -513,7 +513,7 @@ const LicenseDocumentsPage = () => {
                     placeholder="e.g. WHL-9901/2026"
                     value={newNumber}
                     onChange={(e) => setNewNumber(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-3.5 text-sm font-mono font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none"
+                    className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50  px-3.5 text-sm font-mono font-bold text-indigo-600  focus:outline-none"
                   />
                 </div>
                 <div>
@@ -521,7 +521,7 @@ const LicenseDocumentsPage = () => {
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none"
+                    className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-900  focus:outline-none"
                   >
                     <option value="NMRA">NMRA Pharmaceutical</option>
                     <option value="IRAS">Inland Revenue / Tax</option>
@@ -537,7 +537,7 @@ const LicenseDocumentsPage = () => {
                   type="text"
                   value={newAuthority}
                   onChange={(e) => setNewAuthority(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-3.5 text-xs text-slate-900 dark:text-white focus:outline-none"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50  px-3.5 text-xs text-slate-900  focus:outline-none"
                 />
               </div>
 
@@ -550,7 +550,7 @@ const LicenseDocumentsPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowDatePicker(!showDatePicker)}
-                    className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-3.5 text-xs font-semibold text-slate-800 dark:text-slate-200"
+                    className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200  bg-slate-50  px-3.5 text-xs font-semibold text-slate-800 "
                   >
                     <span className="flex items-center gap-2">
                       <CalendarIcon className="h-4 w-4 text-indigo-600" />
@@ -560,7 +560,7 @@ const LicenseDocumentsPage = () => {
                   </button>
 
                   {showDatePicker && (
-                    <div className="absolute z-50 mt-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xl">
+                    <div className="absolute z-50 mt-2 rounded-2xl border border-slate-200  bg-white  p-4 shadow-2xl">
                       <DayPicker
                         mode="single"
                         selected={selectedDate}
@@ -574,11 +574,11 @@ const LicenseDocumentsPage = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 ">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl bg-slate-100 dark:bg-slate-800 px-5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200"
+                  className="rounded-xl bg-slate-100  px-5 py-2 text-xs font-semibold text-slate-700  hover:bg-slate-200"
                 >
                   Cancel
                 </button>

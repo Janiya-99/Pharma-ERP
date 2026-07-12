@@ -4,8 +4,17 @@ import rtl from "tailwindcss-rtl";
 import animate from "tailwindcss-animate";
 
 const config = {
-  darkMode: "class",
-  content: ["./src/**/*.{ts,tsx}"],
+  content: [
+    "./src/**/*.{ts,tsx}",
+    "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}",
+  ],
+  safelist: [
+    {
+      pattern:
+        /^(bg|text|border|fill|stroke|ring)-(brand|blue|cyan|teal|indigo|sky|emerald|violet|slate|rose|amber)-(50|100|200|300|400|500|600|700|800|900)$/,
+      variants: ["hover", "ui-selected"],
+    },
+  ],
   theme: {
     extend: {
       fontFamily: {

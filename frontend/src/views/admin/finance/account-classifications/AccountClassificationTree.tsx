@@ -35,7 +35,7 @@ const TreeNode = ({ node, onEdit, onDelete }: any) => {
           <FileText size={16} className="mr-2 text-gray-400" />
         )}
 
-        <span className="mr-4 font-medium text-navy-700 dark:text-white">
+        <span className="mr-4 font-medium text-navy-700 ">
           {node.name}
         </span>
 
@@ -66,7 +66,7 @@ const TreeNode = ({ node, onEdit, onDelete }: any) => {
       </div>
 
       {expanded && hasChildren && (
-        <div className="ml-2.5 border-l border-gray-200 dark:border-navy-700">
+        <div className="ml-2.5 border-l border-gray-200 ">
           {node.children.map((child: any) => (
             <TreeNode
               key={child.id}

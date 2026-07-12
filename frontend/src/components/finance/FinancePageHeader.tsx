@@ -18,11 +18,11 @@ const FinancePageHeader: React.FC<FinancePageHeaderProps> = ({
   return (
     <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
       <div>
-        <h1 className="text-2xl font-bold text-navy-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-navy-900 ">
           {title}
         </h1>
         {description && (
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-600 ">
             {description}
           </p>
         )}

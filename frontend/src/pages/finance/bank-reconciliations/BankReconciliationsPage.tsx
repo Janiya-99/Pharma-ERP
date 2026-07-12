@@ -75,7 +75,7 @@ export default function BankReconciliationsPage() {
         addLabel="New Reconciliation"
       />
 
-      <div className="bg-white dark:bg-navy-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
+      <div className="bg-white  p-4 rounded-xl shadow-sm border border-gray-100 ">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <BankAccountSelect
             value={filters.bank_account_id}
@@ -102,10 +102,10 @@ export default function BankReconciliationsPage() {
         </div>
       </div>
 
-      <div className="flex-1 bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
+      <div className="flex-1 bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+            <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
               <tr>
                 <th className="px-4 py-3">Reference</th>
                 <th className="px-4 py-3">Bank Account</th>
@@ -117,7 +117,7 @@ export default function BankReconciliationsPage() {
                 <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+            <tbody className="divide-y divide-gray-100 ">
               {loading ? (
                 <tr>
                   <td colSpan="8" className="px-4 py-8 text-center text-gray-500">Loading...</td>
@@ -130,7 +130,7 @@ export default function BankReconciliationsPage() {
                 reconciliations.map((rec: unknown) => {
                   const diff = Math.abs((rec.statement_closing_balance || 0) - (rec.system_closing_balance || 0));
                   return (
-                    <tr key={rec.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30">
+                    <tr key={rec.id} className="hover:bg-gray-50 ">
                       <td className="px-4 py-3 font-medium text-navy-700">
                         <button 
                           onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}`)}
@@ -175,7 +175,7 @@ export default function BankReconciliationsPage() {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-navy-700">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 ">
           <span className="text-gray-500">Total Records: {pagination.total}</span>
           <div className="flex gap-2">
             <button disabled={pagination.page <= 1} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page - 1 }))} className="px-3 py-1 border rounded disabled:opacity-50">Previous</button>

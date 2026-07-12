@@ -70,7 +70,7 @@ const StockTransfersPage = () => {
       header: "Reference No",
       accessorKey: "reference_no",
       cell: ({ row }: { row: { original: StockTransfer } }) => (
-        <span className="font-medium text-brand-600 dark:text-brand-400">
+        <span className="font-medium text-brand-600 ">
           {row.original.reference_no || "DRAFT"}
         </span>
       ),
@@ -119,10 +119,10 @@ const StockTransfersPage = () => {
     <div className="p-6">
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900 ">
             Stock Transfers
           </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 ">
             Manage warehouse stock transfers and their approval process.
           </p>
         </div>
@@ -139,8 +139,8 @@ const StockTransfersPage = () => {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
-        <div className="flex flex-col items-center justify-between gap-4 border-b border-gray-100 bg-gray-50/50 p-4 dark:border-navy-700 dark:bg-navy-800/50 sm:flex-row">
+      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm  ">
+        <div className="flex flex-col items-center justify-between gap-4 border-b border-gray-100 bg-gray-50/50 p-4   sm:flex-row">
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
@@ -150,7 +150,7 @@ const StockTransfersPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setSearch(e.target.value)
               }
-              className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-4 text-sm focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+              className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-4 text-sm focus:ring-2 focus:ring-brand-500   "
             />
           </div>
           <div className="flex w-full items-center gap-2 sm:w-auto">
@@ -160,7 +160,7 @@ const StockTransfersPage = () => {
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setStatusFilter(e.target.value)
               }
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500   "
             >
               <option value="all">All Statuses</option>
               <option value="draft">Draft</option>

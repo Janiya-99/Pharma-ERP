@@ -7,23 +7,23 @@ interface CustomerTypeBadgeProps {
 const CustomerTypeBadge: React.FC<CustomerTypeBadgeProps> = ({ type }) => {
   const colors: Record<string, string> = {
     pharmacy:
-      "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800",
+      "bg-indigo-50 text-indigo-700 border-indigo-200   ",
     hospital:
-      "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800",
+      "bg-purple-50 text-purple-700 border-purple-200   ",
     clinic:
-      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
+      "bg-emerald-50 text-emerald-700 border-emerald-200   ",
     doctor:
-      "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-400 dark:border-teal-800",
+      "bg-teal-50 text-teal-700 border-teal-200   ",
     distributor:
-      "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800",
+      "bg-orange-50 text-orange-700 border-orange-200   ",
     retailer:
-      "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/30 dark:text-sky-400 dark:border-sky-800",
+      "bg-sky-50 text-sky-700 border-sky-200   ",
     wholesaler:
-      "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-400 dark:border-violet-800",
+      "bg-violet-50 text-violet-700 border-violet-200   ",
     individual:
-      "bg-gray-100 text-gray-700 border-gray-300 dark:bg-navy-700 dark:text-gray-300 dark:border-navy-600",
+      "bg-gray-100 text-gray-700 border-gray-300   ",
     other:
-      "bg-gray-100 text-gray-700 border-gray-300 dark:bg-navy-700 dark:text-gray-300 dark:border-navy-600",
+      "bg-gray-100 text-gray-700 border-gray-300   ",
   };
 
   const formattedType = type

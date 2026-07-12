@@ -50,12 +50,12 @@ const RejectStockTransferModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Reject Stock Transfer">
       <div className="p-6">
-        <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+        <p className="mb-4 text-sm text-gray-600 ">
           Please provide a reason for rejecting this stock transfer.
         </p>
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="mb-1 block text-sm font-medium text-gray-700 ">
             Rejection Remarks *
           </label>
           <textarea
@@ -65,7 +65,7 @@ const RejectStockTransferModal = ({
               setRemarks(e.target.value);
               if (error) setError("");
             }}
-            className={`w-full rounded-lg border px-3 py-2 focus:border-brand-500 focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white sm:text-sm ${
+            className={`w-full rounded-lg border px-3 py-2 focus:border-brand-500 focus:ring-2 focus:ring-brand-500    sm:text-sm ${
               error
                 ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                 : "border-gray-300"
@@ -79,7 +79,7 @@ const RejectStockTransferModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-200 dark:hover:bg-navy-700"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50    "
             disabled={submitting}
           >
             Cancel

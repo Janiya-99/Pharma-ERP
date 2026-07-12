@@ -69,7 +69,7 @@ export default function BankTransactionDetailsPage() {
           >
             <MdArrowBack className="mr-1" /> Back to Transactions
           </button>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-navy-700  flex items-center gap-3">
             Transaction: {transaction.transaction_reference}
           </h1>
           <p className="text-gray-500">
@@ -96,8 +96,8 @@ export default function BankTransactionDetailsPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-        <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Transaction Details</h3>
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+        <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Transaction Details</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
           <div>
@@ -114,20 +114,20 @@ export default function BankTransactionDetailsPage() {
           </div>
           <div>
             <p className="text-sm text-gray-500">Source</p>
-            <p className="font-medium text-navy-900 dark:text-white mt-1 capitalize">{transaction.source_module}</p>
+            <p className="font-medium text-navy-900  mt-1 capitalize">{transaction.source_module}</p>
           </div>
           
           <div>
             <p className="text-sm text-gray-500">Transaction Date</p>
-            <p className="font-medium text-navy-900 dark:text-white">{new Date(transaction.transaction_date).toLocaleDateString()}</p>
+            <p className="font-medium text-navy-900 ">{new Date(transaction.transaction_date).toLocaleDateString()}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Value Date</p>
-            <p className="font-medium text-navy-900 dark:text-white">{transaction.value_date ? new Date(transaction.value_date).toLocaleDateString() : "-"}</p>
+            <p className="font-medium text-navy-900 ">{transaction.value_date ? new Date(transaction.value_date).toLocaleDateString() : "-"}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Reference Number</p>
-            <p className="font-medium text-navy-900 dark:text-white">{transaction.reference_number || "-"}</p>
+            <p className="font-medium text-navy-900 ">{transaction.reference_number || "-"}</p>
           </div>
 
           <div>
@@ -140,7 +140,7 @@ export default function BankTransactionDetailsPage() {
           </div>
           <div>
             <p className="text-sm text-gray-500">Created Information</p>
-            <p className="font-medium text-navy-900 dark:text-white text-sm">
+            <p className="font-medium text-navy-900  text-sm">
               By {transaction.creator?.first_name} {transaction.creator?.last_name}
               <br/>
               {new Date(transaction.created_at).toLocaleString()}
@@ -149,14 +149,14 @@ export default function BankTransactionDetailsPage() {
 
           <div className="md:col-span-2 lg:col-span-3">
             <p className="text-sm text-gray-500">Description</p>
-            <p className="font-medium text-navy-900 dark:text-white">{transaction.description || "-"}</p>
+            <p className="font-medium text-navy-900 ">{transaction.description || "-"}</p>
           </div>
         </div>
 
         {transaction.source_module !== "manual" && (
-          <div className="mt-8 p-4 bg-gray-50 dark:bg-navy-900 rounded-lg border border-gray-100 dark:border-navy-700">
-            <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">System Generated Context</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-8 p-4 bg-gray-50  rounded-lg border border-gray-100 ">
+            <h4 className="text-sm font-bold text-gray-700  mb-2">System Generated Context</h4>
+            <p className="text-sm text-gray-600 ">
               This transaction was automatically generated from the <strong>{transaction.source_module}</strong> module.
               Any modifications or deletions must be performed at the source level.
             </p>

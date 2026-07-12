@@ -14,7 +14,7 @@ const Sidebar = ({
 }) => {
   return (
     <div
-      className={`sm:none duration-175 linear sidebar-premium fixed !z-50 flex min-h-full w-[260px] flex-col pb-10 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
+      className={`sm:none duration-175 linear sidebar-premium fixed !z-50 flex min-h-full w-[260px] flex-col pb-10 transition-all   md:!z-50 lg:!z-50 xl:!z-0 ${
         open ? "translate-x-0" : "-translate-x-full"
       }`}
     >
@@ -32,7 +32,7 @@ const Sidebar = ({
           <MdLocalPharmacy className="h-5 w-5 text-white" />
         </div>
         <div>
-          <p className="text-[15px] font-bold leading-tight text-navy-700 dark:text-white">
+          <p className="text-[15px] font-bold leading-tight text-navy-700 ">
             PharmaDist
           </p>
           <p className="text-[10px] font-medium uppercase tracking-widest text-gray-400">
@@ -42,7 +42,7 @@ const Sidebar = ({
       </div>
 
       {/* Divider */}
-      <div className="mx-6 mb-4 h-px bg-gray-100 dark:bg-white/10" />
+      <div className="mx-6 mb-4 h-px bg-gray-100 " />
 
       {/* Nav Links */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
@@ -50,11 +50,11 @@ const Sidebar = ({
       </div>
 
       {/* Bottom User Info */}
-      <div className="mx-4 mt-4 rounded-xl bg-gray-50 p-3 dark:bg-navy-700">
-        <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
+      <div className="mx-4 mt-4 rounded-xl bg-gray-50 p-3 ">
+        <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500 ">
           Signed in as
         </p>
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+        <p className="text-sm font-bold text-navy-700 ">
           Kamali Fernando
         </p>
         <p className="text-[11px] text-gray-400">System Admin — Head Office</p>

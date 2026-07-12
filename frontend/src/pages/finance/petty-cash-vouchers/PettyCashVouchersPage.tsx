@@ -133,39 +133,39 @@ export default function PettyCashVouchersPage() {
         addLabel="Create Petty Cash Voucher"
       />
 
-      <div className="bg-white dark:bg-navy-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
+      <div className="bg-white  p-4 rounded-xl shadow-sm border border-gray-100 ">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          <select value={filters.petty_cash_fund_id} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, petty_cash_fund_id: e.target.value }))} className="w-full px-3 py-2 border rounded-md dark:bg-navy-900 dark:border-navy-600 dark:text-white">
+          <select value={filters.petty_cash_fund_id} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, petty_cash_fund_id: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
             <option value="">All Funds</option>
             {funds.map((f: unknown) => <option key={f.id} value={f.id}>{f.fund_code} - {f.fund_name}</option>)}
           </select>
-          <select value={filters.voucher_type} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, voucher_type: e.target.value }))} className="w-full px-3 py-2 border rounded-md dark:bg-navy-900 dark:border-navy-600 dark:text-white">
+          <select value={filters.voucher_type} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, voucher_type: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
             <option value="">All Types</option>
             <option value="expense">Expense</option>
             <option value="advance">Advance</option>
             <option value="refund">Refund</option>
             <option value="adjustment">Adjustment</option>
           </select>
-          <select value={filters.approval_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, approval_status: e.target.value }))} className="w-full px-3 py-2 border rounded-md dark:bg-navy-900 dark:border-navy-600 dark:text-white">
+          <select value={filters.approval_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, approval_status: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
             <option value="">All Approval Statuses</option>
             <option value="draft">Draft</option>
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>
-          <select value={filters.posted_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, posted_status: e.target.value }))} className="w-full px-3 py-2 border rounded-md dark:bg-navy-900 dark:border-navy-600 dark:text-white">
+          <select value={filters.posted_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, posted_status: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
             <option value="">All Posted Statuses</option>
             <option value="unposted">Unposted</option>
             <option value="posted">Posted</option>
           </select>
-          <input type="text" placeholder="Search Payee/Ref/Voucher No..." value={filters.search} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))} className="w-full px-3 py-2 border rounded-md dark:bg-navy-900 dark:border-navy-600 dark:text-white" />
+          <input type="text" placeholder="Search Payee/Ref/Voucher No..." value={filters.search} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))} className="w-full px-3 py-2 border rounded-md   " />
         </div>
       </div>
 
-      <div className="flex-1 bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
+      <div className="flex-1 bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+            <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
               <tr>
                 <th className="px-4 py-3">Voucher Number</th>
                 <th className="px-4 py-3">Date</th>
@@ -178,15 +178,15 @@ export default function PettyCashVouchersPage() {
                 <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-navy-700 text-gray-700 dark:text-gray-300">
+            <tbody className="divide-y divide-gray-100  text-gray-700 ">
               {loading ? (
                 <tr><td colSpan="9" className="px-4 py-8 text-center text-gray-500">Loading...</td></tr>
               ) : vouchers.length === 0 ? (
                 <tr><td colSpan="9" className="px-4 py-8 text-center text-gray-500">No petty cash vouchers found.</td></tr>
               ) : (
                 vouchers.map((v: unknown) => (
-                  <tr key={v.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30">
-                    <td className="px-4 py-3 font-medium text-navy-700 dark:text-white">{v.voucher_number || '-'}</td>
+                  <tr key={v.id} className="hover:bg-gray-50 ">
+                    <td className="px-4 py-3 font-medium text-navy-700 ">{v.voucher_number || '-'}</td>
                     <td className="px-4 py-3">{v.voucher_date}</td>
                     <td className="px-4 py-3">{v.petty_cash_fund?.fund_code}</td>
                     <td className="px-4 py-3"><PettyCashVoucherTypeBadge type={v.voucher_type} /></td>
@@ -203,7 +203,7 @@ export default function PettyCashVouchersPage() {
                       <div className="flex flex-col gap-2 justify-center items-center">
                         <div className="flex items-center gap-2">
                           {hasPermission("finance.petty_cash_voucher.view") && (
-                            <button onClick={() => history.push(`/admin/finance/petty-cash-vouchers/${v.id}`)} className="text-gray-500 hover:text-navy-700 dark:hover:text-white" title="View Details">
+                            <button onClick={() => history.push(`/admin/finance/petty-cash-vouchers/${v.id}`)} className="text-gray-500 hover:text-navy-700 " title="View Details">
                               <MdVisibility className="h-5 w-5" />
                             </button>
                           )}
@@ -234,12 +234,12 @@ export default function PettyCashVouchersPage() {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-navy-700 bg-gray-50 dark:bg-navy-800 text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100  bg-gray-50  text-gray-500 ">
           <span>Total Records: {pagination.total}</span>
           <div className="flex gap-2">
-            <button disabled={pagination.page <= 1} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page - 1 }))} className="px-3 py-1 border border-gray-300 dark:border-navy-600 rounded disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors">Previous</button>
+            <button disabled={pagination.page <= 1} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page - 1 }))} className="px-3 py-1 border border-gray-300  rounded disabled:opacity-50 hover:bg-gray-100  transition-colors">Previous</button>
             <span className="px-3 py-1">Page {pagination.page}</span>
-            <button disabled={vouchers.length < pagination.limit} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page + 1 }))} className="px-3 py-1 border border-gray-300 dark:border-navy-600 rounded disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors">Next</button>
+            <button disabled={vouchers.length < pagination.limit} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page + 1 }))} className="px-3 py-1 border border-gray-300  rounded disabled:opacity-50 hover:bg-gray-100  transition-colors">Next</button>
           </div>
         </div>
       </div>

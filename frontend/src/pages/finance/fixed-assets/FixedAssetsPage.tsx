@@ -70,12 +70,12 @@ const FixedAssetsPage = () => {
     {
       key: "asset_code",
       label: "Code",
-      render: (val: unknown) => <span className="font-bold text-navy-700 dark:text-white">{val}</span>,
+      render: (val: unknown) => <span className="font-bold text-navy-700 ">{val}</span>,
     },
     {
       key: "asset_name",
       label: "Asset Name",
-      render: (val: unknown) => <span className="font-medium text-gray-800 dark:text-gray-200">{val}</span>,
+      render: (val: unknown) => <span className="font-medium text-gray-800 ">{val}</span>,
     },
     {
       key: "category",
@@ -108,7 +108,7 @@ const FixedAssetsPage = () => {
       key: "net_book_value",
       label: "Net Book Value",
       align: "right",
-      render: (val: unknown) => <span className="font-medium text-brand-600 dark:text-brand-400">LKR {Number(val || 0).toLocaleString()}</span>,
+      render: (val: unknown) => <span className="font-medium text-brand-600 ">LKR {Number(val || 0).toLocaleString()}</span>,
     },
     {
       key: "asset_status",
@@ -125,7 +125,7 @@ const FixedAssetsPage = () => {
           {hasPermission("finance.fixed_asset.view") && (
             <button
               onClick={() => history.push(`/admin/finance/fixed-assets/${row.id}`)}
-              className="p-1.5 text-gray-500 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-navy-700 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-gray-300"
+              className="p-1.5 text-gray-500 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-navy-700   "
               title="View Details"
             >
               <Eye className="w-4 h-4" />
@@ -134,7 +134,7 @@ const FixedAssetsPage = () => {
           {hasPermission("finance.fixed_asset.update") && row.asset_status === "active" && (
             <button
               onClick={() => history.push(`/admin/finance/fixed-assets/${row.id}/edit`)}
-              className="p-1.5 text-brand-600 transition-colors bg-brand-50 rounded-lg hover:bg-brand-100 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-brand-400"
+              className="p-1.5 text-brand-600 transition-colors bg-brand-50 rounded-lg hover:bg-brand-100   "
               title="Edit"
             >
               <Edit className="w-4 h-4" />
@@ -143,7 +143,7 @@ const FixedAssetsPage = () => {
           {hasPermission("finance.fixed_asset.delete") && row.asset_status === "active" && row.accumulated_depreciation === 0 && (
             <button
               onClick={() => handleDeleteClick(row)}
-              className="p-1.5 text-red-600 transition-colors bg-red-50 rounded-lg hover:bg-red-100 dark:bg-navy-700 dark:hover:bg-navy-600 dark:text-red-400"
+              className="p-1.5 text-red-600 transition-colors bg-red-50 rounded-lg hover:bg-red-100   "
               title="Delete"
             >
               <Trash2 className="w-4 h-4" />
@@ -155,7 +155,7 @@ const FixedAssetsPage = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900">
+    <div className="flex flex-col h-full bg-gray-50 ">
       <PageHeader
         title="Fixed Assets"
         breadcrumb={[{ label: "Finance" }, { label: "Fixed Assets" }]}
@@ -172,23 +172,23 @@ const FixedAssetsPage = () => {
       />
 
       <div className="flex-1 p-6 overflow-hidden">
-        <div className="flex flex-col h-full bg-white border border-gray-100 shadow-sm dark:bg-navy-800 dark:border-navy-700 rounded-2xl">
-          <div className="flex flex-wrap items-center justify-between gap-4 p-5 border-b border-gray-100 dark:border-navy-700">
+        <div className="flex flex-col h-full bg-white border border-gray-100 shadow-sm   rounded-2xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 p-5 border-b border-gray-100 ">
             <div className="relative flex-1 min-w-[250px] max-w-md">
               <Search className="absolute w-4 h-4 text-gray-400 -translate-y-1/2 left-3 top-1/2" />
               <input
                 type="text"
                 placeholder="Search by code, name or serial..."
-                className="w-full py-2 pl-9 pr-4 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full py-2 pl-9 pr-4 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-brand-500    transition-all"
                 value={search}
                 onChange={(e: any) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl dark:bg-navy-900 dark:border-navy-600">
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl  ">
                 <Filter className="w-4 h-4 text-gray-500" />
                 <select
-                  className="text-sm bg-transparent outline-none text-gray-700 dark:text-gray-300"
+                  className="text-sm bg-transparent outline-none text-gray-700 "
                   value={statusFilter}
                   onChange={(e: any) => setStatusFilter(e.target.value)}
                 >
@@ -223,9 +223,9 @@ const FixedAssetsPage = () => {
         onClose={() => setDeleteModalOpen(false)}
         title="Delete Fixed Asset"
       >
-        <p className="text-gray-700 dark:text-gray-300 mb-6">
+        <p className="text-gray-700  mb-6">
           Are you sure you want to delete fixed asset{" "}
-          <span className="font-bold text-navy-700 dark:text-white">
+          <span className="font-bold text-navy-700 ">
             {assetToDelete?.asset_code}
           </span>
           ?
@@ -233,7 +233,7 @@ const FixedAssetsPage = () => {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setDeleteModalOpen(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50    "
             disabled={deleting}
           >
             Cancel

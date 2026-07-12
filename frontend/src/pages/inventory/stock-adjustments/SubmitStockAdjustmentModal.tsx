@@ -34,17 +34,17 @@ const SubmitStockAdjustmentModal = ({ isOpen, onClose, adjustment, onSuccess }: 
       icon={Send}
     >
       <form onSubmit={handleSubmit} className="p-6">
-        <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+        <div className="mb-4 text-sm text-gray-600 ">
           You are about to submit stock adjustment <strong>{adjustment.adjustment_number}</strong> for approval.
         </div>
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Remarks (Optional)
           </label>
           <textarea
             value={remarks}
             onChange={(e: any) => setRemarks(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white border-gray-200 dark:border-navy-600"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  border-gray-200 "
             rows={3}
             placeholder="Add any comments..."
           />
@@ -53,7 +53,7 @@ const SubmitStockAdjustmentModal = ({ isOpen, onClose, adjustment, onSuccess }: 
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50    "
           >
             Cancel
           </button>

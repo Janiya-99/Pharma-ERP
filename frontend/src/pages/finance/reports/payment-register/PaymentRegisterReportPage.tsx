@@ -115,8 +115,8 @@ const PaymentRegisterReportPage = () => {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Access Denied</h2>
-        <p className="text-gray-500 dark:text-gray-400">You do not have permission to view the Payment Register report.</p>
+        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
+        <p className="text-gray-500 ">You do not have permission to view the Payment Register report.</p>
       </div>
     );
   }
@@ -125,7 +125,7 @@ const PaymentRegisterReportPage = () => {
     {
       header: "Voucher No",
       accessor: "voucher_number",
-      cell: (row: unknown) => <div className="font-medium text-navy-800 dark:text-white">{row.voucher_number}</div>
+      cell: (row: unknown) => <div className="font-medium text-navy-800 ">{row.voucher_number}</div>
     },
     {
       header: "Date",
@@ -311,7 +311,7 @@ const PaymentRegisterReportPage = () => {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
 
-          <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden">
+          <div className="bg-white  rounded-lg shadow border border-gray-200  overflow-hidden">
             <DataTable
               columns={columns}
               data={(Array.isArray(data) ? data : data?.lines) || []}

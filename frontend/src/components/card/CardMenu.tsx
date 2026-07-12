@@ -17,7 +17,7 @@ function CardMenu(props: { transparent?: boolean }) {
           className={`flex items-center text-xl hover:cursor-pointer ${
             transparent
               ? "bg-none text-white hover:bg-none active:bg-none"
-              : "bg-lightPrimary p-2 text-brand-500 hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10"
+              : "bg-lightPrimary p-2 text-brand-500 hover:bg-gray-100    "
           } linear justify-center rounded-lg font-bold transition duration-200`}
         >
           <BsThreeDots className="h-6 w-6" />
@@ -26,7 +26,7 @@ function CardMenu(props: { transparent?: boolean }) {
       animation={"origin-top-right transition-all duration-300 ease-in-out"}
       classNames={`${transparent ? "top-8" : "top-11"} right-0 w-max`}
       children={
-        <div className="z-50 w-max rounded-xl bg-white px-4 py-3 text-sm shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+        <div className="z-50 w-max rounded-xl bg-white px-4 py-3 text-sm shadow-xl shadow-shadow-500  ">
           <p className="flex cursor-pointer items-center gap-2 text-gray-600 hover:font-medium hover:text-black">
             <span>
               <AiOutlineUser />

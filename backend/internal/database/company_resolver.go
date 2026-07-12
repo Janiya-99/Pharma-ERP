@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -131,10 +132,14 @@ func (r *CompanyResolver) GetOrCreateCompanyDBConnection(company models.Platform
 		sqlDB.SetConnMaxLifetime(5 * time.Minute)
 	}
 
-	// Run migrations
-	if err := companyMigrations.RunCompanyMigrations(newDB, r.logger); err != nil {
-		r.logger.Error("Failed to run migrations for company database", zap.String("db_name", company.DatabaseName), zap.Error(err))
-		return nil, err
+	// Run migrations (skip if requested)
+	if os.Getenv("SKIP_MIGRATIONS") != "true" {
+		if err := companyMigrations.RunCompanyMigrations(newDB, r.logger); err != nil {
+			r.logger.Error("Failed to run migrations for company database", zap.String("db_name", company.DatabaseName), zap.Error(err))
+			return nil, err
+		}
+	} else {
+		r.logger.Info("Skipping company migrations (SKIP_MIGRATIONS=true)", zap.String("db_name", company.DatabaseName))
 	}
 
 	r.dbs[company.DatabaseName] = newDB

@@ -2,10 +2,10 @@ import { ArrowRight } from "lucide-react";
 
 const WarehouseTransferDirection = ({ fromWarehouse, toWarehouse, fromLocation, toLocation }: { fromWarehouse?: unknown; toWarehouse?: unknown; fromLocation?: unknown; toLocation?: unknown }) => {
   return (
-    <div className="flex items-center gap-3 bg-gray-50 dark:bg-navy-800/50 p-3 rounded-lg border border-gray-100 dark:border-navy-700 w-fit">
+    <div className="flex items-center gap-3 bg-gray-50  p-3 rounded-lg border border-gray-100  w-fit">
       <div className="flex flex-col">
         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Source</span>
-        <span className="text-sm font-medium text-gray-900 dark:text-white">
+        <span className="text-sm font-medium text-gray-900 ">
           {fromWarehouse?.warehouse_name || "N/A"}
         </span>
         {fromLocation && (
@@ -19,7 +19,7 @@ const WarehouseTransferDirection = ({ fromWarehouse, toWarehouse, fromLocation, 
 
       <div className="flex flex-col">
         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Destination</span>
-        <span className="text-sm font-medium text-gray-900 dark:text-white">
+        <span className="text-sm font-medium text-gray-900 ">
           {toWarehouse?.warehouse_name || "N/A"}
         </span>
         {toLocation && (

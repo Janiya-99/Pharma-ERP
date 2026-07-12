@@ -117,7 +117,7 @@ const FixedAssetDisposalFormPage = () => {
   const gainLoss = saleVal - nbv;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900 pb-10 overflow-y-auto">
+    <div className="flex flex-col h-full bg-gray-50  pb-10 overflow-y-auto">
       <PageHeader
         title={isEdit ? "Edit Asset Disposal" : "Record Asset Disposal"}
         breadcrumb={[
@@ -131,7 +131,7 @@ const FixedAssetDisposalFormPage = () => {
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => history.push("/admin/finance/fixed-asset-disposals")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
           </button>
@@ -148,13 +148,13 @@ const FixedAssetDisposalFormPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
                 Disposal Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Select Asset <span className="text-red-500">*</span>
                   </label>
                   <FixedAssetSelect
@@ -167,11 +167,11 @@ const FixedAssetDisposalFormPage = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Disposal Type <span className="text-red-500">*</span>
                   </label>
                   <select
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.disposal_type ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.disposal_type}
@@ -193,12 +193,12 @@ const FixedAssetDisposalFormPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Disposal Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.disposal_date ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.disposal_date}
@@ -209,12 +209,12 @@ const FixedAssetDisposalFormPage = () => {
 
                 {formData.disposal_type === "sale" && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700  mb-1">
                       Sale Value (LKR) <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
-                      className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                      className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                         errors.sale_value ? "border-red-500" : "border-gray-200"
                       }`}
                       value={formData.sale_value}
@@ -225,11 +225,11 @@ const FixedAssetDisposalFormPage = () => {
                 )}
                 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Remarks
                   </label>
                   <textarea
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                     placeholder="Reason for disposal..."
                     rows="3"
                     value={formData.remarks}
@@ -241,8 +241,8 @@ const FixedAssetDisposalFormPage = () => {
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-gradient-to-br from-brand-50 to-white dark:from-navy-800 dark:to-navy-900 rounded-2xl shadow-sm border border-brand-100 dark:border-brand-900/30 p-6 sticky top-6">
-              <h3 className="text-lg font-bold text-brand-700 dark:text-brand-400 mb-6">
+            <div className="bg-gradient-to-br from-brand-50 to-white   rounded-2xl shadow-sm border border-brand-100  p-6 sticky top-6">
+              <h3 className="text-lg font-bold text-brand-700  mb-6">
                 Disposal Impact Preview
               </h3>
               
@@ -252,26 +252,26 @@ const FixedAssetDisposalFormPage = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Net Book Value (NBV)</span>
-                    <span className="font-bold text-navy-700 dark:text-white">
+                  <div className="flex justify-between items-center border-b border-brand-100  pb-3">
+                    <span className="text-sm text-gray-600 ">Net Book Value (NBV)</span>
+                    <span className="font-bold text-navy-700 ">
                       LKR {nbv.toLocaleString()}
                     </span>
                   </div>
                   
                   {formData.disposal_type === "sale" && (
-                    <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Sale Value</span>
-                      <span className="font-medium text-green-600 dark:text-green-500">
+                    <div className="flex justify-between items-center border-b border-brand-100  pb-3">
+                      <span className="text-sm text-gray-600 ">Sale Value</span>
+                      <span className="font-medium text-green-600 ">
                         LKR {saleVal.toLocaleString()}
                       </span>
                     </div>
                   )}
 
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-sm font-semibold text-brand-700 dark:text-brand-400">Gain / Loss Amount</span>
+                    <span className="text-sm font-semibold text-brand-700 ">Gain / Loss Amount</span>
                     <div className="flex flex-col items-end">
-                      <span className={`text-xl font-bold ${gainLoss > 0 ? "text-green-600 dark:text-green-400" : gainLoss < 0 ? "text-red-600 dark:text-red-400" : "text-gray-600 dark:text-gray-400"}`}>
+                      <span className={`text-xl font-bold ${gainLoss > 0 ? "text-green-600 " : gainLoss < 0 ? "text-red-600 " : "text-gray-600 "}`}>
                         LKR {Math.abs(gainLoss).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                       <div className="mt-1">
@@ -284,26 +284,26 @@ const FixedAssetDisposalFormPage = () => {
             </div>
             
             {selectedAssetDetails && (
-              <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-                 <h3 className="text-sm font-bold text-navy-700 dark:text-white mb-4 border-b border-gray-100 dark:border-navy-700 pb-2">
+              <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+                 <h3 className="text-sm font-bold text-navy-700  mb-4 border-b border-gray-100  pb-2">
                   Asset Accounting Context
                 </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-xs text-gray-500">Acquisition Cost</span>
-                    <span className="text-xs font-medium text-navy-700 dark:text-white">LKR {Number(selectedAssetDetails.acquisition_cost || 0).toLocaleString()}</span>
+                    <span className="text-xs font-medium text-navy-700 ">LKR {Number(selectedAssetDetails.acquisition_cost || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-xs text-gray-500">Acc. Depreciation</span>
-                    <span className="text-xs font-medium text-navy-700 dark:text-white">LKR {Number(selectedAssetDetails.accumulated_depreciation || 0).toLocaleString()}</span>
+                    <span className="text-xs font-medium text-navy-700 ">LKR {Number(selectedAssetDetails.accumulated_depreciation || 0).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between pt-2 border-t border-gray-50 dark:border-navy-700/50">
+                  <div className="flex justify-between pt-2 border-t border-gray-50 ">
                     <span className="text-xs text-gray-500">Gain on Disposal A/C</span>
-                    <span className="text-xs font-medium text-navy-700 dark:text-white truncate max-w-[150px]">{selectedAssetDetails.gain_on_disposal_account_id ? "Configured" : "Missing"}</span>
+                    <span className="text-xs font-medium text-navy-700  truncate max-w-[150px]">{selectedAssetDetails.gain_on_disposal_account_id ? "Configured" : "Missing"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-xs text-gray-500">Loss on Disposal A/C</span>
-                    <span className="text-xs font-medium text-navy-700 dark:text-white truncate max-w-[150px]">{selectedAssetDetails.loss_on_disposal_account_id ? "Configured" : "Missing"}</span>
+                    <span className="text-xs font-medium text-navy-700  truncate max-w-[150px]">{selectedAssetDetails.loss_on_disposal_account_id ? "Configured" : "Missing"}</span>
                   </div>
                 </div>
               </div>

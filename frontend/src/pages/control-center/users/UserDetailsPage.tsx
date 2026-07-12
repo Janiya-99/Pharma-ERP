@@ -146,7 +146,7 @@ const UserDetailsPage = () => {
       ) : (
         <>
           {/* Header Banner & Profile Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-8 text-white shadow-xl dark:border-slate-800">
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-8 text-white shadow-xl ">
             <div className="absolute -right-10 -top-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
             <div className="absolute -left-10 -bottom-10 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
 
@@ -234,13 +234,13 @@ const UserDetailsPage = () => {
             {/* Left Column — Profile & Modules */}
             <div className="lg:col-span-2 space-y-6">
               {/* Profile Details Card */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800 mb-5">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm  ">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4  mb-5">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600  ">
                       <UserIcon className="h-4 w-4" />
                     </div>
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                    <h2 className="text-base font-semibold text-slate-900 ">
                       Personal & Organization Info
                     </h2>
                   </div>
@@ -251,7 +251,7 @@ const UserDetailsPage = () => {
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5 text-indigo-500" /> Email Address
                     </span>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 break-all">
+                    <p className="text-sm font-medium text-slate-900  break-all">
                       {user?.email || "—"}
                     </p>
                   </div>
@@ -260,7 +260,7 @@ const UserDetailsPage = () => {
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5 text-indigo-500" /> Phone Number
                     </span>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <p className="text-sm font-medium text-slate-900 ">
                       {user?.phone || "—"}
                     </p>
                   </div>
@@ -269,7 +269,7 @@ const UserDetailsPage = () => {
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <Building2 className="h-3.5 w-3.5 text-indigo-500" /> Department
                     </span>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <p className="text-sm font-medium text-slate-900 ">
                       {deptName}
                     </p>
                   </div>
@@ -278,7 +278,7 @@ const UserDetailsPage = () => {
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <ShieldCheck className="h-3.5 w-3.5 text-indigo-500" /> Designation
                     </span>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <p className="text-sm font-medium text-slate-900 ">
                       {desigName}
                     </p>
                   </div>
@@ -287,7 +287,7 @@ const UserDetailsPage = () => {
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5 text-indigo-500" /> Primary Branch
                     </span>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <p className="text-sm font-medium text-slate-900 ">
                       {defaultBranchName}
                     </p>
                   </div>
@@ -296,7 +296,7 @@ const UserDetailsPage = () => {
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <Clock className="h-3.5 w-3.5 text-indigo-500" /> Account Created
                     </span>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <p className="text-sm font-medium text-slate-900 ">
                       {user?.created_at
                         ? new Date(user.created_at).toLocaleDateString()
                         : "—"}
@@ -306,25 +306,25 @@ const UserDetailsPage = () => {
               </div>
 
               {/* Assigned Software Modules */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800 mb-5">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm  ">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4  mb-5">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600  ">
                       <Boxes className="h-4 w-4" />
                     </div>
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                    <h2 className="text-base font-semibold text-slate-900 ">
                       Assigned Software Modules
                     </h2>
                   </div>
-                  <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-300">
+                  <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600  ">
                     {software.length} {software.length === 1 ? "Module" : "Modules"}
                   </span>
                 </div>
 
                 {software.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center dark:border-slate-800">
-                    <Boxes className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-600 mb-2" />
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center ">
+                    <Boxes className="mx-auto h-8 w-8 text-slate-300  mb-2" />
+                    <p className="text-sm font-medium text-slate-500 ">
                       No software modules assigned to this user yet.
                     </p>
                     <p className="text-xs text-slate-400 mt-1">
@@ -336,13 +336,13 @@ const UserDetailsPage = () => {
                     {software.map((s: any) => (
                       <div
                         key={s.id || s.software_code || s.software_id}
-                        className="flex items-center gap-3.5 p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:border-indigo-200 transition-all dark:border-slate-800 dark:bg-slate-800/50"
+                        className="flex items-center gap-3.5 p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:border-indigo-200 transition-all  "
                       >
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm shrink-0">
                           <Boxes className="h-5 w-5" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                          <p className="text-sm font-semibold text-slate-900  truncate">
                             {s.software_name || s.name || s.software_code || "Module"}
                           </p>
                           <p className="text-xs text-slate-500 font-mono mt-0.5 truncate">
@@ -356,25 +356,25 @@ const UserDetailsPage = () => {
               </div>
 
               {/* Roles & Access Matrix */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800 mb-5">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm  ">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4  mb-5">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600  ">
                       <ShieldCheck className="h-4 w-4" />
                     </div>
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                    <h2 className="text-base font-semibold text-slate-900 ">
                       Assigned Roles & Access Matrix
                     </h2>
                   </div>
-                  <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-300">
+                  <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600  ">
                     {accessMatrix.length} {accessMatrix.length === 1 ? "Role" : "Roles"}
                   </span>
                 </div>
 
                 {accessMatrix.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center dark:border-slate-800">
-                    <ShieldCheck className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-600 mb-2" />
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center ">
+                    <ShieldCheck className="mx-auto h-8 w-8 text-slate-300  mb-2" />
+                    <p className="text-sm font-medium text-slate-500 ">
                       No roles assigned via access matrix.
                     </p>
                     <p className="text-xs text-slate-400 mt-1">
@@ -385,24 +385,24 @@ const UserDetailsPage = () => {
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                       <thead>
-                        <tr className="border-b border-slate-200/80 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:border-slate-800">
+                        <tr className="border-b border-slate-200/80 text-xs font-semibold uppercase tracking-wider text-slate-400 ">
                           <th className="pb-3 pr-4">Branch</th>
                           <th className="pb-3 pr-4">Software</th>
                           <th className="pb-3 pr-4">Role Assigned</th>
                           <th className="pb-3">Status</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      <tbody className="divide-y divide-slate-100 ">
                         {accessMatrix.map((item: any, idx: number) => (
-                          <tr key={item.id || idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                            <td className="py-3 pr-4 font-medium text-slate-800 dark:text-slate-200">
+                          <tr key={item.id || idx} className="hover:bg-slate-50/50 ">
+                            <td className="py-3 pr-4 font-medium text-slate-800 ">
                               {item.branch_name || "All Branches"}
                             </td>
-                            <td className="py-3 pr-4 text-slate-600 dark:text-slate-400">
+                            <td className="py-3 pr-4 text-slate-600 ">
                               {item.software_name || item.software_code || "—"}
                             </td>
                             <td className="py-3 pr-4">
-                              <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                              <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700  ">
                                 <ShieldCheck className="h-3.5 w-3.5" />
                                 {item.role_name || "Assigned Role"}
                               </span>
@@ -422,17 +422,17 @@ const UserDetailsPage = () => {
             {/* Right Column — Branches, Security, Activity */}
             <div className="space-y-6">
               {/* Branch Access Card */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800 mb-4">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm  ">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4  mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600  ">
                       <Building2 className="h-4 w-4" />
                     </div>
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                    <h2 className="text-base font-semibold text-slate-900 ">
                       Assigned Branches
                     </h2>
                   </div>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700  ">
                     {branches.length}
                   </span>
                 </div>
@@ -453,18 +453,18 @@ const UserDetailsPage = () => {
                           key={b.id || b.branch_id || b.branch_name}
                           className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                             isDefault
-                              ? "border-indigo-200 bg-indigo-50/50 dark:border-indigo-900/50 dark:bg-indigo-950/30 font-medium"
-                              : "border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/40"
+                              ? "border-indigo-200 bg-indigo-50/50   font-medium"
+                              : "border-slate-100 bg-slate-50/50  "
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <MapPin
                               className={`h-4 w-4 shrink-0 ${
-                                isDefault ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400"
+                                isDefault ? "text-indigo-600 " : "text-slate-400"
                               }`}
                             />
                             <div>
-                              <p className="text-sm text-slate-800 dark:text-slate-200">
+                              <p className="text-sm text-slate-800 ">
                                 {b.branch_name || b.name || `Branch #${b.branch_id}`}
                               </p>
                               {b.branch_code && (
@@ -487,13 +487,13 @@ const UserDetailsPage = () => {
               </div>
 
               {/* Security & Authentication Card */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800 mb-4">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm  ">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4  mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600  ">
                       <Lock className="h-4 w-4" />
                     </div>
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                    <h2 className="text-base font-semibold text-slate-900 ">
                       Security & Auth
                     </h2>
                   </div>
@@ -501,45 +501,45 @@ const UserDetailsPage = () => {
 
                 <div className="space-y-3.5">
                   <div className="flex items-center justify-between py-1">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <span className="text-sm font-medium text-slate-600 ">
                       Login Enabled
                     </span>
                     {user?.login_enabled !== false ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700  ">
                         <CheckCircle2 className="h-3.5 w-3.5" /> Yes
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700  ">
                         <XCircle className="h-3.5 w-3.5" /> No
                       </span>
                     )}
                   </div>
 
                   <div className="flex items-center justify-between py-1">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <span className="text-sm font-medium text-slate-600 ">
                       Two-Factor Auth (2FA)
                     </span>
                     {user?.two_factor_enabled ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700  ">
                         <CheckCircle2 className="h-3.5 w-3.5" /> Enabled
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600  ">
                         Disabled
                       </span>
                     )}
                   </div>
 
                   <div className="flex items-center justify-between py-1">
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <span className="text-sm font-medium text-slate-600 ">
                       Force Password Change
                     </span>
                     {user?.force_password_change ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-950/50 dark:text-amber-300">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700  ">
                         Required
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600  ">
                         No
                       </span>
                     )}
@@ -548,26 +548,26 @@ const UserDetailsPage = () => {
               </div>
 
               {/* Activity & Login Statistics Card */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800 mb-4">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm  ">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4  mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600  ">
                       <Activity className="h-4 w-4" />
                     </div>
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                    <h2 className="text-base font-semibold text-slate-900 ">
                       Login & Activity Stats
                     </h2>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3.5 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/40">
+                  <div className="flex items-start gap-3.5 p-3 rounded-xl bg-slate-50/80 ">
                     <div className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     <div className="flex-1">
                       <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                         Last Login Time
                       </p>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+                      <p className="text-sm font-semibold text-slate-800  mt-0.5">
                         {user?.last_login_at
                           ? new Date(user.last_login_at).toLocaleString()
                           : "Never logged in"}
@@ -575,25 +575,25 @@ const UserDetailsPage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3.5 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/40">
+                  <div className="flex items-start gap-3.5 p-3 rounded-xl bg-slate-50/80 ">
                     <div className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500 shrink-0 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
                     <div className="flex-1">
                       <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                         Total Login Count
                       </p>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+                      <p className="text-sm font-semibold text-slate-800  mt-0.5">
                         {user?.login_count || 0} {user?.login_count === 1 ? "time" : "times"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3.5 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/40">
+                  <div className="flex items-start gap-3.5 p-3 rounded-xl bg-slate-50/80 ">
                     <div className="mt-1 h-2.5 w-2.5 rounded-full bg-purple-500 shrink-0" />
                     <div className="flex-1">
                       <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                         Profile Last Updated
                       </p>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+                      <p className="text-sm font-semibold text-slate-800  mt-0.5">
                         {user?.updated_at
                           ? new Date(user.updated_at).toLocaleString()
                           : "—"}

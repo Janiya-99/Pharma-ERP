@@ -96,8 +96,8 @@ const TrialBalanceReportPage = () => {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Access Denied</h2>
-        <p className="text-gray-500 dark:text-gray-400">You do not have permission to view the Trial Balance report.</p>
+        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
+        <p className="text-gray-500 ">You do not have permission to view the Trial Balance report.</p>
       </div>
     );
   }
@@ -106,7 +106,7 @@ const TrialBalanceReportPage = () => {
     {
       header: "Account Code",
       accessor: "account_code",
-      cell: (row: unknown) => <div className="font-medium text-navy-800 dark:text-white">{row.account_code}</div>
+      cell: (row: unknown) => <div className="font-medium text-navy-800 ">{row.account_code}</div>
     },
     {
       header: "Account Name",
@@ -202,7 +202,7 @@ const TrialBalanceReportPage = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden mb-6">
+          <div className="bg-white  rounded-lg shadow border border-gray-200  overflow-hidden mb-6">
             <DataTable
               columns={columns}
               data={(data?.lines) || []}
@@ -211,36 +211,36 @@ const TrialBalanceReportPage = () => {
             />
             
             {/* Summary Row */}
-            <div className="bg-gray-50 dark:bg-navy-900 border-t border-gray-200 dark:border-navy-700 p-4">
+            <div className="bg-gray-50  border-t border-gray-200  p-4">
               <div className="grid grid-cols-12 gap-4 items-center">
-                <div className="col-span-2 md:col-span-4 font-bold text-navy-800 dark:text-white">Totals</div>
+                <div className="col-span-2 md:col-span-4 font-bold text-navy-800 ">Totals</div>
                 
                 {/* Due to responsive layout, creating a specialized summary display is better here */}
               </div>
               <div className="flex flex-col md:flex-row justify-between pt-4 gap-4 overflow-x-auto text-sm">
                  <div className="flex flex-col min-w-max">
-                   <span className="text-gray-500 dark:text-gray-400 font-medium">Opening Dr</span>
+                   <span className="text-gray-500  font-medium">Opening Dr</span>
                    <span className="font-bold"><ReportAmountCell amount={data.total_opening_debit} /></span>
                  </div>
                  <div className="flex flex-col min-w-max">
-                   <span className="text-gray-500 dark:text-gray-400 font-medium">Opening Cr</span>
+                   <span className="text-gray-500  font-medium">Opening Cr</span>
                    <span className="font-bold"><ReportAmountCell amount={data.total_opening_credit} /></span>
                  </div>
                  <div className="flex flex-col min-w-max">
-                   <span className="text-gray-500 dark:text-gray-400 font-medium">Period Dr</span>
+                   <span className="text-gray-500  font-medium">Period Dr</span>
                    <span className="font-bold"><ReportAmountCell amount={data.total_period_debit} /></span>
                  </div>
                  <div className="flex flex-col min-w-max">
-                   <span className="text-gray-500 dark:text-gray-400 font-medium">Period Cr</span>
+                   <span className="text-gray-500  font-medium">Period Cr</span>
                    <span className="font-bold"><ReportAmountCell amount={data.total_period_credit} /></span>
                  </div>
                  <div className="flex flex-col min-w-max">
-                   <span className="text-gray-500 dark:text-gray-400 font-medium text-brand-600 dark:text-brand-400">Closing Dr</span>
-                   <span className="font-bold text-brand-700 dark:text-brand-300"><ReportAmountCell amount={data.total_closing_debit} /></span>
+                   <span className="text-gray-500  font-medium text-brand-600 ">Closing Dr</span>
+                   <span className="font-bold text-brand-700 "><ReportAmountCell amount={data.total_closing_debit} /></span>
                  </div>
                  <div className="flex flex-col min-w-max">
-                   <span className="text-gray-500 dark:text-gray-400 font-medium text-brand-600 dark:text-brand-400">Closing Cr</span>
-                   <span className="font-bold text-brand-700 dark:text-brand-300"><ReportAmountCell amount={data.total_closing_credit} /></span>
+                   <span className="text-gray-500  font-medium text-brand-600 ">Closing Cr</span>
+                   <span className="font-bold text-brand-700 "><ReportAmountCell amount={data.total_closing_credit} /></span>
                  </div>
                  {!data.is_balanced && (
                    <div className="flex flex-col min-w-max border-l pl-4 border-red-200">
@@ -255,10 +255,10 @@ const TrialBalanceReportPage = () => {
       )}
       
       {!data && !loading && (
-        <div className="bg-white dark:bg-navy-800 rounded-lg shadow p-8 text-center border border-gray-200 dark:border-navy-700">
+        <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
           <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">Run Report</h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="mt-4 text-lg font-medium text-gray-900 ">Run Report</h3>
+          <p className="mt-2 text-sm text-gray-500 ">
             Click Apply Filters to view the trial balance.
           </p>
         </div>

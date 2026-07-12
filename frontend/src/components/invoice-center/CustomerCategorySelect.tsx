@@ -49,10 +49,10 @@ const CustomerCategorySelect: React.FC<CustomerCategorySelectProps> = ({
         value={value || ""}
         onChange={(e) => onChange(Number(e.target.value) || "")}
         disabled={disabled || loading}
-        className={`w-full rounded-xl border bg-white px-3 py-2 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-navy-500 dark:bg-navy-800 ${
+        className={`w-full rounded-xl border bg-white px-3 py-2 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-navy-500  ${
           error
             ? "border-rose-500 focus:ring-rose-500"
-            : "border-gray-200 dark:border-navy-600"
+            : "border-gray-200 "
         } ${disabled ? "cursor-not-allowed bg-gray-50 opacity-70" : ""}`}
       >
         <option value="">

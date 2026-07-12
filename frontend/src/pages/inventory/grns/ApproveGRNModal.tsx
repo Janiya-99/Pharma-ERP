@@ -26,19 +26,19 @@ const ApproveGRNModal = ({ isOpen, onClose, grnId, onSuccess }: { isOpen?: boole
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Approve Goods Receipt Note">
       <div className="p-4">
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+        <p className="text-sm text-gray-600  mb-4">
           Are you sure you want to approve this GRN? After approval, it will be ready for posting to the stock ledger.
         </p>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label className="block text-sm font-medium text-gray-700  mb-1.5">
             Remarks (Optional)
           </label>
           <textarea
             value={remarks}
             onChange={(e: any) => setRemarks(e.target.value)}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+            className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
             placeholder="Add approval notes..."
           />
         </div>
@@ -47,14 +47,14 @@ const ApproveGRNModal = ({ isOpen, onClose, grnId, onSuccess }: { isOpen?: boole
           <button
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50     disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleApprove}
             disabled={submitting}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-xl hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:hover:bg-green-800 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-xl hover:bg-green-200    disabled:opacity-50"
           >
             <CheckCircle className="w-4 h-4" />
             {submitting ? "Approving..." : "Approve"}

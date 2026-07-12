@@ -897,7 +897,7 @@ const Sidebar = () => {
             <span>Preferences</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-slate-200/80" />
-          <DropdownMenuItem className="cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300">
+          <DropdownMenuItem className="cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700   ">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Logout</span>
           </DropdownMenuItem>

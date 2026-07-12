@@ -119,10 +119,10 @@ export default function BankAccountFormPage() {
 
   return (
     <div className="py-4 max-w-4xl mx-auto h-full overflow-y-auto">
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-        <div className="flex items-center justify-between mb-6 border-b pb-4 dark:border-navy-700">
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+        <div className="flex items-center justify-between mb-6 border-b pb-4 ">
           <div>
-            <h2 className="text-xl font-bold text-navy-700 dark:text-white">
+            <h2 className="text-xl font-bold text-navy-700 ">
               {isEdit ? "Edit Bank Account" : "Create Bank Account"}
             </h2>
             <p className="text-sm text-gray-500 mt-1">Fill out the details to {isEdit ? "update" : "create"} a bank account.</p>
@@ -139,7 +139,7 @@ export default function BankAccountFormPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Branch</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Branch</label>
               <select
                 name="branch_id"
                 value={formData.branch_id}
@@ -154,7 +154,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Chart Account *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Chart Account *</label>
               <select
                 name="chart_account_id"
                 value={formData.chart_account_id}
@@ -170,7 +170,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Name *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Bank Name *</label>
               <input
                 type="text"
                 name="bank_name"
@@ -182,7 +182,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Branch Name</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Bank Branch Name</label>
               <input
                 type="text"
                 name="bank_branch_name"
@@ -193,7 +193,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Name *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Account Name *</label>
               <input
                 type="text"
                 name="account_name"
@@ -205,7 +205,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Number *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Account Number *</label>
               <input
                 type="text"
                 name="account_number"
@@ -217,7 +217,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SWIFT Code</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">SWIFT Code</label>
               <input
                 type="text"
                 name="swift_code"
@@ -228,7 +228,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Code</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Bank Code</label>
               <input
                 type="text"
                 name="bank_code"
@@ -239,7 +239,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Branch Code</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Branch Code</label>
               <input
                 type="text"
                 name="branch_code"
@@ -250,7 +250,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Opening Balance</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Opening Balance</label>
               <input
                 type="number"
                 step="0.01"
@@ -265,7 +265,7 @@ export default function BankAccountFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Status *</label>
               <select
                 name="status"
                 value={formData.status}
@@ -287,13 +287,13 @@ export default function BankAccountFormPage() {
                 onChange={handleChange}
                 className="h-4 w-4 text-brand-500 border-gray-300 rounded focus:ring-brand-500"
               />
-              <label htmlFor="is_default" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+              <label htmlFor="is_default" className="ml-2 block text-sm text-gray-900 ">
                 Set as Default Bank Account
               </label>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-6 border-t dark:border-navy-700">
+          <div className="flex justify-end gap-3 pt-6 border-t ">
             <button
               type="submit"
               disabled={saving}

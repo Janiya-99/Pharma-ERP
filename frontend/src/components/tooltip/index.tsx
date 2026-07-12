@@ -10,7 +10,7 @@ const TooltipHorizon = (props: {
     <Tooltip
       placement={placement}
       label={content}
-      className={`w-max rounded-xl bg-white px-4 py-3 text-sm shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none ${extra}`}
+      className={`w-max rounded-xl bg-white px-4 py-3 text-sm shadow-xl shadow-shadow-500   ${extra}`}
     >
       {trigger}
     </Tooltip>

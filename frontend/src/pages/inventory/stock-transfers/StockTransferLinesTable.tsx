@@ -141,20 +141,20 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Transfer Line Items</h3>
+        <h3 className="text-lg font-semibold text-gray-900 ">Transfer Line Items</h3>
         <button
           type="button"
           onClick={handleAddLine}
-          className="flex items-center gap-2 px-3 py-1.5 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:hover:bg-brand-900/50 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3 py-1.5 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100    transition-colors text-sm font-medium"
         >
           <Plus className="h-4 w-4" />
           Add Line
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-navy-700 pb-12">
+      <div className="overflow-x-auto rounded-lg border border-gray-200  pb-12">
         <table className="w-full text-sm text-left whitespace-nowrap min-w-[1400px]">
-          <thead className="bg-gray-50 dark:bg-navy-800/50 text-gray-600 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-navy-700">
+          <thead className="bg-gray-50  text-gray-600  font-medium border-b border-gray-200 ">
             <tr>
               <th className="px-4 py-3 min-w-[250px]">Product & Batch *</th>
               <th className="px-4 py-3 min-w-[200px]">Source Location *</th>
@@ -164,10 +164,10 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
               <th className="px-4 py-3 min-w-[80px] text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+          <tbody className="divide-y divide-gray-100 ">
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500 ">
                   No lines added. Click "Add Line" to begin.
                 </td>
               </tr>
@@ -176,7 +176,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                 const lineErrors: any = errors[`lines.${index}`] || {};
                 
                 return (
-                  <tr key={line.id || index} className="hover:bg-gray-50 dark:hover:bg-navy-800/50">
+                  <tr key={line.id || index} className="hover:bg-gray-50 ">
                     <td className="px-4 py-3 align-top space-y-3">
                       <StockTransferLineProductSelect
                         value={line.product_id}
@@ -196,7 +196,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                       <select
                         value={line.source_location_id || ""}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleLineChange(index, "source_location_id", e.target.value ? parseInt(e.target.value) : "")}
-                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${lineErrors.source_location_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${lineErrors.source_location_id ? "border-red-500" : "border-gray-200 "}`}
                       >
                         <option value="">-- Select Source Location --</option>
                         {sourceLocations.map((loc) => (
@@ -210,7 +210,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                       <select
                         value={line.destination_location_id || ""}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleLineChange(index, "destination_location_id", e.target.value ? parseInt(e.target.value) : "")}
-                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${lineErrors.destination_location_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${lineErrors.destination_location_id ? "border-red-500" : "border-gray-200 "}`}
                       >
                         <option value="">-- Select Dest. Location --</option>
                         {destinationLocations.map((loc) => (
@@ -241,7 +241,7 @@ const StockTransferLinesTable = ({ lines, setLines, sourceWarehouseId, destinati
                         <button
                           type="button"
                           onClick={() => handleRemoveLine(index)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-md hover:bg-red-50  transition-colors"
                           title="Remove Line"
                         >
                           <Trash2 className="h-4 w-4" />

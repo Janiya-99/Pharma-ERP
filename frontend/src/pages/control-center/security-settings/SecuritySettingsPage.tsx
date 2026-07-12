@@ -180,22 +180,22 @@ const SecuritySettingsPage = () => {
       />
       {/* ── Page Header ── */}
 
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Control Center • System Protection
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Global Security & Authentication Policies
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Configure password hardness, session lifespans, MFA enforcement, and network IP whitelisting
           </p>
         </div>
@@ -203,7 +203,7 @@ const SecuritySettingsPage = () => {
         {/* Action Bar */}
         <div className="flex items-center gap-3">
           {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 px-3.5 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 animate-in fade-in">
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50  px-3.5 py-2 text-xs font-bold text-emerald-700  border border-emerald-200/60  animate-in fade-in">
               <CheckCircle2 className="h-4 w-4" /> Policies Enforced Globally!
             </span>
           )}
@@ -222,16 +222,16 @@ const SecuritySettingsPage = () => {
         {/* ══════════════════════════════════════════════
             SECTION 1: Password Policy & Hardness
         ══════════════════════════════════════════════ */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/50 p-2.5 text-indigo-600 dark:text-indigo-400">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-100  pb-4">
+            <div className="rounded-xl bg-indigo-50  p-2.5 text-indigo-600 ">
               <Key className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Password Hardness & Expiration
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Enforce complex cryptographic standards for all employee accounts
               </p>
             </div>
@@ -240,9 +240,9 @@ const SecuritySettingsPage = () => {
           <div className="space-y-5">
             {/* Min Length Slider */}
             <div>
-              <div className="flex justify-between text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">
+              <div className="flex justify-between text-sm font-semibold text-slate-800  mb-2">
                 <span>Minimum Password Length</span>
-                <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">{minLength} characters</span>
+                <span className="font-mono text-indigo-600  font-bold">{minLength} characters</span>
               </div>
               <input
                 type="range"
@@ -250,16 +250,16 @@ const SecuritySettingsPage = () => {
                 max="32"
                 value={minLength}
                 onChange={(e) => setMinLength(Number(e.target.value))}
-                className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                className="w-full h-2 bg-slate-100  rounded-lg appearance-none cursor-pointer accent-indigo-600"
               />
               <p className="mt-1 text-[11px] text-slate-400">Recommended minimum: 12 characters for ERP systems</p>
             </div>
 
             {/* Toggles */}
             <div className="space-y-3 pt-2">
-              <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+              <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
                 <div>
-                  <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Require Special Characters</span>
+                  <span className="block text-sm font-semibold text-slate-800 ">Require Special Characters</span>
                   <span className="text-xs text-slate-400">Must contain at least one symbol (!@#$%^&*)</span>
                 </div>
                 <input
@@ -270,9 +270,9 @@ const SecuritySettingsPage = () => {
                 />
               </label>
 
-              <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+              <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
                 <div>
-                  <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Require Numeric Digits</span>
+                  <span className="block text-sm font-semibold text-slate-800 ">Require Numeric Digits</span>
                   <span className="text-xs text-slate-400">Must contain at least one number (0-9)</span>
                 </div>
                 <input
@@ -283,9 +283,9 @@ const SecuritySettingsPage = () => {
                 />
               </label>
 
-              <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+              <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
                 <div>
-                  <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Require Uppercase Letters</span>
+                  <span className="block text-sm font-semibold text-slate-800 ">Require Uppercase Letters</span>
                   <span className="text-xs text-slate-400">Must contain at least one capital letter (A-Z)</span>
                 </div>
                 <input
@@ -299,13 +299,13 @@ const SecuritySettingsPage = () => {
 
             {/* Expiry Dropdown */}
             <div className="pt-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-2">
                 Mandatory Password Rotation Frequency
               </label>
               <select
                 value={expiryDays}
                 onChange={(e) => setExpiryDays(e.target.value)}
-                className="h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="h-11 w-full rounded-xl border border-slate-200  bg-white  px-3.5 text-sm font-semibold text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               >
                 <option value="30">Every 30 Days (High Security)</option>
                 <option value="60">Every 60 Days</option>
@@ -320,16 +320,16 @@ const SecuritySettingsPage = () => {
         {/* ══════════════════════════════════════════════
             SECTION 2: Session & MFA Management
         ══════════════════════════════════════════════ */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/50 p-2.5 text-emerald-600 dark:text-emerald-400">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-100  pb-4">
+            <div className="rounded-xl bg-emerald-50  p-2.5 text-emerald-600 ">
               <Smartphone className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Session Lifecycle & MFA Enforcement
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Control multi-factor authentication requirements and idle inactivity timeouts
               </p>
             </div>
@@ -338,29 +338,29 @@ const SecuritySettingsPage = () => {
           <div className="space-y-5">
             {/* MFA Selector */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-2">
                 Multi-Factor Authentication (MFA / 2FA) Scope
               </label>
               <select
                 value={mfaEnforcement}
                 onChange={(e) => setMfaEnforcement(e.target.value)}
-                className="h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="h-11 w-full rounded-xl border border-slate-200  bg-white  px-3.5 text-sm font-semibold text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               >
                 <option value="ALL_USERS">Enforce for ALL Users (Strict Compliance)</option>
                 <option value="ADMINS_ONLY">Enforce for Administrators & Branch Managers Only</option>
                 <option value="OPTIONAL">Optional (User-managed toggle in profile)</option>
                 <option value="DISABLED">Disabled Globally</option>
               </select>
-              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <p className="mt-1.5 text-xs text-slate-500  flex items-center gap-1">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> Supports Google Authenticator, Microsoft Authenticator & SMS OTP
               </p>
             </div>
 
             {/* Session Timeout Slider */}
             <div className="pt-2">
-              <div className="flex justify-between text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">
+              <div className="flex justify-between text-sm font-semibold text-slate-800  mb-2">
                 <span>Idle Session Auto-Logout Timeout</span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{sessionTimeout} Minutes</span>
+                <span className="font-mono text-emerald-600  font-bold">{sessionTimeout} Minutes</span>
               </div>
               <input
                 type="range"
@@ -369,16 +369,16 @@ const SecuritySettingsPage = () => {
                 step="5"
                 value={sessionTimeout}
                 onChange={(e) => setSessionTimeout(Number(e.target.value))}
-                className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                className="w-full h-2 bg-slate-100  rounded-lg appearance-none cursor-pointer accent-emerald-600"
               />
               <p className="mt-1 text-[11px] text-slate-400">Automatically terminates inactive sessions to prevent unauthorized desk access</p>
             </div>
 
             {/* Concurrent Logins */}
             <div className="pt-2">
-              <label className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800/80 p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+              <label className="flex items-center justify-between rounded-xl border border-slate-100  p-3.5 hover:bg-slate-50  cursor-pointer transition-colors">
                 <div>
-                  <span className="block text-sm font-semibold text-slate-800 dark:text-slate-200">Prevent Concurrent Logins</span>
+                  <span className="block text-sm font-semibold text-slate-800 ">Prevent Concurrent Logins</span>
                   <span className="text-xs text-slate-400">Logging in from a new device terminates existing active sessions</span>
                 </div>
                 <input
@@ -393,13 +393,13 @@ const SecuritySettingsPage = () => {
             {/* Brute Force Protection */}
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Lockout Attempts
                 </label>
                 <select
                   value={lockoutAttempts}
                   onChange={(e) => setLockoutAttempts(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-xs font-semibold text-slate-900 dark:text-white"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-900 "
                 >
                   <option value="3">3 Failed Attempts</option>
                   <option value="5">5 Failed Attempts</option>
@@ -407,13 +407,13 @@ const SecuritySettingsPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-1">
                   Lockout Duration
                 </label>
                 <select
                   value={lockoutDuration}
                   onChange={(e) => setLockoutDuration(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-xs font-semibold text-slate-900 dark:text-white"
+                  className="h-10 w-full rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-900 "
                 >
                   <option value="15">15 Minutes</option>
                   <option value="30">30 Minutes</option>
@@ -428,24 +428,24 @@ const SecuritySettingsPage = () => {
       {/* ══════════════════════════════════════════════
           SECTION 3: Network Governance & IP Whitelisting
       ══════════════════════════════════════════════ */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-800 pb-4 gap-4">
+      <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100  pb-4 gap-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-blue-50 dark:bg-blue-950/50 p-2.5 text-blue-600 dark:text-blue-400">
+            <div className="rounded-xl bg-blue-50  p-2.5 text-blue-600 ">
               <Globe className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Network Governance & IP Whitelisting
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Restrict administrative login access to authorized corporate subnets and branch VPNs
               </p>
             </div>
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-600 ">
               Enable IP Filtering
             </span>
             <input
@@ -460,14 +460,14 @@ const SecuritySettingsPage = () => {
         {ipWhitelistEnabled ? (
           <div className="space-y-6 animate-in fade-in">
             {/* Add IP Form */}
-            <form onSubmit={handleAddIP} className="flex flex-col sm:flex-row gap-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4 border border-slate-200/60 dark:border-slate-800">
+            <form onSubmit={handleAddIP} className="flex flex-col sm:flex-row gap-3 rounded-xl bg-slate-50  p-4 border border-slate-200/60 ">
               <div className="flex-1">
                 <input
                   type="text"
                   placeholder="CIDR or IP (e.g. 192.168.1.0/24 or 45.12.33.10)"
                   value={newCidr}
                   onChange={(e) => setNewCidr(e.target.value)}
-                  className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-xs font-mono text-slate-900 dark:text-white placeholder:text-slate-400"
+                  className="h-10 w-full rounded-lg border border-slate-200  bg-white  px-3 text-xs font-mono text-slate-900  placeholder:text-slate-400"
                 />
               </div>
               <div className="flex-1">
@@ -476,7 +476,7 @@ const SecuritySettingsPage = () => {
                   placeholder="Location Label (e.g. Kandy Regional Branch)"
                   value={newLabel}
                   onChange={(e) => setNewLabel(e.target.value)}
-                  className="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-xs text-slate-900 dark:text-white placeholder:text-slate-400"
+                  className="h-10 w-full rounded-lg border border-slate-200  bg-white  px-3 text-xs text-slate-900  placeholder:text-slate-400"
                 />
               </div>
               <button
@@ -488,23 +488,23 @@ const SecuritySettingsPage = () => {
             </form>
 
             {/* IP Table */}
-            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 ">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <tr className="border-b border-slate-200  bg-slate-50  text-xs font-bold uppercase tracking-wider text-slate-400">
                     <th className="px-4 py-3">Subnet / IP Range</th>
                     <th className="px-4 py-3">Facility Label</th>
                     <th className="px-4 py-3">Added By</th>
                     <th className="px-4 py-3 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100 ">
                   {ipList.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                      <td className="px-4 py-3 font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">
+                    <tr key={item.id} className="hover:bg-slate-50 ">
+                      <td className="px-4 py-3 font-mono font-bold text-xs text-indigo-600 ">
                         {item.cidr}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200 text-xs">
+                      <td className="px-4 py-3 font-semibold text-slate-800  text-xs">
                         {item.label}
                       </td>
                       <td className="px-4 py-3 text-xs text-slate-500">
@@ -526,7 +526,7 @@ const SecuritySettingsPage = () => {
             </div>
           </div>
         ) : (
-          <div className="rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 p-4 text-xs font-medium text-amber-800 dark:text-amber-300 flex items-center gap-2">
+          <div className="rounded-xl bg-amber-50  border border-amber-200  p-4 text-xs font-medium text-amber-800  flex items-center gap-2">
             <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
             IP Whitelisting is currently disabled. Users can authenticate from any external IP address with valid credentials and MFA.
           </div>

@@ -36,10 +36,10 @@ const ProductDetailsPage = () => {
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/inventory/products")} className="p-2 hover:bg-gray-100 dark:hover:bg-navy-700 rounded-lg transition-colors">
+          <button onClick={() => navigate("/inventory/products")} className="p-2 hover:bg-gray-100  rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+          <h1 className="text-2xl font-bold text-navy-700 ">
             {product.product_code} - {product.product_name}
           </h1>
           <span className={`px-2 py-1 rounded-md text-xs font-medium ${product.status === "active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
@@ -54,7 +54,7 @@ const ProductDetailsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Basic Info */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
             <h2 className="text-lg font-bold mb-4">Product Summary</h2>
             <div className="grid grid-cols-2 gap-y-4">
               <div>
@@ -84,7 +84,7 @@ const ProductDetailsPage = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
             <h2 className="text-lg font-bold mb-4">Pharma Details</h2>
             <div className="grid grid-cols-2 gap-y-4">
               <div>
@@ -109,7 +109,7 @@ const ProductDetailsPage = () => {
 
         {/* Inventory Info */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
             <h2 className="text-lg font-bold mb-4">Inventory Settings</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b pb-2">
@@ -135,12 +135,12 @@ const ProductDetailsPage = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
             <h2 className="text-lg font-bold mb-4">Barcodes</h2>
             {product.barcodes && product.barcodes.length > 0 ? (
               <div className="space-y-2">
                 {product.barcodes.map((b: unknown) => (
-                  <div key={b.id} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-navy-700 rounded-lg">
+                  <div key={b.id} className="flex justify-between items-center p-2 bg-gray-50  rounded-lg">
                     <span className="font-mono text-sm">{b.barcode}</span>
                     <span className="text-xs text-gray-500 uppercase">{b.barcode_type}</span>
                   </div>

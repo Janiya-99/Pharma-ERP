@@ -3,15 +3,15 @@ const ChequeLeafStatusBadge = ({ status }: { status?: unknown }) => {
   const getBadgeClass = (status: unknown) => {
     switch (status) {
       case "available":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+        return "bg-green-100 text-green-800  ";
       case "used":
-        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300";
+        return "bg-indigo-100 text-indigo-800  ";
       case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+        return "bg-red-100 text-red-800  ";
       case "void":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+        return "bg-gray-100 text-gray-800  ";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+        return "bg-gray-100 text-gray-800  ";
     }
   };
 

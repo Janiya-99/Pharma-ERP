@@ -116,20 +116,20 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">GRN Line Items</h3>
+        <h3 className="text-lg font-semibold text-gray-900 ">GRN Line Items</h3>
         <button
           type="button"
           onClick={handleAddLine}
-          className="flex items-center gap-2 px-3 py-1.5 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:hover:bg-brand-900/50 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3 py-1.5 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100    transition-colors text-sm font-medium"
         >
           <Plus className="h-4 w-4" />
           Add Line
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-navy-700 pb-12">
+      <div className="overflow-x-auto rounded-lg border border-gray-200  pb-12">
         <table className="w-full text-sm text-left whitespace-nowrap min-w-[1400px]">
-          <thead className="bg-gray-50 dark:bg-navy-800/50 text-gray-600 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-navy-700">
+          <thead className="bg-gray-50  text-gray-600  font-medium border-b border-gray-200 ">
             <tr>
               <th className="px-4 py-3 min-w-[220px]">Product *</th>
               <th className="px-4 py-3 min-w-[250px]">Batch Details *</th>
@@ -140,10 +140,10 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
               <th className="px-4 py-3 min-w-[80px] text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+          <tbody className="divide-y divide-gray-100 ">
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-500 ">
                   No lines added. Click "Add Line" to begin.
                 </td>
               </tr>
@@ -152,7 +152,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                 const lineErrors = errors[`lines.${index}`] || {};
                 
                 return (
-                  <tr key={line.id || index} className="hover:bg-gray-50 dark:hover:bg-navy-800/50">
+                  <tr key={line.id || index} className="hover:bg-gray-50 ">
                     <td className="px-4 py-3 align-top">
                       <GRNLineProductSelect
                         value={line.product_id}
@@ -160,14 +160,14 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                         error={lineErrors.product_id}
                       />
                       {line.product && (
-                        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex flex-col gap-1">
+                        <div className="mt-2 text-xs text-gray-500  flex flex-col gap-1">
                           {line.product.requires_batch_tracking ? (
-                            <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1"><AlertCircle className="h-3 w-3"/> Batch Req</span>
+                            <span className="text-amber-600  flex items-center gap-1"><AlertCircle className="h-3 w-3"/> Batch Req</span>
                           ) : (
                             <span>No Batch Req</span>
                           )}
                           {line.product.requires_expiry_tracking ? (
-                            <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1"><AlertCircle className="h-3 w-3"/> Expiry Req</span>
+                            <span className="text-amber-600  flex items-center gap-1"><AlertCircle className="h-3 w-3"/> Expiry Req</span>
                           ) : (
                             <span>No Expiry Req</span>
                           )}
@@ -258,7 +258,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                       <select
                         value={line.warehouse_location_id || ""}
                         onChange={(e: any) => handleLineChange(index, "warehouse_location_id", e.target.value ? parseInt(e.target.value) : null)}
-                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${lineErrors.warehouse_location_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${lineErrors.warehouse_location_id ? "border-red-500" : "border-gray-200 "}`}
                       >
                         <option value="">-- Optional --</option>
                         {locations.map((loc: unknown) => (
@@ -275,7 +275,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                             type="number" min="0" step="0.001"
                             value={line.quantity_received === 0 ? "" : line.quantity_received}
                             onChange={(e: any) => handleLineChange(index, "quantity_received", e.target.value)}
-                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.quantity_received ? "border-red-500" : "border-gray-200 dark:border-navy-600"} dark:bg-navy-900`}
+                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.quantity_received ? "border-red-500" : "border-gray-200 "} `}
                           />
                           {lineErrors.quantity_received && <p className="text-[10px] text-red-500 mt-0.5">{lineErrors.quantity_received}</p>}
                         </div>
@@ -286,7 +286,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                               type="number" min="0" step="0.001"
                               value={line.free_quantity === 0 ? "" : line.free_quantity}
                               onChange={(e: any) => handleLineChange(index, "free_quantity", e.target.value)}
-                              className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.free_quantity ? "border-red-500" : "border-gray-200 dark:border-navy-600"} dark:bg-navy-900`}
+                              className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.free_quantity ? "border-red-500" : "border-gray-200 "} `}
                             />
                             {line.free_quantity > 0 && <div className="absolute -top-1 -right-1"><FreeQuantityBadge quantity={line.free_quantity} /></div>}
                           </div>
@@ -299,7 +299,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                             type="number" min="0" step="0.01"
                             value={line.unit_cost === 0 ? "" : line.unit_cost}
                             onChange={(e: any) => handleLineChange(index, "unit_cost", e.target.value)}
-                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.unit_cost ? "border-red-500" : "border-gray-200 dark:border-navy-600"} dark:bg-navy-900`}
+                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.unit_cost ? "border-red-500" : "border-gray-200 "} `}
                           />
                           {lineErrors.unit_cost && <p className="text-[10px] text-red-500 mt-0.5">{lineErrors.unit_cost}</p>}
                         </div>
@@ -310,7 +310,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                             type="number" min="0" step="0.01"
                             value={line.discount_amount === 0 ? "" : line.discount_amount}
                             onChange={(e: any) => handleLineChange(index, "discount_amount", e.target.value)}
-                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.discount_amount ? "border-red-500" : "border-gray-200 dark:border-navy-600"} dark:bg-navy-900`}
+                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.discount_amount ? "border-red-500" : "border-gray-200 "} `}
                           />
                         </div>
                         <div>
@@ -319,7 +319,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                             type="number" min="0" step="0.01"
                             value={line.tax_amount === 0 ? "" : line.tax_amount}
                             onChange={(e: any) => handleLineChange(index, "tax_amount", e.target.value)}
-                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.tax_amount ? "border-red-500" : "border-gray-200 dark:border-navy-600"} dark:bg-navy-900`}
+                            className={`w-full px-2 py-1.5 border rounded text-xs text-right ${lineErrors.tax_amount ? "border-red-500" : "border-gray-200 "} `}
                           />
                         </div>
 
@@ -342,7 +342,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                           rows={2}
                           value={line.line_remarks || ""}
                           onChange={(e: any) => handleLineChange(index, "line_remarks", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-md text-xs focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                          className="w-full px-3 py-2 border border-gray-200  rounded-md text-xs focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                           placeholder="Remarks..."
                         />
                         <div className="grid grid-cols-2 gap-2">
@@ -373,7 +373,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                         <button
                           type="button"
                           onClick={() => handleDuplicateLine(index)}
-                          className="p-1.5 text-gray-400 hover:text-brand-500 rounded-md hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-brand-500 rounded-md hover:bg-gray-100  transition-colors"
                           title="Duplicate Line"
                         >
                           <Copy className="h-4 w-4" />
@@ -381,7 +381,7 @@ const GRNLinesTable = ({ lines, setLines, warehouseId, errors = {} }: { lines?: 
                         <button
                           type="button"
                           onClick={() => handleRemoveLine(index)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-md hover:bg-red-50  transition-colors"
                           title="Remove Line"
                         >
                           <Trash2 className="h-4 w-4" />

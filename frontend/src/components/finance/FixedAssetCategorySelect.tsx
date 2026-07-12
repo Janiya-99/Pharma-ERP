@@ -34,24 +34,24 @@ const FixedAssetCategorySelect = ({ value, onChange, error, disabled, className 
   return (
     <div className={`relative ${className}`}>
       <div
-        className={`flex items-center justify-between w-full p-2.5 bg-white dark:bg-navy-800 border rounded-xl cursor-pointer ${
-          error ? "border-red-500" : "border-gray-200 dark:border-navy-600"
+        className={`flex items-center justify-between w-full p-2.5 bg-white  border rounded-xl cursor-pointer ${
+          error ? "border-red-500" : "border-gray-200 "
         } ${disabled ? "opacity-50 cursor-not-allowed bg-gray-50" : "hover:border-brand-500"}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
-        <span className={`truncate text-sm ${!selectedCategory ? "text-gray-400" : "text-gray-800 dark:text-white"}`}>
+        <span className={`truncate text-sm ${!selectedCategory ? "text-gray-400" : "text-gray-800 "}`}>
           {selectedCategory ? `${selectedCategory.category_code} - ${selectedCategory.category_name}` : "Select Category..."}
         </span>
         <ChevronsUpDown className="w-4 h-4 text-gray-400" />
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-navy-800 dark:border-navy-600">
-          <div className="p-2 border-b border-gray-100 dark:border-navy-700">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg  ">
+          <div className="p-2 border-b border-gray-100 ">
             <input
               type="text"
               placeholder="Search category..."
-              className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+              className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-brand-500   "
               value={search}
               onChange={(e: any) => setSearch(e.target.value)}
               onClick={(e: any) => e.stopPropagation()}
@@ -66,8 +66,8 @@ const FixedAssetCategorySelect = ({ value, onChange, error, disabled, className 
               filteredCategories.map((category: unknown) => (
                 <div
                   key={category.id}
-                  className={`flex items-center justify-between p-2 text-sm rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-700 ${
-                    value === category.id ? "bg-brand-50 text-brand-600 font-medium dark:bg-navy-700" : "text-gray-700 dark:text-gray-200"
+                  className={`flex items-center justify-between p-2 text-sm rounded-lg cursor-pointer hover:bg-gray-50  ${
+                    value === category.id ? "bg-brand-50 text-brand-600 font-medium " : "text-gray-700 "
                   }`}
                   onClick={() => {
                     onChange(category.id);

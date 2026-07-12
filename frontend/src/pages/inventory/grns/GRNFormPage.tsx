@@ -227,12 +227,12 @@ const GRNFormPage = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/admin/inventory/grns")}
-            className="p-2 bg-white dark:bg-navy-800 rounded-full shadow hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
+            className="p-2 bg-white  rounded-full shadow hover:bg-gray-50  transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            <ArrowLeft className="h-5 w-5 text-gray-600 " />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+            <h1 className="text-2xl font-bold text-navy-700 ">
               {isEdit ? "Edit Goods Receipt Note" : "Create Goods Receipt Note"}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
@@ -252,16 +252,16 @@ const GRNFormPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Document Header</h3>
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-semibold text-gray-900  mb-6">Document Header</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Branch *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Branch *</label>
                 <select
                   value={formData.branch_id}
                   onChange={handleBranchChange}
-                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.branch_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${errors.branch_id ? "border-red-500" : "border-gray-200 "}`}
                 >
                   <option value="">Select Branch</option>
                   {branches.map((b: unknown) => <option key={b.id} value={b.id}>{b.branch_name}</option>)}
@@ -270,11 +270,11 @@ const GRNFormPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Supplier *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Supplier *</label>
                 <select
                   value={formData.supplier_id}
                   onChange={(e: any) => setFormData({ ...formData, supplier_id: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.supplier_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${errors.supplier_id ? "border-red-500" : "border-gray-200 "}`}
                 >
                   <option value="">Select Supplier</option>
                   {suppliers.map((s: unknown) => <option key={s.id} value={s.id}>{s.supplier_name}</option>)}
@@ -283,11 +283,11 @@ const GRNFormPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Warehouse *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Warehouse *</label>
                 <select
                   value={formData.warehouse_id}
                   onChange={handleWarehouseChange}
-                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.warehouse_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${errors.warehouse_id ? "border-red-500" : "border-gray-200 "}`}
                 >
                   <option value="">Select Warehouse</option>
                   {warehouses
@@ -298,69 +298,69 @@ const GRNFormPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">GRN Date *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">GRN Date *</label>
                 <input
                   type="date"
                   value={formData.grn_date}
                   onChange={(e: any) => setFormData({ ...formData, grn_date: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${errors.grn_date ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                  className={`w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${errors.grn_date ? "border-red-500" : "border-gray-200 "}`}
                 />
                 {errors.grn_date && <p className="text-xs text-red-500 mt-1">{errors.grn_date}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Supplier Invoice Number</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Supplier Invoice Number</label>
                 <input
                   type="text"
                   value={formData.supplier_invoice_number}
                   onChange={(e: any) => setFormData({ ...formData, supplier_invoice_number: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Supplier Invoice Date</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Supplier Invoice Date</label>
                 <input
                   type="date"
                   value={formData.supplier_invoice_date}
                   onChange={(e: any) => setFormData({ ...formData, supplier_invoice_date: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Purchase Order Number</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Purchase Order Number</label>
                 <input
                   type="text"
                   value={formData.purchase_order_number}
                   onChange={(e: any) => setFormData({ ...formData, purchase_order_number: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Reference Number</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Reference Number</label>
                 <input
                   type="text"
                   value={formData.reference_number}
                   onChange={(e: any) => setFormData({ ...formData, reference_number: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                 />
               </div>
 
               <div className="lg:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Remarks</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1.5">Remarks</label>
                 <textarea
                   value={formData.remarks}
                   onChange={(e: any) => setFormData({ ...formData, remarks: e.target.value })}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                 />
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
             <GRNLinesTable 
               lines={lines} 
               setLines={setLines} 
@@ -373,15 +373,15 @@ const GRNFormPage = () => {
         <div className="lg:col-span-1 space-y-6">
           <GRNTotalsCard lines={lines} />
           
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Financial Context (Optional)</h3>
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-sm font-semibold text-gray-900  mb-4">Financial Context (Optional)</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-400 mb-1">Financial Year</label>
+                <label className="block text-xs font-medium text-gray-700  mb-1">Financial Year</label>
                 <select
                   value={formData.financial_year_id}
                   onChange={(e: any) => setFormData({ ...formData, financial_year_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm bg-gray-50 dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-200  rounded-lg text-sm bg-gray-50  text-gray-900 "
                   disabled={financialYears.length === 0}
                 >
                   <option value="">None selected</option>
@@ -390,11 +390,11 @@ const GRNFormPage = () => {
               </div>
               
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-400 mb-1">Accounting Period</label>
+                <label className="block text-xs font-medium text-gray-700  mb-1">Accounting Period</label>
                 <select
                   value={formData.accounting_period_id}
                   onChange={(e: any) => setFormData({ ...formData, accounting_period_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-lg text-sm bg-gray-50 dark:bg-navy-900 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-200  rounded-lg text-sm bg-gray-50  text-gray-900 "
                   disabled={accountingPeriods.length === 0}
                 >
                   <option value="">None selected</option>

@@ -39,10 +39,10 @@ const PettyCashFundSelect = ({
 
   return (
     <Select value={value?.toString() || ""} onValueChange={(val: unknown) => onChange(parseInt(val, 10))} disabled={disabled || loading}>
-      <SelectTrigger className={className || "w-full bg-white dark:bg-navy-900 border-gray-300 dark:border-navy-700"}>
+      <SelectTrigger className={className || "w-full bg-white  border-gray-300 "}>
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
-      <SelectContent className="bg-white dark:bg-navy-800">
+      <SelectContent className="bg-white ">
         {funds.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
             {item.fund_code} - {item.fund_name} (Balance: LKR {item.current_balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})

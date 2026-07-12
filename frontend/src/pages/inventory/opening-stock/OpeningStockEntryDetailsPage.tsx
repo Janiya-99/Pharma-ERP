@@ -62,13 +62,13 @@ const OpeningStockEntryDetailsPage = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/inventory/opening-stock")}
-            className="p-2 bg-white dark:bg-navy-800 rounded-full shadow hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors"
+            className="p-2 bg-white  rounded-full shadow hover:bg-gray-50  transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            <ArrowLeft className="h-5 w-5 text-gray-600 " />
           </button>
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+              <h1 className="text-2xl font-bold text-navy-700 ">
                 {entry.opening_stock_number}
               </h1>
               <OpeningStockStatusBadge status={entry.approval_status} />
@@ -86,14 +86,14 @@ const OpeningStockEntryDetailsPage = () => {
             <div className="flex gap-2">
               <Link
                 to={`/inventory/stock-balances?warehouse_id=${entry.warehouse_id}`}
-                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-navy-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-navy-600 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700 text-sm font-medium"
+                className="flex items-center gap-2 px-3 py-2 bg-white  text-gray-700  border border-gray-200  rounded-xl hover:bg-gray-50  text-sm font-medium"
               >
                 <PackageSearch className="h-4 w-4" />
                 View Stock
               </Link>
               <Link
                 to={`/inventory/stock-ledger?source_type=opening_stock&source_id=${entry.id}`}
-                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-navy-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-navy-600 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700 text-sm font-medium"
+                className="flex items-center gap-2 px-3 py-2 bg-white  text-gray-700  border border-gray-200  rounded-xl hover:bg-gray-50  text-sm font-medium"
               >
                 <ListTree className="h-4 w-4" />
                 View Ledger
@@ -114,84 +114,84 @@ const OpeningStockEntryDetailsPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-navy-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Document Information</h3>
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 ">
+              <h3 className="text-lg font-semibold text-gray-900 ">Document Information</h3>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Branch</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white font-medium">{entry.branch?.branch_name || entry.branch_id}</p>
+                <p className="text-sm font-medium text-gray-500 ">Branch</p>
+                <p className="mt-1 text-sm text-gray-900  font-medium">{entry.branch?.branch_name || entry.branch_id}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Warehouse</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white font-medium">{entry.warehouse?.warehouse_name || entry.warehouse_id}</p>
+                <p className="text-sm font-medium text-gray-500 ">Warehouse</p>
+                <p className="mt-1 text-sm text-gray-900  font-medium">{entry.warehouse?.warehouse_name || entry.warehouse_id}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Remarks</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{entry.remarks || "-"}</p>
+                <p className="text-sm font-medium text-gray-500 ">Remarks</p>
+                <p className="mt-1 text-sm text-gray-900 ">{entry.remarks || "-"}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Created By</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{entry.creator?.first_name} {entry.creator?.last_name}</p>
+                <p className="text-sm font-medium text-gray-500 ">Created By</p>
+                <p className="mt-1 text-sm text-gray-900 ">{entry.creator?.first_name} {entry.creator?.last_name}</p>
                 <p className="text-xs text-gray-500">{formatDateTime(entry.created_at)}</p>
               </div>
               {entry.approved_by && (
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Approved By</p>
-                  <p className="mt-1 text-sm text-gray-900 dark:text-white">{entry.approver?.first_name} {entry.approver?.last_name}</p>
+                  <p className="text-sm font-medium text-gray-500 ">Approved By</p>
+                  <p className="mt-1 text-sm text-gray-900 ">{entry.approver?.first_name} {entry.approver?.last_name}</p>
                   <p className="text-xs text-gray-500">{formatDateTime(entry.approved_at)}</p>
                 </div>
               )}
               {entry.posted_by && (
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Posted By</p>
-                  <p className="mt-1 text-sm text-gray-900 dark:text-white">{entry.poster?.first_name} {entry.poster?.last_name}</p>
+                  <p className="text-sm font-medium text-gray-500 ">Posted By</p>
+                  <p className="mt-1 text-sm text-gray-900 ">{entry.poster?.first_name} {entry.poster?.last_name}</p>
                   <p className="text-xs text-gray-500">{formatDateTime(entry.posted_at)}</p>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-navy-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Line Items</h3>
+          <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 ">
+              <h3 className="text-lg font-semibold text-gray-900 ">Line Items</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-navy-900 text-gray-600 dark:text-gray-300 font-medium">
+                <thead className="bg-gray-50  text-gray-600  font-medium">
                   <tr>
-                    <th className="px-4 py-3 border-b dark:border-navy-700">#</th>
-                    <th className="px-4 py-3 border-b dark:border-navy-700">Product</th>
-                    <th className="px-4 py-3 border-b dark:border-navy-700">Batch</th>
-                    <th className="px-4 py-3 border-b dark:border-navy-700">Location</th>
-                    <th className="px-4 py-3 border-b dark:border-navy-700 text-right">Qty</th>
-                    <th className="px-4 py-3 border-b dark:border-navy-700 text-right">Unit Cost</th>
-                    <th className="px-4 py-3 border-b dark:border-navy-700 text-right">Total Cost</th>
-                    <th className="px-4 py-3 border-b dark:border-navy-700">Remarks</th>
+                    <th className="px-4 py-3 border-b ">#</th>
+                    <th className="px-4 py-3 border-b ">Product</th>
+                    <th className="px-4 py-3 border-b ">Batch</th>
+                    <th className="px-4 py-3 border-b ">Location</th>
+                    <th className="px-4 py-3 border-b  text-right">Qty</th>
+                    <th className="px-4 py-3 border-b  text-right">Unit Cost</th>
+                    <th className="px-4 py-3 border-b  text-right">Total Cost</th>
+                    <th className="px-4 py-3 border-b ">Remarks</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+                <tbody className="divide-y divide-gray-100 ">
                   {entry.lines?.map((line: any, idx: number) => (
-                    <tr key={line.id} className="hover:bg-gray-50 dark:hover:bg-navy-800/50">
+                    <tr key={line.id} className="hover:bg-gray-50 ">
                       <td className="px-4 py-3 text-gray-500">{line.line_order || idx + 1}</td>
                       <td className="px-4 py-3">
-                        <p className="font-medium text-gray-900 dark:text-white">{line.product?.product_code}</p>
+                        <p className="font-medium text-gray-900 ">{line.product?.product_code}</p>
                         <p className="text-xs text-gray-500">{line.product?.product_name}</p>
                       </td>
                       <td className="px-4 py-3">
                         {line.product_batch ? (
                           <>
-                            <p className="text-gray-900 dark:text-white font-medium">{line.product_batch.batch_number}</p>
+                            <p className="text-gray-900  font-medium">{line.product_batch.batch_number}</p>
                             <p className="text-xs text-gray-500">Exp: {formatDate(line.product_batch.expiry_date)}</p>
                           </>
                         ) : "-"}
                       </td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{line.warehouse_location?.location_name || "-"}</td>
-                      <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-white">{formatNumber(line.quantity, 3)}</td>
-                      <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{formatCurrency(line.unit_cost)}</td>
-                      <td className="px-4 py-3 text-right font-medium text-brand-600 dark:text-brand-400">{formatCurrency(line.total_cost)}</td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{line.line_remarks || "-"}</td>
+                      <td className="px-4 py-3 text-gray-700 ">{line.warehouse_location?.location_name || "-"}</td>
+                      <td className="px-4 py-3 text-right font-medium text-gray-900 ">{formatNumber(line.quantity, 3)}</td>
+                      <td className="px-4 py-3 text-right text-gray-700 ">{formatCurrency(line.unit_cost)}</td>
+                      <td className="px-4 py-3 text-right font-medium text-brand-600 ">{formatCurrency(line.total_cost)}</td>
+                      <td className="px-4 py-3 text-gray-600 ">{line.line_remarks || "-"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -200,16 +200,16 @@ const OpeningStockEntryDetailsPage = () => {
           </div>
 
           {entry.approvals && entry.approvals.length > 0 && (
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 dark:border-navy-700 flex items-center gap-2">
+            <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100  flex items-center gap-2">
                 <Clock className="h-5 w-5 text-gray-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Approval History</h3>
+                <h3 className="text-lg font-semibold text-gray-900 ">Approval History</h3>
               </div>
               <div className="p-6">
                 <div className="space-y-6">
                   {entry.approvals.map((approval: any) => (
                     <div key={approval.id} className="relative flex gap-4">
-                      <div className="absolute left-2.5 top-8 -bottom-6 w-px bg-gray-200 dark:bg-navy-700 last:hidden" />
+                      <div className="absolute left-2.5 top-8 -bottom-6 w-px bg-gray-200  last:hidden" />
                       <div className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                         approval.action === "approved" ? "bg-green-100 text-green-600" :
                         approval.action === "rejected" ? "bg-red-100 text-red-600" :
@@ -219,13 +219,13 @@ const OpeningStockEntryDetailsPage = () => {
                       </div>
                       <div className="flex flex-col pb-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900 dark:text-white capitalize">{approval.action}</span>
+                          <span className="font-medium text-gray-900  capitalize">{approval.action}</span>
                           <span className="text-gray-500 text-sm">by</span>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">{approval.user?.first_name} {approval.user?.last_name}</span>
+                          <span className="font-medium text-gray-700 ">{approval.user?.first_name} {approval.user?.last_name}</span>
                           <span className="text-gray-400 text-sm ml-2">{formatDateTime(approval.action_date)}</span>
                         </div>
                         {approval.remarks && (
-                          <div className="mt-1 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-navy-900 p-2 rounded-lg">
+                          <div className="mt-1 text-sm text-gray-600  bg-gray-50  p-2 rounded-lg">
                             {approval.remarks}
                           </div>
                         )}

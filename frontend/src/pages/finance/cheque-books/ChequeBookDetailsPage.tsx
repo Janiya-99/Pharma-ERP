@@ -72,7 +72,7 @@ export default function ChequeBookDetailsPage() {
           >
             <MdArrowBack className="mr-1" /> Back to Cheque Books
           </button>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-navy-700  flex items-center gap-3">
             Cheque Book #{book.cheque_book_number}
           </h1>
           <p className="text-gray-500">{book.bank_account?.bank_name} - {book.bank_account?.account_number}</p>
@@ -99,19 +99,19 @@ export default function ChequeBookDetailsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Total Leaves</p>
-          <p className="text-2xl font-bold text-navy-700 dark:text-white mt-1">{book.total_leaves}</p>
+          <p className="text-2xl font-bold text-navy-700  mt-1">{book.total_leaves}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Available Leaves</p>
           <p className="text-2xl font-bold text-green-600 mt-1">{book.available_leaves}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Used Leaves</p>
           <p className="text-2xl font-bold text-indigo-600 mt-1">{book.used_leaves}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Cancelled Leaves</p>
           <p className="text-2xl font-bold text-red-600 mt-1">{book.cancelled_leaves}</p>
         </div>
@@ -120,20 +120,20 @@ export default function ChequeBookDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           {/* Details Grid */}
-          <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Book Information</h3>
+          <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Book Information</h3>
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-500">Bank Account</p>
-                <p className="font-medium text-navy-900 dark:text-white">{book.bank_account?.bank_name} - {book.bank_account?.account_number}</p>
+                <p className="font-medium text-navy-900 ">{book.bank_account?.bank_name} - {book.bank_account?.account_number}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Issued Date</p>
-                <p className="font-medium text-navy-900 dark:text-white">{new Date(book.issued_date).toLocaleDateString()}</p>
+                <p className="font-medium text-navy-900 ">{new Date(book.issued_date).toLocaleDateString()}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Start - End Leaf</p>
-                <p className="font-medium text-navy-900 dark:text-white">{book.start_leaf_number} to {book.end_leaf_number}</p>
+                <p className="font-medium text-navy-900 ">{book.start_leaf_number} to {book.end_leaf_number}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Status</p>
@@ -143,7 +143,7 @@ export default function ChequeBookDetailsPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Remarks</p>
-                <p className="font-medium text-navy-900 dark:text-white">{book.remarks || "-"}</p>
+                <p className="font-medium text-navy-900 ">{book.remarks || "-"}</p>
               </div>
             </div>
           </div>
@@ -151,8 +151,8 @@ export default function ChequeBookDetailsPage() {
 
         <div className="lg:col-span-2">
           {/* Leaves Table */}
-          <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Cheque Leaves</h3>
+          <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Cheque Leaves</h3>
             <ChequeLeavesTable 
               leaves={book.cheque_leaves || []} 
               onCancelLeaf={handleCancelLeaf} 

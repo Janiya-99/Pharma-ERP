@@ -34,12 +34,12 @@ export function KPICard({
   trend,
   trendValue,
   icon,
-  iconBg = "bg-erp-800/10 dark:bg-erp-500/10",
+  iconBg = "bg-erp-800/10 ",
   className,
 }: KPICardProps) {
   const trendColors = {
-    up: "text-green-600 dark:text-green-400",
-    down: "text-red-500 dark:text-red-400",
+    up: "text-green-600 ",
+    down: "text-red-500 ",
     neutral: "text-muted-foreground",
   };
 

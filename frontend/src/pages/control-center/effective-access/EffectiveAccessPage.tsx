@@ -85,22 +85,22 @@ const EffectiveAccessPage = () => {
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Control Center • Security & Authorization
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Effective Access & Permission Matrix
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Inspect cumulative user permissions resulting from role inheritance, branch policies, and direct overrides
           </p>
         </div>
@@ -110,7 +110,7 @@ const EffectiveAccessPage = () => {
           <button
             onClick={handleSimulate}
             disabled={isSimulating}
-            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
+            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200  bg-white  px-4 text-sm font-semibold text-slate-700  hover:bg-slate-50  transition-all shadow-sm"
           >
             <RefreshCw className={`h-4 w-4 text-indigo-600 ${isSimulating ? "animate-spin" : ""}`} />
             {isSimulating ? "Recalculating Matrix..." : "Recalculate Effective Access"}
@@ -123,17 +123,17 @@ const EffectiveAccessPage = () => {
       </div>
 
       {/* ── User & Scope Selector Bar ── */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-900 p-6 shadow-sm">
+      <div className="rounded-2xl border border-slate-200  bg-gradient-to-r from-slate-50 via-white to-slate-50    p-6 shadow-sm">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 items-center">
           {/* User Selector */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-2">
               1. Select Target User
             </label>
             <select
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
+              className="h-11 w-full rounded-xl border border-slate-200  bg-white  px-3.5 text-sm font-semibold text-slate-900  focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
             >
               {mockUsers.map((u) => (
                 <option key={u.id} value={u.id}>
@@ -145,13 +145,13 @@ const EffectiveAccessPage = () => {
 
           {/* Module Filter */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-2">
               2. Filter by Software Module
             </label>
             <select
               value={selectedModule}
               onChange={(e) => setSelectedModule(e.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
+              className="h-11 w-full rounded-xl border border-slate-200  bg-white  px-3.5 text-sm font-semibold text-slate-900  focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
             >
               <option value="ALL">All Software Modules</option>
               <option value="Finance & Ledger">Finance & Ledger</option>
@@ -163,7 +163,7 @@ const EffectiveAccessPage = () => {
 
           {/* Search Query */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500  mb-2">
               3. Search Permission Code
             </label>
             <div className="relative">
@@ -173,31 +173,31 @@ const EffectiveAccessPage = () => {
                 placeholder="e.g. FIN_JOURNAL..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
+                className="h-11 w-full rounded-xl border border-slate-200  bg-white  pl-10 pr-4 text-sm text-slate-900  placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
               />
             </div>
           </div>
         </div>
 
         {/* Selected User Summary Strip */}
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200/80 dark:border-slate-800 pt-5 text-xs">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200/80  pt-5 text-xs">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/60 font-bold text-indigo-700 dark:text-indigo-300">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100  font-bold text-indigo-700 ">
               {selectedUser.avatar}
             </div>
             <div>
-              <p className="font-bold text-sm text-slate-900 dark:text-white">{selectedUser.name}</p>
-              <p className="text-slate-500 dark:text-slate-400">{selectedUser.email} • <span className="text-indigo-600 dark:text-indigo-400 font-medium">{selectedUser.role}</span></p>
+              <p className="font-bold text-sm text-slate-900 ">{selectedUser.name}</p>
+              <p className="text-slate-500 ">{selectedUser.email} • <span className="text-indigo-600  font-medium">{selectedUser.role}</span></p>
             </div>
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-slate-400" />
-              <span className="text-slate-600 dark:text-slate-300 font-medium">Assigned Branch: <b>{selectedUser.branch}</b></span>
+              <span className="text-slate-600  font-medium">Assigned Branch: <b>{selectedUser.branch}</b></span>
             </div>
             <div className="flex items-center gap-2">
               <Layers className="h-4 w-4 text-slate-400" />
-              <span className="text-slate-600 dark:text-slate-300 font-medium">Active Policy: <b>Strict Inheritance</b></span>
+              <span className="text-slate-600  font-medium">Active Policy: <b>Strict Inheritance</b></span>
             </div>
           </div>
         </div>
@@ -205,59 +205,59 @@ const EffectiveAccessPage = () => {
 
       {/* ── KPI Summary Cards ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Effective Rights Granted
             </span>
-            <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 p-2 text-emerald-600 dark:text-emerald-400">
+            <div className="rounded-lg bg-emerald-50  p-2 text-emerald-600 ">
               <CheckCircle2 className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{totalGranted}</p>
-          <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">Authorized operations across selected scope</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">{totalGranted}</p>
+          <p className="mt-1 text-xs text-emerald-600  font-medium">Authorized operations across selected scope</p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Effective Denials / Restrictions
             </span>
-            <div className="rounded-lg bg-rose-50 dark:bg-rose-950/50 p-2 text-rose-600 dark:text-rose-400">
+            <div className="rounded-lg bg-rose-50  p-2 text-rose-600 ">
               <XCircle className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{totalDenied}</p>
-          <p className="mt-1 text-xs text-rose-600 dark:text-rose-400 font-medium">Blocked due to lack of grant or explicit denial</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">{totalDenied}</p>
+          <p className="mt-1 text-xs text-rose-600  font-medium">Blocked due to lack of grant or explicit denial</p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Explicit Branch Overrides
             </span>
-            <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/50 p-2 text-indigo-600 dark:text-indigo-400">
+            <div className="rounded-lg bg-indigo-50  p-2 text-indigo-600 ">
               <AlertCircle className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{totalOverrides}</p>
-          <p className="mt-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium">Custom grants/denials overriding role defaults</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">{totalOverrides}</p>
+          <p className="mt-1 text-xs text-indigo-600  font-medium">Custom grants/denials overriding role defaults</p>
         </div>
       </div>
 
       {/* ── Effective Access Matrix Table ── */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-800 p-5 gap-4">
+      <div className="rounded-xl border border-slate-200  bg-white  shadow-sm overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100  p-5 gap-4">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-slate-900 ">
               Authorization Matrix & Resolution Logic
             </h3>
-            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-0.5 text-xs text-slate-500 ">
               Effective status is resolved by applying Branch Overrides over Role-Inherited defaults
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-semibold text-slate-600 dark:text-slate-300">
+            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100  px-2.5 py-1 font-semibold text-slate-600 ">
               Showing {filteredPermissions.length} of {userPermissions.length} permissions
             </span>
           </div>
@@ -266,7 +266,7 @@ const EffectiveAccessPage = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <tr className="border-b border-slate-200  bg-slate-50/50  text-xs font-bold uppercase tracking-wider text-slate-400">
                 <th className="px-5 py-3.5">Permission Code</th>
                 <th className="px-4 py-3.5">Module & Feature</th>
                 <th className="px-4 py-3.5">Role Inheritance</th>
@@ -275,30 +275,30 @@ const EffectiveAccessPage = () => {
                 <th className="px-5 py-3.5">Resolution Rationale & Audit Trail</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100 ">
               {filteredPermissions.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan={6} className="py-12 text-center text-slate-500 ">
                     No permission codes matching the selected scope and search criteria.
                   </td>
                 </tr>
               ) : (
                 filteredPermissions.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="px-5 py-4 font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">
+                  <tr key={row.id} className="hover:bg-slate-50  transition-colors">
+                    <td className="px-5 py-4 font-mono font-bold text-xs text-indigo-600 ">
                       {row.code}
                     </td>
                     <td className="px-4 py-4">
-                      <p className="font-semibold text-slate-800 dark:text-slate-200">{row.feature}</p>
+                      <p className="font-semibold text-slate-800 ">{row.feature}</p>
                       <span className="text-[11px] text-slate-400 font-medium">{row.module}</span>
                     </td>
                     <td className="px-4 py-4">
                       {row.roleInherited === "GRANTED" ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50  px-2 py-0.5 text-xs font-semibold text-emerald-700  border border-emerald-200/60 ">
                           <CheckCircle2 className="h-3 w-3" /> Granted ({row.roleName})
                         </span>
                       ) : row.roleInherited === "DENIED" ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 text-xs font-semibold text-rose-700 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50  px-2 py-0.5 text-xs font-semibold text-rose-700  border border-rose-200/60 ">
                           <XCircle className="h-3 w-3" /> Denied ({row.roleName})
                         </span>
                       ) : (
@@ -307,11 +307,11 @@ const EffectiveAccessPage = () => {
                     </td>
                     <td className="px-4 py-4">
                       {row.branchOverride === "GRANTED" ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50  px-2 py-0.5 text-xs font-bold text-indigo-700  border border-indigo-200/60 ">
                           <Unlock className="h-3 w-3" /> Override Grant
                         </span>
                       ) : row.branchOverride === "DENIED" ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 text-xs font-bold text-rose-700 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50  px-2 py-0.5 text-xs font-bold text-rose-700  border border-rose-200/60 ">
                           <Lock className="h-3 w-3" /> Override Denial
                         </span>
                       ) : (
@@ -329,7 +329,7 @@ const EffectiveAccessPage = () => {
                         </span>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-xs text-slate-600 dark:text-slate-400">
+                    <td className="px-5 py-4 text-xs text-slate-600 ">
                       <p className="line-clamp-2 leading-relaxed">{row.reason}</p>
                     </td>
                   </tr>

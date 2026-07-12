@@ -102,7 +102,7 @@ export default function BankAccountDetailsPage() {
           >
             <MdArrowBack className="mr-1" /> Back to Bank Accounts
           </button>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-navy-700  flex items-center gap-3">
             {account.bank_name} - {account.account_number}
             {account.is_default && <BankAccountBadge isDefault={account.is_default} />}
           </h1>
@@ -130,63 +130,63 @@ export default function BankAccountDetailsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Cheque Books</p>
-          <p className="text-2xl font-bold text-navy-700 dark:text-white mt-1">{summary.totalChequeBooks}</p>
+          <p className="text-2xl font-bold text-navy-700  mt-1">{summary.totalChequeBooks}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Available Leaves</p>
           <p className="text-2xl font-bold text-green-600 mt-1">{summary.availableChequeLeaves}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Used Leaves</p>
           <p className="text-2xl font-bold text-indigo-600 mt-1">{summary.usedChequeLeaves}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Cancelled Leaves</p>
           <p className="text-2xl font-bold text-red-600 mt-1">{summary.cancelledChequeLeaves}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:bg-navy-800 dark:border-navy-700">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100  ">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Unreconciled Trans.</p>
           <p className="text-2xl font-bold text-orange-600 mt-1">{summary.unreconciledTransactions}</p>
         </div>
       </div>
 
       {/* Details Grid */}
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-        <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Account Information</h3>
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+        <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Account Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
           <div>
             <p className="text-sm text-gray-500">Bank Name</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.bank_name}</p>
+            <p className="font-medium text-navy-900 ">{account.bank_name}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Bank Branch Name</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.bank_branch_name || "-"}</p>
+            <p className="font-medium text-navy-900 ">{account.bank_branch_name || "-"}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Chart Account</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.chart_of_account?.account_code} - {account.chart_of_account?.account_name}</p>
+            <p className="font-medium text-navy-900 ">{account.chart_of_account?.account_code} - {account.chart_of_account?.account_name}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Account Name</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.account_name}</p>
+            <p className="font-medium text-navy-900 ">{account.account_name}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Account Number</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.account_number}</p>
+            <p className="font-medium text-navy-900 ">{account.account_number}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">SWIFT Code</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.swift_code || "-"}</p>
+            <p className="font-medium text-navy-900 ">{account.swift_code || "-"}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Bank Code</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.bank_code || "-"}</p>
+            <p className="font-medium text-navy-900 ">{account.bank_code || "-"}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Branch Code</p>
-            <p className="font-medium text-navy-900 dark:text-white">{account.branch_code || "-"}</p>
+            <p className="font-medium text-navy-900 ">{account.branch_code || "-"}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Status</p>
@@ -196,7 +196,7 @@ export default function BankAccountDetailsPage() {
           </div>
           <div>
             <p className="text-sm text-gray-500">Opening Balance</p>
-            <p className="font-medium text-navy-900 dark:text-white"><MoneyDisplay amount={account.opening_balance} /></p>
+            <p className="font-medium text-navy-900 "><MoneyDisplay amount={account.opening_balance} /></p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Current Balance</p>
@@ -204,7 +204,7 @@ export default function BankAccountDetailsPage() {
           </div>
           <div>
             <p className="text-sm text-gray-500">Created Information</p>
-            <p className="font-medium text-navy-900 dark:text-white text-sm">
+            <p className="font-medium text-navy-900  text-sm">
               By {account.creator?.first_name} {account.creator?.last_name} on {new Date(account.created_at).toLocaleDateString()}
             </p>
           </div>

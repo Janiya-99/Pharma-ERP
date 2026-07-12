@@ -97,8 +97,8 @@ const DayBookReportPage = () => {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Access Denied</h2>
-        <p className="text-gray-500 dark:text-gray-400">You do not have permission to view the Day Book report.</p>
+        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
+        <p className="text-gray-500 ">You do not have permission to view the Day Book report.</p>
       </div>
     );
   }
@@ -156,20 +156,20 @@ const DayBookReportPage = () => {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
 
-          <div className="bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700 overflow-hidden mb-6">
+          <div className="bg-white  rounded-lg shadow border border-gray-200  overflow-hidden mb-6">
             {data.days && data.days.length > 0 ? (
-              <div className="divide-y divide-gray-200 dark:divide-navy-700">
+              <div className="divide-y divide-gray-200 ">
                 {(data.days || []).map((day: unknown, idx: unknown) => (
                   <div key={idx} className="p-0">
-                    <div className="bg-gray-50 dark:bg-navy-900 px-6 py-3 border-b border-gray-200 dark:border-navy-700">
-                      <h3 className="font-bold text-navy-800 dark:text-white">
+                    <div className="bg-gray-50  px-6 py-3 border-b border-gray-200 ">
+                      <h3 className="font-bold text-navy-800 ">
                         {format(new Date(day.date), 'EEEE, MMMM d, yyyy')}
                       </h3>
                     </div>
                     
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-navy-800 border-b border-gray-100 dark:border-navy-700">
+                        <thead className="text-xs text-gray-500  bg-white  border-b border-gray-100 ">
                           <tr>
                             <th className="px-6 py-3 font-medium">Source Type</th>
                             <th className="px-6 py-3 font-medium">Source No</th>
@@ -180,9 +180,9 @@ const DayBookReportPage = () => {
                             <th className="px-6 py-3 font-medium text-right">Credit</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-navy-700/50">
+                        <tbody className="divide-y divide-gray-100 ">
                           {(day.lines || []).map((line: unknown, lidx: unknown) => (
-                            <tr key={lidx} className="hover:bg-gray-50 dark:hover:bg-navy-900/50">
+                            <tr key={lidx} className="hover:bg-gray-50 ">
                               <td className="px-6 py-3 whitespace-nowrap"><SourceTypeBadge type={line.source_type} /></td>
                               <td className="px-6 py-3 whitespace-nowrap font-medium">{line.source_number}</td>
                               <td className="px-6 py-3 whitespace-nowrap">{line.account_code}</td>
@@ -193,11 +193,11 @@ const DayBookReportPage = () => {
                             </tr>
                           ))}
                         </tbody>
-                        <tfoot className="bg-gray-50 dark:bg-navy-900 font-semibold border-t-2 border-gray-200 dark:border-navy-700">
+                        <tfoot className="bg-gray-50  font-semibold border-t-2 border-gray-200 ">
                           <tr>
-                            <td colSpan="5" className="px-6 py-3 text-right text-navy-800 dark:text-white">Daily Total:</td>
-                            <td className="px-6 py-3 whitespace-nowrap text-right text-navy-800 dark:text-white"><ReportAmountCell amount={day.total_debit} /></td>
-                            <td className="px-6 py-3 whitespace-nowrap text-right text-navy-800 dark:text-white"><ReportAmountCell amount={day.total_credit} /></td>
+                            <td colSpan="5" className="px-6 py-3 text-right text-navy-800 ">Daily Total:</td>
+                            <td className="px-6 py-3 whitespace-nowrap text-right text-navy-800 "><ReportAmountCell amount={day.total_debit} /></td>
+                            <td className="px-6 py-3 whitespace-nowrap text-right text-navy-800 "><ReportAmountCell amount={day.total_credit} /></td>
                           </tr>
                         </tfoot>
                       </table>
@@ -206,22 +206,22 @@ const DayBookReportPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              <div className="p-8 text-center text-gray-500 ">
                 No transactions found for the selected dates.
               </div>
             )}
             
             {data.days && data.days.length > 0 && (
-              <div className="bg-brand-50 dark:bg-navy-900 p-6 border-t border-gray-200 dark:border-navy-700 flex justify-end items-center gap-8">
+              <div className="bg-brand-50  p-6 border-t border-gray-200  flex justify-end items-center gap-8">
                 <div className="text-right">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Grand Total Debit</div>
-                  <div className="text-xl font-bold text-navy-800 dark:text-white">
+                  <div className="text-sm text-gray-500 ">Grand Total Debit</div>
+                  <div className="text-xl font-bold text-navy-800 ">
                     <ReportAmountCell amount={data.grand_total_debit} />
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Grand Total Credit</div>
-                  <div className="text-xl font-bold text-navy-800 dark:text-white">
+                  <div className="text-sm text-gray-500 ">Grand Total Credit</div>
+                  <div className="text-xl font-bold text-navy-800 ">
                     <ReportAmountCell amount={data.grand_total_credit} />
                   </div>
                 </div>
@@ -232,10 +232,10 @@ const DayBookReportPage = () => {
       )}
       
       {!data && !loading && (
-        <div className="bg-white dark:bg-navy-800 rounded-lg shadow p-8 text-center border border-gray-200 dark:border-navy-700">
+        <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
           <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">Run Report</h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="mt-4 text-lg font-medium text-gray-900 ">Run Report</h3>
+          <p className="mt-2 text-sm text-gray-500 ">
             Click Apply Filters to view the day book.
           </p>
         </div>

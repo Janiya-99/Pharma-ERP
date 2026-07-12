@@ -76,7 +76,7 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
     >
       <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Manufacturer Code <span className="text-red-500">*</span>
           </label>
           <input
@@ -84,11 +84,11 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
             name="manufacturer_code"
             value={formData.manufacturer_code || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white" required
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 " required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Manufacturer Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -96,11 +96,11 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
             name="manufacturer_name"
             value={formData.manufacturer_name || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white" required
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 " required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Country 
           </label>
           <input
@@ -108,11 +108,11 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
             name="country"
             value={formData.country || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Contact Person 
           </label>
           <input
@@ -120,11 +120,11 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
             name="contact_person"
             value={formData.contact_person || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Contact Number 
           </label>
           <input
@@ -132,11 +132,11 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
             name="contact_number"
             value={formData.contact_number || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Email 
           </label>
           <input
@@ -144,11 +144,11 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
             name="email"
             value={formData.email || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Address 
           </label>
           <textarea
@@ -156,18 +156,18 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
             value={formData.address || ""}
             onChange={handleChange}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Status <span className="text-red-500">*</span>
           </label>
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white" required
+            className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 " required
           >
             <option value="">Select...</option>
             <option value="active">Active</option><option value="inactive">Inactive</option>
@@ -175,11 +175,11 @@ const ManufacturerFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpe
         </div>
 
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-navy-600 mt-6">
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100  mt-6">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-navy-600 dark:text-gray-300 dark:hover:bg-navy-500 rounded-xl transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200    rounded-xl transition-colors"
           >
             Cancel
           </button>

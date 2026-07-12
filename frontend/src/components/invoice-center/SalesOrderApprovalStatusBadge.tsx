@@ -9,26 +9,26 @@ interface Props {
 const statusConfig: Record<string, { label: string; className: string }> = {
   draft: {
     label: "Draft",
-    className: "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300",
+    className: "bg-gray-100 text-gray-600  ",
   },
   pending: {
     label: "Pending",
     className:
-      "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300",
+      "bg-yellow-100 text-yellow-700  ",
   },
   approved: {
     label: "Approved",
     className:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+      "bg-emerald-100 text-emerald-700  ",
   },
   rejected: {
     label: "Rejected",
     className:
-      "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
+      "bg-rose-100 text-rose-700  ",
   },
   cancelled: {
     label: "Cancelled",
-    className: "bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+    className: "bg-gray-200 text-gray-500  ",
   },
 };
 

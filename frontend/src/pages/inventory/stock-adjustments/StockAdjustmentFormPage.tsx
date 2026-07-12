@@ -336,15 +336,15 @@ const StockAdjustmentFormPage = () => {
       <div className="mb-6 flex items-center gap-4">
         <button
           onClick={() => navigate("/inventory/stock-adjustments")}
-          className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 hover:text-gray-700 dark:border-navy-700 dark:bg-navy-800 dark:hover:text-gray-300"
+          className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 hover:text-gray-700   "
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900 ">
             {isEditMode ? "Edit Stock Adjustment" : "New Stock Adjustment"}
           </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 ">
             {isEditMode
               ? "Update draft adjustment details"
               : "Create a new stock adjustment draft"}
@@ -354,23 +354,23 @@ const StockAdjustmentFormPage = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Header Section */}
-        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm  ">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 ">
             Adjustment Details
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 ">
                 Branch *
               </label>
               <select
                 name="branch_id"
                 value={formData.branch_id}
                 onChange={handleChange}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500   ${
                   errors.branch_id
                     ? "border-red-500"
-                    : "border-gray-200 dark:border-navy-600"
+                    : "border-gray-200 "
                 }`}
               >
                 <option value="">Select Branch...</option>
@@ -386,7 +386,7 @@ const StockAdjustmentFormPage = () => {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 ">
                 Warehouse *
               </label>
               <select
@@ -394,10 +394,10 @@ const StockAdjustmentFormPage = () => {
                 value={formData.warehouse_id}
                 onChange={handleChange}
                 disabled={!formData.branch_id}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500   ${
                   errors.warehouse_id
                     ? "border-red-500"
-                    : "border-gray-200 dark:border-navy-600"
+                    : "border-gray-200 "
                 } ${
                   !formData.branch_id ? "cursor-not-allowed opacity-50" : ""
                 }`}
@@ -417,17 +417,17 @@ const StockAdjustmentFormPage = () => {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 ">
                 Adjustment Type *
               </label>
               <select
                 name="adjustment_type"
                 value={formData.adjustment_type}
                 onChange={handleChange}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500   ${
                   errors.adjustment_type
                     ? "border-red-500"
-                    : "border-gray-200 dark:border-navy-600"
+                    : "border-gray-200 "
                 }`}
               >
                 <option value="positive">Positive (Increase Stock)</option>
@@ -446,7 +446,7 @@ const StockAdjustmentFormPage = () => {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 ">
                 Adjustment Date *
               </label>
               <input
@@ -454,10 +454,10 @@ const StockAdjustmentFormPage = () => {
                 name="adjustment_date"
                 value={formData.adjustment_date}
                 onChange={handleChange}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-2 focus:ring-brand-500   ${
                   errors.adjustment_date
                     ? "border-red-500"
-                    : "border-gray-200 dark:border-navy-600"
+                    : "border-gray-200 "
                 }`}
               />
               {errors.adjustment_date && (
@@ -468,7 +468,7 @@ const StockAdjustmentFormPage = () => {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 ">
                 Reference Number
               </label>
               <input
@@ -477,12 +477,12 @@ const StockAdjustmentFormPage = () => {
                 value={formData.reference_number}
                 onChange={handleChange}
                 placeholder="e.g. Audit #123"
-                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   "
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 ">
                 Reason
               </label>
               <input
@@ -491,12 +491,12 @@ const StockAdjustmentFormPage = () => {
                 value={formData.reason}
                 onChange={handleChange}
                 placeholder="e.g. Stock count variance"
-                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   "
               />
             </div>
 
             <div className="md:col-span-2 lg:col-span-4">
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 ">
                 Remarks
               </label>
               <textarea
@@ -505,14 +505,14 @@ const StockAdjustmentFormPage = () => {
                 onChange={handleChange}
                 rows={2}
                 placeholder="Detailed remarks..."
-                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   "
               />
             </div>
           </div>
         </div>
 
         {/* Lines Section */}
-        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm  ">
           {!formData.warehouse_id ? (
             <div className="py-8 text-center text-gray-500">
               Please select a Branch and Warehouse to manage adjustment lines.
@@ -533,7 +533,7 @@ const StockAdjustmentFormPage = () => {
           <button
             type="button"
             onClick={() => navigate("/inventory/stock-adjustments")}
-            className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-navy-600 dark:bg-navy-800 dark:text-gray-200 dark:hover:bg-navy-700"
+            className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50    "
           >
             Cancel
           </button>

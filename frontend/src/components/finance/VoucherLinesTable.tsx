@@ -32,9 +32,9 @@ export default function VoucherLinesTable({ lines, setLines, disabled }: { lines
 
   return (
     <div className="space-y-4">
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
-        <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-navy-700">
-          <h3 className="text-lg font-medium text-navy-800 dark:text-white">Line Items</h3>
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden">
+        <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 ">
+          <h3 className="text-lg font-medium text-navy-800 ">Line Items</h3>
           {!disabled && (
             <button
               type="button"
@@ -47,7 +47,7 @@ export default function VoucherLinesTable({ lines, setLines, disabled }: { lines
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+            <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
               <tr>
                 <th className="px-4 py-3 w-1/3">Account</th>
                 <th className="px-4 py-3">Line Description</th>
@@ -55,9 +55,9 @@ export default function VoucherLinesTable({ lines, setLines, disabled }: { lines
                 <th className="px-4 py-3 w-24 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+            <tbody className="divide-y divide-gray-100 ">
               {lines.map((line: unknown, index: unknown) => (
-                <tr key={index} className="hover:bg-gray-50 dark:hover:bg-navy-700/30">
+                <tr key={index} className="hover:bg-gray-50 ">
                   <td className="px-4 py-2">
                     <JournalLineAccountSelect
                       value={line.account_id}

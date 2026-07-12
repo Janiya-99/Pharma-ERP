@@ -50,49 +50,49 @@ export default function FinanceDashboard() {
   return (
     <div className="flex flex-col gap-5 py-5">
       <div className="flex flex-col mb-4">
-        <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Finance Dashboard</h1>
+        <h1 className="text-2xl font-bold text-navy-700 ">Finance Dashboard</h1>
         <p className="text-sm text-gray-400">Overview of your financial configurations and current status</p>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 mb-2">
+      <div className="bg-white  p-4 rounded-xl shadow-sm border border-gray-100  mb-2">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <p className="text-gray-500 dark:text-gray-400">Company</p>
-            <p className="font-semibold text-navy-700 dark:text-white">{company?.company_name || "N/A"}</p>
+            <p className="text-gray-500 ">Company</p>
+            <p className="font-semibold text-navy-700 ">{company?.company_name || "N/A"}</p>
           </div>
           <div>
-            <p className="text-gray-500 dark:text-gray-400">Active Branch</p>
-            <p className="font-semibold text-navy-700 dark:text-white">{activeBranch?.branch_name || "N/A"}</p>
+            <p className="text-gray-500 ">Active Branch</p>
+            <p className="font-semibold text-navy-700 ">{activeBranch?.branch_name || "N/A"}</p>
           </div>
           <div>
-            <p className="text-gray-500 dark:text-gray-400">Active Software</p>
-            <p className="font-semibold text-navy-700 dark:text-white">{activeSoftware?.software?.software_name || "Finance"}</p>
+            <p className="text-gray-500 ">Active Software</p>
+            <p className="font-semibold text-navy-700 ">{activeSoftware?.software?.software_name || "Finance"}</p>
           </div>
           <div>
-            <p className="text-gray-500 dark:text-gray-400">Logged-in User</p>
-            <p className="font-semibold text-navy-700 dark:text-white">{user?.full_name || user?.email || "N/A"}</p>
+            <p className="text-gray-500 ">Logged-in User</p>
+            <p className="font-semibold text-navy-700 ">{user?.full_name || user?.email || "N/A"}</p>
           </div>
         </div>
       </div>
 
       <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
         <Widget
-          icon={<MdDateRange className="h-6 w-6 text-brand-500 dark:text-white" />}
+          icon={<MdDateRange className="h-6 w-6 text-brand-500 " />}
           title="Active Financial Year"
           subtitle={stats.activeFinancialYear}
         />
         <Widget
-          icon={<MdCalendarToday className="h-6 w-6 text-brand-500 dark:text-white" />}
+          icon={<MdCalendarToday className="h-6 w-6 text-brand-500 " />}
           title="Open Accounting Periods"
           subtitle={stats.openPeriods.toString()}
         />
         <Widget
-          icon={<MdAccountBalanceWallet className="h-6 w-6 text-brand-500 dark:text-white" />}
+          icon={<MdAccountBalanceWallet className="h-6 w-6 text-brand-500 " />}
           title="Chart of Accounts"
           subtitle={stats.accounts.toString()}
         />
         <Widget
-          icon={<MdOutlineAccountBalance className="h-6 w-6 text-brand-500 dark:text-white" />}
+          icon={<MdOutlineAccountBalance className="h-6 w-6 text-brand-500 " />}
           title="Opening Balances"
           subtitle={stats.openingBalances.toString()}
         />

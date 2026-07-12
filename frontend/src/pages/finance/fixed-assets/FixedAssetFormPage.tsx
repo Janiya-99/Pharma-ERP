@@ -202,7 +202,7 @@ const FixedAssetFormPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900 pb-10 overflow-y-auto">
+    <div className="flex flex-col h-full bg-gray-50  pb-10 overflow-y-auto">
       <PageHeader
         title={isEdit ? "Edit Fixed Asset" : "Create Fixed Asset"}
         breadcrumb={[
@@ -216,7 +216,7 @@ const FixedAssetFormPage = () => {
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => history.push("/admin/finance/fixed-assets")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
           </button>
@@ -234,17 +234,17 @@ const FixedAssetFormPage = () => {
           <div className="lg:col-span-2 space-y-6">
             
             {/* Basic Asset Details */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
                 1. Basic Asset Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Branch <span className="text-red-500">*</span>
                   </label>
                   <select
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.branch_id ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.branch_id}
@@ -258,7 +258,7 @@ const FixedAssetFormPage = () => {
                   {errors.branch_id && <span className="text-xs text-red-500 mt-1">{errors.branch_id}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Asset Category <span className="text-red-500">*</span>
                   </label>
                   <FixedAssetCategorySelect
@@ -269,12 +269,12 @@ const FixedAssetFormPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Asset Code <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.asset_code ? "border-red-500" : "border-gray-200"
                     }`}
                     placeholder="e.g., FA-COMP-001"
@@ -284,12 +284,12 @@ const FixedAssetFormPage = () => {
                   {errors.asset_code && <span className="text-xs text-red-500 mt-1">{errors.asset_code}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Asset Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.asset_name ? "border-red-500" : "border-gray-200"
                     }`}
                     placeholder="e.g., Dell Latitude 5420"
@@ -299,11 +299,11 @@ const FixedAssetFormPage = () => {
                   {errors.asset_name && <span className="text-xs text-red-500 mt-1">{errors.asset_name}</span>}
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Description
                   </label>
                   <textarea
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                     placeholder="Asset details..."
                     rows="2"
                     value={formData.description}
@@ -311,28 +311,28 @@ const FixedAssetFormPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Serial Number</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Serial Number</label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white   "
                     value={formData.serial_number}
                     onChange={(e: any) => setFormData({ ...formData, serial_number: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model Number</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Model Number</label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white   "
                     value={formData.model_number}
                     onChange={(e: any) => setFormData({ ...formData, model_number: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Manufacturer</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Manufacturer</label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white   "
                     value={formData.manufacturer}
                     onChange={(e: any) => setFormData({ ...formData, manufacturer: e.target.value })}
                   />
@@ -341,18 +341,18 @@ const FixedAssetFormPage = () => {
             </div>
 
             {/* Purchase Details */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
                 2. Purchase & Acquisition
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Purchase Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.purchase_date ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.purchase_date}
@@ -361,12 +361,12 @@ const FixedAssetFormPage = () => {
                   {errors.purchase_date && <span className="text-xs text-red-500 mt-1">{errors.purchase_date}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Acquisition Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.acquisition_date ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.acquisition_date}
@@ -375,30 +375,30 @@ const FixedAssetFormPage = () => {
                   {errors.acquisition_date && <span className="text-xs text-red-500 mt-1">{errors.acquisition_date}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Supplier Name</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Supplier Name</label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white   "
                     value={formData.supplier_name}
                     onChange={(e: any) => setFormData({ ...formData, supplier_name: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invoice Number</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Invoice Number</label>
                   <input
                     type="text"
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white   "
                     value={formData.invoice_number}
                     onChange={(e: any) => setFormData({ ...formData, invoice_number: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Acquisition Cost (LKR) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.acquisition_cost ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.acquisition_cost}
@@ -407,12 +407,12 @@ const FixedAssetFormPage = () => {
                   {errors.acquisition_cost && <span className="text-xs text-red-500 mt-1">{errors.acquisition_cost}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Residual Value (LKR)
                   </label>
                   <input
                     type="number"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.residual_value ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.residual_value}
@@ -424,18 +424,18 @@ const FixedAssetFormPage = () => {
             </div>
 
             {/* Depreciation Setup */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
                 3. Depreciation Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Useful Life (Months) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.useful_life_months ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.useful_life_months}
@@ -444,12 +444,12 @@ const FixedAssetFormPage = () => {
                   {errors.useful_life_months && <span className="text-xs text-red-500 mt-1">{errors.useful_life_months}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Depreciation Start Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
-                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                    className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                       errors.depreciation_start_date ? "border-red-500" : "border-gray-200"
                     }`}
                     value={formData.depreciation_start_date}
@@ -458,13 +458,13 @@ const FixedAssetFormPage = () => {
                   {errors.depreciation_start_date && <span className="text-xs text-red-500 mt-1">{errors.depreciation_start_date}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Depreciation Method
                   </label>
                   <input
                     type="text"
                     disabled
-                    className="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 dark:bg-navy-900/50 dark:border-navy-700 text-gray-500"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50   text-gray-500"
                     value="Straight Line"
                   />
                 </div>
@@ -472,13 +472,13 @@ const FixedAssetFormPage = () => {
             </div>
 
             {/* Accounting Setup */}
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+            <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
                 4. Accounting Integration
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Asset Account <span className="text-red-500">*</span>
                   </label>
                   <ChartOfAccountSelect
@@ -488,7 +488,7 @@ const FixedAssetFormPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Accumulated Depreciation Account <span className="text-red-500">*</span>
                   </label>
                   <ChartOfAccountSelect
@@ -498,7 +498,7 @@ const FixedAssetFormPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Depreciation Expense Account <span className="text-red-500">*</span>
                   </label>
                   <ChartOfAccountSelect
@@ -509,14 +509,14 @@ const FixedAssetFormPage = () => {
                 </div>
                 <div></div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gain on Disposal Account</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Gain on Disposal Account</label>
                   <ChartOfAccountSelect
                     value={formData.gain_on_disposal_account_id}
                     onChange={(val: unknown) => setFormData({ ...formData, gain_on_disposal_account_id: val })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Loss on Disposal Account</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Loss on Disposal Account</label>
                   <ChartOfAccountSelect
                     value={formData.loss_on_disposal_account_id}
                     onChange={(val: unknown) => setFormData({ ...formData, loss_on_disposal_account_id: val })}
@@ -525,14 +525,14 @@ const FixedAssetFormPage = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+            <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700  mb-1">
                     Status <span className="text-red-500">*</span>
                   </label>
                   <select
-                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                    className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                     value={formData.status}
                     onChange={(e: any) => setFormData({ ...formData, status: e.target.value })}
                   >
@@ -547,36 +547,36 @@ const FixedAssetFormPage = () => {
 
           <div className="lg:col-span-1 space-y-6">
             {/* Live Financial Summary */}
-            <div className="bg-gradient-to-br from-brand-50 to-white dark:from-navy-800 dark:to-navy-900 rounded-2xl shadow-sm border border-brand-100 dark:border-brand-900/30 p-6 sticky top-6">
-              <h3 className="text-lg font-bold text-brand-700 dark:text-brand-400 mb-6">
+            <div className="bg-gradient-to-br from-brand-50 to-white   rounded-2xl shadow-sm border border-brand-100  p-6 sticky top-6">
+              <h3 className="text-lg font-bold text-brand-700  mb-6">
                 Financial Preview
               </h3>
               
               <div className="space-y-4">
-                <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Acquisition Cost</span>
-                  <span className="font-bold text-navy-700 dark:text-white">
+                <div className="flex justify-between items-center border-b border-brand-100  pb-3">
+                  <span className="text-sm text-gray-600 ">Acquisition Cost</span>
+                  <span className="font-bold text-navy-700 ">
                     LKR {Number(formData.acquisition_cost || 0).toLocaleString()}
                   </span>
                 </div>
                 
-                <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Residual Value</span>
-                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                <div className="flex justify-between items-center border-b border-brand-100  pb-3">
+                  <span className="text-sm text-gray-600 ">Residual Value</span>
+                  <span className="font-medium text-gray-700 ">
                     LKR {Number(formData.residual_value || 0).toLocaleString()}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-brand-100 dark:border-brand-900/30 pb-3">
-                  <span className="text-sm font-semibold text-brand-700 dark:text-brand-400">Depreciable Amount</span>
-                  <span className="font-bold text-brand-700 dark:text-brand-400">
+                <div className="flex justify-between items-center border-b border-brand-100  pb-3">
+                  <span className="text-sm font-semibold text-brand-700 ">Depreciable Amount</span>
+                  <span className="font-bold text-brand-700 ">
                     LKR {depreciableAmount.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center pt-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Monthly Depr.</span>
-                  <span className="font-bold text-red-600 dark:text-red-400">
+                  <span className="text-sm text-gray-600 ">Monthly Depr.</span>
+                  <span className="font-bold text-red-600 ">
                     LKR {monthlyDepreciation.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>

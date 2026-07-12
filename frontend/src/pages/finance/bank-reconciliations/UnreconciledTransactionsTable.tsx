@@ -8,7 +8,7 @@ export default function UnreconciledTransactionsTable({ transactions, selectedTx
     <div className="w-full">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+          <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
             <tr>
               <th className="px-4 py-3 w-10 text-center">
                 <input
@@ -25,7 +25,7 @@ export default function UnreconciledTransactionsTable({ transactions, selectedTx
               <th className="px-4 py-3 text-right">Credit (Out)</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+          <tbody className="divide-y divide-gray-100 ">
             {transactions.length === 0 ? (
               <tr>
                 <td colSpan="6" className="px-4 py-8 text-center text-gray-500">No unreconciled transactions available.</td>
@@ -34,7 +34,7 @@ export default function UnreconciledTransactionsTable({ transactions, selectedTx
               transactions.map((tx: unknown) => (
                 <tr 
                   key={tx.id} 
-                  className={`hover:bg-gray-50 dark:hover:bg-navy-700/30 cursor-pointer ${selectedTxIds.includes(tx.id) ? 'bg-brand-50/50 dark:bg-brand-900/10' : ''}`}
+                  className={`hover:bg-gray-50  cursor-pointer ${selectedTxIds.includes(tx.id) ? 'bg-brand-50/50 ' : ''}`}
                   onClick={() => onToggleSelection(tx.id)}
                 >
                   <td className="px-4 py-3 text-center" onClick={(e: any) => e.stopPropagation()}>
@@ -46,7 +46,7 @@ export default function UnreconciledTransactionsTable({ transactions, selectedTx
                     />
                   </td>
                   <td className="px-4 py-3">{new Date(tx.transaction_date).toLocaleDateString()}</td>
-                  <td className="px-4 py-3 font-medium text-navy-700 dark:text-white">{tx.transaction_reference}</td>
+                  <td className="px-4 py-3 font-medium text-navy-700 ">{tx.transaction_reference}</td>
                   <td className="px-4 py-3"><BankTransactionTypeBadge type={tx.transaction_type} /></td>
                   <td className="px-4 py-3 text-right text-green-600"><MoneyDisplay amount={tx.debit_amount} /></td>
                   <td className="px-4 py-3 text-right text-red-600"><MoneyDisplay amount={tx.credit_amount} /></td>

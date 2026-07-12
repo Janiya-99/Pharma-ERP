@@ -38,8 +38,8 @@ function InputField(props: {
           isLuxury
             ? "mb-2 block font-medium text-white/70"
             : variant === "auth"
-            ? "mb-2 block font-bold text-navy-700 dark:text-white"
-            : "mb-2 block font-bold text-navy-700 dark:text-white"
+            ? "mb-2 block font-bold text-navy-700 "
+            : "mb-2 block font-bold text-navy-700 "
         }`}
       >
         {label}
@@ -56,18 +56,18 @@ function InputField(props: {
             isLuxury
               ? "auth-input-luxury"
               : disabled === true
-              ? "cursor-not-allowed border border-gray-100 bg-gray-50 text-gray-500 dark:border-white/5 dark:bg-white/5 dark:text-white/40"
+              ? "cursor-not-allowed border border-gray-100 bg-gray-50 text-gray-500   "
               : state === "error"
-              ? "border border-red-500 bg-red-50 text-red-600 placeholder:text-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 dark:border-red-400 dark:bg-red-400/10"
+              ? "border border-red-500 bg-red-50 text-red-600 placeholder:text-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/10  "
               : state === "success"
-              ? "border border-green-500 bg-green-50 text-green-600 placeholder:text-green-400 focus:border-green-500 focus:ring-4 focus:ring-green-500/10 dark:border-green-400 dark:bg-green-400/10"
-              : "border border-gray-200 bg-white text-navy-700 placeholder:text-gray-400 hover:border-gray-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-navy-900 dark:text-white dark:placeholder:text-white/30 dark:focus:border-brand-500 dark:focus:ring-brand-500/20"
+              ? "border border-green-500 bg-green-50 text-green-600 placeholder:text-green-400 focus:border-green-500 focus:ring-4 focus:ring-green-500/10  "
+              : "border border-gray-200 bg-white text-navy-700 placeholder:text-gray-400 hover:border-gray-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10      "
           }`}
         />
         {icon && (
           <div
             className={`absolute right-4 flex items-center ${
-              isLuxury ? "" : "text-gray-400 dark:text-white"
+              isLuxury ? "" : "text-gray-400 "
             }`}
           >
             {icon}

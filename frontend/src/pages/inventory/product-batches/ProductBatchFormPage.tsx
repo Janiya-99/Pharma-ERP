@@ -113,10 +113,10 @@ const ProductBatchFormPage = () => {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/inventory/product-batches")} className="p-2 hover:bg-gray-100 dark:hover:bg-navy-700 rounded-lg transition-colors">
+          <button onClick={() => navigate("/inventory/product-batches")} className="p-2 hover:bg-gray-100  rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+          <h1 className="text-2xl font-bold text-navy-700 ">
             {isEdit ? "Edit Batch" : "New Batch"}
           </h1>
         </div>
@@ -125,7 +125,7 @@ const ProductBatchFormPage = () => {
         </button>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+      <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
         <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label className="block text-sm font-medium mb-1">Product <span className="text-red-500">*</span></label>
@@ -139,11 +139,11 @@ const ProductBatchFormPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Batch Number <span className="text-red-500">*</span></label>
-            <input type="text" name="batch_number" value={formData.batch_number} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. BAT-202606A" />
+            <input type="text" name="batch_number" value={formData.batch_number} onChange={handleChange} required className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. BAT-202606A" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Status</label>
-            <select name="batch_status" value={formData.batch_status} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700">
+            <select name="batch_status" value={formData.batch_status} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white ">
               <option value="active">Active</option>
               <option value="near_expiry">Near Expiry</option>
               <option value="expired">Expired</option>
@@ -180,15 +180,15 @@ const ProductBatchFormPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Purchase Rate</label>
-            <input type="number" step="0.01" name="purchase_rate" value={formData.purchase_rate} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 150.00" />
+            <input type="number" step="0.01" name="purchase_rate" value={formData.purchase_rate} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. 150.00" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Selling Price</label>
-            <input type="number" step="0.01" name="selling_price" value={formData.selling_price} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 220.00" />
+            <input type="number" step="0.01" name="selling_price" value={formData.selling_price} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. 220.00" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">MRP</label>
-            <input type="number" step="0.01" name="mrp" value={formData.mrp} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-navy-700" placeholder="e.g. 250.00" />
+            <input type="number" step="0.01" name="mrp" value={formData.mrp} onChange={handleChange} className="w-full px-3 py-2 border rounded-xl bg-white " placeholder="e.g. 250.00" />
           </div>
         </form>
       </div>

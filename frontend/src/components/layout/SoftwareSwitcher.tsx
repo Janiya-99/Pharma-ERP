@@ -45,16 +45,16 @@ const SoftwareSwitcher = () => {
           onValueChange={handleChange}
           disabled={loading}
         >
-          <SelectTrigger className="w-[180px] bg-gray-50 dark:bg-navy-900 border-gray-300 dark:border-navy-700 text-gray-700 dark:text-gray-200 h-9 rounded-xl focus:ring-brand-500 focus:border-brand-500">
+          <SelectTrigger className="w-[180px] bg-gray-50  border-gray-300  text-gray-700  h-9 rounded-xl focus:ring-brand-500 focus:border-brand-500">
             <SelectValue placeholder="Select Module" />
           </SelectTrigger>
-          <SelectContent className="bg-white dark:bg-navy-800 border border-gray-200 dark:border-navy-700 z-50">
+          <SelectContent className="bg-white  border border-gray-200  z-50">
             {softwareModules.map((s: unknown) => {
               const code = s.software_code || s.software?.software_code || "";
               const name = s.software_name || s.software?.software_name || "";
               const key = s.software_id || s.id || code;
               return (
-                <SelectItem key={key} value={code} className="dark:text-gray-200">
+                <SelectItem key={key} value={code} className="">
                   {name}
                 </SelectItem>
               );

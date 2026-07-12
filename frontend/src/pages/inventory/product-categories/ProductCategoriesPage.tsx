@@ -83,21 +83,21 @@ const ProductCategoriesPage = () => {
     <div className="p-6">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Product Categories</h1>
+          <h1 className="text-2xl font-bold text-navy-700 ">Product Categories</h1>
           <p className="text-sm text-gray-500 mt-1">Manage product categories</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex bg-gray-100 dark:bg-navy-700 p-1 rounded-xl">
+          <div className="flex bg-gray-100  p-1 rounded-xl">
             <button
               onClick={() => setViewMode("table")}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === "table" ? "bg-white dark:bg-navy-600 shadow-sm text-brand-600 dark:text-brand-400" : "text-gray-500 hover:text-gray-700"}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === "table" ? "bg-white  shadow-sm text-brand-600 " : "text-gray-500 hover:text-gray-700"}`}
               title="Table View"
             >
               <ListIcon className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode("tree")}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === "tree" ? "bg-white dark:bg-navy-600 shadow-sm text-brand-600 dark:text-brand-400" : "text-gray-500 hover:text-gray-700"}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === "tree" ? "bg-white  shadow-sm text-brand-600 " : "text-gray-500 hover:text-gray-700"}`}
               title="Tree View"
             >
               <GitMerge className="w-4 h-4" />
@@ -110,7 +110,7 @@ const ProductCategoriesPage = () => {
               placeholder="Search..."
               value={search}
               onChange={(e: any) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+              className="pl-9 pr-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
             />
           </div>
           <PermissionGuard permission="inventory.product_category.create">
@@ -126,7 +126,7 @@ const ProductCategoriesPage = () => {
       </div>
 
       {viewMode === "table" ? (
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  overflow-hidden">
           <DataTable
             columns={columns}
             data={data}

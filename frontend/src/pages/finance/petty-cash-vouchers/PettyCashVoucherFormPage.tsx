@@ -177,34 +177,34 @@ export default function PettyCashVoucherFormPage() {
       />
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200 dark:bg-red-900/30 dark:border-red-800">
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200  ">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4">Voucher Information</h3>
+        <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+          <h3 className="text-lg font-bold text-navy-700  mb-4">Voucher Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Branch *</label>
-              <select name="branch_id" value={formData.branch_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Branch *</label>
+              <select name="branch_id" value={formData.branch_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="" disabled>Select Branch</option>
                 {branches.map((b: unknown) => <option key={b.id} value={b.id}>{b.branch_name}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Petty Cash Fund *</label>
-              <select name="petty_cash_fund_id" value={formData.petty_cash_fund_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Petty Cash Fund *</label>
+              <select name="petty_cash_fund_id" value={formData.petty_cash_fund_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="" disabled>Select Fund</option>
                 {funds.map((f: unknown) => <option key={f.id} value={f.id}>{f.fund_code} - {f.fund_name}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Voucher Type *</label>
-              <select name="voucher_type" value={formData.voucher_type} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Voucher Type *</label>
+              <select name="voucher_type" value={formData.voucher_type} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="expense">Expense</option>
                 <option value="advance">Advance</option>
                 <option value="refund">Refund</option>
@@ -213,16 +213,16 @@ export default function PettyCashVoucherFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Financial Year *</label>
-              <select name="financial_year_id" value={formData.financial_year_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Financial Year *</label>
+              <select name="financial_year_id" value={formData.financial_year_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="" disabled>Select Year</option>
                 {financialYears.map((fy: unknown) => <option key={fy.id} value={fy.id}>{fy.year_name}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Accounting Period *</label>
-              <select name="accounting_period_id" value={formData.accounting_period_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" required>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Accounting Period *</label>
+              <select name="accounting_period_id" value={formData.accounting_period_id} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " required>
                 <option value="" disabled>Select Period</option>
                 {accountingPeriods.filter((ap: unknown) => !formData.financial_year_id || ap.financial_year_id === formData.financial_year_id).map((ap: unknown) => (
                   <option key={ap.id} value={ap.id}>{ap.period_name}</option>
@@ -231,7 +231,7 @@ export default function PettyCashVoucherFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Voucher Date *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Voucher Date *</label>
               <DatePicker
                 value={formData.voucher_date}
                 onChange={(value) => setFormData((prev: any) => ({ ...prev, voucher_date: value }))}
@@ -241,23 +241,23 @@ export default function PettyCashVoucherFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payee Name</label>
-              <input type="text" name="payee_name" value={formData.payee_name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" placeholder="e.g. John Doe" />
+              <label className="block text-sm font-medium text-gray-700  mb-1">Payee Name</label>
+              <input type="text" name="payee_name" value={formData.payee_name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " placeholder="e.g. John Doe" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reference Number</label>
-              <input type="text" name="reference_number" value={formData.reference_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" placeholder="e.g. REF-1234" />
+              <label className="block text-sm font-medium text-gray-700  mb-1">Reference Number</label>
+              <input type="text" name="reference_number" value={formData.reference_number} onChange={handleChange} className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " placeholder="e.g. REF-1234" />
             </div>
 
             <div className="lg:col-span-3">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-              <textarea name="description" value={formData.description} onChange={handleChange} rows="2" className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500 dark:bg-navy-900 dark:border-navy-600 dark:text-white" placeholder="e.g. Office supplies and local travel expenses" />
+              <label className="block text-sm font-medium text-gray-700  mb-1">Description</label>
+              <textarea name="description" value={formData.description} onChange={handleChange} rows="2" className="w-full px-3 py-2 border rounded-md focus:ring-brand-500 focus:border-brand-500   " placeholder="e.g. Office supplies and local travel expenses" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+        <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
           <PettyCashLinesTable lines={formData.lines} onChange={handleLinesChange} readOnly={false} />
           
           <PettyCashTotalSummary 
@@ -271,7 +271,7 @@ export default function PettyCashVoucherFormPage() {
           <button
             type="button"
             onClick={() => history.push("/admin/finance/petty-cash-vouchers")}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700 font-medium transition-colors"
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50     font-medium transition-colors"
           >
             Cancel
           </button>

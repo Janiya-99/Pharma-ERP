@@ -8,10 +8,10 @@ const TreeNode = ({ node, level = 0 }: { node?: unknown; level?: unknown }) => {
   return (
     <div className="select-none">
       <div
-        className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-gray-50 dark:hover:bg-navy-700/50 ${
+        className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-gray-50  ${
           level === 0
-            ? "font-medium text-navy-700 dark:text-white"
-            : "text-gray-600 dark:text-gray-300"
+            ? "font-medium text-navy-700 "
+            : "text-gray-600 "
         }`}
         style={{ paddingLeft: `${level * 1.5 + 0.75}rem` }}
         onClick={() => hasChildren && setIsOpen(!isOpen)}
@@ -28,13 +28,13 @@ const TreeNode = ({ node, level = 0 }: { node?: unknown; level?: unknown }) => {
           )}
         </div>
         <span className="flex-1 truncate">{node.category_name}</span>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 font-mono text-xs text-gray-400 dark:bg-navy-700">
+        <span className="rounded-full bg-gray-100 px-2 py-0.5 font-mono text-xs text-gray-400 ">
           {node.category_code}
         </span>
       </div>
 
       {hasChildren && isOpen && (
-        <div className="ml-5 border-l border-gray-200 dark:border-navy-600">
+        <div className="ml-5 border-l border-gray-200 ">
           {node.children.map((child: unknown) => (
             <TreeNode key={child.id} node={child} level={level + 1} />
           ))}
@@ -77,7 +77,7 @@ const ProductCategoryTree = ({ data }: { data?: Record<string, unknown> }) => {
   const treeData = buildTree(data);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm  ">
       <div className="space-y-1">
         {treeData.map((node: unknown) => (
           <TreeNode key={node.id} node={node} />

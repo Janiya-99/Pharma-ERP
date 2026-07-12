@@ -41,10 +41,10 @@ const ProductBatchDetailsPage = () => {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/inventory/product-batches")} className="p-2 hover:bg-gray-100 dark:hover:bg-navy-700 rounded-lg transition-colors">
+          <button onClick={() => navigate("/inventory/product-batches")} className="p-2 hover:bg-gray-100  rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+          <h1 className="text-2xl font-bold text-navy-700 ">
             Batch: {batch.batch_number}
           </h1>
           <BatchStatusBadge status={batch.batch_status} />
@@ -66,11 +66,11 @@ const ProductBatchDetailsPage = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+      <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
         <div className="grid grid-cols-2 gap-y-6 gap-x-4">
           <div>
             <p className="text-sm text-gray-500">Product</p>
-            <p className="font-medium text-lg text-navy-700 dark:text-white">{batch.product?.product_name || "-"}</p>
+            <p className="font-medium text-lg text-navy-700 ">{batch.product?.product_name || "-"}</p>
             <p className="text-xs text-gray-400 font-mono mt-0.5">{batch.product?.product_code}</p>
           </div>
           <div>
@@ -94,9 +94,9 @@ const ProductBatchDetailsPage = () => {
             <p className="font-medium font-mono">Rs. {Number(batch.selling_price).toFixed(2)}</p>
           </div>
           {batch.is_blocked && (
-            <div className="col-span-2 bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900/50 mt-2">
-              <p className="text-sm text-red-600 dark:text-red-400 font-semibold mb-1">Block Reason</p>
-              <p className="text-sm text-red-800 dark:text-red-300">{batch.block_reason}</p>
+            <div className="col-span-2 bg-red-50  p-4 rounded-xl border border-red-100  mt-2">
+              <p className="text-sm text-red-600  font-semibold mb-1">Block Reason</p>
+              <p className="text-sm text-red-800 ">{batch.block_reason}</p>
             </div>
           )}
         </div>

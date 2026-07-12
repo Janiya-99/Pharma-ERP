@@ -5,7 +5,7 @@ const DepreciationLinesTable = ({ lines, loading }: { lines?: unknown; loading?:
     {
       key: "asset_code",
       label: "Asset Code",
-      render: (val: unknown, row: unknown) => <span className="font-medium text-navy-700 dark:text-white">{row.fixed_asset?.asset_code || val}</span>,
+      render: (val: unknown, row: unknown) => <span className="font-medium text-navy-700 ">{row.fixed_asset?.asset_code || val}</span>,
     },
     {
       key: "asset_name",
@@ -17,7 +17,7 @@ const DepreciationLinesTable = ({ lines, loading }: { lines?: unknown; loading?:
       label: "Depreciation Amount",
       align: "right",
       render: (val: unknown) => (
-        <span className="font-medium text-red-600 dark:text-red-400">
+        <span className="font-medium text-red-600 ">
           LKR {Number(val || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </span>
       ),

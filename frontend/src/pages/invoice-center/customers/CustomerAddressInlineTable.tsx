@@ -53,18 +53,18 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
-      <div className="flex items-center justify-between border-b border-gray-100 p-5 dark:border-navy-700">
+    <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm  ">
+      <div className="flex items-center justify-between border-b border-gray-100 p-5 ">
         <div className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-brand-500" />
-          <h3 className="text-lg font-bold text-navy-900 dark:text-white">
+          <h3 className="text-lg font-bold text-navy-900 ">
             Customer Addresses
           </h3>
         </div>
         <PermissionGuard permission="invoice_center.customer.update">
           <button
             onClick={() => setModalState({ isOpen: true, address: null })}
-            className="flex items-center gap-1.5 rounded-xl bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-600 transition-all hover:bg-brand-100 dark:bg-navy-700 dark:text-brand-400 dark:hover:bg-navy-600"
+            className="flex items-center gap-1.5 rounded-xl bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-600 transition-all hover:bg-brand-100   "
           >
             <Plus className="h-4 w-4" /> Add Address
           </button>
@@ -74,7 +74,7 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:bg-navy-700/50">
+            <tr className="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-gray-400 ">
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Type</th>
               <th className="px-4 py-3">Address</th>
@@ -83,12 +83,12 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 text-sm dark:divide-navy-700">
+          <tbody className="divide-y divide-gray-100 text-sm ">
             {addresses.length === 0 ? (
               <tr>
                 <td
                   colSpan={6}
-                  className="py-8 text-center text-gray-500 dark:text-gray-400"
+                  className="py-8 text-center text-gray-500 "
                 >
                   No branch or delivery addresses registered.
                 </td>
@@ -97,18 +97,18 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
               addresses.map((addr) => (
                 <tr
                   key={addr.id}
-                  className="transition-colors hover:bg-gray-50/80 dark:hover:bg-navy-700/50"
+                  className="transition-colors hover:bg-gray-50/80 "
                 >
-                  <td className="px-4 py-3 font-bold text-navy-900 dark:text-white">
+                  <td className="px-4 py-3 font-bold text-navy-900 ">
                     {addr.address_title}
                   </td>
                   <td className="px-4 py-3">
                     <AddressTypeBadge type={addr.address_type} />
                   </td>
-                  <td className="max-w-xs truncate px-4 py-3 text-gray-600 dark:text-gray-300">
+                  <td className="max-w-xs truncate px-4 py-3 text-gray-600 ">
                     {addr.street_address}
                   </td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                  <td className="px-4 py-3 text-gray-600 ">
                     {addr.city}{" "}
                     {addr.state_province ? `(${addr.state_province})` : ""}
                   </td>
@@ -125,7 +125,7 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
                           onClick={() =>
                             setModalState({ isOpen: true, address: addr })
                           }
-                          className="rounded-lg p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50 dark:hover:bg-navy-700"
+                          className="rounded-lg p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50 "
                           title="Edit Address"
                         >
                           <Edit className="h-4 w-4" />
@@ -134,7 +134,7 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
                           onClick={() =>
                             handleDelete(addr.id, addr.address_title)
                           }
-                          className="text-rose-600 hover:bg-rose-50 rounded-lg p-1.5 transition-colors dark:hover:bg-navy-700"
+                          className="text-rose-600 hover:bg-rose-50 rounded-lg p-1.5 transition-colors "
                           title="Delete Address"
                         >
                           <Trash2 className="h-4 w-4" />

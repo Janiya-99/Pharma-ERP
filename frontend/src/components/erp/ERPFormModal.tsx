@@ -146,10 +146,10 @@ export function ERPFormModal({
 
   return (
     <Sheet open={open} onOpenChange={(val: unknown) => !val && onClose()}>
-      <SheetContent side="right" className="w-[400px] sm:w-[540px] sm:max-w-none p-0 flex flex-col bg-gray-50 dark:bg-navy-900 border-none shadow-2xl">
+      <SheetContent side="right" className="w-[400px] sm:w-[540px] sm:max-w-none p-0 flex flex-col bg-gray-50  border-none shadow-2xl">
         {/* Header */}
-        <SheetHeader className="px-6 py-5 bg-white dark:bg-navy-800 border-b border-gray-100 dark:border-navy-700 text-left">
-          <SheetTitle className="text-lg font-bold text-navy-700 dark:text-white">{title}</SheetTitle>
+        <SheetHeader className="px-6 py-5 bg-white  border-b border-gray-100  text-left">
+          <SheetTitle className="text-lg font-bold text-navy-700 ">{title}</SheetTitle>
           {subtitle && (
             <SheetDescription className="text-[12px] text-gray-400 mt-0.5">{subtitle}</SheetDescription>
           )}
@@ -172,7 +172,7 @@ export function ERPFormModal({
                 key={field.key}
                 className={field.span === 2 ? "sm:col-span-2" : ""}
               >
-                <label className="block text-[13px] font-bold text-navy-700 dark:text-white mb-2">
+                <label className="block text-[13px] font-bold text-navy-700  mb-2">
                   {field.label}
                   {field.required && (
                     <span className="text-red-500 ml-0.5">*</span>
@@ -185,10 +185,10 @@ export function ERPFormModal({
                     onValueChange={(val: unknown) => { handleChange(field.key, val); setTouched((prev: unknown) => ({...prev, [field.key]: true})); }}
                     disabled={isPosted || field.disabled}
                   >
-                    <SelectTrigger className={`w-full rounded-xl border px-4 h-[44px] text-sm text-navy-700 dark:text-white bg-white dark:bg-navy-900 dark:border-white/10 focus:ring-2 focus:ring-offset-0 disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
+                    <SelectTrigger className={`w-full rounded-xl border px-4 h-[44px] text-sm text-navy-700  bg-white   focus:ring-2 focus:ring-offset-0 disabled:bg-gray-50  disabled:text-gray-400 disabled:cursor-not-allowed ${
                       errors[field.key] && touched[field.key]
-                        ? "border-red-300 focus:ring-red-50 dark:focus:ring-red-500/20"
-                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
+                        ? "border-red-300 focus:ring-red-50 "
+                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50  shadow-sm"
                     }`}>
                       <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
                     </SelectTrigger>
@@ -206,12 +206,12 @@ export function ERPFormModal({
                       <Button
                         variant={"outline"}
                         disabled={isPosted || field.disabled}
-                        className={`w-full justify-start text-left font-normal h-[44px] rounded-xl border px-4 bg-white dark:bg-navy-900 dark:border-white/10 text-navy-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
-                          !values[field.key] && "text-gray-400 dark:text-gray-500"
+                        className={`w-full justify-start text-left font-normal h-[44px] rounded-xl border px-4 bg-white   text-navy-700  hover:bg-gray-50  disabled:bg-gray-50  disabled:text-gray-400 disabled:cursor-not-allowed ${
+                          !values[field.key] && "text-gray-400 "
                         } ${
                           errors[field.key] && touched[field.key]
-                            ? "border-red-300 focus:ring-red-50 dark:focus:ring-red-500/20"
-                            : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
+                            ? "border-red-300 focus:ring-red-50 "
+                            : "border-gray-200 focus:border-brand-400 focus:ring-brand-50  shadow-sm"
                         }`}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -239,10 +239,10 @@ export function ERPFormModal({
                     disabled={isPosted || field.disabled}
                     placeholder={field.placeholder}
                     rows={3}
-                    className={`w-full rounded-xl border px-4 py-3 text-sm text-navy-700 dark:text-white bg-white dark:bg-navy-900 dark:border-white/10 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition-all resize-none disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
+                    className={`w-full rounded-xl border px-4 py-3 text-sm text-navy-700  bg-white   placeholder:text-gray-400  focus:outline-none focus:ring-2 transition-all resize-none disabled:bg-gray-50  disabled:text-gray-400 disabled:cursor-not-allowed ${
                       errors[field.key] && touched[field.key]
-                        ? "border-red-300 focus:border-red-400 focus:ring-red-50 dark:focus:ring-red-500/20"
-                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
+                        ? "border-red-300 focus:border-red-400 focus:ring-red-50 "
+                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50  shadow-sm"
                     }`}
                   />
                 ) : (
@@ -253,10 +253,10 @@ export function ERPFormModal({
                     onBlur={() => handleBlur(field.key)}
                     disabled={isPosted || field.disabled}
                     placeholder={field.placeholder}
-                    className={`w-full rounded-xl border px-4 h-[44px] text-sm text-navy-700 dark:text-white bg-white dark:bg-navy-900 dark:border-white/10 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition-all disabled:bg-gray-50 dark:disabled:bg-white/5 disabled:text-gray-400 disabled:cursor-not-allowed ${
+                    className={`w-full rounded-xl border px-4 h-[44px] text-sm text-navy-700  bg-white   placeholder:text-gray-400  focus:outline-none focus:ring-2 transition-all disabled:bg-gray-50  disabled:text-gray-400 disabled:cursor-not-allowed ${
                       errors[field.key] && touched[field.key]
-                        ? "border-red-300 focus:border-red-400 focus:ring-red-50 dark:focus:ring-red-500/20"
-                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50 dark:focus:ring-brand-400/20 shadow-sm"
+                        ? "border-red-300 focus:border-red-400 focus:ring-red-50 "
+                        : "border-gray-200 focus:border-brand-400 focus:ring-brand-50  shadow-sm"
                     }`}
                   />
                 )}
@@ -274,7 +274,7 @@ export function ERPFormModal({
 
         {/* Footer */}
         {!isPosted && (
-          <SheetFooter className="flex-row sm:justify-end gap-2 px-6 py-4 bg-white dark:bg-navy-800 border-t border-gray-100 dark:border-navy-700 mt-0 shrink-0">
+          <SheetFooter className="flex-row sm:justify-end gap-2 px-6 py-4 bg-white  border-t border-gray-100  mt-0 shrink-0">
             <button
               onClick={onClose}
               className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"

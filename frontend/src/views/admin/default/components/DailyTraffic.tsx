@@ -11,7 +11,7 @@ const DailyTraffic = () => {
           <p className="text-sm font-medium leading-4 text-gray-600">
             Daily Traffic
           </p>
-          <p className="text-[34px] font-bold text-navy-700 dark:text-white">
+          <p className="text-[34px] font-bold text-navy-700 ">
             2.579{" "}
             <span className="text-sm font-medium leading-6 text-gray-600">
               Visitors

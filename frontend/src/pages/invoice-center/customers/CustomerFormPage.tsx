@@ -112,7 +112,7 @@ const CustomerFormPage: React.FC = () => {
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
-      <div className="m-6 rounded-2xl border border-rose-200 bg-rose-50 p-8 text-center font-medium text-rose-600 dark:border-rose-800 dark:bg-rose-900/20 dark:text-rose-400">
+      <div className="m-6 rounded-2xl border border-rose-200 bg-rose-50 p-8 text-center font-medium text-rose-600   ">
         Please switch to Invoice Center module to access this page.
       </div>
     );

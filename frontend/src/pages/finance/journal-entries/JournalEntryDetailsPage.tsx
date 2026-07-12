@@ -79,11 +79,11 @@ export default function JournalEntryDetailsPage() {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => history.push("/admin/finance/journal-entries")}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100  transition-colors"
           >
-            <MdArrowBack className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+            <MdArrowBack className="h-6 w-6 text-gray-500 " />
           </button>
-          <h1 className="text-2xl font-bold text-navy-800 dark:text-white">
+          <h1 className="text-2xl font-bold text-navy-800 ">
             Journal Entry {journal.journal_number}
           </h1>
         </div>
@@ -95,22 +95,22 @@ export default function JournalEntryDetailsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Header Summary */}
         <div className="md:col-span-2 space-y-4">
-          <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
-            <h3 className="text-lg font-medium text-navy-800 dark:text-white mb-4">Details</h3>
+          <div className="bg-white  p-6 rounded-xl shadow-sm border border-gray-100 ">
+            <h3 className="text-lg font-medium text-navy-800  mb-4">Details</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-500 mb-1">Journal Date</p>
-                <p className="font-medium text-navy-800 dark:text-white">
+                <p className="font-medium text-navy-800 ">
                   {new Date(journal.journal_date).toLocaleDateString()}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500 mb-1">Reference Number</p>
-                <p className="font-medium text-navy-800 dark:text-white">{journal.reference_number || "-"}</p>
+                <p className="font-medium text-navy-800 ">{journal.reference_number || "-"}</p>
               </div>
               <div className="col-span-2">
                 <p className="text-gray-500 mb-1">Description</p>
-                <p className="font-medium text-navy-800 dark:text-white">{journal.description || "-"}</p>
+                <p className="font-medium text-navy-800 ">{journal.description || "-"}</p>
               </div>
               {journal.is_reversed && (
                 <div className="col-span-2 bg-orange-50 text-orange-800 p-3 rounded mt-2 border border-orange-200">
@@ -121,11 +121,11 @@ export default function JournalEntryDetailsPage() {
             </div>
           </div>
           
-          <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
-            <h3 className="text-lg font-medium text-navy-800 dark:text-white mb-4">Line Items</h3>
+          <div className="bg-white  p-6 rounded-xl shadow-sm border border-gray-100 ">
+            <h3 className="text-lg font-medium text-navy-800  mb-4">Line Items</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+                <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
                   <tr>
                     <th className="px-4 py-3">Account Code</th>
                     <th className="px-4 py-3">Account Name</th>
@@ -134,7 +134,7 @@ export default function JournalEntryDetailsPage() {
                     <th className="px-4 py-3 text-right">Credit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+                <tbody className="divide-y divide-gray-100 ">
                   {journal.lines?.map((line: unknown) => (
                     <tr key={line.id}>
                       <td className="px-4 py-3">{line.account?.account_code || "-"}</td>
@@ -144,10 +144,10 @@ export default function JournalEntryDetailsPage() {
                       <td className="px-4 py-3 text-right"><MoneyDisplay amount={line.credit_amount} /></td>
                     </tr>
                   ))}
-                  <tr className="bg-gray-50 dark:bg-navy-700/50 font-bold">
-                    <td colSpan="3" className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">Total</td>
-                    <td className="px-4 py-3 text-right text-navy-800 dark:text-white"><MoneyDisplay amount={journal.total_debit} /></td>
-                    <td className="px-4 py-3 text-right text-navy-800 dark:text-white"><MoneyDisplay amount={journal.total_credit} /></td>
+                  <tr className="bg-gray-50  font-bold">
+                    <td colSpan="3" className="px-4 py-3 text-right text-gray-700 ">Total</td>
+                    <td className="px-4 py-3 text-right text-navy-800 "><MoneyDisplay amount={journal.total_debit} /></td>
+                    <td className="px-4 py-3 text-right text-navy-800 "><MoneyDisplay amount={journal.total_credit} /></td>
                   </tr>
                 </tbody>
               </table>
@@ -157,8 +157,8 @@ export default function JournalEntryDetailsPage() {
 
         {/* Status & History */}
         <div className="space-y-4">
-          <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
-            <h3 className="text-lg font-medium text-navy-800 dark:text-white mb-4">Status</h3>
+          <div className="bg-white  p-6 rounded-xl shadow-sm border border-gray-100 ">
+            <h3 className="text-lg font-medium text-navy-800  mb-4">Status</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-500 text-sm">Approval Status</span>
@@ -168,7 +168,7 @@ export default function JournalEntryDetailsPage() {
                 <span className="text-gray-500 text-sm">Posted Status</span>
                 <PostedStatusBadge status={journal.posted_status} />
               </div>
-              <hr className="my-2 border-gray-100 dark:border-navy-700" />
+              <hr className="my-2 border-gray-100 " />
               <div className="text-sm space-y-2">
                 <p><span className="text-gray-500">Created:</span> {new Date(journal.created_at).toLocaleString()}</p>
                 {journal.approved_at && (
@@ -181,8 +181,8 @@ export default function JournalEntryDetailsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
-            <h3 className="text-lg font-medium text-navy-800 dark:text-white mb-4">Approval History</h3>
+          <div className="bg-white  p-6 rounded-xl shadow-sm border border-gray-100 ">
+            <h3 className="text-lg font-medium text-navy-800  mb-4">Approval History</h3>
             {journal.approvals?.length > 0 ? (
               <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
                 {journal.approvals.map((approval: unknown, idx: unknown) => (

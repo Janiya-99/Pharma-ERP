@@ -158,7 +158,7 @@ const StockAdjustmentsPage = () => {
         <Link
           to={`/inventory/stock-adjustments/${row.original.id}`}
           onClick={(e) => e.stopPropagation()}
-          className="text-brand-600 hover:text-brand-800 font-semibold dark:text-brand-400 dark:hover:text-brand-300"
+          className="text-brand-600 hover:text-brand-800 font-semibold  "
         >
           {row.original.adjustment_number}
         </Link>
@@ -245,8 +245,8 @@ const StockAdjustmentsPage = () => {
     <div className="p-6 max-w-[1600px] mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Stock Adjustments</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 ">Stock Adjustments</h1>
+          <p className="text-sm text-gray-500  mt-1">
             Manage physical counts, damages, expirations, and stock corrections
           </p>
         </div>
@@ -261,9 +261,9 @@ const StockAdjustmentsPage = () => {
         </PermissionGuard>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden mb-6">
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden mb-6">
         {/* Filters Grid */}
-        <div className="p-4 border-b border-gray-100 dark:border-navy-700 bg-gray-50/50 dark:bg-navy-800/50 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+        <div className="p-4 border-b border-gray-100  bg-gray-50/50  grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
           <div className="relative col-span-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -271,14 +271,14 @@ const StockAdjustmentsPage = () => {
               placeholder="Search ref/no..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
             />
           </div>
 
           <select
             value={branchFilter}
             onChange={(e) => setBranchFilter(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
           >
             <option value="">All Branches</option>
             {branches.map((b) => (
@@ -291,7 +291,7 @@ const StockAdjustmentsPage = () => {
           <select
             value={warehouseFilter}
             onChange={(e) => setWarehouseFilter(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
           >
             <option value="">All Warehouses</option>
             {warehouses.map((w) => (
@@ -304,7 +304,7 @@ const StockAdjustmentsPage = () => {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
           >
             <option value="">All Types</option>
             <option value="positive">Positive</option>
@@ -319,7 +319,7 @@ const StockAdjustmentsPage = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
           >
             <option value="">All Approval Statuses</option>
             <option value="draft">Draft</option>
@@ -332,7 +332,7 @@ const StockAdjustmentsPage = () => {
           <select
             value={postedStatusFilter}
             onChange={(e) => setPostedStatusFilter(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
           >
             <option value="">All Posting Statuses</option>
             <option value="unposted">Unposted</option>
@@ -345,7 +345,7 @@ const StockAdjustmentsPage = () => {
               placeholder="Start Date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
             />
           </div>
 
@@ -355,7 +355,7 @@ const StockAdjustmentsPage = () => {
               placeholder="End Date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white outline-none"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900  outline-none"
             />
           </div>
         </div>

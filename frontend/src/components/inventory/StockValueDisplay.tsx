@@ -8,7 +8,7 @@ const StockValueDisplay = ({ value }: { value?: unknown }) => {
   });
 
   return (
-    <div className="text-right tabular-nums whitespace-nowrap font-medium text-navy-700 dark:text-white">
+    <div className="text-right tabular-nums whitespace-nowrap font-medium text-navy-700 ">
       {formattedValue}
     </div>
   );

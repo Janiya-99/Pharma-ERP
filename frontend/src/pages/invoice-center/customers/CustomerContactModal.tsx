@@ -112,8 +112,8 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
         side="right"
         className="w-[calc(100vw-1rem)] overflow-y-auto rounded-l-xl border-slate-200 bg-white p-0 shadow-2xl sm:max-w-xl"
       >
-        <SheetHeader className="border-b border-gray-100 bg-gray-50 px-6 py-5 dark:border-navy-700 dark:bg-navy-900/50">
-          <SheetTitle className="text-lg font-bold text-navy-900 dark:text-white">
+        <SheetHeader className="border-b border-gray-100 bg-gray-50 px-6 py-5  ">
+          <SheetTitle className="text-lg font-bold text-navy-900 ">
             {contact ? "Edit Contact Person" : "Add Contact Person"}
           </SheetTitle>
         </SheetHeader>
@@ -137,7 +137,7 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
                 setFormData({ ...formData, contact_name: e.target.value })
               }
               placeholder="e.g. Dr. Samantha Silva"
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
             />
           </div>
 
@@ -153,7 +153,7 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
                   setFormData({ ...formData, designation: e.target.value })
                 }
                 placeholder="Chief Pharmacist"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
             <div>
@@ -167,7 +167,7 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
                   setFormData({ ...formData, department: e.target.value })
                 }
                 placeholder="Procurement"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
           </div>
@@ -184,7 +184,7 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
                   setFormData({ ...formData, email: e.target.value })
                 }
                 placeholder="samantha@hospital.com"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
             <div>
@@ -198,7 +198,7 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
                   setFormData({ ...formData, mobile: e.target.value })
                 }
                 placeholder="+94 77 987 6543"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
           </div>
@@ -215,11 +215,11 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
                   setFormData({ ...formData, phone: e.target.value })
                 }
                 placeholder="+94 11 222 3344"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
             <div className="flex items-center pt-6">
-              <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-navy-900 dark:text-white">
+              <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-navy-900 ">
                 <input
                   type="checkbox"
                   checked={formData.is_primary}
@@ -244,16 +244,16 @@ const CustomerContactModal: React.FC<CustomerContactModalProps> = ({
                 setFormData({ ...formData, notes: e.target.value })
               }
               placeholder="Availability, preferred calling times..."
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-navy-700">
+          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 ">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50   "
             >
               Cancel
             </button>

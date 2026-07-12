@@ -180,11 +180,11 @@ export default function ReceiptVoucherFormPage() {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => history.goBack()}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100  transition-colors"
           >
-            <MdArrowBack className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+            <MdArrowBack className="h-6 w-6 text-gray-500 " />
           </button>
-          <h1 className="text-2xl font-bold text-navy-800 dark:text-white">
+          <h1 className="text-2xl font-bold text-navy-800 ">
             {isEdit ? "Edit Receipt Voucher" : "Create Receipt Voucher"}
           </h1>
         </div>
@@ -204,11 +204,11 @@ export default function ReceiptVoucherFormPage() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700">
-        <h3 className="text-lg font-medium text-navy-800 dark:text-white mb-4">Header Information</h3>
+      <div className="bg-white  p-6 rounded-xl shadow-sm border border-gray-100 ">
+        <h3 className="text-lg font-medium text-navy-800  mb-4">Header Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Branch *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Branch *</label>
             <BranchSelector
               value={formData.branch_id}
               onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, branch_id: val }))}
@@ -216,14 +216,14 @@ export default function ReceiptVoucherFormPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Financial Year *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Financial Year *</label>
             <FinancialYearSelect
               value={formData.financial_year_id}
               onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, financial_year_id: val, accounting_period_id: "" }))}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Accounting Period *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Accounting Period *</label>
             <AccountingPeriodSelect
               financialYearId={formData.financial_year_id}
               value={formData.accounting_period_id}
@@ -231,7 +231,7 @@ export default function ReceiptVoucherFormPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Receipt Date *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Receipt Date *</label>
             <input
               type="date"
               value={formData.receipt_date}
@@ -240,7 +240,7 @@ export default function ReceiptVoucherFormPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Receipt Type *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Receipt Type *</label>
             <select
               value={formData.receipt_type}
               onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, receipt_type: e.target.value }))}
@@ -252,7 +252,7 @@ export default function ReceiptVoucherFormPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Receipt Method *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Receipt Method *</label>
             <select
               value={formData.receipt_method}
               onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, receipt_method: e.target.value }))}
@@ -266,7 +266,7 @@ export default function ReceiptVoucherFormPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Received To Account *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Received To Account *</label>
             <AccountSelect
               value={formData.received_to_account_id}
               onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, received_to_account_id: val }))}
@@ -276,7 +276,7 @@ export default function ReceiptVoucherFormPage() {
           {formData.receipt_method === "cheque" && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cheque Number *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Cheque Number *</label>
                 <input
                   type="text"
                   value={formData.cheque_number}
@@ -286,7 +286,7 @@ export default function ReceiptVoucherFormPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cheque Date *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Cheque Date *</label>
                 <input
                   type="date"
                   value={formData.cheque_date}
@@ -297,7 +297,7 @@ export default function ReceiptVoucherFormPage() {
             </>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reference Number</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Reference Number</label>
             <input
               type="text"
               value={formData.reference_number}
@@ -307,7 +307,7 @@ export default function ReceiptVoucherFormPage() {
             />
           </div>
           <div className="lg:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Description</label>
             <textarea
               value={formData.description}
               onChange={(e: any) => setFormData((prev: unknown) => ({ ...prev, description: e.target.value }))}

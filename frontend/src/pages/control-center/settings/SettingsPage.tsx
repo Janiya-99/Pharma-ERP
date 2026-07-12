@@ -31,7 +31,7 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col gap-6 py-4">
       <div>
-        <h1 className="text-xl font-bold text-navy-700 dark:text-white">System Settings</h1>
+        <h1 className="text-xl font-bold text-navy-700 ">System Settings</h1>
         <p className="text-sm text-gray-400">Configure global ERP system settings</p>
       </div>
       {settingGroups.map((g: any) => (

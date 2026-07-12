@@ -58,7 +58,7 @@ export default function PettyCashFundDetailsPage() {
       <div className="flex items-center gap-4 mb-2">
         <button
           onClick={() => history.push("/admin/finance/petty-cash-funds")}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-navy-800 border border-gray-200 dark:border-navy-700 text-gray-500 hover:text-brand-500 hover:border-brand-500 transition-colors shadow-sm"
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-white  border border-gray-200  text-gray-500 hover:text-brand-500 hover:border-brand-500 transition-colors shadow-sm"
           title="Back to List"
         >
           <MdArrowBack className="w-5 h-5" />
@@ -73,7 +73,7 @@ export default function PettyCashFundDetailsPage() {
         {hasPermission("finance.petty_cash_fund.update") && (
           <button
             onClick={() => history.push(`/admin/finance/petty-cash-funds/${fund.id}/edit`)}
-            className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-brand-600 shadow-sm ring-1 ring-inset ring-brand-200 hover:bg-brand-50 dark:bg-navy-800 dark:text-brand-400 dark:ring-navy-600 dark:hover:bg-navy-700"
+            className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-brand-600 shadow-sm ring-1 ring-inset ring-brand-200 hover:bg-brand-50    "
           >
             <MdEdit className="h-4 w-4" />
             Edit Fund
@@ -82,7 +82,7 @@ export default function PettyCashFundDetailsPage() {
         {hasPermission("finance.petty_cash_fund.delete") && (
           <button
             onClick={handleDelete}
-            className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-sm ring-1 ring-inset ring-red-200 hover:bg-red-50 dark:bg-navy-800 dark:text-red-400 dark:ring-navy-600 dark:hover:bg-navy-700"
+            className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-sm ring-1 ring-inset ring-red-200 hover:bg-red-50    "
           >
             <MdDelete className="h-4 w-4" />
             Delete Fund
@@ -92,48 +92,48 @@ export default function PettyCashFundDetailsPage() {
 
       <PettyCashBalanceCard fund={fund} />
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-        <h3 className="text-lg font-bold text-navy-700 dark:text-white border-b border-gray-100 dark:border-navy-700 pb-3 mb-4">
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+        <h3 className="text-lg font-bold text-navy-700  border-b border-gray-100  pb-3 mb-4">
           General Information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Fund Code</span>
-            <span className="block mt-1 text-base text-gray-900 dark:text-white font-medium">{fund.fund_code}</span>
+            <span className="block text-sm font-medium text-gray-500 ">Fund Code</span>
+            <span className="block mt-1 text-base text-gray-900  font-medium">{fund.fund_code}</span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Fund Name</span>
-            <span className="block mt-1 text-base text-gray-900 dark:text-white font-medium">{fund.fund_name}</span>
+            <span className="block text-sm font-medium text-gray-500 ">Fund Name</span>
+            <span className="block mt-1 text-base text-gray-900  font-medium">{fund.fund_name}</span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Branch</span>
-            <span className="block mt-1 text-base text-gray-900 dark:text-white">{fund.branch?.branch_name}</span>
+            <span className="block text-sm font-medium text-gray-500 ">Branch</span>
+            <span className="block mt-1 text-base text-gray-900 ">{fund.branch?.branch_name}</span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Cash Account</span>
-            <span className="block mt-1 text-base text-gray-900 dark:text-white">
+            <span className="block text-sm font-medium text-gray-500 ">Cash Account</span>
+            <span className="block mt-1 text-base text-gray-900 ">
               {fund.chart_of_account?.account_code} - {fund.chart_of_account?.account_name}
             </span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Custodian User</span>
-            <span className="block mt-1 text-base text-gray-900 dark:text-white">
+            <span className="block text-sm font-medium text-gray-500 ">Custodian User</span>
+            <span className="block mt-1 text-base text-gray-900 ">
               {fund.custodian_user?.name || fund.custodian_user?.full_name}
             </span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-1 ${fund.status === "active" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800" : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700"}`}>
+            <span className="block text-sm font-medium text-gray-500 ">Status</span>
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-1 ${fund.status === "active" ? "bg-green-100 text-green-800   border border-green-200 " : "bg-gray-100 text-gray-800   border border-gray-200 "}`}>
               {fund.status}
             </span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Created By</span>
-            <span className="block mt-1 text-base text-gray-900 dark:text-white">{fund.created_by_user?.name || fund.created_by_user?.full_name}</span>
+            <span className="block text-sm font-medium text-gray-500 ">Created By</span>
+            <span className="block mt-1 text-base text-gray-900 ">{fund.created_by_user?.name || fund.created_by_user?.full_name}</span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-gray-500 dark:text-gray-400">Created At</span>
-            <span className="block mt-1 text-base text-gray-900 dark:text-white">{new Date(fund.created_at).toLocaleString()}</span>
+            <span className="block text-sm font-medium text-gray-500 ">Created At</span>
+            <span className="block mt-1 text-base text-gray-900 ">{new Date(fund.created_at).toLocaleString()}</span>
           </div>
         </div>
       </div>

@@ -113,7 +113,7 @@ export default function AccountClassificationsPage() {
         }
       />
 
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-4">
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-4">
         {viewMode === "tree" ? (
           <AccountClassificationTree 
             data={treeData} 

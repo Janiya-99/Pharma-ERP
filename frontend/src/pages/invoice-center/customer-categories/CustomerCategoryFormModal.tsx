@@ -136,8 +136,8 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
         side="right"
         className="w-[calc(100vw-1rem)] overflow-y-auto rounded-l-xl border-slate-200 bg-white p-0 shadow-2xl sm:max-w-xl"
       >
-        <SheetHeader className="border-b border-gray-100 bg-gray-50 px-6 py-5 dark:border-navy-700 dark:bg-navy-900/50">
-          <SheetTitle className="text-lg font-bold text-navy-900 dark:text-white">
+        <SheetHeader className="border-b border-gray-100 bg-gray-50 px-6 py-5  ">
+          <SheetTitle className="text-lg font-bold text-navy-900 ">
             {category ? "Edit Customer Category" : "Create Customer Category"}
           </SheetTitle>
         </SheetHeader>
@@ -163,7 +163,7 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
                   setFormData({ ...formData, category_code: e.target.value })
                 }
                 placeholder="e.g. CAT-VIP"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 disabled:bg-gray-100 disabled:opacity-70 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 disabled:bg-gray-100 disabled:opacity-70  "
               />
             </div>
             <div>
@@ -178,7 +178,7 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
                   setFormData({ ...formData, category_name: e.target.value })
                 }
                 placeholder="e.g. VIP Hospitals"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
           </div>
@@ -194,7 +194,7 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
                 setFormData({ ...formData, description: e.target.value })
               }
               placeholder="Brief description of this customer category..."
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
             />
           </div>
 
@@ -212,7 +212,7 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
                   setFormData({ ...formData, credit_limit: e.target.value })
                 }
                 placeholder="0.00"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
             <div>
@@ -227,7 +227,7 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
                   setFormData({ ...formData, credit_days: e.target.value })
                 }
                 placeholder="30"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
           </div>
@@ -250,7 +250,7 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
                   })
                 }
                 placeholder="0.0"
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
               />
             </div>
             <div>
@@ -274,12 +274,12 @@ const CustomerCategoryFormModal: React.FC<CustomerCategoryFormModalProps> = ({
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-navy-700">
+          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 ">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50   "
             >
               Cancel
             </button>

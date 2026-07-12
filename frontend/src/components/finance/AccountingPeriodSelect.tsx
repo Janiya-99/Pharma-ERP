@@ -71,7 +71,7 @@ const AccountingPeriodSelect: React.FC<AccountingPeriodSelectProps> = ({
       <SelectTrigger
         className={
           className ||
-          "w-full border-gray-300 bg-white dark:border-navy-700 dark:bg-navy-900"
+          "w-full border-gray-300 bg-white  "
         }
       >
         <SelectValue
@@ -84,7 +84,7 @@ const AccountingPeriodSelect: React.FC<AccountingPeriodSelectProps> = ({
           }
         />
       </SelectTrigger>
-      <SelectContent className="bg-white dark:bg-navy-800">
+      <SelectContent className="bg-white ">
         {periods.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
             {item.period_name} ({item.start_date} to {item.end_date})

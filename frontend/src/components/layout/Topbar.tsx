@@ -1,11 +1,11 @@
 import React from "react";
 import { useAuth } from "../../auth/AuthContext";
 import { LogOut, ChevronRight, Menu } from "lucide-react";
-import BranchSwitcher from "./BranchSwitcher";
-import SoftwareSwitcher from "./SoftwareSwitcher";
 import { useLocation } from "react-router-dom";
 import { useSidebarState } from "./AppLayout";
 import { Button } from "../ui/button";
+import ModuleIconSwitcher from "./ModuleIconSwitcher";
+import BranchSwitcher from "./BranchSwitcher";
 
 // Map path segments to human-readable breadcrumb names
 const segmentLabel = (s: string) =>
@@ -31,9 +31,9 @@ const Topbar = () => {
     .slice(0, 2);
 
   return (
-    <header className="glass-header sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between px-3 md:px-4 lg:px-6">
-      {/* Left: Mobile menu toggle + Breadcrumb */}
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="glass-header sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between px-4 md:px-6 lg:px-8">
+      {/* Left Group: Menu, Breadcrumbs, Module Switcher, Branch Switcher, User Info */}
+      <div className="flex min-w-0 items-center gap-3 md:gap-4 lg:gap-6">
         {/* Mobile menu toggle — hidden on lg+ */}
         <button
           onClick={() => setMobileOpen(true)}
@@ -43,7 +43,7 @@ const Topbar = () => {
           <Menu className="h-5 w-5" />
         </button>
 
-        {/* Breadcrumbs — hidden on mobile for space */}
+        {/* 1. Breadcrumbs */}
         <div className="hidden min-w-0 items-center gap-1.5 text-sm sm:flex">
           {breadcrumbs.map((crumb, i) => (
             <React.Fragment key={i}>
@@ -62,17 +62,29 @@ const Topbar = () => {
             </React.Fragment>
           ))}
         </div>
+
+        <div className="hidden md:block mx-1 h-6 w-px bg-slate-200/80" />
+
+        {/* 2. Module Icons Switcher */}
+        <div className="hidden md:block">
+          <ModuleIconSwitcher />
+        </div>
+
+        <div className="hidden md:block mx-1 h-6 w-px bg-slate-200/80" />
+
+        {/* 3. Branch Switcher */}
+        <div className="hidden md:block">
+          <BranchSwitcher />
+        </div>
+
+        <div className="hidden md:block mx-1 h-6 w-px bg-slate-200/80" />
+
       </div>
 
-      {/* Center: Switchers — wrapped on small screens */}
-      <div className="mx-2 flex items-center gap-2 md:mx-4">
-        <BranchSwitcher />
-        <SoftwareSwitcher />
-      </div>
-
-      {/* Right: User info + Logout */}
-      <div className="flex shrink-0 items-center gap-2 md:gap-3">
-        <div className="flex items-center gap-2.5">
+      {/* Right Group: User Info & Logout */}
+      <div className="flex shrink-0 items-center gap-4 pl-2">
+        {/* 4. User Info */}
+        <div className="hidden items-center gap-2.5 sm:flex">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-[#4854CC] text-xs font-bold text-white shadow-sm overflow-hidden">
             {user?.avatar_url ? (
               <img src={user.avatar_url} alt="Profile" className="h-full w-full object-cover" />
@@ -80,16 +92,17 @@ const Topbar = () => {
               initials
             )}
           </div>
-          <div className="hidden text-right sm:block">
-            <p className="text-sm font-semibold leading-none text-[#111827]">
+          <div className="text-left">
+            <p className="text-sm font-semibold leading-none text-[#111827] max-w-[120px] truncate">
               {user?.name || user?.full_name || "User"}
             </p>
-            <p className="mt-0.5 text-[10px] leading-none text-[#6B7280]">
+            <p className="mt-0.5 text-[10px] leading-none text-[#6B7280] max-w-[120px] truncate">
               {company?.company_name || "Pharma ERP"}
             </p>
           </div>
         </div>
-        <div className="mx-1 hidden h-6 w-px bg-slate-200/80 sm:block" />
+        
+        <div className="hidden sm:block h-6 w-px bg-slate-200/80" />
         <Button
           variant="destructive"
           size="sm"

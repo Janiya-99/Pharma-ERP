@@ -133,22 +133,22 @@ const AccessAuditPage = () => {
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <FileText className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Control Center • Compliance & Governance
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Access Audit & Authorization Logs
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Immutable security telemetry tracking permission checks, privilege assignments, and authentication anomalies
           </p>
         </div>
@@ -158,7 +158,7 @@ const AccessAuditPage = () => {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
+            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200  bg-white  px-4 text-sm font-semibold text-slate-700  hover:bg-slate-50  transition-all shadow-sm"
           >
             <RefreshCw className={`h-4 w-4 text-indigo-600 ${isRefreshing ? "animate-spin" : ""}`} />
             {isRefreshing ? "Syncing Logs..." : "Refresh Telemetry"}
@@ -172,61 +172,61 @@ const AccessAuditPage = () => {
 
       {/* ── KPI Summary Cards ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Total Logged Events
             </span>
-            <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/50 p-2 text-indigo-600 dark:text-indigo-400">
+            <div className="rounded-lg bg-indigo-50  p-2 text-indigo-600 ">
               <FileText className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">14,280</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">14,280</p>
           <p className="mt-1 text-xs text-slate-400 font-medium">+340 events today</p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Authorized Checks
             </span>
-            <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 p-2 text-emerald-600 dark:text-emerald-400">
+            <div className="rounded-lg bg-emerald-50  p-2 text-emerald-600 ">
               <CheckCircle2 className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">98.4%</p>
-          <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">14,050 successful verifications</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">98.4%</p>
+          <p className="mt-1 text-xs text-emerald-600  font-medium">14,050 successful verifications</p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Denied / Blocked Actions
             </span>
-            <div className="rounded-lg bg-rose-50 dark:bg-rose-950/50 p-2 text-rose-600 dark:text-rose-400">
+            <div className="rounded-lg bg-rose-50  p-2 text-rose-600 ">
               <XCircle className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">194</p>
-          <p className="mt-1 text-xs text-rose-600 dark:text-rose-400 font-medium">1.4% unauthorized attempts</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">194</p>
+          <p className="mt-1 text-xs text-rose-600  font-medium">1.4% unauthorized attempts</p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Security Anomaly Alerts
             </span>
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/50 p-2 text-amber-600 dark:text-amber-400">
+            <div className="rounded-lg bg-amber-50  p-2 text-amber-600 ">
               <ShieldAlert className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-amber-600 dark:text-amber-400">36</p>
-          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 font-medium">Flagged IP anomalies / brute force</p>
+          <p className="mt-2 text-3xl font-extrabold text-amber-600 ">36</p>
+          <p className="mt-1 text-xs text-amber-600  font-medium">Flagged IP anomalies / brute force</p>
         </div>
       </div>
 
       {/* ── Filter Bar ── */}
-      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 rounded-xl border border-slate-200  bg-white  p-4 shadow-sm md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 items-center gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -235,7 +235,7 @@ const AccessAuditPage = () => {
               placeholder="Search by User, Event ID, Target, or IP..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  pl-10 pr-4 text-sm text-slate-900  placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
             />
           </div>
         </div>
@@ -244,7 +244,7 @@ const AccessAuditPage = () => {
           <select
             value={selectedAction}
             onChange={(e) => setSelectedAction(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="h-10 rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="ALL">All Event Types</option>
             <option value="PERMISSION_CHECK">Permission Check</option>
@@ -256,7 +256,7 @@ const AccessAuditPage = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="h-10 rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="ALL">All Statuses</option>
             <option value="SUCCESS">Authorized / Success</option>
@@ -267,7 +267,7 @@ const AccessAuditPage = () => {
           <select
             value={selectedTimeframe}
             onChange={(e) => setSelectedTimeframe(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="h-10 rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="24H">Last 24 Hours</option>
             <option value="7D">Last 7 Days</option>
@@ -277,11 +277,11 @@ const AccessAuditPage = () => {
       </div>
 
       {/* ── Audit Logs Table ── */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-slate-200  bg-white  shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <tr className="border-b border-slate-200  bg-slate-50/50  text-xs font-bold uppercase tracking-wider text-slate-400">
                 <th className="px-5 py-3.5">Event ID & Time</th>
                 <th className="px-4 py-3.5">User & Role</th>
                 <th className="px-4 py-3.5">Action & Module</th>
@@ -291,52 +291,52 @@ const AccessAuditPage = () => {
                 <th className="px-5 py-3.5 text-right pr-4">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100 ">
               {filteredEvents.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-slate-500 ">
                     No audit logs matching the selected filters and search query.
                   </td>
                 </tr>
               ) : (
                 filteredEvents.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr key={row.id} className="hover:bg-slate-50  transition-colors">
                     <td className="px-5 py-4">
-                      <p className="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">{row.id}</p>
+                      <p className="font-mono font-bold text-xs text-indigo-600 ">{row.id}</p>
                       <span className="text-[11px] text-slate-400 font-mono">{row.timestamp}</span>
                     </td>
                     <td className="px-4 py-4">
-                      <p className="font-semibold text-slate-800 dark:text-slate-200">{row.user}</p>
+                      <p className="font-semibold text-slate-800 ">{row.user}</p>
                       <span className="text-[11px] text-slate-400 font-medium">{row.role}</span>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-slate-100  px-2 py-0.5 text-xs font-bold text-slate-700 ">
                         {row.action}
                       </span>
                       <p className="text-[11px] text-slate-400 font-medium mt-1">{row.module}</p>
                     </td>
                     <td className="px-4 py-4 max-w-xs">
-                      <p className="font-medium text-slate-800 dark:text-slate-200 text-xs line-clamp-2" title={row.target}>
+                      <p className="font-medium text-slate-800  text-xs line-clamp-2" title={row.target}>
                         {row.target}
                       </p>
                     </td>
                     <td className="px-4 py-4">
-                      <p className="font-mono text-xs font-medium text-slate-700 dark:text-slate-300">{row.ipAddress}</p>
+                      <p className="font-mono text-xs font-medium text-slate-700 ">{row.ipAddress}</p>
                       <span className="text-[11px] text-slate-400 flex items-center gap-1">
                         <Globe className="h-3 w-3" /> {row.location}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-center">
                       {row.status === "SUCCESS" ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 px-2.5 py-0.5 text-[11px] font-bold">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700   border border-emerald-200/60  px-2.5 py-0.5 text-[11px] font-bold">
                           <CheckCircle2 className="h-3 w-3" /> SUCCESS
                         </span>
                       ) : row.status === "DENIED" ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60 px-2.5 py-0.5 text-[11px] font-bold">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700   border border-rose-200/60  px-2.5 py-0.5 text-[11px] font-bold">
                           <XCircle className="h-3 w-3" /> DENIED
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700   border border-amber-200/60  px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
                           <AlertTriangle className="h-3 w-3" /> FLAGGED
                         </span>
                       )}
@@ -344,7 +344,7 @@ const AccessAuditPage = () => {
                     <td className="px-5 py-4 text-right pr-4">
                       <button
                         onClick={() => setSelectedEvent(row)}
-                        className="rounded-lg border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors inline-flex items-center gap-1"
+                        className="rounded-lg border border-slate-200  px-2.5 py-1.5 text-xs font-semibold text-slate-700  hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors inline-flex items-center gap-1"
                       >
                         <Eye className="h-3.5 w-3.5" /> Inspect
                       </button>
@@ -360,14 +360,14 @@ const AccessAuditPage = () => {
       {/* ── Inspector Modal / Drawer ── */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-in fade-in-50">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-slate-200  bg-white  p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100  pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/50 p-2 text-indigo-600 dark:text-indigo-400">
+                <div className="rounded-lg bg-indigo-50  p-2 text-indigo-600 ">
                   <Terminal className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-slate-900 ">
                     Audit Event Payload Inspector
                   </h3>
                   <p className="text-xs font-mono text-slate-400">{selectedEvent.id} • {selectedEvent.timestamp}</p>
@@ -375,33 +375,33 @@ const AccessAuditPage = () => {
               </div>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100  hover:text-slate-700"
               >
                 ✕
               </button>
             </div>
 
             <div className="mt-6 space-y-4 text-sm">
-              <div className="grid grid-cols-2 gap-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4">
+              <div className="grid grid-cols-2 gap-4 rounded-xl bg-slate-50  p-4">
                 <div>
                   <span className="block text-xs font-bold uppercase text-slate-400">Actor Account</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{selectedEvent.user}</span>
+                  <span className="font-semibold text-slate-900 ">{selectedEvent.user}</span>
                   <span className="block text-xs text-slate-500">{selectedEvent.email} ({selectedEvent.role})</span>
                 </div>
                 <div>
                   <span className="block text-xs font-bold uppercase text-slate-400">Network & Origin</span>
-                  <span className="font-mono font-medium text-slate-900 dark:text-white">{selectedEvent.ipAddress}</span>
+                  <span className="font-mono font-medium text-slate-900 ">{selectedEvent.ipAddress}</span>
                   <span className="block text-xs text-slate-500">{selectedEvent.location}</span>
                 </div>
               </div>
 
               <div>
                 <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Action Telemetry</span>
-                <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-3.5">
-                  <p className="font-bold text-slate-800 dark:text-slate-200">
+                <div className="rounded-xl border border-slate-200  p-3.5">
+                  <p className="font-bold text-slate-800 ">
                     [{selectedEvent.action}] → {selectedEvent.module}
                   </p>
-                  <p className="mt-1 font-mono text-xs text-indigo-600 dark:text-indigo-400">
+                  <p className="mt-1 font-mono text-xs text-indigo-600 ">
                     Target: {selectedEvent.target}
                   </p>
                 </div>
@@ -420,10 +420,10 @@ const AccessAuditPage = () => {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 pt-4">
+            <div className="mt-6 flex justify-end gap-3 border-t border-slate-100  pt-4">
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="rounded-xl bg-slate-100 dark:bg-slate-800 px-5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors"
+                className="rounded-xl bg-slate-100  px-5 py-2 text-xs font-semibold text-slate-700  hover:bg-slate-200 transition-colors"
               >
                 Close Inspector
               </button>

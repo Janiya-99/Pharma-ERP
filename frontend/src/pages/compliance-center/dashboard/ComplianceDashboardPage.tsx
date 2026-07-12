@@ -103,22 +103,22 @@ const ComplianceDashboardPage = () => {
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Compliance Center • Regulatory Governance
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Regulatory Compliance & Quality Dashboard
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Real-time telemetry on NMRA licensing, quality holds, drug recalls, and pharmaceutical expiry disposals
           </p>
         </div>
@@ -128,7 +128,7 @@ const ComplianceDashboardPage = () => {
           <select
             value={selectedFacility}
             onChange={(e) => setSelectedFacility(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
+            className="h-10 rounded-xl border border-slate-200  bg-white  px-3.5 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
           >
             <option value="ALL">All Facilities & Warehouses</option>
             <option value="HQ">Colombo Central Warehouse</option>
@@ -139,7 +139,7 @@ const ComplianceDashboardPage = () => {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
+            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200  bg-white  px-4 text-sm font-semibold text-slate-700  hover:bg-slate-50  transition-all shadow-sm"
           >
             <RefreshCw className={`h-4 w-4 text-indigo-600 ${isRefreshing ? "animate-spin" : ""}`} />
             {isRefreshing ? "Syncing NMRA..." : "Refresh Status"}
@@ -154,39 +154,39 @@ const ComplianceDashboardPage = () => {
       {/* ── Tier 1: KPI Summary Cards ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Active Licenses */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Active NMRA & IRAS Licenses
             </span>
-            <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/50 p-2 text-indigo-600 dark:text-indigo-400">
+            <div className="rounded-lg bg-indigo-50  p-2 text-indigo-600 ">
               <FileCheck className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">24</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">24</p>
           <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+            <span className="text-emerald-600  font-bold flex items-center gap-1">
               <CheckCircle2 className="h-3.5 w-3.5" /> 100% Compliant
             </span>
-            <span className="rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold px-1.5 py-0.5 text-[10px]">
+            <span className="rounded bg-amber-100  text-amber-800  font-bold px-1.5 py-0.5 text-[10px]">
               2 Expiring in 30D
             </span>
           </div>
         </div>
 
         {/* Batches Under Quarantine */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Batches Under Quarantine
             </span>
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/50 p-2 text-amber-600 dark:text-amber-400">
+            <div className="rounded-lg bg-amber-50  p-2 text-amber-600 ">
               <Pill className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">14</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">14</p>
           <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="text-amber-600 dark:text-amber-400 font-semibold">
+            <span className="text-amber-600  font-semibold">
               4.2M LKR Stock Value Held
             </span>
             <span className="text-slate-400 font-medium">Pending QC Assay</span>
@@ -194,18 +194,18 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Active Product Recalls */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Active Product Recalls
             </span>
-            <div className="rounded-lg bg-rose-50 dark:bg-rose-950/50 p-2 text-rose-600 dark:text-rose-400">
+            <div className="rounded-lg bg-rose-50  p-2 text-rose-600 ">
               <RotateCcw className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-rose-600 dark:text-rose-400">3</p>
+          <p className="mt-2 text-3xl font-extrabold text-rose-600 ">3</p>
           <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1">
+            <span className="text-rose-600  font-bold flex items-center gap-1">
               <AlertTriangle className="h-3.5 w-3.5" /> Class II Safety Alert
             </span>
             <span className="text-slate-400 font-medium">82% Recovered</span>
@@ -213,18 +213,18 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Pending Expiry Disposals */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm relative overflow-hidden">
+        <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
               Pending Expiry Disposals
             </span>
-            <div className="rounded-lg bg-purple-50 dark:bg-purple-950/50 p-2 text-purple-600 dark:text-purple-400">
+            <div className="rounded-lg bg-purple-50  p-2 text-purple-600 ">
               <Trash2 className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">8</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">8</p>
           <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="text-purple-600 dark:text-purple-400 font-semibold">
+            <span className="text-purple-600  font-semibold">
               5.19M LKR Write-off Value
             </span>
             <span className="text-slate-400 font-medium">Awaiting Witness</span>
@@ -235,17 +235,17 @@ const ComplianceDashboardPage = () => {
       {/* ── Tier 2: Tremor Analytics Charts ── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Pass Rate Area Chart */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-2">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Quality Assurance Pass Rate & NMRA Compliance Index
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Monthly trajectory of batch QC approvals vs regulatory inspection scores
               </p>
             </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50  px-3 py-1 text-xs font-bold text-emerald-700  border border-emerald-200/60 ">
               <TrendingUp className="h-3.5 w-3.5" /> +1.2% vs H2 2025
             </span>
           </div>
@@ -263,12 +263,12 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Quarantine Reasons Donut Chart */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-slate-900 ">
               Quarantine Root Causes
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500 ">
               Breakdown of 14 active batch holds
             </p>
             <DonutChart
@@ -282,9 +282,9 @@ const ComplianceDashboardPage = () => {
               label="14 Batches"
             />
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+          <div className="mt-4 pt-4 border-t border-slate-100  text-xs text-slate-500  flex items-center justify-between">
             <span>Primary driver: Cold chain excursion</span>
-            <span className="font-bold text-indigo-600 dark:text-indigo-400">45%</span>
+            <span className="font-bold text-indigo-600 ">45%</span>
           </div>
         </div>
       </div>
@@ -292,11 +292,11 @@ const ComplianceDashboardPage = () => {
       {/* ── Tier 3: Bar Chart & Recent Activity Table ── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Expiry Write-Off Bar Chart */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-900 ">
             Expiry Write-off Value by Category
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+          <p className="text-xs text-slate-500  mb-4">
             Total pending disposal value: <b>5,190,000 LKR</b>
           </p>
           <BarChart
@@ -313,18 +313,18 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Recent Regulatory Actions Table */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200  bg-white  p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   Live Regulatory Audit Trail
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 ">
                   Recent licensing actions, quality quarantine triggers, and incineration witnessing
                 </p>
               </div>
-              <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+              <span className="text-xs font-semibold text-indigo-600  hover:underline cursor-pointer">
                 View All Records →
               </span>
             </div>
@@ -332,7 +332,7 @@ const ComplianceDashboardPage = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <tr className="border-b border-slate-200  bg-slate-50/50  text-xs font-bold uppercase tracking-wider text-slate-400">
                     <th className="px-4 py-3">ID & Timestamp</th>
                     <th className="px-4 py-3">Action Type</th>
                     <th className="px-4 py-3">Target Subject</th>
@@ -340,36 +340,36 @@ const ComplianceDashboardPage = () => {
                     <th className="px-4 py-3 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100 ">
                   {recentRegulatoryActions.map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <tr key={row.id} className="hover:bg-slate-50  transition-colors">
                       <td className="px-4 py-3.5">
-                        <p className="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">{row.id}</p>
+                        <p className="font-mono font-bold text-xs text-indigo-600 ">{row.id}</p>
                         <span className="text-[11px] text-slate-400 font-medium">{row.timestamp}</span>
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-100  px-2 py-0.5 text-xs font-bold text-slate-700 ">
                           {row.type}
                         </span>
                       </td>
                       <td className="px-4 py-3.5 max-w-xs">
-                        <p className="font-bold text-slate-800 dark:text-slate-200 text-xs line-clamp-1">{row.target}</p>
+                        <p className="font-bold text-slate-800  text-xs line-clamp-1">{row.target}</p>
                         <span className="text-[11px] text-slate-400 line-clamp-1">{row.notes}</span>
                       </td>
-                      <td className="px-4 py-3.5 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                      <td className="px-4 py-3.5 text-xs font-semibold text-slate-600 ">
                         {row.authority}
                       </td>
                       <td className="px-4 py-3.5 text-right">
                         {row.status === "COMPLETED" ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 px-2.5 py-0.5 text-[11px] font-bold">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700   border border-emerald-200/60  px-2.5 py-0.5 text-[11px] font-bold">
                             <CheckCircle2 className="h-3 w-3" /> COMPLETED
                           </span>
                         ) : row.status === "IN_PROGRESS" ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 px-2.5 py-0.5 text-[11px] font-bold">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700   border border-amber-200/60  px-2.5 py-0.5 text-[11px] font-bold">
                             <Clock className="h-3 w-3" /> IN PROGRESS
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60 px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700   border border-rose-200/60  px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
                             <AlertTriangle className="h-3 w-3" /> INVESTIGATION
                           </span>
                         )}
@@ -380,9 +380,9 @@ const ComplianceDashboardPage = () => {
               </table>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-4 pt-4 border-t border-slate-100  flex items-center justify-between text-xs text-slate-500 ">
             <span>All regulatory records are cryptographically timestamped and immutable.</span>
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400">OMACX Compliance Engine v2.4</span>
+            <span className="font-semibold text-indigo-600 ">OMACX Compliance Engine v2.4</span>
           </div>
         </div>
       </div>

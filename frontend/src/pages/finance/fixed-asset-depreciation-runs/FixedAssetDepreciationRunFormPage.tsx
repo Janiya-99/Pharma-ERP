@@ -148,7 +148,7 @@ const FixedAssetDepreciationRunFormPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-navy-900 pb-10 overflow-y-auto">
+    <div className="flex flex-col h-full bg-gray-50  pb-10 overflow-y-auto">
       <PageHeader
         title="Create Depreciation Run"
         breadcrumb={[
@@ -162,7 +162,7 @@ const FixedAssetDepreciationRunFormPage = () => {
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => history.push("/admin/finance/fixed-asset-depreciation-runs")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
           </button>
@@ -171,7 +171,7 @@ const FixedAssetDepreciationRunFormPage = () => {
             <button
               onClick={handlePreview}
               disabled={previewing || saving}
-              className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 transition-all rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700 shadow-sm disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 transition-all rounded-xl hover:bg-gray-50     shadow-sm disabled:opacity-50"
             >
               <Eye className="w-4 h-4" /> {previewing ? "Previewing..." : "Preview Depreciation"}
             </button>
@@ -185,17 +185,17 @@ const FixedAssetDepreciationRunFormPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 p-6 mb-6">
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-6 border-b border-gray-100 dark:border-navy-700 pb-3">
+        <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6 mb-6">
+          <h3 className="text-lg font-bold text-navy-700  mb-6 border-b border-gray-100  pb-3">
             Run Configuration
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Branch (Optional)
               </label>
               <select
-                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                 value={formData.branch_id}
                 onChange={(e: any) => setFormData({ ...formData, branch_id: e.target.value })}
               >
@@ -206,12 +206,12 @@ const FixedAssetDepreciationRunFormPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Run Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.run_date ? "border-red-500" : "border-gray-200"
                 }`}
                 value={formData.run_date}
@@ -222,11 +222,11 @@ const FixedAssetDepreciationRunFormPage = () => {
             <div></div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Financial Year <span className="text-red-500">*</span>
               </label>
               <select
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.financial_year_id ? "border-red-500" : "border-gray-200"
                 }`}
                 value={formData.financial_year_id}
@@ -240,11 +240,11 @@ const FixedAssetDepreciationRunFormPage = () => {
               {errors.financial_year_id && <span className="text-xs text-red-500 mt-1">{errors.financial_year_id}</span>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Accounting Period <span className="text-red-500">*</span>
               </label>
               <select
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.accounting_period_id ? "border-red-500" : "border-gray-200"
                 }`}
                 value={formData.accounting_period_id}
@@ -261,12 +261,12 @@ const FixedAssetDepreciationRunFormPage = () => {
             <div></div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Depreciation From Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.depreciation_from_date ? "border-red-500" : "border-gray-200"
                 }`}
                 value={formData.depreciation_from_date}
@@ -275,12 +275,12 @@ const FixedAssetDepreciationRunFormPage = () => {
               {errors.depreciation_from_date && <span className="text-xs text-red-500 mt-1">{errors.depreciation_from_date}</span>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Depreciation To Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
-                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all ${
+                className={`w-full p-2.5 border rounded-xl outline-none focus:border-brand-500 bg-white    transition-all ${
                   errors.depreciation_to_date ? "border-red-500" : "border-gray-200"
                 }`}
                 value={formData.depreciation_to_date}
@@ -290,11 +290,11 @@ const FixedAssetDepreciationRunFormPage = () => {
             </div>
             
             <div className="md:col-span-2 lg:col-span-3">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Remarks
               </label>
               <textarea
-                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 dark:text-white transition-all"
+                className="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-brand-500 bg-white    transition-all"
                 placeholder="Enter remarks..."
                 rows="2"
                 value={formData.remarks}

@@ -13,7 +13,7 @@ export function FinanceReportShortcuts() {
   ];
 
   return (
-    <Card className="border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
+    <Card className="border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm  ">
       <CardHeader className="pb-3">
         <CardTitle>Core Reports</CardTitle>
         <CardDescription>Essential financial statements</CardDescription>
@@ -25,14 +25,14 @@ export function FinanceReportShortcuts() {
             return (
               <div
                 key={idx}
-                className="group flex cursor-pointer items-start gap-3 rounded-md p-2 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                className="group flex cursor-pointer items-start gap-3 rounded-md p-2 transition-colors hover:bg-slate-50 "
                 onClick={() => navigate(report.path)}
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-100  ">
                   <Icon className="h-4 w-4" />
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-gray-900 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
+                  <div className="text-sm font-medium text-gray-900 group-hover:text-indigo-600  ">
                     {report.title}
                   </div>
                   <div className="text-xs text-gray-500">{report.desc}</div>

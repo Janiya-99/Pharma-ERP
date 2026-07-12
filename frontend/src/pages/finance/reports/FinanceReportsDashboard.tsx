@@ -94,32 +94,32 @@ const FinanceReportsDashboard = () => {
       />
 
       {visibleCards.length === 0 ? (
-        <div className="bg-white dark:bg-navy-800 rounded-lg shadow p-8 text-center border border-gray-200 dark:border-navy-700">
+        <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
           <FileText className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No Reports Available</h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="mt-4 text-lg font-medium text-gray-900 ">No Reports Available</h3>
+          <p className="mt-2 text-sm text-gray-500 ">
             You do not have permission to view any finance reports. Contact your administrator to request access.
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {visibleCards.map((card: unknown, index: unknown) => (
-            <Card key={index} className="flex flex-col border-gray-200 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow">
+            <Card key={index} className="flex flex-col border-gray-200  shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                <div className="p-3 bg-gray-50 dark:bg-navy-900 rounded-lg">
+                <div className="p-3 bg-gray-50  rounded-lg">
                   {card.icon}
                 </div>
                 <div>
-                  <CardTitle className="text-lg text-navy-800 dark:text-white">{card.title}</CardTitle>
+                  <CardTitle className="text-lg text-navy-800 ">{card.title}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="flex-1">
-                <p className="text-sm text-gray-500 dark:text-gray-400">{card.description}</p>
+                <p className="text-sm text-gray-500 ">{card.description}</p>
               </CardContent>
-              <CardFooter className="pt-4 border-t border-gray-100 dark:border-navy-700">
+              <CardFooter className="pt-4 border-t border-gray-100 ">
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-between hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-navy-900 dark:hover:text-white"
+                  className="w-full justify-between hover:bg-brand-50 hover:text-brand-600  "
                   onClick={() => navigate(card.path)}
                 >
                   Open Report

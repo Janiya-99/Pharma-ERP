@@ -262,7 +262,7 @@ const StockAdjustmentLinesTable = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+        <h4 className="text-sm font-medium text-gray-900 ">
           Adjustment Lines
         </h4>
         <div className="flex items-center gap-2">
@@ -270,7 +270,7 @@ const StockAdjustmentLinesTable = ({
             <button
               type="button"
               onClick={() => setLines([])}
-              className="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 dark:bg-navy-700/50 dark:text-red-400 dark:hover:bg-navy-600"
+              className="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100   "
             >
               Clear All
             </button>
@@ -278,7 +278,7 @@ const StockAdjustmentLinesTable = ({
           <button
             type="button"
             onClick={addLine}
-            className="flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-600 transition-colors hover:bg-brand-100 dark:bg-navy-700 dark:text-brand-400 dark:hover:bg-navy-600"
+            className="flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-600 transition-colors hover:bg-brand-100   "
           >
             <Plus className="h-4 w-4" />
             Add Line
@@ -292,10 +292,10 @@ const StockAdjustmentLinesTable = ({
         </p>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-navy-700">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 ">
         <table className="w-full min-w-[1500px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50 dark:border-navy-700 dark:bg-navy-800">
+            <tr className="border-b border-gray-200 bg-gray-50  ">
               <th className="w-8 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 #
               </th>
@@ -352,12 +352,12 @@ const StockAdjustmentLinesTable = ({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-navy-700">
+          <tbody className="divide-y divide-gray-200 ">
             {lines.length === 0 ? (
               <tr>
                 <td
                   colSpan={12}
-                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                  className="px-4 py-8 text-center text-gray-500 "
                 >
                   No lines added. Click "Add Line" to begin.
                 </td>
@@ -388,8 +388,8 @@ const StockAdjustmentLinesTable = ({
                 const totalCost = absQty * (line.unit_cost || 0);
 
                 return (
-                  <tr key={line.id} className="group bg-white dark:bg-navy-900">
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                  <tr key={line.id} className="group bg-white ">
+                    <td className="px-4 py-3 text-sm text-gray-500 ">
                       {index + 1}
                     </td>
 
@@ -459,7 +459,7 @@ const StockAdjustmentLinesTable = ({
                               Loading...
                             </span>
                           ) : (
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            <span className="text-sm font-medium text-gray-900 ">
                               {(line.system_quantity || 0).toFixed(3)}
                             </span>
                           )}
@@ -477,10 +477,10 @@ const StockAdjustmentLinesTable = ({
                                 e.target.value
                               )
                             }
-                            className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
+                            className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   ${
                               qtyError
                                 ? "border-red-300"
-                                : "border-gray-200 dark:border-navy-600"
+                                : "border-gray-200 "
                             }`}
                             placeholder="Count..."
                           />
@@ -523,7 +523,7 @@ const StockAdjustmentLinesTable = ({
                               Loading...
                             </span>
                           ) : (
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            <span className="text-sm font-medium text-gray-900 ">
                               {(line.system_quantity || 0).toFixed(3)}
                             </span>
                           )}
@@ -542,10 +542,10 @@ const StockAdjustmentLinesTable = ({
                                 line.adjustment_direction === "in" ? val : -val
                               );
                             }}
-                            className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 dark:bg-navy-900 dark:text-white ${
+                            className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   ${
                               qtyError
                                 ? "border-red-300"
-                                : "border-gray-200 dark:border-navy-600"
+                                : "border-gray-200 "
                             }`}
                             placeholder="Qty..."
                           />
@@ -586,7 +586,7 @@ const StockAdjustmentLinesTable = ({
                               adjustmentType === "damage" ||
                               adjustmentType === "expiry"
                             }
-                            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60   "
                           >
                             <option value="in">In (+)</option>
                             <option value="out">Out (-)</option>
@@ -609,12 +609,12 @@ const StockAdjustmentLinesTable = ({
                           )
                         }
                         disabled={line.adjustment_direction === "out"}
-                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-60   "
                         placeholder="0.00"
                       />
                     </td>
 
-                    <td className="px-4 py-3 align-top text-sm font-medium text-gray-900 dark:text-white">
+                    <td className="px-4 py-3 align-top text-sm font-medium text-gray-900 ">
                       {formatCurrency(totalCost)}
                     </td>
 
@@ -625,7 +625,7 @@ const StockAdjustmentLinesTable = ({
                         onChange={(e: any) =>
                           updateLine(line.id, "line_reason", e.target.value)
                         }
-                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   "
                         placeholder="Reason..."
                       />
                     </td>
@@ -637,7 +637,7 @@ const StockAdjustmentLinesTable = ({
                         onChange={(e: any) =>
                           updateLine(line.id, "line_remarks", e.target.value)
                         }
-                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-navy-600 dark:bg-navy-900 dark:text-white"
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   "
                         placeholder="Remarks..."
                       />
                     </td>
@@ -646,7 +646,7 @@ const StockAdjustmentLinesTable = ({
                       <button
                         type="button"
                         onClick={() => duplicateLine(line)}
-                        className="rounded p-1.5 text-gray-400 transition-colors hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-navy-800"
+                        className="rounded p-1.5 text-gray-400 transition-colors hover:bg-brand-50 hover:text-brand-600 "
                         title="Duplicate Line"
                       >
                         <svg
@@ -671,7 +671,7 @@ const StockAdjustmentLinesTable = ({
                       <button
                         type="button"
                         onClick={() => removeLine(line.id)}
-                        className="rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-navy-800"
+                        className="rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 "
                         title="Remove Line"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -83,9 +83,9 @@ function JournalEntryLinesTable({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
-        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-navy-700">
-          <h3 className="text-lg font-medium text-navy-800 dark:text-white">
+      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm  ">
+        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 ">
+          <h3 className="text-lg font-medium text-navy-800 ">
             Journal Lines
           </h3>
           {!disabled && (
@@ -100,7 +100,7 @@ function JournalEntryLinesTable({
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-gray-200 bg-gray-50 font-semibold text-gray-500 dark:border-navy-700 dark:bg-navy-700/50 dark:text-gray-300">
+            <thead className="border-b border-gray-200 bg-gray-50 font-semibold text-gray-500   ">
               <tr>
                 <th className="w-1/3 px-4 py-3">Account</th>
                 <th className="px-4 py-3">Line Description</th>
@@ -109,11 +109,11 @@ function JournalEntryLinesTable({
                 <th className="w-24 px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+            <tbody className="divide-y divide-gray-100 ">
               {lines.map((line: any, index: any) => (
                 <tr
                   key={index}
-                  className="hover:bg-gray-50 dark:hover:bg-navy-700/30"
+                  className="hover:bg-gray-50 "
                 >
                   <td className="px-4 py-2">
                     <JournalLineAccountSelect

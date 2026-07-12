@@ -5,19 +5,19 @@ const PettyCashVoucherTypeBadge = ({ type }: { type?: unknown }) => {
 
   switch (type) {
     case "expense":
-      badgeStyle = "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800";
+      badgeStyle = "bg-orange-100 text-orange-700   border-orange-200 ";
       label = "Expense";
       break;
     case "advance":
-      badgeStyle = "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800";
+      badgeStyle = "bg-indigo-100 text-indigo-700   border-indigo-200 ";
       label = "Advance";
       break;
     case "refund":
-      badgeStyle = "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800";
+      badgeStyle = "bg-green-100 text-green-700   border-green-200 ";
       label = "Refund";
       break;
     case "adjustment":
-      badgeStyle = "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-300 border-gray-200 dark:border-gray-700";
+      badgeStyle = "bg-gray-100 text-gray-700   border-gray-200 ";
       label = "Adjustment";
       break;
     default:

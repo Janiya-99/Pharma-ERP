@@ -96,10 +96,10 @@ export default function ChequeBookFormPage() {
 
   return (
     <div className="py-4 max-w-3xl mx-auto h-full overflow-y-auto">
-      <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-        <div className="flex items-center justify-between mb-6 border-b pb-4 dark:border-navy-700">
+      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+        <div className="flex items-center justify-between mb-6 border-b pb-4 ">
           <div>
-            <h2 className="text-xl font-bold text-navy-700 dark:text-white">
+            <h2 className="text-xl font-bold text-navy-700 ">
               {isEdit ? "Edit Cheque Book" : "Create Cheque Book"}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
@@ -120,7 +120,7 @@ export default function ChequeBookFormPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Account *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Bank Account *</label>
               <BankAccountSelect
                 value={formData.bank_account_id}
                 onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, bank_account_id: val }))}
@@ -130,7 +130,7 @@ export default function ChequeBookFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cheque Book Number *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Cheque Book Number *</label>
               <input
                 type="text"
                 name="cheque_book_number"
@@ -142,7 +142,7 @@ export default function ChequeBookFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Issued Date *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Issued Date *</label>
               <input
                 type="date"
                 name="issued_date"
@@ -154,7 +154,7 @@ export default function ChequeBookFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Leaf Number *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Start Leaf Number *</label>
               <input
                 type="text"
                 name="start_leaf_number"
@@ -169,7 +169,7 @@ export default function ChequeBookFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Number of Leaves *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Number of Leaves *</label>
               <input
                 type="number"
                 min="1"
@@ -185,7 +185,7 @@ export default function ChequeBookFormPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Status *</label>
               <select
                 name="status"
                 value={formData.status}
@@ -200,7 +200,7 @@ export default function ChequeBookFormPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remarks</label>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Remarks</label>
               <textarea
                 name="remarks"
                 value={formData.remarks}
@@ -212,7 +212,7 @@ export default function ChequeBookFormPage() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-6 border-t dark:border-navy-700">
+          <div className="flex justify-end gap-3 pt-6 border-t ">
             <button
               type="submit"
               disabled={saving}

@@ -96,13 +96,13 @@ export default function AdminLayout(props: { [x: string]: any }) {
 
   // Standard admin layout with sidebar + topbar
   return (
-    <div className="relative flex h-screen w-full overflow-hidden bg-gray-50 dark:!bg-navy-900">
+    <div className="relative flex h-screen w-full overflow-hidden bg-gray-50 ">
       <Sidebar open={open} onClose={() => setOpen(false)} />
 
       {/* Floating Sidebar Toggle Button (Desktop only) */}
       <button
         onClick={() => setOpen(!open)}
-        className={`absolute top-20 z-50 flex hidden h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:text-gray-700 dark:border-navy-700 dark:bg-navy-800 dark:text-gray-300 dark:hover:bg-navy-700 dark:hover:text-white xl:flex ${
+        className={`absolute top-20 z-50 flex hidden h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:text-gray-700      xl:flex ${
           open ? "left-[246px]" : "left-4"
         }`}
       >

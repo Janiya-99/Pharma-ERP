@@ -98,8 +98,8 @@ const SortableStageItem: React.FC<SortableStageProps> = ({
       style={style}
       className={`group relative rounded-2xl border ${
         isDragging
-          ? "border-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/80 shadow-xl scale-[1.01]"
-          : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-500/40"
+          ? "border-indigo-500 bg-indigo-50/80  shadow-xl scale-[1.01]"
+          : "border-slate-200  bg-white  shadow-sm hover:border-indigo-500/40"
       } p-5 transition-all`}
     >
       <div className="flex items-start gap-4">
@@ -107,7 +107,7 @@ const SortableStageItem: React.FC<SortableStageProps> = ({
         <div
           {...attributes}
           {...listeners}
-          className="mt-1 flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-indigo-100 hover:text-indigo-600 dark:hover:bg-indigo-950 dark:hover:text-indigo-400 transition-colors active:cursor-grabbing"
+          className="mt-1 flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-xl bg-slate-100  text-slate-400 hover:bg-indigo-100 hover:text-indigo-600   transition-colors active:cursor-grabbing"
           title="Drag to reorder approval stage"
         >
           <GripVertical className="h-5 w-5" />
@@ -124,13 +124,13 @@ const SortableStageItem: React.FC<SortableStageProps> = ({
                 type="text"
                 value={stage.title}
                 onChange={(e) => onUpdate(stage.id, "title", e.target.value)}
-                className="font-bold text-base text-slate-900 dark:text-white bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none transition-colors px-1 py-0.5"
+                className="font-bold text-base text-slate-900  bg-transparent border-b border-transparent hover:border-slate-300  focus:border-indigo-500 focus:outline-none transition-colors px-1 py-0.5"
               />
             </div>
 
             <button
               onClick={() => onRemove(stage.id)}
-              className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors self-start sm:self-center"
+              className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50  transition-colors self-start sm:self-center"
               title="Delete this approval stage"
             >
               <Trash2 className="h-4 w-4" />
@@ -146,7 +146,7 @@ const SortableStageItem: React.FC<SortableStageProps> = ({
                 type="text"
                 value={stage.role}
                 onChange={(e) => onUpdate(stage.id, "role", e.target.value)}
-                className="h-9 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+                className="h-9 w-full rounded-lg border border-slate-200  bg-slate-50  px-3 text-xs font-semibold text-slate-800  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
               />
             </div>
 
@@ -158,7 +158,7 @@ const SortableStageItem: React.FC<SortableStageProps> = ({
                 type="text"
                 value={stage.threshold}
                 onChange={(e) => onUpdate(stage.id, "threshold", e.target.value)}
-                className="h-9 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3 text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+                className="h-9 w-full rounded-lg border border-slate-200  bg-slate-50  px-3 text-xs font-mono font-medium text-slate-800  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
               />
             </div>
 
@@ -173,7 +173,7 @@ const SortableStageItem: React.FC<SortableStageProps> = ({
                   max="168"
                   value={stage.slaHours}
                   onChange={(e) => onUpdate(stage.id, "slaHours", Number(e.target.value))}
-                  className="h-9 w-24 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+                  className="h-9 w-24 rounded-lg border border-slate-200  bg-slate-50  px-3 text-xs font-mono font-bold text-slate-800  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
                 />
                 <span className="text-xs text-slate-500 font-medium">Hours</span>
               </div>
@@ -188,7 +188,7 @@ const SortableStageItem: React.FC<SortableStageProps> = ({
               type="text"
               value={stage.description}
               onChange={(e) => onUpdate(stage.id, "description", e.target.value)}
-              className="h-9 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3 text-xs text-slate-600 dark:text-slate-400 focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+              className="h-9 w-full rounded-lg border border-slate-200  bg-slate-50  px-3 text-xs text-slate-600  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
             />
           </div>
         </div>
@@ -355,22 +355,22 @@ const ApprovalSettingsPage = () => {
       />
       {/* ── Page Header ── */}
 
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <GitMerge className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Control Center • Workflow Orchestration
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Multi-Stage Approval Workflows
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Configure hierarchical sign-off stages, financial thresholds, and SLA auto-escalation rules
           </p>
         </div>
@@ -378,7 +378,7 @@ const ApprovalSettingsPage = () => {
         {/* Action Bar */}
         <div className="flex items-center gap-3">
           {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 px-3.5 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 animate-in fade-in">
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50  px-3.5 py-2 text-xs font-bold text-emerald-700  border border-emerald-200/60  animate-in fade-in">
               <CheckCircle2 className="h-4 w-4" /> Workflows Enforced!
             </span>
           )}
@@ -404,19 +404,19 @@ const ApprovalSettingsPage = () => {
               onClick={() => setActiveWorkflowKey(key)}
               className={`flex flex-col justify-between rounded-xl border p-4 text-left transition-all ${
                 isActive
-                  ? "border-indigo-600 bg-indigo-50/60 dark:bg-indigo-950/60 shadow-md ring-2 ring-indigo-600/20"
-                  : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700"
+                  ? "border-indigo-600 bg-indigo-50/60  shadow-md ring-2 ring-indigo-600/20"
+                  : "border-slate-200  bg-white  hover:border-slate-300 "
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className={`text-xs font-bold uppercase tracking-wider ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400"}`}>
+                  <span className={`text-xs font-bold uppercase tracking-wider ${isActive ? "text-indigo-600 " : "text-slate-400"}`}>
                     {stageCount} {stageCount === 1 ? "Stage" : "Stages"}
                   </span>
-                  {isActive && <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />}
+                  {isActive && <CheckCircle2 className="h-4 w-4 text-indigo-600 " />}
                 </div>
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white">{info.label}</h3>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{info.desc}</p>
+                <h3 className="font-bold text-sm text-slate-900 ">{info.label}</h3>
+                <p className="mt-1 text-xs text-slate-500  line-clamp-2">{info.desc}</p>
               </div>
             </button>
           );
@@ -425,19 +425,19 @@ const ApprovalSettingsPage = () => {
 
       {/* ── Drag and Drop Stage Builder ── */}
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200  pb-4">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-900  flex items-center gap-2">
               <Layers className="h-5 w-5 text-indigo-600" />
               Configure Hierarchy: {workflowLabels[activeWorkflowKey]?.label}
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500  mt-0.5">
               Drag by the handle on the left to reorder approval priority. Requests escalate sequentially from Stage 1 upwards.
             </p>
           </div>
           <button
             onClick={handleAddStage}
-            className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors shadow-2xs shrink-0"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200  bg-white  px-4 text-xs font-bold text-indigo-600  hover:bg-indigo-50  transition-colors shadow-2xs shrink-0"
           >
             <Plus className="h-4 w-4" /> Add Approval Stage
           </button>
@@ -454,8 +454,8 @@ const ApprovalSettingsPage = () => {
           >
             <div className="space-y-4">
               {currentStages.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
-                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                <div className="rounded-2xl border border-dashed border-slate-300  p-12 text-center">
+                  <p className="text-sm font-semibold text-slate-600 ">
                     No approval stages defined for this workflow yet.
                   </p>
                   <p className="text-xs text-slate-400 mt-1">

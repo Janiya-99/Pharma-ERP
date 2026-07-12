@@ -50,12 +50,12 @@ const RebuildLedgerModal = ({ isOpen, onClose, onSuccess, financialYears }: { is
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-900/30">
+        <div className="bg-red-50  p-4 rounded-lg border border-red-200 ">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+            <AlertTriangle className="w-5 h-5 text-red-600  mt-0.5 shrink-0" />
             <div>
-              <h4 className="text-sm font-semibold text-red-800 dark:text-red-400 mb-1">Warning: Destructive Action</h4>
-              <p className="text-sm text-red-700 dark:text-red-300">
+              <h4 className="text-sm font-semibold text-red-800  mb-1">Warning: Destructive Action</h4>
+              <p className="text-sm text-red-700 ">
                 This will rebuild ledger entries for the selected financial year from posted transactions. 
                 This action should only be used by Finance Managers. Existing entries for the selected year will be deleted and recreated.
               </p>
@@ -91,7 +91,7 @@ const RebuildLedgerModal = ({ isOpen, onClose, onSuccess, financialYears }: { is
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-navy-700">
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 ">
           <Button
             type="button"
             variant="outline"

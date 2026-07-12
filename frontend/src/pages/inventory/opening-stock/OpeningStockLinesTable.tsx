@@ -94,20 +94,20 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Line Items</h3>
+        <h3 className="text-lg font-semibold text-gray-900 ">Line Items</h3>
         <button
           type="button"
           onClick={handleAddLine}
-          className="flex items-center gap-2 px-3 py-1.5 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:hover:bg-brand-900/50 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3 py-1.5 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100    transition-colors text-sm font-medium"
         >
           <Plus className="h-4 w-4" />
           Add Line
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-navy-700">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 ">
         <table className="w-full text-sm text-left whitespace-nowrap">
-          <thead className="bg-gray-50 dark:bg-navy-800/50 text-gray-600 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-navy-700">
+          <thead className="bg-gray-50  text-gray-600  font-medium border-b border-gray-200 ">
             <tr>
               <th className="px-4 py-3 min-w-[200px]">Product *</th>
               <th className="px-4 py-3 min-w-[200px]">Batch *</th>
@@ -119,10 +119,10 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
               <th className="px-4 py-3 min-w-[80px] text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+          <tbody className="divide-y divide-gray-100 ">
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                <td colSpan={8} className="px-4 py-8 text-center text-gray-500 ">
                   No lines added. Click "Add Line" to begin.
                 </td>
               </tr>
@@ -131,7 +131,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                 const lineErrors = errors[`lines.${index}`] || {};
                 
                 return (
-                  <tr key={line.id || index} className="hover:bg-gray-50 dark:hover:bg-navy-800/50">
+                  <tr key={line.id || index} className="hover:bg-gray-50 ">
                     <td className="px-4 py-3 align-top">
                       <OpeningStockLineProductSelect
                         value={line.product_id}
@@ -139,9 +139,9 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         error={lineErrors.product_id}
                       />
                       {line.product && (
-                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex flex-col gap-0.5">
+                        <div className="mt-1 text-xs text-gray-500  flex flex-col gap-0.5">
                           {line.product.requires_batch_tracking ? (
-                            <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1"><AlertCircle className="h-3 w-3"/> Batch Req</span>
+                            <span className="text-amber-600  flex items-center gap-1"><AlertCircle className="h-3 w-3"/> Batch Req</span>
                           ) : (
                             <span>No Batch Req</span>
                           )}
@@ -162,7 +162,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                       <select
                         value={line.warehouse_location_id || ""}
                         onChange={(e: any) => handleLineChange(index, "warehouse_location_id", e.target.value ? parseInt(e.target.value) : null)}
-                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${lineErrors.warehouse_location_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${lineErrors.warehouse_location_id ? "border-red-500" : "border-gray-200 "}`}
                       >
                         <option value="">-- Optional --</option>
                         {locations.map((loc: any) => (
@@ -177,7 +177,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         step="0.001"
                         value={line.quantity === 0 ? "" : line.quantity}
                         onChange={(e: any) => handleLineChange(index, "quantity", e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white text-right ${lineErrors.quantity ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  text-right ${lineErrors.quantity ? "border-red-500" : "border-gray-200 "}`}
                       />
                       {lineErrors.quantity && <p className="text-xs text-red-500 mt-1">{lineErrors.quantity}</p>}
                     </td>
@@ -188,7 +188,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         step="0.01"
                         value={line.unit_cost === 0 ? "" : line.unit_cost}
                         onChange={(e: any) => handleLineChange(index, "unit_cost", e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white text-right ${lineErrors.unit_cost ? "border-red-500" : "border-gray-200 dark:border-navy-600"}`}
+                        className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  text-right ${lineErrors.unit_cost ? "border-red-500" : "border-gray-200 "}`}
                       />
                       {lineErrors.unit_cost && <p className="text-xs text-red-500 mt-1">{lineErrors.unit_cost}</p>}
                     </td>
@@ -197,7 +197,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         type="text"
                         disabled
                         value={line.total_cost?.toFixed(2) || "0.00"}
-                        className="w-full px-3 py-2 border border-gray-100 dark:border-navy-700 rounded-md text-sm bg-gray-50 dark:bg-navy-800 text-gray-600 dark:text-gray-400 text-right font-medium"
+                        className="w-full px-3 py-2 border border-gray-100  rounded-md text-sm bg-gray-50  text-gray-600  text-right font-medium"
                       />
                     </td>
                     <td className="px-4 py-3 align-top">
@@ -205,7 +205,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         type="text"
                         value={line.line_remarks || ""}
                         onChange={(e: any) => handleLineChange(index, "line_remarks", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-200 dark:border-navy-600 rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-200  rounded-md text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
                         placeholder="Remarks..."
                       />
                     </td>
@@ -214,7 +214,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         <button
                           type="button"
                           onClick={() => handleDuplicateLine(index)}
-                          className="p-1.5 text-gray-400 hover:text-brand-500 rounded-md hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-brand-500 rounded-md hover:bg-gray-100  transition-colors"
                           title="Duplicate Line"
                         >
                           <Copy className="h-4 w-4" />
@@ -222,7 +222,7 @@ const OpeningStockLinesTable = ({ lines, setLines, warehouseId, errors = {} }: {
                         <button
                           type="button"
                           onClick={() => handleRemoveLine(index)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-md hover:bg-red-50  transition-colors"
                           title="Remove Line"
                         >
                           <Trash2 className="h-4 w-4" />

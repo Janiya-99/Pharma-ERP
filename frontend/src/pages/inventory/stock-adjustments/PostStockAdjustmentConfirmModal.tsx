@@ -33,9 +33,9 @@ const PostStockAdjustmentConfirmModal = ({ isOpen, onClose, adjustment, onSucces
       icon={FileCheck}
     >
       <form onSubmit={handlePost} className="p-6">
-        <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/30 rounded-lg flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
-          <div className="text-sm text-orange-800 dark:text-orange-300">
+        <div className="mb-6 p-4 bg-orange-50  border border-orange-200  rounded-lg flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-orange-600  shrink-0 mt-0.5" />
+          <div className="text-sm text-orange-800 ">
             <p className="font-semibold mb-1">Warning: Irreversible Action</p>
             <p>
               Posting stock adjustment will update stock balances and create stock ledger entries. This action cannot be undone or edited after posting.
@@ -44,24 +44,24 @@ const PostStockAdjustmentConfirmModal = ({ isOpen, onClose, adjustment, onSucces
         </div>
 
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Adjustment Summary</h4>
-          <div className="bg-gray-50 dark:bg-navy-900 rounded-lg p-4 border border-gray-200 dark:border-navy-700">
+          <h4 className="text-sm font-medium text-gray-900  mb-3">Adjustment Summary</h4>
+          <div className="bg-gray-50  rounded-lg p-4 border border-gray-200 ">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Total Quantity In</span>
-                <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                <span className="text-xs text-gray-500  block mb-1">Total Quantity In</span>
+                <span className="text-sm font-medium text-green-600 ">
                   {formatNumber(adjustment.total_quantity_in, 3)}
                 </span>
               </div>
               <div>
-                <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Total Quantity Out</span>
-                <span className="text-sm font-medium text-red-600 dark:text-red-400">
+                <span className="text-xs text-gray-500  block mb-1">Total Quantity Out</span>
+                <span className="text-sm font-medium text-red-600 ">
                   {formatNumber(adjustment.total_quantity_out, 3)}
                 </span>
               </div>
-              <div className="col-span-2 pt-2 border-t border-gray-200 dark:border-navy-700">
-                <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Total Stock Value Impact</span>
-                <span className="text-base font-bold text-gray-900 dark:text-white">
+              <div className="col-span-2 pt-2 border-t border-gray-200 ">
+                <span className="text-xs text-gray-500  block mb-1">Total Stock Value Impact</span>
+                <span className="text-base font-bold text-gray-900 ">
                   {formatCurrency(adjustment.total_stock_value)}
                 </span>
               </div>
@@ -73,7 +73,7 @@ const PostStockAdjustmentConfirmModal = ({ isOpen, onClose, adjustment, onSucces
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50    "
           >
             Cancel
           </button>

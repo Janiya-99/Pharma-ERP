@@ -190,15 +190,15 @@ const StockTransferFormPage = () => {
       <div className="flex items-center gap-4 mb-6">
         <button
           onClick={() => navigate("/inventory/stock-transfers")}
-          className="p-2 text-gray-500 hover:text-gray-700 bg-white border border-gray-200 rounded-lg dark:bg-navy-800 dark:border-navy-700 dark:hover:text-gray-300"
+          className="p-2 text-gray-500 hover:text-gray-700 bg-white border border-gray-200 rounded-lg   "
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900 ">
             {isEditMode ? "Edit Stock Transfer" : "New Stock Transfer"}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-500  mt-1">
             {isEditMode ? "Update draft transfer details" : "Create a new stock transfer draft"}
           </p>
         </div>
@@ -206,20 +206,20 @@ const StockTransferFormPage = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Header Section */}
-        <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Transfer Details</h3>
+        <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+          <h3 className="text-lg font-semibold text-gray-900  mb-4">Transfer Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Source Warehouse *
               </label>
               <select
                 name="source_warehouse_id"
                 value={formData.source_warehouse_id}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
-                  errors.source_warehouse_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${
+                  errors.source_warehouse_id ? "border-red-500" : "border-gray-200 "
                 }`}
               >
                 <option value="">Select Source...</option>
@@ -231,15 +231,15 @@ const StockTransferFormPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Destination Warehouse *
               </label>
               <select
                 name="destination_warehouse_id"
                 value={formData.destination_warehouse_id}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
-                  errors.destination_warehouse_id ? "border-red-500" : "border-gray-200 dark:border-navy-600"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${
+                  errors.destination_warehouse_id ? "border-red-500" : "border-gray-200 "
                 }`}
               >
                 <option value="">Select Destination...</option>
@@ -251,7 +251,7 @@ const StockTransferFormPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Transfer Date *
               </label>
               <input
@@ -259,15 +259,15 @@ const StockTransferFormPage = () => {
                 name="transfer_date"
                 value={formData.transfer_date}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white ${
-                  errors.transfer_date ? "border-red-500" : "border-gray-200 dark:border-navy-600"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900  ${
+                  errors.transfer_date ? "border-red-500" : "border-gray-200 "
                 }`}
               />
               {errors.transfer_date && <p className="mt-1 text-sm text-red-500">{errors.transfer_date}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Reference No
               </label>
               <input
@@ -276,12 +276,12 @@ const StockTransferFormPage = () => {
                 value={formData.reference_no}
                 onChange={handleChange}
                 placeholder="Optional external ref"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900 "
               />
             </div>
             
             <div className="md:col-span-2 lg:col-span-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700  mb-1">
                 Remarks
               </label>
               <textarea
@@ -290,14 +290,14 @@ const StockTransferFormPage = () => {
                 onChange={handleChange}
                 rows={2}
                 placeholder="Internal notes..."
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 dark:border-navy-600 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 bg-white   text-gray-900 "
               />
             </div>
           </div>
         </div>
 
         {/* Lines Section */}
-        <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
+        <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
           {!formData.source_warehouse_id || !formData.destination_warehouse_id ? (
             <div className="text-center py-8 text-gray-500">
               Please select Source and Destination warehouses to manage transfer lines.
@@ -318,7 +318,7 @@ const StockTransferFormPage = () => {
           <button
             type="button"
             onClick={() => navigate("/inventory/stock-transfers")}
-            className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700"
+            className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50    "
           >
             Cancel
           </button>

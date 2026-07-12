@@ -102,7 +102,7 @@ export default function BankReconciliationDetailsPage() {
             <MdArrowBack className="mr-1" /> Back to Reconciliations
           </button>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-navy-700 dark:text-white">
+            <h1 className="text-2xl font-bold text-navy-700 ">
               {rec.reference_number || `Reconciliation #${rec.id}`}
             </h1>
             <ReconciliationStatusBadge status={rec.status} />
@@ -161,25 +161,25 @@ export default function BankReconciliationDetailsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Reconciliation Details</h3>
+          <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Reconciliation Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
               <div>
                 <p className="text-sm text-gray-500">Statement Period</p>
-                <p className="font-medium text-navy-900 dark:text-white">
+                <p className="font-medium text-navy-900 ">
                   {new Date(rec.statement_start_date).toLocaleDateString()} to {new Date(rec.statement_end_date).toLocaleDateString()}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Statement Date</p>
-                <p className="font-medium text-navy-900 dark:text-white">
+                <p className="font-medium text-navy-900 ">
                   {new Date(rec.statement_date).toLocaleDateString()}
                 </p>
               </div>
               
               <div className="md:col-span-2">
                 <p className="text-sm text-gray-500">Remarks</p>
-                <p className="font-medium text-navy-900 dark:text-white">{rec.remarks || "-"}</p>
+                <p className="font-medium text-navy-900 ">{rec.remarks || "-"}</p>
               </div>
 
               {rec.status === "cancelled" && (
@@ -191,14 +191,14 @@ export default function BankReconciliationDetailsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">
+          <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+            <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">
               Matched Transactions ({rec.lines?.length || 0})
             </h3>
             
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+                <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
                   <tr>
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Reference</th>
@@ -207,7 +207,7 @@ export default function BankReconciliationDetailsPage() {
                     <th className="px-4 py-3 text-right">Credit (Out)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+                <tbody className="divide-y divide-gray-100 ">
                   {(!rec.lines || rec.lines.length === 0) ? (
                     <tr>
                       <td colSpan="5" className="px-4 py-8 text-center text-gray-500">No transactions matched.</td>
@@ -216,9 +216,9 @@ export default function BankReconciliationDetailsPage() {
                     rec.lines.map((line: unknown) => {
                       const tx = line.bank_transaction;
                       return (
-                        <tr key={line.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30">
+                        <tr key={line.id} className="hover:bg-gray-50 ">
                           <td className="px-4 py-3">{new Date(tx.transaction_date).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 font-medium text-navy-700 dark:text-white">
+                          <td className="px-4 py-3 font-medium text-navy-700 ">
                             <button 
                               onClick={() => history.push(`/admin/finance/bank-transactions/${tx.id}`)}
                               className="text-brand-500 hover:underline"
@@ -240,44 +240,44 @@ export default function BankReconciliationDetailsPage() {
         </div>
 
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-gray-50 dark:bg-navy-900 rounded-xl p-5 border border-gray-200 dark:border-navy-700">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Summary</h3>
+          <div className="bg-gray-50  rounded-xl p-5 border border-gray-200 ">
+            <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Summary</h3>
             
             <div className="space-y-3">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Statement Closing</span>
-                <span className="font-medium text-navy-900 dark:text-white"><MoneyDisplay amount={rec.statement_closing_balance} /></span>
+                <span className="text-gray-600 ">Statement Closing</span>
+                <span className="font-medium text-navy-900 "><MoneyDisplay amount={rec.statement_closing_balance} /></span>
               </div>
               
-              <div className="pt-3 border-t border-dashed border-gray-300 dark:border-navy-700"></div>
+              <div className="pt-3 border-t border-dashed border-gray-300 "></div>
               
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600 dark:text-gray-400">System Opening</span>
-                <span className="font-medium text-navy-900 dark:text-white"><MoneyDisplay amount={rec.statement_opening_balance} /></span>
+                <span className="text-gray-600 ">System Opening</span>
+                <span className="font-medium text-navy-900 "><MoneyDisplay amount={rec.statement_opening_balance} /></span>
               </div>
               
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600 dark:text-gray-400">+ Cleared Debits</span>
+                <span className="text-gray-600 ">+ Cleared Debits</span>
                 <span className="font-medium text-green-600"><MoneyDisplay amount={rec.total_cleared_debits} /></span>
               </div>
               
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600 dark:text-gray-400">- Cleared Credits</span>
+                <span className="text-gray-600 ">- Cleared Credits</span>
                 <span className="font-medium text-red-600"><MoneyDisplay amount={rec.total_cleared_credits} /></span>
               </div>
               
-              <div className="pt-3 border-t border-gray-300 dark:border-navy-700"></div>
+              <div className="pt-3 border-t border-gray-300 "></div>
               
               <div className="flex justify-between items-center font-bold">
-                <span className="text-navy-700 dark:text-white">System Balance</span>
-                <span className="text-navy-900 dark:text-white"><MoneyDisplay amount={rec.system_closing_balance} /></span>
+                <span className="text-navy-700 ">System Balance</span>
+                <span className="text-navy-900 "><MoneyDisplay amount={rec.system_closing_balance} /></span>
               </div>
 
-              <div className={`mt-4 p-3 rounded-lg flex justify-between items-center ${isBalanced ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
-                <span className={`font-bold ${isBalanced ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'}`}>
+              <div className={`mt-4 p-3 rounded-lg flex justify-between items-center ${isBalanced ? 'bg-green-100 ' : 'bg-red-100 '}`}>
+                <span className={`font-bold ${isBalanced ? 'text-green-800 ' : 'text-red-800 '}`}>
                   Difference
                 </span>
-                <span className={`font-bold text-lg ${isBalanced ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'}`}>
+                <span className={`font-bold text-lg ${isBalanced ? 'text-green-800 ' : 'text-red-800 '}`}>
                   <MoneyDisplay amount={diff} />
                 </span>
               </div>

@@ -78,8 +78,8 @@ const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({
         side="right"
         className="w-[calc(100vw-1rem)] overflow-y-auto rounded-l-xl border-slate-200 bg-white p-0 shadow-2xl sm:max-w-md"
       >
-        <SheetHeader className="border-b border-gray-100 bg-amber-50/50 px-6 py-5 dark:border-navy-700 dark:bg-amber-900/10">
-          <SheetTitle className="flex items-center gap-2 font-bold text-amber-700 dark:text-amber-400">
+        <SheetHeader className="border-b border-gray-100 bg-amber-50/50 px-6 py-5  ">
+          <SheetTitle className="flex items-center gap-2 font-bold text-amber-700 ">
             <ShieldAlert className="h-5 w-5" />
             <span>Change Customer Status</span>
           </SheetTitle>
@@ -93,9 +93,9 @@ const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({
           )}
 
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-gray-600 ">
               Updating account status for{" "}
-              <strong className="text-navy-900 dark:text-white">
+              <strong className="text-navy-900 ">
                 {customer.customer_name}
               </strong>{" "}
               ({customer.customer_code}).
@@ -128,16 +128,16 @@ const ChangeCustomerStatusModal: React.FC<ChangeCustomerStatusModalProps> = ({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Explain why the status is being changed..."
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-navy-500  "
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-navy-700">
+          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 ">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-navy-600 dark:text-gray-300 dark:hover:bg-navy-700"
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50   "
             >
               Cancel
             </button>

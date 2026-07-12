@@ -62,12 +62,12 @@ const AccountClassificationSelect: React.FC<
       <SelectTrigger
         className={
           className ||
-          "w-full border-gray-300 bg-white dark:border-navy-700 dark:bg-navy-900"
+          "w-full border-gray-300 bg-white  "
         }
       >
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
-      <SelectContent className="bg-white dark:bg-navy-800">
+      <SelectContent className="bg-white ">
         {classifications.map((item: unknown) => (
           <SelectItem key={item.id} value={item.id.toString()}>
             {item.name} (Level {item.level})

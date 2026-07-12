@@ -16,7 +16,7 @@ export function FinanceQuickActions() {
   ];
 
   return (
-    <Card className="border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
+    <Card className="border-gray-200 bg-white/88 shadow-sm backdrop-blur-sm  ">
       <CardHeader className="pb-3">
         <CardTitle>Quick Actions</CardTitle>
         <CardDescription>Common finance tasks</CardDescription>
@@ -29,7 +29,7 @@ export function FinanceQuickActions() {
               <Button
                 key={idx}
                 variant="outline"
-                className="h-auto flex-col items-center justify-center gap-2 px-2 py-4 text-center hover:bg-slate-50 hover:text-indigo-600 dark:hover:bg-slate-800 dark:hover:text-indigo-400"
+                className="h-auto flex-col items-center justify-center gap-2 px-2 py-4 text-center hover:bg-slate-50 hover:text-indigo-600  "
                 onClick={() => navigate(action.path)}
               >
                 <Icon className="h-5 w-5" />

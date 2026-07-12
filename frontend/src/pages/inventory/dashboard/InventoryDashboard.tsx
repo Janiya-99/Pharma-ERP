@@ -102,9 +102,9 @@ const money = (amount: number) =>
   }).format(amount);
 
 const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => (
-  <div className="group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-500/30">
+  <div className="group relative overflow-hidden rounded-xl border border-slate-200  bg-white  p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-500/30">
     <div className="flex items-start justify-between gap-2">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
         {title}
       </span>
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone} transition-transform group-hover:scale-105`}>
@@ -112,11 +112,11 @@ const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: 
       </div>
     </div>
     <div className="mt-3 flex items-baseline justify-between">
-      <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{value}</h3>
+      <h3 className="text-2xl font-bold tracking-tight text-slate-900 ">{value}</h3>
     </div>
-    <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-3">
+    <div className="mt-3 flex items-center justify-between border-t border-slate-100  pt-3">
       {trend ? (
-        <span className={`inline-flex items-center gap-1 text-xs font-semibold ${trendUp ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+        <span className={`inline-flex items-center gap-1 text-xs font-semibold ${trendUp ? "text-emerald-600 " : "text-rose-600 "}`}>
           {trendUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
           {trend}
         </span>
@@ -158,22 +158,22 @@ const InventoryDashboard = () => {
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <Package className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 {activeBranch?.branch_name || "Headquarters (HQ)"} • {activeSoftware?.software_name || "Pharma ERP"}
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Inventory & Supply Chain Dashboard
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Real-time stock valuation, warehouse distribution, batch expiration monitoring, and supply health
           </p>
         </div>
@@ -185,14 +185,14 @@ const InventoryDashboard = () => {
             <input
               type="text"
               placeholder="Search SKU or Batch..."
-              className="h-10 w-52 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
+              className="h-10 w-52 rounded-xl border border-slate-200  bg-white  pl-10 pr-4 text-sm text-slate-900  placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
             />
           </div>
 
           <button
             onClick={handleRefresh}
             title="Refresh stock telemetry"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200  bg-white  text-slate-600  hover:bg-slate-50  hover:text-slate-900  transition-all shadow-sm"
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
           </button>
@@ -209,7 +209,7 @@ const InventoryDashboard = () => {
       ══════════════════════════════════════════════ */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 ">
             Stock Health & Batch Metrics
           </h2>
           <span className="text-xs text-slate-400">Live warehouse sync</span>
@@ -219,7 +219,7 @@ const InventoryDashboard = () => {
             title="Total Products (SKUs)"
             value={stats.total_products.toLocaleString()}
             icon={Package}
-            tone="bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400"
+            tone="bg-indigo-50 text-indigo-600  "
             subtitle={`${stats.active_products} active SKUs`}
             trend="+24 SKUs this month"
             trendUp={true}
@@ -228,7 +228,7 @@ const InventoryDashboard = () => {
             title="Total Stock Valuation"
             value={money(Number(stats.total_stock_value || 0))}
             icon={DollarSign}
-            tone="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400"
+            tone="bg-emerald-50 text-emerald-600  "
             subtitle="Across all warehouses"
             trend="+5.8% vs last month"
             trendUp={true}
@@ -237,7 +237,7 @@ const InventoryDashboard = () => {
             title="Active Warehouses"
             value={stats.total_warehouses}
             icon={Database}
-            tone="bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400"
+            tone="bg-blue-50 text-blue-600  "
             subtitle="Central & Regional"
             trend="100% capacity online"
             trendUp={true}
@@ -246,7 +246,7 @@ const InventoryDashboard = () => {
             title="Low Stock Warning"
             value={stats.low_stock_products}
             icon={TrendingDown}
-            tone="bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
+            tone="bg-amber-50 text-amber-600  "
             subtitle="Below reorder threshold"
             trend="Requires restock"
             trendUp={false}
@@ -255,7 +255,7 @@ const InventoryDashboard = () => {
             title="Total Tracked Batches"
             value={stats.total_batches.toLocaleString()}
             icon={Archive}
-            tone="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+            tone="bg-slate-100 text-slate-600  "
             subtitle="Lot numbers logged"
             trend="+140 new batches"
             trendUp={true}
@@ -264,7 +264,7 @@ const InventoryDashboard = () => {
             title="Near Expiry Batches"
             value={stats.near_expiry_batches}
             icon={AlertTriangle}
-            tone="bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
+            tone="bg-amber-50 text-amber-600  "
             subtitle="Expiring ≤ 90 days"
             trend="Inspect soon"
             trendUp={false}
@@ -273,7 +273,7 @@ const InventoryDashboard = () => {
             title="Expired Batches"
             value={stats.expired_batches}
             icon={AlertCircle}
-            tone="bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400"
+            tone="bg-rose-50 text-rose-600  "
             subtitle="Past expiration date"
             trend="Quarantine required"
             trendUp={false}
@@ -282,7 +282,7 @@ const InventoryDashboard = () => {
             title="Blocked / Quarantined"
             value={stats.blocked_batches}
             icon={ShieldAlert}
-            tone="bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400"
+            tone="bg-purple-50 text-purple-600  "
             subtitle="Quality hold / Recall"
             trend="Under review"
             trendUp={false}
@@ -295,18 +295,18 @@ const InventoryDashboard = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Stock Valuation Trajectory (2/3 width) */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   Stock Valuation & Supply Movement
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 ">
                   Total inventory asset value vs inbound receipts and outbound dispatches
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50  px-3 py-1 text-xs font-semibold text-emerald-700  border border-emerald-200/60 ">
                 Turnover Rate: 4.2x / Year
               </span>
             </div>
@@ -325,22 +325,22 @@ const InventoryDashboard = () => {
               />
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100  pt-4 text-xs text-slate-500 ">
             <span>Peak Inventory Asset Value: {money(48500000)} (June)</span>
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline flex items-center gap-1">
+            <span className="font-semibold text-indigo-600  cursor-pointer hover:underline flex items-center gap-1">
               View warehouse ledger <ArrowUpRight className="h-3 w-3" />
             </span>
           </div>
         </div>
 
         {/* Right: Warehouse Distribution Donut Chart (1/3 width) */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between">
+        <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div className="mb-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Warehouse Asset Distribution
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 ">
                 Stock valuation share by storage facility
               </p>
             </div>
@@ -356,20 +356,20 @@ const InventoryDashboard = () => {
               />
             </div>
 
-            <div className="mt-6 space-y-2 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs">
+            <div className="mt-6 space-y-2 border-t border-slate-100  pt-4 text-xs">
               {warehouseData.map((item, idx) => {
                 const total = warehouseData.reduce((acc, curr) => acc + curr.value, 0);
                 const pct = Math.round((item.value / total) * 100);
                 return (
                   <div key={idx} className="flex items-center justify-between">
-                    <span className="font-medium text-slate-600 dark:text-slate-400 truncate max-w-[180px]">{item.name}</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">{pct}%</span>
+                    <span className="font-medium text-slate-600  truncate max-w-[180px]">{item.name}</span>
+                    <span className="font-mono font-bold text-slate-900 ">{pct}%</span>
                   </div>
                 );
               })}
             </div>
           </div>
-          <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-center text-slate-500 dark:text-slate-400">
+          <div className="mt-4 border-t border-slate-100  pt-4 text-xs text-center text-slate-500 ">
             <span>All storage zones climate-controlled & synced</span>
           </div>
         </div>
@@ -380,19 +380,19 @@ const InventoryDashboard = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left 2 Cols: Critical Batch Expiration Alerts */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100  pb-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-amber-500" />
                   Critical Batch Expiration & Quarantine Monitor
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-slate-500  mt-1">
                   Batches requiring immediate quality inspection, discount allocation, or disposal quarantine
                 </p>
               </div>
-              <button className="rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-colors shrink-0">
+              <button className="rounded-lg bg-slate-100  px-3 py-1.5 text-xs font-semibold text-slate-700  hover:bg-indigo-600 hover:text-white transition-colors shrink-0">
                 View All 20 Alerts
               </button>
             </div>
@@ -400,7 +400,7 @@ const InventoryDashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <tr className="border-b border-slate-200  text-xs font-bold uppercase tracking-wider text-slate-400">
                     <th className="pb-3 pl-2">Batch No</th>
                     <th className="pb-3">Product Name</th>
                     <th className="pb-3">Expiry Date</th>
@@ -410,27 +410,27 @@ const InventoryDashboard = () => {
                     <th className="pb-3 text-right pr-2">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100 ">
                   {batchAlerts.map((row) => (
-                    <tr key={row.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-3.5 pl-2 font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">{row.batch}</td>
-                      <td className="py-3.5 font-semibold text-slate-800 dark:text-slate-200">{row.product}</td>
-                      <td className="py-3.5 font-mono text-xs text-slate-600 dark:text-slate-400">{row.expiry}</td>
-                      <td className="py-3.5 font-mono text-xs text-slate-900 dark:text-white">{row.qty}</td>
-                      <td className="py-3.5 text-xs text-slate-500 dark:text-slate-400">{row.warehouse}</td>
+                    <tr key={row.id} className="group hover:bg-slate-50  transition-colors">
+                      <td className="py-3.5 pl-2 font-mono font-bold text-xs text-indigo-600 ">{row.batch}</td>
+                      <td className="py-3.5 font-semibold text-slate-800 ">{row.product}</td>
+                      <td className="py-3.5 font-mono text-xs text-slate-600 ">{row.expiry}</td>
+                      <td className="py-3.5 font-mono text-xs text-slate-900 ">{row.qty}</td>
+                      <td className="py-3.5 text-xs text-slate-500 ">{row.warehouse}</td>
                       <td className="py-3.5">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${
                           row.status === "Expired"
-                            ? "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-400 dark:border-rose-800"
+                            ? "bg-rose-50 text-rose-700 border-rose-200   "
                             : row.status === "Near Expiry"
-                            ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-800"
-                            : "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-400 dark:border-purple-800"
+                            ? "bg-amber-50 text-amber-700 border-amber-200   "
+                            : "bg-purple-50 text-purple-700 border-purple-200   "
                         }`}>
                           {row.status}
                         </span>
                       </td>
                       <td className="py-3.5 text-right pr-2">
-                        <button className="rounded-md border border-slate-200 dark:border-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
+                        <button className="rounded-md border border-slate-200  px-2.5 py-1 text-xs font-semibold text-slate-700  hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
                           Quarantine
                         </button>
                       </td>
@@ -441,9 +441,9 @@ const InventoryDashboard = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-6 flex items-center justify-between border-t border-slate-100  pt-4 text-xs text-slate-500 ">
             <span>Automated FEFO (First Expired, First Out) picking active</span>
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1">
+            <span className="font-semibold text-indigo-600  hover:underline cursor-pointer flex items-center gap-1">
               Configure expiry rules <ArrowUpRight className="h-3 w-3" />
             </span>
           </div>
@@ -452,19 +452,19 @@ const InventoryDashboard = () => {
         {/* Right 1 Col: Stock Health Index & Top Movers */}
         <div className="space-y-6">
           {/* Stock Health Card */}
-          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base font-bold text-slate-900 ">
                 Overall Stock Health Index
               </h3>
-              <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+              <span className="rounded-full bg-emerald-100  px-2.5 py-0.5 text-xs font-bold text-emerald-800 ">
                 94.2% Optimal
               </span>
             </div>
 
             <div className="space-y-4">
               <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
+                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
                   <span>Stock Availability Ratio</span>
                   <span>1,180 / 1,240 SKUs</span>
                 </div>
@@ -472,7 +472,7 @@ const InventoryDashboard = () => {
               </div>
 
               <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
+                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
                   <span>Batch Quality Compliance</span>
                   <span>98.6% Passed</span>
                 </div>
@@ -480,7 +480,7 @@ const InventoryDashboard = () => {
               </div>
 
               <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 dark:text-slate-300">
+                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
                   <span>Reorder Level Buffer</span>
                   <span>85.4% Above Minimum</span>
                 </div>
@@ -488,30 +488,30 @@ const InventoryDashboard = () => {
               </div>
             </div>
 
-            <div className="mt-5 border-t border-slate-100 dark:border-slate-800 pt-4 flex items-center justify-between text-xs">
-              <span className="text-slate-500 dark:text-slate-400">18 products below safety stock</span>
-              <button className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+            <div className="mt-5 border-t border-slate-100  pt-4 flex items-center justify-between text-xs">
+              <span className="text-slate-500 ">18 products below safety stock</span>
+              <button className="font-bold text-indigo-600  hover:underline">
                 Generate Purchase Orders →
               </button>
             </div>
           </div>
 
           {/* Top Movers Card */}
-          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4">
+          <div className="rounded-xl border border-slate-200  bg-white  p-6 shadow-sm">
+            <h3 className="text-base font-bold text-slate-900  mb-4">
               Top Moving Pharmaceuticals
             </h3>
             <div className="space-y-3">
               {topMovingProducts.map((prod, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded-lg border border-slate-100 dark:border-slate-800/80 p-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div key={idx} className="flex items-center justify-between rounded-lg border border-slate-100  p-2.5 hover:bg-slate-50  transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">{prod.name}</h4>
+                    <h4 className="text-xs font-bold text-slate-800 ">{prod.name}</h4>
                     <span className="text-[11px] text-slate-400 font-mono">{prod.unitsSold.toLocaleString()} units sold</span>
                   </div>
                   <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${
                     prod.stock === "Optimal"
-                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60"
-                      : "bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60"
+                      ? "bg-emerald-50 text-emerald-700   border border-emerald-200/60 "
+                      : "bg-amber-50 text-amber-700   border border-amber-200/60 "
                   }`}>
                     {prod.stock}
                   </span>

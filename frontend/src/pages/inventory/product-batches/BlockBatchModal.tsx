@@ -24,11 +24,11 @@ const BlockBatchModal = ({ isOpen, onClose, onSave, batch }: { isOpen?: boolean;
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Block Batch">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-600 ">
           Blocking batch <span className="font-semibold">{batch?.batch_number}</span> will prevent it from being used in any future transactions.
         </p>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Reason for Blocking <span className="text-red-500">*</span>
           </label>
           <textarea required rows={3} value={reason} onChange={(e: any) => setReason(e.target.value)} className="w-full px-3 py-2 border rounded-xl" />

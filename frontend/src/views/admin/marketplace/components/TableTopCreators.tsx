@@ -24,7 +24,7 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("name", {
       id: "name",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">NAME</p>
+        <p className="text-sm font-bold text-gray-600 ">NAME</p>
       ),
       cell: (info: any) => (
         <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ function CheckTable(props: { tableData: any }) {
               alt=""
             />
           </div>
-          <p className="text-sm font-medium text-navy-700 dark:text-white">
+          <p className="text-sm font-medium text-navy-700 ">
             {info.getValue()[0]}
           </p>
         </div>
@@ -44,12 +44,12 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("artworks", {
       id: "artworks",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
+        <p className="text-sm font-bold text-gray-600 ">
           ARTWORKS
         </p>
       ),
       cell: (info: unknown) => (
-        <p className="text-md font-medium text-gray-600 dark:text-white">
+        <p className="text-md font-medium text-gray-600 ">
           {info.getValue()}
         </p>
       ),
@@ -57,7 +57,7 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("rating", {
       id: "rating",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
+        <p className="text-sm font-bold text-gray-600 ">
           RATING
         </p>
       ),
@@ -83,11 +83,11 @@ function CheckTable(props: { tableData: any }) {
   return (
     <Card extra={"w-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
-        <div className="text-xl font-bold text-navy-700 dark:text-white">
+        <div className="text-xl font-bold text-navy-700 ">
           Check Table
         </div>
 
-        <button className="dark:active-bg-white-20 linear rounded-md bg-lightPrimary px-4 py-2 text-base font-medium text-brand-500 transition duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10">
+        <button className=" linear rounded-md bg-lightPrimary px-4 py-2 text-base font-medium text-brand-500 transition duration-200 hover:bg-gray-100 active:bg-gray-200   ">
           See all
         </button>
       </header>

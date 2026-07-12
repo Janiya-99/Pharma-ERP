@@ -167,7 +167,7 @@ export default function BankReconciliationFormPage() {
     <div className="py-4 max-w-6xl mx-auto h-full overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-navy-700 dark:text-white">
+          <h2 className="text-2xl font-bold text-navy-700 ">
             {isEdit ? "Edit Bank Reconciliation" : "New Bank Reconciliation"}
           </h2>
           <p className="text-sm text-gray-500 mt-1">Match bank statement with system transactions.</p>
@@ -184,11 +184,11 @@ export default function BankReconciliationFormPage() {
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Statement Details</h3>
+            <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Statement Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Account *</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Bank Account *</label>
                   <BankAccountSelect
                     value={formData.bank_account_id}
                     onChange={(val: unknown) => setFormData((prev: unknown) => ({ ...prev, bank_account_id: val }))}
@@ -197,7 +197,7 @@ export default function BankReconciliationFormPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statement Start Date *</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Statement Start Date *</label>
                   <input
                     type="date"
                     name="statement_start_date"
@@ -208,7 +208,7 @@ export default function BankReconciliationFormPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statement End Date *</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Statement End Date *</label>
                   <input
                     type="date"
                     name="statement_end_date"
@@ -220,7 +220,7 @@ export default function BankReconciliationFormPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statement Opening Balance</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Statement Opening Balance</label>
                   <input
                     type="number"
                     step="0.01"
@@ -231,7 +231,7 @@ export default function BankReconciliationFormPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statement Closing Balance *</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Statement Closing Balance *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -244,7 +244,7 @@ export default function BankReconciliationFormPage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remarks</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Remarks</label>
                   <textarea
                     name="remarks"
                     value={formData.remarks}
@@ -256,8 +256,8 @@ export default function BankReconciliationFormPage() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700 flex justify-between items-center">
+            <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2  flex justify-between items-center">
                 <span>Transactions to Reconcile</span>
                 <span className="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-md">{selectedTxIds.length} Selected</span>
               </h3>
@@ -283,8 +283,8 @@ export default function BankReconciliationFormPage() {
               totalClearedCredits={totalClearedCredits}
             />
 
-            <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-gray-100 dark:border-navy-700 p-6">
-              <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4 border-b pb-2 dark:border-navy-700">Actions</h3>
+            <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
+              <h3 className="text-lg font-bold text-navy-700  mb-4 border-b pb-2 ">Actions</h3>
               <p className="text-sm text-gray-500 mb-4">
                 Save this reconciliation as a draft. You can complete it later when the difference is zero.
               </p>

@@ -26,19 +26,19 @@ const SubmitGRNModal = ({ isOpen, onClose, grnId, onSuccess }: { isOpen?: boolea
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Submit Goods Receipt Note">
       <div className="p-4">
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+        <p className="text-sm text-gray-600  mb-4">
           Are you sure you want to submit this GRN for approval? Once submitted, it cannot be edited unless rejected.
         </p>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label className="block text-sm font-medium text-gray-700  mb-1.5">
             Remarks (Optional)
           </label>
           <textarea
             value={remarks}
             onChange={(e: any) => setRemarks(e.target.value)}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white"
+            className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
             placeholder="Add any notes..."
           />
         </div>
@@ -47,14 +47,14 @@ const SubmitGRNModal = ({ isOpen, onClose, grnId, onSuccess }: { isOpen?: boolea
           <button
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 dark:hover:bg-navy-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50     disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-700 bg-yellow-100 rounded-xl hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-100 dark:hover:bg-yellow-800 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-700 bg-yellow-100 rounded-xl hover:bg-yellow-200    disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
             {submitting ? "Submitting..." : "Submit"}

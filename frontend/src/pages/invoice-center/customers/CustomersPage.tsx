@@ -119,7 +119,7 @@ const CustomersPage: React.FC = () => {
 
   if (activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
-      <div className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800 m-6 rounded-2xl border p-8 text-center font-medium">
+      <div className="bg-rose-50  text-rose-600  border-rose-200  m-6 rounded-2xl border p-8 text-center font-medium">
         Please switch to Invoice Center module to access this page.
       </div>
     );
@@ -133,12 +133,12 @@ const CustomersPage: React.FC = () => {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm   sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-navy-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-navy-900 ">
             Customers
           </h1>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-gray-500 ">
             Manage customer profiles, credit accounts, and contact points
           </p>
         </div>
@@ -146,7 +146,7 @@ const CustomersPage: React.FC = () => {
           <button
             onClick={fetchCustomers}
             disabled={loading}
-            className="rounded-xl bg-gray-50 p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:bg-navy-700 dark:text-gray-300 dark:hover:bg-navy-600"
+            className="rounded-xl bg-gray-50 p-2 text-gray-600 transition-colors hover:bg-gray-100   "
             title="Refresh"
           >
             <RefreshCw className={`h-5 w-5 ${loading ? "animate-spin" : ""}`} />
@@ -170,7 +170,7 @@ const CustomersPage: React.FC = () => {
       )}
 
       {/* Filters bar */}
-      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm   sm:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
           <Search className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
           <input
@@ -178,7 +178,7 @@ const CustomersPage: React.FC = () => {
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             placeholder="Search code, name, phone..."
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 dark:border-navy-600 dark:bg-navy-700"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-navy-500  "
           />
         </div>
 
@@ -244,11 +244,11 @@ const CustomersPage: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-navy-700 dark:bg-navy-800">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm  ">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:bg-navy-700/50">
+              <tr className="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-gray-400 ">
                 <th className="px-4 py-3.5">Code</th>
                 <th className="px-4 py-3.5">Customer Name</th>
                 <th className="px-4 py-3.5">Type</th>
@@ -260,7 +260,7 @@ const CustomersPage: React.FC = () => {
                 <th className="px-4 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-sm dark:divide-navy-700">
+            <tbody className="divide-y divide-gray-100 text-sm ">
               {loading ? (
                 <tr>
                   <td
@@ -274,7 +274,7 @@ const CustomersPage: React.FC = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-gray-500 dark:text-gray-400"
+                    className="py-12 text-center text-gray-500 "
                   >
                     No customers found matching filters.
                   </td>
@@ -283,32 +283,32 @@ const CustomersPage: React.FC = () => {
                 customers.map((cust) => (
                   <tr
                     key={cust.id}
-                    className="transition-colors hover:bg-gray-50/80 dark:hover:bg-navy-700/50"
+                    className="transition-colors hover:bg-gray-50/80 "
                   >
-                    <td className="px-4 py-3.5 font-mono font-semibold text-navy-900 dark:text-white">
+                    <td className="px-4 py-3.5 font-mono font-semibold text-navy-900 ">
                       {cust.customer_code}
                     </td>
                     <td
                       onClick={() =>
                         navigate(`/invoice-center/customers/${cust.id}`)
                       }
-                      className="cursor-pointer px-4 py-3.5 font-bold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                      className="cursor-pointer px-4 py-3.5 font-bold text-brand-600 hover:text-brand-700 "
                     >
                       {cust.customer_name}
                     </td>
                     <td className="px-4 py-3.5">
                       <CustomerTypeBadge type={cust.customer_type} />
                     </td>
-                    <td className="px-4 py-3.5 text-gray-700 dark:text-gray-300">
+                    <td className="px-4 py-3.5 text-gray-700 ">
                       {cust.category?.category_name || "—"}
                     </td>
-                    <td className="px-4 py-3.5 text-gray-600 dark:text-gray-400">
+                    <td className="px-4 py-3.5 text-gray-600 ">
                       {cust.phone || "—"}
                     </td>
-                    <td className="px-4 py-3.5 font-medium text-gray-700 dark:text-gray-300">
+                    <td className="px-4 py-3.5 font-medium text-gray-700 ">
                       {formatLKR(cust.credit_limit)}
                     </td>
-                    <td className="px-4 py-3.5 font-bold text-navy-900 dark:text-white">
+                    <td className="px-4 py-3.5 font-bold text-navy-900 ">
                       {formatLKR(cust.current_balance)}
                     </td>
                     <td className="px-4 py-3.5">

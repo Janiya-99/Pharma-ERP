@@ -26,7 +26,7 @@ const PettyCashActionButtons = ({
       {showEdit && hasPermission(permissions.update) && (
         <button
           onClick={onEdit}
-          className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-brand-600 shadow-sm ring-1 ring-inset ring-brand-200 hover:bg-brand-50 dark:bg-navy-800 dark:text-brand-400 dark:ring-navy-600 dark:hover:bg-navy-700"
+          className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-brand-600 shadow-sm ring-1 ring-inset ring-brand-200 hover:bg-brand-50    "
         >
           <MdEdit className="h-4 w-4" />
           Edit
@@ -36,7 +36,7 @@ const PettyCashActionButtons = ({
       {showDelete && hasPermission(permissions.delete) && (
         <button
           onClick={onDelete}
-          className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-sm ring-1 ring-inset ring-red-200 hover:bg-red-50 dark:bg-navy-800 dark:text-red-400 dark:ring-navy-600 dark:hover:bg-navy-700"
+          className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-sm ring-1 ring-inset ring-red-200 hover:bg-red-50    "
         >
           <MdDelete className="h-4 w-4" />
           Delete

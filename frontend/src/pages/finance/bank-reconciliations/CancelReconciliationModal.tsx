@@ -17,20 +17,20 @@ export default function CancelReconciliationModal({ isOpen, onClose, onCancelRec
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-lg w-full max-w-md">
-        <div className="flex items-center gap-3 mb-4 text-red-600 dark:text-red-500">
+      <div className="bg-white  p-6 rounded-xl shadow-lg w-full max-w-md">
+        <div className="flex items-center gap-3 mb-4 text-red-600 ">
           <MdCancel className="h-6 w-6" />
-          <h3 className="text-lg font-bold text-navy-700 dark:text-white">Cancel Reconciliation</h3>
+          <h3 className="text-lg font-bold text-navy-700 ">Cancel Reconciliation</h3>
         </div>
         
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+        <p className="text-sm text-gray-600  mb-6">
           Are you sure you want to cancel this completed reconciliation? 
           The linked transactions will become unreconciled and available again.
         </p>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cancellation Reason *</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">Cancellation Reason *</label>
             <textarea
               value={remarks}
               onChange={(e: any) => setRemarks(e.target.value)}

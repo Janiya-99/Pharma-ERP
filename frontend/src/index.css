@@ -99,54 +99,6 @@
     --sidebar: rgba(255, 255, 255, 0.5);
   }
 
-  .dark {
-    --erp-surface: #1e1b4b;
-    --erp-surface-muted: #312e81;
-    --erp-border-soft: rgba(129, 140, 248, 0.2);
-    --erp-text-primary: #f8fafc;
-    --erp-text-secondary: #e2e8f0;
-
-    --background: #020420;
-    --foreground: #f8fafc;
-    --card: #1e1b4b;
-    --card-foreground: #f8fafc;
-    --popover: #1e1b4b;
-    --popover-foreground: #f8fafc;
-    --primary: #4854cc;
-    --primary-foreground: #ffffff;
-    --secondary: #312e81;
-    --secondary-foreground: #f8fafc;
-    --muted: #312e81;
-    --muted-foreground: #cbd5e1;
-    --accent: #312e81;
-    --accent-foreground: #f8fafc;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --erp-button-secondary-bg: rgba(30, 41, 59, 0.78);
-    --erp-button-secondary-hover: rgba(51, 65, 85, 0.92);
-    --erp-button-secondary-fg: #f8fafc;
-    --border: rgba(129, 140, 248, 0.15);
-    --input: rgba(129, 140, 248, 0.15);
-    --ring: #4854cc;
-
-    --sidebar-background: #020420;
-    --sidebar-foreground: #f8fafc;
-    --sidebar-primary: #4854cc;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #312e81;
-    --sidebar-accent-foreground: #f8fafc;
-    --sidebar-border: rgba(129, 140, 248, 0.1);
-    --sidebar-ring: #4854cc;
-    --sidebar: #1e1b4b;
-
-    --chart-1: #4854cc;
-    --chart-2: #6366f1;
-    --chart-3: #818cf8;
-    --chart-4: #334155;
-    --chart-5: #4854cc;
-    --chart-6: #312e81;
-  }
-
   * {
     @apply border-border;
     outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
@@ -156,7 +108,9 @@
     @apply text-foreground;
     color: var(--erp-text-secondary);
     letter-spacing: 0;
-    background: #fafafa;
+    /* Subtle modern noise texture on light grey background */
+    background-color: #fafafa;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
     background-attachment: fixed;
     min-height: 100vh;
   }

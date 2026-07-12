@@ -18,7 +18,7 @@ export default function ChequeLeavesTable({ leaves, onCancelLeaf, hasPermission 
     <div className="w-full">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-gray-50 dark:bg-navy-700/50 text-gray-500 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-navy-700">
+          <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
             <tr>
               <th className="px-4 py-3">Leaf Number</th>
               <th className="px-4 py-3 text-center">Status</th>
@@ -27,14 +27,14 @@ export default function ChequeLeavesTable({ leaves, onCancelLeaf, hasPermission 
               <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+          <tbody className="divide-y divide-gray-100 ">
             {leaves.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-4 py-8 text-center text-gray-500">No leaves found for this cheque book.</td>
               </tr>
             ) : (
               leaves.map((leaf: unknown) => (
-                <tr key={leaf.id} className="hover:bg-gray-50 dark:hover:bg-navy-700/30">
+                <tr key={leaf.id} className="hover:bg-gray-50 ">
                   <td className="px-4 py-3 font-medium text-navy-700">{leaf.leaf_number}</td>
                   <td className="px-4 py-3 text-center">
                     <ChequeLeafStatusBadge status={leaf.status} />
@@ -63,11 +63,11 @@ export default function ChequeLeavesTable({ leaves, onCancelLeaf, hasPermission 
       {/* Cancel Modal */}
       {cancelModal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-navy-800 p-6 rounded-xl shadow-lg w-full max-w-md">
-            <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-4">Cancel Cheque Leaf</h3>
+          <div className="bg-white  p-6 rounded-xl shadow-lg w-full max-w-md">
+            <h3 className="text-lg font-bold text-navy-700  mb-4">Cancel Cheque Leaf</h3>
             <form onSubmit={handleCancelSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cancellation Remarks *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Cancellation Remarks *</label>
                 <textarea
                   value={cancelModal.remarks}
                   onChange={(e: any) => setCancelModal((prev: unknown) => ({ ...prev, remarks: e.target.value }))}

@@ -1,22 +1,22 @@
 
 const StockAdjustmentStatusBadge = ({ status }: { status?: unknown }) => {
-  let bgColor = "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+  let bgColor = "bg-gray-100 text-gray-800  ";
 
   switch (status) {
     case "draft":
-      bgColor = "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+      bgColor = "bg-gray-100 text-gray-800  ";
       break;
     case "pending":
-      bgColor = "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+      bgColor = "bg-yellow-100 text-yellow-800  ";
       break;
     case "approved":
-      bgColor = "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      bgColor = "bg-green-100 text-green-800  ";
       break;
     case "rejected":
-      bgColor = "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+      bgColor = "bg-red-100 text-red-800  ";
       break;
     case "cancelled":
-      bgColor = "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300";
+      bgColor = "bg-slate-100 text-slate-800  ";
       break;
     default:
       break;

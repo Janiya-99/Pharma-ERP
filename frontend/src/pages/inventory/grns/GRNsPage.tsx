@@ -100,7 +100,7 @@ const GRNsPage = () => {
     <div className="p-6">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-navy-700 dark:text-white">Goods Receipt Notes</h1>
+          <h1 className="text-2xl font-bold text-navy-700 ">Goods Receipt Notes</h1>
           <p className="text-sm text-gray-500 mt-1">Manage supplier deliveries and GRNs</p>
         </div>
         <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ const GRNsPage = () => {
               placeholder="Search GRNs..."
               value={search}
               onChange={(e: any) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-200 dark:border-navy-600 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white dark:bg-navy-700 text-gray-700 dark:text-white"
+              className="pl-9 pr-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
             />
           </div>
           <PermissionGuard permission="inventory.grn.create">
@@ -126,7 +126,7 @@ const GRNsPage = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-sm border border-gray-100 dark:border-navy-700 overflow-hidden">
+      <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  overflow-hidden">
         <DataTable
           columns={columns}
           data={data}

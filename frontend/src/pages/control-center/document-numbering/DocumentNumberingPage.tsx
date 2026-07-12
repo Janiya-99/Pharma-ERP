@@ -139,22 +139,22 @@ const DocumentNumberingPage = () => {
         isLoading={isSaving}
       />
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
               <Hash className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
                 Control Center • System Configuration
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
                 Document Numbering & Sequence Rules
               </h1>
             </div>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 pl-12">
+          <p className="mt-1 text-sm text-slate-500  pl-12">
             Configure prefixes, suffixes, sequence padding, and automatic reset frequencies for all ERP vouchers
           </p>
         </div>
@@ -162,7 +162,7 @@ const DocumentNumberingPage = () => {
         {/* Action Bar */}
         <div className="flex items-center gap-3">
           {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 px-3.5 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 animate-in fade-in">
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50  px-3.5 py-2 text-xs font-bold text-emerald-700  border border-emerald-200/60  animate-in fade-in">
               <CheckCircle2 className="h-4 w-4" /> Sequence Rules Enforced!
             </span>
           )}
@@ -178,7 +178,7 @@ const DocumentNumberingPage = () => {
       </div>
 
       {/* ── Filter & Search Bar ── */}
-      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 rounded-xl border border-slate-200  bg-white  p-4 shadow-sm md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 items-center gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -187,7 +187,7 @@ const DocumentNumberingPage = () => {
               placeholder="Search document type or prefix..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              className="h-10 w-full rounded-xl border border-slate-200  bg-slate-50/50  pl-10 pr-4 text-sm text-slate-900  placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
             />
           </div>
         </div>
@@ -196,7 +196,7 @@ const DocumentNumberingPage = () => {
           <select
             value={selectedModule}
             onChange={(e) => setSelectedModule(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="h-10 rounded-xl border border-slate-200  bg-white  px-3.5 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="ALL">All Software Modules</option>
             <option value="Finance & Banking">Finance & Banking</option>
@@ -209,11 +209,11 @@ const DocumentNumberingPage = () => {
       </div>
 
       {/* ── Document Numbering Rules Table ── */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-slate-200  bg-white  shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <tr className="border-b border-slate-200  bg-slate-50/50  text-xs font-bold uppercase tracking-wider text-slate-400">
                 <th className="px-5 py-3.5">Document Type & Module</th>
                 <th className="px-4 py-3.5">Prefix</th>
                 <th className="px-4 py-3.5">Suffix</th>
@@ -223,19 +223,19 @@ const DocumentNumberingPage = () => {
                 <th className="px-5 py-3.5 text-right pr-5">Live Voucher Preview</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100 ">
               {filteredRules.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-slate-500 ">
                     No document numbering rules match your filter criteria.
                   </td>
                 </tr>
               ) : (
                 filteredRules.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                  <tr key={row.id} className="hover:bg-slate-50  transition-colors">
                     <td className="px-5 py-4">
-                      <p className="font-bold text-slate-900 dark:text-white">{row.name}</p>
-                      <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">{row.module}</span>
+                      <p className="font-bold text-slate-900 ">{row.name}</p>
+                      <span className="text-[11px] font-semibold text-indigo-600 ">{row.module}</span>
                       <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{row.description}</p>
                     </td>
 
@@ -245,7 +245,7 @@ const DocumentNumberingPage = () => {
                         type="text"
                         value={row.prefix}
                         onChange={(e) => handleUpdate(row.id, "prefix", e.target.value)}
-                        className="h-9 w-28 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 font-mono text-xs font-bold text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+                        className="h-9 w-28 rounded-lg border border-slate-200  bg-slate-50  px-2.5 font-mono text-xs font-bold text-slate-900  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
                       />
                     </td>
 
@@ -256,7 +256,7 @@ const DocumentNumberingPage = () => {
                         placeholder="None"
                         value={row.suffix}
                         onChange={(e) => handleUpdate(row.id, "suffix", e.target.value)}
-                        className="h-9 w-20 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 font-mono text-xs font-medium text-slate-800 dark:text-slate-200 focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+                        className="h-9 w-20 rounded-lg border border-slate-200  bg-slate-50  px-2.5 font-mono text-xs font-medium text-slate-800  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
                       />
                     </td>
 
@@ -268,7 +268,7 @@ const DocumentNumberingPage = () => {
                         max="8"
                         value={row.padding}
                         onChange={(e) => handleUpdate(row.id, "padding", Number(e.target.value))}
-                        className="h-9 w-16 text-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 font-mono text-xs font-bold text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+                        className="h-9 w-16 text-center rounded-lg border border-slate-200  bg-slate-50  px-2 font-mono text-xs font-bold text-slate-900  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
                       />
                     </td>
 
@@ -279,7 +279,7 @@ const DocumentNumberingPage = () => {
                         min="1"
                         value={row.nextNumber}
                         onChange={(e) => handleUpdate(row.id, "nextNumber", Number(e.target.value))}
-                        className="h-9 w-24 text-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:border-indigo-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-colors"
+                        className="h-9 w-24 text-center rounded-lg border border-slate-200  bg-slate-50  px-2 font-mono text-xs font-bold text-indigo-600  focus:border-indigo-500 focus:outline-none focus:bg-white  transition-colors"
                       />
                     </td>
 
@@ -288,7 +288,7 @@ const DocumentNumberingPage = () => {
                       <select
                         value={row.resetFreq}
                         onChange={(e) => handleUpdate(row.id, "resetFreq", e.target.value)}
-                        className="h-9 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        className="h-9 rounded-lg border border-slate-200  bg-white  px-2.5 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                       >
                         <option value="NEVER">Never (Continuous)</option>
                         <option value="YEARLY">Yearly (Jan 1st)</option>
@@ -299,7 +299,7 @@ const DocumentNumberingPage = () => {
 
                     {/* Live Preview Badge */}
                     <td className="px-5 py-4 text-right pr-5">
-                      <span className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 px-3.5 py-2 font-mono text-sm font-extrabold text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 shadow-2xs">
+                      <span className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-50  px-3.5 py-2 font-mono text-sm font-extrabold text-indigo-700  border border-indigo-200/80  shadow-2xs">
                         <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
                         {formatPreview(row)}
                       </span>
@@ -313,14 +313,14 @@ const DocumentNumberingPage = () => {
       </div>
 
       {/* ── Footer Information Banner ── */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-5 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+      <div className="rounded-xl border border-slate-200  bg-slate-50  p-5 text-xs text-slate-500  flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <RotateCcw className="h-4 w-4 text-indigo-600 shrink-0" />
           <span>
             <b>Automated Reset Logic:</b> When a sequence reaches its reset cycle (e.g. Yearly), the sequence counter automatically resets to <b>1</b> and appends the new period year to the prefix/suffix.
           </span>
         </div>
-        <span className="font-semibold text-slate-700 dark:text-slate-300 shrink-0">
+        <span className="font-semibold text-slate-700  shrink-0">
           Strict NMRA & IRAS Audit Compliance Active
         </span>
       </div>
