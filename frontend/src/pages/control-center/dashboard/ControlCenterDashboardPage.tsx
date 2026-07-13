@@ -134,6 +134,7 @@ const roleData: RoleDistribution[] = [
 ];
 
 const kpiCards: KPIData[] = [
+  {
     title: "Total Branches",
     value: "24",
     icon: Building2,
@@ -142,6 +143,7 @@ const kpiCards: KPIData[] = [
     description: "Regional office locations",
     tone: "blue",
   },
+  {
     title: "Total Users",
     value: "1,248",
     icon: Users,
@@ -150,6 +152,7 @@ const kpiCards: KPIData[] = [
     description: "Registered employee accounts",
     tone: "indigo",
   },
+  {
     title: "Software Modules",
     value: "8",
     icon: Blocks,

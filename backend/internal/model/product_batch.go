@@ -13,6 +13,7 @@ type ProductBatch struct {
 	BinLocation  string    `gorm:"size:100" json:"bin_location"`
 	AvailableQty int       `gorm:"default:0" json:"available_qty"`
 	ReservedQty  int       `gorm:"default:0" json:"reserved_qty"`
+	UnitCost     float64   `gorm:"type:decimal(15,2);default:0" json:"unit_cost"`
 	Status       string    `gorm:"type:enum('Available', 'Near Expiry', 'Expired', 'On Hold');default:'Available'" json:"status"`
 
 	// Relationships

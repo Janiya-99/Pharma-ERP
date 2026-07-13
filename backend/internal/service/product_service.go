@@ -24,7 +24,7 @@ func (s *ProductService) Create(ctx context.Context, req dto.CreateProductReq) (
 		Name:         req.Name,
 		GenericName:  req.GenericName,
 		Brand:        req.Brand,
-		Category:     req.Category,
+		CategoryID:   req.CategoryID,
 		Manufacturer: req.Manufacturer,
 		DosageForm:   req.DosageForm,
 		Strength:     req.Strength,

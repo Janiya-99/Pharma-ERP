@@ -7,7 +7,7 @@ type Product struct {
 	Name         string `gorm:"size:255;not null" json:"name"`
 	GenericName  string `gorm:"size:255" json:"generic_name"`
 	Brand        string `gorm:"size:255" json:"brand"`
-	Category     string `gorm:"size:100" json:"category"`
+	CategoryID   uint64 `gorm:"column:category_id;not null" json:"category_id"`
 	Manufacturer string `gorm:"size:255" json:"manufacturer"`
 	DosageForm   string `gorm:"size:100" json:"dosage_form"`
 	Strength     string `gorm:"size:100" json:"strength"`
@@ -17,5 +17,6 @@ type Product struct {
 	Status       string `gorm:"type:enum('Active', 'Inactive');default:'Active'" json:"status"`
 
 	// Relationships
-	Batches []ProductBatch `gorm:"foreignKey:ProductID" json:"batches,omitempty"`
+	ProductCategory *ProductCategory `gorm:"foreignKey:CategoryID" json:"product_category,omitempty"`
+	Batches         []ProductBatch   `gorm:"foreignKey:ProductID" json:"batches,omitempty"`
 }

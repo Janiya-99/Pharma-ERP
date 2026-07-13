@@ -1,8 +1,6 @@
 package seeders
 
 import (
-	"strings"
-
 	"github.com/pixandco/erp-phrma/internal/company/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"

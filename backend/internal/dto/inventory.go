@@ -26,7 +26,7 @@ type CreateProductReq struct {
 	Name         string `json:"name" binding:"required"`
 	GenericName  string `json:"generic_name"`
 	Brand        string `json:"brand"`
-	Category     string `json:"category"`
+	CategoryID   uint64 `json:"category_id" binding:"required"`
 	Manufacturer string `json:"manufacturer"`
 	DosageForm   string `json:"dosage_form"`
 	Strength     string `json:"strength"`
@@ -41,7 +41,7 @@ type UpdateProductReq struct {
 	Name         string `json:"name"`
 	GenericName  string `json:"generic_name"`
 	Brand        string `json:"brand"`
-	Category     string `json:"category"`
+	CategoryID   uint64 `json:"category_id"`
 	Manufacturer string `json:"manufacturer"`
 	DosageForm   string `json:"dosage_form"`
 	Strength     string `json:"strength"`
