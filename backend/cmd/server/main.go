@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/pixandco/erp-phrma/internal/auth/handlers"
-	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
@@ -34,7 +33,8 @@ func main() {
 	logger.Info("Platform database ready", zap.String("db", cfg.PlatformDB.Name))
 
 	// 3.1. Run Platform AutoMigrate + Seeder
-	if os.Getenv("SKIP_MIGRATIONS") != "true" {
+	hasPlatformTables := platformDB.Migrator().HasTable("platform_admin_users")
+	if os.Getenv("SKIP_PLATFORM_MIGRATIONS") != "true" && (os.Getenv("SKIP_MIGRATIONS") != "true" || !hasPlatformTables) {
 		if err := platformMigrations.RunPlatformMigrations(platformDB, logger); err != nil {
 			logger.Fatal("Failed to run platform migrations", zap.Error(err))
 		}
@@ -48,14 +48,9 @@ func main() {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
 
-	// 4.1. Run Company AutoMigrate + Seeder (Development only)
-	if os.Getenv("SKIP_MIGRATIONS") != "true" {
-		if err := companyMigrations.RunCompanyMigrations(db, logger); err != nil {
-			logger.Fatal("Failed to run company migrations", zap.Error(err))
-		}
-	} else {
-		logger.Info("Skipping company migrations and seeders (SKIP_MIGRATIONS=true)")
-	}
+	// 4.1. Startup Company Migrations Disabled
+	// Company migrations are not run on startup. They are executed dynamically when a company is created from the platform.
+	logger.Info("Company migrations on startup disabled (migrated dynamically on company creation)")
 
 	// 5. Setup Repositories
 	userRepo := repository.NewUserRepository(db)
