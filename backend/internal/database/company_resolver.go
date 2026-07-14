@@ -8,6 +8,7 @@ import (
 	"time"
 
 	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
+	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/platform/models"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
@@ -16,14 +17,16 @@ import (
 )
 
 type CompanyResolver struct {
+	cfg        *config.Config
 	platformDB *gorm.DB
 	logger     *zap.Logger
 	mu         sync.RWMutex
 	dbs        map[string]*gorm.DB
 }
 
-func NewCompanyResolver(platformDB *gorm.DB, logger *zap.Logger) *CompanyResolver {
+func NewCompanyResolver(cfg *config.Config, platformDB *gorm.DB, logger *zap.Logger) *CompanyResolver {
 	return &CompanyResolver{
+		cfg:        cfg,
 		platformDB: platformDB,
 		logger:     logger,
 		dbs:        make(map[string]*gorm.DB),
@@ -106,12 +109,12 @@ func (r *CompanyResolver) GetOrCreateCompanyDBConnection(company models.Platform
 	// The prompt implies platform database stores routing details.
 	// Let's connect using standard root:root@tcp(127.0.0.1:3306)/dbname?parseTime=true
 
-	// Default to local dev credentials for the company database.
+	// Use the configured database defaults for the host/port/credentials.
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		"root",
-		"root", // or from config
-		"127.0.0.1",
-		"3306",
+		r.cfg.Database.User,
+		r.cfg.Database.Password,
+		r.cfg.Database.Host,
+		r.cfg.Database.Port,
 		company.DatabaseName,
 	)
 

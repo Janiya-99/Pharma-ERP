@@ -122,11 +122,11 @@ func Load() (*Config, error) {
 		},
 		// Company database — legacy single-company connection (kept for backward compatibility)
 		Database: DatabaseConfig{
-			Host:            getEnv("DB_HOST", "127.0.0.1"),
-			Port:            getEnv("DB_PORT", "3306"),
+			Host:            getEnv("DB_HOST", getEnv("PLATFORM_DB_HOST", "localhost")),
+			Port:            getEnv("DB_PORT", getEnv("PLATFORM_DB_PORT", "3306")),
 			Name:            getEnv("DB_NAME", "erp_phrma"),
-			User:            getEnv("DB_USER", "root"),
-			Password:        getEnv("DB_PASSWORD", ""),
+			User:            getEnv("DB_USER", getEnv("PLATFORM_DB_USER", "root")),
+			Password:        getEnv("DB_PASSWORD", getEnv("PLATFORM_DB_PASSWORD", "")),
 			MaxOpenConns:    getEnvInt("DB_MAX_OPEN_CONNS", 25),
 			MaxIdleConns:    getEnvInt("DB_MAX_IDLE_CONNS", 10),
 			ConnMaxLifetime: time.Duration(getEnvInt("DB_CONN_MAX_LIFETIME_MINUTES", 5)) * time.Minute,

@@ -4,6 +4,7 @@ import rtl from "tailwindcss-rtl";
 import animate from "tailwindcss-animate";
 
 const config = {
+  darkMode: "class",
   content: [
     "./src/**/*.{ts,tsx}",
     "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}",

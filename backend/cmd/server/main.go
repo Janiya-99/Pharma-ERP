@@ -104,7 +104,7 @@ func main() {
 	grnCtrl := controller.NewGRNController(grnService)
 
 	// Step 7: New Auth
-	companyResolver := database.NewCompanyResolver(platformDB, logger)
+	companyResolver := database.NewCompanyResolver(cfg, platformDB, logger)
 	newAuthHandler := handlers.NewAuthHandler(companyResolver)
 
 	// 8. Setup Router
