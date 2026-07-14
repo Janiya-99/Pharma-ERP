@@ -61,10 +61,6 @@ func RunPlatformMigrations(db *gorm.DB, logger *zap.Logger) error {
 		return err
 	}
 
-	if err := seeders.SeedPlatformCompanies(db, logger); err != nil {
-		logger.Error("Platform company seeder failed", zap.Error(err))
-		return err
-	}
 
 	if err := seeders.SeedPlatformAdminData(db, logger); err != nil {
 		logger.Error("Platform admin data seeder failed", zap.Error(err))
