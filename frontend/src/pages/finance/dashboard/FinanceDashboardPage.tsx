@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { RefreshCw, Wallet, Landmark, Receipt, FileText, TrendingUp, TrendingDown, BarChart3, BadgeDollarSign, ClipboardCheck, CircleDollarSign } from "lucide-react";
+import { RefreshCw, Wallet, Landmark, Receipt, FileText, TrendingUp, TrendingDown, BarChart3, BadgeDollarSign, ClipboardCheck, CircleDollarSign, ChevronDown, Plus } from "lucide-react";
 
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
@@ -9,6 +9,13 @@ import { getErrorMessage } from "./utils";
 import toast from "react-hot-toast";
 
 import { Button } from "../../../components/ui/button";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "../../../components/ui/dropdown-menu";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "../../../components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -64,9 +71,34 @@ const FinanceDashboardPage = () => {
           <Button variant="outline" size="icon" onClick={() => refetch()} disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           </Button>
-          <Button className="bg-indigo-600 text-white hover:bg-indigo-700  ">
-            New Journal Entry
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/20 px-4 transition-all">
+                <Plus className="mr-2 h-4 w-4" />
+                New Action
+                <ChevronDown className="ml-2 h-4 w-4 opacity-70" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl border-slate-100">
+              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
+                <FileText className="mr-3 h-4 w-4 text-indigo-500" />
+                <span className="font-medium">New Journal Entry</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
+                <Receipt className="mr-3 h-4 w-4 text-emerald-500" />
+                <span className="font-medium">Create Invoice</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
+                <Wallet className="mr-3 h-4 w-4 text-amber-500" />
+                <span className="font-medium">Record Payment</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-slate-100 my-1" />
+              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
+                <Landmark className="mr-3 h-4 w-4 text-blue-500" />
+                <span className="font-medium">Bank Transfer</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -103,48 +135,42 @@ const FinanceDashboardPage = () => {
         {!isLoading && !isError && dashboardData && (
           <div className="w-full space-y-6">
             {/* KPI Cards Row 1 (6 columns) */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
               <FinanceKpiCard
                 label="Cash Balance"
                 metric={dashboardData.summary.cash_balance}
                 icon={Wallet}
-                iconBgClass="bg-emerald-50 "
-                iconColorClass="text-emerald-600 "
+                tone="emerald"
               />
               <FinanceKpiCard
                 label="Bank Balance"
                 metric={dashboardData.summary.bank_balance}
                 icon={Landmark}
-                iconBgClass="bg-indigo-50 "
-                iconColorClass="text-indigo-600 "
+                tone="indigo"
               />
               <FinanceKpiCard
                 label="Accounts Receivable"
                 metric={dashboardData.summary.accounts_receivable}
                 icon={Receipt}
-                iconBgClass="bg-blue-50 "
-                iconColorClass="text-blue-600 "
+                tone="blue"
               />
               <FinanceKpiCard
                 label="Accounts Payable"
                 metric={dashboardData.summary.accounts_payable}
                 icon={FileText}
-                iconBgClass="bg-amber-50 "
-                iconColorClass="text-amber-600 "
+                tone="amber"
               />
               <FinanceKpiCard
                 label="Monthly Revenue"
                 metric={dashboardData.summary.monthly_revenue}
                 icon={TrendingUp}
-                iconBgClass="bg-emerald-50 "
-                iconColorClass="text-emerald-600 "
+                tone="emerald"
               />
               <FinanceKpiCard
                 label="Monthly Expenses"
                 metric={dashboardData.summary.monthly_expenses}
                 icon={TrendingDown}
-                iconBgClass="bg-rose-50 "
-                iconColorClass="text-rose-600 "
+                tone="rose"
               />
             </div>
 
@@ -154,29 +180,25 @@ const FinanceDashboardPage = () => {
                 label="Gross Profit"
                 metric={dashboardData.summary.gross_profit}
                 icon={BarChart3}
-                iconBgClass="bg-emerald-50 "
-                iconColorClass="text-emerald-600 "
+                tone="emerald"
               />
               <FinanceSummaryCard
                 label="Net Profit"
                 metric={dashboardData.summary.net_profit}
                 icon={BadgeDollarSign}
-                iconBgClass="bg-indigo-50 "
-                iconColorClass="text-indigo-600 "
+                tone="indigo"
               />
               <FinanceSummaryCard
                 label="Pending Payments"
                 metric={dashboardData.summary.pending_payments}
                 icon={ClipboardCheck}
-                iconBgClass="bg-amber-50 "
-                iconColorClass="text-amber-600 "
+                tone="amber"
               />
               <FinanceSummaryCard
                 label="Pending Receipts"
                 metric={dashboardData.summary.pending_receipts}
                 icon={CircleDollarSign}
-                iconBgClass="bg-blue-50 "
-                iconColorClass="text-blue-600 "
+                tone="blue"
               />
             </div>
 

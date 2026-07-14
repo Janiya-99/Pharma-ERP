@@ -6,6 +6,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/company/models"
 	"github.com/pixandco/erp-phrma/internal/control/dto"
 	"github.com/pixandco/erp-phrma/internal/control/repositories"
+	"github.com/pixandco/erp-phrma/internal/pkg/imageutil"
 )
 
 type CompanyService struct {
@@ -36,7 +37,18 @@ func (s *CompanyService) UpdateCompanyProfile(companyCode string, req dto.Update
 	company.Phone = req.Phone
 	company.Email = req.Email
 	company.Website = req.Website
-	company.LogoURL = req.LogoURL
+
+	// Process logo if provided
+	if req.LogoURL != "" && len(req.LogoURL) > 100 { // basic check for actual base64
+		compressedLogo, err := imageutil.ResizeAndCompressBase64Image(req.LogoURL, 512, 512)
+		if err == nil && compressedLogo != "" {
+			company.LogoURL = compressedLogo
+		} else {
+			company.LogoURL = req.LogoURL
+		}
+	} else {
+		company.LogoURL = req.LogoURL
+	}
 
 	if err := s.repo.Update(company); err != nil {
 		return nil, errors.New("failed to update company profile")

@@ -134,11 +134,6 @@ const CompanyProfilePage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 1024 * 1024) {
-      toast.error("Image size must be less than 1MB");
-      return;
-    }
-
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData((prev) => ({
