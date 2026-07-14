@@ -29,7 +29,26 @@ import {
   Settings,
   Lock,
 } from "lucide-react";
-import { AreaChart, BarChart, DonutChart } from "@tremor/react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  PieChart,
+  Pie,
+  Cell,
+  RadialBarChart,
+  RadialBar,
+  Legend,
+  ResponsiveContainer
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "../../../components/ui/chart";
 
 /* ─────────────────────────────────────────────────
    Type Declarations
@@ -106,7 +125,29 @@ interface KPIData {
    Static Data
 ───────────────────────────────────────────────── */
 
-const activityData: ActivityDataPoint[] = [
+const telemetryChartConfig = {
+  "Active Users": { label: "Active Users", color: "var(--chart-1)" },
+  "API Calls": { label: "API Calls", color: "var(--chart-2)" },
+} satisfies ChartConfig;
+
+const moduleChartConfig = {
+  inventory: { label: "Inventory", color: "var(--chart-1)" },
+  finance: { label: "Finance", color: "var(--chart-2)" },
+  hr: { label: "HR & Payroll", color: "var(--chart-3)" },
+  compliance: { label: "Compliance", color: "var(--chart-4)" },
+  crm: { label: "CRM", color: "var(--chart-5)" },
+  controlCenter: { label: "Control Center", color: "var(--chart-6)" },
+} satisfies ChartConfig;
+
+const roleChartConfig = {
+  regular: { label: "Regular Users", color: "var(--chart-1)" },
+  managers: { label: "Department Mgrs", color: "var(--chart-2)" },
+  admins: { label: "System Admins", color: "var(--chart-3)" },
+  auditors: { label: "Auditors", color: "var(--chart-4)" },
+  compliance: { label: "Compliance Officers", color: "var(--chart-5)" },
+} satisfies ChartConfig;
+
+const activityData = [
   { name: "Mon", "Active Users": 820, "API Calls": 14200 },
   { name: "Tue", "Active Users": 940, "API Calls": 18500 },
   { name: "Wed", "Active Users": 890, "API Calls": 16800 },
@@ -116,21 +157,21 @@ const activityData: ActivityDataPoint[] = [
   { name: "Sun", "Active Users": 380, "API Calls": 7200 },
 ];
 
-const moduleData: ModuleDataPoint[] = [
-  { name: "Inventory", Users: 640 },
-  { name: "Finance", Users: 520 },
-  { name: "HR & Payroll", Users: 480 },
-  { name: "Compliance", Users: 340 },
-  { name: "Control Center", Users: 120 },
-  { name: "CRM", Users: 290 },
+const moduleData = [
+  { name: "Inventory", Users: 640, fill: "var(--chart-1)" },
+  { name: "Finance", Users: 520, fill: "var(--chart-2)" },
+  { name: "HR & Payroll", Users: 480, fill: "var(--chart-3)" },
+  { name: "Compliance", Users: 340, fill: "var(--chart-4)" },
+  { name: "CRM", Users: 290, fill: "var(--chart-5)" },
+  { name: "Control Center", Users: 120, fill: "var(--chart-6)" },
 ];
 
-const roleData: RoleDistribution[] = [
-  { name: "Regular Users", count: 850 },
-  { name: "Department Mgrs", count: 124 },
-  { name: "System Admins", count: 12 },
-  { name: "Auditors", count: 18 },
-  { name: "Compliance Officers", count: 24 },
+const roleData = [
+  { name: "Regular Users", count: 850, fill: "var(--chart-1)" },
+  { name: "Department Mgrs", count: 124, fill: "var(--chart-2)" },
+  { name: "Compliance Officers", count: 24, fill: "var(--chart-5)" },
+  { name: "Auditors", count: 18, fill: "var(--chart-4)" },
+  { name: "System Admins", count: 12, fill: "var(--chart-3)" },
 ];
 
 const kpiCards: KPIData[] = [
@@ -281,7 +322,7 @@ const ControlCenterDashboardPage = () => {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900  sm:text-3xl">
                 Control Center
               </h1>
               <p className="text-sm text-slate-500 ">
@@ -363,7 +404,7 @@ const ControlCenterDashboardPage = () => {
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 truncate">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 truncate">
                     {kpi.title}
                   </span>
                   <div
@@ -382,7 +423,7 @@ const ControlCenterDashboardPage = () => {
                 </div>
 
                 <div className="mt-3 flex items-baseline justify-between">
-                  <span className={`text-2xl font-bold tracking-tight truncate ${kpi.tone === "rose" ? "text-rose-600" : kpi.tone === "blue" ? "text-blue-600" : kpi.tone === "emerald" ? "text-emerald-600" : "text-indigo-600"}`}>
+                  <span className={`text-2xl font-semibold tracking-tight truncate ${kpi.tone === "rose" ? "text-rose-600" : kpi.tone === "blue" ? "text-blue-600" : kpi.tone === "emerald" ? "text-emerald-600" : "text-indigo-600"}`}>
                     {kpi.value}
                   </span>
                 </div>
@@ -408,7 +449,7 @@ const ControlCenterDashboardPage = () => {
           <div className="min-w-0">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div className="min-w-0">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900  truncate">
                   System Traffic & User Telemetry
                 </h3>
                 <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
@@ -427,17 +468,26 @@ const ControlCenterDashboardPage = () => {
             </div>
 
             <div className="mt-6 w-full overflow-hidden min-w-0">
-              <AreaChart
-                className="h-72 sm:h-80 w-full"
-                data={activityData}
-                index="name"
-                categories={["Active Users", "API Calls"]}
-                colors={["blue", "indigo"]}
-                valueFormatter={(number: number) => Intl.NumberFormat("us").format(number)}
-                showLegend={true}
-                showGridLines={true}
-                curveType="monotone"
-              />
+              <ChartContainer config={telemetryChartConfig} className="h-72 sm:h-80 w-full">
+                <AreaChart data={activityData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-Active\ Users)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--color-Active\ Users)" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorApi" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-API\ Calls)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--color-API\ Calls)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(number: number) => Intl.NumberFormat("us").format(number)} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Area type="monotone" dataKey="Active Users" stroke="var(--color-Active\ Users)" strokeWidth={2} fillOpacity={1} fill="url(#colorUsers)" />
+                  <Area type="monotone" dataKey="API Calls" stroke="var(--color-API\ Calls)" strokeWidth={2} fillOpacity={1} fill="url(#colorApi)" />
+                </AreaChart>
+              </ChartContainer>
             </div>
           </div>
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100  pt-4 text-xs text-slate-500 ">
@@ -452,7 +502,7 @@ const ControlCenterDashboardPage = () => {
         <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="mb-4 min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900  truncate">
                 Module Adoption Matrix
               </h3>
               <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
@@ -461,17 +511,12 @@ const ControlCenterDashboardPage = () => {
             </div>
 
             <div className="mt-8 w-full overflow-hidden min-w-0">
-              <BarChart
-                className="h-72 sm:h-80 w-full"
-                data={moduleData}
-                index="name"
-                categories={["Users"]}
-                colors={["indigo"]}
-                valueFormatter={(number: number) => `${Intl.NumberFormat("us").format(number)} seats`}
-                layout="vertical"
-                showLegend={false}
-                showGridLines={true}
-              />
+              <ChartContainer config={moduleChartConfig} className="h-72 sm:h-80 w-full">
+                <RadialBarChart innerRadius="20%" outerRadius="100%" data={moduleData} startAngle={90} endAngle={-270}>
+                  <RadialBar background dataKey="Users" cornerRadius={10} />
+                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                </RadialBarChart>
+              </ChartContainer>
             </div>
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100  pt-4 text-xs text-slate-500 ">
@@ -490,7 +535,7 @@ const ControlCenterDashboardPage = () => {
           <div className="min-w-0">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-100  pb-4">
               <div className="min-w-0">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900  truncate">
                   Security Governance & Audit Trail
                 </h3>
                 <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
@@ -530,7 +575,7 @@ const ControlCenterDashboardPage = () => {
               {activeTab === "security" ? (
                 <table className="w-full min-w-[640px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200  text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <tr className="border-b border-slate-200  text-xs font-semibold uppercase tracking-wider text-slate-400">
                       <th className="pb-3 pl-2">Severity</th>
                       <th className="pb-3">Event Description</th>
                       <th className="pb-3">Target User</th>
@@ -563,7 +608,7 @@ const ControlCenterDashboardPage = () => {
               ) : (
                 <table className="w-full min-w-[550px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200  text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <tr className="border-b border-slate-200  text-xs font-semibold uppercase tracking-wider text-slate-400">
                       <th className="pb-3 pl-2">Module</th>
                       <th className="pb-3">Action Performed</th>
                       <th className="pb-3">Actor Account</th>
@@ -609,7 +654,7 @@ const ControlCenterDashboardPage = () => {
         <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 flex flex-col justify-between min-w-0">
           <div className="min-w-0">
             <div className="mb-4 min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900  truncate">
                 Role Privilege Distribution
               </h3>
               <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
@@ -618,19 +663,18 @@ const ControlCenterDashboardPage = () => {
             </div>
 
             <div className="mt-8 flex flex-col items-center w-full overflow-hidden min-w-0">
-              <DonutChart
-                className="h-56 w-full"
-                data={roleData}
-                category="count"
-                index="name"
-                valueFormatter={(val: number) => `${val} accounts`}
-                colors={["sky", "blue", "cyan", "teal", "indigo"]}
-              />
+              <ChartContainer config={roleChartConfig} className="h-56 w-full">
+                <PieChart>
+                  <Pie data={roleData} dataKey="count" nameKey="name" innerRadius={60} strokeWidth={2} paddingAngle={2}>
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                </PieChart>
+              </ChartContainer>
             </div>
 
             {/* Branch Progress Breakdown */}
             <div className="mt-8 space-y-5 border-t border-slate-100 pt-6">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 ">
                 Regional Hub Utilization
               </h4>
               <div className="space-y-3">
@@ -671,7 +715,7 @@ const ControlCenterDashboardPage = () => {
         <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 xl:col-span-2 min-w-0 flex flex-col justify-between">
           <div className="mb-6 flex items-start sm:items-center justify-between gap-4">
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900  truncate">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900  truncate">
                 Administrative Quick Actions
               </h3>
               <p className="text-xs text-slate-500  line-clamp-2 sm:line-clamp-1">
@@ -694,13 +738,13 @@ const ControlCenterDashboardPage = () => {
                       <Icon className="h-5 w-5" />
                     </div>
                     {action.badge && (
-                      <span className="inline-flex items-center rounded-md bg-indigo-50  px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-700  border border-indigo-100  shrink-0">
+                      <span className="inline-flex items-center rounded-md bg-indigo-50  px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-700  border border-indigo-100  shrink-0">
                         {action.badge}
                       </span>
                     )}
                   </div>
                   <div className="mt-4 min-w-0 w-full">
-                    <h4 className="text-sm font-bold text-slate-900  group-hover:text-indigo-600  transition-colors truncate">
+                    <h4 className="text-sm font-semibold text-slate-900  group-hover:text-indigo-600  transition-colors truncate">
                       {action.label}
                     </h4>
                     <p className="mt-1 text-xs text-slate-500  line-clamp-2">
@@ -720,11 +764,11 @@ const ControlCenterDashboardPage = () => {
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <div className="flex items-center gap-2 min-w-0">
                 <AlertCircle className="h-5 w-5 text-amber-600  shrink-0" />
-                <h3 className="text-base font-bold text-slate-900  truncate">
+                <h3 className="text-base font-semibold text-slate-900  truncate">
                   Pending Administrative Action
                 </h3>
               </div>
-              <span className="rounded-full bg-amber-100  px-2.5 py-0.5 text-xs font-bold text-amber-800  shrink-0">
+              <span className="rounded-full bg-amber-100  px-2.5 py-0.5 text-xs font-semibold text-amber-800  shrink-0">
                 20 items
               </span>
             </div>
@@ -746,7 +790,7 @@ const ControlCenterDashboardPage = () => {
                             : "bg-blue-400"
                         }`}
                       />
-                      <h4 className="text-xs font-bold text-slate-900  truncate">
+                      <h4 className="text-xs font-semibold text-slate-900  truncate">
                         {item.label}
                       </h4>
                     </div>
@@ -765,11 +809,11 @@ const ControlCenterDashboardPage = () => {
           {/* System Health Status Card */}
           <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 ring-1 ring-inset ring-slate-50 min-w-0">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <h3 className="text-base font-bold text-slate-900  flex items-center gap-2 min-w-0">
+              <h3 className="text-base font-semibold text-slate-900  flex items-center gap-2 min-w-0">
                 <Server className="h-4 w-4 text-indigo-600  shrink-0" />
                 <span className="truncate">Infrastructure Health</span>
               </h3>
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600  shrink-0">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600  shrink-0">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 All Systems Operational
               </span>
@@ -778,19 +822,19 @@ const ControlCenterDashboardPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Global Uptime</span>
-                <span className="text-sm font-bold text-slate-900  truncate block">99.989%</span>
+                <span className="text-sm font-semibold text-slate-900  truncate block">99.989%</span>
               </div>
               <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Database Sync</span>
-                <span className="text-sm font-bold text-emerald-600  truncate block">0.02s latency</span>
+                <span className="text-sm font-semibold text-emerald-600  truncate block">0.02s latency</span>
               </div>
               <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Active Suites</span>
-                <span className="text-sm font-bold text-slate-900  truncate block">8 / 8 Online</span>
+                <span className="text-sm font-semibold text-slate-900  truncate block">8 / 8 Online</span>
               </div>
               <div className="rounded-lg bg-slate-50  p-3 border border-slate-100  min-w-0">
                 <span className="text-slate-400 block mb-1 truncate">Last Snapshot</span>
-                <span className="text-sm font-bold text-slate-900  truncate block">2 hrs ago (Encrypted)</span>
+                <span className="text-sm font-semibold text-slate-900  truncate block">2 hrs ago (Encrypted)</span>
               </div>
             </div>
           </div>
