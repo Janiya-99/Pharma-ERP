@@ -11,7 +11,7 @@ export function CashFlowLiquidityCard({ data }: CashFlowLiquidityCardProps) {
   const isHealthy = data.liquidity_status === "Healthy";
   
   return (
-    <Card className="rounded-2xl border-slate-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50  ">
+    <Card className="rounded-2xl border-slate-200/60 bg-white/70 backdrop-blur-xl shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-inset ring-slate-900/5  ">
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <CardTitle className="text-base">Cash Flow Liquidity</CardTitle>
         <Badge variant="outline" className={
@@ -52,7 +52,7 @@ export function CashFlowLiquidityCard({ data }: CashFlowLiquidityCardProps) {
           
           <div className="pt-2 border-t border-gray-100  flex justify-between items-center">
             <span className="text-sm font-medium text-gray-700 ">Net Surplus</span>
-            <span className="text-lg font-bold text-gray-900 ">{money(data.net_surplus)}</span>
+            <span className="text-lg font-semibold text-gray-900 ">{money(data.net_surplus)}</span>
           </div>
         </div>
       </CardContent>

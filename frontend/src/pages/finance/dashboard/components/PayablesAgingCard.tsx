@@ -8,7 +8,7 @@ interface PayablesAgingCardProps {
 
 export function PayablesAgingCard({ data }: PayablesAgingCardProps) {
   return (
-    <Card className="rounded-2xl border-slate-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50  ">
+    <Card className="rounded-2xl border-slate-200/60 bg-white/70 backdrop-blur-xl shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-inset ring-slate-900/5  ">
       <CardHeader className="pb-3">
         <CardTitle>Accounts Payable</CardTitle>
         <CardDescription>Outstanding supplier bills</CardDescription>
@@ -17,7 +17,7 @@ export function PayablesAgingCard({ data }: PayablesAgingCardProps) {
         <div className="mb-4 flex items-center justify-between">
           <div>
             <div className="text-sm text-gray-500 ">Total Payable</div>
-            <div className="text-2xl font-bold text-gray-900 ">
+            <div className="text-2xl font-semibold text-gray-900 ">
               {money(data.total_payable)}
             </div>
           </div>

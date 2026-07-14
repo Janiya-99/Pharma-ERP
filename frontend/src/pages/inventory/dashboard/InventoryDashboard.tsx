@@ -18,7 +18,7 @@ import {
   ExternalLink,
   SlidersHorizontal,
 } from "lucide-react";
-import { AreaChart, DonutChart, BarChart, ProgressBar } from "@tremor/react";
+import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from "recharts";
 import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 
@@ -74,11 +74,12 @@ const stockTrendData = [
 ];
 
 const warehouseData = [
-  { name: "Central Warehouse (HQ)", value: 28500000 },
-  { name: "Cold Storage Unit A", value: 12400000 },
-  { name: "Regional Depot (NY)", value: 5800000 },
-  { name: "Quarantine & Inspection", value: 1800000 },
+  { name: "Central HQ", value: 28500000 },
+  { name: "Cold Storage", value: 12400000 },
+  { name: "Regional Depot", value: 5800000 },
+  { name: "Quarantine", value: 1800000 },
 ];
+const COLORS = ["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B"];
 
 const batchAlerts = [
   { id: "BAT-01", batch: "B-2026-0881", product: "Amoxicillin 500mg Cap", expiry: "2026-07-15", qty: "4,500 units", warehouse: "Central HQ", status: "Near Expiry" },
@@ -88,288 +89,257 @@ const batchAlerts = [
 ];
 
 const topMovingProducts = [
-  { name: "Atorvastatin 20mg Tab", unitsSold: 24500, turnover: "94%", stock: "Optimal" },
-  { name: "Metformin 500mg Tab", unitsSold: 19800, turnover: "88%", stock: "Optimal" },
-  { name: "Omeprazole 20mg Cap", unitsSold: 15400, turnover: "82%", stock: "Low Stock" },
-  { name: "Cetirizine 10mg Tab", unitsSold: 14200, turnover: "79%", stock: "Optimal" },
+  { name: "Atorvastatin 20mg Tab", unitsSold: 24500, turnover: 94, stock: "Optimal" },
+  { name: "Metformin 500mg Tab", unitsSold: 19800, turnover: 88, stock: "Optimal" },
+  { name: "Omeprazole 20mg Cap", unitsSold: 15400, turnover: 82, stock: "Low Stock" },
+  { name: "Cetirizine 10mg Tab", unitsSold: 14200, turnover: 79, stock: "Optimal" },
 ];
 
 const money = (amount: number) =>
   new Intl.NumberFormat("en-LK", {
     style: "currency",
     currency: "LKR",
+    minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
 
-const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => (
-  <div className="group relative overflow-hidden rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ring-1 ring-inset ring-slate-50 hover:ring-indigo-50 hover:border-indigo-500/30">
-    <div className="flex items-start justify-between gap-2">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
-        {title}
-      </span>
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone} transition-transform group-hover:scale-105`}>
-        <Icon className="h-4 w-4" />
-      </div>
-    </div>
-    <div className="mt-3 flex items-baseline justify-between">
-      <h3 className="text-2xl font-bold tracking-tight text-slate-900 ">{value}</h3>
-    </div>
-    <div className="mt-3 flex items-center justify-between border-t border-slate-100  pt-3">
-      {trend ? (
-        <span className={`inline-flex items-center gap-1 text-xs font-semibold ${trendUp ? "text-emerald-600 " : "text-rose-600 "}`}>
-          {trendUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-          {trend}
-        </span>
-      ) : (
-        <span className="text-xs font-medium text-slate-400">Current Status</span>
-      )}
-      {subtitle && <span className="text-[11px] text-slate-400 truncate max-w-[120px]" title={subtitle}>{subtitle}</span>}
-    </div>
-  </div>
-);
+const formatYAxis = (value: number) => {
+  if (value >= 1000000) return `Rs.${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `Rs.${(value / 1000).toFixed(1)}K`;
+  return `Rs.${value}`;
+};
 
-const InventoryDashboard = () => {
-  const { user, activeSoftware, activeBranch } = useAuth();
+export default function InventoryDashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<InventoryStats>(fallbackStats);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
+    // Mocking an API call
+    const fetchStats = async () => {
       try {
-        const response = await inventoryApi.getInventoryDashboard();
-        if (response.data?.success && response.data.data) {
+        const response = await inventoryApi.getDashboardStats();
+        if (response?.data?.data) {
           setStats(response.data.data);
         }
-      } catch (error) {
-        console.warn("Using fallback inventory dashboard telemetry:", error);
+      } catch (err) {
+        console.error("Failed to fetch inventory stats", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchDashboard();
+    fetchStats();
   }, []);
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 800);
+  const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => {
+    const toneMap: Record<string, { bg: string; text: string; iconBg: string }> = {
+      blue: { bg: "bg-blue-50/50", text: "text-blue-700", iconBg: "bg-blue-100" },
+      emerald: { bg: "bg-emerald-50/50", text: "text-emerald-700", iconBg: "bg-emerald-100" },
+      indigo: { bg: "bg-indigo-50/50", text: "text-indigo-700", iconBg: "bg-indigo-100" },
+      amber: { bg: "bg-amber-50/50", text: "text-amber-700", iconBg: "bg-amber-100" },
+      rose: { bg: "bg-rose-50/50", text: "text-rose-700", iconBg: "bg-rose-100" },
+      slate: { bg: "bg-slate-50/50", text: "text-slate-700", iconBg: "bg-slate-100" },
+    };
+    const t = toneMap[tone] || toneMap.blue;
+
+    return (
+      <div className={`relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-5 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+              {title}
+            </p>
+            <h3 className="text-2xl font-bold tracking-tight text-slate-900">
+              {value}
+            </h3>
+          </div>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${t.iconBg} shadow-sm transition-transform duration-300 hover:scale-110`}>
+            <Icon className={`h-6 w-6 ${t.text}`} />
+          </div>
+        </div>
+        {(subtitle || trend) && (
+          <div className="mt-4 flex items-center justify-between text-[13px]">
+            {subtitle && <span className="text-slate-500 font-medium">{subtitle}</span>}
+            {trend && (
+              <span className={`flex items-center font-semibold ${trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {trendUp ? <TrendingUp className="mr-1 h-3.5 w-3.5" /> : <TrendingDown className="mr-1 h-3.5 w-3.5" />}
+                {trend}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-h-screen bg-slate-50/50 pb-12 pt-6 px-4 sm:px-6 lg:px-8 font-sans">
+      {/* ══════════════════════════════════════════════
+          HEADER SECTION
+      ══════════════════════════════════════════════ */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-              <Package className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
-                {activeBranch?.branch_name || "Headquarters (HQ)"} • {activeSoftware?.software_name || "Pharma ERP"}
-              </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
-                Inventory & Supply Chain Dashboard
-              </h1>
-            </div>
-          </div>
-          <p className="mt-1 text-sm text-slate-500  pl-12">
-            Real-time stock valuation, warehouse distribution, batch expiration monitoring, and supply health
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+            <Package className="h-6 w-6 text-brand-600" />
+            Inventory Command Center
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 font-medium">
+            Real-time tracking of multi-warehouse stock, batches, and valuations.
           </p>
         </div>
-
-        {/* Header Action Bar */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search SKU or Batch..."
-              className="h-10 w-52 rounded-xl border border-slate-200  bg-white  pl-10 pr-4 text-sm text-slate-900  placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
-            />
-          </div>
-
-          <button
-            onClick={handleRefresh}
-            title="Refresh stock telemetry"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200  bg-white  text-slate-600  hover:bg-slate-50  hover:text-slate-900  transition-all shadow-sm"
-          >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
+        <div className="flex items-center gap-3">
+          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
+            <RefreshCw className="h-4 w-4" />
+            <span className="hidden sm:inline">Refresh Data</span>
           </button>
-
-          <button className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 hover:bg-indigo-700 transition-colors">
+          <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
             <Plus className="h-4 w-4" />
-            Stock Intake Voucher
+            <span className="hidden sm:inline">Receive Stock</span>
           </button>
         </div>
       </div>
 
       {/* ══════════════════════════════════════════════
-          TIER 1: 8-Up Inventory Health KPI Cards
+          TIER 1: Core KPI Cards
       ══════════════════════════════════════════════ */}
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 ">
-            Stock Health & Batch Metrics
-          </h2>
-          <span className="text-xs text-slate-400">Live warehouse sync</span>
-        </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            title="Total Products (SKUs)"
-            value={stats.total_products.toLocaleString()}
-            icon={Package}
-            tone="bg-indigo-50 text-indigo-600  "
-            subtitle={`${stats.active_products} active SKUs`}
-            trend="+24 SKUs this month"
-            trendUp={true}
-          />
-          <StatCard
-            title="Total Stock Valuation"
-            value={money(Number(stats.total_stock_value || 0))}
-            icon={DollarSign}
-            tone="bg-emerald-50 text-emerald-600  "
-            subtitle="Across all warehouses"
-            trend="+5.8% vs last month"
-            trendUp={true}
-          />
-          <StatCard
-            title="Active Warehouses"
-            value={stats.total_warehouses}
-            icon={Database}
-            tone="bg-blue-50 text-blue-600  "
-            subtitle="Central & Regional"
-            trend="100% capacity online"
-            trendUp={true}
-          />
-          <StatCard
-            title="Low Stock Warning"
-            value={stats.low_stock_products}
-            icon={TrendingDown}
-            tone="bg-amber-50 text-amber-600  "
-            subtitle="Below reorder threshold"
-            trend="Requires restock"
-            trendUp={false}
-          />
-          <StatCard
-            title="Total Tracked Batches"
-            value={stats.total_batches.toLocaleString()}
-            icon={Archive}
-            tone="bg-slate-100 text-slate-600  "
-            subtitle="Lot numbers logged"
-            trend="+140 new batches"
-            trendUp={true}
-          />
-          <StatCard
-            title="Near Expiry Batches"
-            value={stats.near_expiry_batches}
-            icon={AlertTriangle}
-            tone="bg-amber-50 text-amber-600  "
-            subtitle="Expiring ≤ 90 days"
-            trend="Inspect soon"
-            trendUp={false}
-          />
-          <StatCard
-            title="Expired Batches"
-            value={stats.expired_batches}
-            icon={AlertCircle}
-            tone="bg-rose-50 text-rose-600  "
-            subtitle="Past expiration date"
-            trend="Quarantine required"
-            trendUp={false}
-          />
-          <StatCard
-            title="Blocked / Quarantined"
-            value={stats.blocked_batches}
-            icon={ShieldAlert}
-            tone="bg-purple-50 text-purple-600  "
-            subtitle="Quality hold / Recall"
-            trend="Under review"
-            trendUp={false}
-          />
-        </div>
+      <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Stock Value"
+          value={money(stats.total_stock_value)}
+          icon={DollarSign}
+          tone="emerald"
+          subtitle="Across all warehouses"
+          trend="+4.2% vs last month"
+          trendUp={true}
+        />
+        <StatCard
+          title="Active SKUs"
+          value={stats.active_products.toLocaleString()}
+          icon={Database}
+          tone="indigo"
+          subtitle={`Out of ${stats.total_products} total`}
+          trend="+12 new this week"
+          trendUp={true}
+        />
+        <StatCard
+          title="Low Stock Alerts"
+          value={stats.low_stock_products}
+          icon={AlertTriangle}
+          tone="amber"
+          subtitle="Requires reordering"
+          trend="-2 from yesterday"
+          trendUp={true}
+        />
+        <StatCard
+          title="Blocked/Quarantine"
+          value={stats.blocked_batches + stats.expired_batches}
+          icon={ShieldAlert}
+          tone="rose"
+          subtitle="Non-sellable batches"
+          trend="Action required"
+          trendUp={false}
+        />
       </div>
 
       {/* ══════════════════════════════════════════════
-          TIER 2: Stock Valuation & Warehouse Distribution
+          TIER 2: Main Charts
       ══════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left: Stock Valuation Trajectory (2/3 width) */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-2 flex flex-col justify-between">
+      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left: Stock Value Trend Area Chart (2/3 width) */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 ">
+                <h3 className="text-lg font-semibold text-slate-900">
                   Stock Valuation & Supply Movement
                 </h3>
-                <p className="text-xs text-slate-500 ">
+                <p className="text-xs text-slate-500 font-medium mt-1">
                   Total inventory asset value vs inbound receipts and outbound dispatches
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50  px-3 py-1 text-xs font-semibold text-emerald-700  border border-emerald-200/60 ">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60 shadow-sm">
                 Turnover Rate: 4.2x / Year
               </span>
             </div>
 
-            <div className="mt-4">
-              <AreaChart
-                className="h-72 w-full"
-                data={stockTrendData}
-                index="month"
-                categories={["Stock Value", "Inbound Value", "Outbound Value"]}
-                colors={["indigo", "emerald", "blue"]}
-                valueFormatter={(val: number) => money(val)}
-                showLegend={true}
-                showGridLines={true}
-                curveType="monotone"
-              />
+            <div className="h-72 w-full mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={stockTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorStock" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorInbound" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorOutbound" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} tickFormatter={formatYAxis} />
+                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: number) => [money(value), undefined]} />
+                  <Area type="monotone" dataKey="Stock Value" stroke="#4F46E5" strokeWidth={2} fillOpacity={1} fill="url(#colorStock)" />
+                  <Area type="monotone" dataKey="Inbound Value" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorInbound)" />
+                  <Area type="monotone" dataKey="Outbound Value" stroke="#3B82F6" strokeWidth={2} fillOpacity={1} fill="url(#colorOutbound)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-slate-100  pt-4 text-xs text-slate-500 ">
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 font-medium">
             <span>Peak Inventory Asset Value: {money(48500000)} (June)</span>
-            <span className="font-semibold text-indigo-600  cursor-pointer hover:underline flex items-center gap-1">
+            <span className="font-semibold text-brand-600 cursor-pointer hover:text-brand-700 flex items-center gap-1 transition-colors">
               View warehouse ledger <ArrowUpRight className="h-3 w-3" />
             </span>
           </div>
         </div>
 
         {/* Right: Warehouse Distribution Donut Chart (1/3 width) */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
           <div>
             <div className="mb-4">
-              <h3 className="text-lg font-bold text-slate-900 ">
+              <h3 className="text-lg font-semibold text-slate-900">
                 Warehouse Asset Distribution
               </h3>
-              <p className="text-xs text-slate-500 ">
+              <p className="text-xs text-slate-500 font-medium mt-1">
                 Stock valuation share by storage facility
               </p>
             </div>
 
-            <div className="mt-6 flex flex-col items-center">
-              <DonutChart
-                className="h-52 w-full"
-                data={warehouseData}
-                category="value"
-                index="name"
-                valueFormatter={(val: number) => money(val)}
-                colors={["indigo", "blue", "emerald", "amber"]}
-              />
+            <div className="mt-6 flex flex-col items-center h-52 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: number) => [money(value), "Value"]} />
+                  <Pie data={warehouseData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                    {warehouseData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="transparent" />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
             </div>
 
-            <div className="mt-6 space-y-2 border-t border-slate-100  pt-4 text-xs">
+            <div className="mt-6 space-y-3 border-t border-slate-100 pt-4 text-xs">
               {warehouseData.map((item, idx) => {
                 const total = warehouseData.reduce((acc, curr) => acc + curr.value, 0);
                 const pct = Math.round((item.value / total) * 100);
                 return (
                   <div key={idx} className="flex items-center justify-between">
-                    <span className="font-medium text-slate-600  truncate max-w-[180px]">{item.name}</span>
-                    <span className="font-mono font-bold text-slate-900 ">{pct}%</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+                      <span className="font-medium text-slate-600 truncate max-w-[180px]">{item.name}</span>
+                    </div>
+                    <span className="font-semibold text-slate-900">{pct}%</span>
                   </div>
                 );
               })}
             </div>
           </div>
-          <div className="mt-4 border-t border-slate-100  pt-4 text-xs text-center text-slate-500 ">
+          <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-center text-slate-500 font-medium">
             <span>All storage zones climate-controlled & synced</span>
           </div>
         </div>
@@ -380,59 +350,65 @@ const InventoryDashboard = () => {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left 2 Cols: Critical Batch Expiration Alerts */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100  pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-amber-500" />
                   Critical Batch Expiration & Quarantine Monitor
                 </h3>
-                <p className="text-xs text-slate-500  mt-1">
+                <p className="text-xs text-slate-500 font-medium mt-1">
                   Batches requiring immediate quality inspection, discount allocation, or disposal quarantine
                 </p>
               </div>
-              <button className="rounded-lg bg-slate-100  px-3 py-1.5 text-xs font-semibold text-slate-700  hover:bg-indigo-600 hover:text-white transition-colors shrink-0">
+              <button className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 transition-all shadow-sm shrink-0">
                 View All 20 Alerts
               </button>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200  text-xs font-bold uppercase tracking-wider text-slate-400">
-                    <th className="pb-3 pl-2">Batch No</th>
-                    <th className="pb-3">Product Name</th>
-                    <th className="pb-3">Expiry Date</th>
-                    <th className="pb-3">Stock Qty</th>
-                    <th className="pb-3">Warehouse</th>
-                    <th className="pb-3">Status</th>
-                    <th className="pb-3 text-right pr-2">Action</th>
+              <table className="w-full text-left text-sm text-slate-600">
+                <thead className="text-xs uppercase text-slate-500 font-semibold border-b border-slate-200 bg-slate-50/50">
+                  <tr>
+                    <th scope="col" className="px-4 py-3 rounded-tl-lg">Batch No.</th>
+                    <th scope="col" className="px-4 py-3">Product</th>
+                    <th scope="col" className="px-4 py-3">Expiry Date</th>
+                    <th scope="col" className="px-4 py-3">Quantity</th>
+                    <th scope="col" className="px-4 py-3 rounded-tr-lg">Status / Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 ">
-                  {batchAlerts.map((row) => (
-                    <tr key={row.id} className="group hover:bg-slate-50  transition-colors">
-                      <td className="py-3.5 pl-2 font-mono font-bold text-xs text-indigo-600 ">{row.batch}</td>
-                      <td className="py-3.5 font-semibold text-slate-800 ">{row.product}</td>
-                      <td className="py-3.5 font-mono text-xs text-slate-600 ">{row.expiry}</td>
-                      <td className="py-3.5 font-mono text-xs text-slate-900 ">{row.qty}</td>
-                      <td className="py-3.5 text-xs text-slate-500 ">{row.warehouse}</td>
-                      <td className="py-3.5">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${
-                          row.status === "Expired"
-                            ? "bg-rose-50 text-rose-700 border-rose-200   "
-                            : row.status === "Near Expiry"
-                            ? "bg-amber-50 text-amber-700 border-amber-200   "
-                            : "bg-purple-50 text-purple-700 border-purple-200   "
-                        }`}>
-                          {row.status}
+                <tbody className="divide-y divide-slate-100">
+                  {batchAlerts.map((alert) => (
+                    <tr key={alert.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-slate-900">
+                        {alert.batch}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700">
+                        {alert.product}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3.5 text-xs font-medium">
+                        <span className={alert.status === "Expired" ? "text-rose-600 font-bold" : "text-amber-600 font-semibold"}>
+                          {alert.expiry}
                         </span>
                       </td>
-                      <td className="py-3.5 text-right pr-2">
-                        <button className="rounded-md border border-slate-200  px-2.5 py-1 text-xs font-semibold text-slate-700  hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
-                          Quarantine
-                        </button>
+                      <td className="whitespace-nowrap px-4 py-3.5 text-xs font-medium text-slate-600">
+                        {alert.qty} <span className="text-slate-400">({alert.warehouse})</span>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`inline-flex items-center rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                              alert.status === "Expired"
+                                ? "bg-rose-100 text-rose-700 ring-1 ring-inset ring-rose-600/20"
+                                : alert.status === "Blocked"
+                                ? "bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-600/20"
+                                : "bg-amber-100 text-amber-700 ring-1 ring-inset ring-amber-600/20"
+                            }`}
+                          >
+                            {alert.status}
+                          </span>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -440,89 +416,63 @@ const InventoryDashboard = () => {
               </table>
             </div>
           </div>
-
-          <div className="mt-6 flex items-center justify-between border-t border-slate-100  pt-4 text-xs text-slate-500 ">
-            <span>Automated FEFO (First Expired, First Out) picking active</span>
-            <span className="font-semibold text-indigo-600  hover:underline cursor-pointer flex items-center gap-1">
-              Configure expiry rules <ArrowUpRight className="h-3 w-3" />
+          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>Showing top 4 critical alerts</span>
+            <span className="flex items-center gap-1 cursor-pointer hover:text-brand-600 transition-colors font-semibold">
+              <Archive className="h-3.5 w-3.5" /> Open Quarantine Bay
             </span>
           </div>
         </div>
 
-        {/* Right 1 Col: Stock Health Index & Top Movers */}
-        <div className="space-y-6">
-          {/* Stock Health Card */}
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-slate-900 ">
-                Overall Stock Health Index
+        {/* Right Col: High-Velocity Products (1/3 width) */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
+          <div>
+            <div className="mb-6 border-b border-slate-100 pb-4">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-emerald-500" />
+                High-Velocity Movers
               </h3>
-              <span className="rounded-full bg-emerald-100  px-2.5 py-0.5 text-xs font-bold text-emerald-800 ">
-                94.2% Optimal
-              </span>
+              <p className="text-xs text-slate-500 font-medium mt-1">
+                Top products by sales volume & turnover
+              </p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
-                  <span>Stock Availability Ratio</span>
-                  <span>1,180 / 1,240 SKUs</span>
-                </div>
-                <ProgressBar value={95.1} color="indigo" className="h-2.5" />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
-                  <span>Batch Quality Compliance</span>
-                  <span>98.6% Passed</span>
-                </div>
-                <ProgressBar value={98.6} color="emerald" className="h-2.5" />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
-                  <span>Reorder Level Buffer</span>
-                  <span>85.4% Above Minimum</span>
-                </div>
-                <ProgressBar value={85.4} color="blue" className="h-2.5" />
-              </div>
-            </div>
-
-            <div className="mt-5 border-t border-slate-100  pt-4 flex items-center justify-between text-xs">
-              <span className="text-slate-500 ">18 products below safety stock</span>
-              <button className="font-bold text-indigo-600  hover:underline">
-                Generate Purchase Orders →
-              </button>
-            </div>
-          </div>
-
-          {/* Top Movers Card */}
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50">
-            <h3 className="text-base font-bold text-slate-900  mb-4">
-              Top Moving Pharmaceuticals
-            </h3>
-            <div className="space-y-3">
-              {topMovingProducts.map((prod, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded-lg border border-slate-100  p-2.5 hover:bg-slate-50  transition-colors">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 ">{prod.name}</h4>
-                    <span className="text-[11px] text-slate-400 font-mono">{prod.unitsSold.toLocaleString()} units sold</span>
+            <div className="space-y-5">
+              {topMovingProducts.map((product, idx) => (
+                <div key={idx} className="group">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-sm font-semibold text-slate-800 group-hover:text-brand-600 transition-colors">
+                      {product.name}
+                    </span>
+                    <span className="text-xs font-bold text-slate-900">
+                      {product.unitsSold.toLocaleString()} units
+                    </span>
                   </div>
-                  <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${
-                    prod.stock === "Optimal"
-                      ? "bg-emerald-50 text-emerald-700   border border-emerald-200/60 "
-                      : "bg-amber-50 text-amber-700   border border-amber-200/60 "
-                  }`}>
-                    {prod.stock}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-1000 ${product.turnover > 90 ? 'bg-emerald-500' : product.turnover > 80 ? 'bg-brand-500' : 'bg-amber-500'}`} 
+                        style={{ width: `${product.turnover}%` }} 
+                      />
+                    </div>
+                    <span className="text-[11px] font-bold text-slate-500 w-8 text-right">
+                      {product.turnover}%
+                    </span>
+                  </div>
+                  <p className={`text-[10px] mt-1 font-semibold ${product.stock === 'Low Stock' ? 'text-amber-600' : 'text-emerald-600'}`}>
+                    {product.stock}
+                  </p>
                 </div>
               ))}
             </div>
+          </div>
+          <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+            <button className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors flex items-center justify-center gap-1 w-full">
+              Analyze Sales Velocity <ExternalLink className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default InventoryDashboard;
+}

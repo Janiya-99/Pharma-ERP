@@ -11,7 +11,7 @@ const COLORS = ["#4F46E5", "#0F766E", "#16A34A", "#D97706", "#6B7280", "#DC2626"
 
 export function ExpenseDistributionChart({ data }: ExpenseDistributionChartProps) {
   return (
-    <Card className="col-span-1 rounded-2xl border-slate-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-4  ">
+    <Card className="col-span-1 rounded-2xl border-slate-200/60 bg-white/70 backdrop-blur-xl shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-inset ring-slate-900/5 lg:col-span-4  ">
       <CardHeader className="pb-2">
         <CardTitle>Expense Distribution</CardTitle>
         <CardDescription>Breakdown of operating costs</CardDescription>

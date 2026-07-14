@@ -24,10 +24,11 @@ import {
   AlertCircle,
   Search,
   Filter,
-  PieChart,
+  PieChart as PieChartIcon,
+  TrendingDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { AreaChart, BarChart, DonutChart, ProgressBar } from "@tremor/react";
+import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
 
 /* ─────────────────────────────────────────────────
    Type Declarations
@@ -96,477 +97,401 @@ const agingDistribution = [
   { bucket: "61-90 Days Overdue", value: 2900000 },
   { bucket: "90+ Days Critical", value: 1250000 },
 ];
+const AGING_COLORS = ["#10B981", "#F59E0B", "#F97316", "#EF4444"];
 
 const fallbackCustomers: Customer[] = [
-  { id: 1, customer_code: "CUST-0081", customer_name: "Asiri Surgical Hospital", customer_type: "HOSPITAL", credit_limit: 15000000, current_balance: 4200000, status: "ACTIVE" },
-  { id: 2, customer_code: "CUST-0142", customer_name: "HealthGuard Pharmacy Flagship", customer_type: "PHARMACY", credit_limit: 5000000, current_balance: 1850000, status: "ACTIVE" },
-  { id: 3, customer_code: "CUST-0204", customer_name: "Lanka Hospitals Diagnostics", customer_type: "HOSPITAL", credit_limit: 12000000, current_balance: 6100000, status: "ACTIVE" },
-  { id: 4, customer_code: "CUST-0095", customer_name: "Rajagiriya Medical Center", customer_type: "CLINIC", credit_limit: 2000000, current_balance: 2150000, status: "OVER_CREDIT" },
-  { id: 5, customer_code: "CUST-0311", customer_name: "Union Chemists Colombo", customer_type: "DISTRIBUTOR", credit_limit: 8000000, current_balance: 8000000, status: "ON_HOLD" },
+  { id: 1, customer_code: "CUS-10045", customer_name: "MediCare Pharmacy Network", customer_type: "PHARMACY", credit_limit: 5000000, current_balance: 4250000, status: "ACTIVE" },
+  { id: 2, customer_code: "CUS-10211", customer_name: "City General Hospital", customer_type: "HOSPITAL", credit_limit: 12000000, current_balance: 13500000, status: "BLOCKED" },
+  { id: 3, customer_code: "CUS-09482", customer_name: "HealthPlus Distributors", customer_type: "DISTRIBUTOR", credit_limit: 15000000, current_balance: 8900000, status: "ACTIVE" },
+  { id: 4, customer_code: "CUS-11002", customer_name: "Lanka Care Clinics", customer_type: "CLINIC", credit_limit: 2000000, current_balance: 1950000, status: "ON_HOLD" },
 ];
 
-const StatCard: React.FC<StatCardProps> = ({
-  title,
-  value,
-  icon: Icon,
-  tone,
-  subtitle,
-  trend,
-  trendUp,
-}) => (
-  <div className="group relative overflow-hidden rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ring-1 ring-inset ring-slate-50 hover:ring-indigo-50 hover:border-indigo-500/30">
-    <div className="flex items-start justify-between gap-2">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 ">
-        {title}
-      </span>
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone} transition-transform group-hover:scale-105`}>
-        <Icon className="h-4 w-4" />
-      </div>
-    </div>
-    <div className="mt-3 flex items-baseline justify-between">
-      <h3 className="text-2xl font-bold tracking-tight text-slate-900 ">{value}</h3>
-    </div>
-    <div className="mt-3 flex items-center justify-between border-t border-slate-100  pt-3">
-      {trend ? (
-        <span className={`inline-flex items-center gap-1 text-xs font-semibold ${trendUp ? "text-emerald-600 " : "text-rose-600 "}`}>
-          {trendUp ? <TrendingUp className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
-          {trend}
-        </span>
-      ) : (
-        <span className="text-xs font-medium text-slate-400">Current Status</span>
-      )}
-      {subtitle && <span className="text-[11px] text-slate-400 truncate max-w-[130px]" title={subtitle}>{subtitle}</span>}
-    </div>
-  </div>
-);
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("en-LK", {
+    style: "currency",
+    currency: "LKR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 
-const InvoiceCenterDashboard: React.FC = () => {
-  const { activeSoftware, activeBranch } = useAuth();
+const formatYAxis = (value: number) => {
+  if (value >= 1000000) return `Rs.${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `Rs.${(value / 1000).toFixed(1)}K`;
+  return `Rs.${value}`;
+};
+
+export default function InvoiceCenterDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [summary, setSummary] = useState<DashboardSummary>(fallbackSummary);
-  const [recentCustomers, setRecentCustomers] = useState<Customer[]>(fallbackCustomers);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [customers, setCustomers] = useState<Customer[]>(fallbackCustomers);
 
-  const fetchData = async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
-    setError(null);
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
+  const fetchDashboardData = async () => {
     try {
-      const [sumRes, custRes] = await Promise.all([
-        invoiceCenterApi.getInvoiceCenterDashboard(),
-        invoiceCenterApi.getCustomers({ limit: 5 }),
-      ]);
-
-      if (sumRes.data?.success && sumRes.data.data) {
-        setSummary(sumRes.data.data);
+      setLoading(true);
+      const res = await invoiceCenterApi.getDashboardSummary();
+      if (res?.data?.data) {
+        setSummary(res.data.data);
       }
-      if (custRes.data?.success && custRes.data.data) {
-        setRecentCustomers(custRes.data.data || []);
-      }
-    } catch (err) {
-      console.warn("Using fallback Invoice Center dashboard telemetry:", err);
+    } catch (error) {
+      console.error("Error fetching invoice dashboard summary:", error);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
-  useEffect(() => {
-    if (activeSoftware?.software_code === "INVOICE_CENTER" || !activeSoftware) {
-      fetchData();
-    }
-  }, [activeSoftware]);
+  const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => {
+    const toneMap: Record<string, { bg: string; text: string; iconBg: string }> = {
+      blue: { bg: "bg-blue-50/50", text: "text-blue-700", iconBg: "bg-blue-100" },
+      emerald: { bg: "bg-emerald-50/50", text: "text-emerald-700", iconBg: "bg-emerald-100" },
+      amber: { bg: "bg-amber-50/50", text: "text-amber-700", iconBg: "bg-amber-100" },
+      rose: { bg: "bg-rose-50/50", text: "text-rose-700", iconBg: "bg-rose-100" },
+      indigo: { bg: "bg-indigo-50/50", text: "text-indigo-700", iconBg: "bg-indigo-100" },
+      slate: { bg: "bg-slate-50/50", text: "text-slate-700", iconBg: "bg-slate-100" },
+    };
+    const t = toneMap[tone] || toneMap.slate;
 
-  if (activeSoftware && activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
-      <div className="bg-rose-50  text-rose-600  border-rose-200  m-6 rounded-2xl border p-8 text-center font-medium">
-        Please switch to Invoice Center module to access this dashboard.
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-5 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+              {title}
+            </p>
+            <h3 className="text-2xl font-bold tracking-tight text-slate-900">
+              {value}
+            </h3>
+          </div>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${t.iconBg} shadow-sm transition-transform duration-300 hover:scale-110`}>
+            <Icon className={`h-6 w-6 ${t.text}`} />
+          </div>
+        </div>
+        {(subtitle || trend) && (
+          <div className="mt-4 flex items-center justify-between text-[13px]">
+            {subtitle && <span className="text-slate-500 font-medium">{subtitle}</span>}
+            {trend && (
+              <span className={`flex items-center font-semibold ${trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {trendUp ? <TrendingUp className="mr-1 h-3.5 w-3.5" /> : <TrendingDown className="mr-1 h-3.5 w-3.5" />}
+                {trend}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     );
-  }
-
-  const formatLKR = (val?: number) =>
-    `LKR ${Number(val || 0).toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })}`;
+  };
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-h-screen bg-slate-50/50 pb-12 pt-6 px-4 sm:px-6 lg:px-8 font-sans">
+      {/* ══════════════════════════════════════════════
+          HEADER SECTION
+      ══════════════════════════════════════════════ */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-              <FileText className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
-                {activeBranch?.branch_name || "Headquarters (HQ)"} • Invoice Center
-              </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
-                Billing & Accounts Receivable Dashboard
-              </h1>
-            </div>
-          </div>
-          <p className="mt-1 text-sm text-slate-500  pl-12">
-            Monitor invoicing pipelines, credit limit utilization, aging analysis, and customer ledger balances
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+            <Receipt className="h-6 w-6 text-brand-600" />
+            Invoice & Receivables Center
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 font-medium">
+            Manage billing, monitor collections, and track AR aging in real-time.
           </p>
         </div>
-
-        {/* Header Controls */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={() => fetchData(true)}
-            disabled={refreshing || loading}
-            title="Refresh billing data"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200  bg-white  text-slate-600  hover:bg-slate-50  transition-all shadow-sm disabled:opacity-50"
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={fetchDashboardData}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin text-indigo-600" : ""}`} />
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh Data</span>
           </button>
-
-          <button
-            onClick={() => navigate("/invoice-center/customers/create")}
-            className="flex h-10 items-center gap-2 rounded-xl bg-white  border border-slate-200  px-4 text-sm font-semibold text-slate-800  hover:bg-slate-50  transition-colors shadow-sm"
-          >
-            <Users className="h-4 w-4 text-indigo-600 " />
-            + New Customer
-          </button>
-
-          <button
-            onClick={() => navigate("/invoice-center/invoices/create")}
-            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 hover:bg-indigo-700 transition-colors"
-          >
+          <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
             <Plus className="h-4 w-4" />
-            Create Invoice
+            <span className="hidden sm:inline">Create Invoice</span>
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="bg-rose-50 border-rose-200 text-rose-700    rounded-xl border p-4 text-sm font-medium flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 shrink-0 text-rose-600" />
-          {error}
-        </div>
-      )}
-
       {/* ══════════════════════════════════════════════
-          TIER 1: 8-Up Billing & AR KPI Cards
+          TIER 1: Core Financial & Customer KPIs
       ══════════════════════════════════════════════ */}
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 ">
-            Customer Credit & Receivable Overview
-          </h2>
-          <span className="text-xs text-slate-400">Real-time ledger sync</span>
-        </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            title="Total Registered Customers"
-            value={summary.total_customers || 0}
-            icon={Users}
-            tone="bg-indigo-50 text-indigo-600  "
-            subtitle={`${summary.total_customer_categories || 0} customer categories`}
-            trend="+12 accounts this month"
-            trendUp={true}
-          />
-          <StatCard
-            title="Active Billing Accounts"
-            value={summary.active_customers || 0}
-            icon={UserCheck}
-            tone="bg-emerald-50 text-emerald-600  "
-            subtitle="Regular trading partners"
-            trend="90.6% active ratio"
-            trendUp={true}
-          />
-          <StatCard
-            title="Inactive Accounts"
-            value={summary.inactive_customers || 0}
-            icon={UserX}
-            tone="bg-slate-100 text-slate-600  "
-            subtitle="No orders > 180 days"
-            trend="Review for dormancy"
-            trendUp={false}
-          />
-          <StatCard
-            title="Blocked Customers"
-            value={summary.blocked_customers || 0}
-            icon={ShieldAlert}
-            tone="bg-rose-50 text-rose-600  "
-            subtitle="Credit or compliance hold"
-            trend="Zero billing permitted"
-            trendUp={false}
-          />
-
-          <StatCard
-            title="On Hold Customers"
-            value={summary.on_hold_customers || 0}
-            icon={PauseCircle}
-            tone="bg-amber-50 text-amber-600  "
-            subtitle="Temporary billing freeze"
-            trend="Pending payment clearance"
-            trendUp={false}
-          />
-          <StatCard
-            title="Over Credit Limit"
-            value={summary.customers_over_credit_limit || 0}
-            icon={CreditCard}
-            tone="bg-rose-50 text-rose-600  "
-            subtitle="Exceeded allocated limit"
-            trend="Requires approval to bill"
-            trendUp={false}
-          />
-          <StatCard
-            title="Total Credit Allocated"
-            value={formatLKR(summary.total_credit_limit)}
-            icon={DollarSign}
-            tone="bg-blue-50 text-blue-600  "
-            subtitle="Combined credit ceiling"
-            trend="38.1% currently utilized"
-            trendUp={true}
-          />
-          <StatCard
-            title="Total Accounts Receivable"
-            value={formatLKR(summary.total_customer_balance)}
-            icon={Receipt}
-            tone="bg-emerald-50 text-emerald-600  "
-            subtitle="Total outstanding dues"
-            trend="89% collection efficiency"
-            trendUp={true}
-          />
-        </div>
+      <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total AR Balance"
+          value={formatCurrency(summary.total_customer_balance || 0)}
+          icon={DollarSign}
+          tone="emerald"
+          subtitle="Outstanding Receivables"
+          trend="-2.4% vs last month"
+          trendUp={true}
+        />
+        <StatCard
+          title="Total Customers"
+          value={(summary.total_customers || 0).toLocaleString()}
+          icon={Users}
+          tone="blue"
+          subtitle={`${summary.active_customers || 0} active accounts`}
+          trend="+8 new this month"
+          trendUp={true}
+        />
+        <StatCard
+          title="Over Credit Limit"
+          value={summary.customers_over_credit_limit || 0}
+          icon={ShieldAlert}
+          tone="rose"
+          subtitle="Requires intervention"
+          trend="Action required"
+          trendUp={false}
+        />
+        <StatCard
+          title="Total Credit Granted"
+          value={formatCurrency(summary.total_credit_limit || 0)}
+          icon={CreditCard}
+          tone="indigo"
+          subtitle="Across all accounts"
+        />
       </div>
 
       {/* ══════════════════════════════════════════════
-          TIER 2: Invoicing Volume & Aging Analysis
+          TIER 2: Main Charts
       ══════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left: Invoiced vs Collected Trajectory (2/3 width) */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 lg:col-span-2 flex flex-col justify-between">
+      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left: Invoice Generation vs Collections (2/3 width) */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 ">
-                  Invoicing Volume & Receipt Collection
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Invoicing vs Collections
                 </h3>
-                <p className="text-xs text-slate-500 ">
-                  Monthly gross invoiced sales vs realized payment collections
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  Monthly billed revenue compared to actual cash receipts
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50  px-3 py-1 text-xs font-semibold text-indigo-700  border border-indigo-200/60 ">
-                June Collection Ratio: 89%
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60 shadow-sm">
+                Avg Collection Ratio: 92%
               </span>
             </div>
 
-            <div className="mt-4">
-              <BarChart
-                className="h-72 w-full"
-                data={invoiceTrendData}
-                index="month"
-                categories={["Invoiced Amount", "Collected Receipts"]}
-                colors={["indigo", "emerald"]}
-                valueFormatter={(val: number) => formatLKR(val)}
-                showLegend={true}
-                showGridLines={true}
-              />
+            <div className="h-72 w-full mt-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={invoiceTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorInvoice" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorCollected" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} tickFormatter={formatYAxis} />
+                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: number) => [formatCurrency(value), undefined]} />
+                  <Area type="monotone" dataKey="Invoiced Amount" stroke="#4F46E5" strokeWidth={2} fillOpacity={1} fill="url(#colorInvoice)" />
+                  <Area type="monotone" dataKey="Collected Receipts" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorCollected)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-slate-100  pt-4 text-xs text-slate-500 ">
-            <span>Peak Monthly Invoicing: {formatLKR(24800000)} (June)</span>
-            <button
-              onClick={() => navigate("/invoice-center/reports/aging")}
-              className="flex items-center gap-1 text-indigo-600  font-semibold hover:underline"
-            >
-              Open AR Aging Report <ArrowUpRight className="h-3 w-3" />
-            </button>
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 font-medium">
+            <span>YTD Collected: {formatCurrency(114600000)}</span>
+            <span className="font-semibold text-brand-600 cursor-pointer hover:text-brand-700 flex items-center gap-1 transition-colors">
+              View Detailed Ledger <ArrowUpRight className="h-3 w-3" />
+            </span>
           </div>
         </div>
 
-        {/* Right: AR Aging Distribution Donut Chart (1/3 width) */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 flex flex-col justify-between">
+        {/* Right: AR Aging Distribution Donut (1/3 width) */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
           <div>
             <div className="mb-4">
-              <h3 className="text-lg font-bold text-slate-900 ">
+              <h3 className="text-lg font-semibold text-slate-900">
                 AR Aging Distribution
               </h3>
-              <p className="text-xs text-slate-500 ">
-                Outstanding dues categorized by aging intervals
+              <p className="text-xs text-slate-500 font-medium mt-1">
+                Outstanding balances by overdue period
               </p>
             </div>
 
-            <div className="mt-6 flex flex-col items-center">
-              <DonutChart
-                className="h-52 w-full"
-                data={agingDistribution}
-                category="value"
-                index="bucket"
-                valueFormatter={(val: number) => formatLKR(val)}
-                colors={["emerald", "blue", "amber", "rose"]}
-              />
+            <div className="mt-6 flex flex-col items-center h-52 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: number) => [formatCurrency(value), "Value"]} />
+                  <Pie data={agingDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                    {agingDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={AGING_COLORS[index % AGING_COLORS.length]} stroke="transparent" />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
             </div>
 
-            <div className="mt-6 space-y-2 border-t border-slate-100  pt-4 text-xs">
+            <div className="mt-6 space-y-3 border-t border-slate-100 pt-4 text-xs">
               {agingDistribution.map((item, idx) => {
                 const total = agingDistribution.reduce((acc, curr) => acc + curr.value, 0);
                 const pct = Math.round((item.value / total) * 100);
                 return (
                   <div key={idx} className="flex items-center justify-between">
-                    <span className="font-medium text-slate-600  truncate max-w-[180px]">{item.bucket}</span>
-                    <span className="font-mono font-bold text-slate-900 ">{pct}%</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: AGING_COLORS[idx % AGING_COLORS.length] }} />
+                      <span className="font-medium text-slate-600 truncate max-w-[180px]">{item.bucket}</span>
+                    </div>
+                    <span className="font-semibold text-slate-900">{pct}%</span>
                   </div>
                 );
               })}
             </div>
           </div>
-          <div className="mt-4 border-t border-slate-100  pt-4 text-xs text-center text-slate-500 ">
-            <span>Automated dunning reminders sent weekly</span>
+          <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-center text-slate-500 font-medium">
+            <span>Goal: Keep &gt;85% in Current bucket</span>
           </div>
         </div>
       </div>
 
       {/* ══════════════════════════════════════════════
-          TIER 3: Recent Customers & Credit Watchlist
+          TIER 3: Critical Account Alerts & Top Debtors
       ══════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
-        {/* Main Customers Table */}
-        <div className="rounded-xl border border-slate-200  bg-white  shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-100  p-5">
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 ">
-                Recent Customer Master Records
-              </h3>
-              <p className="mt-0.5 text-xs text-slate-500 ">
-                Recently added or modified customer accounts and billing limits
-              </p>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left 2 Cols: Accounts Requiring Attention */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <ShieldAlert className="h-5 w-5 text-rose-500" />
+                  Accounts Requiring Immediate Attention
+                </h3>
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  Customers exceeding credit limits or blocked due to severe overdue payments
+                </p>
+              </div>
+              <button 
+                onClick={() => navigate("/invoice-center/customers")}
+                className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 transition-all shadow-sm shrink-0"
+              >
+                View Customer Directory
+              </button>
             </div>
-            <button
-              onClick={() => navigate("/invoice-center/customers")}
-              className="flex items-center gap-1 text-xs font-semibold text-indigo-600  hover:underline"
-            >
-              View All Customers <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-200  bg-slate-50/50  text-xs font-bold uppercase tracking-wider text-slate-400">
-                  <th className="px-4 py-3">Code</th>
-                  <th className="px-4 py-3">Customer Name</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Credit Limit</th>
-                  <th className="px-4 py-3">Current Balance</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 ">
-                {recentCustomers.length === 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-slate-600">
+                <thead className="text-xs uppercase text-slate-500 font-semibold border-b border-slate-200 bg-slate-50/50">
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-500 ">
-                      No customer records found.
-                    </td>
+                    <th scope="col" className="px-4 py-3 rounded-tl-lg">Customer</th>
+                    <th scope="col" className="px-4 py-3">Status</th>
+                    <th scope="col" className="px-4 py-3 text-right">Credit Limit</th>
+                    <th scope="col" className="px-4 py-3 text-right">Current Balance</th>
+                    <th scope="col" className="px-4 py-3 rounded-tr-lg text-right">Exposure</th>
                   </tr>
-                ) : (
-                  recentCustomers.map((cust) => (
-                    <tr
-                      key={cust.id}
-                      onClick={() => navigate(`/invoice-center/customers/${cust.id}`)}
-                      className="cursor-pointer transition-colors hover:bg-slate-50 "
-                    >
-                      <td className="px-4 py-3.5 font-mono font-bold text-xs text-indigo-600 ">
-                        {cust.customer_code}
-                      </td>
-                      <td className="px-4 py-3.5 font-semibold text-slate-800 ">
-                        {cust.customer_name}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <CustomerTypeBadge type={cust.customer_type} />
-                      </td>
-                      <td className="px-4 py-3.5 font-mono text-xs font-medium text-slate-600 ">
-                        {formatLKR(cust.credit_limit)}
-                      </td>
-                      <td className="px-4 py-3.5 font-mono text-xs font-bold text-slate-900 ">
-                        {formatLKR(cust.current_balance)}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <CustomerStatusBadge status={cust.status} />
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {customers.map((c) => {
+                    const isOverLimit = c.current_balance > c.credit_limit;
+                    const exposure = Math.max(0, c.current_balance - c.credit_limit);
+                    return (
+                      <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="whitespace-nowrap px-4 py-4">
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-slate-900">{c.customer_name}</span>
+                            <span className="text-xs text-slate-500 font-medium">{c.customer_code}</span>
+                          </div>
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-4">
+                          <CustomerStatusBadge status={c.status} />
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-4 text-right font-medium text-slate-700">
+                          {formatCurrency(c.credit_limit)}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-4 text-right font-semibold">
+                          <span className={isOverLimit ? "text-rose-600" : "text-slate-900"}>
+                            {formatCurrency(c.current_balance)}
+                          </span>
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-4 text-right">
+                          {exposure > 0 ? (
+                            <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-1 text-xs font-bold text-rose-700 ring-1 ring-inset ring-rose-600/20">
+                              +{formatCurrency(exposure)}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-400 font-medium">Within Limit</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>Showing top critical accounts</span>
+            <span className="flex items-center gap-1 cursor-pointer hover:text-brand-600 transition-colors font-semibold">
+              Generate Risk Report <FileText className="h-3.5 w-3.5" />
+            </span>
           </div>
         </div>
 
-        {/* Right Sidebar: Credit Utilization Index */}
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-7 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-slate-900 ">
-                Credit Utilization Health
-              </h3>
-              <span className="rounded-full bg-indigo-100  px-2.5 py-0.5 text-xs font-bold text-indigo-800 ">
-                38.1% Utilized
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
-                  <span>Hospital Accounts Limit</span>
-                  <span>42M / 60M LKR</span>
-                </div>
-                <ProgressBar value={70} color="indigo" className="h-2.5" />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
-                  <span>Pharmacy Chains Limit</span>
-                  <span>12M / 18M LKR</span>
-                </div>
-                <ProgressBar value={66.6} color="blue" className="h-2.5" />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5 text-slate-700 ">
-                  <span>Distributors & Clinics</span>
-                  <span>3.5M / 7M LKR</span>
-                </div>
-                <ProgressBar value={50} color="emerald" className="h-2.5" />
-              </div>
-            </div>
-
-            <div className="mt-5 border-t border-slate-100  pt-4 flex items-center justify-between text-xs">
-              <span className="text-slate-500 ">12 accounts over limit</span>
-              <button
-                onClick={() => navigate("/invoice-center/reports/credit-limit")}
-                className="font-bold text-indigo-600  hover:underline"
-              >
-                Review Limits →
-              </button>
-            </div>
+        {/* Right Col: Collection Shortcuts */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col">
+          <div className="mb-6 border-b border-slate-100 pb-4">
+            <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-indigo-500" />
+              Quick Actions
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-1">
+              Frequent invoicing and collection workflows
+            </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200  bg-gradient-to-br from-indigo-900 to-navy-900 p-6 text-white shadow-md">
-            <h3 className="text-base font-bold mb-2">Automated Billing Rules</h3>
-            <p className="text-xs text-indigo-200 leading-relaxed mb-4">
-              Invoices generated for accounts exceeding 100% of their allocated credit limit will automatically be routed for Managerial Credit Override approval.
-            </p>
-            <button
-              onClick={() => navigate("/invoice-center/settings")}
-              className="w-full rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 py-2.5 text-xs font-semibold text-white backdrop-blur-md transition-all"
-            >
-              Configure Credit Policies
+          <div className="space-y-3 flex-1">
+            <button className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-slate-50 hover:border-slate-300 transition-all text-left shadow-sm group">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                  <DollarSign className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 text-sm">Log Payment Receipt</p>
+                  <p className="text-xs text-slate-500">Record incoming customer funds</p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all" />
+            </button>
+
+            <button className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-slate-50 hover:border-slate-300 transition-all text-left shadow-sm group">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                  <Receipt className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 text-sm">Create Recurring Invoice</p>
+                  <p className="text-xs text-slate-500">Setup automated billing cycles</p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all" />
+            </button>
+
+            <button className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-slate-50 hover:border-slate-300 transition-all text-left shadow-sm group">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                  <AlertCircle className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 text-sm">Send Reminders</p>
+                  <p className="text-xs text-slate-500">Dispatch overdue notifications</p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all" />
             </button>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default InvoiceCenterDashboard;
+}
