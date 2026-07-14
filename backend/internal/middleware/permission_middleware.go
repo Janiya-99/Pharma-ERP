@@ -40,7 +40,7 @@ func RequirePermission(permissionKey string) gin.HandlerFunc {
 
 		hasPermission := false
 		for _, p := range permissions {
-			if p == permissionKey {
+			if p == "*" || p == permissionKey {
 				hasPermission = true
 				break
 			}

@@ -22,7 +22,7 @@ func (s *PermissionService) GetPermissionsForUserContext(userID, branchID uint64
 
 	// 2. Find active roles from user_branch_software_roles
 	var matrix []models.UserBranchRole
-	s.db.Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").Find(&matrix)
+	s.db.Preload("Role").Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").Find(&matrix)
 
 	if len(matrix) == 0 {
 		return []string{}
@@ -31,6 +31,9 @@ func (s *PermissionService) GetPermissionsForUserContext(userID, branchID uint64
 	var roleIDs []uint64
 	for _, m := range matrix {
 		if m.Role.Status == "active" {
+			if m.Role.RoleCode == "SUPER_ADMIN" {
+				return []string{"*"}
+			}
 			roleIDs = append(roleIDs, m.RoleID)
 		}
 	}
