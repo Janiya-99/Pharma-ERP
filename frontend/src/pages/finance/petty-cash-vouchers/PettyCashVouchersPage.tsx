@@ -15,6 +15,7 @@ import RejectPettyCashModal from "../petty-cash/shared/RejectPettyCashModal";
 import PostPettyCashConfirmModal from "../petty-cash/shared/PostPettyCashConfirmModal";
 import { toast } from "react-hot-toast";
 import { MdVisibility } from "react-icons/md";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 export default function PettyCashVouchersPage() {
   const history = useHistory();
@@ -133,49 +134,65 @@ export default function PettyCashVouchersPage() {
         addLabel="Create Petty Cash Voucher"
       />
 
-      <div className="bg-white  p-4 rounded-xl shadow-sm border border-gray-100 ">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          <select value={filters.petty_cash_fund_id} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, petty_cash_fund_id: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
-            <option value="">All Funds</option>
-            {funds.map((f: unknown) => <option key={f.id} value={f.id}>{f.fund_code} - {f.fund_name}</option>)}
-          </select>
-          <select value={filters.voucher_type} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, voucher_type: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
-            <option value="">All Types</option>
-            <option value="expense">Expense</option>
-            <option value="advance">Advance</option>
-            <option value="refund">Refund</option>
-            <option value="adjustment">Adjustment</option>
-          </select>
-          <select value={filters.approval_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, approval_status: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
-            <option value="">All Approval Statuses</option>
-            <option value="draft">Draft</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <select value={filters.posted_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, posted_status: e.target.value }))} className="w-full px-3 py-2 border rounded-md   ">
-            <option value="">All Posted Statuses</option>
-            <option value="unposted">Unposted</option>
-            <option value="posted">Posted</option>
-          </select>
-          <input type="text" placeholder="Search Payee/Ref/Voucher No..." value={filters.search} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))} className="w-full px-3 py-2 border rounded-md   " />
-        </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current: unknown) => ({ ...current, search: value }))
+          }
+          statusFilter={false}
+          customFilters={
+            <>
+              <div className="w-40">
+                <select value={filters.petty_cash_fund_id} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, petty_cash_fund_id: e.target.value }))} className="w-full px-3 py-1.5 text-sm border rounded-md">
+                  <option value="">All Funds</option>
+                  {funds.map((f: unknown) => <option key={f.id} value={f.id}>{f.fund_code}</option>)}
+                </select>
+              </div>
+              <div className="w-40">
+                <select value={filters.voucher_type} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, voucher_type: e.target.value }))} className="w-full px-3 py-1.5 text-sm border rounded-md">
+                  <option value="">All Types</option>
+                  <option value="expense">Expense</option>
+                  <option value="advance">Advance</option>
+                  <option value="refund">Refund</option>
+                  <option value="adjustment">Adjustment</option>
+                </select>
+              </div>
+              <div className="w-40">
+                <select value={filters.approval_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, approval_status: e.target.value }))} className="w-full px-3 py-1.5 text-sm border rounded-md">
+                  <option value="">All Approval Statuses</option>
+                  <option value="draft">Draft</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              <div className="w-40">
+                <select value={filters.posted_status} onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, posted_status: e.target.value }))} className="w-full px-3 py-1.5 text-sm border rounded-md">
+                  <option value="">All Posted Statuses</option>
+                  <option value="unposted">Unposted</option>
+                  <option value="posted">Posted</option>
+                </select>
+              </div>
+            </>
+          }
+        />
       </div>
 
       <div className="flex-1 bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
+            <thead className="bg-slate-50/80 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3">Voucher Number</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Fund</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Payee</th>
-                <th className="px-4 py-3">Reference</th>
-                <th className="px-4 py-3 text-right">Amount</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Voucher Number</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Date</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Fund</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Type</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Payee</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Reference</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Amount</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Status</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100  text-gray-700 ">

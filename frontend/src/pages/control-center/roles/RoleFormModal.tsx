@@ -180,8 +180,8 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
           </div>
         )}
 
-        <div className="bg-gray-50/70 p-4 rounded-lg border border-gray-200 space-y-4">
-          <h4 className="text-sm font-semibold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+        <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-200/80 space-y-5 shadow-sm">
+          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest flex items-center gap-2.5">
             <Layers className="w-4 h-4 text-indigo-600" />
             1. Role Details
           </h4>
@@ -232,22 +232,22 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
               rows={2}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-sm"
               placeholder="Role description..."
             />
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-gray-200">
+        <div className="space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
             <div>
-              <h4 className="text-sm font-semibold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest flex items-center gap-2.5">
                 <Shield className="w-4 h-4 text-indigo-600" />
                 2. Assign Permissions
               </h4>
@@ -259,25 +259,23 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
             </div>
 
             {groupedPermissions.length > 0 && (
-              <Button
+              <button
                 type="button"
-                variant="secondary"
-                size="sm"
                 onClick={handleSelectAllPerms}
-                className="text-xs h-8 flex items-center gap-1.5 self-start sm:self-auto"
+                className="text-xs font-semibold h-9 px-3.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 transition-all text-slate-700 flex items-center gap-2 shadow-sm self-start sm:self-auto"
               >
                 {isAllSelected ? (
                   <>
-                    <Square className="w-3.5 h-3.5 text-gray-600" />
+                    <Square className="w-4 h-4 text-slate-400" />
                     Clear All Permissions
                   </>
                 ) : (
                   <>
-                    <CheckSquare className="w-3.5 h-3.5 text-indigo-600" />
+                    <CheckSquare className="w-4 h-4 text-indigo-600" />
                     Select All Permissions
                   </>
                 )}
-              </Button>
+              </button>
             )}
           </div>
 

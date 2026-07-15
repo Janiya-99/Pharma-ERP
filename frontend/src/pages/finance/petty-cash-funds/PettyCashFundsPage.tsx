@@ -6,6 +6,7 @@ import { useAuth } from "../../../../auth/AuthContext";
 import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
 import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
 import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 export default function PettyCashFundsPage() {
   const history = useHistory();
@@ -92,62 +93,63 @@ export default function PettyCashFundsPage() {
         addLabel="Create Petty Cash Fund"
       />
 
-      <div className="bg-white  p-4 rounded-xl shadow-sm border border-gray-100 ">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <select
-            value={filters.branch_id}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, branch_id: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500   "
-          >
-            <option value="">All Branches</option>
-            {branches.map((b: unknown) => (
-              <option key={b.id} value={b.id}>{b.branch_name}</option>
-            ))}
-          </select>
-          <select
-            value={filters.custodian_user_id}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, custodian_user_id: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500   "
-          >
-            <option value="">All Custodians</option>
-            {users.map((u: unknown) => (
-              <option key={u.id} value={u.id}>{u.name || u.full_name}</option>
-            ))}
-          </select>
-          <select
-            value={filters.status}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, status: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500   "
-          >
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Search Code or Name..."
-            value={filters.search}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500   "
-          />
-        </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current: unknown) => ({ ...current, search: value }))
+          }
+          statusFilter={true}
+          statusValue={filters.status || "all"}
+          onStatusChange={(value) =>
+            setFilters((current: unknown) => ({ ...current, status: value === "all" ? "" : value }))
+          }
+          customFilters={
+            <>
+              <div className="w-40">
+                <select
+                  value={filters.branch_id}
+                  onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, branch_id: e.target.value }))}
+                  className="w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
+                >
+                  <option value="">All Branches</option>
+                  {branches.map((b: unknown) => (
+                    <option key={b.id} value={b.id}>{b.branch_name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-40">
+                <select
+                  value={filters.custodian_user_id}
+                  onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, custodian_user_id: e.target.value }))}
+                  className="w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
+                >
+                  <option value="">All Custodians</option>
+                  {users.map((u: unknown) => (
+                    <option key={u.id} value={u.id}>{u.name || u.full_name}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          }
+        />
       </div>
 
       <div className="flex-1 bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
+            <thead className="bg-slate-50/80 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3">Fund Code</th>
-                <th className="px-4 py-3">Fund Name</th>
-                <th className="px-4 py-3">Branch</th>
-                <th className="px-4 py-3">Cash Account</th>
-                <th className="px-4 py-3">Custodian</th>
-                <th className="px-4 py-3 text-right">Opening Balance</th>
-                <th className="px-4 py-3 text-right">Current Balance</th>
-                <th className="px-4 py-3 text-right">Fund Limit</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Fund Code</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Fund Name</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Branch</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Cash Account</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Custodian</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Opening Balance</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Current Balance</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Fund Limit</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Status</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100  text-gray-700 ">

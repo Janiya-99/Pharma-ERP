@@ -47,8 +47,8 @@ export const OpeningBalancesPage = () => (
         accountField("account_id", "Account"),
         { name: "debit_amount", label: "Debit Amount", type: "number", table: true, defaultValue: 0 },
         { name: "credit_amount", label: "Credit Amount", type: "number", table: true, defaultValue: 0 },
-        { name: "remarks", label: "Remarks", type: "textarea" },
         statusField,
+        { name: "remarks", label: "Remarks", type: "textarea" },
       ],
     }}
   />
@@ -117,16 +117,23 @@ export const JournalEntryPage = () => (
         accountingPeriodField,
         { name: "journal_date", label: "Journal Date", type: "date", required: true, table: true },
         { name: "reference_number", label: "Reference Number", type: "text", table: true },
-        { name: "description", label: "Description", type: "textarea" },
         approvalStatusField,
+        { name: "description", label: "Description", type: "textarea" },
         {
           name: "lines",
-          label: "Lines JSON",
-          type: "json",
+          label: "Journal Lines",
+          type: "dynamic-lines",
           required: true,
+          columns: [
+            optionalBranchField,
+            accountField("account_id", "GL Account", true),
+            { name: "debit_amount", label: "Debit Amount", type: "number", required: true, defaultValue: 0, placeholder: "0.00" },
+            { name: "credit_amount", label: "Credit Amount", type: "number", required: true, defaultValue: 0, placeholder: "0.00" },
+            { name: "line_description", label: "Remarks", type: "text", placeholder: "Remarks" },
+          ],
           defaultValue: [
-            { account_id: 0, line_description: "Debit line", debit_amount: 0, credit_amount: 0 },
-            { account_id: 0, line_description: "Credit line", debit_amount: 0, credit_amount: 0 },
+            { branch_id: "", account_id: "", debit_amount: 0, credit_amount: 0, line_description: "" },
+            { branch_id: "", account_id: "", debit_amount: 0, credit_amount: 0, line_description: "" },
           ],
         },
       ],
@@ -166,7 +173,19 @@ export const PaymentVouchersPage = () => (
         accountField("paid_from_account_id", "Paid From Account"),
         { name: "reference_number", label: "Reference Number", type: "text" },
         { name: "description", label: "Description", type: "textarea" },
-        { name: "lines", label: "Lines JSON", type: "json", required: true, defaultValue: [{ account_id: 0, line_description: "Payment line", amount: 0 }] },
+        { 
+          name: "lines", 
+          label: "Payment Lines", 
+          type: "dynamic-lines", 
+          required: true, 
+          columns: [
+            optionalBranchField,
+            accountField("account_id", "GL Account", true),
+            { name: "amount", label: "Amount", type: "number", required: true, defaultValue: 0, placeholder: "0.00" },
+            { name: "line_description", label: "Remarks", type: "text", placeholder: "Remarks" },
+          ],
+          defaultValue: [{ branch_id: "", account_id: "", amount: 0, line_description: "" }] 
+        },
       ],
     }}
   />
@@ -203,7 +222,19 @@ export const ReceiptVouchersPage = () => (
         accountField("received_to_account_id", "Received To Account"),
         { name: "reference_number", label: "Reference Number", type: "text" },
         { name: "description", label: "Description", type: "textarea" },
-        { name: "lines", label: "Lines JSON", type: "json", required: true, defaultValue: [{ account_id: 0, line_description: "Receipt line", amount: 0 }] },
+        { 
+          name: "lines", 
+          label: "Receipt Lines", 
+          type: "dynamic-lines", 
+          required: true, 
+          columns: [
+            optionalBranchField,
+            accountField("account_id", "GL Account", true),
+            { name: "amount", label: "Amount", type: "number", required: true, defaultValue: 0, placeholder: "0.00" },
+            { name: "line_description", label: "Remarks", type: "text", placeholder: "Remarks" },
+          ],
+          defaultValue: [{ branch_id: "", account_id: "", amount: 0, line_description: "" }] 
+        },
       ],
     }}
   />

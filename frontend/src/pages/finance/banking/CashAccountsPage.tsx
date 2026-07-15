@@ -43,6 +43,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import ERPConfirmDialog from "../../../components/erp/ERPConfirmDialog";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 type ApiRecord = Record<string, any>;
 
@@ -318,10 +319,6 @@ const CashAccountsPage = () => {
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Button onClick={openCreateDialog} className="bg-indigo-600 text-white hover:bg-indigo-700">
-            <Plus className="h-4 w-4" />
-            Add Cash Account
-          </Button>
         </div>
       </div>
 
@@ -337,47 +334,34 @@ const CashAccountsPage = () => {
         </CardContent>
       </Card>
 
-      <Card className="border border-slate-200 bg-white shadow-sm">
-        <CardHeader className="border-b border-slate-100">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-              <CardTitle>Cash Account Register</CardTitle>
-              <CardDescription>Cash locations and their linked ledger accounts.</CardDescription>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-2.5 top-2 h-4 w-4 text-slate-400" />
-                <Input
-                  value={filters.search}
-                  onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
-                  placeholder="Search cash accounts"
-                  className="h-9 w-full border-slate-200 bg-white pl-8 sm:w-64"
-                />
-              </div>
-              <Select value={filters.status} onValueChange={(value) => setFilters((current) => ({ ...current, status: value }))}>
-                <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
+      <Card className="border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current) => ({ ...current, search: value }))
+          }
+          statusFilter={true}
+          statusValue={filters.status}
+          onStatusChange={(value) =>
+            setFilters((current) => ({ ...current, status: value }))
+          }
+          onAdd={() => {
+            setEditingAccount(null);
+            form.reset();
+            setDialogOpen(true);
+          }}
+        />
+        <CardContent className="pt-0 p-0">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50/80">
-                <TableHead>Cash Account Name</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead>Responsible User</TableHead>
-                <TableHead className="text-right">Current Balance</TableHead>
-                <TableHead>Linked Ledger Account</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Cash Account Name</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Branch</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Responsible User</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Current Balance</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Linked Ledger Account</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Status</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -437,19 +421,20 @@ const CashAccountsPage = () => {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-2xl">
-          <SheetHeader>
-            <SheetTitle>{editingAccount ? "Edit Cash Account" : "Add Cash Account"}</SheetTitle>
+        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:max-w-2xl border-l border-slate-200 shadow-2xl">
+          <SheetHeader className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 shrink-0">
+            <SheetTitle className="text-xl font-bold text-slate-800">{editingAccount ? "Edit Cash Account" : "Add Cash Account"}</SheetTitle>
             <SheetDescription>Cash accounts must link to a cash ledger account or request backend auto-create.</SheetDescription>
           </SheetHeader>
-          {errors.company_id && (
-            <Alert variant="destructive">
-              <AlertTitle>Company context required</AlertTitle>
-              <AlertDescription>{errors.company_id}</AlertDescription>
-            </Alert>
-          )}
-          <form id="cash-account-form" onSubmit={submitForm} className="space-y-5">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            {errors.company_id && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertTitle>Company context required</AlertTitle>
+                <AlertDescription>{errors.company_id}</AlertDescription>
+              </Alert>
+            )}
+            <form id="cash-account-form" onSubmit={submitForm} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Field label="Cash Account Name" error={errors.cash_account_name} required>
                 <Input value={form.cash_account_name} onChange={(event) => setField("cash_account_name", event.target.value)} />
               </Field>
@@ -517,25 +502,28 @@ const CashAccountsPage = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <div>
-                  <Label>Auto Create Ledger</Label>
-                  <p className="mt-1 text-xs text-slate-500">Backend should create Assets / Current Assets / Cash Accounts ledger.</p>
+              <div className="flex flex-col gap-2 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm hover:border-indigo-200 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <Label className="text-sm font-semibold text-slate-700 leading-tight">Auto Create Ledger</Label>
+                    <p className="mt-1 text-xs text-slate-500">Backend should create Assets / Current Assets / Cash Accounts ledger.</p>
+                  </div>
+                  <Switch checked={form.auto_create_ledger} onCheckedChange={(checked) => setField("auto_create_ledger", checked)} />
                 </div>
-                <Switch checked={form.auto_create_ledger} onCheckedChange={(checked) => setField("auto_create_ledger", checked)} />
               </div>
             </div>
-            <Separator />
+            <Separator className="my-6" />
             <Field label="Description">
               <Input value={form.description} onChange={(event) => setField("description", event.target.value)} />
             </Field>
           </form>
-          <SheetFooter>
+          </div>
+          <SheetFooter className="border-t border-slate-100 bg-slate-50/50 px-6 py-4 shrink-0 flex flex-row items-center justify-end gap-2">
             <Button variant="outline" type="button" onClick={() => setDialogOpen(false)} disabled={submitting}>
               Cancel
             </Button>
             <Button form="cash-account-form" type="submit" className="bg-indigo-600 text-white hover:bg-indigo-700" disabled={submitting}>
-              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {submitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Save Cash Account
             </Button>
           </SheetFooter>
@@ -567,10 +555,10 @@ const Field = ({
   error?: string;
   children: React.ReactNode;
 }) => (
-  <div className="space-y-2">
-    <Label>
+  <div className="space-y-1.5">
+    <Label className="text-sm font-semibold text-slate-700">
       {label}
-      {required && <span className="text-red-600">*</span>}
+      {required && <span className="text-red-600 ml-1">*</span>}
     </Label>
     {children}
     {error && <p className="text-xs font-medium text-red-600">{error}</p>}

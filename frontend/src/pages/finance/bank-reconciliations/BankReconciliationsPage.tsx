@@ -7,6 +7,7 @@ import BankAccountSelect from "../../../../components/finance/BankAccountSelect"
 import ReconciliationStatusBadge from "../../../../components/finance/ReconciliationStatusBadge";
 import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
 import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 export default function BankReconciliationsPage() {
   const history = useHistory();
@@ -75,46 +76,42 @@ export default function BankReconciliationsPage() {
         addLabel="New Reconciliation"
       />
 
-      <div className="bg-white  p-4 rounded-xl shadow-sm border border-gray-100 ">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <BankAccountSelect
-            value={filters.bank_account_id}
-            onChange={(val: unknown) => setFilters((prev: unknown) => ({ ...prev, bank_account_id: val }))}
-            placeholder="All Bank Accounts"
-          />
-          <select
-            value={filters.status}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, status: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
-          >
-            <option value="">All Statuses</option>
-            <option value="draft">Draft</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Search Reference..."
-            value={filters.search}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
-          />
-        </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current: unknown) => ({ ...current, search: value }))
+          }
+          statusFilter={true}
+          statusValue={filters.status || "all"}
+          onStatusChange={(value) =>
+            setFilters((current: unknown) => ({ ...current, status: value === "all" ? "" : value }))
+          }
+          customFilters={
+            <div className="w-48">
+              <BankAccountSelect
+                value={filters.bank_account_id}
+                onChange={(val: unknown) => setFilters((prev: unknown) => ({ ...prev, bank_account_id: val }))}
+                placeholder="All Bank Accounts"
+              />
+            </div>
+          }
+        />
       </div>
 
       <div className="flex-1 bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
+            <thead className="bg-slate-50/80 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3">Reference</th>
-                <th className="px-4 py-3">Bank Account</th>
-                <th className="px-4 py-3">Statement Date</th>
-                <th className="px-4 py-3 text-right">Statement Balance</th>
-                <th className="px-4 py-3 text-right">System Balance</th>
-                <th className="px-4 py-3 text-right">Difference</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Reference</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Bank Account</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Statement Date</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Statement Balance</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-right">System Balance</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Difference</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Status</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 ">

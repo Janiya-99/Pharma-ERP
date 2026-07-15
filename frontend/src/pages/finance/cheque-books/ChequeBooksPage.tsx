@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import BankAccountSelect from "../../../../components/finance/BankAccountSelect";
+import { useNavigate } from "react-router-dom";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import BankAccountSelect from "../../../components/finance/BankAccountSelect";
 import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 export default function ChequeBooksPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [books, setBooks] = useState([]);
@@ -45,7 +46,7 @@ export default function ChequeBooksPage() {
     }
   }, [filters, pagination.page, activeSoftware]);
 
-  const handleDelete = async (book: unknown) => {
+  const handleDelete = async (book: any) => {
     if (book.used_leaves > 0) {
       alert("Cannot delete a cheque book that has used leaves.");
       return;
@@ -54,7 +55,7 @@ export default function ChequeBooksPage() {
       try {
         await financeApi.deleteChequeBook(book.id);
         fetchBooks();
-      } catch (err) {
+      } catch (err: any) {
         alert("Failed to delete: " + (err.response?.data?.message || err.message));
       }
     }
@@ -69,69 +70,65 @@ export default function ChequeBooksPage() {
       <FinancePageHeader
         title="Cheque Books"
         subtitle="Manage cheque books and cheque leaf inventory"
-        onAdd={hasPermission("finance.cheque_book.create") ? () => history.push("/admin/finance/cheque-books/create") : undefined}
+        onAdd={hasPermission("finance.cheque_book.create") ? () => navigate("/admin/finance/cheque-books/create") : undefined}
         addLabel="Create Cheque Book"
       />
 
-      <div className="bg-white  p-4 rounded-xl shadow-sm border border-gray-100 ">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <BankAccountSelect
-            value={filters.bank_account_id}
-            onChange={(val: unknown) => setFilters((prev: unknown) => ({ ...prev, bank_account_id: val }))}
-            placeholder="All Bank Accounts"
-          />
-          <select
-            value={filters.status}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, status: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
-          >
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Search Book Number..."
-            value={filters.search}
-            onChange={(e: any) => setFilters((prev: unknown) => ({ ...prev, search: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-navy-500"
-          />
-        </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current: any) => ({ ...current, search: value }))
+          }
+          statusFilter={true}
+          statusValue={filters.status || "all"}
+          onStatusChange={(value) =>
+            setFilters((current: any) => ({ ...current, status: value === "all" ? "" : value }))
+          }
+          customFilters={
+            <div className="w-48">
+              <BankAccountSelect
+                value={filters.bank_account_id}
+                onChange={(val: any) => setFilters((prev: any) => ({ ...prev, bank_account_id: val }))}
+                placeholder="All Bank Accounts"
+              />
+            </div>
+          }
+        />
       </div>
 
       <div className="flex-1 bg-white  rounded-xl shadow-sm border border-gray-100  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50  text-gray-500  font-semibold border-b border-gray-200 ">
+            <thead className="bg-slate-50/80 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3">Book Number</th>
-                <th className="px-4 py-3">Bank Account</th>
-                <th className="px-4 py-3">Start - End</th>
-                <th className="px-4 py-3 text-center">Total</th>
-                <th className="px-4 py-3 text-center text-indigo-600">Used</th>
-                <th className="px-4 py-3 text-center text-red-600">Cancelled</th>
-                <th className="px-4 py-3 text-center text-green-600">Available</th>
-                <th className="px-4 py-3 text-center">Issued Date</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Book Number</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Bank Account</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide">Start - End</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Total</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center text-indigo-600">Used</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center text-red-600">Cancelled</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center text-green-600">Available</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Issued Date</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Status</th>
+                <th className="px-4 py-3 text-xs uppercase font-bold text-slate-500 tracking-wide text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 ">
               {loading ? (
                 <tr>
-                  <td colSpan="10" className="px-4 py-8 text-center text-gray-500">Loading...</td>
+                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">Loading...</td>
                 </tr>
               ) : books.length === 0 ? (
                 <tr>
-                  <td colSpan="10" className="px-4 py-8 text-center text-gray-500">No cheque books found.</td>
+                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">No cheque books found.</td>
                 </tr>
               ) : (
-                books.map((book: unknown) => (
+                books.map((book: any) => (
                   <tr key={book.id} className="hover:bg-gray-50 ">
                     <td className="px-4 py-3 font-medium text-navy-700">
                       <button 
-                        onClick={() => history.push(`/admin/finance/cheque-books/${book.id}`)}
+                        onClick={() => navigate(`/admin/finance/cheque-books/${book.id}`)}
                         className="text-brand-500 hover:underline"
                       >
                         {book.cheque_book_number}
@@ -152,12 +149,12 @@ export default function ChequeBooksPage() {
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {hasPermission("finance.cheque_book.view") && (
-                          <button onClick={() => history.push(`/admin/finance/cheque-books/${book.id}`)} className="text-gray-500 hover:text-navy-700">
+                          <button onClick={() => navigate(`/admin/finance/cheque-books/${book.id}`)} className="text-gray-500 hover:text-navy-700">
                             <MdVisibility className="h-5 w-5" />
                           </button>
                         )}
                         {hasPermission("finance.cheque_book.update") && (
-                          <button onClick={() => history.push(`/admin/finance/cheque-books/${book.id}/edit`)} className="text-brand-500 hover:text-brand-700">
+                          <button onClick={() => navigate(`/admin/finance/cheque-books/${book.id}/edit`)} className="text-brand-500 hover:text-brand-700">
                             <MdEdit className="h-5 w-5" />
                           </button>
                         )}
@@ -177,9 +174,9 @@ export default function ChequeBooksPage() {
         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 ">
           <span className="text-gray-500">Total Records: {pagination.total}</span>
           <div className="flex gap-2">
-            <button disabled={pagination.page <= 1} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page - 1 }))} className="px-3 py-1 border rounded disabled:opacity-50">Previous</button>
+            <button disabled={pagination.page <= 1} onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page - 1 }))} className="px-3 py-1 border rounded disabled:opacity-50">Previous</button>
             <span className="px-3 py-1">Page {pagination.page}</span>
-            <button disabled={books.length < pagination.limit} onClick={() => setPagination((prev: unknown) => ({ ...prev, page: prev.page + 1 }))} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+            <button disabled={books.length < pagination.limit} onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page + 1 }))} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
           </div>
         </div>
       </div>

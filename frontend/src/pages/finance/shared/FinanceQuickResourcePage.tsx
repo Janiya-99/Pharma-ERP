@@ -56,8 +56,11 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import ERPConfirmDialog from "../../../components/erp/ERPConfirmDialog";
+import { DataTableToolbar } from "./DataTableToolbar";
 
-type SourceName =
+import { DynamicLinesEditor } from "./DynamicLinesEditor";
+
+export type SourceName =
   | "branches"
   | "accounts"
   | "financialYears"
@@ -73,7 +76,8 @@ type FieldType =
   | "select"
   | "textarea"
   | "checkbox"
-  | "json";
+  | "json"
+  | "dynamic-lines";
 
 export type QuickField = {
   name: string;
@@ -85,6 +89,7 @@ export type QuickField = {
   options?: { label: string; value: string }[];
   source?: SourceName;
   defaultValue?: unknown;
+  columns?: QuickField[];
 };
 
 type QuickResourceConfig = {
@@ -132,7 +137,7 @@ const normalizeRows = (value: any) => {
   return [];
 };
 
-const optionLabel = (source: SourceName, row: any) => {
+export const optionLabel = (source: SourceName, row: any) => {
   switch (source) {
     case "branches":
       return `${row.branch_code || row.code || row.id} - ${
@@ -174,6 +179,8 @@ const makeEmptyForm = (
       form[field.name] = false;
     } else if (field.type === "json") {
       form[field.name] = "[]";
+    } else if (field.type === "dynamic-lines") {
+      form[field.name] = [];
     } else {
       form[field.name] =
         field.name === "branch_id" && activeBranchId
@@ -335,9 +342,13 @@ export function FinanceQuickResourcePage({
     config.fields.forEach((field) => {
       const value = row[field.name];
       if (value === undefined || value === null) return;
-      next[field.name] =
-        field.type === "json" ? JSON.stringify(value, null, 2) : String(value);
-      if (field.type === "checkbox") next[field.name] = !!value;
+      if (field.type === "dynamic-lines") {
+        next[field.name] = Array.isArray(value) ? value : [];
+      } else {
+        next[field.name] =
+          field.type === "json" ? JSON.stringify(value, null, 2) : String(value);
+        if (field.type === "checkbox") next[field.name] = !!value;
+      }
     });
     setForm(next);
     setErrors({});
@@ -375,6 +386,11 @@ export function FinanceQuickResourcePage({
           nextErrors[field.name] = `${field.label} must be valid JSON.`;
         }
       }
+      if (field.type === "dynamic-lines") {
+        if (!Array.isArray(value) || value.length === 0) {
+          nextErrors[field.name] = `${field.label} requires at least one line.`;
+        }
+      }
     });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
@@ -399,6 +415,14 @@ export function FinanceQuickResourcePage({
         payload[field.name] = !!value;
       } else if (field.type === "json") {
         payload[field.name] = JSON.parse(value || "[]");
+      } else if (field.type === "dynamic-lines") {
+        payload[field.name] = Array.isArray(value) ? value.map(row => {
+          const formattedRow: any = { ...row };
+          field.columns?.forEach(col => {
+             if (col.type === "number") formattedRow[col.name] = Number(row[col.name] || 0);
+          });
+          return formattedRow;
+        }) : [];
       } else if (field.source) {
         payload[field.name] = Number(value);
       } else {
@@ -477,65 +501,29 @@ export function FinanceQuickResourcePage({
             {config.description}
           </p>
         </div>
-        <Button
-          onClick={openCreateDialog}
-          className="bg-indigo-600 text-white hover:bg-indigo-700"
-        >
-          <Plus className="h-4 w-4" />
-          {config.createLabel}
-        </Button>
       </div>
 
-      <Card className="border-slate-200 border bg-white shadow-sm">
-        <CardHeader className="border-slate-100 border-b">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <CardTitle>{config.title}</CardTitle>
-              <CardDescription>
-                Records are loaded from the Finance API.
-              </CardDescription>
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(220px,1fr)_130px]">
-              <div className="relative">
-                <Search className="text-slate-400 pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <Input
-                  value={filters.search}
-                  onChange={(event) =>
-                    setFilters((current) => ({
-                      ...current,
-                      search: event.target.value,
-                    }))
-                  }
-                  placeholder={config.searchPlaceholder || "Search"}
-                  className="pl-9"
-                />
-              </div>
-              {config.statusFilter ? (
-                <Select
-                  value={filters.status}
-                  onValueChange={(value) =>
-                    setFilters((current) => ({ ...current, status: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : null}
-            </div>
-          </div>
-        </CardHeader>
+      <Card className="border-slate-200 border bg-white shadow-sm overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current) => ({ ...current, search: value }))
+          }
+          onAdd={openCreateDialog}
+          statusFilter={config.statusFilter}
+          statusValue={filters.status}
+          onStatusChange={(value) =>
+            setFilters((current) => ({ ...current, status: value }))
+          }
+        />
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
                 {tableFields.map((field) => (
-                  <TableHead key={field.name}>{field.label}</TableHead>
+                  <TableHead key={field.name} className="text-xs uppercase font-bold text-slate-500 tracking-wide">
+                    {field.label}
+                  </TableHead>
                 ))}
                 <TableHead className="w-12" />
               </TableRow>
@@ -619,24 +607,24 @@ export function FinanceQuickResourcePage({
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-3xl">
-          <form onSubmit={handleSubmit}>
-            <SheetHeader>
-              <SheetTitle>
-                {editingRow ? `Update ${config.title}` : config.createLabel}
-              </SheetTitle>
-              <SheetDescription>
-                Required fields are marked with an asterisk. JSON fields are
-                sent as structured arrays.
-              </SheetDescription>
-            </SheetHeader>
-
-            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:max-w-3xl border-l border-slate-200 shadow-2xl">
+          <SheetHeader className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 shrink-0">
+            <SheetTitle className="text-xl font-bold text-slate-800">
+              {editingRow ? `Update ${config.title}` : config.createLabel}
+            </SheetTitle>
+            <SheetDescription>
+              Required fields are marked with an asterisk. JSON fields are
+              sent as structured arrays.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <form id="quick-resource-form" onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {config.fields.map((field) => (
                 <div
                   key={field.name}
                   className={
-                    field.type === "textarea" || field.type === "json"
+                    field.type === "textarea" || field.type === "json" || field.type === "dynamic-lines"
                       ? "md:col-span-2"
                       : undefined
                   }
@@ -655,29 +643,30 @@ export function FinanceQuickResourcePage({
                   </Field>
                 </div>
               ))}
-            </div>
-
-            <SheetFooter className="mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="bg-indigo-600 text-white hover:bg-indigo-700"
-              >
-                {submitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : null}
-                {editingRow ? `Update ${config.title}` : config.createLabel}
-              </Button>
-            </SheetFooter>
-          </form>
+              </div>
+            </form>
+          </div>
+          <SheetFooter className="border-t border-slate-100 bg-slate-50/50 px-6 py-4 shrink-0 flex flex-row items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              form="quick-resource-form"
+              type="submit"
+              disabled={submitting}
+              className="bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              {submitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {editingRow ? `Update ${config.title}` : config.createLabel}
+            </Button>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
 
@@ -701,25 +690,36 @@ function renderField(
   onChange: (value: any) => void,
   refs: Record<SourceName, any[]>
 ) {
+  if (field.type === "dynamic-lines") {
+    return (
+      <DynamicLinesEditor 
+        columns={field.columns || []}
+        value={Array.isArray(value) ? value : []}
+        onChange={onChange}
+        refs={refs}
+      />
+    );
+  }
   if (field.type === "textarea" || field.type === "json") {
     return (
       <Textarea
         value={value || ""}
         onChange={(event) => onChange(event.target.value)}
         rows={field.type === "json" ? 7 : 3}
-        placeholder={field.placeholder}
+        placeholder={field.placeholder || `Enter ${field.label}`}
       />
     );
   }
   if (field.type === "checkbox") {
     return (
-      <label className="border-slate-200 flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm">
+      <label className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 text-sm shadow-sm hover:border-indigo-200 transition-colors cursor-pointer w-full">
         <input
           type="checkbox"
           checked={!!value}
           onChange={(event) => onChange(event.target.checked)}
+          className="w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 focus:ring-2"
         />
-        Enabled
+        <span className="font-medium text-slate-700">Enabled</span>
       </label>
     );
   }
@@ -761,7 +761,7 @@ function renderField(
       }
       value={value || ""}
       onChange={(event) => onChange(event.target.value)}
-      placeholder={field.placeholder}
+      placeholder={field.placeholder || `Enter ${field.label}`}
     />
   );
 }
@@ -777,8 +777,8 @@ const Field = ({
   error?: string;
   children: React.ReactNode;
 }) => (
-  <div className="space-y-2">
-    <Label className="text-slate-700 text-sm font-medium">
+  <div className="space-y-1.5">
+    <Label className="text-sm font-semibold text-slate-700">
       {label} {required ? <span className="text-red-500">*</span> : null}
     </Label>
     {children}

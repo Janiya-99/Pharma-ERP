@@ -65,6 +65,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import ERPConfirmDialog from "../../../components/erp/ERPConfirmDialog";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 type ApiRecord = Record<string, any>;
 
@@ -572,54 +573,32 @@ const BankAccountsPage = () => {
         </Card>
       </div>
 
-      <Card className="mt-4 border border-slate-200 bg-white shadow-sm">
-        <CardHeader className="border-b border-slate-100">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-              <CardTitle>Company Bank Accounts</CardTitle>
-              <CardDescription>
-                Accounts are linked to Chart of Accounts ledger records flagged
-                as bank accounts.
-              </CardDescription>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-2.5 top-2 h-4 w-4 text-slate-400" />
-                <Input
-                  value={filters.search}
-                  onChange={(event) =>
-                    setFilters((current) => ({
-                      ...current,
-                      search: event.target.value,
-                    }))
-                  }
-                  placeholder="Search accounts"
-                  className="h-9 w-full border-slate-200 bg-white pl-8 sm:w-64"
-                />
-              </div>
-              <Select
-                value={filters.status}
-                onValueChange={(value) =>
-                  setFilters((current) => ({ ...current, status: value }))
-                }
-              >
-                <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+      <Card className="mt-4 border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current) => ({ ...current, search: value }))
+          }
+          statusFilter={true}
+          statusValue={filters.status}
+          onStatusChange={(value) =>
+            setFilters((current) => ({ ...current, status: value }))
+          }
+          onAdd={() => {
+            setEditingAccount(null);
+            setForm(emptyForm);
+            setDialogOpen(true);
+          }}
+          customFilters={
+            <div className="w-44">
               <Select
                 value={filters.branch_id}
                 onValueChange={(value) =>
                   setFilters((current) => ({ ...current, branch_id: value }))
                 }
               >
-                <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-44">
-                  <SelectValue />
+                <SelectTrigger className="h-9 w-full">
+                  <SelectValue placeholder="All Branches" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Branches</SelectItem>
@@ -631,19 +610,19 @@ const BankAccountsPage = () => {
                 </SelectContent>
               </Select>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
+          }
+        />
+        <CardContent className="pt-0 p-0">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50/80">
-                <TableHead>Bank Name</TableHead>
-                <TableHead>Account Name</TableHead>
-                <TableHead>Account Number</TableHead>
-                <TableHead className="text-right">Current Balance</TableHead>
-                <TableHead>Linked Ledger Account</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Bank Name</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Account Name</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Account Number</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Current Balance</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Linked Ledger Account</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Status</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

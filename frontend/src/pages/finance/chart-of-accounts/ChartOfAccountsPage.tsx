@@ -40,6 +40,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import ERPConfirmDialog from "../../../components/erp/ERPConfirmDialog";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 type ApiRecord = Record<string, any>;
 
@@ -366,26 +367,28 @@ const ChartOfAccountsPage = () => {
           </CardContent>
         </Card>
 
-        <Card className="border border-slate-200 bg-white shadow-sm">
-          <CardHeader className="border-b border-slate-100">
-            <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-              <div>
-                <CardTitle>Ledger Accounts</CardTitle>
-                <CardDescription>Search, filter, create, edit, view, and deactivate accounts.</CardDescription>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-2.5 top-2 h-4 w-4 text-slate-400" />
-                  <Input
-                    value={filters.search}
-                    onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
-                    placeholder="Search accounts"
-                    className="h-9 w-full border-slate-200 bg-white pl-8 sm:w-64"
-                  />
-                </div>
-                <Select value={filters.account_type} onValueChange={(value) => setFilters((current) => ({ ...current, account_type: value }))}>
-                  <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
-                    <SelectValue />
+        <Card className="border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <DataTableToolbar
+            searchQuery={filters.search}
+            onSearchChange={(value) =>
+              setFilters((current) => ({ ...current, search: value }))
+            }
+            onAdd={openCreateDialog}
+            statusFilter={true}
+            statusValue={filters.status}
+            onStatusChange={(value) =>
+              setFilters((current) => ({ ...current, status: value }))
+            }
+            customFilters={
+              <div className="w-40">
+                <Select
+                  value={filters.account_type}
+                  onValueChange={(value) =>
+                    setFilters((current) => ({ ...current, account_type: value }))
+                  }
+                >
+                  <SelectTrigger className="h-9 w-full">
+                    <SelectValue placeholder="Type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Types</SelectItem>
@@ -396,30 +399,20 @@ const ChartOfAccountsPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={filters.status} onValueChange={(value) => setFilters((current) => ({ ...current, status: value }))}>
-                  <SelectTrigger className="h-9 w-full border-slate-200 bg-white sm:w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
+            }
+          />
+          <CardContent className="pt-0 p-0">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50/80">
-                  <TableHead>Code</TableHead>
-                  <TableHead>Account Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Normal Balance</TableHead>
-                  <TableHead className="text-right">Current Balance</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Code</TableHead>
+                  <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Account Name</TableHead>
+                  <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Type</TableHead>
+                  <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Normal Balance</TableHead>
+                  <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Current Balance</TableHead>
+                  <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Status</TableHead>
+                  <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -482,13 +475,14 @@ const ChartOfAccountsPage = () => {
       </div>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-3xl">
-          <SheetHeader>
-            <SheetTitle>{editingAccount ? "Update Account" : "Create Account"}</SheetTitle>
+        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:max-w-3xl border-l border-slate-200 shadow-2xl">
+          <SheetHeader className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 shrink-0">
+            <SheetTitle className="text-xl font-bold text-slate-800">{editingAccount ? "Update Account" : "Create Account"}</SheetTitle>
             <SheetDescription>Accounts with transactions should be deactivated instead of deleted.</SheetDescription>
           </SheetHeader>
-          <form id="account-form" onSubmit={submitForm} className="space-y-5">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <form id="account-form" onSubmit={submitForm} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Field label="Account Code" error={errors.account_code} required>
                 <Input value={form.account_code} onChange={(event) => setField("account_code", event.target.value)} disabled={!!editingAccount} />
               </Field>
@@ -565,19 +559,20 @@ const ChartOfAccountsPage = () => {
                   </SelectContent>
                 </Select>
               </Field>
-            </div>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <Toggle label="Allow control posting" checked={form.is_control_account} onChange={(checked) => setField("is_control_account", checked)} />
-              <Toggle label="Bank account ledger" checked={form.is_bank_account} onChange={(checked) => setField("is_bank_account", checked)} />
-              <Toggle label="Cash account ledger" checked={form.is_cash_account} onChange={(checked) => setField("is_cash_account", checked)} />
-            </div>
-          </form>
-          <SheetFooter>
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <Toggle label="Allow control posting" checked={form.is_control_account} onChange={(checked) => setField("is_control_account", checked)} />
+                <Toggle label="Bank account ledger" checked={form.is_bank_account} onChange={(checked) => setField("is_bank_account", checked)} />
+                <Toggle label="Cash account ledger" checked={form.is_cash_account} onChange={(checked) => setField("is_cash_account", checked)} />
+              </div>
+            </form>
+          </div>
+          <SheetFooter className="border-t border-slate-100 bg-slate-50/50 px-6 py-4 shrink-0 flex flex-row items-center justify-end gap-2">
             <Button variant="outline" type="button" onClick={() => setDialogOpen(false)} disabled={submitting}>
               Cancel
             </Button>
             <Button form="account-form" type="submit" className="bg-indigo-600 text-white hover:bg-indigo-700" disabled={submitting}>
-              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {submitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {editingAccount ? "Update Account" : "Create Account"}
             </Button>
           </SheetFooter>
@@ -638,8 +633,8 @@ const Field = ({
   error?: string;
   children: React.ReactNode;
 }) => (
-  <div className="space-y-2">
-    <Label>
+  <div className="space-y-1.5">
+    <Label className="text-sm font-semibold text-slate-700">
       {label}
       {required && <span className="text-red-600">*</span>}
     </Label>
@@ -649,9 +644,11 @@ const Field = ({
 );
 
 const Toggle = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) => (
-  <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
-    <Label>{label}</Label>
-    <Switch checked={checked} onCheckedChange={onChange} />
+  <div className="flex flex-col gap-2 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm hover:border-indigo-200 transition-colors">
+    <div className="flex items-center justify-between">
+      <Label className="text-sm font-semibold text-slate-700 leading-tight">{label}</Label>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
   </div>
 );
 

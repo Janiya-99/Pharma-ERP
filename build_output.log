@@ -1,8 +1,0 @@
-npm error code ENOENT
-npm error syscall open
-npm error path /home/janith/Projects/pixandco-web/erp/package.json
-npm error errno -2
-npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/home/janith/Projects/pixandco-web/erp/package.json'
-npm error enoent This is related to npm not being able to find a file.
-npm error enoent
-npm error A complete log of this run can be found in: /home/janith/.npm/_logs/2026-06-20T12_55_51_396Z-debug-0.log
