@@ -148,7 +148,7 @@ const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }
             onChange={handleChange}
             rows={2}
             className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
-          />
+           placeholder="Enter text..." />
         </div>
 
         <div>

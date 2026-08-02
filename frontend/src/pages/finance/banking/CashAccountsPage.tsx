@@ -436,7 +436,7 @@ const CashAccountsPage = () => {
             <form id="cash-account-form" onSubmit={submitForm} className="space-y-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Field label="Cash Account Name" error={errors.cash_account_name} required>
-                <Input value={form.cash_account_name} onChange={(event) => setField("cash_account_name", event.target.value)} />
+                <Input value={form.cash_account_name} onChange={(event) => setField("cash_account_name", event.target.value)}  placeholder="Enter value" />
               </Field>
               <Field label="Branch" error={errors.branch_id} required>
                 <Select value={form.branch_id} onValueChange={(value) => setField("branch_id", value)}>
@@ -468,10 +468,10 @@ const CashAccountsPage = () => {
                 </Select>
               </Field>
               <Field label="Opening Balance" error={errors.opening_balance}>
-                <Input type="number" min="0" step="0.01" value={form.opening_balance} onChange={(event) => setField("opening_balance", event.target.value)} />
+                <Input type="number" min="0" step="0.01" value={form.opening_balance} onChange={(event) => setField("opening_balance", event.target.value)}  placeholder="Enter value" />
               </Field>
               <Field label="Opening Balance Date">
-                <Input type="date" value={form.opening_balance_date} onChange={(event) => setField("opening_balance_date", event.target.value)} />
+                <Input type="date" value={form.opening_balance_date} onChange={(event) => setField("opening_balance_date", event.target.value)}  placeholder="Enter value" />
               </Field>
               <Field label="Linked Ledger Account" error={errors.linked_ledger_account_id} required={!form.auto_create_ledger}>
                 <Select
@@ -514,7 +514,7 @@ const CashAccountsPage = () => {
             </div>
             <Separator className="my-6" />
             <Field label="Description">
-              <Input value={form.description} onChange={(event) => setField("description", event.target.value)} />
+              <Input value={form.description} onChange={(event) => setField("description", event.target.value)}  placeholder="Enter value" />
             </Field>
           </form>
           </div>

@@ -170,7 +170,7 @@ const SalesOrderLinesTable: React.FC<SalesOrderLinesTableProps> = ({
                           })
                         )
                       }
-                    />
+                     placeholder="0.00" />
                     <ValidationMessage
                       message={errors[`${line.id}.quantity`]}
                     />
@@ -191,7 +191,7 @@ const SalesOrderLinesTable: React.FC<SalesOrderLinesTableProps> = ({
                           })
                         )
                       }
-                    />
+                     placeholder="0.00" />
                     <ValidationMessage
                       message={errors[`${line.id}.unit_price`]}
                     />
@@ -209,7 +209,7 @@ const SalesOrderLinesTable: React.FC<SalesOrderLinesTableProps> = ({
                           })
                         )
                       }
-                    />
+                     placeholder="0.00" />
                   </TableCell>
                   <TableCell className="py-3">
                     <Input
@@ -224,7 +224,7 @@ const SalesOrderLinesTable: React.FC<SalesOrderLinesTableProps> = ({
                           })
                         )
                       }
-                    />
+                     placeholder="0.00" />
                   </TableCell>
                   <TableCell className="py-3">
                     <Input

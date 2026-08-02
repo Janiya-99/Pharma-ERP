@@ -89,7 +89,7 @@ const emptyForm: AccountForm = {
   parent_account_id: "",
   account_level: "1",
   account_type: "asset",
-  normal_balance: "debit",
+  normal_balance: "Debit",
   opening_balance: "0",
   status: "active",
   is_control_account: false,
@@ -193,7 +193,7 @@ const ChartOfAccountsPage = () => {
       parent_account_id: account.parent_account_id ? String(account.parent_account_id) : "",
       account_level: String(account.account_level || 1),
       account_type: account.account_type || "asset",
-      normal_balance: account.normal_balance || "debit",
+      normal_balance: account.normal_balance || "Debit",
       opening_balance: String(account.opening_balance || 0),
       status: account.status || "active",
       is_control_account: !!account.is_control_account,
@@ -484,10 +484,10 @@ const ChartOfAccountsPage = () => {
             <form id="account-form" onSubmit={submitForm} className="space-y-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Field label="Account Code" error={errors.account_code} required>
-                <Input value={form.account_code} onChange={(event) => setField("account_code", event.target.value)} disabled={!!editingAccount} />
+                <Input value={form.account_code} onChange={(event) => setField("account_code", event.target.value)} disabled={!!editingAccount}  placeholder="Enter value" />
               </Field>
               <Field label="Account Name" error={errors.account_name} required>
-                <Input value={form.account_name} onChange={(event) => setField("account_name", event.target.value)} />
+                <Input value={form.account_name} onChange={(event) => setField("account_name", event.target.value)}  placeholder="Enter value" />
               </Field>
               <Field label="Classification" error={errors.account_classification_id} required>
                 <Select value={form.account_classification_id} onValueChange={(value) => setField("account_classification_id", value)}>
@@ -540,13 +540,13 @@ const ChartOfAccountsPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="debit">Debit</SelectItem>
-                    <SelectItem value="credit">Credit</SelectItem>
+                    <SelectItem value="Debit">Debit</SelectItem>
+                    <SelectItem value="Credit">Credit</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
               <Field label="Opening Balance" error={errors.opening_balance}>
-                <Input type="number" step="0.01" value={form.opening_balance} onChange={(event) => setField("opening_balance", event.target.value)} disabled={!!editingAccount} />
+                <Input type="number" step="0.01" value={form.opening_balance} onChange={(event) => setField("opening_balance", event.target.value)} disabled={!!editingAccount}  placeholder="Enter value" />
               </Field>
               <Field label="Status" error={errors.status} required>
                 <Select value={form.status} onValueChange={(value) => setField("status", value)}>

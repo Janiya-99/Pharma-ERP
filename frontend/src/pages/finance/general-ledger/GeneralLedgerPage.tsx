@@ -291,7 +291,7 @@ const GeneralLedgerPage = () => {
             type="date" 
             value={filters.transaction_date_from}
             onChange={(e: any) => handleFilterChange('transaction_date_from', e.target.value)}
-          />
+           placeholder="Enter value" />
         </div>
 
         <div className="space-y-2">
@@ -300,7 +300,7 @@ const GeneralLedgerPage = () => {
             type="date" 
             value={filters.transaction_date_to}
             onChange={(e: any) => handleFilterChange('transaction_date_to', e.target.value)}
-          />
+           placeholder="Enter value" />
         </div>
 
         <div className="space-y-2 lg:col-span-2">

@@ -220,7 +220,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
               onChange={handleChange}
               required
               autoFocus
-            />
+             placeholder="Enter Role Name" />
 
             <Input
               label="Role Code *"
@@ -228,7 +228,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
               value={formData.role_code}
               onChange={handleChange}
               required
-            />
+             placeholder="Enter Role Code" />
           </div>
 
           <div>

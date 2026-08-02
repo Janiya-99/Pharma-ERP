@@ -292,7 +292,7 @@ const PurchaseReturnFormPage: React.FC = () => {
                     type="date"
                     value={purchaseReturnDate}
                     onChange={(e) => setPurchaseReturnDate(e.target.value)}
-                  />
+                   placeholder="Enter value" />
                 </div>
 
                 <div className="space-y-2">

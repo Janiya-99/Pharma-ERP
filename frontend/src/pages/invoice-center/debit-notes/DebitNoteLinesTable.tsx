@@ -146,7 +146,7 @@ export const DebitNoteLinesTable: React.FC<Props> = ({
                       {...register(`lines.${index}.quantity`, {
                         valueAsNumber: true,
                       })}
-                    />
+                     placeholder="0.00" />
                   </TableCell>
                   <TableCell>
                     <Input
@@ -158,7 +158,7 @@ export const DebitNoteLinesTable: React.FC<Props> = ({
                       {...register(`lines.${index}.unit_price`, {
                         valueAsNumber: true,
                       })}
-                    />
+                     placeholder="0.00" />
                   </TableCell>
                   <TableCell>
                     <Input
@@ -170,7 +170,7 @@ export const DebitNoteLinesTable: React.FC<Props> = ({
                       {...register(`lines.${index}.discount_amount`, {
                         valueAsNumber: true,
                       })}
-                    />
+                     placeholder="0.00" />
                   </TableCell>
                   <TableCell>
                     <Input
@@ -182,7 +182,7 @@ export const DebitNoteLinesTable: React.FC<Props> = ({
                       {...register(`lines.${index}.tax_amount`, {
                         valueAsNumber: true,
                       })}
-                    />
+                     placeholder="0.00" />
                   </TableCell>
                   <TableCell className="bg-gray-50 text-right font-semibold text-indigo-700">
                     {formatMoney(total)}

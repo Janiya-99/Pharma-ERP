@@ -66,15 +66,15 @@ export function PrintFormatFieldBuilder({ control, register, setValue, watch }: 
                     </Button>
                   </div>
                 </TableCell>
-                <TableCell><Input {...register(`fields.${index}.field_key`)} /></TableCell>
-                <TableCell><Input {...register(`fields.${index}.field_label`)} /></TableCell>
+                <TableCell><Input {...register(`fields.${index}.field_key`)}  placeholder="Enter value" /></TableCell>
+                <TableCell><Input {...register(`fields.${index}.field_label`)}  placeholder="Enter value" /></TableCell>
                 <TableCell className="text-center">
                   <Switch
                     checked={Boolean(watch(`fields.${index}.is_visible`))}
                     onCheckedChange={(checked) => setValue(`fields.${index}.is_visible`, checked)}
                   />
                 </TableCell>
-                <TableCell><Input type="number" {...register(`fields.${index}.column_width`, { valueAsNumber: true })} /></TableCell>
+                <TableCell><Input type="number" {...register(`fields.${index}.column_width`, { valueAsNumber: true })}  placeholder="Enter value" /></TableCell>
                 <TableCell>
                   <Select value={watch(`fields.${index}.alignment`) || "left"} onValueChange={(value) => setValue(`fields.${index}.alignment`, value)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>

@@ -893,7 +893,7 @@ export default function PrintFormatFormPage() {
                               field_label: event.target.value,
                             })
                           }
-                        />
+                         placeholder="Enter value" />
                         {(() => {
                           const source = getPrintDataField(
                             field.field_key,
@@ -919,7 +919,7 @@ export default function PrintFormatFormPage() {
                               column_width: Number(event.target.value),
                             })
                           }
-                        />
+                         placeholder="Enter value" />
                       </Field>
                       <Field label="Alignment">
                         <Select
@@ -1016,10 +1016,10 @@ export default function PrintFormatFormPage() {
               >
                 <div className="grid gap-4 md:grid-cols-2">
                   <Field label="Terms and Conditions Text">
-                    <Textarea rows={5} {...register("terms_and_conditions")} />
+                    <Textarea rows={5} {...register("terms_and_conditions")}  placeholder="Enter text..." />
                   </Field>
                   <Field label="Footer Note Text">
-                    <Textarea rows={5} {...register("footer_note")} />
+                    <Textarea rows={5} {...register("footer_note")}  placeholder="Enter text..." />
                   </Field>
                   <Toggle
                     label="Show Signature Section"
@@ -1085,13 +1085,13 @@ export default function PrintFormatFormPage() {
                     </div>
                   </Field>
                   <Field label="Font Family">
-                    <Input {...register("font_family")} />
+                    <Input {...register("font_family")}  placeholder="Enter value" />
                   </Field>
                   <Field label="Border Style">
-                    <Input value="Soft Gray" readOnly />
+                    <Input value="Soft Gray" readOnly  placeholder="Enter value" />
                   </Field>
                   <Field label="Table Header Style">
-                    <Input value="Navy filled header" readOnly />
+                    <Input value="Navy filled header" readOnly  placeholder="Enter value" />
                   </Field>
                   <Field label="Watermark Text">
                     <Input placeholder="Optional watermark" />

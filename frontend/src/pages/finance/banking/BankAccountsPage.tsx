@@ -834,7 +834,7 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("account_name", event.target.value)
                   }
-                />
+                 placeholder="Enter value" />
               </Field>
               <Field
                 label="Account Number"
@@ -846,7 +846,7 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("account_number", event.target.value)
                   }
-                />
+                 placeholder="Enter value" />
               </Field>
               <Field label="Branch">
                 <Select
@@ -934,7 +934,7 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("opening_balance", event.target.value)
                   }
-                />
+                 placeholder="Enter value" />
               </Field>
               <Field label="Opening Balance Date">
                 <Input
@@ -943,7 +943,7 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("opening_balance_date", event.target.value)
                   }
-                />
+                 placeholder="Enter value" />
               </Field>
               <Field label="Status" error={errors.status} required>
                 <Select
@@ -980,7 +980,7 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("swift_code", event.target.value)
                   }
-                />
+                 placeholder="Enter value" />
               </Field>
               <Field label="Bank Code">
                 <Input
@@ -988,7 +988,7 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("bank_code", event.target.value)
                   }
-                />
+                 placeholder="Enter value" />
               </Field>
               <Field label="Branch Code">
                 <Input
@@ -996,7 +996,7 @@ const BankAccountsPage = () => {
                   onChange={(event) =>
                     setField("branch_code", event.target.value)
                   }
-                />
+                 placeholder="Enter value" />
               </Field>
             </div>
           </form>

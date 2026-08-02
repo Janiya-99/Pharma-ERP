@@ -251,7 +251,7 @@ export default function BankReconciliationFormPage() {
                     onChange={handleChange}
                     rows="2"
                     className="w-full px-3 py-2 border rounded-md"
-                  ></textarea>
+                  placeholder="Enter text..."></textarea>
                 </div>
               </div>
             </div>

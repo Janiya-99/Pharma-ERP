@@ -149,7 +149,7 @@ export const SubscriptionPlanFormPage = () => {
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none h-20 resize-none"
-          />
+           placeholder="Enter text..." />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

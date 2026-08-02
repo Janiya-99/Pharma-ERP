@@ -176,7 +176,7 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
               type="date"
               value={filters.as_of_date || ""}
               onChange={(e) => setFilters(prev => ({ ...prev, as_of_date: e.target.value }))}
-            />
+             placeholder="Enter As Of Date" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="due_date_from">Due Date From</Label>
@@ -185,7 +185,7 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
               type="date"
               value={filters.due_date_from || ""}
               onChange={(e) => setFilters(prev => ({ ...prev, due_date_from: e.target.value }))}
-            />
+             placeholder="Enter Due Date From" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="due_date_to">Due Date To</Label>
@@ -194,7 +194,7 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
               type="date"
               value={filters.due_date_to || ""}
               onChange={(e) => setFilters(prev => ({ ...prev, due_date_to: e.target.value }))}
-            />
+             placeholder="Enter Due Date To" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="payment_status">Payment Status</Label>

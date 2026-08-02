@@ -74,7 +74,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boo
           onChange={(e: any) => setPassword(e.target.value)}
           required
           autoFocus
-        />
+         placeholder="Enter value" />
 
         <Input
           label="Confirm Password *"
@@ -82,7 +82,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boo
           value={confirmPassword}
           onChange={(e: any) => setConfirmPassword(e.target.value)}
           required
-        />
+         placeholder="Enter value" />
 
         <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
           <Button variant="secondary" onClick={onClose} type="button">

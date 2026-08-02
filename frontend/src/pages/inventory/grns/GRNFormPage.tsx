@@ -355,7 +355,7 @@ const GRNFormPage = () => {
                   onChange={(e: any) => setFormData({ ...formData, remarks: e.target.value })}
                   rows={2}
                   className="w-full px-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-900 "
-                />
+                 placeholder="Enter text..." />
               </div>
             </div>
           </div>

@@ -244,7 +244,7 @@ const PurchaseReturnLinesTable: React.FC<Props> = ({
                         updateLine(index, "unit_cost", e.target.value)
                       }
                       disabled={disabled || !!line.goods_receipt_note_line_id}
-                    />
+                     placeholder="Enter value" />
                   </td>
 
                   {/* Discount */}
@@ -259,7 +259,7 @@ const PurchaseReturnLinesTable: React.FC<Props> = ({
                         updateLine(index, "discount_amount", e.target.value)
                       }
                       disabled={disabled || !!line.goods_receipt_note_line_id}
-                    />
+                     placeholder="0.00" />
                   </td>
 
                   {/* Tax */}
@@ -274,7 +274,7 @@ const PurchaseReturnLinesTable: React.FC<Props> = ({
                         updateLine(index, "tax_amount", e.target.value)
                       }
                       disabled={disabled || !!line.goods_receipt_note_line_id}
-                    />
+                     placeholder="0.00" />
                   </td>
 
                   {/* Line Total */}

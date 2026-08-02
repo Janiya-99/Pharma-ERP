@@ -306,7 +306,7 @@ export default function BankTransactionFormPage() {
                   }
                   required
                   className="mt-2 border-slate-200 bg-white"
-                />
+                 placeholder="Enter value" />
               </div>
 
               <div>
@@ -318,7 +318,7 @@ export default function BankTransactionFormPage() {
                     setField("value_date", event.target.value)
                   }
                   className="mt-2 border-slate-200 bg-white"
-                />
+                 placeholder="Enter value" />
               </div>
 
               <div>
@@ -342,7 +342,7 @@ export default function BankTransactionFormPage() {
                   }
                   rows={2}
                   className="mt-2 border-slate-200 bg-white"
-                />
+                 placeholder="Enter text..." />
               </div>
 
               <div>
@@ -360,7 +360,7 @@ export default function BankTransactionFormPage() {
                   }
                   className="mt-2 border-slate-200 bg-white"
                   disabled={formData.credit_amount > 0}
-                />
+                 placeholder="0.00" />
               </div>
 
               <div>
@@ -378,7 +378,7 @@ export default function BankTransactionFormPage() {
                   }
                   className="mt-2 border-slate-200 bg-white"
                   disabled={formData.debit_amount > 0}
-                />
+                 placeholder="0.00" />
               </div>
             </div>
 

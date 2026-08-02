@@ -181,7 +181,7 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
               type="date"
               value={filters.date_from || ""}
               onChange={(e) => setFilters(prev => ({ ...prev, date_from: e.target.value }))}
-            />
+             placeholder="Enter Date From" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="date_to">Date To</Label>
@@ -190,7 +190,7 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
               type="date"
               value={filters.date_to || ""}
               onChange={(e) => setFilters(prev => ({ ...prev, date_to: e.target.value }))}
-            />
+             placeholder="Enter Date To" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="approval_status">Approval Status</Label>
