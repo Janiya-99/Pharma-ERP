@@ -119,6 +119,7 @@ interface KPIData {
   trendValue: string;
   description: string;
   accent?: boolean;
+  tone?: string;
 }
 
 /* ─────────────────────────────────────────────────

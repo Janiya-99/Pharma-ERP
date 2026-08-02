@@ -655,29 +655,29 @@ const Sidebar = () => {
             title={!showExpanded ? menu.name : undefined}
             className={() =>
               `group relative flex items-center gap-3 rounded-xl transition-all duration-150 ${
-                showExpanded ? "h-10 px-3" : "mx-auto h-10 w-10 justify-center"
+                showExpanded ? "mx-3 h-11 px-3" : "mx-auto h-11 w-11 justify-center"
               } ${
                 isActive
-                  ? "border border-transparent bg-[#4854CC] font-semibold text-white shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
-                  : "text-[#002137] hover:bg-[#4854CC]/10 hover:text-[#002137]"
+                  ? "bg-indigo-50 font-semibold text-indigo-600"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
               }`
             }
           >
             {() => (
               <>
                 <menu.icon
-                  className={`h-4 w-4 shrink-0 transition-colors ${
+                  className={`h-5 w-5 shrink-0 transition-colors ${
                     isActive
-                      ? "text-white"
-                      : "text-[#002137] group-hover:text-[#002137]"
+                      ? "text-indigo-600"
+                      : "text-slate-400 group-hover:text-slate-600"
                   }`}
                 />
                 {showExpanded && (
                   <span
-                    className={`truncate text-sm font-medium transition-colors ${
+                    className={`truncate text-sm transition-colors ${
                       isActive
-                        ? "text-white"
-                        : "text-[#1F2937] group-hover:text-[#1F2937]"
+                        ? "text-indigo-600 font-semibold"
+                        : "text-slate-600 group-hover:text-slate-800"
                     }`}
                   >
                     {menu.name}
@@ -701,26 +701,26 @@ const Sidebar = () => {
             if (!showExpanded && !isMobile) setIsExpanded(true);
             setOpenAccordion(isAccordionOpen ? null : menu.name);
           }}
-          className={`group relative flex w-full items-center gap-3 rounded-xl transition-all duration-150 ${
-            showExpanded ? "h-10 px-3" : "mx-auto h-10 w-10 justify-center"
+          className={`group relative flex w-[auto] items-center gap-3 rounded-xl transition-all duration-150 ${
+            showExpanded ? "mx-3 h-11 px-3" : "mx-auto h-11 w-11 justify-center"
           } ${
             isActiveParent
-              ? "border border-transparent bg-[#4854CC] font-semibold text-white shadow-[0_8px_20px_rgba(0,119,182,0.28)]"
-              : "text-[#002137] hover:bg-[#4854CC]/10 hover:text-[#002137]"
+              ? "bg-indigo-50 font-semibold text-indigo-600"
+              : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
           }`}
         >
           <menu.icon
-            className={`h-4 w-4 shrink-0 transition-colors ${
+            className={`h-5 w-5 shrink-0 transition-colors ${
               isActiveParent
-                ? "text-white"
-                : "text-[#002137] group-hover:text-[#002137]"
+                ? "text-indigo-600"
+                : "text-slate-400 group-hover:text-slate-600"
             }`}
           />
           {showExpanded && (
             <>
               <span
-                className={`flex-1 truncate text-left text-sm font-medium ${
-                  isActiveParent ? "text-white" : "text-[#1F2937]"
+                className={`flex-1 truncate text-left text-sm transition-colors ${
+                  isActiveParent ? "text-indigo-600 font-semibold" : "text-slate-600 group-hover:text-slate-800"
                 }`}
               >
                 {menu.name}
@@ -771,10 +771,10 @@ const Sidebar = () => {
                     <NavLink
                       to={child.path}
                       className={() =>
-                        `flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
+                        `flex items-center gap-2.5 rounded-lg px-3 py-2 mx-3 text-xs transition-all duration-150 ${
                           isActive
-                            ? "bg-[#4854CC] font-semibold text-white shadow-[0_6px_16px_rgba(0,119,182,0.22)]"
-                            : "text-[#6B7280] hover:bg-[#4854CC]/10 hover:text-[#1F2937]"
+                            ? "bg-indigo-50 font-semibold text-indigo-600"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                         }`
                       }
                     >
@@ -782,7 +782,7 @@ const Sidebar = () => {
                         <>
                           <span
                             className={`h-1.5 w-1.5 rounded-full ${
-                              isActive ? "bg-white" : "bg-[#9CA3AF]/50"
+                              isActive ? "bg-indigo-600" : "bg-slate-300"
                             }`}
                           />
                           <span className="truncate">{child.name}</span>
@@ -935,7 +935,7 @@ const Sidebar = () => {
       {/* ── Desktop Sidebar (hidden on mobile) ── */}
       <div
         className={`ease-[cubic-bezier(0.4,0,0.2,1)] relative z-30 hidden h-full shrink-0 transition-all duration-300 lg:block ${
-          effectiveExpanded ? "w-60" : "w-[68px]"
+          effectiveExpanded ? "w-[260px]" : "w-[72px]"
         }`}
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => {
@@ -943,8 +943,8 @@ const Sidebar = () => {
         }}
       >
         <div
-          className={`ease-[cubic-bezier(0.4,0,0.2,1)] fixed bottom-0 left-0 top-0 z-30 flex h-full flex-col overflow-hidden border-r border-slate-200/70 bg-white/70 backdrop-blur-xl transition-all duration-300 ${
-            effectiveExpanded ? "w-60" : "w-[68px]"
+          className={`ease-[cubic-bezier(0.4,0,0.2,1)] fixed bottom-4 left-4 top-4 z-30 flex flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-xl shadow-slate-200/40 transition-all duration-300 ${
+            effectiveExpanded ? "w-[260px]" : "w-[72px]"
           }`}
         >
           {sidebarContent(false)}
