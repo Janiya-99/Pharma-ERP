@@ -128,7 +128,7 @@ const DesignationFormModal = ({ isOpen, onClose, designation = null, onSuccess }
       onClose={onClose as any}
       title={isEdit ? "Edit Designation" : "Create New Designation"}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <FormError message={error} />
         
         <Input

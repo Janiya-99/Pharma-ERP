@@ -66,7 +66,6 @@ import UserBranchAccessPage from "../pages/control-center/user-access/UserBranch
 import UserSoftwareAccessPage from "../pages/control-center/user-access/UserSoftwareAccessPage";
 
 import RolesPermissionsPage from "../pages/control-center/roles-permissions/RolesPermissionsPage";
-import AccessMatrixPage from "../pages/control-center/access-matrix/AccessMatrixPage";
 
 import AuditLogsPage from "../pages/control-center/logs/AuditLogsPage";
 import LoginLogsPage from "../pages/control-center/logs/LoginLogsPage";
@@ -286,14 +285,6 @@ const AppRoutes = () => {
           <Route
             path="/control-center/roles"
             element={<RolesPermissionsPage />}
-          />
-          <Route
-            path="/control-center/permissions"
-            element={<RolesPermissionsPage />}
-          />
-          <Route
-            path="/control-center/user-assignments"
-            element={<AccessMatrixPage />}
           />
           <Route
             path="/control-center/effective-access"

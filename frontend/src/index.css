@@ -58,7 +58,7 @@
     --glass-blur-subtle: blur(12px) saturate(160%);
 
     /* ── Shadcn CSS Variable Tokens (Light Mode) ── */
-    --background: #fafafa;
+    --background: #ffffff;
     --foreground: #111827;
     --card: rgba(255, 255, 255, 0.45);
     --card-foreground: #1f2937;
@@ -251,20 +251,7 @@
 
 /* Removed Bento Box Design System in favor of clean ERP cards */
 
-/* ── Glass Modal / Sheet Panel ── */
-.glass-modal {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: var(--glass-blur-strong);
-  -webkit-backdrop-filter: var(--glass-blur-strong);
-  box-shadow: -8px 0 40px rgba(72, 84, 204, 0.1),
-    inset 1px 0 0 rgba(255, 255, 255, 0.6);
-}
-
-.glass-modal-header {
-  background: rgba(238, 242, 255, 0.5);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-  backdrop-filter: blur(8px);
-}
+/* ── Modal / Sheet Panel ── */
 
 /* ── Premium ERP Button Styles (Dark Navy Pill) ── */
 .btn-erp-pill {
@@ -816,6 +803,21 @@ select.select-premium:focus {
   background-color: var(--erp-button-danger-bg) !important;
   border-color: transparent !important;
   color: #ffffff !important;
+}
+
+[data-slot="sheet-content"] form > div:last-child {
+  position: sticky !important;
+  bottom: -24px !important; 
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  margin-left: -32px !important; 
+  margin-right: -32px !important;
+  margin-bottom: -24px !important;
+  padding: 16px 32px !important;
+  border-top: 1px solid #e2e8f0 !important;
+  z-index: 50 !important;
+  margin-top: auto !important;
 }
 
 :where(

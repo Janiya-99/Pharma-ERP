@@ -26,7 +26,7 @@ export default function ApproveJournalModal({ isOpen, onClose, journal, onSucces
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Approve Journal Entry">
-      <form onSubmit={handleApprove} className="space-y-4">
+      <form onSubmit={handleApprove} className="flex flex-col space-y-4 h-full">
         {error && <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>}
         <p className="text-sm text-gray-600">
           Are you sure you want to approve journal entry <strong>{journal.journal_number}</strong>?

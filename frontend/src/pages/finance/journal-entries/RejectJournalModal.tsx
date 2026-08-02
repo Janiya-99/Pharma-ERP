@@ -31,7 +31,7 @@ export default function RejectJournalModal({ isOpen, onClose, journal, onSuccess
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Reject Journal Entry">
-      <form onSubmit={handleReject} className="space-y-4">
+      <form onSubmit={handleReject} className="flex flex-col space-y-4 h-full">
         {error && <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>}
         <p className="text-sm text-gray-600">
           Are you sure you want to reject journal entry <strong>{journal.journal_number}</strong>?

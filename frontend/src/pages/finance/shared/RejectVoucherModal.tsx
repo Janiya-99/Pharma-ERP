@@ -38,7 +38,7 @@ export default function RejectVoucherModal({ isOpen, onClose, voucher, type, onS
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Reject ${displayType}`}>
-      <form onSubmit={handleReject} className="space-y-4">
+      <form onSubmit={handleReject} className="flex flex-col space-y-4 h-full">
         {error && <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>}
         <p className="text-sm text-gray-600">
           You are about to reject {displayType.toLowerCase()} <strong>{voucherNumber || "this voucher"}</strong>.

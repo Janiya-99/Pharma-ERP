@@ -77,7 +77,7 @@ const ProductCategoryFormModal = ({ isOpen, onClose, onSave, initialData }: { is
       onClose={onClose}
       title={initialData ? "Edit Product Category" : "Create Product Category"}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
                 <div>
           <label className="block text-sm font-medium text-gray-700  mb-1">
             Category Code <span className="text-red-500">*</span>

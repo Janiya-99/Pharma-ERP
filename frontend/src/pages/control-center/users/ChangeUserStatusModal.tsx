@@ -48,7 +48,7 @@ const ChangeUserStatusModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: 
       title="Change User Status"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <div className="bg-indigo-50 p-3 rounded-md mb-4 text-sm text-indigo-800">
           Updating status for: <span className="font-semibold">{user?.name || user?.full_name}</span> ({user?.email})
         </div>

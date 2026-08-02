@@ -26,7 +26,7 @@ export default function SubmitJournalModal({ isOpen, onClose, journal, onSuccess
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Submit Journal Entry">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         {error && <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>}
         <p className="text-sm text-gray-600">
           You are about to submit journal entry <strong>{journal.journal_number}</strong> for approval.

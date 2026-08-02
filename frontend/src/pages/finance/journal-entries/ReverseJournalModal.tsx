@@ -40,7 +40,7 @@ export default function ReverseJournalModal({ isOpen, onClose, journal, onSucces
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Reverse Journal Entry">
-      <form onSubmit={handleReverse} className="space-y-4">
+      <form onSubmit={handleReverse} className="flex flex-col space-y-4 h-full">
         {error && <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>}
         
         <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200 text-orange-800">

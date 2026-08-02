@@ -138,7 +138,7 @@ const DepartmentFormModal = ({
       onClose={onClose}
       title={isEdit ? "Edit Department" : "Create New Department"}
     >
-      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col space-y-4 h-full">
         <FormError message={error} />
         
         <Input

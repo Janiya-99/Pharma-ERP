@@ -170,7 +170,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
       title={isEdit ? "Edit Role & Permissions" : "Create Role & Assign Permissions"}
       size="half"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-6 h-full">
         <FormError message={error} />
 
         {isEdit && role?.is_system && (
@@ -180,7 +180,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
           </div>
         )}
 
-        <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-200/80 space-y-5 shadow-sm">
+        <div className="bg-slate-50 p-6 rounded-[10px] border border-slate-200 space-y-5">
           <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest flex items-center gap-2.5">
             <Layers className="w-4 h-4 text-indigo-600" />
             1. Role Details
@@ -238,7 +238,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
               value={formData.description}
               onChange={handleChange}
               rows={2}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-sm"
+              className="w-full rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 transition-all"
               placeholder="Role description..."
             />
           </div>
@@ -280,7 +280,7 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
           </div>
 
           {!formData.software_id ? (
-            <div className="bg-white p-8 text-center rounded-lg border border-dashed border-gray-300 text-gray-400">
+            <div className="bg-white p-8 text-center rounded-[10px] border border-dashed border-slate-300 text-slate-400">
               <Layers className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm font-medium">No Software Module Selected</p>
               <p className="text-xs mt-1">Choose a software module in step 1 to load permissions.</p>

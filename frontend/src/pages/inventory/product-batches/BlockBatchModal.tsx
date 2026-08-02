@@ -23,7 +23,7 @@ const BlockBatchModal = ({ isOpen, onClose, onSave, batch }: { isOpen?: boolean;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Block Batch">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <p className="text-sm text-gray-600 ">
           Blocking batch <span className="font-semibold">{batch?.batch_number}</span> will prevent it from being used in any future transactions.
         </p>

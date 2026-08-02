@@ -34,15 +34,15 @@ const Modal = ({
     >
       <SheetContent
         side="right"
-        className={`${sizeClass} flex h-full w-full flex-col p-0 shadow-2xl transition duration-300 glass-modal`}
+        className={`${sizeClass} flex h-full w-full flex-col p-0`}
         showCloseButton={true}
       >
-        <SheetHeader className="glass-modal-header px-6 py-5">
-          <SheetTitle className="text-lg font-bold leading-tight text-navy-700 ">
+        <SheetHeader className="px-8 py-6 border-b border-slate-100 bg-white">
+          <SheetTitle className="text-xl font-bold tracking-tight text-slate-900 pr-8">
             {title}
           </SheetTitle>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto px-6 py-6">{children}</div>
+        <div className="flex-1 overflow-y-auto px-8 py-6 bg-white">{children}</div>
       </SheetContent>
     </Sheet>
   );

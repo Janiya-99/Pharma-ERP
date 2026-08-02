@@ -33,7 +33,7 @@ const ApproveStockAdjustmentModal = ({ isOpen, onClose, adjustment, onSuccess }:
       title="Approve Stock Adjustment"
       icon={CheckCircle}
     >
-      <form onSubmit={handleApprove} className="p-6">
+      <form onSubmit={handleApprove}  className="flex flex-col h-full">
         <div className="mb-4 text-sm text-gray-600 ">
           Are you sure you want to approve stock adjustment <strong>{adjustment.adjustment_number}</strong>?
         </div>

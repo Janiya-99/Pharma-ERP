@@ -194,7 +194,7 @@ const BranchFormModal = ({
       title={isEdit ? "Edit Branch" : "Create New Branch"}
       size="lg"
     >
-      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col space-y-4 h-full">
         <FormError message={error} />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

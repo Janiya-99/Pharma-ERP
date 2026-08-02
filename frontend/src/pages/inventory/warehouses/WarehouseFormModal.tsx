@@ -76,7 +76,7 @@ const WarehouseFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpen?:
       onClose={onClose}
       title={initialData ? "Edit Warehouse" : "Create Warehouse"}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
                 <div>
           <label className="block text-sm font-medium text-gray-700  mb-1">
             Branch <span className="text-red-500">*</span>

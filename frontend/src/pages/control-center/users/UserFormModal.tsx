@@ -166,7 +166,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
       title={isEdit ? "Edit User" : "Create User"}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <FormError message={error} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

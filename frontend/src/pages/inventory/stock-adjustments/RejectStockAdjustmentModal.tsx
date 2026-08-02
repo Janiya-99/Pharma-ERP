@@ -40,7 +40,7 @@ const RejectStockAdjustmentModal = ({ isOpen, onClose, adjustment, onSuccess }: 
       title="Reject Stock Adjustment"
       icon={XCircle}
     >
-      <form onSubmit={handleReject} className="p-6">
+      <form onSubmit={handleReject}  className="flex flex-col h-full">
         <div className="mb-4 text-sm text-gray-600 ">
           Are you sure you want to reject stock adjustment <strong>{adjustment.adjustment_number}</strong>?
         </div>

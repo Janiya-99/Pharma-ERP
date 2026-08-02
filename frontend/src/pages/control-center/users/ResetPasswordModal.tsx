@@ -60,7 +60,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boo
       title="Reset Password"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <div className="bg-orange-50 p-3 rounded-md mb-4 text-sm text-orange-800">
           Resetting password for: <span className="font-semibold">{user?.full_name}</span>
         </div>

@@ -66,7 +66,7 @@ const ProductUnitFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpen
       onClose={onClose}
       title={initialData ? "Edit Product Unit" : "Create Product Unit"}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
                 <div>
           <label className="block text-sm font-medium text-gray-700  mb-1">
             Unit Code <span className="text-red-500">*</span>

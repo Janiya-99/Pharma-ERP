@@ -120,12 +120,6 @@ const RolesPage = () => {
   const getRowActions = (row: unknown) => {
     const actions = [
       {
-        label: "Manage Permissions",
-        icon: Shield,
-        permission: "control.permission.assign",
-        onClick: (r: any) => navigate(`/control-center/roles-permissions?tab=matrix&software_id=${r.software_id}&role_id=${r.id}`),
-      },
-      {
         label: "Edit Role",
         icon: Edit2,
         permission: "control.role.update",
