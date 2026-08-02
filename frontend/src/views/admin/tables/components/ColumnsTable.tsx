@@ -26,10 +26,10 @@ function ColumnsTable(props: { tableData: any }) {
     columnHelper.accessor("name", {
       id: "name",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">NAME</p>
+        <p className="text-sm font-bold text-gray-600 ">NAME</p>
       ),
       cell: (info: any) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+        <p className="text-sm font-bold text-navy-700 ">
           {info.getValue()}
         </p>
       ),
@@ -37,12 +37,12 @@ function ColumnsTable(props: { tableData: any }) {
     columnHelper.accessor("progress", {
       id: "progress",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
+        <p className="text-sm font-bold text-gray-600 ">
           PROGRESS
         </p>
       ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+      cell: (info: unknown) => (
+        <p className="text-sm font-bold text-navy-700 ">
           {info.getValue()}
         </p>
       ),
@@ -50,12 +50,12 @@ function ColumnsTable(props: { tableData: any }) {
     columnHelper.accessor("quantity", {
       id: "quantity",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
+        <p className="text-sm font-bold text-gray-600 ">
           QUANTITY
         </p>
       ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+      cell: (info: unknown) => (
+        <p className="text-sm font-bold text-navy-700 ">
           {info.getValue()}
         </p>
       ),
@@ -63,10 +63,10 @@ function ColumnsTable(props: { tableData: any }) {
     columnHelper.accessor("date", {
       id: "date",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
+        <p className="text-sm font-bold text-gray-600 ">DATE</p>
       ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+      cell: (info: unknown) => (
+        <p className="text-sm font-bold text-navy-700 ">
           {info.getValue()}
         </p>
       ),
@@ -87,7 +87,7 @@ function ColumnsTable(props: { tableData: any }) {
   return (
     <Card extra={"w-full pb-10 p-4 h-full"}>
       <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold text-navy-700 dark:text-white">
+        <div className="text-xl font-bold text-navy-700 ">
           4-Columns Table
         </div>
         <CardMenu />
@@ -96,15 +96,15 @@ function ColumnsTable(props: { tableData: any }) {
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
         <table className="w-full">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: unknown) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header: unknown) => {
                   return (
                     <th
                       key={header.id}
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="cursor-pointer border-b-[1px] border-gray-200 pt-4 pb-2 pr-4 text-start"
+                      className="cursor-pointer border-b-[1px] border-gray-200 pb-2 pr-4 pt-4 text-start"
                     >
                       <div className="items-center justify-between text-xs text-gray-200">
                         {flexRender(
@@ -126,10 +126,10 @@ function ColumnsTable(props: { tableData: any }) {
             {table
               .getRowModel()
               .rows.slice(0, 5)
-              .map((row) => {
+              .map((row: unknown) => {
                 return (
                   <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
+                    {row.getVisibleCells().map((cell: unknown) => {
                       return (
                         <td
                           key={cell.id}

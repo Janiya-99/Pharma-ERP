@@ -1,9 +1,13 @@
 package main
 
 import (
+	"os"
+
+	"github.com/pixandco/erp-phrma/internal/auth/handlers"
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
+	platformMigrations "github.com/pixandco/erp-phrma/internal/platform/migrations"
 	"github.com/pixandco/erp-phrma/internal/repository"
 	"github.com/pixandco/erp-phrma/internal/router"
 	"github.com/pixandco/erp-phrma/internal/service"
@@ -21,13 +25,34 @@ func main() {
 		logger.Fatal("Failed to load config", zap.Error(err))
 	}
 
-	// 3. Init Database
+	// 3. Init Platform Database (erp_platform)
+	platformDB, err := database.NewPlatformDB(&cfg.PlatformDB, logger)
+	if err != nil {
+		logger.Fatal("Failed to connect to platform database", zap.Error(err))
+	}
+	logger.Info("Platform database ready", zap.String("db", cfg.PlatformDB.Name))
+
+	// 3.1. Run Platform AutoMigrate + Seeder
+	hasPlatformTables := platformDB.Migrator().HasTable("platform_admin_users")
+	if os.Getenv("SKIP_PLATFORM_MIGRATIONS") != "true" && (os.Getenv("SKIP_MIGRATIONS") != "true" || !hasPlatformTables) {
+		if err := platformMigrations.RunPlatformMigrations(platformDB, logger); err != nil {
+			logger.Fatal("Failed to run platform migrations", zap.Error(err))
+		}
+	} else {
+		logger.Info("Skipping platform migrations and seeders (SKIP_MIGRATIONS=true)")
+	}
+
+	// 4. Init Company Database (legacy single-company connection)
 	db, err := database.NewMySQL(&cfg.Database, logger)
 	if err != nil {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
 
-	// 4. Setup Repositories
+	// 4.1. Startup Company Migrations Disabled
+	// Company migrations are not run on startup. They are executed dynamically when a company is created from the platform.
+	logger.Info("Company migrations on startup disabled (migrated dynamically on company creation)")
+
+	// 5. Setup Repositories
 	userRepo := repository.NewUserRepository(db)
 	sessionRepo := repository.NewSessionRepository(db)
 	roleRepo := repository.NewRoleRepository(db)
@@ -39,7 +64,7 @@ func main() {
 	compRepo := repository.NewCompanyRepository(db)
 	branchRepo := repository.NewBranchRepository(db)
 
-	// 5. Setup Services
+	// 6. Setup Services
 	authService := service.NewAuthService(userRepo, sessionRepo, &cfg.JWT, logger)
 	auditService := service.NewAuditService(auditRepo, logger)
 	permService := service.NewPermissionService(roleRepo, nil, logger) // No cache for now
@@ -51,7 +76,7 @@ func main() {
 	compService := service.NewCompanyService(compRepo, logger)
 	branchService := service.NewBranchService(branchRepo, logger)
 
-	// 6. Setup Controllers
+	// 7. Setup Controllers
 	authCtrl := controller.NewAuthController(authService)
 	userCtrl := controller.NewUserController(userService)
 	roleCtrl := controller.NewRoleController(roleService)
@@ -61,8 +86,31 @@ func main() {
 	compCtrl := controller.NewCompanyController(compService)
 	branchCtrl := controller.NewBranchController(branchService)
 
-	// 7. Setup Router
+	// --- Inventory Module ---
+	whRepo := repository.NewWarehouseRepository(db)
+	prodRepo := repository.NewProductRepository(db)
+	suppRepo := repository.NewSupplierRepository(db)
+	batchRepo := repository.NewProductBatchRepository(db)
+	grnRepo := repository.NewGRNRepository(db)
+
+	whService := service.NewWarehouseService(whRepo, logger)
+	prodService := service.NewProductService(prodRepo, logger)
+	suppService := service.NewSupplierService(suppRepo, logger)
+	grnService := service.NewGRNService(grnRepo, batchRepo, db, logger)
+
+	whCtrl := controller.NewWarehouseController(whService)
+	prodCtrl := controller.NewProductController(prodService)
+	suppCtrl := controller.NewSupplierController(suppService)
+	grnCtrl := controller.NewGRNController(grnService)
+
+	// Step 7: New Auth
+	companyResolver := database.NewCompanyResolver(cfg, platformDB, logger)
+	newAuthHandler := handlers.NewAuthHandler(companyResolver)
+
+	// 8. Setup Router
 	r := router.Setup(
+		newAuthHandler,
+		companyResolver,
 		authCtrl,
 		userCtrl,
 		roleCtrl,
@@ -71,13 +119,19 @@ func main() {
 		desCtrl,
 		compCtrl,
 		branchCtrl,
+		whCtrl,
+		prodCtrl,
+		suppCtrl,
+		grnCtrl,
 		authService,
-		cfg.CORS.AllowedOrigins,
+		cfg,
+		platformDB,
+		logger,
 	)
 
-	// 8. Start Server
+	// 9. Start Server
 	logger.Info("Starting API Server", zap.String("port", cfg.App.Port))
-	if err := r.Run(":" + cfg.App.Port); err != nil {
+	if err := r.Run("0.0.0.0:" + cfg.App.Port); err != nil {
 		logger.Fatal("Server failed", zap.Error(err))
 	}
 }

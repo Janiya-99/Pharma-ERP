@@ -14,8 +14,19 @@ function InputField(props: {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
-  const { label, id, extra, type, placeholder, variant, state, disabled, icon, value, onChange } =
-    props;
+  const {
+    label,
+    id,
+    extra,
+    type,
+    placeholder,
+    variant,
+    state,
+    disabled,
+    icon,
+    value,
+    onChange,
+  } = props;
 
   const isLuxury = variant === "luxury";
 
@@ -23,17 +34,17 @@ function InputField(props: {
     <div className={`${extra}`}>
       <label
         htmlFor={id}
-        className={`text-sm ${
+        className={`text-[13px] tracking-wide ${
           isLuxury
-            ? "ml-0.5 font-medium text-white/60"
+            ? "mb-2 block font-medium text-white/70"
             : variant === "auth"
-            ? "ml-1.5 font-medium text-navy-700 dark:text-white"
-            : "ml-3 font-bold text-navy-700 dark:text-white"
+            ? "mb-2 block font-bold text-navy-700 "
+            : "mb-2 block font-bold text-navy-700 "
         }`}
       >
         {label}
       </label>
-      <div className="relative mt-2 flex items-center">
+      <div className="relative flex items-center">
         <input
           disabled={disabled}
           type={type}
@@ -41,20 +52,24 @@ function InputField(props: {
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          className={`flex h-12 w-full items-center justify-center rounded-xl p-3 text-sm outline-none transition-all duration-300 ${
+          className={`w-full rounded-xl px-4 py-3.5 text-[14px] font-medium leading-relaxed shadow-sm outline-none transition-all duration-300 ${
             isLuxury
               ? "auth-input-luxury"
               : disabled === true
-              ? "border bg-white/0 !border-none !bg-gray-100 dark:!bg-white/5 dark:placeholder:!text-[rgba(255,255,255,0.15)]"
+              ? "cursor-not-allowed border border-gray-100 bg-gray-50 text-gray-500   "
               : state === "error"
-              ? "border bg-white/0 border-red-500 text-red-500 placeholder:text-red-500 dark:!border-red-400 dark:!text-red-400 dark:placeholder:!text-red-400"
+              ? "border border-red-500 bg-red-50 text-red-600 placeholder:text-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/10  "
               : state === "success"
-              ? "border bg-white/0 border-green-500 text-green-500 placeholder:text-green-500 dark:!border-green-400 dark:!text-green-400 dark:placeholder:!text-green-400"
-              : "border bg-white/0 border-gray-200 dark:!border-white/10 dark:text-white"
+              ? "border border-green-500 bg-green-50 text-green-600 placeholder:text-green-400 focus:border-green-500 focus:ring-4 focus:ring-green-500/10  "
+              : "border border-gray-200 bg-white text-navy-700 placeholder:text-gray-400 hover:border-gray-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10      "
           }`}
         />
         {icon && (
-          <div className={`absolute right-3 flex items-center ${isLuxury ? "" : "text-gray-400 dark:text-white"}`}>
+          <div
+            className={`absolute right-4 flex items-center ${
+              isLuxury ? "" : "text-gray-400 "
+            }`}
+          >
             {icon}
           </div>
         )}

@@ -1,21 +1,29 @@
-.PHONY: build run dev test lint migrate-up migrate-down migrate-create clean
+.PHONY: build run dev test lint platform-migrate-up platform-migrate-down company-migrate-up company-migrate-down seed clean
 
 # Variables
-APP_NAME=erp-phrma
+APP_NAME=pharma-erp
 BUILD_DIR=./bin
 MAIN_FILE=./cmd/server/main.go
-MIGRATE_DIR=./database/migrations
-DB_DSN?=mysql://$(DB_USER):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_NAME)
+
+# Migration directories
+PLATFORM_MIGRATE_DIR=./database/platform_migrations
+COMPANY_MIGRATE_DIR=./database/company_migrations
 
 # Include .env if it exists
 -include .env
 export
 
+# Platform DB DSN (for goose)
+PLATFORM_GOOSE_DBSTRING ?= $(PLATFORM_DB_USER):$(PLATFORM_DB_PASSWORD)@tcp($(PLATFORM_DB_HOST):$(PLATFORM_DB_PORT))/$(PLATFORM_DB_NAME)?parseTime=true
+
+# Company DB DSN (for goose — legacy/default company)
+GOOSE_DBSTRING ?= $(DB_USER):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_NAME)?parseTime=true
+
 # ==================== Build ====================
 
 build:
 	@echo "Building $(APP_NAME)..."
-	@go build -o $(BUILD_DIR)/$(APP_NAME) $(MAIN_FILE)
+	@go build -o "$(BUILD_DIR)/$(APP_NAME)" $(MAIN_FILE)
 	@echo "Build complete: $(BUILD_DIR)/$(APP_NAME)"
 
 run: build
@@ -44,33 +52,49 @@ lint:
 	@go vet ./...
 	@echo "Lint passed."
 
-# ==================== Migrations ====================
+# ==================== Platform Migrations ====================
 
-GOOSE_DBSTRING ?= $(DB_USER):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_NAME)?parseTime=true
+platform-migrate-up:
+	@echo "Running platform database migrations..."
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(PLATFORM_GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(PLATFORM_MIGRATE_DIR) up
+	@echo "Platform migrations complete."
 
-migrate-up:
-	@echo "Running migrations with goose..."
-	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATE_DIR) up
-	@echo "Migrations complete."
+platform-migrate-down:
+	@echo "Rolling back last platform migration..."
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(PLATFORM_GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(PLATFORM_MIGRATE_DIR) down
 
-migrate-down:
-	@echo "Rolling back last migration with goose..."
-	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATE_DIR) down
+platform-migrate-down-all:
+	@echo "Rolling back all platform migrations..."
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(PLATFORM_GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(PLATFORM_MIGRATE_DIR) down-to 0
 
-migrate-down-all:
-	@echo "Rolling back all migrations with goose..."
-	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATE_DIR) down-to 0
+platform-migrate-status:
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(PLATFORM_GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(PLATFORM_MIGRATE_DIR) status
 
-migrate-create:
+platform-migrate-create:
 	@read -p "Enter migration name: " name; \
-	GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATE_DIR) create $$name sql
+	GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(PLATFORM_GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(PLATFORM_MIGRATE_DIR) create $$name sql
 
-migrate-status:
-	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATE_DIR) status
+# ==================== Company Migrations ====================
 
-seed:
-	@echo "Running database seeders..."
-	@go run ./cmd/seeder/main.go
+company-migrate-up:
+	@echo "Running company database migrations..."
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(COMPANY_MIGRATE_DIR) up
+	@echo "Company migrations complete."
+
+company-migrate-down:
+	@echo "Rolling back last company migration..."
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(COMPANY_MIGRATE_DIR) down
+
+company-migrate-down-all:
+	@echo "Rolling back all company migrations..."
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(COMPANY_MIGRATE_DIR) down-to 0
+
+company-migrate-status:
+	@GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(COMPANY_MIGRATE_DIR) status
+
+company-migrate-create:
+	@read -p "Enter migration name: " name; \
+	GOOSE_DRIVER=mysql GOOSE_DBSTRING="$(GOOSE_DBSTRING)" go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(COMPANY_MIGRATE_DIR) create $$name sql
 
 # ==================== Cleanup ====================
 

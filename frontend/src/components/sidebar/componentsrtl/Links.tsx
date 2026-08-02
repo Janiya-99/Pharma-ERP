@@ -1,5 +1,4 @@
 /* eslint-disable */
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import DashIcon from "components/icons/DashIcon";
 // chakra imports
@@ -16,7 +15,7 @@ export function SidebarLinks(props: { routes: RoutesType[] }) {
   };
 
   const createLinks = (routes: RoutesType[]) => {
-    return routes.map((route, index) => {
+    return routes.map((route: unknown, index: unknown) => {
       if (
         route.layout === "/admin" ||
         route.layout === "/auth" ||
@@ -32,7 +31,7 @@ export function SidebarLinks(props: { routes: RoutesType[] }) {
                 <span
                   className={`${
                     activeRoute(route.path) === true
-                      ? "font-bold text-brand-500 dark:text-white"
+                      ? "font-bold text-brand-500 "
                       : "font-medium text-gray-600"
                   }`}
                 >
@@ -41,7 +40,7 @@ export function SidebarLinks(props: { routes: RoutesType[] }) {
                 <p
                   className={`leading-1 flex ms-4 ${
                     activeRoute(route.path) === true
-                      ? "font-bold text-navy-700 dark:text-white"
+                      ? "font-bold text-navy-700 "
                       : "font-medium text-gray-600"
                   }`}
                 >
@@ -49,7 +48,7 @@ export function SidebarLinks(props: { routes: RoutesType[] }) {
                 </p>
               </li>
               {activeRoute(route.path) ? (
-                <div className="absolute top-px h-9 w-1 rounded-lg bg-brand-500 end-0 dark:bg-brand-400" />
+                <div className="absolute top-px h-9 w-1 rounded-lg bg-brand-500 end-0 " />
               ) : null}
             </div>
           </Link>

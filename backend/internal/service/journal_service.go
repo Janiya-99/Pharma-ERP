@@ -15,11 +15,11 @@ import (
 
 // JournalService handles journal entry business logic.
 type JournalService struct {
-	journalRepo  *repository.JournalRepository
-	glTransRepo  *repository.GlTransactionRepository
-	audit        *AuditService
-	db           *gorm.DB
-	logger       *zap.Logger
+	journalRepo *repository.JournalRepository
+	glTransRepo *repository.GlTransactionRepository
+	audit       *AuditService
+	db          *gorm.DB
+	logger      *zap.Logger
 }
 
 func NewJournalService(
@@ -30,11 +30,11 @@ func NewJournalService(
 	logger *zap.Logger,
 ) *JournalService {
 	return &JournalService{
-		journalRepo:  journalRepo,
-		glTransRepo:  glTransRepo,
-		audit:        audit,
-		db:           db,
-		logger:       logger,
+		journalRepo: journalRepo,
+		glTransRepo: glTransRepo,
+		audit:       audit,
+		db:          db,
+		logger:      logger,
 	}
 }
 

@@ -1,0 +1,691 @@
+import React, { useEffect } from "react";
+import { Plus, Trash2, AlertCircle } from "lucide-react";
+import StockAdjustmentLineProductSelect from "../../../components/inventory/StockAdjustmentLineProductSelect";
+import StockAdjustmentLineBatchSelect from "../../../components/inventory/StockAdjustmentLineBatchSelect";
+import WarehouseLocationSelect from "../../../components/inventory/WarehouseLocationSelect";
+import { inventoryApi } from "../../../api/inventoryApi";
+import { formatCurrency } from "../../../lib/utils";
+
+const StockAdjustmentLinesTable = ({
+  lines,
+  setLines,
+  warehouseId,
+  adjustmentType,
+  errors,
+}: {
+  lines: any[];
+  setLines: any;
+  warehouseId: number;
+  adjustmentType: string;
+  errors: Record<string, string>;
+}) => {
+  const [products, setProducts] = React.useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = React.useState(false);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const res = await inventoryApi.getProducts({
+        limit: 500,
+        status: "active",
+        with_batches: true,
+      });
+      if (res.success !== false) {
+        setProducts(
+          Array.isArray(res.data?.data)
+            ? res.data.data
+            : Array.isArray(res.data)
+            ? res.data
+            : []
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load products", error);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
+  const addLine = () => {
+    setLines([
+      ...lines,
+      {
+        id: `temp-${Date.now()}`,
+        product_id: null,
+        product: null,
+        product_batch_id: null,
+        batch: null,
+        warehouse_location_id: "",
+        adjustment_direction:
+          adjustmentType === "positive"
+            ? "in"
+            : adjustmentType === "negative"
+            ? "out"
+            : "in",
+        system_quantity: 0,
+        physical_quantity: "",
+        variance_quantity: 0,
+        unit_cost: 0,
+        stock_balance_loading: false,
+        stock_balance_data: null,
+        line_reason: "",
+        line_remarks: "",
+      },
+    ]);
+  };
+
+  const removeLine = (idToRemove: string | number) => {
+    setLines(lines.filter((line: any) => line.id !== idToRemove));
+  };
+
+  const duplicateLine = (line: any) => {
+    setLines([
+      ...lines,
+      {
+        ...line,
+        id: `temp-${Date.now()}`,
+      },
+    ]);
+  };
+
+  const updateLine = (id: string | number, field: string, value: any) => {
+    setLines((prevLines: any) =>
+      prevLines.map((line: any) => {
+        if (line.id !== id) return line;
+
+        const updatedLine = { ...line, [field]: value };
+
+        // Handle physical count variance calculation
+        if (
+          adjustmentType === "physical_count" &&
+          (field === "physical_quantity" || field === "system_quantity")
+        ) {
+          const sysQty = parseFloat(updatedLine.system_quantity || 0);
+          const physQtyStr = String(updatedLine.physical_quantity || "");
+
+          if (physQtyStr.trim() !== "") {
+            const physQty = parseFloat(physQtyStr);
+            updatedLine.variance_quantity = Number(
+              (physQty - sysQty).toFixed(3)
+            );
+            updatedLine.adjustment_direction =
+              updatedLine.variance_quantity >= 0 ? "in" : "out";
+          } else {
+            updatedLine.variance_quantity = 0;
+            updatedLine.adjustment_direction = "in";
+          }
+        }
+
+        // If product changes, reset dependent fields
+        if (field === "product_id") {
+          const prod = products.find((p: any) => p.id === value);
+          updatedLine.product = prod;
+          updatedLine.product_batch_id = null;
+          updatedLine.batch = null;
+          updatedLine.unit_cost = 0;
+          updatedLine.system_quantity = 0;
+          updatedLine.physical_quantity = "";
+          updatedLine.variance_quantity = 0;
+          updatedLine.stock_balance_data = null;
+        }
+
+        // If batch changes, set batch obj
+        if (field === "product_batch_id") {
+          if (updatedLine.product?.batches) {
+            const batch = updatedLine.product.batches.find(
+              (b: any) => b.id === value
+            );
+            updatedLine.batch = batch;
+          } else {
+            updatedLine.batch = null;
+          }
+        }
+
+        return updatedLine;
+      })
+    );
+  };
+
+  // Trigger stock balance fetch when product, batch, or location changes
+  useEffect(() => {
+    lines.forEach((line: any) => {
+      const needsFetch =
+        line.product_id &&
+        line.warehouse_location_id &&
+        (!line.product?.requires_batch_tracking || line.product_batch_id);
+
+      if (
+        needsFetch &&
+        !line.stock_balance_data &&
+        !line.stock_balance_loading
+      ) {
+        fetchStockBalanceForLine(
+          line.id,
+          line.product_id,
+          line.product_batch_id,
+          line.warehouse_location_id
+        );
+      }
+    });
+  }, [lines, warehouseId]);
+
+  const fetchStockBalanceForLine = async (
+    lineId: string | number,
+    productId: string | number,
+    batchId: string | number,
+    locationId: string | number
+  ) => {
+    if (!warehouseId || !productId || !locationId) return;
+
+    setLines((prev: any) =>
+      prev.map((l: any) =>
+        l.id === lineId ? { ...l, stock_balance_loading: true } : l
+      )
+    );
+
+    try {
+      const params: Record<string, any> = {
+        warehouse_id: warehouseId,
+        warehouse_location_id: locationId,
+        product_id: productId,
+      };
+      if (batchId) params.product_batch_id = batchId;
+
+      const res = await inventoryApi.getStockBalances(params);
+      const balances = Array.isArray(res.data?.data)
+        ? res.data.data
+        : Array.isArray(res.data)
+        ? res.data
+        : [];
+
+      let foundBalance = null;
+      if (balances.length > 0) {
+        foundBalance = balances[0];
+      }
+
+      setLines((prev: any) =>
+        prev.map((l: any) => {
+          if (l.id !== lineId) return l;
+
+          const sysQty = foundBalance
+            ? parseFloat(
+                foundBalance.quantity_on_hand ||
+                  foundBalance.quantity_available ||
+                  0
+              )
+            : 0;
+          const avgCost = foundBalance
+            ? parseFloat(foundBalance.average_cost || 0)
+            : 0;
+
+          let variance = l.variance_quantity;
+          let dir = l.adjustment_direction;
+
+          if (
+            adjustmentType === "physical_count" &&
+            String(l.physical_quantity || "").trim() !== ""
+          ) {
+            const physQty = parseFloat(l.physical_quantity);
+            variance = Number((physQty - sysQty).toFixed(3));
+            dir = variance >= 0 ? "in" : "out";
+          }
+
+          return {
+            ...l,
+            stock_balance_loading: false,
+            stock_balance_data: foundBalance || {
+              quantity_on_hand: 0,
+              average_cost: 0,
+              quantity_available: 0,
+            },
+            system_quantity: sysQty,
+            unit_cost: avgCost,
+            variance_quantity: variance,
+            adjustment_direction: dir,
+          };
+        })
+      );
+    } catch (error) {
+      console.error("Failed to fetch balance", error);
+      setLines((prev: any) =>
+        prev.map((l: any) =>
+          l.id === lineId ? { ...l, stock_balance_loading: false } : l
+        )
+      );
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-medium text-gray-900 ">
+          Adjustment Lines
+        </h4>
+        <div className="flex items-center gap-2">
+          {lines.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setLines([])}
+              className="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100   "
+            >
+              Clear All
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={addLine}
+            className="flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-600 transition-colors hover:bg-brand-100   "
+          >
+            <Plus className="h-4 w-4" />
+            Add Line
+          </button>
+        </div>
+      </div>
+
+      {errors.lines && (
+        <p className="flex items-center gap-1 text-sm text-red-500">
+          <AlertCircle className="h-4 w-4" /> {errors.lines}
+        </p>
+      )}
+
+      <div className="overflow-x-auto rounded-xl border border-gray-200 ">
+        <table className="w-full min-w-[1500px] border-collapse text-left">
+          <thead>
+            <tr className="border-b border-gray-200 bg-gray-50  ">
+              <th className="w-8 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                #
+              </th>
+              <th className="w-64 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Product
+              </th>
+              <th className="w-48 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Batch
+              </th>
+              <th className="w-48 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Location
+              </th>
+
+              {adjustmentType === "physical_count" ? (
+                <>
+                  <th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Sys Qty
+                  </th>
+                  <th className="w-32 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Phys Qty
+                  </th>
+                  <th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Variance
+                  </th>
+                </>
+              ) : (
+                <>
+                  <th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Available
+                  </th>
+                  <th className="w-32 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Adj Qty
+                  </th>
+                  <th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Direction
+                  </th>
+                </>
+              )}
+
+              <th className="w-28 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Unit Cost
+              </th>
+              <th className="w-28 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Total Cost
+              </th>
+              <th className="w-40 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Reason
+              </th>
+              <th className="w-40 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Remarks
+              </th>
+              <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 ">
+            {lines.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={12}
+                  className="px-4 py-8 text-center text-gray-500 "
+                >
+                  No lines added. Click "Add Line" to begin.
+                </td>
+              </tr>
+            ) : (
+              lines.map((line: any, index: number) => {
+                const productError = errors[`lines.${index}.product_id`];
+                const batchError = errors[`lines.${index}.product_batch_id`];
+                const locError = errors[`lines.${index}.warehouse_location_id`];
+                const qtyError =
+                  errors[`lines.${index}.variance_quantity`] ||
+                  errors[`lines.${index}.physical_quantity`];
+
+                const available =
+                  line.stock_balance_data?.quantity_available !== undefined
+                    ? parseFloat(line.stock_balance_data.quantity_available)
+                    : line.stock_balance_data?.quantity_on_hand
+                    ? parseFloat(line.stock_balance_data.quantity_on_hand)
+                    : 0;
+                const isOut = line.adjustment_direction === "out";
+                const absQty = Math.abs(
+                  parseFloat(line.variance_quantity || 0)
+                );
+                const qtyExceeded = isOut && absQty > available;
+                const qtyMatchesAvailable =
+                  isOut && absQty === available && available > 0;
+
+                const totalCost = absQty * (line.unit_cost || 0);
+
+                return (
+                  <tr key={line.id} className="group bg-white ">
+                    <td className="px-4 py-3 text-sm text-gray-500 ">
+                      {index + 1}
+                    </td>
+
+                    <td className="px-4 py-3 align-top">
+                      <StockAdjustmentLineProductSelect
+                        value={line.product_id}
+                        onChange={(p: any) =>
+                          updateLine(line.id, "product_id", p.id)
+                        }
+                        products={products}
+                        error={productError}
+                      />
+                      {productError && (
+                        <span className="mt-1 block text-[10px] text-red-500">
+                          {productError}
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="px-4 py-3 align-top">
+                      <StockAdjustmentLineBatchSelect
+                        value={line.product_batch_id}
+                        onChange={(b: any) =>
+                          updateLine(line.id, "product_batch_id", b.id)
+                        }
+                        batches={line.product?.batches || []}
+                        error={batchError}
+                        disabled={
+                          !line.product || !line.product.requires_batch_tracking
+                        }
+                      />
+                      {batchError && (
+                        <span className="mt-1 block text-[10px] text-red-500">
+                          {batchError}
+                        </span>
+                      )}
+                      {line.product &&
+                        !line.product.requires_batch_tracking && (
+                          <span className="mt-1 block text-[10px] text-gray-400">
+                            Batch tracking disabled
+                          </span>
+                        )}
+                    </td>
+
+                    <td className="px-4 py-3 align-top">
+                      <WarehouseLocationSelect
+                        value={line.warehouse_location_id}
+                        onChange={(val: any) =>
+                          updateLine(line.id, "warehouse_location_id", val)
+                        }
+                        disabled={!warehouseId}
+                        error={!!locError}
+                        extraParams={{ warehouse_id: warehouseId }}
+                      />
+                      {locError && (
+                        <span className="mt-1 block text-[10px] text-red-500">
+                          {locError}
+                        </span>
+                      )}
+                    </td>
+
+                    {adjustmentType === "physical_count" ? (
+                      <>
+                        <td className="px-4 py-3 align-top">
+                          {line.stock_balance_loading ? (
+                            <span className="animate-pulse text-sm text-gray-400">
+                              Loading...
+                            </span>
+                          ) : (
+                            <span className="text-sm font-medium text-gray-900 ">
+                              {(line.system_quantity || 0).toFixed(3)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 align-top">
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.001"
+                            value={line.physical_quantity}
+                            onChange={(e: any) =>
+                              updateLine(
+                                line.id,
+                                "physical_quantity",
+                                e.target.value
+                              )
+                            }
+                            className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   ${
+                              qtyError
+                                ? "border-red-300"
+                                : "border-gray-200 "
+                            }`}
+                            placeholder="Count..."
+                          />
+                          {qtyError && (
+                            <span className="mt-1 block text-[10px] text-red-500">
+                              {qtyError}
+                            </span>
+                          )}
+                          {qtyExceeded && (
+                            <span className="mt-1 block text-[10px] text-red-500">
+                              Exceeds stock ({available})
+                            </span>
+                          )}
+                          {qtyMatchesAvailable && (
+                            <span className="mt-1 block text-[10px] font-medium text-yellow-600">
+                              Adjusting full stock
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 align-top">
+                          <span
+                            className={`text-sm font-bold ${
+                              line.variance_quantity > 0
+                                ? "text-green-600"
+                                : line.variance_quantity < 0
+                                ? "text-red-600"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            {line.variance_quantity > 0 ? "+" : ""}
+                            {(line.variance_quantity || 0).toFixed(3)}
+                          </span>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-4 py-3 align-top">
+                          {line.stock_balance_loading ? (
+                            <span className="animate-pulse text-sm text-gray-400">
+                              Loading...
+                            </span>
+                          ) : (
+                            <span className="text-sm font-medium text-gray-900 ">
+                              {(line.system_quantity || 0).toFixed(3)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 align-top">
+                          <input
+                            type="number"
+                            min="0.001"
+                            step="0.001"
+                            value={Math.abs(line.variance_quantity) || ""}
+                            onChange={(e: any) => {
+                              const val = parseFloat(e.target.value || 0);
+                              updateLine(
+                                line.id,
+                                "variance_quantity",
+                                line.adjustment_direction === "in" ? val : -val
+                              );
+                            }}
+                            className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   ${
+                              qtyError
+                                ? "border-red-300"
+                                : "border-gray-200 "
+                            }`}
+                            placeholder="Qty..."
+                          />
+                          {qtyError && (
+                            <span className="mt-1 block text-[10px] text-red-500">
+                              {qtyError}
+                            </span>
+                          )}
+                          {qtyExceeded && (
+                            <span className="mt-1 block text-[10px] text-red-500">
+                              Exceeds stock ({available})
+                            </span>
+                          )}
+                          {qtyMatchesAvailable && (
+                            <span className="mt-1 block text-[10px] font-medium text-yellow-600">
+                              Adjusting full stock
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 align-top">
+                          <select
+                            value={line.adjustment_direction}
+                            onChange={(e: any) => {
+                              const dir = e.target.value;
+                              updateLine(line.id, "adjustment_direction", dir);
+                              const currentVal = Math.abs(
+                                line.variance_quantity || 0
+                              );
+                              updateLine(
+                                line.id,
+                                "variance_quantity",
+                                dir === "in" ? currentVal : -currentVal
+                              );
+                            }}
+                            disabled={
+                              adjustmentType === "positive" ||
+                              adjustmentType === "negative" ||
+                              adjustmentType === "damage" ||
+                              adjustmentType === "expiry"
+                            }
+                            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60   "
+                          >
+                            <option value="in">In (+)</option>
+                            <option value="out">Out (-)</option>
+                          </select>
+                        </td>
+                      </>
+                    )}
+
+                    <td className="px-4 py-3 align-top">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={line.unit_cost}
+                        onChange={(e: any) =>
+                          updateLine(
+                            line.id,
+                            "unit_cost",
+                            parseFloat(e.target.value || 0)
+                          )
+                        }
+                        disabled={line.adjustment_direction === "out"}
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-60   "
+                        placeholder="0.00"
+                      />
+                    </td>
+
+                    <td className="px-4 py-3 align-top text-sm font-medium text-gray-900 ">
+                      {formatCurrency(totalCost)}
+                    </td>
+
+                    <td className="px-4 py-3 align-top">
+                      <input
+                        type="text"
+                        value={line.line_reason}
+                        onChange={(e: any) =>
+                          updateLine(line.id, "line_reason", e.target.value)
+                        }
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   "
+                        placeholder="Reason..."
+                      />
+                    </td>
+
+                    <td className="px-4 py-3 align-top">
+                      <input
+                        type="text"
+                        value={line.line_remarks}
+                        onChange={(e: any) =>
+                          updateLine(line.id, "line_remarks", e.target.value)
+                        }
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-500   "
+                        placeholder="Remarks..."
+                      />
+                    </td>
+
+                    <td className="flex items-center justify-center gap-1.5 px-4 py-3 text-center align-top">
+                      <button
+                        type="button"
+                        onClick={() => duplicateLine(line)}
+                        className="rounded p-1.5 text-gray-400 transition-colors hover:bg-brand-50 hover:text-brand-600 "
+                        title="Duplicate Line"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <rect
+                            x="9"
+                            y="9"
+                            width="13"
+                            height="13"
+                            rx="2"
+                            ry="2"
+                          />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeLine(line.id)}
+                        className="rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 "
+                        title="Remove Line"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default StockAdjustmentLinesTable;

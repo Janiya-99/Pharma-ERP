@@ -30,10 +30,10 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("name", {
       id: "name",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">NAME</p>
+        <p className="text-sm font-bold text-gray-600 ">NAME</p>
       ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+      cell: (info: unknown) => (
+        <p className="text-sm font-bold text-navy-700 ">
           {info.getValue()}
         </p>
       ),
@@ -41,7 +41,7 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("tech", {
       id: "tech",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">TECH</p>
+        <p className="text-sm font-bold text-gray-600 ">TECH</p>
       ),
       cell: (info: any) => (
         <div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ function CheckTable(props: { tableData: any }) {
               return (
                 <div
                   key={key}
-                  className="text-[22px] text-gray-600 dark:text-white"
+                  className="text-[22px] text-gray-600 "
                 >
                   <DiApple />
                 </div>
@@ -59,7 +59,7 @@ function CheckTable(props: { tableData: any }) {
               return (
                 <div
                   key={key}
-                  className="text-[21px] text-gray-600 dark:text-white"
+                  className="text-[21px] text-gray-600 "
                 >
                   <DiAndroid />
                 </div>
@@ -68,7 +68,7 @@ function CheckTable(props: { tableData: any }) {
               return (
                 <div
                   key={key}
-                  className="text-xl text-gray-600 dark:text-white"
+                  className="text-xl text-gray-600 "
                 >
                   <DiWindows />
                 </div>
@@ -81,12 +81,12 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("progress", {
       id: "progress",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
+        <p className="text-sm font-bold text-gray-600 ">
           PROGRESS
         </p>
       ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+      cell: (info: unknown) => (
+        <p className="text-sm font-bold text-navy-700 ">
           {info.getValue()}
         </p>
       ),
@@ -94,10 +94,10 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("date", {
       id: "date",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
+        <p className="text-sm font-bold text-gray-600 ">DATE</p>
       ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
+      cell: (info: unknown) => (
+        <p className="text-sm font-bold text-navy-700 ">
           {info.getValue()}
         </p>
       ),
@@ -105,13 +105,13 @@ function CheckTable(props: { tableData: any }) {
     columnHelper.accessor("progress", {
       id: "quantity",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
+        <p className="text-sm font-bold text-gray-600 ">
           QUANTITY
         </p>
       ),
-      cell: (info) => (
+      cell: (info: unknown) => (
         <div className="flex items-center gap-3">
-          <p className="text-sm font-bold text-navy-700 dark:text-white">
+          <p className="text-sm font-bold text-navy-700 ">
             {info.getValue()}%
           </p>
           <Progress width="w-[68px]" value={info.getValue()} />
@@ -134,7 +134,7 @@ function CheckTable(props: { tableData: any }) {
   return (
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
-        <div className="text-xl font-bold text-navy-700 dark:text-white">
+        <div className="text-xl font-bold text-navy-700 ">
           Check Table
         </div>
 
@@ -144,15 +144,15 @@ function CheckTable(props: { tableData: any }) {
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
         <table className="w-full">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: unknown) => (
               <tr key={headerGroup.id} className="!border-px !border-gray-400">
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header: unknown) => {
                   return (
                     <th
                       key={header.id}
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="cursor-pointer border-b-[1px] border-gray-200 pt-4 pb-2 pr-4 text-start"
+                      className="cursor-pointer border-b-[1px] border-gray-200 pb-2 pr-4 pt-4 text-start"
                     >
                       <div className="items-center justify-between text-xs text-gray-200">
                         {flexRender(
@@ -174,10 +174,10 @@ function CheckTable(props: { tableData: any }) {
             {table
               .getRowModel()
               .rows.slice(0, 5)
-              .map((row) => {
+              .map((row: unknown) => {
                 return (
                   <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
+                    {row.getVisibleCells().map((cell: unknown) => {
                       return (
                         <td
                           key={cell.id}

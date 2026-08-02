@@ -7,7 +7,7 @@ function Card(props: {
   const { variant, extra, children, ...rest } = props;
   return (
     <div
-      className={`relative flex flex-col rounded-[10px] border-[1px] border-gray-200 bg-white bg-clip-border shadow-md shadow-[#F3F3F3] dark:border-[#ffffff33] dark:!bg-navy-800 dark:text-white dark:shadow-none ${extra}`}
+      className={`relative flex flex-col rounded-2xl border border-gray-100 bg-white dark:bg-navy-800 dark:border-navy-700 dark:text-white bg-clip-border shadow-[0_8px_30px_rgb(0,0,0,0.015)] ${extra}`}
       {...rest}
     >
       {children}

@@ -8,11 +8,10 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from "axios";
 import { useAuthStore } from "store/authStore";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8888/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // sends httpOnly refresh token cookie automatically
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,22 +19,25 @@ const api = axios.create({
 
 // Request Interceptor — attach JWT access token from Zustand store
 api.interceptors.request.use(
-  (config) => {
+  (config: unknown) => {
     const token = useAuthStore.getState().accessToken;
     if (token && config.headers) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: unknown) => Promise.reject(error)
 );
 
 // Response Interceptor — handle 401 (token expired) and trigger refresh
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (val: string) => void; reject: (err: any) => void }> = [];
+let failedQueue: Array<{
+  resolve: (val: string) => void;
+  reject: (err: any) => void;
+}> = [];
 
 const processQueue = (error: any, token: string | null) => {
-  failedQueue.forEach((prom) => {
+  failedQueue.forEach((prom: unknown) => {
     if (error) prom.reject(error);
     else prom.resolve(token!);
   });
@@ -45,15 +47,19 @@ const processQueue = (error: any, token: string | null) => {
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve: unknown, reject: unknown) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
+        }).then((token: unknown) => {
           if (originalRequest.headers) {
-            (originalRequest.headers as any)["Authorization"] = `Bearer ${token}`;
+            (originalRequest.headers as any)[
+              "Authorization"
+            ] = `Bearer ${token}`;
           }
           return api(originalRequest);
         });
@@ -63,17 +69,25 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Call the Go backend refresh endpoint (httpOnly cookie sent automatically)
-        const response = await axios.post(
-          `${BASE_URL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
-        const { accessToken } = response.data;
-        useAuthStore.getState().setAccessToken(accessToken);
-        processQueue(null, accessToken);
+        const refreshToken = useAuthStore.getState().refreshToken;
+        if (!refreshToken) throw new Error("No refresh token available");
+
+        const response = await axios.post(`${BASE_URL}/auth/refresh`, {
+          refresh_token: refreshToken,
+        });
+        const { access_token, refresh_token: new_refresh_token } =
+          response.data.data.tokens;
+
+        useAuthStore.getState().setAccessToken(access_token);
+        if (new_refresh_token) {
+          useAuthStore.getState().setRefreshToken(new_refresh_token);
+        }
+
+        processQueue(null, access_token);
         if (originalRequest.headers) {
-          (originalRequest.headers as any)["Authorization"] = `Bearer ${accessToken}`;
+          (originalRequest.headers as any)[
+            "Authorization"
+          ] = `Bearer ${access_token}`;
         }
         return api(originalRequest);
       } catch (refreshError) {

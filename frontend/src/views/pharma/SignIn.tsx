@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MdOutlineVerifiedUser, MdOutlineSecurity, MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
 import { FaLinkedin } from "react-icons/fa";
@@ -61,13 +61,13 @@ export default function PharmaSignIn() {
             </p>
           </div>
 
-          <form className="flex flex-col gap-6" onSubmit={e => e.preventDefault()}>
+          <form className="flex flex-col gap-6" onSubmit={(e: any) => e.preventDefault()}>
             
             {/* Email */}
             <div className="relative border-b border-gray-200 focus-within:border-pharmaPurple transition-colors pb-1">
               <label className="text-[11px] font-bold uppercase tracking-wider text-[#8E88A5]">Email Address</label>
               <input 
-                type="email" placeholder="email@example.com" value={email} onChange={e=>setEmail(e.target.value)}
+                type="email" placeholder="email@example.com" value={email} onChange={(e: any)=>setEmail(e.target.value)}
                 className="w-full bg-transparent text-sm text-pharmaDark placeholder:text-gray-300 focus:outline-none pt-1"
               />
             </div>
@@ -79,7 +79,7 @@ export default function PharmaSignIn() {
                 <a href="#" className="text-[11px] font-bold text-pharmaPurple hover:underline">Forgot?</a>
               </div>
               <input 
-                type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e: any)=>setPassword(e.target.value)}
                 className="w-full bg-transparent text-sm text-pharmaDark placeholder:text-gray-300 focus:outline-none pt-1 pr-8"
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-6 text-gray-400 hover:text-pharmaPurple">
@@ -90,7 +90,7 @@ export default function PharmaSignIn() {
             {/* Remember Me */}
             <div className="flex items-start gap-2">
               <input 
-                type="checkbox" id="remember" checked={rememberMe} onChange={e=>setRememberMe(e.target.checked)}
+                type="checkbox" id="remember" checked={rememberMe} onChange={(e: any)=>setRememberMe(e.target.checked)}
                 className="mt-0.5 rounded border-gray-300 text-pharmaPurple focus:ring-pharmaPurple cursor-pointer"
               />
               <label htmlFor="remember" className="text-[13px] text-[#8E88A5] cursor-pointer">
