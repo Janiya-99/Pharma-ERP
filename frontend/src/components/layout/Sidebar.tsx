@@ -701,8 +701,8 @@ const Sidebar = () => {
             if (!showExpanded && !isMobile) setIsExpanded(true);
             setOpenAccordion(isAccordionOpen ? null : menu.name);
           }}
-          className={`group relative flex w-[auto] items-center gap-3 rounded-xl transition-all duration-150 ${
-            showExpanded ? "mx-3 h-11 px-3" : "mx-auto h-11 w-11 justify-center"
+          className={`group relative flex items-center gap-3 rounded-xl transition-all duration-150 ${
+            showExpanded ? "mx-3 h-11 w-auto px-3" : "mx-auto h-11 w-11 justify-center"
           } ${
             isActiveParent
               ? "bg-indigo-50 font-semibold text-indigo-600"
@@ -814,7 +814,7 @@ const Sidebar = () => {
     <>
       {/* Logo area */}
       <div
-        className={`flex h-14 shrink-0 items-center gap-3 border-b border-slate-200/70 transition-all duration-300 ${
+        className={`flex h-16 shrink-0 items-center gap-3 border-b border-slate-200/70 transition-all duration-300 ${
           isMobile || effectiveExpanded ? "px-5" : "justify-center px-2"
         }`}
       >
@@ -943,7 +943,7 @@ const Sidebar = () => {
         }}
       >
         <div
-          className={`ease-[cubic-bezier(0.4,0,0.2,1)] fixed bottom-4 left-4 top-4 z-30 flex flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-xl shadow-slate-200/40 transition-all duration-300 ${
+          className={`ease-[cubic-bezier(0.4,0,0.2,1)] fixed bottom-0 left-0 top-0 z-30 flex flex-col overflow-hidden border-r border-slate-200 bg-white shadow-xl shadow-slate-200/40 transition-all duration-300 ${
             effectiveExpanded ? "w-[260px]" : "w-[72px]"
           }`}
         >
