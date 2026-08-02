@@ -1,13 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html {
-    font-family: "Inter Variable", "Inter", system-ui, sans-serif !important;
+    font-family: "Poppins", system-ui, sans-serif !important;
     font-feature-settings: "kern", "cv02", "cv03", "cv04", "cv11" !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -116,10 +116,11 @@
   }
 
   .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: "Inter Variable", sans-serif;
+    --font-heading: "Poppins", sans-serif;
+    --font-sans: "Poppins", sans-serif;
   }
 }
+
 
 /* ═══════════════════════════════════════════════
    ERP Glass Design System — Utility Classes

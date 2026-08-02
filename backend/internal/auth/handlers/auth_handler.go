@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pixandco/erp-phrma/internal/auth/dto"
@@ -33,20 +35,49 @@ func (h *AuthHandler) resolveLoginCompany(req dto.LoginRequest) (*gorm.DB, *plat
 		return nil, nil, err
 	}
 
-	for i := range companies {
-		company := companies[i]
-		db, err := h.resolver.GetOrCreateCompanyDBConnection(company)
-		if err != nil {
-			continue
-		}
+	type result struct {
+		db      *gorm.DB
+		company *platformModels.PlatformCompany
+	}
 
-		var user models.User
-		if err := db.Where("email = ?", req.Email).First(&user).Error; err != nil {
-			continue
-		}
-		if security.CheckPasswordHash(req.Password, user.PasswordHash) {
-			return db, &company, nil
-		}
+	var wg sync.WaitGroup
+	resultCh := make(chan result, 1)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := range companies {
+		wg.Add(1)
+		go func(company platformModels.PlatformCompany) {
+			defer wg.Done()
+			
+			db, err := h.resolver.GetOrCreateCompanyDBConnection(company)
+			if err != nil {
+				return
+			}
+
+			var user models.User
+			if err := db.WithContext(ctx).Where("email = ?", req.Email).First(&user).Error; err != nil {
+				return
+			}
+			
+			if security.CheckPasswordHash(req.Password, user.PasswordHash) {
+				select {
+				case resultCh <- result{db: db, company: &company}:
+					cancel()
+				default:
+				}
+			}
+		}(companies[i])
+	}
+
+	go func() {
+		wg.Wait()
+		close(resultCh)
+	}()
+
+	res, ok := <-resultCh
+	if ok {
+		return res.db, res.company, nil
 	}
 
 	return nil, nil, errors.New("invalid credentials")

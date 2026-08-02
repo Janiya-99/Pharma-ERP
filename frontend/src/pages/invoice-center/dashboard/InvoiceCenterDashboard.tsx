@@ -146,40 +146,44 @@ export default function InvoiceCenterDashboard() {
   };
 
   const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => {
-    const toneMap: Record<string, { bg: string; text: string; iconBg: string }> = {
-      blue: { bg: "bg-blue-50/50", text: "text-blue-700", iconBg: "bg-blue-100" },
-      emerald: { bg: "bg-emerald-50/50", text: "text-emerald-700", iconBg: "bg-emerald-100" },
-      amber: { bg: "bg-amber-50/50", text: "text-amber-700", iconBg: "bg-amber-100" },
-      rose: { bg: "bg-rose-50/50", text: "text-rose-700", iconBg: "bg-rose-100" },
-      indigo: { bg: "bg-indigo-50/50", text: "text-indigo-700", iconBg: "bg-indigo-100" },
-      slate: { bg: "bg-slate-50/50", text: "text-slate-700", iconBg: "bg-slate-100" },
+    const toneStyles: Record<string, { card: string; iconBg: string; text: string }> = {
+      blue: { card: "border-blue-100 bg-gradient-to-br from-blue-50/80 to-white shadow-md ring-1 ring-inset ring-blue-100", iconBg: "bg-blue-100 text-blue-600 group-hover:bg-blue-200", text: "text-blue-600" },
+      emerald: { card: "border-emerald-100 bg-gradient-to-br from-emerald-50/80 to-white shadow-md ring-1 ring-inset ring-emerald-100", iconBg: "bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200", text: "text-emerald-600" },
+      amber: { card: "border-amber-100 bg-gradient-to-br from-amber-50/80 to-white shadow-md ring-1 ring-inset ring-amber-100", iconBg: "bg-amber-100 text-amber-600 group-hover:bg-amber-200", text: "text-amber-600" },
+      rose: { card: "border-rose-100 bg-gradient-to-br from-rose-50/80 to-white shadow-md ring-1 ring-inset ring-rose-100", iconBg: "bg-rose-100 text-rose-600 group-hover:bg-rose-200", text: "text-rose-600" },
+      indigo: { card: "border-indigo-100 bg-gradient-to-br from-indigo-50/80 to-white shadow-md ring-1 ring-inset ring-indigo-100", iconBg: "bg-indigo-100 text-indigo-600 group-hover:bg-indigo-200", text: "text-indigo-600" },
+      slate: { card: "border-slate-100 bg-gradient-to-br from-slate-50/80 to-white shadow-md ring-1 ring-inset ring-slate-100", iconBg: "bg-slate-100 text-slate-600 group-hover:bg-slate-200", text: "text-slate-600" },
     };
-    const t = toneMap[tone] || toneMap.slate;
+    const t = toneStyles[tone] || toneStyles.slate;
 
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-5 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              {title}
-            </p>
-            <h3 className="text-2xl font-bold tracking-tight text-slate-900">
-              {value}
-            </h3>
-          </div>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${t.iconBg} shadow-sm transition-transform duration-300 hover:scale-110`}>
-            <Icon className={`h-6 w-6 ${t.text}`} />
+      <div className={`group relative overflow-hidden rounded-3xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${t.card}`}>
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 truncate mb-1 block">
+            {title}
+          </span>
+          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${t.iconBg}`}>
+            <Icon className="h-4 w-4" />
           </div>
         </div>
+        <div className="mt-3 flex items-baseline justify-between">
+          <h3 className={`text-2xl font-semibold tracking-tight truncate ${t.text}`}>
+            {value}
+          </h3>
+        </div>
         {(subtitle || trend) && (
-          <div className="mt-4 flex items-center justify-between text-[13px]">
-            {subtitle && <span className="text-slate-500 font-medium">{subtitle}</span>}
+          <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 text-[11px]">
             {trend && (
-              <span className={`flex items-center font-semibold ${trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
-                {trendUp ? <TrendingUp className="mr-1 h-3.5 w-3.5" /> : <TrendingDown className="mr-1 h-3.5 w-3.5" />}
-                {trend}
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold shrink-0 max-w-full truncate ${
+                trendUp
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                  : "bg-rose-50 text-rose-700 border border-rose-200/60"
+              }`}>
+                {trendUp ? <TrendingUp className="h-3 w-3 shrink-0" /> : <TrendingDown className="h-3 w-3 shrink-0" />}
+                <span className="truncate">{trend}</span>
               </span>
             )}
+            {subtitle && <span className="text-slate-400 truncate flex-1 text-right" title={subtitle}>{subtitle}</span>}
           </div>
         )}
       </div>
