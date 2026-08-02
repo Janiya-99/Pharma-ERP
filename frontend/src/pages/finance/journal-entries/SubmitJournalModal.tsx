@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Modal from "../../../../components/common/Modal";
-import { financeApi } from "../../../../api/financeApi";
+import Modal from "../../../components/common/Modal";
+import { financeApi } from "../../../api/financeApi";
 
 export default function SubmitJournalModal({ isOpen, onClose, journal, onSuccess }: { isOpen?: boolean; onClose?: unknown; journal?: unknown; onSuccess?: unknown }) {
   const [remarks, setRemarks] = useState("");

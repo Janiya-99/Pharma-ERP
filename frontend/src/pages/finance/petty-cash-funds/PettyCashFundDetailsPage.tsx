@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import PettyCashBalanceCard from "../../../../components/finance/PettyCashBalanceCard";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import PettyCashBalanceCard from "../../../components/finance/PettyCashBalanceCard";
 import { MdEdit, MdDelete, MdArrowBack } from "react-icons/md";
 
 export default function PettyCashFundDetailsPage() {

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Modal from "../../../../components/common/Modal";
-import { financeApi } from "../../../../api/financeApi";
+import Modal from "../../../components/common/Modal";
+import { financeApi } from "../../../api/financeApi";
 import { MdRestore } from "react-icons/md";
 
 export default function ReverseJournalModal({ isOpen, onClose, journal, onSuccess }: { isOpen?: boolean; onClose?: unknown; journal?: unknown; onSuccess?: unknown }) {

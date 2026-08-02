@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MdAdd, MdDelete, MdClear } from "react-icons/md";
-import { financeApi } from "../../../api/financeApi";
+import { financeApi } from "../../api/financeApi";
 
 const PettyCashLinesTable = ({ lines, onChange, readOnly }: { lines?: unknown; onChange?: unknown; readOnly?: unknown }) => {
   const [accounts, setAccounts] = useState([]);

@@ -1,4 +1,4 @@
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 
 export default function ReconciliationSummary({ 
   statementClosingBalance, 

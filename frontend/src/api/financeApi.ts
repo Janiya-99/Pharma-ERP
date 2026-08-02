@@ -218,7 +218,11 @@ export const financeApi = {
 
   // Cheque Books
   getChequeBooks: (params: Record<string, unknown>) =>
-    apiClient.get("/finance/cheque-books", { params }),
+    apiClient.request({
+      url: "/finance/cheque-books",
+      method: "QUERY",
+      data: params,
+    }),
   getChequeBookById: (id: string | number) =>
     apiClient.get(`/finance/cheque-books/${id}`),
   createChequeBook: (payload: Record<string, unknown>) =>

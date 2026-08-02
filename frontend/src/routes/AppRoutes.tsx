@@ -85,11 +85,12 @@ import {
   OpeningBalancesPage,
   FinancialYearPage,
   TaxSettingsPage,
-  JournalEntryPage,
   PaymentVouchersPage,
   ReceiptVouchersPage,
   BankReconciliationPage,
 } from "../pages/finance/setup/FinanceFunctionalPages";
+import JournalEntriesPage from "../pages/finance/journal-entries/JournalEntriesPage";
+import JournalEntryFormPage from "../pages/finance/journal-entries/JournalEntryFormPage";
 import {
   FixedAssetCategoriesPage,
   FixedAssetsPage,
@@ -353,7 +354,15 @@ const AppRoutes = () => {
 
           <Route
             path="/finance/general-ledger/journal-entry"
-            element={<JournalEntryPage />}
+            element={<JournalEntriesPage />}
+          />
+          <Route
+            path="/finance/general-ledger/journal-entry/create"
+            element={<JournalEntryFormPage />}
+          />
+          <Route
+            path="/finance/general-ledger/journal-entry/:id/edit"
+            element={<JournalEntryFormPage />}
           />
           <Route
             path="/finance/general-ledger/journal-register"

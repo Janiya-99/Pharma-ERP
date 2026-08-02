@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import BranchSelector from "../../../../components/common/BranchSelector";
-import FinancialYearSelect from "../../../../components/finance/FinancialYearSelect";
-import AccountingPeriodSelect from "../../../../components/finance/AccountingPeriodSelect";
-import AccountSelect from "../../../../components/finance/AccountSelect";
-import VoucherLinesTable from "../../../../components/finance/VoucherLinesTable";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import BranchSelector from "../../../components/common/BranchSelector";
+import FinancialYearSelect from "../../../components/finance/FinancialYearSelect";
+import AccountingPeriodSelect from "../../../components/finance/AccountingPeriodSelect";
+import AccountSelect from "../../../components/finance/AccountSelect";
+import VoucherLinesTable from "../../../components/finance/VoucherLinesTable";
 import { MdArrowBack, MdSave } from "react-icons/md";
 
 export default function ReceiptVoucherFormPage() {

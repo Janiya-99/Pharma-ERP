@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import { MdAdd, MdDelete, MdClear } from "react-icons/md";
-import JournalLineAccountSelect from "../../../../components/finance/JournalLineAccountSelect";
-import DebitCreditSummary from "../../../../components/finance/DebitCreditSummary";
+import JournalLineAccountSelect from "../../../components/finance/JournalLineAccountSelect";
+import DebitCreditSummary from "../../../components/finance/DebitCreditSummary";
 
 function JournalEntryLinesTable({
   lines,

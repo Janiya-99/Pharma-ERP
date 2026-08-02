@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { getBranches } from "../../../../api/controlApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import PettyCashLinesTable from "../../../../components/finance/PettyCashLinesTable";
-import PettyCashTotalSummary from "../../../../components/finance/PettyCashTotalSummary";
-import { DatePicker } from "../../../../components/ui/date-picker";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches } from "../../../api/controlApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import PettyCashLinesTable from "../../../components/finance/PettyCashLinesTable";
+import PettyCashTotalSummary from "../../../components/finance/PettyCashTotalSummary";
+import { DatePicker } from "../../../components/ui/date-picker";
 
 export default function PettyCashVoucherFormPage() {
   const { id } = useParams();

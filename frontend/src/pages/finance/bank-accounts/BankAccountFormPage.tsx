@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { getBranches } from "../../../../api/controlApi";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches } from "../../../api/controlApi";
 import { toast } from "react-hot-toast";
 
 export default function BankAccountFormPage() {

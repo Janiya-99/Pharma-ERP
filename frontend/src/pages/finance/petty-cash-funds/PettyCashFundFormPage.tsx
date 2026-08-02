@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { getBranches, getUsers } from "../../../../api/controlApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches, getUsers } from "../../../api/controlApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
 
 export default function PettyCashFundFormPage() {
   const { id } = useParams();

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import BankAccountSelect from "../../../../components/finance/BankAccountSelect";
-import ReconciliationStatusBadge from "../../../../components/finance/ReconciliationStatusBadge";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import BankAccountSelect from "../../../components/finance/BankAccountSelect";
+import ReconciliationStatusBadge from "../../../components/finance/ReconciliationStatusBadge";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
 import { DataTableToolbar } from "../shared/DataTableToolbar";
 

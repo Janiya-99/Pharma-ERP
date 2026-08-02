@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { getBranches } from "../../../../api/controlApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import { DatePicker } from "../../../../components/ui/date-picker";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches } from "../../../api/controlApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import { DatePicker } from "../../../components/ui/date-picker";
 
 export default function PettyCashReplenishmentFormPage() {
   const { id } = useParams();

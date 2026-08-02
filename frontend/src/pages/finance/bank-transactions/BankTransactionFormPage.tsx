@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { getBranches } from "../../../../api/controlApi";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches } from "../../../api/controlApi";
 import BankAccountSelect, {
   type BankAccountOption,
-} from "../../../../components/finance/BankAccountSelect";
-import { Button } from "../../../../components/ui/button";
+} from "../../../components/finance/BankAccountSelect";
+import { Button } from "../../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../../../components/ui/card";
-import { Input } from "../../../../components/ui/input";
-import { Label } from "../../../../components/ui/label";
+} from "../../../components/ui/card";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../../components/ui/select";
-import { Textarea } from "../../../../components/ui/textarea";
+} from "../../../components/ui/select";
+import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "react-hot-toast";
 
 type BranchOption = {

@@ -47,18 +47,49 @@ func (h *ChequeBookHandler) ListChequeBooks(c *gin.Context) {
 		return
 	}
 
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-
+	var page, limit int
 	filters := map[string]interface{}{}
-	if b := c.Query("bank_account_id"); b != "" {
-		filters["bank_account_id"] = b
-	}
-	if s := c.Query("status"); s != "" {
-		filters["status"] = s
-	}
-	if q := c.Query("search"); q != "" {
-		filters["search"] = q
+
+	if c.Request.Method == "QUERY" {
+		var req struct {
+			Page          int    `json:"page"`
+			Limit         int    `json:"limit"`
+			BankAccountID string `json:"bank_account_id"`
+			Status        string `json:"status"`
+			Search        string `json:"search"`
+		}
+		if err := c.ShouldBindJSON(&req); err == nil {
+			page = req.Page
+			limit = req.Limit
+			if req.BankAccountID != "" {
+				filters["bank_account_id"] = req.BankAccountID
+			}
+			if req.Status != "" {
+				filters["status"] = req.Status
+			}
+			if req.Search != "" {
+				filters["search"] = req.Search
+			}
+		}
+		if page <= 0 {
+			page = 1
+		}
+		if limit <= 0 {
+			limit = 10
+		}
+	} else {
+		page, _ = strconv.Atoi(c.DefaultQuery("page", "1"))
+		limit, _ = strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+		if b := c.Query("bank_account_id"); b != "" {
+			filters["bank_account_id"] = b
+		}
+		if s := c.Query("status"); s != "" {
+			filters["status"] = s
+		}
+		if q := c.Query("search"); q != "" {
+			filters["search"] = q
+		}
 	}
 
 	books, total, err := service.ListChequeBooks(companyID, filters, page, limit)

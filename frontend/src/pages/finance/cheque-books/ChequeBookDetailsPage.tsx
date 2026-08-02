@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
 import ChequeLeavesTable from "./ChequeLeavesTable";
 import { MdEdit, MdDelete, MdArrowBack } from "react-icons/md";
 import { toast } from "react-hot-toast";
