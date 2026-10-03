@@ -1,62 +1,86 @@
-version: '3.8'
-
 services:
-  # 1. Frontend Server
+  # 1. Frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+
+    container_name: pharma-erp-frontend
+
     ports:
-      - "80:80"
+      - "127.0.0.1:8081:80"
+
     depends_on:
       - backend
-    restart: always
 
-  # 2. Go Backend Server
+    restart: unless-stopped
+
+    networks:
+      - pharma-network
+
+
+  # 2. Go Backend
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+
+    container_name: pharma-erp-backend
+
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
+
     environment:
-      - APP_ENV=production
-      - APP_PORT=8080
-      - PLATFORM_DB_HOST=mysql
-      - PLATFORM_DB_PORT=3306
-      - PLATFORM_DB_USER=root
-      - PLATFORM_DB_PASSWORD=secret
-      - PLATFORM_DB_NAME=erp_platform
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - JWT_SECRET=super_secret_key
-      - JWT_REFRESH_SECRET=super_secret_refresh_key
+      APP_ENV: production
+      APP_PORT: 8080
+
+      # Shared MySQL
+      PLATFORM_DB_HOST: shared-mysql
+      PLATFORM_DB_PORT: 3306
+      PLATFORM_DB_USER: pharma_erp_user
+      PLATFORM_DB_PASSWORD: ${PLATFORM_DB_PASSWORD}
+      PLATFORM_DB_NAME: erp_phrma
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+
     depends_on:
-      - mysql
       - redis
-    restart: always
 
-  # 3. MySQL Database
-  mysql:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=erp_platform
-    volumes:
-      - mysql_data:/var/lib/mysql
-    restart: always
+    restart: unless-stopped
 
-  # 4. Redis Cache Layer
+    networks:
+      - pharma-network
+      - shared-services
+
+
+  # 3. Redis - ERP specific
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+
+    container_name: pharma-erp-redis
+
+    restart: unless-stopped
+
     volumes:
       - redis_data:/data
-    restart: always
+
+    networks:
+      - pharma-network
+
 
 volumes:
-  mysql_data:
   redis_data:
+
+
+networks:
+  pharma-network:
+    driver: bridge
+
+  shared-services:
+    external: true
