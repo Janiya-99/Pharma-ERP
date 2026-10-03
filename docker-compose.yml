@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # 1. Frontend Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+  # 2. Go Backend Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_ENV=production
+      - APP_PORT=8080
+      - PLATFORM_DB_HOST=mysql
+      - PLATFORM_DB_PORT=3306
+      - PLATFORM_DB_USER=root
+      - PLATFORM_DB_PASSWORD=secret
+      - PLATFORM_DB_NAME=erp_platform
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=super_secret_key
+      - JWT_REFRESH_SECRET=super_secret_refresh_key
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+
+  # 3. MySQL Database
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=erp_platform
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
+  # 4. Redis Cache Layer
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  mysql_data:
+  redis_data:
