@@ -1,104 +1,105 @@
+import { lazy } from "react";
 
 // Auth
-import SignIn from "views/auth/SignIn";
+const SignIn = lazy(() => import("views/auth/SignIn"));
 
 // Dashboard
-import LandingPage from "views/admin/landing";
+const LandingPage = lazy(() => import("views/admin/landing"));
 
 // Control Center — new pages
-import SoftwareModulesPage from "pages/control-center/software-modules/SoftwareModulesPage";
-import GeneralSettingsPage from "pages/control-center/settings/GeneralSettingsPage";
-import ApprovalSettingsPage from "pages/control-center/approval-settings/ApprovalSettingsPage";
-import DocumentNumberingPage from "pages/control-center/document-numbering/DocumentNumberingPage";
-import SecuritySettingsPage from "pages/control-center/security-settings/SecuritySettingsPage";
+const SoftwareModulesPage = lazy(() => import("pages/control-center/software-modules/SoftwareModulesPage"));
+const GeneralSettingsPage = lazy(() => import("pages/control-center/settings/GeneralSettingsPage"));
+const ApprovalSettingsPage = lazy(() => import("pages/control-center/approval-settings/ApprovalSettingsPage"));
+const DocumentNumberingPage = lazy(() => import("pages/control-center/document-numbering/DocumentNumberingPage"));
+const SecuritySettingsPage = lazy(() => import("pages/control-center/security-settings/SecuritySettingsPage"));
 
 // Control Center — new pages
-import ControlCenterDashboardPage from "pages/control-center/dashboard/ControlCenterDashboardPage";
-import OrganizationSetupPage from "pages/control-center/organization/OrganizationSetupPage";
-import UsersPage from "pages/control-center/users/UsersPage";
-import UserCreatePage from "pages/control-center/users/UserCreatePage";
-import UserDetailsPage from "pages/control-center/users/UserDetailsPage";
-import RolesPermissionsPage from "pages/control-center/roles-permissions/RolesPermissionsPage";
-import AccessMatrixPage from "pages/control-center/access-matrix/AccessMatrixPage";
-import AuditLogsPage from "pages/control-center/logs/AuditLogsPage";
-import LoginLogsPage from "pages/control-center/logs/LoginLogsPage";
+const ControlCenterDashboardPage = lazy(() => import("pages/control-center/dashboard/ControlCenterDashboardPage"));
+const OrganizationSetupPage = lazy(() => import("pages/control-center/organization/OrganizationSetupPage"));
+const UsersPage = lazy(() => import("pages/control-center/users/UsersPage"));
+const UserCreatePage = lazy(() => import("pages/control-center/users/UserCreatePage"));
+const UserDetailsPage = lazy(() => import("pages/control-center/users/UserDetailsPage"));
+const RolesPermissionsPage = lazy(() => import("pages/control-center/roles-permissions/RolesPermissionsPage"));
+const AccessMatrixPage = lazy(() => import("pages/control-center/access-matrix/AccessMatrixPage"));
+const AuditLogsPage = lazy(() => import("pages/control-center/logs/AuditLogsPage"));
+const LoginLogsPage = lazy(() => import("pages/control-center/logs/LoginLogsPage"));
 
 // Finance
-import FinanceDashboard from "views/admin/finance/FinanceDashboard";
-import FinancialYearsPage from "views/admin/finance/financial-years/FinancialYearsPage";
-import AccountingPeriodsPage from "views/admin/finance/accounting-periods/AccountingPeriodsPage";
-import AccountClassificationsPage from "views/admin/finance/account-classifications/AccountClassificationsPage";
-import ChartOfAccountsPage from "views/admin/finance/chart-of-accounts/ChartOfAccountsPage";
-import OpeningBalancesPage from "views/admin/finance/opening-balances/OpeningBalancesPage";
-import JournalEntriesPage from "pages/finance/journal-entries/JournalEntriesPage";
-import JournalEntryFormPage from "pages/finance/journal-entries/JournalEntryFormPage";
-import JournalEntryDetailsPage from "pages/finance/journal-entries/JournalEntryDetailsPage";
-import PaymentVouchersPage from "pages/finance/payment-vouchers/PaymentVouchersPage";
-import PaymentVoucherFormPage from "pages/finance/payment-vouchers/PaymentVoucherFormPage";
-import PaymentVoucherDetailsPage from "pages/finance/payment-vouchers/PaymentVoucherDetailsPage";
-import ReceiptVouchersPage from "pages/finance/receipt-vouchers/ReceiptVouchersPage";
-import ReceiptVoucherFormPage from "pages/finance/receipt-vouchers/ReceiptVoucherFormPage";
-import ReceiptVoucherDetailsPage from "pages/finance/receipt-vouchers/ReceiptVoucherDetailsPage";
-import BankAccountsPage from "pages/finance/bank-accounts/BankAccountsPage";
-import BankAccountFormPage from "pages/finance/bank-accounts/BankAccountFormPage";
-import BankAccountDetailsPage from "pages/finance/bank-accounts/BankAccountDetailsPage";
-import ChequeBooksPage from "pages/finance/cheque-books/ChequeBooksPage";
-import ChequeBookFormPage from "pages/finance/cheque-books/ChequeBookFormPage";
-import ChequeBookDetailsPage from "pages/finance/cheque-books/ChequeBookDetailsPage";
-import BankTransactionsPage from "pages/finance/bank-transactions/BankTransactionsPage";
-import BankTransactionFormPage from "pages/finance/bank-transactions/BankTransactionFormPage";
-import BankTransactionDetailsPage from "pages/finance/bank-transactions/BankTransactionDetailsPage";
-import BankReconciliationsPage from "pages/finance/bank-reconciliations/BankReconciliationsPage";
-import BankReconciliationFormPage from "pages/finance/bank-reconciliations/BankReconciliationFormPage";
-import BankReconciliationDetailsPage from "pages/finance/bank-reconciliations/BankReconciliationDetailsPage";
-import PettyCashFundsPage from "pages/finance/petty-cash-funds/PettyCashFundsPage";
-import PettyCashFundFormPage from "pages/finance/petty-cash-funds/PettyCashFundFormPage";
-import PettyCashFundDetailsPage from "pages/finance/petty-cash-funds/PettyCashFundDetailsPage";
-import PettyCashVouchersPage from "pages/finance/petty-cash-vouchers/PettyCashVouchersPage";
-import PettyCashVoucherFormPage from "pages/finance/petty-cash-vouchers/PettyCashVoucherFormPage";
-import PettyCashVoucherDetailsPage from "pages/finance/petty-cash-vouchers/PettyCashVoucherDetailsPage";
-import PettyCashReplenishmentsPage from "pages/finance/petty-cash-replenishments/PettyCashReplenishmentsPage";
-import PettyCashReplenishmentFormPage from "pages/finance/petty-cash-replenishments/PettyCashReplenishmentFormPage";
-import PettyCashReplenishmentDetailsPage from "pages/finance/petty-cash-replenishments/PettyCashReplenishmentDetailsPage";
+const FinanceDashboard = lazy(() => import("views/admin/finance/FinanceDashboard"));
+const FinancialYearsPage = lazy(() => import("views/admin/finance/financial-years/FinancialYearsPage"));
+const AccountingPeriodsPage = lazy(() => import("views/admin/finance/accounting-periods/AccountingPeriodsPage"));
+const AccountClassificationsPage = lazy(() => import("views/admin/finance/account-classifications/AccountClassificationsPage"));
+const ChartOfAccountsPage = lazy(() => import("views/admin/finance/chart-of-accounts/ChartOfAccountsPage"));
+const OpeningBalancesPage = lazy(() => import("views/admin/finance/opening-balances/OpeningBalancesPage"));
+const JournalEntriesPage = lazy(() => import("pages/finance/journal-entries/JournalEntriesPage"));
+const JournalEntryFormPage = lazy(() => import("pages/finance/journal-entries/JournalEntryFormPage"));
+const JournalEntryDetailsPage = lazy(() => import("pages/finance/journal-entries/JournalEntryDetailsPage"));
+const PaymentVouchersPage = lazy(() => import("pages/finance/payment-vouchers/PaymentVouchersPage"));
+const PaymentVoucherFormPage = lazy(() => import("pages/finance/payment-vouchers/PaymentVoucherFormPage"));
+const PaymentVoucherDetailsPage = lazy(() => import("pages/finance/payment-vouchers/PaymentVoucherDetailsPage"));
+const ReceiptVouchersPage = lazy(() => import("pages/finance/receipt-vouchers/ReceiptVouchersPage"));
+const ReceiptVoucherFormPage = lazy(() => import("pages/finance/receipt-vouchers/ReceiptVoucherFormPage"));
+const ReceiptVoucherDetailsPage = lazy(() => import("pages/finance/receipt-vouchers/ReceiptVoucherDetailsPage"));
+const BankAccountsPage = lazy(() => import("pages/finance/bank-accounts/BankAccountsPage"));
+const BankAccountFormPage = lazy(() => import("pages/finance/bank-accounts/BankAccountFormPage"));
+const BankAccountDetailsPage = lazy(() => import("pages/finance/bank-accounts/BankAccountDetailsPage"));
+const ChequeBooksPage = lazy(() => import("pages/finance/cheque-books/ChequeBooksPage"));
+const ChequeBookFormPage = lazy(() => import("pages/finance/cheque-books/ChequeBookFormPage"));
+const ChequeBookDetailsPage = lazy(() => import("pages/finance/cheque-books/ChequeBookDetailsPage"));
+const BankTransactionsPage = lazy(() => import("pages/finance/bank-transactions/BankTransactionsPage"));
+const BankTransactionFormPage = lazy(() => import("pages/finance/bank-transactions/BankTransactionFormPage"));
+const BankTransactionDetailsPage = lazy(() => import("pages/finance/bank-transactions/BankTransactionDetailsPage"));
+const BankReconciliationsPage = lazy(() => import("pages/finance/bank-reconciliations/BankReconciliationsPage"));
+const BankReconciliationFormPage = lazy(() => import("pages/finance/bank-reconciliations/BankReconciliationFormPage"));
+const BankReconciliationDetailsPage = lazy(() => import("pages/finance/bank-reconciliations/BankReconciliationDetailsPage"));
+const PettyCashFundsPage = lazy(() => import("pages/finance/petty-cash-funds/PettyCashFundsPage"));
+const PettyCashFundFormPage = lazy(() => import("pages/finance/petty-cash-funds/PettyCashFundFormPage"));
+const PettyCashFundDetailsPage = lazy(() => import("pages/finance/petty-cash-funds/PettyCashFundDetailsPage"));
+const PettyCashVouchersPage = lazy(() => import("pages/finance/petty-cash-vouchers/PettyCashVouchersPage"));
+const PettyCashVoucherFormPage = lazy(() => import("pages/finance/petty-cash-vouchers/PettyCashVoucherFormPage"));
+const PettyCashVoucherDetailsPage = lazy(() => import("pages/finance/petty-cash-vouchers/PettyCashVoucherDetailsPage"));
+const PettyCashReplenishmentsPage = lazy(() => import("pages/finance/petty-cash-replenishments/PettyCashReplenishmentsPage"));
+const PettyCashReplenishmentFormPage = lazy(() => import("pages/finance/petty-cash-replenishments/PettyCashReplenishmentFormPage"));
+const PettyCashReplenishmentDetailsPage = lazy(() => import("pages/finance/petty-cash-replenishments/PettyCashReplenishmentDetailsPage"));
 
 // Inventory
-import InventoryDashboard from "views/admin/inventory/InventoryDashboard";
-import ProductsPage from "views/admin/inventory/ProductsPage";
-import BatchesPage from "views/admin/inventory/BatchesPage";
-import WarehousesPage from "views/admin/inventory/WarehousesPage";
-import GRNsPage from "pages/inventory/grns/GRNsPage";
-import GRNFormPage from "pages/inventory/grns/GRNFormPage";
-import GRNDetailsPage from "pages/inventory/grns/GRNDetailsPage";
-import StockTransfersPage from "pages/inventory/stock-transfers/StockTransfersPage";
-import StockTransferFormPage from "pages/inventory/stock-transfers/StockTransferFormPage";
-import StockTransferDetailsPage from "pages/inventory/stock-transfers/StockTransferDetailsPage";
-import StockAdjustmentsPage from "pages/inventory/stock-adjustments/StockAdjustmentsPage";
-import StockAdjustmentFormPage from "pages/inventory/stock-adjustments/StockAdjustmentFormPage";
-import StockAdjustmentDetailsPage from "pages/inventory/stock-adjustments/StockAdjustmentDetailsPage";
-import StockLedgerPage from "views/admin/inventory/StockLedgerPage";
-import OpeningStockEntriesPage from "pages/inventory/opening-stock/OpeningStockEntriesPage";
-import OpeningStockEntryFormPage from "pages/inventory/opening-stock/OpeningStockEntryFormPage";
-import OpeningStockEntryDetailsPage from "pages/inventory/opening-stock/OpeningStockEntryDetailsPage";
+const InventoryDashboard = lazy(() => import("views/admin/inventory/InventoryDashboard"));
+const ProductsPage = lazy(() => import("views/admin/inventory/ProductsPage"));
+const BatchesPage = lazy(() => import("views/admin/inventory/BatchesPage"));
+const WarehousesPage = lazy(() => import("views/admin/inventory/WarehousesPage"));
+const GRNsPage = lazy(() => import("pages/inventory/grns/GRNsPage"));
+const GRNFormPage = lazy(() => import("pages/inventory/grns/GRNFormPage"));
+const GRNDetailsPage = lazy(() => import("pages/inventory/grns/GRNDetailsPage"));
+const StockTransfersPage = lazy(() => import("pages/inventory/stock-transfers/StockTransfersPage"));
+const StockTransferFormPage = lazy(() => import("pages/inventory/stock-transfers/StockTransferFormPage"));
+const StockTransferDetailsPage = lazy(() => import("pages/inventory/stock-transfers/StockTransferDetailsPage"));
+const StockAdjustmentsPage = lazy(() => import("pages/inventory/stock-adjustments/StockAdjustmentsPage"));
+const StockAdjustmentFormPage = lazy(() => import("pages/inventory/stock-adjustments/StockAdjustmentFormPage"));
+const StockAdjustmentDetailsPage = lazy(() => import("pages/inventory/stock-adjustments/StockAdjustmentDetailsPage"));
+const StockLedgerPage = lazy(() => import("views/admin/inventory/StockLedgerPage"));
+const OpeningStockEntriesPage = lazy(() => import("pages/inventory/opening-stock/OpeningStockEntriesPage"));
+const OpeningStockEntryFormPage = lazy(() => import("pages/inventory/opening-stock/OpeningStockEntryFormPage"));
+const OpeningStockEntryDetailsPage = lazy(() => import("pages/inventory/opening-stock/OpeningStockEntryDetailsPage"));
 
 // Invoice Center
-import InvoiceDashboard from "views/admin/invoice-center/InvoiceDashboard";
-import SalesOrdersPage from "views/admin/invoice-center/SalesOrdersPage";
-import InvoicesPage from "views/admin/invoice-center/InvoicesPage";
-import CreditNotesPage from "views/admin/invoice-center/CreditNotesPage";
-import DebitNotesPage from "views/admin/invoice-center/DebitNotesPage";
-import CustomerReceiptsPage from "pages/invoice-center/customer-receipts/CustomerReceiptsPage";
-import CustomerReceiptFormPage from "pages/invoice-center/customer-receipts/CustomerReceiptFormPage";
-import CustomerReceiptDetailsPage from "pages/invoice-center/customer-receipts/CustomerReceiptDetailsPage";
-import InvoiceCenterFinanceSettingsPage from "pages/invoice-center/finance-settings/InvoiceCenterFinanceSettingsPage";
-import InvoiceCenterFinancePostingPage from "pages/invoice-center/finance-posting/InvoiceCenterFinancePostingPage";
+const InvoiceDashboard = lazy(() => import("views/admin/invoice-center/InvoiceDashboard"));
+const SalesOrdersPage = lazy(() => import("views/admin/invoice-center/SalesOrdersPage"));
+const InvoicesPage = lazy(() => import("views/admin/invoice-center/InvoicesPage"));
+const CreditNotesPage = lazy(() => import("views/admin/invoice-center/CreditNotesPage"));
+const DebitNotesPage = lazy(() => import("views/admin/invoice-center/DebitNotesPage"));
+const CustomerReceiptsPage = lazy(() => import("pages/invoice-center/customer-receipts/CustomerReceiptsPage"));
+const CustomerReceiptFormPage = lazy(() => import("pages/invoice-center/customer-receipts/CustomerReceiptFormPage"));
+const CustomerReceiptDetailsPage = lazy(() => import("pages/invoice-center/customer-receipts/CustomerReceiptDetailsPage"));
+const InvoiceCenterFinanceSettingsPage = lazy(() => import("pages/invoice-center/finance-settings/InvoiceCenterFinanceSettingsPage"));
+const InvoiceCenterFinancePostingPage = lazy(() => import("pages/invoice-center/finance-posting/InvoiceCenterFinancePostingPage"));
 
 // Compliance Center
-import ComplianceDashboard from "views/admin/compliance/ComplianceDashboard";
-import LicenseDocumentsPage from "views/admin/compliance/LicenseDocumentsPage";
-import BatchRecallPage from "views/admin/compliance/BatchRecallPage";
-import BatchHoldPage from "views/admin/compliance/BatchHoldPage";
-import ExpiryDisposalPage from "views/admin/compliance/ExpiryDisposalPage";
-import RegulatoryRecordsPage from "views/admin/compliance/RegulatoryRecordsPage";
+const ComplianceDashboard = lazy(() => import("views/admin/compliance/ComplianceDashboard"));
+const LicenseDocumentsPage = lazy(() => import("views/admin/compliance/LicenseDocumentsPage"));
+const BatchRecallPage = lazy(() => import("views/admin/compliance/BatchRecallPage"));
+const BatchHoldPage = lazy(() => import("views/admin/compliance/BatchHoldPage"));
+const ExpiryDisposalPage = lazy(() => import("views/admin/compliance/ExpiryDisposalPage"));
+const RegulatoryRecordsPage = lazy(() => import("views/admin/compliance/RegulatoryRecordsPage"));
 
 // Icons
 import {
