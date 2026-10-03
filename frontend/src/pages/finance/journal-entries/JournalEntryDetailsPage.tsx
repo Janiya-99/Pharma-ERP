@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import JournalStatusBadge from "../../../../components/finance/JournalStatusBadge";
-import PostedStatusBadge from "../../../../components/finance/PostedStatusBadge";
-import JournalActionButtons from "../../../../components/finance/JournalActionButtons";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import { financeApi } from "../../../api/financeApi";
+import JournalStatusBadge from "../../../components/finance/JournalStatusBadge";
+import PostedStatusBadge from "../../../components/finance/PostedStatusBadge";
+import JournalActionButtons from "../../../components/finance/JournalActionButtons";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import { MdArrowBack } from "react-icons/md";
 
 import SubmitJournalModal from "./SubmitJournalModal";

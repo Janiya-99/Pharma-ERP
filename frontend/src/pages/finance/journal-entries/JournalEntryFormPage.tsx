@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import BranchSelector from "../../../../components/common/BranchSelector";
-import FinancialYearSelect from "../../../../components/finance/FinancialYearSelect";
-import AccountingPeriodSelect from "../../../../components/finance/AccountingPeriodSelect";
+import { useParams, useNavigate } from "react-router-dom";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import BranchSelector from "../../../components/common/BranchSelector";
+import FinancialYearSelect from "../../../components/finance/FinancialYearSelect";
+import AccountingPeriodSelect from "../../../components/finance/AccountingPeriodSelect";
 import JournalEntryLinesTable from "./JournalEntryLinesTable";
 import { MdArrowBack, MdSave } from "react-icons/md";
 
 export default function JournalEntryFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   const isEdit = Boolean(id);
 
@@ -141,7 +141,7 @@ export default function JournalEntryFormPage() {
       } else {
         await financeApi.createJournalEntry(payload);
       }
-      history.push("/admin/finance/journal-entries");
+      navigate("/finance/general-ledger/journal-entry");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to save journal entry");
       console.error(err);
@@ -167,7 +167,7 @@ export default function JournalEntryFormPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => history.goBack()}
+            onClick={() => navigate(-1)}
             className="p-2 rounded-full hover:bg-gray-100  transition-colors"
           >
             <MdArrowBack className="h-6 w-6 text-gray-500 " />

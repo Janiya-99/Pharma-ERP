@@ -103,7 +103,7 @@ const StepLoginSecurity = ({ formData, onChange, isEdit }: StepLoginSecurityProp
               name="account_expiry"
               value={formData.account_expiry || ""}
               onChange={handleChange}
-            />
+             placeholder="Enter Account Expiry" />
             <Input
               label="Allowed Login Time"
               type="text"

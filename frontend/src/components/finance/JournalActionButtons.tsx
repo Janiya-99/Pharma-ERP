@@ -1,4 +1,4 @@
-import { useAuth } from "../../../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 import { MdEdit, MdDelete, MdSend, MdCheckCircle, MdCancel, MdPostAdd, MdRestore } from "react-icons/md";
 
 export default function JournalActionButtons({ journal, onAction }: { journal?: unknown; onAction?: unknown }) {

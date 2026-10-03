@@ -428,7 +428,7 @@ const CustomerReceiptFormPage = () => {
                     className={`pl-12 text-lg font-semibold ${
                       errors.receipt_amount ? "border-red-500" : ""
                     }`}
-                  />
+                   placeholder="0.00" />
                 </div>
                 {errors.receipt_amount && (
                   <p className="mt-1 text-sm text-red-500">

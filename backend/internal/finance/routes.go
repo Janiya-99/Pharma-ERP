@@ -182,6 +182,7 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	cb := finance.Group("/cheque-books")
 	{
 		cb.GET("", middleware.RequirePermission("finance.cheque_book.view"), cbHandler.ListChequeBooks)
+		cb.Handle("QUERY", "", middleware.RequirePermission("finance.cheque_book.view"), cbHandler.ListChequeBooks)
 		cb.GET("/:id", middleware.RequirePermission("finance.cheque_book.view"), cbHandler.GetChequeBookByID)
 		cb.POST("", middleware.RequirePermission("finance.cheque_book.create"), cbHandler.CreateChequeBook)
 		cb.PUT("/:id", middleware.RequirePermission("finance.cheque_book.update"), cbHandler.UpdateChequeBook)

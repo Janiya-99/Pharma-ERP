@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ChequeLeafStatusBadge from "../../../../components/finance/ChequeLeafStatusBadge";
+import ChequeLeafStatusBadge from "../../../components/finance/ChequeLeafStatusBadge";
 
 export default function ChequeLeavesTable({ leaves, onCancelLeaf, hasPermission }: { leaves?: unknown; onCancelLeaf?: unknown; hasPermission?: boolean }) {
   const [cancelModal, setCancelModal] = useState({ isOpen: false, leafId: null, remarks: "" });

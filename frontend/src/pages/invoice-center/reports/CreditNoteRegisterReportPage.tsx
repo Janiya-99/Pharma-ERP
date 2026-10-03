@@ -264,7 +264,7 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, date_from: e.target.value }))
               }
-            />
+             placeholder="Enter Date From" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="date_to">Date To</Label>
@@ -275,7 +275,7 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, date_to: e.target.value }))
               }
-            />
+             placeholder="Enter Date To" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="credit_note_type">Type</Label>

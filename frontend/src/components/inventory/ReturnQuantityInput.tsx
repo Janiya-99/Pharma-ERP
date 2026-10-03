@@ -45,7 +45,7 @@ export const ReturnQuantityInput: React.FC<Props> = ({
         className={`w-full text-right ${
           error ? "border-red-500 focus-visible:ring-red-500" : ""
         }`}
-      />
+       placeholder="Enter value" />
       {error && (
         <span className="absolute -bottom-5 right-0 z-10 whitespace-nowrap rounded border border-red-100 bg-white px-1 text-[10px] text-red-600 shadow-sm">
           {error}

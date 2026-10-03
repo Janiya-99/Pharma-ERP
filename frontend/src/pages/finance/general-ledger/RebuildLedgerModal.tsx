@@ -49,7 +49,7 @@ const RebuildLedgerModal = ({ isOpen, onClose, onSuccess, financialYears }: { is
       title="Rebuild General Ledger"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-6 h-full">
         <div className="bg-red-50  p-4 rounded-lg border border-red-200 ">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-red-600  mt-0.5 shrink-0" />

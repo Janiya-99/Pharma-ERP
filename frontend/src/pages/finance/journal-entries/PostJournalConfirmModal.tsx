@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Modal from "../../../../components/common/Modal";
-import { financeApi } from "../../../../api/financeApi";
+import Modal from "../../../components/common/Modal";
+import { financeApi } from "../../../api/financeApi";
 import { MdWarning } from "react-icons/md";
 
 export default function PostJournalConfirmModal({ isOpen, onClose, journal, onSuccess }: { isOpen?: boolean; onClose?: unknown; journal?: unknown; onSuccess?: unknown }) {

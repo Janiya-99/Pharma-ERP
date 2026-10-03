@@ -66,7 +66,6 @@ import UserBranchAccessPage from "../pages/control-center/user-access/UserBranch
 import UserSoftwareAccessPage from "../pages/control-center/user-access/UserSoftwareAccessPage";
 
 import RolesPermissionsPage from "../pages/control-center/roles-permissions/RolesPermissionsPage";
-import AccessMatrixPage from "../pages/control-center/access-matrix/AccessMatrixPage";
 
 import AuditLogsPage from "../pages/control-center/logs/AuditLogsPage";
 import LoginLogsPage from "../pages/control-center/logs/LoginLogsPage";
@@ -85,11 +84,12 @@ import {
   OpeningBalancesPage,
   FinancialYearPage,
   TaxSettingsPage,
-  JournalEntryPage,
   PaymentVouchersPage,
   ReceiptVouchersPage,
   BankReconciliationPage,
 } from "../pages/finance/setup/FinanceFunctionalPages";
+import JournalEntriesPage from "../pages/finance/journal-entries/JournalEntriesPage";
+import JournalEntryFormPage from "../pages/finance/journal-entries/JournalEntryFormPage";
 import {
   FixedAssetCategoriesPage,
   FixedAssetsPage,
@@ -287,14 +287,6 @@ const AppRoutes = () => {
             element={<RolesPermissionsPage />}
           />
           <Route
-            path="/control-center/permissions"
-            element={<RolesPermissionsPage />}
-          />
-          <Route
-            path="/control-center/user-assignments"
-            element={<AccessMatrixPage />}
-          />
-          <Route
             path="/control-center/effective-access"
             element={<EffectiveAccessPage />}
           />
@@ -353,7 +345,15 @@ const AppRoutes = () => {
 
           <Route
             path="/finance/general-ledger/journal-entry"
-            element={<JournalEntryPage />}
+            element={<JournalEntriesPage />}
+          />
+          <Route
+            path="/finance/general-ledger/journal-entry/create"
+            element={<JournalEntryFormPage />}
+          />
+          <Route
+            path="/finance/general-ledger/journal-entry/:id/edit"
+            element={<JournalEntryFormPage />}
           />
           <Route
             path="/finance/general-ledger/journal-register"

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { financeApi } from "../../../api/financeApi";
+import { financeApi } from "../../api/financeApi";
 
 export default function JournalLineAccountSelect({ value, onChange, error, disabled }: { value?: unknown; onChange?: unknown; error?: unknown; disabled?: unknown }) {
   const [accounts, setAccounts] = useState([]);

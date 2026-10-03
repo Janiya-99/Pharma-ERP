@@ -181,7 +181,7 @@ const SalesOrdersPage: React.FC = () => {
                     branch_id: event.target.value,
                   }))
                 }
-              />
+               placeholder="Enter value" />
             </div>
             <div className="space-y-1">
               <Label>Customer ID</Label>
@@ -193,7 +193,7 @@ const SalesOrdersPage: React.FC = () => {
                     customer_id: event.target.value,
                   }))
                 }
-              />
+               placeholder="Enter value" />
             </div>
             <div className="space-y-1">
               <Label>Approval Status</Label>

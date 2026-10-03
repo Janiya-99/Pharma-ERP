@@ -118,11 +118,11 @@ export const OrganizationAssignments: React.FC<OrganizationAssignmentsProps> = (
             </div>
             <div>
               <label className="text-xs font-bold text-[#052659] uppercase">Effective From</label>
-              <Input type="date" value={assignment.effective_from} onChange={(e) => updateAssignment(index, "effective_from", e.target.value)} className="h-9 mt-1" />
+              <Input type="date" value={assignment.effective_from} onChange={(e) => updateAssignment(index, "effective_from", e.target.value)} className="h-9 mt-1"  placeholder="Enter value" />
             </div>
             <div>
               <label className="text-xs font-bold text-[#052659] uppercase">Effective To</label>
-              <Input type="date" value={assignment.effective_to} onChange={(e) => updateAssignment(index, "effective_to", e.target.value)} className="h-9 mt-1" />
+              <Input type="date" value={assignment.effective_to} onChange={(e) => updateAssignment(index, "effective_to", e.target.value)} className="h-9 mt-1"  placeholder="Enter value" />
             </div>
             <div>
               <label className="text-xs font-bold text-[#052659] uppercase">Status</label>

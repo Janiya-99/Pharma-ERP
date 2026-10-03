@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { financeApi } from "../../../api/financeApi";
+import { financeApi } from "../../api/financeApi";
 import {
   Select,
   SelectContent,

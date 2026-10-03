@@ -1,5 +1,5 @@
 import { MdAdd, MdDelete, MdClear } from "react-icons/md";
-import JournalLineAccountSelect from "../../../../components/finance/JournalLineAccountSelect";
+import JournalLineAccountSelect from "../../../components/finance/JournalLineAccountSelect";
 
 export default function VoucherLinesTable({ lines, setLines, disabled }: { lines?: unknown; setLines?: unknown; disabled?: unknown }) {
   const addLine = () => {

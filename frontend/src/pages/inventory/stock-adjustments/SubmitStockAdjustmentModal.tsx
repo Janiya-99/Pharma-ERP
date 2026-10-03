@@ -33,7 +33,7 @@ const SubmitStockAdjustmentModal = ({ isOpen, onClose, adjustment, onSuccess }: 
       title="Submit Stock Adjustment"
       icon={Send}
     >
-      <form onSubmit={handleSubmit} className="p-6">
+      <form onSubmit={handleSubmit}  className="flex flex-col h-full">
         <div className="mb-4 text-sm text-gray-600 ">
           You are about to submit stock adjustment <strong>{adjustment.adjustment_number}</strong> for approval.
         </div>

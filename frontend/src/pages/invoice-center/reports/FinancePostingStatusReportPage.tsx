@@ -241,7 +241,7 @@ export const FinancePostingStatusReportPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, date_from: e.target.value }))
               }
-            />
+             placeholder="Enter Date From" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="date_to">Date To</Label>
@@ -252,7 +252,7 @@ export const FinancePostingStatusReportPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, date_to: e.target.value }))
               }
-            />
+             placeholder="Enter Date To" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="document_type">Document Type</Label>

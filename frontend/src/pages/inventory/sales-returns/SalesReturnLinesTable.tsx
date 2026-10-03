@@ -270,7 +270,7 @@ const SalesReturnLinesTable: React.FC<Props> = ({
                         updateLine(index, "return_quantity", e.target.value)
                       }
                       disabled={disabled}
-                    />
+                     placeholder="0.00" />
                   </td>
 
                   {/* Unit Price */}
@@ -285,7 +285,7 @@ const SalesReturnLinesTable: React.FC<Props> = ({
                         updateLine(index, "unit_price", e.target.value)
                       }
                       disabled={disabled}
-                    />
+                     placeholder="0.00" />
                   </td>
 
                   {/* Discount */}
@@ -300,7 +300,7 @@ const SalesReturnLinesTable: React.FC<Props> = ({
                         updateLine(index, "discount_amount", e.target.value)
                       }
                       disabled={disabled}
-                    />
+                     placeholder="0.00" />
                   </td>
 
                   {/* Tax */}
@@ -315,7 +315,7 @@ const SalesReturnLinesTable: React.FC<Props> = ({
                         updateLine(index, "tax_amount", e.target.value)
                       }
                       disabled={disabled}
-                    />
+                     placeholder="0.00" />
                   </td>
 
                   {/* Line Total */}

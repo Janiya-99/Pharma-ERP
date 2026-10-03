@@ -1,5 +1,5 @@
-import BankTransactionTypeBadge from "../../../../components/finance/BankTransactionTypeBadge";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import BankTransactionTypeBadge from "../../../components/finance/BankTransactionTypeBadge";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 
 export default function UnreconciledTransactionsTable({ transactions, selectedTxIds, onToggleSelection, onToggleAll }: { transactions?: unknown; selectedTxIds?: unknown; onToggleSelection?: unknown; onToggleAll?: unknown }) {
   const allSelected = transactions.length > 0 && selectedTxIds.length === transactions.length;

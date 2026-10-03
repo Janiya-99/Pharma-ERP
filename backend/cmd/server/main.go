@@ -11,6 +11,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/repository"
 	"github.com/pixandco/erp-phrma/internal/router"
 	"github.com/pixandco/erp-phrma/internal/service"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -52,7 +53,15 @@ func main() {
 	// Company migrations are not run on startup. They are executed dynamically when a company is created from the platform.
 	logger.Info("Company migrations on startup disabled (migrated dynamically on company creation)")
 
-	// 5. Setup Repositories
+	// 5. Setup Redis and Cache
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     cfg.Redis.Addr(),
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
+	})
+	cacheService := service.NewCacheService(redisClient, logger)
+
+	// 6. Setup Repositories
 	userRepo := repository.NewUserRepository(db)
 	sessionRepo := repository.NewSessionRepository(db)
 	roleRepo := repository.NewRoleRepository(db)
@@ -64,19 +73,19 @@ func main() {
 	compRepo := repository.NewCompanyRepository(db)
 	branchRepo := repository.NewBranchRepository(db)
 
-	// 6. Setup Services
+	// 7. Setup Services
 	authService := service.NewAuthService(userRepo, sessionRepo, &cfg.JWT, logger)
 	auditService := service.NewAuditService(auditRepo, logger)
-	permService := service.NewPermissionService(roleRepo, nil, logger) // No cache for now
+	permService := service.NewPermissionService(roleRepo, cacheService, logger)
 	roleService := service.NewRoleService(roleRepo, permService, logger)
 	userService := service.NewUserService(userRepo, db, logger)
-	coaService := service.NewCoAService(coaRepo, nil, auditService, logger) // No cache for now
+	coaService := service.NewCoAService(coaRepo, cacheService, auditService, logger)
 	journalService := service.NewJournalService(journalRepo, glTransRepo, auditService, db, logger)
 	desService := service.NewDesignationService(desRepo, logger)
 	compService := service.NewCompanyService(compRepo, logger)
 	branchService := service.NewBranchService(branchRepo, logger)
 
-	// 7. Setup Controllers
+	// 8. Setup Controllers
 	authCtrl := controller.NewAuthController(authService)
 	userCtrl := controller.NewUserController(userService)
 	roleCtrl := controller.NewRoleController(roleService)

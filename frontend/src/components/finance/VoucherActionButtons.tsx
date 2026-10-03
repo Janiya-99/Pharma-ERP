@@ -1,4 +1,4 @@
-import { useAuth } from "../../../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 import { MdEdit, MdDelete, MdSend, MdCheckCircle, MdCancel, MdPostAdd } from "react-icons/md";
 
 export default function VoucherActionButtons({ voucher, type, onAction }: { voucher?: unknown; type?: unknown; onAction?: unknown }) {

@@ -9,6 +9,7 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
+import { DataTableToolbar } from "../shared/DataTableToolbar";
 import { useAuth } from "../../../auth/AuthContext";
 import { financeApi } from "../../../api/financeApi";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
@@ -300,46 +301,28 @@ const AccountGroupsPage = () => {
             accounts and finance reports.
           </p>
         </div>
-        <Button
-          onClick={openCreateDialog}
-          className="bg-indigo-600 text-white hover:bg-indigo-700"
-        >
-          <Plus className="h-4 w-4" />
-          Create Account Group
-        </Button>
       </div>
-
-      <Card className="border-slate-200 border bg-white shadow-sm">
-        <CardHeader className="border-slate-100 border-b">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <CardTitle>Account Groups</CardTitle>
-              <CardDescription>
-                Search, filter, create, edit, and deactivate account groups.
-              </CardDescription>
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(220px,1fr)_150px_130px]">
-              <div className="relative">
-                <Search className="text-slate-400 pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <Input
-                  value={filters.search}
-                  onChange={(event) =>
-                    setFilters((current) => ({
-                      ...current,
-                      search: event.target.value,
-                    }))
-                  }
-                  placeholder="Search groups"
-                  className="pl-9"
-                />
-              </div>
+      <Card className="border-slate-200 border bg-white shadow-sm overflow-hidden">
+        <DataTableToolbar
+          searchQuery={filters.search}
+          onSearchChange={(value) =>
+            setFilters((current) => ({ ...current, search: value }))
+          }
+          onAdd={openCreateDialog}
+          statusFilter={true}
+          statusValue={filters.status}
+          onStatusChange={(value) =>
+            setFilters((current) => ({ ...current, status: value }))
+          }
+          customFilters={
+            <div className="w-40">
               <Select
                 value={filters.account_type}
                 onValueChange={(value) =>
                   setFilters((current) => ({ ...current, account_type: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-9 w-full">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -351,33 +334,18 @@ const AccountGroupsPage = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <Select
-                value={filters.status}
-                onValueChange={(value) =>
-                  setFilters((current) => ({ ...current, status: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
-          </div>
-        </CardHeader>
+          }
+        />
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
-                <TableHead>Code</TableHead>
-                <TableHead>Group Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Parent</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Code</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Group Name</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Type</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Parent</TableHead>
+                <TableHead className="text-xs uppercase font-bold text-slate-500 tracking-wide">Status</TableHead>
                 <TableHead className="w-12" />
               </TableRow>
             </TableHeader>
@@ -467,18 +435,19 @@ const AccountGroupsPage = () => {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent className="w-full overflow-y-auto bg-white sm:max-w-2xl">
-          <form onSubmit={handleSubmit}>
-            <SheetHeader>
-              <SheetTitle>
-                {editingGroup ? "Update Account Group" : "Create Account Group"}
-              </SheetTitle>
-              <SheetDescription>
-                Required fields are marked with an asterisk.
-              </SheetDescription>
-            </SheetHeader>
+        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:max-w-2xl border-l border-slate-200 shadow-2xl">
+          <SheetHeader className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 shrink-0">
+            <SheetTitle className="text-xl font-bold text-slate-800">
+              {editingGroup ? "Update Account Group" : "Create Account Group"}
+            </SheetTitle>
+            <SheetDescription>
+              Required fields are marked with an asterisk.
+            </SheetDescription>
+          </SheetHeader>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <form id="group-form" onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Field label="Group Code" required error={errors.group_code}>
                 <Input
                   value={form.group_code}
@@ -561,29 +530,31 @@ const AccountGroupsPage = () => {
                   />
                 </Field>
               </div>
-            </div>
+              </div>
+            </form>
+          </div>
 
-            <SheetFooter className="mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="bg-indigo-600 text-white hover:bg-indigo-700"
-              >
-                {submitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : null}
-                {editingGroup ? "Update Account Group" : "Create Account Group"}
-              </Button>
-            </SheetFooter>
-          </form>
+          <SheetFooter className="border-t border-slate-100 bg-slate-50/50 px-6 py-4 shrink-0 flex flex-row items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="group-form"
+              disabled={submitting}
+              className="bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              {submitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {editingGroup ? "Update Account Group" : "Create Account Group"}
+            </Button>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
 
@@ -612,8 +583,8 @@ const Field = ({
   error?: string;
   children: React.ReactNode;
 }) => (
-  <div className="space-y-2">
-    <Label className="text-slate-700 text-sm font-medium">
+  <div className="space-y-1.5">
+    <Label className="text-sm font-semibold text-slate-700">
       {label} {required ? <span className="text-red-500">*</span> : null}
     </Label>
     {children}

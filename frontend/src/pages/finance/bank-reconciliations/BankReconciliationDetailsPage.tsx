@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import ReconciliationStatusBadge from "../../../../components/finance/ReconciliationStatusBadge";
-import ReconciliationDifferenceBadge from "../../../../components/finance/ReconciliationDifferenceBadge";
-import BankTransactionTypeBadge from "../../../../components/finance/BankTransactionTypeBadge";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import ReconciliationStatusBadge from "../../../components/finance/ReconciliationStatusBadge";
+import ReconciliationDifferenceBadge from "../../../components/finance/ReconciliationDifferenceBadge";
+import BankTransactionTypeBadge from "../../../components/finance/BankTransactionTypeBadge";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import CompleteReconciliationModal from "./CompleteReconciliationModal";
 import CancelReconciliationModal from "./CancelReconciliationModal";
 import { MdEdit, MdDelete, MdArrowBack } from "react-icons/md";

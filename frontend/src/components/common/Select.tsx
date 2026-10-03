@@ -67,7 +67,7 @@ const Select = ({
           <PopoverTrigger asChild disabled={disabled}>
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-1.5 rounded-xl border px-3.5 py-2.5 text-sm text-left focus:outline-none disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-all glass-input"
+              className="flex w-full items-center justify-between gap-1.5 rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-all"
             >
               <span className={selectedOption ? "text-slate-900 truncate" : "text-slate-400 truncate"}>
                 {selectedOption ? selectedOption.label : placeholder}
@@ -129,7 +129,7 @@ const Select = ({
         onValueChange={handleSelectChange}
         disabled={disabled}
       >
-        <SelectTrigger className="w-full border focus:ring-2 focus:ring-slate-100/50 rounded-xl text-sm text-left py-2.5 px-3.5 flex justify-between items-center text-slate-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-all glass-input">
+        <SelectTrigger className="w-full border border-slate-200 bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 rounded-[10px] text-sm text-left py-2.5 px-3.5 flex justify-between items-center text-slate-900 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed h-10 transition-all">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className="border shadow-md rounded-md z-50 max-h-60 overflow-y-auto" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px) saturate(180%)', borderColor: 'rgba(148,163,184,0.25)' }}>

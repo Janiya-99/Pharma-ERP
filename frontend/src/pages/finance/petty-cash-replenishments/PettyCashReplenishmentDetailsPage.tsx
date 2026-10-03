@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import PettyCashActionButtons from "../../../../components/finance/PettyCashActionButtons";
-import PettyCashStatusBadge from "../../../../components/finance/PettyCashStatusBadge";
-import PettyCashPostedStatusBadge from "../../../../components/finance/PettyCashPostedStatusBadge";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import PettyCashActionButtons from "../../../components/finance/PettyCashActionButtons";
+import PettyCashStatusBadge from "../../../components/finance/PettyCashStatusBadge";
+import PettyCashPostedStatusBadge from "../../../components/finance/PettyCashPostedStatusBadge";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import { MdArrowBack } from "react-icons/md";
 import { toast } from "react-hot-toast";
 

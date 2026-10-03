@@ -121,7 +121,7 @@ const DayBookReportPage = () => {
             type="date" 
             value={filters.date_from}
             onChange={(e: any) => handleFilterChange('date_from', e.target.value)}
-          />
+           placeholder="Enter value" />
         </div>
 
         <div className="space-y-2">
@@ -130,7 +130,7 @@ const DayBookReportPage = () => {
             type="date" 
             value={filters.date_to}
             onChange={(e: any) => handleFilterChange('date_to', e.target.value)}
-          />
+           placeholder="Enter value" />
         </div>
 
         <div className="space-y-2">

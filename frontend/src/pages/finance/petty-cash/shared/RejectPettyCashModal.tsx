@@ -17,7 +17,7 @@ const RejectPettyCashModal = ({ isOpen, onClose, onReject, isSubmitting }: { isO
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Reject Record" size="md">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col h-full">
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 ">
             Remarks (Required)

@@ -11,7 +11,7 @@ const SubmitPettyCashModal = ({ isOpen, onClose, onSubmit, isSubmitting }: { isO
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Submit for Approval" size="md">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col h-full">
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 ">
             Remarks (Optional)

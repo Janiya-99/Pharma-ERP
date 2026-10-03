@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import BankAccountSelect from "../../../../components/finance/BankAccountSelect";
+import { financeApi } from "../../../api/financeApi";
+import BankAccountSelect from "../../../components/finance/BankAccountSelect";
 import UnreconciledTransactionsTable from "./UnreconciledTransactionsTable";
 import ReconciliationSummary from "./ReconciliationSummary";
 import { toast } from "react-hot-toast";
@@ -251,7 +251,7 @@ export default function BankReconciliationFormPage() {
                     onChange={handleChange}
                     rows="2"
                     className="w-full px-3 py-2 border rounded-md"
-                  ></textarea>
+                  placeholder="Enter text..."></textarea>
                 </div>
               </div>
             </div>

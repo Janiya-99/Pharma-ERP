@@ -166,7 +166,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
       title={isEdit ? "Edit User" : "Create User"}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <FormError message={error} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -177,7 +177,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
             onChange={handleChange}
             required
             autoFocus
-          />
+           placeholder="Enter Full Name" />
           <Input
             label="Email *"
             type="email"
@@ -185,19 +185,19 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
             value={formData.email}
             onChange={handleChange}
             required
-          />
+           placeholder="Enter Email" />
           <Input
             label="Employee Code"
             name="employee_code"
             value={formData.employee_code}
             onChange={handleChange}
-          />
+           placeholder="Enter Employee Code" />
           <Input
             label="Phone"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-          />
+           placeholder="Enter Phone" />
         </div>
 
         {!isEdit && (
@@ -209,7 +209,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
               value={formData.password}
               onChange={handleChange}
               required
-            />
+             placeholder="Enter Password" />
             <Input
               label="Confirm Password *"
               type="password"
@@ -217,7 +217,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSuccess, departments, designat
               value={formData.confirm_password}
               onChange={handleChange}
               required
-            />
+             placeholder="Enter Confirm Password" />
           </div>
         )}
 

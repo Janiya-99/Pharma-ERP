@@ -38,9 +38,9 @@ const Button = ({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-gradient-to-br from-[#4854CC] to-[#3730a3] text-white hover:from-[#5b66d6] hover:to-[#4854CC] active:from-[#3730a3] active:to-[#312e81] shadow-sm shadow-indigo-200/50 focus-visible:ring-indigo-500",
+      "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-sm focus-visible:ring-indigo-500",
     secondary:
-      "bg-white/50 text-gray-700 hover:bg-white/70 active:bg-white/80 backdrop-blur-sm border border-white/50 focus-visible:ring-gray-400",
+      "bg-transparent text-slate-700 hover:bg-slate-100 active:scale-95 focus-visible:ring-slate-400",
     outline:
       "border bg-white/40 text-gray-700 hover:bg-white/60 active:bg-white/70 backdrop-blur-sm shadow-sm focus-visible:ring-gray-400" + " border-[rgba(148,163,184,0.3)]",
     danger:

@@ -32,7 +32,7 @@ const PostStockAdjustmentConfirmModal = ({ isOpen, onClose, adjustment, onSucces
       title="Post Stock Adjustment"
       icon={FileCheck}
     >
-      <form onSubmit={handlePost} className="p-6">
+      <form onSubmit={handlePost}  className="flex flex-col h-full">
         <div className="mb-6 p-4 bg-orange-50  border border-orange-200  rounded-lg flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-orange-600  shrink-0 mt-0.5" />
           <div className="text-sm text-orange-800 ">

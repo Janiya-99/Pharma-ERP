@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import JournalStatusBadge from "../../../../components/finance/JournalStatusBadge";
-import PostedStatusBadge from "../../../../components/finance/PostedStatusBadge";
-import JournalActionButtons from "../../../../components/finance/JournalActionButtons";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
-import FinancialYearSelect from "../../../../components/finance/FinancialYearSelect";
-import AccountingPeriodSelect from "../../../../components/finance/AccountingPeriodSelect";
+import { useNavigate } from "react-router-dom";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import JournalStatusBadge from "../../../components/finance/JournalStatusBadge";
+import PostedStatusBadge from "../../../components/finance/PostedStatusBadge";
+import JournalActionButtons from "../../../components/finance/JournalActionButtons";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
+import FinancialYearSelect from "../../../components/finance/FinancialYearSelect";
+import AccountingPeriodSelect from "../../../components/finance/AccountingPeriodSelect";
 
 // Note: Modals will be implemented next.
 // import SubmitJournalModal from "./SubmitJournalModal";
@@ -18,7 +18,7 @@ import AccountingPeriodSelect from "../../../../components/finance/AccountingPer
 // import ReverseJournalModal from "./ReverseJournalModal";
 
 export default function JournalEntriesPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [journals, setJournals] = useState([]);
@@ -67,7 +67,7 @@ export default function JournalEntriesPage() {
 
   const handleAction = async (action: unknown, journal: unknown) => {
     if (action === "edit") {
-      history.push(`/admin/finance/journal-entries/${journal.id}/edit`);
+      navigate(`/finance/general-ledger/journal-entry/${journal.id}/edit`);
     } else if (action === "delete") {
       if (window.confirm("Are you sure you want to delete this journal entry?")) {
         try {
@@ -91,7 +91,7 @@ export default function JournalEntriesPage() {
       <FinancePageHeader
         title="Journal Entries"
         subtitle="Manage financial journal entries and approvals"
-        onAdd={hasPermission("finance.journal.create") ? () => history.push("/admin/finance/journal-entries/create") : undefined}
+        onAdd={hasPermission("finance.journal.create") ? () => navigate("/finance/general-ledger/journal-entry/create") : undefined}
         addLabel="Create Journal Entry"
       />
 
@@ -186,7 +186,7 @@ export default function JournalEntriesPage() {
                   <tr key={journal.id} className="hover:bg-gray-50 ">
                     <td className="px-4 py-3 font-medium text-navy-700">
                       <button 
-                        onClick={() => history.push(`/admin/finance/journal-entries/${journal.id}`)}
+                        onClick={() => navigate(`/finance/general-ledger/journal-entry/${journal.id}`)}
                         className="text-brand-500 hover:underline"
                       >
                         {journal.journal_number}

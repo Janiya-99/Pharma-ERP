@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Modal from "../../../../components/common/Modal";
-import { financeApi } from "../../../../api/financeApi";
+import Modal from "../../../components/common/Modal";
+import { financeApi } from "../../../api/financeApi";
 import { MdWarning } from "react-icons/md";
 
 export default function PostVoucherConfirmModal({ isOpen, onClose, voucher, type, onSuccess }: { isOpen?: boolean; onClose?: unknown; voucher?: unknown; type?: unknown; onSuccess?: unknown }) {

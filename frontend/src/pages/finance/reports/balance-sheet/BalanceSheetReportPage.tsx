@@ -158,7 +158,7 @@ const BalanceSheetReportPage = () => {
             type="date" 
             value={filters.as_of_date}
             onChange={(e: any) => handleFilterChange('as_of_date', e.target.value)}
-          />
+           placeholder="Enter value" />
         </div>
       </ReportFilterCard>
 

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import BankAccountBadge from "../../../../components/finance/BankAccountBadge";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import BankAccountBadge from "../../../components/finance/BankAccountBadge";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import { MdEdit, MdDelete, MdArrowBack } from "react-icons/md";
 import { toast } from "react-hot-toast";
 

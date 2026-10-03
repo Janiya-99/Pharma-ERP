@@ -1,7 +1,6 @@
 import { PeriodStatus } from "../types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../components/ui/card";
-import { Badge } from "../../../../components/ui/badge";
-import { Calendar, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Calendar, AlertCircle, CheckCircle2, LockKeyhole, LockOpen } from "lucide-react";
 
 interface AccountingPeriodStatusCardProps {
   data: PeriodStatus;
@@ -12,43 +11,57 @@ export function AccountingPeriodStatusCard({ data }: AccountingPeriodStatusCardP
   const isClosed = data.status === "Closed";
   
   return (
-    <Card className="rounded-2xl border-slate-200/60 bg-white/70 backdrop-blur-xl shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-inset ring-slate-900/5  ">
-      <CardHeader className="pb-3 flex flex-row items-center justify-between">
+    <Card className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 to-indigo-50/20 opacity-50 pointer-events-none" />
+      
+      <CardHeader className="pb-4 relative z-10 border-b border-slate-100/50 flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-base">Period Status</CardTitle>
-          <CardDescription>{data.financial_year}</CardDescription>
+          <CardTitle className="text-lg font-semibold tracking-tight text-slate-800">Period Status</CardTitle>
+          <CardDescription className="text-sm font-medium text-slate-500">{data.financial_year}</CardDescription>
         </div>
-        <Badge variant="outline" className={
+        <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${
           isClosed 
-            ? "bg-slate-50 text-slate-700  " 
+            ? "bg-slate-50 text-slate-600 ring-slate-200/50" 
             : isClosingSoon 
-              ? "bg-amber-50 text-amber-700  "
-              : "bg-emerald-50 text-emerald-700  "
-        }>
+              ? "bg-amber-50 text-amber-600 ring-amber-200/50"
+              : "bg-emerald-50 text-emerald-600 ring-emerald-200/50"
+        }`}>
+          {isClosed ? <LockKeyhole className="h-3.5 w-3.5" /> : <LockOpen className="h-3.5 w-3.5" />}
           {data.status}
-        </Badge>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600  ">
-            <Calendar className="h-5 w-5" />
+      
+      <CardContent className="pt-5 relative z-10 space-y-4">
+        <div className="flex items-center gap-4 bg-white rounded-2xl p-4 ring-1 ring-slate-100 shadow-sm shadow-slate-100/50">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 shadow-inner">
+            <Calendar className="h-6 w-6" strokeWidth={2} />
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-900 ">{data.accounting_period}</div>
-            <div className="text-xs text-gray-500">Closes on {data.closing_date}</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-0.5">Current Period</div>
+            <div className="text-base font-bold text-slate-900">{data.accounting_period}</div>
+            <div className="text-xs font-medium text-slate-500 mt-0.5">Closes on {data.closing_date}</div>
           </div>
         </div>
         
-        <div className="rounded-md bg-slate-50 p-3 flex items-start gap-2 ">
+        <div className={`rounded-2xl p-4 flex items-start gap-3 ring-1 ${
+          data.posting_allowed 
+            ? "bg-emerald-50/50 ring-emerald-100/50 text-emerald-800" 
+            : "bg-amber-50/50 ring-amber-100/50 text-amber-800"
+        }`}>
           {data.posting_allowed ? (
-            <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5" />
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 mt-0.5" />
           ) : (
-            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5" />
+            <AlertCircle className="h-5 w-5 shrink-0 text-amber-500 mt-0.5" />
           )}
-          <div className="text-xs text-gray-700 ">
-            {data.posting_allowed 
-              ? "Journal posting is currently permitted for this period." 
-              : "Journal posting is locked. Period is closed or restricted."}
+          <div>
+            <div className="text-sm font-bold mb-1">
+              {data.posting_allowed ? "Posting Permitted" : "Posting Restricted"}
+            </div>
+            <div className={`text-xs font-medium leading-relaxed ${data.posting_allowed ? "text-emerald-600" : "text-amber-600"}`}>
+              {data.posting_allowed 
+                ? "Journal entry posting is currently allowed for this accounting period." 
+                : "Journal posting is locked. The period has been closed or is under restricted access."}
+            </div>
           </div>
         </div>
       </CardContent>

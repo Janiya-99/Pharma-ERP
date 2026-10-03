@@ -269,7 +269,7 @@ const GeneralSettingsPage = () => {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full rounded-xl border border-slate-200  bg-slate-50/50  pl-10 pr-3.5 py-2 text-sm text-slate-900  focus:border-indigo-500 focus:outline-none"
-                />
+                 placeholder="Enter text..." />
               </div>
             </div>
 

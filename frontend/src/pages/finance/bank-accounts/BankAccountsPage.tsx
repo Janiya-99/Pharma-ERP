@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { getBranches } from "../../../../api/controlApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import FinancePageHeader from "../../../../components/finance/FinancePageHeader";
-import BankAccountBadge from "../../../../components/finance/BankAccountBadge";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches } from "../../../api/controlApi";
+import { useAuth } from "../../../auth/AuthContext";
+import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import BankAccountBadge from "../../../components/finance/BankAccountBadge";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
 
 export default function BankAccountsPage() {

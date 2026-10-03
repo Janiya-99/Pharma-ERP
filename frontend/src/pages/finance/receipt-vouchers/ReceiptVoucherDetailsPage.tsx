@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { useAuth } from "../../../../auth/AuthContext";
-import VoucherStatusBadge from "../../../../components/finance/VoucherStatusBadge";
-import VoucherPostedStatusBadge from "../../../../components/finance/VoucherPostedStatusBadge";
-import PaymentMethodBadge from "../../../../components/finance/PaymentMethodBadge";
-import VoucherActionButtons from "../../../../components/finance/VoucherActionButtons";
-import MoneyDisplay from "../../../../components/finance/MoneyDisplay";
+import { financeApi } from "../../../api/financeApi";
+import { useAuth } from "../../../auth/AuthContext";
+import VoucherStatusBadge from "../../../components/finance/VoucherStatusBadge";
+import VoucherPostedStatusBadge from "../../../components/finance/VoucherPostedStatusBadge";
+import PaymentMethodBadge from "../../../components/finance/PaymentMethodBadge";
+import VoucherActionButtons from "../../../components/finance/VoucherActionButtons";
+import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import { MdArrowBack } from "react-icons/md";
 
 import SubmitVoucherModal from "../shared/SubmitVoucherModal";

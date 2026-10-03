@@ -226,7 +226,7 @@ export const CustomerReceiptAllocationsTable: React.FC<Props> = ({
                         value={alloc.allocated_amount === 0 ? "" : alloc.allocated_amount}
                         onChange={(e) => handleAllocatedAmountChange(idx, e.target.value)}
                         onBlur={() => validateAllocatedAmountOnBlur(idx)}
-                      />
+                       placeholder="0.00" />
                     )}
                   </td>
                   {!readOnly && (

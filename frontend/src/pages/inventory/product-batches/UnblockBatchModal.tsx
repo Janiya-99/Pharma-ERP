@@ -22,7 +22,7 @@ const UnblockBatchModal = ({ isOpen, onClose, onSave, batch }: { isOpen?: boolea
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Unblock Batch">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <p className="text-sm text-gray-600 ">
           Are you sure you want to unblock batch <span className="font-semibold">{batch?.batch_number}</span>?
         </p>

@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { financeApi } from "../../../../api/financeApi";
-import { getBranches } from "../../../../api/controlApi";
+import { financeApi } from "../../../api/financeApi";
+import { getBranches } from "../../../api/controlApi";
 import BankAccountSelect, {
   type BankAccountOption,
-} from "../../../../components/finance/BankAccountSelect";
-import { Button } from "../../../../components/ui/button";
+} from "../../../components/finance/BankAccountSelect";
+import { Button } from "../../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../../../components/ui/card";
-import { Input } from "../../../../components/ui/input";
-import { Label } from "../../../../components/ui/label";
+} from "../../../components/ui/card";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../../components/ui/select";
-import { Textarea } from "../../../../components/ui/textarea";
+} from "../../../components/ui/select";
+import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "react-hot-toast";
 
 type BranchOption = {
@@ -306,7 +306,7 @@ export default function BankTransactionFormPage() {
                   }
                   required
                   className="mt-2 border-slate-200 bg-white"
-                />
+                 placeholder="Enter value" />
               </div>
 
               <div>
@@ -318,7 +318,7 @@ export default function BankTransactionFormPage() {
                     setField("value_date", event.target.value)
                   }
                   className="mt-2 border-slate-200 bg-white"
-                />
+                 placeholder="Enter value" />
               </div>
 
               <div>
@@ -342,7 +342,7 @@ export default function BankTransactionFormPage() {
                   }
                   rows={2}
                   className="mt-2 border-slate-200 bg-white"
-                />
+                 placeholder="Enter text..." />
               </div>
 
               <div>
@@ -360,7 +360,7 @@ export default function BankTransactionFormPage() {
                   }
                   className="mt-2 border-slate-200 bg-white"
                   disabled={formData.credit_amount > 0}
-                />
+                 placeholder="0.00" />
               </div>
 
               <div>
@@ -378,7 +378,7 @@ export default function BankTransactionFormPage() {
                   }
                   className="mt-2 border-slate-200 bg-white"
                   disabled={formData.debit_amount > 0}
-                />
+                 placeholder="0.00" />
               </div>
             </div>
 

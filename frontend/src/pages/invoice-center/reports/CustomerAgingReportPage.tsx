@@ -197,7 +197,7 @@ export const CustomerAgingReportPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, as_of_date: e.target.value }))
               }
-            />
+             placeholder="Enter As Of Date" />
           </div>
         </ReportFilterBar>
       }

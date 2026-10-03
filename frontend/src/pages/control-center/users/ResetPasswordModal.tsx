@@ -60,7 +60,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boo
       title="Reset Password"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
         <div className="bg-orange-50 p-3 rounded-md mb-4 text-sm text-orange-800">
           Resetting password for: <span className="font-semibold">{user?.full_name}</span>
         </div>
@@ -74,7 +74,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boo
           onChange={(e: any) => setPassword(e.target.value)}
           required
           autoFocus
-        />
+         placeholder="Enter value" />
 
         <Input
           label="Confirm Password *"
@@ -82,7 +82,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user, onSuccess }: { isOpen?: boo
           value={confirmPassword}
           onChange={(e: any) => setConfirmPassword(e.target.value)}
           required
-        />
+         placeholder="Enter value" />
 
         <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
           <Button variant="secondary" onClick={onClose} type="button">

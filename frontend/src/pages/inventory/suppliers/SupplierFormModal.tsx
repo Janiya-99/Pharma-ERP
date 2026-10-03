@@ -78,7 +78,7 @@ const SupplierFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpen?: 
       onClose={onClose}
       title={initialData ? "Edit Supplier" : "Create Supplier"}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 h-full">
                 <div>
           <label className="block text-sm font-medium text-gray-700  mb-1">
             Supplier Code <span className="text-red-500">*</span>
@@ -149,7 +149,7 @@ const SupplierFormModal = ({ isOpen, onClose, onSave, initialData }: { isOpen?: 
             onChange={handleChange}
             rows={3}
             className="w-full px-3 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 "
-          />
+           placeholder="Enter text..." />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700  mb-1">
