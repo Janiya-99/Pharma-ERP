@@ -4,7 +4,9 @@ import { inventoryApi } from "../../../api/inventoryApi";
 import { getBranches } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
 import { toast } from "react-hot-toast";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import StockAdjustmentLinesTable from "./StockAdjustmentLinesTable";
 
 const StockAdjustmentFormPage = () => {
@@ -29,6 +31,96 @@ const StockAdjustmentFormPage = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    let matchedWhId = formData.warehouse_id;
+    let matchedBranchId = formData.branch_id;
+
+    if (aiData.warehouse_id) {
+      matchedWhId = String(aiData.warehouse_id);
+    } else if (aiData.warehouse_name && warehouses.length > 0) {
+      const match = warehouses.find(
+        (w: any) =>
+          w.warehouse_name?.toLowerCase().includes(aiData.warehouse_name.toLowerCase()) ||
+          aiData.warehouse_name.toLowerCase().includes(w.warehouse_name?.toLowerCase()) ||
+          w.warehouse_code?.toLowerCase() === aiData.warehouse_name.toLowerCase()
+      );
+      if (match) {
+        matchedWhId = String(match.id);
+        if (match.branch_id) matchedBranchId = String(match.branch_id);
+      }
+    }
+
+    if (!matchedWhId && warehouses.length > 0) {
+      matchedWhId = String(warehouses[0].id);
+      if (warehouses[0].branch_id) matchedBranchId = String(warehouses[0].branch_id);
+    }
+    if (!matchedBranchId && branches.length > 0) {
+      matchedBranchId = String(branches[0].id);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      branch_id: matchedBranchId || prev.branch_id,
+      warehouse_id: matchedWhId || prev.warehouse_id,
+      adjustment_type: aiData.adjustment_type || prev.adjustment_type,
+      adjustment_date: aiData.adjustment_date || prev.adjustment_date,
+      reference_number: aiData.reference_number || prev.reference_number,
+      reason: aiData.reason || prev.reason,
+      remarks: aiData.remarks || prev.remarks,
+    }));
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any) => {
+        let matchedProduct = null;
+        if (l.product_id) {
+          matchedProduct = products.find((p: any) => String(p.id) === String(l.product_id));
+        }
+        if (!matchedProduct && l.product_name && products.length > 0) {
+          const searchName = l.product_name.toLowerCase();
+          matchedProduct = products.find(
+            (p: any) =>
+              p.product_name?.toLowerCase().includes(searchName) ||
+              searchName.includes(p.product_name?.toLowerCase()) ||
+              p.product_code?.toLowerCase() === searchName
+          );
+        }
+        const prod = matchedProduct || products[0] || null;
+        const dir = aiData.adjustment_type === "damage" || aiData.adjustment_type === "expiry" || aiData.adjustment_type === "negative" ? "out" : "in";
+
+        return {
+          id: `temp-${Date.now()}-${Math.random()}`,
+          product_id: prod ? prod.id : null,
+          product: prod,
+          product_batch_id: null,
+          batch: null,
+          warehouse_location_id: "",
+          adjustment_direction: dir,
+          system_quantity: 0,
+          physical_quantity: Number(l.quantity || l.variance_quantity || 1),
+          variance_quantity: Number(l.quantity || l.variance_quantity || 1),
+          unit_cost: Number(l.unit_cost || prod?.unit_price || 0),
+          stock_balance_loading: false,
+          stock_balance_data: null,
+          line_reason: l.line_reason || l.reason || aiData.reason || "",
+          line_remarks: l.line_remarks || "",
+        };
+      });
+      setLines(mapped);
+    }
+  };
 
   useEffect(() => {
     const requiredPermission = isEditMode
@@ -333,24 +425,46 @@ const StockAdjustmentFormPage = () => {
 
   return (
     <div className="mx-auto max-w-[1600px] p-6 pb-24">
-      <div className="mb-6 flex items-center gap-4">
-        <button
-          onClick={() => navigate("/inventory/stock-adjustments")}
-          className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 hover:text-gray-700   "
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 ">
-            {isEditMode ? "Edit Stock Adjustment" : "New Stock Adjustment"}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 ">
-            {isEditMode
-              ? "Update draft adjustment details"
-              : "Create a new stock adjustment draft"}
-          </p>
-        </div>
-      </div>
+      <PageTitleCard
+        title={isEditMode ? "Edit Stock Adjustment" : "New Pharmaceutical Stock Adjustment"}
+        description="Record physical count variances, damage write-offs, shelf-life expiries, and cycle counts."
+        moduleTag="Inventory"
+        accent="emerald"
+        backTo="/inventory/stock-adjustments"
+        quote={{
+          text: "Authorized inventory adjustments with strict batch disposal and financial ledger reconciliation.",
+          author: "Ceylon Med Regulatory Standard",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEditMode && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/inventory/stock-adjustments")}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-brand-500/20 cursor-pointer"
+            >
+              <Save className="w-4 h-4" />
+              {saving ? "Saving..." : "Save Draft"}
+            </button>
+          </div>
+        }
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Header Section */}
@@ -547,6 +661,26 @@ const StockAdjustmentFormPage = () => {
           </button>
         </div>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="stock_adjustment"
+        title="AI Stock Adjustment Auto-Fill"
+        contextData={{
+          warehouses: warehouses.map((w) => ({
+            id: w.id,
+            name: w.warehouse_name,
+          })),
+          products: products.map((p) => ({
+            id: p.id,
+            name: p.product_name,
+            code: p.product_code,
+            unit_price: p.unit_price,
+          })),
+        }}
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

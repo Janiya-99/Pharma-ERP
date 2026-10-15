@@ -7,10 +7,13 @@ import {
   FileText,
   Loader2,
   Save,
+  Sparkles,
   UserRound,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
+import { inventoryApi } from "../../../api/inventoryApi";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { useAuth } from "../../../auth/AuthContext";
 import {
   SalesOrderCustomerCreditCard,
@@ -90,6 +93,78 @@ const SalesOrderFormPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [lineErrors, setLineErrors] = useState<Record<string, string>>({});
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    let matchedCustomerId = "";
+    if (aiData.customer_id) {
+      matchedCustomerId = String(aiData.customer_id);
+    } else if (aiData.customer_name && customers.length > 0) {
+      const match = customers.find(
+        (c: any) =>
+          c.customer_name?.toLowerCase().includes(aiData.customer_name.toLowerCase()) ||
+          aiData.customer_name.toLowerCase().includes(c.customer_name?.toLowerCase()) ||
+          c.customer_code?.toLowerCase() === aiData.customer_name.toLowerCase()
+      );
+      if (match) matchedCustomerId = String(match.id);
+    }
+
+    setForm((current) => ({
+      ...current,
+      customer_id: matchedCustomerId || current.customer_id,
+      sales_order_date: aiData.order_date || aiData.sales_order_date || current.sales_order_date,
+      expected_delivery_date: aiData.expected_delivery_date || current.expected_delivery_date,
+      customer_reference_number:
+        aiData.customer_po_reference || aiData.customer_reference_number || current.customer_reference_number,
+      remarks: aiData.remarks || current.remarks,
+    }));
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any) => {
+        let matchedProduct = null;
+        if (l.product_id) {
+          matchedProduct = products.find((p: any) => String(p.id) === String(l.product_id));
+        }
+        if (!matchedProduct && l.product_name && products.length > 0) {
+          const searchName = l.product_name.toLowerCase();
+          matchedProduct = products.find(
+            (p: any) =>
+              p.product_name?.toLowerCase().includes(searchName) ||
+              searchName.includes(p.product_name?.toLowerCase()) ||
+              p.product_code?.toLowerCase() === searchName
+          );
+        }
+        const prodId = matchedProduct ? matchedProduct.id : (products[0]?.id || null);
+        const unitPrice = Number(l.unit_price || matchedProduct?.unit_price || 0);
+
+        return {
+          id: crypto.randomUUID(),
+          product_id: prodId,
+          product_batch_id: null,
+          quantity: Number(l.quantity) || 1,
+          unit_price: unitPrice,
+          discount_amount: Number(
+            l.discount_amount ||
+              (l.discount_percentage ? (unitPrice * Number(l.quantity || 1) * l.discount_percentage) / 100 : 0)
+          ) || 0,
+          tax_amount: Number(l.tax_amount) || 0,
+          line_remarks: l.remarks || l.line_remarks || "",
+        };
+      });
+      setLines(mapped);
+    }
+  };
 
   const updateForm = (patch: Partial<SalesOrderFormState>) => {
     setForm((current) => ({ ...current, ...patch }));
@@ -328,6 +403,16 @@ const SalesOrderFormPage: React.FC = () => {
           }
           actions={
             <>
+              {!isEdit && (
+                <Button
+                  type="button"
+                  onClick={() => setIsAiModalOpen(true)}
+                  className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100"
+                >
+                  <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                  <span>✨ AI Auto-Fill</span>
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="outline"
@@ -529,6 +614,27 @@ const SalesOrderFormPage: React.FC = () => {
             <ValidationMessage message={lineErrors.form} />
           </InvoiceCenterFormSection>
         </InvoiceCenterFormBody>
+
+        <AiAutoFillModal
+          isOpen={isAiModalOpen}
+          onClose={() => setIsAiModalOpen(false)}
+          formType="sales_order"
+          title="AI Sales Order Auto-Fill"
+          contextData={{
+            customers: customers.map((c) => ({
+              id: c.id,
+              name: c.customer_name,
+              code: c.customer_code,
+            })),
+            products: products.map((p) => ({
+              id: p.id,
+              name: p.product_name,
+              code: p.product_code,
+              unit_price: p.unit_price,
+            })),
+          }}
+          onApply={handleAiApply}
+        />
       </InvoiceCenterFormPage>
     </form>
   );

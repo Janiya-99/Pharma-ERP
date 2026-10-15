@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { PageTitleCard } from "../common/PageTitleCard";
 
 type FormPageProps = {
   children: ReactNode;
@@ -39,25 +40,18 @@ export const InvoiceCenterFormHeader = ({
   backAction,
   actions,
 }: FormHeaderProps) => (
-  <div className="sticky top-14 z-30 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-    <div className="flex min-w-0 items-center gap-3">
-      {backAction}
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          {icon}
-          <h1 className="truncate text-2xl font-semibold tracking-tight text-[#111827]">
-            {title}
-          </h1>
-        </div>
-        {description && (
-          <p className="mt-1 text-sm text-[#64748B]">{description}</p>
-        )}
-      </div>
-    </div>
-    {actions && (
-      <div className="flex flex-wrap items-center gap-2">{actions}</div>
-    )}
-  </div>
+  <PageTitleCard
+    title={title}
+    description={description}
+    moduleTag="Invoice Center"
+    accent="indigo"
+    backAction={backAction}
+    actions={actions}
+    quote={{
+      text: "NMRA Good Distribution Practice (GDP) compliant sales and billing operations.",
+      author: "Ceylon Med Pharmaceutical ERP Standard",
+    }}
+  />
 );
 
 export const InvoiceCenterFormBody = ({ children, aside }: FormBodyProps) => (

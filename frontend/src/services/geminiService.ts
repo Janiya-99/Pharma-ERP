@@ -16,7 +16,23 @@ export type FormType =
   | "customer"
   | "journal_entry"
   | "product"
-  | "grn";
+  | "grn"
+  | "sales_order"
+  | "credit_note"
+  | "debit_note"
+  | "product_batch"
+  | "stock_transfer"
+  | "stock_adjustment"
+  | "purchase_return"
+  | "payment_voucher"
+  | "receipt_voucher"
+  | "user"
+  | "sales_return"
+  | "opening_stock"
+  | "bank_account"
+  | "cheque_book"
+  | "petty_cash_voucher"
+  | "fixed_asset";
 
 export interface AiAutoFillResult {
   success: boolean;
@@ -46,6 +62,26 @@ const FORM_SCHEMAS: Record<FormType, { description: string; jsonExample: string 
       ]
     }, null, 2)
   },
+  sales_order: {
+    description: "Extract sales order details including customer name, order date, delivery date, customer PO reference, payment terms, and items.",
+    jsonExample: JSON.stringify({
+      customer_name: "Asiri Central Hospital PLC",
+      order_date: "2026-10-15",
+      expected_delivery_date: "2026-10-18",
+      customer_po_reference: "ACH-PO-8841",
+      payment_terms: "30 Days Credit",
+      remarks: "Priority order for theatre pharmaceuticals",
+      lines: [
+        {
+          product_name: "Paracetamol Infusion 100ml",
+          quantity: 200,
+          unit_price: 650,
+          discount_percentage: 5,
+          remarks: "Urgent ward supply"
+        }
+      ]
+    }, null, 2)
+  },
   customer_receipt: {
     description: "Extract customer payment receipt details including customer name, receipt date, payment method, payment reference/cheque number, receipt amount, and remarks.",
     jsonExample: JSON.stringify({
@@ -55,6 +91,45 @@ const FORM_SCHEMAS: Record<FormType, { description: string; jsonExample: string 
       payment_reference: "BOC-FT-883921",
       receipt_amount: 650000,
       remarks: "Full settlement for invoice INV-2026-0042"
+    }, null, 2)
+  },
+  credit_note: {
+    description: "Extract credit note details including customer name, date, invoice reference number, reason (e.g. sales_return, price_adjustment), and items or adjustment amounts.",
+    jsonExample: JSON.stringify({
+      customer_name: "Nawaloka Hospitals PLC",
+      credit_note_date: "2026-10-15",
+      credit_note_type: "sales_return",
+      reference_number: "RTN-2026-041",
+      reason: "Goods returned due to outer pack damage on transit",
+      remarks: "Credit approved by finance controller",
+      lines: [
+        {
+          product_name: "Metformin 500mg Tablets",
+          quantity: 20,
+          unit_price: 450,
+          line_total: 9000,
+          description: "Damaged packaging return"
+        }
+      ]
+    }, null, 2)
+  },
+  debit_note: {
+    description: "Extract debit note details including customer name, date, invoice reference, type (e.g. price_adjustment, interest, freight), and amount.",
+    jsonExample: JSON.stringify({
+      customer_name: "Durdans Hospital",
+      debit_note_date: "2026-10-15",
+      debit_note_type: "price_adjustment",
+      reference_number: "DN-REQ-091",
+      reason: "Special cold-chain handling and expedited logistics fee",
+      remarks: "Authorized supplementary charge",
+      lines: [
+        {
+          description: "Emergency refrigerated courier dispatch fee",
+          quantity: 1,
+          unit_price: 15000,
+          line_total: 15000
+        }
+      ]
     }, null, 2)
   },
   customer: {
@@ -117,6 +192,122 @@ const FORM_SCHEMAS: Record<FormType, { description: string; jsonExample: string 
       status: "active"
     }, null, 2)
   },
+  product_batch: {
+    description: "Extract batch tracking details including batch number, manufacture date, expiry date, purchase rate, selling price, and supplier.",
+    jsonExample: JSON.stringify({
+      batch_number: "BAT-2026-104",
+      manufacture_date: "2026-08-01",
+      expiry_date: "2028-07-31",
+      purchase_rate: 450,
+      selling_price: 680,
+      mrp: 750,
+      remarks: "Quality Control passed analytical assay",
+      status: "active"
+    }, null, 2)
+  },
+  stock_transfer: {
+    description: "Extract stock transfer details including source and destination warehouses, transfer date, reference, reason, and product items.",
+    jsonExample: JSON.stringify({
+      transfer_date: "2026-10-15",
+      from_warehouse_name: "Colombo Central Medical Warehouse",
+      to_warehouse_name: "Kandy Central Distribution Warehouse",
+      reference_number: "REQ-KDY-884",
+      remarks: "Replenishment for Hill Country regional hospitals",
+      lines: [
+        {
+          product_name: "Paracetamol 500mg Tablets",
+          quantity: 500,
+          remarks: "Fast-moving stock replenishment"
+        }
+      ]
+    }, null, 2)
+  },
+  stock_adjustment: {
+    description: "Extract stock adjustment details including warehouse, adjustment type (increase, decrease, damage, expiry), reason, and product quantities.",
+    jsonExample: JSON.stringify({
+      adjustment_date: "2026-10-15",
+      warehouse_name: "Colombo Central Medical Warehouse",
+      adjustment_type: "damage",
+      reason: "Carton damage on pallet shift",
+      remarks: "Written off and segregated to disposal bin",
+      lines: [
+        {
+          product_name: "Amoxicillin 500mg Capsules",
+          quantity: 25,
+          unit_cost: 380,
+          line_reason: "Damaged ampoules"
+        }
+      ]
+    }, null, 2)
+  },
+  purchase_return: {
+    description: "Extract purchase return details including supplier name, return date, reason, reference, and product items.",
+    jsonExample: JSON.stringify({
+      supplier_name: "State Pharmaceuticals Corporation of Sri Lanka (SPC)",
+      return_date: "2026-10-15",
+      reference_number: "PR-SPC-904",
+      remarks: "Short expiry delivered (< 6 months remaining shelf-life)",
+      lines: [
+        {
+          product_name: "Insulin Glargine 100 IU/ml",
+          quantity: 50,
+          unit_cost: 1450,
+          return_reason: "Near-expiry batch return"
+        }
+      ]
+    }, null, 2)
+  },
+  payment_voucher: {
+    description: "Extract finance payment voucher details including supplier or payee, payment date, method, bank account, amount, and expense accounts.",
+    jsonExample: JSON.stringify({
+      payee_name: "Hemas Healthcare Distribution",
+      payment_date: "2026-10-15",
+      payment_type: "supplier_payment",
+      payment_method: "bank_transfer",
+      reference_number: "PO-SETTLE-8812",
+      description: "Direct bank transfer payment for pharmaceutical bulk shipment",
+      total_amount: 1250000,
+      lines: [
+        {
+          account_name: "Trade Creditors",
+          line_description: "Invoice settlement Hemas",
+          amount: 1250000
+        }
+      ]
+    }, null, 2)
+  },
+  receipt_voucher: {
+    description: "Extract finance receipt voucher details including customer or payer, receipt date, method, deposit bank account, and amount.",
+    jsonExample: JSON.stringify({
+      payer_name: "Asiri Surgical Hospital PLC",
+      receipt_date: "2026-10-15",
+      receipt_type: "customer_receipt",
+      receipt_method: "bank_transfer",
+      reference_number: "ACH-RTGS-9901",
+      description: "Electronic RTGS settlement for inpatient pharmaceuticals",
+      total_amount: 1850000,
+      lines: [
+        {
+          account_name: "Trade Debtors",
+          line_description: "Hospital account settlement",
+          amount: 1850000
+        }
+      ]
+    }, null, 2)
+  },
+  user: {
+    description: "Extract system enterprise user details including name, employee code, email, designation, department, and branch.",
+    jsonExample: JSON.stringify({
+      name: "Dr. Saman Wijesinghe",
+      employee_code: "EMP-015",
+      email: "saman.w@ceylonmed.lk",
+      phone: "+94 77 889 9001",
+      department_name: "Quality Assurance & Regulatory",
+      designation_name: "Senior QC Compliance Pharmacist",
+      default_branch_name: "Colombo Central Hub",
+      status: "active"
+    }, null, 2)
+  },
   grn: {
     description: "Extract goods received note details including supplier name, invoice reference, dates, and received product batches.",
     jsonExample: JSON.stringify({
@@ -134,6 +325,106 @@ const FORM_SCHEMAS: Record<FormType, { description: string; jsonExample: string 
           unit_cost: 4.5
         }
       ]
+    }, null, 2)
+  },
+  sales_return: {
+    description: "Extract customer sales return details including customer name, sales invoice number, return reason, return condition, and returned product lines with quantities and prices.",
+    jsonExample: JSON.stringify({
+      customer_name: "Homagama Medical Supplies",
+      customer_contact_number: "+94 11 289 1234",
+      sales_invoice_number: "SINV-2026-0042",
+      reference_number: "SR-RET-901",
+      return_reason: "customer_return",
+      return_condition: "saleable",
+      remarks: "Returned undamaged stock due to over-ordering by client",
+      lines: [
+        {
+          product_name: "Amoxicillin 500mg",
+          return_quantity: 10,
+          unit_price: 1250,
+          discount_amount: 0,
+          tax_amount: 0,
+          line_remarks: "Unopened sealed boxes"
+        }
+      ]
+    }, null, 2)
+  },
+  opening_stock: {
+    description: "Extract opening stock entry details including date, reference number, remarks, and line items with product names, batches, expiry dates, quantities, and unit costs.",
+    jsonExample: JSON.stringify({
+      opening_stock_date: "2026-10-15",
+      reference_number: "OP-STOCK-2026-01",
+      remarks: "Initial audited warehouse opening balance stock",
+      lines: [
+        {
+          product_name: "Paracetamol 500mg Tablets",
+          batch_number: "OP-B26-01",
+          expiry_date: "2029-06-30",
+          quantity: 2500,
+          unit_cost: 4.2,
+          line_remarks: "Audited physical count"
+        }
+      ]
+    }, null, 2)
+  },
+  bank_account: {
+    description: "Extract commercial bank account details including bank name, branch name, account name, account number, SWIFT code, and opening balance.",
+    jsonExample: JSON.stringify({
+      bank_name: "Bank of Ceylon (BOC)",
+      bank_branch_name: "Kollupitiya Corporate Branch",
+      account_name: "Ceylon Med Global Operations LKR",
+      account_number: "7041289552",
+      swift_code: "BCEYLKLX",
+      bank_code: "7010",
+      branch_code: "045",
+      opening_balance: 5000000,
+      is_default: true,
+      status: "active"
+    }, null, 2)
+  },
+  cheque_book: {
+    description: "Extract cheque book registration details including bank account name, cheque book series/number, starting cheque number, ending cheque number, and total leaves.",
+    jsonExample: JSON.stringify({
+      bank_account_name: "Bank of Ceylon (BOC) - 7041289552",
+      book_number: "CHQ-BOC-2026-A",
+      start_cheque_number: "100201",
+      end_cheque_number: "100250",
+      number_of_cheques: 50,
+      remarks: "Standard corporate payout cheque book for wholesale payments"
+    }, null, 2)
+  },
+  petty_cash_voucher: {
+    description: "Extract petty cash voucher details including voucher date, voucher type (expense, advance, refund), payee name, reference number, description, and expense lines.",
+    jsonExample: JSON.stringify({
+      voucher_date: "2026-10-15",
+      voucher_type: "expense",
+      payee_name: "Sunil Disinfection & Hygiene Services",
+      reference_number: "PCV-EXP-2026-88",
+      description: "Emergency cold-room disinfection consumables",
+      lines: [
+        {
+          account_name: "Office Consumables & Sanitation",
+          line_description: "Medical grade isopropyl alcohol gallons & PPE gloves",
+          amount: 8500
+        }
+      ]
+    }, null, 2)
+  },
+  fixed_asset: {
+    description: "Extract fixed asset details including asset code, asset name, category, serial number, model, purchase date, acquisition cost, residual value, and useful life.",
+    jsonExample: JSON.stringify({
+      asset_code: "FA-EQ-2026-009",
+      asset_name: "Thermo Fisher Scientific Ultra-Low Temperature Freezer (-80C)",
+      description: "Specialized cold-chain pharmaceutical storage freezer for vaccines and biologics",
+      serial_number: "TFS-ULT-99412",
+      model_number: "TSX60086A",
+      manufacturer: "Thermo Fisher Scientific",
+      purchase_date: "2026-10-15",
+      acquisition_cost: 3850000,
+      residual_value: 385000,
+      useful_life_months: 120,
+      depreciation_method: "straight_line",
+      status: "active"
     }, null, 2)
   }
 };

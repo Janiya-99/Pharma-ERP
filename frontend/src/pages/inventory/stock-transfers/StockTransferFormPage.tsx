@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { inventoryApi } from "../../../api/inventoryApi";
 import { toast } from "react-hot-toast";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import StockTransferLinesTable from "./StockTransferLinesTable";
 import { StockTransferLine, Warehouse } from "../../../types/inventory";
 
@@ -24,6 +26,94 @@ const StockTransferFormPage = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    let sourceWhId = formData.source_warehouse_id;
+    let destWhId = formData.destination_warehouse_id;
+
+    if (aiData.from_warehouse_id) {
+      sourceWhId = String(aiData.from_warehouse_id);
+    } else if (aiData.from_warehouse_name && warehouses.length > 0) {
+      const match = warehouses.find(
+        (w: any) =>
+          w.warehouse_name?.toLowerCase().includes(aiData.from_warehouse_name.toLowerCase()) ||
+          aiData.from_warehouse_name.toLowerCase().includes(w.warehouse_name?.toLowerCase()) ||
+          w.warehouse_code?.toLowerCase() === aiData.from_warehouse_name.toLowerCase()
+      );
+      if (match) sourceWhId = String(match.id);
+    }
+
+    if (aiData.to_warehouse_id) {
+      destWhId = String(aiData.to_warehouse_id);
+    } else if (aiData.to_warehouse_name && warehouses.length > 0) {
+      const match = warehouses.find(
+        (w: any) =>
+          w.warehouse_name?.toLowerCase().includes(aiData.to_warehouse_name.toLowerCase()) ||
+          aiData.to_warehouse_name.toLowerCase().includes(w.warehouse_name?.toLowerCase()) ||
+          w.warehouse_code?.toLowerCase() === aiData.to_warehouse_name.toLowerCase()
+      );
+      if (match) destWhId = String(match.id);
+    }
+
+    // Default if not matched
+    if (!sourceWhId && warehouses.length > 0) sourceWhId = String(warehouses[0].id);
+    if (!destWhId && warehouses.length > 1) destWhId = String(warehouses[1].id);
+
+    setFormData((prev) => ({
+      ...prev,
+      source_warehouse_id: sourceWhId,
+      destination_warehouse_id: destWhId,
+      transfer_date: aiData.transfer_date || prev.transfer_date,
+      reference_no: aiData.reference_number || aiData.reference_no || prev.reference_no,
+      remarks: aiData.remarks || prev.remarks,
+    }));
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any) => {
+        let matchedProduct = null;
+        if (l.product_id) {
+          matchedProduct = products.find((p: any) => String(p.id) === String(l.product_id));
+        }
+        if (!matchedProduct && l.product_name && products.length > 0) {
+          const searchName = l.product_name.toLowerCase();
+          matchedProduct = products.find(
+            (p: any) =>
+              p.product_name?.toLowerCase().includes(searchName) ||
+              searchName.includes(p.product_name?.toLowerCase()) ||
+              p.product_code?.toLowerCase() === searchName
+          );
+        }
+        const prod = matchedProduct || products[0] || null;
+
+        return {
+          id: `temp-${Date.now()}-${Math.random()}`,
+          product_id: prod ? prod.id : null,
+          product: prod,
+          product_batch_id: null,
+          batch: null,
+          source_location_id: "",
+          destination_location_id: "",
+          transfer_quantity: Number(l.quantity || l.transfer_quantity || 1),
+          available_quantity: null,
+          stock_balance_loading: false,
+          stock_balance_data: null,
+        };
+      });
+      setLines(mapped);
+    }
+  };
 
   useEffect(() => {
     fetchWarehouses();
@@ -186,23 +276,47 @@ const StockTransferFormPage = () => {
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
-      <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={() => navigate("/inventory/stock-transfers")}
-          className="p-2 text-gray-500 hover:text-gray-700 bg-white border border-gray-200 rounded-lg   "
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 ">
-            {isEditMode ? "Edit Stock Transfer" : "New Stock Transfer"}
-          </h1>
-          <p className="text-sm text-gray-500  mt-1">
-            {isEditMode ? "Update draft transfer details" : "Create a new stock transfer draft"}
-          </p>
-        </div>
-      </div>
+    <div className="p-6 max-w-[1600px] mx-auto pb-24">
+      <PageTitleCard
+        title={isEditMode ? "Edit Stock Transfer" : "New Inter-Warehouse Stock Transfer"}
+        description="Transfer pharmaceutical formulations between cold-chain and central medical depots."
+        moduleTag="Inventory"
+        accent="emerald"
+        backTo="/inventory/stock-transfers"
+        quote={{
+          text: "Cold-chain validation and chain-of-custody transfer logging compliant with WHO GDP.",
+          author: "Ceylon Med Supply Chain Guidelines",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEditMode && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/inventory/stock-transfers")}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-brand-500/20 cursor-pointer"
+            >
+              <Save className="w-4 h-4" />
+              {saving ? "Saving..." : "Save Draft"}
+            </button>
+          </div>
+        }
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Header Section */}
@@ -332,6 +446,26 @@ const StockTransferFormPage = () => {
           </button>
         </div>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="stock_transfer"
+        title="AI Stock Transfer Auto-Fill"
+        contextData={{
+          warehouses: warehouses.map((w) => ({
+            id: w.id,
+            name: w.warehouse_name,
+          })),
+          products: products.map((p) => ({
+            id: p.id,
+            name: p.product_name,
+            code: p.product_code,
+            unit_price: p.unit_price,
+          })),
+        }}
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

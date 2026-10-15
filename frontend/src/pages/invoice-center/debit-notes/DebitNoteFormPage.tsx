@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { ArrowLeft, Save, Check } from "lucide-react";
+import { ArrowLeft, Save, Check, Sparkles } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { getBranches } from "../../../api/controlApi";
+import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { Button } from "../../../components/ui/button";
 import {
   Card,
@@ -89,6 +92,71 @@ const DebitNoteFormPage: React.FC = () => {
   const [branches, setBranches] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [lookupsLoading, setLookupsLoading] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    if (aiData.customer_id) {
+      setValue("customer_id", String(aiData.customer_id), { shouldValidate: true });
+    } else if (aiData.customer_name && customers.length > 0) {
+      const match = customers.find(
+        (c: any) =>
+          c.customer_name?.toLowerCase().includes(aiData.customer_name.toLowerCase()) ||
+          aiData.customer_name.toLowerCase().includes(c.customer_name?.toLowerCase()) ||
+          c.customer_code?.toLowerCase() === aiData.customer_name.toLowerCase()
+      );
+      if (match) {
+        setValue("customer_id", String(match.id), { shouldValidate: true });
+      }
+    }
+
+    if (aiData.debit_note_date) setValue("debit_note_date", aiData.debit_note_date, { shouldValidate: true });
+    if (aiData.debit_note_type) setValue("debit_note_type", aiData.debit_note_type, { shouldValidate: true });
+    if (aiData.reference_number) setValue("reference_number", aiData.reference_number);
+    if (aiData.reason) setValue("reason", aiData.reason);
+    if (aiData.remarks) setValue("remarks", aiData.remarks);
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mappedLines = aiData.lines.map((l: any) => {
+        let matchedProduct = null;
+        if (l.product_id) {
+          matchedProduct = products.find((p: any) => String(p.id) === String(l.product_id));
+        }
+        if (!matchedProduct && l.product_name && products.length > 0) {
+          const searchName = l.product_name.toLowerCase();
+          matchedProduct = products.find(
+            (p: any) =>
+              p.product_name?.toLowerCase().includes(searchName) ||
+              searchName.includes(p.product_name?.toLowerCase()) ||
+              p.product_code?.toLowerCase() === searchName
+          );
+        }
+        const prodId = matchedProduct ? String(matchedProduct.id) : (products[0]?.id ? String(products[0].id) : "");
+        const unitPrice = Number(l.unit_price || matchedProduct?.unit_price || 0);
+
+        return {
+          product_id: prodId,
+          product_batch_id: "",
+          quantity: Number(l.quantity) || 1,
+          unit_price: unitPrice,
+          tax_amount: Number(l.tax_amount) || 0,
+          reason: l.reason || l.description || "",
+        };
+      });
+
+      setValue("lines", mappedLines, { shouldValidate: true });
+    }
+  };
   const [salesInvoiceInfo, setSalesInvoiceInfo] = useState<any | null>(null);
 
   const {
@@ -359,33 +427,51 @@ const DebitNoteFormPage: React.FC = () => {
 
   return (
     <div className="page-content mx-auto w-full max-w-7xl space-y-5 pb-12">
-      <div className="sticky top-14 z-30 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate("/invoice-center/debit-notes")}
-            disabled={saving}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            {isEdit ? "Edit Debit Note" : "Create Debit Note"}
-          </h1>
-        </div>
-        <PermissionGuard
-          permission={
-            isEdit
-              ? "invoice_center.debit_note.update"
-              : "invoice_center.debit_note.create"
-          }
-        >
-          <Button onClick={handleSubmit(onSubmit)} disabled={saving || loading}>
-            <Save className="mr-2 h-4 w-4" />
-            {saving ? "Saving..." : "Save Draft"}
-          </Button>
-        </PermissionGuard>
-      </div>
+      <PageTitleCard
+        title={isEdit ? "Edit Debit Note" : "Create Debit Note"}
+        description="Issue supplementary debit notes, cold-chain freight adjustments, and delayed payment interest charges."
+        moduleTag="Invoice Center"
+        accent="indigo"
+        backTo="/invoice-center/debit-notes"
+        quote={{
+          text: "Transparent pharmaceutical billing adjustments with full NMRA and GDP auditable records.",
+          author: "Ceylon Med Regulatory Standard",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <Button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/invoice-center/debit-notes")}
+              disabled={saving}
+            >
+              Cancel
+            </Button>
+            <PermissionGuard
+              permission={
+                isEdit
+                  ? "invoice_center.debit_note.update"
+                  : "invoice_center.debit_note.create"
+              }
+            >
+              <Button onClick={handleSubmit(onSubmit)} disabled={saving || loading}>
+                <Save className="mr-2 h-4 w-4" />
+                {saving ? "Saving..." : "Save Draft"}
+              </Button>
+            </PermissionGuard>
+          </div>
+        }
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
@@ -732,6 +818,27 @@ const DebitNoteFormPage: React.FC = () => {
           </div>
         </div>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="debit_note"
+        title="AI Debit Note Auto-Fill"
+        contextData={{
+          customers: customers.map((c) => ({
+            id: c.id,
+            name: c.customer_name,
+            code: c.customer_code,
+          })),
+          products: products.map((p) => ({
+            id: p.id,
+            name: p.product_name,
+            code: p.product_code,
+            unit_price: p.unit_price,
+          })),
+        }}
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

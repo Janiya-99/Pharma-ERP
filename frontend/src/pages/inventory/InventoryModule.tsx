@@ -28,6 +28,7 @@ import { useAuth } from "@/auth/AuthContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageTitleCard } from "@/components/common/PageTitleCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -368,27 +369,25 @@ function InventoryPage({
 }: {
   title: string;
   description: string;
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: any;
   actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="w-full text-slate-900 animate-in fade-in-50 duration-300">
       <div className="flex w-full flex-col gap-5">
-        <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            {Icon ? (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-indigo-600 shadow-sm">
-                <Icon className="h-5 w-5" />
-              </div>
-            ) : null}
-            <div>
-              <h1 className="text-2xl font-semibold tracking-normal text-slate-950">{title}</h1>
-              <p className="mt-1 max-w-3xl text-sm tracking-normal text-slate-500">{description}</p>
-            </div>
-          </div>
-          {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
-        </div>
+        <PageTitleCard
+          title={title}
+          description={description}
+          moduleTag="Pharmaceutical Supply Chain & Inventory"
+          icon={Icon}
+          accent="indigo"
+          quote={{
+            text: "Strict batch traceability, cold-chain temperature monitoring, and FEFO inventory rotation.",
+            author: "Good Distribution Practices (GDP / NMRA)"
+          }}
+          actions={actions}
+        />
         {children}
       </div>
     </div>

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, Sparkles } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 import GRNLinesTable from "./GRNLinesTable";
@@ -36,6 +38,111 @@ const GRNFormPage = () => {
 
   const [lines, setLines] = useState([]);
   const [errors, setErrors] = useState({});
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    let matchedSupId = formData.supplier_id;
+    if (aiData.supplier_id) {
+      matchedSupId = String(aiData.supplier_id);
+    } else if (aiData.supplier_name && suppliers.length > 0) {
+      const match = (suppliers as any[]).find(
+        (s: any) =>
+          s.supplier_name?.toLowerCase().includes(aiData.supplier_name.toLowerCase()) ||
+          aiData.supplier_name.toLowerCase().includes(s.supplier_name?.toLowerCase()) ||
+          s.supplier_code?.toLowerCase() === aiData.supplier_name.toLowerCase()
+      );
+      if (match) matchedSupId = String(match.id);
+    }
+
+    let matchedWhId = formData.warehouse_id;
+    let matchedBrId = formData.branch_id;
+    if (aiData.warehouse_id) {
+      matchedWhId = String(aiData.warehouse_id);
+    } else if (aiData.warehouse_name && warehouses.length > 0) {
+      const match = (warehouses as any[]).find(
+        (w: any) =>
+          w.warehouse_name?.toLowerCase().includes(aiData.warehouse_name.toLowerCase()) ||
+          aiData.warehouse_name.toLowerCase().includes(w.warehouse_name?.toLowerCase()) ||
+          w.warehouse_code?.toLowerCase() === aiData.warehouse_name.toLowerCase()
+      );
+      if (match) {
+        matchedWhId = String(match.id);
+        if (match.branch_id) matchedBrId = String(match.branch_id);
+      }
+    }
+
+    if (!matchedWhId && warehouses.length > 0) {
+      matchedWhId = String((warehouses[0] as any).id);
+      if ((warehouses[0] as any).branch_id) matchedBrId = String((warehouses[0] as any).branch_id);
+    }
+    if (!matchedBrId && branches && branches.length > 0) {
+      matchedBrId = String(branches[0].id);
+    }
+
+    setFormData((prev: any) => ({
+      ...prev,
+      supplier_id: matchedSupId || prev.supplier_id,
+      warehouse_id: matchedWhId || prev.warehouse_id,
+      branch_id: matchedBrId || prev.branch_id,
+      grn_date: aiData.grn_date || prev.grn_date,
+      supplier_invoice_number: aiData.supplier_invoice_number || prev.supplier_invoice_number,
+      supplier_invoice_date: aiData.supplier_invoice_date || prev.supplier_invoice_date,
+      remarks: aiData.remarks || prev.remarks,
+    }));
+
+    const rawLines = aiData.items || aiData.lines;
+    if (Array.isArray(rawLines) && rawLines.length > 0) {
+      const mapped = rawLines.map((l: any, idx: number) => {
+        let matchedProduct = null;
+        if (l.product_id) {
+          matchedProduct = products.find((p: any) => String(p.id) === String(l.product_id));
+        }
+        if (!matchedProduct && l.product_name && products.length > 0) {
+          const searchName = l.product_name.toLowerCase();
+          matchedProduct = products.find(
+            (p: any) =>
+              p.product_name?.toLowerCase().includes(searchName) ||
+              searchName.includes(p.product_name?.toLowerCase()) ||
+              p.product_code?.toLowerCase() === searchName
+          );
+        }
+        const prod = matchedProduct || products[0] || null;
+        const qty = Number(l.quantity_received || l.quantity || 1);
+        const cost = Number(l.unit_cost || prod?.unit_price || 0);
+
+        return {
+          id: `line-${idx}-${Date.now()}`,
+          product_id: prod ? prod.id : "",
+          product_name: prod ? prod.product_name : (l.product_name || "Pharmaceutical Item"),
+          product_code: prod ? prod.product_code : "",
+          batch_number: l.batch_number || `BAT-${Math.floor(1000 + Math.random() * 9000)}`,
+          manufacture_date: l.manufacture_date || "",
+          expiry_date: l.expiry_date || "",
+          warehouse_location_id: "",
+          quantity_received: qty,
+          unit_cost: cost,
+          discount_percentage: 0,
+          discount_amount: 0,
+          tax_percentage: 0,
+          tax_amount: 0,
+          line_total: qty * cost,
+          remarks: l.remarks || "",
+        };
+      });
+      setLines(mapped as any);
+    }
+  };
 
   useEffect(() => {
     fetchLookups();
@@ -222,33 +329,47 @@ const GRNFormPage = () => {
   if (loading) return <div className="p-6 text-center">Loading...</div>;
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate("/admin/inventory/grns")}
-            className="p-2 bg-white  rounded-full shadow hover:bg-gray-50  transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-gray-600 " />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-navy-700 ">
-              {isEdit ? "Edit Goods Receipt Note" : "Create Goods Receipt Note"}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Enter incoming inventory details
-            </p>
+    <div className="p-6 max-w-[1600px] mx-auto pb-24">
+      <PageTitleCard
+        title={isEdit ? "Edit Goods Receipt Note" : "New Goods Receipt Note (GRN)"}
+        description="Receive incoming pharmaceutical consignments, record vendor invoices, and track batch QA quarantine."
+        moduleTag="Inventory"
+        accent="emerald"
+        backTo="/admin/inventory/grns"
+        quote={{
+          text: "Pharmaceutical warehouse receipt with strict batch inspection and NMRA compliance verification.",
+          author: "Ceylon Med Regulatory Standard",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/admin/inventory/grns")}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-2.5 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm font-medium cursor-pointer"
+            >
+              <Save className="h-4 w-4" />
+              {saving ? "Saving..." : "Save Draft"}
+            </button>
           </div>
-        </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm font-medium"
-        >
-          <Save className="h-4 w-4" />
-          {saving ? "Saving..." : "Save Draft"}
-        </button>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-6">
@@ -405,6 +526,18 @@ const GRNFormPage = () => {
           </div>
         </div>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="grn"
+        onApply={handleAiApply}
+        contextData={{
+          suppliers,
+          warehouses,
+          products,
+        }}
+      />
     </div>
   );
 };

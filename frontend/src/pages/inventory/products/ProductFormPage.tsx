@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Save, ArrowLeft, Plus, Trash2, Sparkles } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { inventoryApi } from "../../../api/inventoryApi";
 import ProductCategorySelect from "../../../components/inventory/ProductCategorySelect";
@@ -168,31 +169,38 @@ const ProductFormPage = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/inventory/products")} className="p-2 hover:bg-gray-100  rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-2xl font-bold text-navy-700 ">
-            {isEdit ? "Edit Product" : "New Product"}
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          {!isEdit && (
+      <PageTitleCard
+        title={isEdit ? "Edit Product" : "New Pharmaceutical Product"}
+        description="Register pharmaceutical formulations, dosages, NMRA registrations, and batch rules."
+        moduleTag="Inventory"
+        accent="emerald"
+        backTo="/inventory/products"
+        quote={{
+          text: "NMRA registration and batch traceability compliance for pharmaceutical products.",
+          author: "Ceylon Med Regulatory Standard",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
             <button
-              type="button"
-              onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100"
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium disabled:opacity-50 cursor-pointer"
             >
-              <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
-              <span>✨ AI Auto-Fill</span>
+              <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Product"}
             </button>
-          )}
-          <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium disabled:opacity-50">
-            <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Product"}
-          </button>
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       <form className="space-y-6">
         {/* Basic Details */}

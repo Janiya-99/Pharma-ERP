@@ -3,7 +3,9 @@ import { useParams, useHistory } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
-import FinancePageHeader from "../../../components/finance/FinancePageHeader";
+import { Sparkles } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import PettyCashLinesTable from "../../../components/finance/PettyCashLinesTable";
 import PettyCashTotalSummary from "../../../components/finance/PettyCashTotalSummary";
 import { DatePicker } from "../../../components/ui/date-picker";
@@ -20,6 +22,8 @@ export default function PettyCashVoucherFormPage() {
 
   const [branches, setBranches] = useState([]);
   const [funds, setFunds] = useState([]);
+  const [chartAccounts, setChartAccounts] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [financialYears, setFinancialYears] = useState([]);
   const [accountingPeriods, setAccountingPeriods] = useState([]);
 
@@ -39,6 +43,54 @@ export default function PettyCashVoucherFormPage() {
   });
 
   const [selectedFundBalance, setSelectedFundBalance] = useState(undefined);
+
+  useEffect(() => {
+    financeApi
+      .getChartOfAccounts({ limit: 1000 })
+      .then((res: any) => {
+        const list = res.data?.data || res.data || [];
+        if (Array.isArray(list)) setChartAccounts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    setFormData((prev: any) => {
+      let matchedLines = prev.lines;
+      if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+        matchedLines = aiData.lines.map((l: any) => {
+          let matchedAccId = l.account_id;
+          if (!matchedAccId && (l.account_name || l.account_code) && chartAccounts.length > 0) {
+            const match = chartAccounts.find(
+              (a: any) =>
+                (l.account_name && a.account_name?.toLowerCase().includes(l.account_name.toLowerCase())) ||
+                (l.account_code && a.account_code === l.account_code)
+            );
+            if (match) matchedAccId = match.id;
+          }
+          if (!matchedAccId && chartAccounts.length > 0) {
+            matchedAccId = chartAccounts[0].id;
+          }
+
+          return {
+            account_id: matchedAccId || "",
+            line_description: l.line_description || l.description || "",
+            amount: parseFloat(l.amount || 0)
+          };
+        });
+      }
+
+      return {
+        ...prev,
+        voucher_date: aiData.voucher_date || prev.voucher_date,
+        voucher_type: aiData.voucher_type || prev.voucher_type,
+        payee_name: aiData.payee_name || prev.payee_name,
+        reference_number: aiData.reference_number || prev.reference_number,
+        description: aiData.description || prev.description,
+        lines: matchedLines
+      };
+    });
+  };
 
   useEffect(() => {
     if (activeSoftware?.software_code !== "FINANCE") return;
@@ -170,10 +222,29 @@ export default function PettyCashVoucherFormPage() {
 
   return (
     <div className="flex flex-col gap-4 py-4 h-full max-w-6xl mx-auto">
-      <FinancePageHeader
+      <PageTitleCard
         title={isEdit ? "Edit Petty Cash Voucher" : "Create Petty Cash Voucher"}
-        subtitle={isEdit ? `Editing voucher` : "Create a new petty cash expense, advance, or refund"}
-        backUrl="/admin/finance/petty-cash-vouchers"
+        description={isEdit ? "Editing petty cash voucher" : "Record petty cash expenses, cash advances, or refund transactions"}
+        backAction={() => history.push("/admin/finance/petty-cash-vouchers")}
+        actions={
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4 text-amber-300" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => history.push("/admin/finance/petty-cash-vouchers")}
+              className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        }
       />
 
       {error && (
@@ -284,6 +355,20 @@ export default function PettyCashVoucherFormPage() {
           </button>
         </div>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="petty_cash_voucher"
+        onApply={handleAiApply}
+        contextData={{
+          accounts: chartAccounts.map((a: any) => ({
+            id: a.id,
+            name: a.account_name,
+            code: a.account_code,
+          })),
+        }}
+      />
     </div>
   );
 }

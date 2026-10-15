@@ -3,6 +3,9 @@ import { useParams, useHistory } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
 import { toast } from "react-hot-toast";
+import { Sparkles, Save, ArrowLeft } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 
 export default function BankAccountFormPage() {
   const { id } = useParams();
@@ -13,6 +16,7 @@ export default function BankAccountFormPage() {
   const [chartAccounts, setChartAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     branch_id: "",
@@ -115,27 +119,68 @@ export default function BankAccountFormPage() {
     }
   };
 
+  const handleAiApply = (aiData: any) => {
+    setFormData((prev: any) => {
+      let matchedAccountId = prev.chart_account_id;
+      if (aiData.chart_account_id) {
+        matchedAccountId = String(aiData.chart_account_id);
+      } else if (aiData.chart_account_name && chartAccounts.length > 0) {
+        const match = (chartAccounts as any[]).find(
+          (a: any) =>
+            a.account_name?.toLowerCase().includes(aiData.chart_account_name.toLowerCase()) ||
+            a.account_code === aiData.chart_account_code
+        );
+        if (match) matchedAccountId = String(match.id);
+      } else if (chartAccounts.length > 0 && !matchedAccountId) {
+        matchedAccountId = String((chartAccounts[0] as any).id);
+      }
+
+      return {
+        ...prev,
+        bank_name: aiData.bank_name || prev.bank_name,
+        bank_branch_name: aiData.bank_branch_name || prev.bank_branch_name,
+        account_name: aiData.account_name || prev.account_name,
+        account_number: aiData.account_number || prev.account_number,
+        swift_code: aiData.swift_code || prev.swift_code,
+        bank_code: aiData.bank_code || prev.bank_code,
+        branch_code: aiData.branch_code || prev.branch_code,
+        opening_balance: aiData.opening_balance !== undefined ? Number(aiData.opening_balance) : prev.opening_balance,
+        is_default: aiData.is_default !== undefined ? Boolean(aiData.is_default) : prev.is_default,
+        chart_account_id: matchedAccountId
+      };
+    });
+  };
+
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
   return (
-    <div className="py-4 max-w-4xl mx-auto h-full overflow-y-auto">
-      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
-        <div className="flex items-center justify-between mb-6 border-b pb-4 ">
-          <div>
-            <h2 className="text-xl font-bold text-navy-700 ">
-              {isEdit ? "Edit Bank Account" : "Create Bank Account"}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">Fill out the details to {isEdit ? "update" : "create"} a bank account.</p>
+    <div className="py-4 max-w-4xl mx-auto h-full overflow-y-auto space-y-6">
+      <PageTitleCard
+        title={isEdit ? "Edit Bank Account" : "Create Bank Account"}
+        description={isEdit ? "Update banking credentials and chart of account mappings" : "Register corporate commercial bank accounts and ledger integrations"}
+        backAction={() => history.push("/admin/finance/bank-accounts")}
+        actions={
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4 text-amber-300" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => history.push("/admin/finance/bank-accounts")}
+              className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => history.push("/admin/finance/bank-accounts")}
-            className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-        </div>
+        }
+      />
 
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -304,6 +349,20 @@ export default function BankAccountFormPage() {
           </div>
         </form>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="bank_account"
+        onApply={handleAiApply}
+        contextData={{
+          accounts: chartAccounts.map((a: any) => ({
+            id: a.id,
+            name: a.account_name,
+            code: a.account_code,
+          })),
+        }}
+      />
     </div>
   );
 }

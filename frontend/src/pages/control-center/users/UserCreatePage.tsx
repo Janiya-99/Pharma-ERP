@@ -3,9 +3,11 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { toast } from "sonner";
 import {
   ArrowLeft, User, Building2, Shield,
-  Save, Key, Camera, Clock, Lock, Eye, EyeOff
+  Save, Key, Camera, Clock, Lock, Eye, EyeOff, Sparkles
 } from "lucide-react";
 
+import { PageTitleCard } from "@/components/common/PageTitleCard";
+import { AiAutoFillModal } from "@/components/common/AiAutoFillModal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -86,6 +88,69 @@ const UserCreatePage: React.FC = () => {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
+  const handleAiApply = (aiData: any) => {
+    let fn = aiData.first_name || "";
+    let ln = aiData.last_name || "";
+    if (!fn && aiData.name) {
+      const parts = aiData.name.trim().split(" ");
+      fn = parts[0] || "";
+      ln = parts.slice(1).join(" ") || "";
+    }
+
+    let deptId = form.department_id;
+    if (aiData.department_id) {
+      deptId = String(aiData.department_id);
+    } else if (aiData.department_name && departments.length > 0) {
+      const match = departments.find(
+        (d: any) =>
+          d.department_name?.toLowerCase().includes(aiData.department_name.toLowerCase()) ||
+          aiData.department_name.toLowerCase().includes(d.department_name?.toLowerCase())
+      );
+      if (match) deptId = String(match.id);
+    }
+
+    let desigId = form.designation_id;
+    if (aiData.designation_id) {
+      desigId = String(aiData.designation_id);
+    } else if (aiData.designation_name && designations.length > 0) {
+      const match = designations.find(
+        (d: any) =>
+          d.designation_name?.toLowerCase().includes(aiData.designation_name.toLowerCase()) ||
+          aiData.designation_name.toLowerCase().includes(d.designation_name?.toLowerCase())
+      );
+      if (match) desigId = String(match.id);
+    }
+
+    let branchId = form.primary_branch_id;
+    if (aiData.primary_branch_id) {
+      branchId = String(aiData.primary_branch_id);
+    } else if (aiData.default_branch_name && branches.length > 0) {
+      const match = branches.find(
+        (b: any) =>
+          b.branch_name?.toLowerCase().includes(aiData.default_branch_name.toLowerCase()) ||
+          aiData.default_branch_name.toLowerCase().includes(b.branch_name?.toLowerCase())
+      );
+      if (match) branchId = String(match.id);
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      first_name: fn || prev.first_name,
+      last_name: ln || prev.last_name,
+      display_name: aiData.name || (fn && ln ? `${fn} ${ln}` : prev.display_name),
+      employee_code: aiData.employee_code || prev.employee_code || `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
+      email: aiData.email || prev.email,
+      phone: aiData.phone || prev.phone,
+      department_id: deptId,
+      designation_id: desigId,
+      primary_branch_id: branchId || (branches[0]?.id ? String(branches[0].id) : ""),
+      status: aiData.status || prev.status,
+      password: prev.password || "CeylonMed@2026",
+      confirm_password: prev.confirm_password || "CeylonMed@2026",
+    }));
+  };
 
   useEffect(() => {
     fetchDropdowns();
@@ -248,23 +313,47 @@ const UserCreatePage: React.FC = () => {
   if (loading) return <div><Skeleton className="h-[500px] w-full rounded-2xl" /></div>;
 
   return (
-    <div className="max-w-6xl mx-auto w-full space-y-8 py-2 pb-8">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigate("/control-center/users")} className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-slate-600 bg-white shadow-sm">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{isEdit ? "Edit User Profile" : "Create New User"}</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/control-center/users")} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-all shadow-sm bg-white active:scale-[0.98]">
-            Cancel
-          </button>
-          <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-sm hover:bg-blue-700 hover:shadow-md transition-all flex items-center gap-2 active:scale-[0.98] disabled:opacity-50">
-            <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save User"}
-          </button>
-        </div>
-      </div>
+    <div className="max-w-6xl mx-auto w-full space-y-8 py-2 pb-24">
+      <PageTitleCard
+        title={isEdit ? "Edit User Profile" : "Register New Enterprise User"}
+        description="Configure identity, pharmaceutical department credentials, branch allocation, and RBAC matrix."
+        moduleTag="Control Center"
+        accent="purple"
+        backTo="/control-center/users"
+        quote={{
+          text: "Role-based pharmaceutical data access controls compliant with GxP 21 CFR Part 11 electronic records.",
+          author: "Ceylon Med Security Protocol",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/control-center/users")}
+              className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-all shadow-sm bg-white active:scale-[0.98] cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-sm hover:bg-blue-700 hover:shadow-md transition-all flex items-center gap-2 active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+            >
+              <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save User"}
+            </button>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -448,6 +537,13 @@ const UserCreatePage: React.FC = () => {
         </button>
       </div>
 
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="user"
+        title="AI Enterprise User Provisioning"
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

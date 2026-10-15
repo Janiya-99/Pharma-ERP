@@ -30,8 +30,10 @@ type TrialBalanceReportRequest struct {
 }
 
 type TrialBalanceLine struct {
+	AccountID     uint64  `json:"account_id"`
 	AccountCode   string  `json:"account_code"`
 	AccountName   string  `json:"account_name"`
+	Balance       float64 `json:"balance"`
 	OpeningDebit  float64 `json:"opening_debit"`
 	OpeningCredit float64 `json:"opening_credit"`
 	PeriodDebit   float64 `json:"period_debit"`
@@ -71,6 +73,9 @@ type ProfitLossReportResponse struct {
 	AdministrativeExpenses PLSection `json:"administrative_expenses"`
 	SellingExpenses        PLSection `json:"selling_expenses"`
 	FinanceExpenses        PLSection `json:"finance_expenses"`
+	TotalIncome            float64   `json:"total_income"`
+	TotalExpense           float64   `json:"total_expense"`
+	NetProfit              float64   `json:"net_profit"`
 	NetProfitLoss          float64   `json:"net_profit_loss"`
 }
 

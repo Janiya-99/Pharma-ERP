@@ -1,23 +1,37 @@
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '../../ui/button';
+import React from 'react';
+import { FileSpreadsheet } from 'lucide-react';
+import { PageTitleCard } from '@/components/common/PageTitleCard';
 
-const ReportPageHeader = ({ title, description, backTo = "/finance/reports" }: { title?: unknown; description?: unknown; backTo?: unknown }) => {
-  const navigate = useNavigate();
+interface ReportPageHeaderProps {
+  title: string;
+  description?: string;
+  backTo?: string;
+  actions?: React.ReactNode;
+  icon?: any;
+}
+
+const ReportPageHeader: React.FC<ReportPageHeaderProps> = ({
+  title,
+  description,
+  backTo = "/finance/reports",
+  actions,
+  icon = FileSpreadsheet,
+}) => {
   return (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-4">
-        {backTo && (
-          <Button variant="outline" size="icon" onClick={() => navigate(backTo)} className="h-9 w-9">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        )}
-        <div>
-          <h1 className="text-2xl font-bold text-navy-800 ">{title}</h1>
-          {description && <p className="text-sm text-gray-500  mt-1">{description}</p>}
-        </div>
-      </div>
-    </div>
+    <PageTitleCard
+      title={title}
+      description={description}
+      moduleTag="Statutory Financial Intelligence"
+      icon={icon}
+      backTo={backTo}
+      accent="emerald"
+      quote={{
+        text: "Audited financial transparency, real-time fiscal control, and statutory governance.",
+        author: "SLFRS / LKAS Accounting Standard",
+      }}
+      actions={actions}
+    />
   );
 };
+
 export default ReportPageHeader;

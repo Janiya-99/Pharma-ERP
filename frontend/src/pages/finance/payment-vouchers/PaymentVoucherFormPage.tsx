@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import BranchSelector from "../../../components/common/BranchSelector";
@@ -7,17 +7,76 @@ import FinancialYearSelect from "../../../components/finance/FinancialYearSelect
 import AccountingPeriodSelect from "../../../components/finance/AccountingPeriodSelect";
 import AccountSelect from "../../../components/finance/AccountSelect";
 import VoucherLinesTable from "../../../components/finance/VoucherLinesTable";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { MdArrowBack, MdSave } from "react-icons/md";
+import { Sparkles } from "lucide-react";
 
 export default function PaymentVoucherFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   const isEdit = Boolean(id);
 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [accountsList, setAccountsList] = useState<any[]>([]);
+
+  useEffect(() => {
+    financeApi
+      .getChartOfAccounts({ limit: 1000 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setAccountsList(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    if (aiData.payment_date) {
+      setFormData((prev: any) => ({ ...prev, payment_date: aiData.payment_date }));
+    }
+    if (aiData.payment_type) {
+      setFormData((prev: any) => ({ ...prev, payment_type: aiData.payment_type }));
+    }
+    if (aiData.payment_method) {
+      setFormData((prev: any) => ({ ...prev, payment_method: aiData.payment_method }));
+    }
+    if (aiData.reference_number) {
+      setFormData((prev: any) => ({ ...prev, reference_number: aiData.reference_number }));
+    }
+    if (aiData.description) {
+      setFormData((prev: any) => ({ ...prev, description: aiData.description }));
+    }
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any) => {
+        let matchedAccount = null;
+        if (l.account_id) {
+          matchedAccount = accountsList.find((a: any) => String(a.id) === String(l.account_id));
+        }
+        if (!matchedAccount && l.account_name && accountsList.length > 0) {
+          const searchName = l.account_name.toLowerCase();
+          matchedAccount = accountsList.find(
+            (a: any) =>
+              a.account_name?.toLowerCase().includes(searchName) ||
+              searchName.includes(a.account_name?.toLowerCase()) ||
+              a.account_code?.toLowerCase() === searchName
+          );
+        }
+        const accId = matchedAccount ? String(matchedAccount.id) : (accountsList[0]?.id ? String(accountsList[0].id) : "");
+
+        return {
+          account_id: accId,
+          line_description: l.line_description || aiData.description || "",
+          amount: Number(l.amount) || 0,
+        };
+      });
+      setLines(mapped);
+    }
+  };
 
   const [formData, setFormData] = useState({
     branch_id: "",
@@ -175,28 +234,47 @@ export default function PaymentVoucherFormPage() {
   const isSaveDisabled = lines.reduce((s: unknown, l: unknown) => s + (Number(l.amount) || 0), 0) <= 0;
 
   return (
-    <div className="flex flex-col gap-4 py-4 h-full max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => history.goBack()}
-            className="p-2 rounded-full hover:bg-gray-100  transition-colors"
-          >
-            <MdArrowBack className="h-6 w-6 text-gray-500 " />
-          </button>
-          <h1 className="text-2xl font-bold text-navy-800 ">
-            {isEdit ? "Edit Payment Voucher" : "Create Payment Voucher"}
-          </h1>
-        </div>
-        <button
-          onClick={handleSave}
-          disabled={submitting || isSaveDisabled}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <MdSave size={20} />
-          {submitting ? "Saving..." : "Save Voucher"}
-        </button>
-      </div>
+    <div className="flex flex-col gap-4 py-4 h-full max-w-7xl mx-auto pb-24">
+      <PageTitleCard
+        title={isEdit ? "Edit Payment Voucher" : "New Payment Voucher"}
+        description="Issue pharmaceutical supplier disbursements, bank payments, and expense vouchers."
+        moduleTag="Finance"
+        accent="blue"
+        backTo="/admin/finance/payment-vouchers"
+        quote={{
+          text: "Authorized double-entry cash and bank payment vouchers with automated ledger posting.",
+          author: "Ceylon Med Financial Governance Standard",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/admin/finance/payment-vouchers")}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={submitting || isSaveDisabled}
+              className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <MdSave size={20} />
+              {submitting ? "Saving..." : "Save Voucher"}
+            </button>
+          </div>
+        }
+      />
 
       {error && (
         <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg">
@@ -324,6 +402,21 @@ export default function PaymentVoucherFormPage() {
         lines={lines}
         setLines={setLines}
         disabled={submitting}
+      />
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="payment_voucher"
+        title="AI Payment Voucher Auto-Fill"
+        contextData={{
+          accounts: accountsList.map((a) => ({
+            id: a.id,
+            name: a.account_name,
+            code: a.account_code,
+          })),
+        }}
+        onApply={handleAiApply}
       />
     </div>
   );
