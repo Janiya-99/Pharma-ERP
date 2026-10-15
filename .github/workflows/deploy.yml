@@ -99,10 +99,10 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             
-            # Rebuild and restart containerized services
+            # Rebuild and restart containerized services gracefully
             echo "📦 Building and restarting Docker containers..."
-            docker compose down
-            docker compose up -d --build
+            docker compose build
+            docker compose up -d --remove-orphans
             
             # Verify containers
             echo "🔍 Verifying running services..."
@@ -110,15 +110,22 @@ jobs:
             
             # Health check probe
             echo "🩺 Probing backend health endpoint..."
-            for i in {1..10}; do
-              if curl -s -f http://127.0.0.1:8080/api/v1/health | grep -q '"status":"ok"'; then
-                echo "✅ Backend health check passed!"
-                exit 0
+            HEALTHY=false
+            for i in {1..30}; do
+              RESPONSE=$(curl -s -m 5 http://127.0.0.1:8080/api/v1/health 2>/dev/null || true)
+              if echo "$RESPONSE" | grep -q '"status":"ok"'; then
+                echo "✅ Backend health check passed! ($i/30)"
+                echo "Response: $RESPONSE"
+                HEALTHY=true
+                break
               fi
-              echo "Waiting for backend service to become ready... ($i/10)"
+              echo "Waiting for backend service to become ready... ($i/30)"
               sleep 3
             done
             
-            echo "❌ Health check failed!"
-            docker compose logs backend --tail=50
-            exit 1
+            if [ "$HEALTHY" != "true" ]; then
+              echo "❌ Health check failed after 90 seconds!"
+              docker compose ps
+              docker compose logs backend --tail=100
+              exit 1
+            fi
