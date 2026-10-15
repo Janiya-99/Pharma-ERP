@@ -8,6 +8,7 @@ import AccountingPeriodSelect from "../../../components/finance/AccountingPeriod
 import JournalEntryLinesTable from "./JournalEntryLinesTable";
 import { MdArrowBack, MdSave } from "react-icons/md";
 import { Sparkles } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 
 export default function JournalEntryFormPage() {
@@ -219,40 +220,47 @@ export default function JournalEntryFormPage() {
     lines.reduce((s: unknown, l: unknown) => s + (Number(l.debit_amount) || 0), 0) === lines.reduce((s: unknown, l: unknown) => s + (Number(l.credit_amount) || 0), 0);
 
   return (
-    <div className="flex flex-col gap-4 py-4 h-full max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-full hover:bg-gray-100  transition-colors"
-          >
-            <MdArrowBack className="h-6 w-6 text-gray-500 " />
-          </button>
-          <h1 className="text-2xl font-bold text-navy-800 ">
-            {isEdit ? "Edit Journal Entry" : "Create Journal Entry"}
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          {!isEdit && (
+    <div className="flex flex-col gap-4 py-4 h-full max-w-7xl mx-auto pb-24">
+      <PageTitleCard
+        title={isEdit ? "Edit Journal Entry" : "New General Ledger Journal Entry"}
+        description="Double-entry manual journal vouchers with automated balanced debit and credit validation."
+        moduleTag="Finance"
+        accent="blue"
+        backTo="/admin/finance/journal-entries"
+        quote={{
+          text: "Balanced double-entry accounting records compliant with Sri Lanka Accounting Standards (LKAS/SLFRS).",
+          author: "Ceylon Med General Ledger System",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100"
+              onClick={() => navigate("/admin/finance/journal-entries")}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
             >
-              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-              <span>✨ AI Auto-Fill</span>
+              Cancel
             </button>
-          )}
-          <button
-            onClick={handleSave}
-            disabled={submitting || !isBalanced}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
-          >
-            <MdSave size={20} />
-            {submitting ? "Saving..." : "Save Journal"}
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={handleSave}
+              disabled={submitting || !isBalanced}
+              className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm cursor-pointer"
+            >
+              <MdSave size={20} />
+              {submitting ? "Saving..." : "Save Journal"}
+            </button>
+          </div>
+        }
+      />
 
       {error && (
         <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg">

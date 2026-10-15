@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, Sparkles } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { inventoryApi } from "../../../api/inventoryApi";
 import ProductSelect from "../../../components/inventory/ProductSelect";
 import SupplierSelect from "../../../components/inventory/SupplierSelect";
@@ -15,6 +17,45 @@ const ProductBatchFormPage = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
   const [productData, setProductData] = useState(null);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    let matchedProductId = "";
+    if (aiData.product_id) {
+      matchedProductId = String(aiData.product_id);
+    } else if (aiData.product_name && products.length > 0) {
+      const match = products.find(
+        (p: any) =>
+          p.product_name?.toLowerCase().includes(aiData.product_name.toLowerCase()) ||
+          aiData.product_name.toLowerCase().includes(p.product_name?.toLowerCase()) ||
+          p.product_code?.toLowerCase() === aiData.product_name.toLowerCase()
+      );
+      if (match) matchedProductId = String(match.id);
+    }
+
+    setFormData((prev: any) => ({
+      ...prev,
+      product_id: matchedProductId || prev.product_id,
+      batch_number: aiData.batch_number || prev.batch_number,
+      manufacture_date: aiData.manufacture_date || prev.manufacture_date,
+      expiry_date: aiData.expiry_date || prev.expiry_date,
+      purchase_rate: aiData.purchase_rate !== undefined ? aiData.purchase_rate : prev.purchase_rate,
+      selling_price: aiData.selling_price !== undefined ? aiData.selling_price : prev.selling_price,
+      mrp: aiData.mrp !== undefined ? aiData.mrp : prev.mrp,
+      batch_status: aiData.status || aiData.batch_status || prev.batch_status,
+    }));
+  };
 
   const [formData, setFormData] = useState({
     product_id: "",
@@ -110,20 +151,39 @@ const ProductBatchFormPage = () => {
   if (fetching) return <div className="p-6 text-center">Loading...</div>;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/inventory/product-batches")} className="p-2 hover:bg-gray-100  rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-2xl font-bold text-navy-700 ">
-            {isEdit ? "Edit Batch" : "New Batch"}
-          </h1>
-        </div>
-        <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium disabled:opacity-50">
-          <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Batch"}
-        </button>
-      </div>
+    <div className="p-6 max-w-4xl mx-auto pb-24">
+      <PageTitleCard
+        title={isEdit ? "Edit Product Batch" : "New Product Batch"}
+        description="Register pharmaceutical batch numbers, manufacture & expiry dates, pricing, and QC tracking."
+        moduleTag="Inventory"
+        accent="emerald"
+        backTo="/inventory/product-batches"
+        quote={{
+          text: "Strict batch-level isolation ensuring end-to-end pharmaceutical recall traceability.",
+          author: "Ceylon Med Quality Assurance Standards",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+            )}
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium disabled:opacity-50 cursor-pointer"
+            >
+              <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Batch"}
+            </button>
+          </div>
+        }
+      />
 
       <div className="bg-white  rounded-2xl shadow-sm border border-gray-100  p-6">
         <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -192,6 +252,22 @@ const ProductBatchFormPage = () => {
           </div>
         </form>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="product_batch"
+        title="AI Product Batch Auto-Fill"
+        contextData={{
+          products: products.map((p) => ({
+            id: p.id,
+            name: p.product_name,
+            code: p.product_code,
+            unit_price: p.unit_price,
+          })),
+        }}
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

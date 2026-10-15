@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { controlApi } from "../../../api/controlApi";
-import PageHeader from "../../../components/common/PageHeader";
-import { ArrowLeft, Save } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import ChartOfAccountSelect from "../../../components/finance/ChartOfAccountSelect";
 import FixedAssetCategorySelect from "../../../components/finance/FixedAssetCategorySelect";
@@ -16,6 +17,8 @@ const FixedAssetFormPage = () => {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [branches, setBranches] = useState([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     branch_id: "",
@@ -47,10 +50,55 @@ const FixedAssetFormPage = () => {
 
   useEffect(() => {
     fetchBranches();
+    financeApi
+      .getFixedAssetCategories({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setCategories(list);
+      })
+      .catch(console.error);
+
     if (isEdit) {
       fetchAsset();
     }
   }, [id]);
+
+  const handleAiApply = (aiData: any) => {
+    setFormData((prev: any) => {
+      let matchedCatId = prev.fixed_asset_category_id;
+      if (aiData.fixed_asset_category_id) {
+        matchedCatId = aiData.fixed_asset_category_id;
+      } else if (aiData.category_name && categories.length > 0) {
+        const match = categories.find((c: any) =>
+          c.category_name?.toLowerCase().includes(aiData.category_name.toLowerCase())
+        );
+        if (match) matchedCatId = match.id;
+      } else if (categories.length > 0 && !matchedCatId) {
+        matchedCatId = categories[0].id;
+      }
+
+      return {
+        ...prev,
+        fixed_asset_category_id: matchedCatId,
+        asset_code: aiData.asset_code || prev.asset_code,
+        asset_name: aiData.asset_name || prev.asset_name,
+        description: aiData.description || prev.description,
+        serial_number: aiData.serial_number || prev.serial_number,
+        model_number: aiData.model_number || prev.model_number,
+        manufacturer: aiData.manufacturer || prev.manufacturer,
+        purchase_date: aiData.purchase_date || prev.purchase_date || new Date().toISOString().split("T")[0],
+        acquisition_date: aiData.acquisition_date || aiData.purchase_date || prev.acquisition_date || new Date().toISOString().split("T")[0],
+        supplier_name: aiData.supplier_name || prev.supplier_name,
+        invoice_number: aiData.invoice_number || prev.invoice_number,
+        acquisition_cost: aiData.acquisition_cost || prev.acquisition_cost,
+        residual_value: aiData.residual_value !== undefined ? aiData.residual_value : prev.residual_value,
+        useful_life_months: aiData.useful_life_months || prev.useful_life_months || 60,
+        depreciation_method: aiData.depreciation_method || prev.depreciation_method || "straight_line",
+        depreciation_start_date: aiData.depreciation_start_date || aiData.purchase_date || prev.depreciation_start_date,
+        status: aiData.status || prev.status || "active"
+      };
+    });
+  };
 
   const fetchBranches = async () => {
     try {
@@ -202,33 +250,35 @@ const FixedAssetFormPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50  pb-10 overflow-y-auto">
-      <PageHeader
-        title={isEdit ? "Edit Fixed Asset" : "Create Fixed Asset"}
-        breadcrumb={[
-          { label: "Finance" },
-          { label: "Fixed Assets", path: "/admin/finance/fixed-assets" },
-          { label: isEdit ? "Edit" : "Create" },
-        ]}
-      />
+    <div className="flex flex-col h-full bg-gray-50 pb-10 overflow-y-auto space-y-6">
+      <div className="px-6 max-w-6xl mx-auto w-full pt-4">
+        <PageTitleCard
+          title={isEdit ? "Edit Fixed Asset" : "Create Fixed Asset"}
+          description={isEdit ? "Update fixed asset registry parameters and valuation" : "Register capital asset, acquisition valuation, and depreciation schedule"}
+          backAction={() => history.push("/admin/finance/fixed-assets")}
+          actions={
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300" />
+                <span>✨ AI Auto-Fill</span>
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 shadow-sm disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" /> {saving ? "Saving..." : "Save Asset"}
+              </button>
+            </div>
+          }
+        />
+      </div>
 
       <div className="px-6 max-w-6xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => history.push("/admin/finance/fixed-assets")}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to List
-          </button>
-          
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 shadow-sm disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" /> {saving ? "Saving..." : "Save Asset"}
-          </button>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
@@ -585,6 +635,16 @@ const FixedAssetFormPage = () => {
           </div>
         </div>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="fixed_asset"
+        onApply={handleAiApply}
+        contextData={{
+          categories,
+        }}
+      />
     </div>
   );
 };

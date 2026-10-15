@@ -2,6 +2,7 @@ package services
 
 import (
 	"math"
+	"strings"
 
 	"github.com/pixandco/erp-phrma/internal/finance/dto"
 	"github.com/pixandco/erp-phrma/internal/finance/models"
@@ -119,9 +120,13 @@ func (s *FinanceReportService) GetProfitLossReport(companyID uint64, req dto.Pro
 			closingCredit = netCredit - netDebit
 		}
 
+		val := math.Abs(closingCredit - closingDebit) // Conventional positive amount on P&L statement
+
 		line := dto.TrialBalanceLine{
+			AccountID:     raw.AccountID,
 			AccountCode:   raw.AccountCode,
 			AccountName:   raw.AccountName,
+			Balance:       val,
 			OpeningDebit:  raw.OpeningDebit,
 			OpeningCredit: raw.OpeningCredit,
 			PeriodDebit:   raw.PeriodDebit,
@@ -130,26 +135,44 @@ func (s *FinanceReportService) GetProfitLossReport(companyID uint64, req dto.Pro
 			ClosingCredit: closingCredit,
 		}
 
-		// Determine section (hardcoded matching for standard chart of accounts, or by normal balance)
-		// A robust system would have a 'pl_section' on the classification.
-		// For now we map by typical classification names if present, else by NormalBalance
-		val := math.Abs(closingCredit - closingDebit) // use absolute value, P&L conventionally shows positive
-
-		if raw.NormalBalance == "credit" {
-			// Income
-			// Add logic to separate Revenue vs Other Income based on your COA
+		// Standard pharmaceutical chart of accounts classification:
+		// 40xxxx -> Sales Revenue
+		// 41xxxx -> Other Income
+		// 5xxxxx -> Cost of Goods Sold / Direct Expenses
+		// 6xxxxx -> Administrative Expenses
+		// 7xxxxx -> Selling & Distribution Expenses
+		// 8xxxxx -> Finance Expenses
+		if strings.HasPrefix(raw.AccountCode, "40") {
+			response.Revenue.Lines = append(response.Revenue.Lines, line)
+			response.Revenue.Total += val
+		} else if strings.HasPrefix(raw.AccountCode, "41") {
+			response.OtherIncome.Lines = append(response.OtherIncome.Lines, line)
+			response.OtherIncome.Total += val
+		} else if strings.HasPrefix(raw.AccountCode, "5") {
+			response.DirectExpenses.Lines = append(response.DirectExpenses.Lines, line)
+			response.DirectExpenses.Total += val
+		} else if strings.HasPrefix(raw.AccountCode, "6") {
+			response.AdministrativeExpenses.Lines = append(response.AdministrativeExpenses.Lines, line)
+			response.AdministrativeExpenses.Total += val
+		} else if strings.HasPrefix(raw.AccountCode, "7") {
+			response.SellingExpenses.Lines = append(response.SellingExpenses.Lines, line)
+			response.SellingExpenses.Total += val
+		} else if strings.HasPrefix(raw.AccountCode, "8") {
+			response.FinanceExpenses.Lines = append(response.FinanceExpenses.Lines, line)
+			response.FinanceExpenses.Total += val
+		} else if strings.EqualFold(raw.NormalBalance, "credit") {
 			response.Revenue.Lines = append(response.Revenue.Lines, line)
 			response.Revenue.Total += val
 		} else {
-			// Expenses
 			response.AdministrativeExpenses.Lines = append(response.AdministrativeExpenses.Lines, line)
 			response.AdministrativeExpenses.Total += val
 		}
 	}
 
-	totalIncome := response.Revenue.Total + response.OtherIncome.Total
-	totalExpenses := response.DirectExpenses.Total + response.AdministrativeExpenses.Total + response.SellingExpenses.Total + response.FinanceExpenses.Total
-	response.NetProfitLoss = totalIncome - totalExpenses
+	response.TotalIncome = response.Revenue.Total + response.OtherIncome.Total
+	response.TotalExpense = response.DirectExpenses.Total + response.AdministrativeExpenses.Total + response.SellingExpenses.Total + response.FinanceExpenses.Total
+	response.NetProfit = response.TotalIncome - response.TotalExpense
+	response.NetProfitLoss = response.NetProfit
 
 	return &response, nil
 }

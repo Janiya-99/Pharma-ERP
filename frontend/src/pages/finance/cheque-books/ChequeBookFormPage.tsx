@@ -3,6 +3,9 @@ import { useParams, useHistory } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import BankAccountSelect from "../../../components/finance/BankAccountSelect";
 import { toast } from "react-hot-toast";
+import { Sparkles, Save, ArrowLeft } from "lucide-react";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 
 export default function ChequeBookFormPage() {
   const { id } = useParams();
@@ -11,6 +14,8 @@ export default function ChequeBookFormPage() {
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     bank_account_id: "",
@@ -92,31 +97,74 @@ export default function ChequeBookFormPage() {
     }
   };
 
+  useEffect(() => {
+    financeApi
+      .getBankAccounts({ limit: 100, status: "active" })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setBankAccounts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    setFormData((prev: any) => {
+      let matchedBankAccId = prev.bank_account_id;
+      if (aiData.bank_account_id) {
+        matchedBankAccId = String(aiData.bank_account_id);
+      } else if (aiData.bank_account_name && bankAccounts.length > 0) {
+        const match = bankAccounts.find(
+          (b: any) =>
+            b.account_name?.toLowerCase().includes(aiData.bank_account_name.toLowerCase()) ||
+            b.bank_name?.toLowerCase().includes(aiData.bank_account_name.toLowerCase()) ||
+            b.account_number?.includes(aiData.bank_account_name)
+        );
+        if (match) matchedBankAccId = String(match.id);
+      } else if (bankAccounts.length > 0 && !matchedBankAccId) {
+        matchedBankAccId = String(bankAccounts[0].id);
+      }
+
+      return {
+        ...prev,
+        bank_account_id: matchedBankAccId,
+        cheque_book_number: aiData.book_number || aiData.cheque_book_number || prev.cheque_book_number,
+        start_leaf_number: aiData.start_cheque_number || aiData.start_leaf_number || prev.start_leaf_number,
+        number_of_leaves: aiData.number_of_cheques || aiData.number_of_leaves || prev.number_of_leaves,
+        remarks: aiData.remarks || prev.remarks,
+      };
+    });
+  };
+
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
   return (
-    <div className="py-4 max-w-3xl mx-auto h-full overflow-y-auto">
-      <div className="bg-white  rounded-xl shadow-sm border border-gray-100  p-6">
-        <div className="flex items-center justify-between mb-6 border-b pb-4 ">
-          <div>
-            <h2 className="text-xl font-bold text-navy-700 ">
-              {isEdit ? "Edit Cheque Book" : "Create Cheque Book"}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {isEdit 
-                ? "Update cheque book details. Note: You cannot modify leaves once created." 
-                : "Create a new cheque book. Cheque leaves will be automatically generated."}
-            </p>
+    <div className="py-4 max-w-3xl mx-auto h-full overflow-y-auto space-y-6">
+      <PageTitleCard
+        title={isEdit ? "Edit Cheque Book" : "Create Cheque Book"}
+        description={isEdit ? "Update cheque book registry parameters" : "Register a new commercial cheque book series with auto-generated leaves"}
+        backAction={() => history.push("/admin/finance/cheque-books")}
+        actions={
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4 text-amber-300" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => history.push("/admin/finance/cheque-books")}
+              className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => history.push("/admin/finance/cheque-books")}
-            className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-        </div>
+        }
+      />
 
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
@@ -223,6 +271,19 @@ export default function ChequeBookFormPage() {
           </div>
         </form>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="cheque_book"
+        onApply={handleAiApply}
+        contextData={{
+          accounts: bankAccounts.map((b: any) => ({
+            id: b.id,
+            name: `${b.bank_name} - ${b.account_number} (${b.account_name})`,
+          })),
+        }}
+      />
     </div>
   );
 }

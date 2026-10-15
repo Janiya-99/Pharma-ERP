@@ -115,18 +115,21 @@ const ProfitLossReportPage = () => {
     }
 
     return (
-      <div className="divide-y divide-gray-100 ">
-        {lines.map((line: unknown) => (
-          <div key={line.account_id} className="flex justify-between items-center px-4 py-2 hover:bg-gray-50  transition-colors">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-navy-800 ">{line.account_code}</span>
-              <span className="text-xs text-gray-500 ">{line.account_name}</span>
+      <div className="divide-y divide-gray-100">
+        {lines.map((line: any, idx: number) => {
+          const lineBal = line.balance !== undefined ? line.balance : (line.closing_credit || line.closing_debit || 0);
+          return (
+            <div key={line.account_id || line.account_code || idx} className="flex justify-between items-center px-4 py-2 hover:bg-gray-50 transition-colors">
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-slate-800">{line.account_code}</span>
+                <span className="text-xs text-slate-500">{line.account_name}</span>
+              </div>
+              <div className="text-sm font-medium">
+                <ReportAmountCell amount={lineBal} />
+              </div>
             </div>
-            <div className="text-sm">
-              <ReportAmountCell amount={line.balance} />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
@@ -236,17 +239,22 @@ const ProfitLossReportPage = () => {
         </div>
       </ReportFilterCard>
 
-      {data && (
+      {data && (() => {
+        const totalIncome = data.total_income !== undefined ? data.total_income : ((data.revenue?.total || 0) + (data.other_income?.total || 0));
+        const totalExpense = data.total_expense !== undefined ? data.total_expense : ((data.direct_expenses?.total || 0) + (data.administrative_expenses?.total || 0) + (data.selling_expenses?.total || 0) + (data.finance_expenses?.total || 0));
+        const netProfit = data.net_profit !== undefined ? data.net_profit : (data.net_profit_loss !== undefined ? data.net_profit_loss : (totalIncome - totalExpense));
+
+        return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex justify-between items-end mb-6">
             <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
             <div className="mb-4">
-               <ProfitLossBadge amount={data.net_profit} />
+               <ProfitLossBadge amount={netProfit} />
             </div>
           </div>
 
-          <div className="bg-white  rounded-lg shadow-sm border border-gray-200  p-6 mb-8">
-            <h2 className="text-2xl font-bold text-center text-navy-800  mb-6">Income Statement</h2>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 mb-8">
+            <h2 className="text-2xl font-bold text-center text-slate-800 mb-6">Income Statement</h2>
             
             {/* Income Sections */}
             <ReportSection title="Revenue" totalLabel="Total Revenue" totalAmount={data.revenue?.total}>
@@ -257,10 +265,10 @@ const ProfitLossReportPage = () => {
               {renderSectionLines(data.other_income?.lines)}
             </ReportSection>
 
-            <div className="bg-green-50  border border-green-200  rounded-lg px-4 py-3 flex justify-between items-center mb-8">
-              <span className="font-bold text-green-800 ">Total Income</span>
-              <span className="font-bold text-green-800 ">
-                <ReportAmountCell amount={data.total_income} />
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex justify-between items-center mb-8 shadow-xs">
+              <span className="font-bold text-emerald-800">Total Income</span>
+              <span className="font-bold text-emerald-800">
+                <ReportAmountCell amount={totalIncome} />
               </span>
             </div>
 
@@ -268,8 +276,6 @@ const ProfitLossReportPage = () => {
             <ReportSection title="Direct Expenses" totalLabel="Total Direct Expenses" totalAmount={data.direct_expenses?.total}>
               {renderSectionLines(data.direct_expenses?.lines)}
             </ReportSection>
-            
-            {/* Gross Profit could be calculated here, but following exactly the requested layout */}
 
             <ReportSection title="Administrative Expenses" totalLabel="Total Administrative Expenses" totalAmount={data.administrative_expenses?.total}>
               {renderSectionLines(data.administrative_expenses?.lines)}
@@ -283,36 +289,37 @@ const ProfitLossReportPage = () => {
               {renderSectionLines(data.finance_expenses?.lines)}
             </ReportSection>
 
-            <div className="bg-red-50  border border-red-200  rounded-lg px-4 py-3 flex justify-between items-center mb-8">
-              <span className="font-bold text-red-800 ">Total Expenses</span>
-              <span className="font-bold text-red-800 ">
-                <ReportAmountCell amount={data.total_expense} />
+            <div className="bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 flex justify-between items-center mb-8 shadow-xs">
+              <span className="font-bold text-rose-800">Total Expenses</span>
+              <span className="font-bold text-rose-800">
+                <ReportAmountCell amount={totalExpense} />
               </span>
             </div>
 
             {/* Net Profit */}
-            <div className={`rounded-lg px-6 py-4 flex justify-between items-center border-2 ${
-              data.net_profit > 0 
-                ? "bg-green-100  border-green-300 " 
-                : data.net_profit < 0 
-                  ? "bg-red-100  border-red-300 "
-                  : "bg-gray-100  border-gray-300 "
+            <div className={`rounded-xl px-6 py-4 flex justify-between items-center border-2 shadow-xs ${
+              netProfit > 0 
+                ? "bg-emerald-50 border-emerald-300" 
+                : netProfit < 0 
+                  ? "bg-rose-50 border-rose-300"
+                  : "bg-slate-50 border-slate-300"
             }`}>
               <span className={`text-xl font-bold ${
-                data.net_profit > 0 ? "text-green-800 " : data.net_profit < 0 ? "text-red-800 " : "text-gray-800 "
+                netProfit > 0 ? "text-emerald-800" : netProfit < 0 ? "text-rose-800" : "text-slate-800"
               }`}>
-                Net {data.net_profit > 0 ? "Profit" : data.net_profit < 0 ? "Loss" : "Profit/Loss"}
+                Net {netProfit > 0 ? "Profit" : netProfit < 0 ? "Loss" : "Profit/Loss"}
               </span>
               <span className={`text-2xl font-bold ${
-                data.net_profit > 0 ? "text-green-800 " : data.net_profit < 0 ? "text-red-800 " : "text-gray-800 "
+                netProfit > 0 ? "text-emerald-800" : netProfit < 0 ? "text-rose-800" : "text-slate-800"
               }`}>
-                <ReportAmountCell amount={data.net_profit} />
+                <ReportAmountCell amount={netProfit} />
               </span>
             </div>
 
           </div>
         </div>
-      )}
+        );
+      })()}
       
       {!data && !loading && (
         <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">

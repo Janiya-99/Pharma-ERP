@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
 import { inventoryApi } from "api/inventoryApi";
 import * as controlApi from "api/controlApi";
 import { Button } from "components/ui/button";
@@ -12,6 +12,8 @@ import { SalesReturnLine } from "types/inventory";
 import SalesReturnLinesTable from "./SalesReturnLinesTable";
 import { SalesReturnTotalsCard, ReturnConditionWarehouseWarning } from "components/inventory/SalesReturnCards";
 import PermissionGuard from "auth/PermissionGuard";
+import { PageTitleCard } from "components/common/PageTitleCard";
+import { AiAutoFillModal } from "components/common/AiAutoFillModal";
 
 const SalesReturnFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +26,8 @@ const SalesReturnFormPage: React.FC = () => {
   // Lookups
   const [branches, setBranches] = useState<any[]>([]);
   const [warehouses, setWarehouses] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   
   // Header state
   const [salesReturnDate, setSalesReturnDate] = useState(new Date().toISOString().split("T")[0]);
@@ -40,6 +44,60 @@ const SalesReturnFormPage: React.FC = () => {
 
   // Lines state
   const [lines, setLines] = useState<SalesReturnLine[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    if (aiData.customer_name) setCustomerName(aiData.customer_name);
+    if (aiData.customer_contact_number) setCustomerContactNumber(aiData.customer_contact_number);
+    if (aiData.sales_invoice_number) setSalesInvoiceNumber(aiData.sales_invoice_number);
+    if (aiData.customer_credit_note_number) setCustomerCreditNoteNumber(aiData.customer_credit_note_number);
+    if (aiData.reference_number) setReferenceNumber(aiData.reference_number);
+    if (aiData.return_reason) setReturnReason(aiData.return_reason);
+    if (aiData.return_condition) setReturnCondition(aiData.return_condition);
+    if (aiData.remarks) setRemarks(aiData.remarks);
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any, idx: number) => {
+        let matchedProd = products.find(
+          (p: any) =>
+            p.id === l.product_id ||
+            p.product_name?.toLowerCase() === l.product_name?.toLowerCase() ||
+            p.brand_name?.toLowerCase() === l.product_name?.toLowerCase()
+        );
+        const qty = Number(l.return_quantity || l.quantity || 1);
+        const price = Number(l.unit_price || matchedProd?.unit_price || 0);
+        const discount = Number(l.discount_amount || 0);
+        const tax = Number(l.tax_amount || 0);
+        const total = qty * price - discount + tax;
+
+        return {
+          id: `ai-line-${Date.now()}-${idx}`,
+          product_id: matchedProd ? matchedProd.id : l.product_id || 1,
+          product: matchedProd || { id: 1, product_name: l.product_name || "Product" },
+          product_batch_id: l.product_batch_id || null,
+          return_quantity: qty,
+          unit_price: price,
+          discount_amount: discount,
+          tax_amount: tax,
+          line_total: total,
+          stock_unit_cost: Number(l.stock_unit_cost || price * 0.8),
+          return_reason: l.return_reason || aiData.return_reason || "customer_return",
+          return_condition: l.return_condition || aiData.return_condition || "saleable",
+          line_remarks: l.line_remarks || ""
+        };
+      });
+      setLines(mapped);
+    }
+  };
 
   useEffect(() => {
     fetchLookups();
@@ -227,29 +285,29 @@ const SalesReturnFormPage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link to="/inventory/sales-returns">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-800">
-              {isEdit ? "Edit Sales Return" : "Create Sales Return"}
-            </h1>
-            <p className="text-sm text-slate-500">
-              {isEdit ? "Update return details and line items" : "Create a new return from a customer"}
-            </p>
+      <PageTitleCard
+        title={isEdit ? "Edit Sales Return" : "Create Sales Return"}
+        description={isEdit ? "Update return details and line items" : "Record customer goods returns and generate credit adjustment records"}
+        backTo="/inventory/sales-returns"
+        actions={
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4 text-amber-300" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+            <PermissionGuard permission={isEdit ? "inventory.sales_return.update" : "inventory.sales_return.create"}>
+              <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-xs py-2.5 px-4 h-auto rounded-xl">
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? "Saving..." : "Save Draft"}
+              </Button>
+            </PermissionGuard>
           </div>
-        </div>
-        <PermissionGuard permission={isEdit ? "inventory.sales_return.update" : "inventory.sales_return.create"}>
-          <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? "Saving..." : "Save Draft"}
-          </Button>
-        </PermissionGuard>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
@@ -406,6 +464,17 @@ const SalesReturnFormPage: React.FC = () => {
           <SalesReturnTotalsCard salesReturn={totals as any} />
         </div>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="sales_return"
+        onApply={handleAiApply}
+        contextData={{
+          warehouses,
+          products,
+        }}
+      />
     </div>
   );
 };

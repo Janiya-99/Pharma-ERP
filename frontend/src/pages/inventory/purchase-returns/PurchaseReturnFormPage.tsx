@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
+import { PageTitleCard } from "components/common/PageTitleCard";
+import { AiAutoFillModal } from "components/common/AiAutoFillModal";
 import { inventoryApi } from "api/inventoryApi";
 import * as controlApi from "api/controlApi";
 import { Button } from "components/ui/button";
@@ -40,6 +42,94 @@ const PurchaseReturnFormPage: React.FC = () => {
 
   // Lines state
   const [lines, setLines] = useState<PurchaseReturnLine[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    if (aiData.supplier_id) {
+      setSupplierId(String(aiData.supplier_id));
+    } else if (aiData.supplier_name && suppliers.length > 0) {
+      const match = suppliers.find(
+        (s: any) =>
+          s.supplier_name?.toLowerCase().includes(aiData.supplier_name.toLowerCase()) ||
+          aiData.supplier_name.toLowerCase().includes(s.supplier_name?.toLowerCase()) ||
+          s.supplier_code?.toLowerCase() === aiData.supplier_name.toLowerCase()
+      );
+      if (match) setSupplierId(String(match.id));
+    }
+
+    if (aiData.warehouse_id) {
+      setWarehouseId(String(aiData.warehouse_id));
+    } else if (aiData.warehouse_name && warehouses.length > 0) {
+      const match = warehouses.find(
+        (w: any) =>
+          w.warehouse_name?.toLowerCase().includes(aiData.warehouse_name.toLowerCase()) ||
+          aiData.warehouse_name.toLowerCase().includes(w.warehouse_name?.toLowerCase()) ||
+          w.warehouse_code?.toLowerCase() === aiData.warehouse_name.toLowerCase()
+      );
+      if (match) setWarehouseId(String(match.id));
+    } else if (warehouses.length > 0 && !warehouseId) {
+      setWarehouseId(String(warehouses[0].id));
+    }
+
+    if (branches.length > 0 && !branchId) {
+      setBranchId(String(branches[0].id));
+    }
+
+    if (aiData.return_date) setPurchaseReturnDate(aiData.return_date);
+    if (aiData.reference_number) setReferenceNumber(aiData.reference_number);
+    if (aiData.return_reason) setReturnReason(aiData.return_reason);
+    if (aiData.remarks) setRemarks(aiData.remarks);
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any, idx: number) => {
+        let matchedProduct = null;
+        if (l.product_id) {
+          matchedProduct = products.find((p: any) => String(p.id) === String(l.product_id));
+        }
+        if (!matchedProduct && l.product_name && products.length > 0) {
+          const searchName = l.product_name.toLowerCase();
+          matchedProduct = products.find(
+            (p: any) =>
+              p.product_name?.toLowerCase().includes(searchName) ||
+              searchName.includes(p.product_name?.toLowerCase()) ||
+              p.product_code?.toLowerCase() === searchName
+          );
+        }
+        const prod = matchedProduct || products[0] || null;
+        const qty = Number(l.quantity || l.return_quantity || 1);
+        const cost = Number(l.unit_cost || prod?.unit_price || 0);
+
+        return {
+          id: `line-${idx}-${Date.now()}`,
+          product_id: prod ? prod.id : 0,
+          product_name: prod ? prod.product_name : (l.product_name || "Pharmaceutical Item"),
+          product_code: prod ? prod.product_code : "",
+          product_batch_id: null,
+          batch_number: l.batch_number || "BATCH-DEFAULT",
+          available_quantity: qty * 2,
+          return_quantity: qty,
+          unit_cost: cost,
+          discount_amount: 0,
+          tax_amount: 0,
+          line_total: qty * cost,
+          return_reason: l.return_reason || aiData.return_reason || "damaged",
+          line_remarks: l.remarks || "",
+        } as PurchaseReturnLine;
+      });
+      setLines(mapped);
+    }
+  };
 
   useEffect(() => {
     fetchLookups();
@@ -239,30 +329,45 @@ const PurchaseReturnFormPage: React.FC = () => {
   const totals = calculateTotals();
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link to="/inventory/purchase-returns">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
+    <div className="p-6 space-y-6 max-w-7xl mx-auto pb-24">
+      <PageTitleCard
+        title={isEdit ? "Edit Purchase Return" : "New Pharmaceutical Purchase Return"}
+        description="Return defective, temperature-damaged, or short-expiry batches to pharmaceutical manufacturers."
+        moduleTag="Inventory"
+        accent="emerald"
+        backTo="/inventory/purchase-returns"
+        quote={{
+          text: "Authorized pharmaceutical vendor returns with mandatory quarantine batch isolation.",
+          author: "Ceylon Med Supply Chain Guidelines",
+        }}
+        actions={
+          <div className="flex items-center gap-3">
+            {!isEdit && (
+              <Button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100"
+              >
+                <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/inventory/purchase-returns")}
+            >
+              Cancel
             </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-800">
-              {isEdit ? "Edit Purchase Return" : "Create Purchase Return"}
-            </h1>
-            <p className="text-sm text-slate-500">
-              {isEdit ? "Update return details and line items" : "Create a new return to supplier"}
-            </p>
+            <PermissionGuard permission={isEdit ? "inventory.purchase_return.update" : "inventory.purchase_return.create"}>
+              <Button onClick={handleSave} disabled={saving} className="bg-brand-600 hover:bg-brand-700">
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? "Saving..." : "Save Draft"}
+              </Button>
+            </PermissionGuard>
           </div>
-        </div>
-        <PermissionGuard permission={isEdit ? "inventory.purchase_return.update" : "inventory.purchase_return.create"}>
-          <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? "Saving..." : "Save Draft"}
-          </Button>
-        </PermissionGuard>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
@@ -397,6 +502,22 @@ const PurchaseReturnFormPage: React.FC = () => {
           <GRNLinkedReturnCard grn={selectedGrn} />
         </div>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="purchase_return"
+        title="AI Purchase Return Auto-Fill"
+        contextData={{
+          products: products.map((p) => ({
+            id: p.id,
+            name: p.product_name,
+            code: p.product_code,
+            unit_price: p.unit_price,
+          })),
+        }}
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

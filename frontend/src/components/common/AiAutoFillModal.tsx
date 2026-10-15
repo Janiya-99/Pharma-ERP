@@ -60,6 +60,86 @@ const PRESET_PROMPTS: Record<FormType, string[]> = {
   grn: [
     "Receive shipment from State Pharmaceuticals Manufacturing: 5000 units Paracetamol 500mg batch B-2026-1002 mfg 2026-09-01 exp 2029-08-31 at 4.50 LKR each, invoice SPMC-INV-8812.",
     "Goods received note from Astron Limited: 1000 units Amoxicillin 500mg batch AST-26-889 exp 2028-10-15 at 11.20 LKR per unit, invoice AST-9921."
+  ],
+  sales_order: [
+    "Sales order for Asiri Central Hospital PLC, customer PO reference ACH-PO-8841, delivery in 3 days, 30 days credit. Items: 200 Paracetamol Infusion 100ml at 650 LKR with 5% discount, priority ward consignment.",
+    "Create sales order for Nawaloka Hospitals PLC, PO reference NW-9021, delivery due 2026-10-20. Items: 150 Amoxicillin 500mg Capsules at 1250 LKR and 80 Metformin 500mg at 450 LKR.",
+    "Order from Durdans Hospital, ref DH-ORD-1102, Net 30 days, 100 Ciprofloxacin 500mg at 820 LKR each."
+  ],
+  credit_note: [
+    "Issue sales return credit note to Nawaloka Hospitals PLC for 20 Metformin 500mg at 450 LKR each due to outer packaging damage in transit, reference RTN-2026-041.",
+    "Price adjustment credit note for Homagama Medical Supplies for 15,000 LKR due to agreed contractual volume rebate on invoice INV-2026-0042.",
+    "Credit note for Asiri Surgical Hospital, return of 10 vials Insulin Glargine 100 IU/ml at 1450 LKR due to temperature excursion during transit."
+  ],
+  debit_note: [
+    "Supplementary debit note to Durdans Hospital for 15,000 LKR for emergency refrigerated courier transport and special cold-chain dry ice handling on delivery DN-REQ-091.",
+    "Debit note to Lanka Hospitals for 8,500 LKR covering late payment interest charge on overdue invoice INV-2026-0012.",
+    "Price correction debit note to Central Care Galle for 25,000 LKR underbilled freight differential."
+  ],
+  product_batch: [
+    "New product batch BAT-2026-104 manufactured on 2026-08-01, expiry 2028-07-31, purchase rate 450 LKR, selling price 680 LKR, MRP 750 LKR, Passed QA inspection.",
+    "Batch B-2026-881, mfg date 2026-09-15, exp date 2029-09-14, cost 1200 LKR, selling price 1750 LKR, MRP 1900 LKR.",
+    "Cold chain batch CC-2026-009, mfg 2026-10-01, exp 2027-09-30, cost 3200 LKR, retail price 4500 LKR, storage 2C-8C."
+  ],
+  stock_transfer: [
+    "Transfer 500 Paracetamol 500mg Tablets from Colombo Central Medical Warehouse to Kandy Central Distribution Warehouse, transfer date today, reference REQ-KDY-884, priority replenishment.",
+    "Stock transfer of 200 Amoxicillin 500mg from Central Bulk Depot to Galle Regional Depot, ref TR-GAL-019, regular weekly distribution.",
+    "Move 100 Insulin Glargine pens from Main Warehouse to Cold Chain Storage Facility, ref CC-MOV-881."
+  ],
+  stock_adjustment: [
+    "Stock write-off adjustment for Colombo Central Medical Warehouse: 25 Amoxicillin 500mg Capsules damaged on pallet shift during unloading, unit cost 380 LKR, write off to inventory damage loss.",
+    "Inventory adjustment increase at Kandy Warehouse: Found 40 units Paracetamol 500mg during bi-weekly physical cycle count, unit cost 4.50 LKR.",
+    "Stock adjustment for 15 expired Salbutamol Inhalers, write down due to shelf-life expiry, batch EX-2026-09."
+  ],
+  purchase_return: [
+    "Return 50 Insulin Glargine 100 IU/ml to State Pharmaceuticals Corporation of Sri Lanka (SPC) due to delivery with < 6 months remaining shelf-life, unit cost 1450 LKR, ref PR-SPC-904.",
+    "Purchase return to Hemas Healthcare: 30 Metformin 500mg damaged seal boxes, ref PR-HEM-102.",
+    "Return to Astron Limited: 100 Amoxicillin 500mg batch discrepancy, ref PR-AST-044."
+  ],
+  payment_voucher: [
+    "Supplier payment voucher to Hemas Healthcare Distribution for 1,250,000 LKR via bank transfer from Bank of Ceylon Current Account settling pharmaceutical invoices, ref PO-SETTLE-8812.",
+    "Disburse 450,000 LKR to State Pharmaceuticals Corporation via Commercial Bank transfer for batch deliveries.",
+    "Utility payment voucher: 185,000 LKR to Ceylon Electricity Board for cold storage warehouse power supply."
+  ],
+  receipt_voucher: [
+    "Customer receipt voucher: 1,850,000 LKR received from Asiri Surgical Hospital PLC via electronic RTGS transfer deposited to Commercial Bank Current Account, ref ACH-RTGS-9901.",
+    "Receipt voucher from Nawaloka Hospitals PLC for 950,000 LKR via cheque CHQ-778102 deposited to BOC account.",
+    "Direct deposit receipt of 320,000 LKR from Royal Health Pharmacy for invoice settlements."
+  ],
+  user: [
+    "Register Dr. Saman Wijesinghe, employee code EMP-015, email saman.w@ceylonmed.lk, phone +94 77 889 9001, Quality Assurance department, Senior QC Compliance Pharmacist, default branch Colombo Central Hub.",
+    "Add new user: Dilani Perera, EMP-016, email dilani.p@ceylonmed.lk, Finance department, Senior Accounts Executive, Head Office Colombo.",
+    "Add sales representative: Ruwan Jayasuriya, EMP-017, email ruwan.j@ceylonmed.lk, Sales & Marketing, Kandy Regional Branch."
+  ],
+  sales_return: [
+    "Customer sales return from Homagama Medical Supplies for invoice SINV-2026-0042: return 10 packs Amoxicillin 500mg, unopened sealed boxes, return reason customer_return, condition saleable, unit price 1250 LKR.",
+    "Sales return from Lanka Hospitals Pharmacy: 5 units Salbutamol Inhaler, reason defective_packaging, condition damaged, credit note requested.",
+    "Return from Asiri Central Hospital: 25 packs Paracetamol 500mg Tablets, invoice SINV-2026-0038, overstock return, condition saleable."
+  ],
+  opening_stock: [
+    "Opening stock initial audit entry: 2500 Paracetamol 500mg Tablets, batch OP-B26-01, expiry 2029-06-30, unit cost 4.20 LKR, reference OP-STOCK-2026-01.",
+    "Opening inventory count: 800 Amoxicillin 500mg, batch OP-AMX-001, expiry 2028-12-31, unit cost 1150 LKR, audited physical stock.",
+    "Opening balance: 150 Insulin Glargine 100 IU/ml pens, batch OP-INS-02, expiry 2027-10-31, unit cost 1400 LKR, verified cold storage."
+  ],
+  bank_account: [
+    "Bank of Ceylon (BOC) Kollupitiya Corporate Branch, Account: Ceylon Med Global Operations LKR, Number: 7041289552, SWIFT: BCEYLKLX, opening balance 5,000,000 LKR, set as primary default account.",
+    "Commercial Bank of Ceylon PLC, Foreign Trade Branch Colombo 01, Account: Ceylon Med Import Escrow, Number: 1009847120, SWIFT: COMBCEYL, opening balance 12,500,000 LKR.",
+    "Hatton National Bank (HNB), Cinnamon Gardens Branch, Account: Ceylon Med Operations, Number: 0039485712, SWIFT: HNBLLKLX, opening balance 3,500,000 LKR."
+  ],
+  cheque_book: [
+    "Register Bank of Ceylon 50-leaf cheque book CHQ-BOC-2026-A, start number 100201 to 100250 for corporate supplier payouts.",
+    "Commercial Bank cheque book CB-2026-B, start cheque 554101 to 554200 (100 cheques), main disbursement account.",
+    "HNB 25-leaf emergency cheque book HNB-EMG-01, start cheque 300101 to 300125."
+  ],
+  petty_cash_voucher: [
+    "Petty cash voucher for 8,500 LKR paid to Sunil Disinfection Services for medical-grade cold room sanitizing supplies, voucher type expense, ref PCV-EXP-88.",
+    "Emergency petty cash expense of 4,200 LKR for urgent DHL courier dispatch of laboratory sample to NWSDB lab, payee DHL Express.",
+    "Petty cash advance of 15,000 LKR to driver Kasun Bandara for fuel and expressway tolls during inter-warehouse cold-chain transfer."
+  ],
+  fixed_asset: [
+    "Register new asset: Thermo Fisher Scientific Ultra-Low Temperature Freezer (-80C), asset code FA-EQ-2026-009, model TSX60086A, serial TFS-ULT-99412, acquisition cost 3,850,000 LKR, 10 years useful life, straight-line depreciation.",
+    "Purchase asset: Toyota HiAce Cold-Chain Refrigerated Van, asset code FA-VH-2026-003, acquisition cost 16,500,000 LKR, residual value 2,000,000 LKR, useful life 60 months, straight-line depreciation.",
+    "Office IT Asset: Dell PowerEdge R750xs Server for ERP Core Host, asset code FA-IT-2026-012, cost 2,450,000 LKR, useful life 36 months."
   ]
 };
 

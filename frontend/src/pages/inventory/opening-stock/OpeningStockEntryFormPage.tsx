@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, Sparkles } from "lucide-react";
 import { inventoryApi } from "api/inventoryApi";
 import { useAuth } from "auth/AuthContext";
 import OpeningStockLinesTable from "./OpeningStockLinesTable";
 import OpeningStockTotalsCard from "../../../components/inventory/OpeningStockTotalsCard";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 
 const OpeningStockEntryFormPage = () => {
   const { id } = useParams();
@@ -16,6 +18,8 @@ const OpeningStockEntryFormPage = () => {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [warehouses, setWarehouses] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [financialYears, setFinancialYears] = useState<any[]>([]);
   const [accountingPeriods, setAccountingPeriods] = useState<any[]>([]);
   
@@ -31,6 +35,48 @@ const OpeningStockEntryFormPage = () => {
 
   const [lines, setLines] = useState<any[]>([]);
   const [errors, setErrors] = useState<any>({});
+
+  useEffect(() => {
+    inventoryApi
+      .getProducts({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setProducts(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      opening_stock_date: aiData.opening_stock_date || prev.opening_stock_date,
+      reference_number: aiData.reference_number || prev.reference_number,
+      remarks: aiData.remarks || prev.remarks,
+    }));
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any, idx: number) => {
+        const matchedProd = products.find(
+          (p: any) =>
+            p.id === l.product_id ||
+            p.product_name?.toLowerCase() === l.product_name?.toLowerCase() ||
+            p.brand_name?.toLowerCase() === l.product_name?.toLowerCase()
+        );
+        return {
+          id: `ai-open-line-${Date.now()}-${idx}`,
+          product_id: matchedProd ? matchedProd.id : l.product_id || 1,
+          product: matchedProd || { id: 1, product_name: l.product_name || "Product" },
+          product_batch_id: l.product_batch_id || "",
+          batch_number: l.batch_number || "",
+          expiry_date: l.expiry_date || "",
+          quantity: l.quantity || 1,
+          unit_cost: l.unit_cost || matchedProd?.unit_price || 0,
+          line_remarks: l.line_remarks || ""
+        };
+      });
+      setLines(mapped);
+    }
+  };
 
   useEffect(() => {
     fetchLookups();
@@ -182,33 +228,32 @@ const OpeningStockEntryFormPage = () => {
   const { totalQty, totalValue } = calculateTotals();
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate("/inventory/opening-stock")}
-            className="p-2 bg-white  rounded-full shadow hover:bg-gray-50  transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-gray-600 " />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-navy-700 ">
-              {isEdit ? "Edit Opening Stock" : "Create Opening Stock"}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Enter initial inventory quantities and values
-            </p>
+    <div className="p-6 max-w-[1600px] mx-auto space-y-6">
+      <PageTitleCard
+        title={isEdit ? "Edit Opening Stock" : "Create Opening Stock"}
+        description={isEdit ? "Update opening stock inventory quantities and audited values" : "Enter initial inventory quantities and audited opening balances"}
+        backTo="/inventory/opening-stock"
+        actions={
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4 text-amber-300" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-5 py-2.5 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm font-semibold text-xs"
+            >
+              <Save className="h-4 w-4" />
+              {saving ? "Saving..." : "Save Draft"}
+            </button>
           </div>
-        </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm font-medium"
-        >
-          <Save className="h-4 w-4" />
-          {saving ? "Saving..." : "Save Draft"}
-        </button>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-6">
@@ -343,6 +388,17 @@ const OpeningStockEntryFormPage = () => {
           </div>
         </div>
       </div>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="opening_stock"
+        onApply={handleAiApply}
+        contextData={{
+          warehouses,
+          products,
+        }}
+      />
     </div>
   );
 };
