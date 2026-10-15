@@ -10,6 +10,7 @@ import ChangeCustomerStatusModal from "./ChangeCustomerStatusModal";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Search, Plus, RefreshCw, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../../../components/common/PageHeader";
 import {
   Select,
   SelectContent,
@@ -133,34 +134,30 @@ const CustomersPage: React.FC = () => {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm   sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-navy-900 ">
-            Customers
-          </h1>
-          <p className="mt-1 text-xs text-gray-500 ">
-            Manage customer profiles, credit accounts, and contact points
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={fetchCustomers}
-            disabled={loading}
-            className="rounded-xl bg-gray-50 p-2 text-gray-600 transition-colors hover:bg-gray-100   "
-            title="Refresh"
-          >
-            <RefreshCw className={`h-5 w-5 ${loading ? "animate-spin" : ""}`} />
-          </button>
-          <PermissionGuard permission="invoice_center.customer.create">
+      <PageHeader
+        title="Customers"
+        description="Manage customer profiles, credit accounts, and contact points"
+        action={
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate("/invoice-center/customers/create")}
-              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-brand-600"
+              onClick={fetchCustomers}
+              disabled={loading}
+              className="rounded-xl border border-slate-200 bg-white/80 p-2.5 text-slate-600 transition-colors hover:bg-slate-100 shadow-xs"
+              title="Refresh"
             >
-              <Plus className="h-4 w-4" /> Add Customer
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
-          </PermissionGuard>
-        </div>
-      </div>
+            <PermissionGuard permission="invoice_center.customer.create">
+              <button
+                onClick={() => navigate("/invoice-center/customers/create")}
+                className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-brand-600"
+              >
+                <Plus className="h-4 w-4" /> Add Customer
+              </button>
+            </PermissionGuard>
+          </div>
+        }
+      />
 
       {error && (
         <div className="bg-rose-50 border-rose-200 text-rose-700 flex items-center gap-2 rounded-xl border p-4 text-sm">
@@ -170,7 +167,7 @@ const CustomersPage: React.FC = () => {
       )}
 
       {/* Filters bar */}
-      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm   sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-4 shadow-xs sm:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
           <Search className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
           <input
@@ -244,7 +241,7 @@ const CustomersPage: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm  ">
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>

@@ -23,37 +23,34 @@ export const CustomerReceiptTotalsCard: React.FC<Props> = ({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Receipt Summary</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {allocationCount !== undefined && (
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>Allocations</span>
-              <span>{allocationCount}</span>
-            </div>
-          )}
-          <div className="flex justify-between text-base font-bold">
-            <span>Receipt Amount</span>
-            <span>{formatLKR(receiptAmount)}</span>
-          </div>
-          <Separator className="my-2" />
-          <div className="flex justify-between text-sm text-green-700">
-            <span>Allocated Amount</span>
-            <span>{formatLKR(allocatedAmount)}</span>
-          </div>
-          <div
-            className={`flex justify-between text-sm font-medium ${
-              unallocatedAmount > 0 ? "text-orange-600" : "text-gray-600"
-            }`}
-          >
-            <span>Unallocated Amount</span>
-            <span>{formatLKR(unallocatedAmount)}</span>
-          </div>
+    <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-5 shadow-xs">
+      <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
+        <h4 className="text-sm font-bold uppercase tracking-wider text-slate-800">Receipt Summary</h4>
+        {allocationCount !== undefined && (
+          <span className="text-xs font-semibold text-slate-500">
+            {allocationCount} {allocationCount === 1 ? "Invoice" : "Invoices"}
+          </span>
+        )}
+      </div>
+      <div className="pt-4 space-y-2.5">
+        <div className="flex justify-between text-base font-extrabold text-slate-900">
+          <span>Receipt Total</span>
+          <span className="text-brand-600">{formatLKR(receiptAmount)}</span>
         </div>
-      </CardContent>
-    </Card>
+        <div className="border-t border-slate-100 my-2" />
+        <div className="flex justify-between text-sm text-emerald-600 font-semibold">
+          <span>Allocated Amount</span>
+          <span>{formatLKR(allocatedAmount)}</span>
+        </div>
+        <div
+          className={`flex justify-between text-sm font-semibold ${
+            unallocatedAmount > 0 ? "text-amber-600" : "text-slate-500"
+          }`}
+        >
+          <span>Unallocated Amount</span>
+          <span>{formatLKR(unallocatedAmount)}</span>
+        </div>
+      </div>
+    </div>
   );
 };
