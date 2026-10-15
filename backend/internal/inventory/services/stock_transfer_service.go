@@ -456,7 +456,7 @@ func (s *stockTransferService) PostStockTransfer(db *gorm.DB, companyID, userID,
 		return errors.New("Stock transfer is already posted to stock ledger")
 	}
 
-	return db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		for i, line := range transfer.Lines {
 			// Validate Source
 			err = s.stockMovementSvc.ValidateStockAvailability(tx, dto.StockOutPayload{
