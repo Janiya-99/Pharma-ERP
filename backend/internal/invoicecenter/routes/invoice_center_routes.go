@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	companymodels "github.com/pixandco/erp-phrma/internal/company/models"
 	invrepositories "github.com/pixandco/erp-phrma/internal/inventory/repositories"
 	invservices "github.com/pixandco/erp-phrma/internal/inventory/services"
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/handlers"
@@ -11,6 +12,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/services"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 func RequireInvoiceCenter() gin.HandlerFunc {
@@ -22,7 +24,26 @@ func RequireInvoiceCenter() gin.HandlerFunc {
 			return
 		}
 		ctx, ok := authCtx.(*middleware.AuthContext)
-		if !ok || ctx.ActiveSoftwareCode != "INVOICE_CENTER" {
+		if !ok {
+			c.JSON(http.StatusForbidden, gin.H{"success": false, "message": "Invalid auth context", "errors": []string{}})
+			c.Abort()
+			return
+		}
+
+		// Super admin has universal access across all modules
+		if companyDB, exists := c.Get("companyDB"); exists {
+			if db, ok := companyDB.(*gorm.DB); ok {
+				var user companymodels.User
+				if err := db.Select("user_type").First(&user, ctx.UserID).Error; err == nil {
+					if user.UserType == "super_admin" {
+						c.Next()
+						return
+					}
+				}
+			}
+		}
+
+		if ctx.ActiveSoftwareCode != "INVOICE_CENTER" && c.GetHeader("X-Software-Code") != "INVOICE_CENTER" {
 			c.JSON(http.StatusForbidden, gin.H{
 				"success": false,
 				"message": "Please switch to Invoice Center module to access this resource",

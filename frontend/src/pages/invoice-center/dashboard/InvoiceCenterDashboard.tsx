@@ -28,6 +28,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
 
 /* ─────────────────────────────────────────────────
@@ -153,34 +154,34 @@ export default function InvoiceCenterDashboard() {
 
   const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => {
     const toneStyles: Record<string, { card: string; iconBg: string; text: string }> = {
-      blue: { card: "border-blue-100 bg-gradient-to-br from-blue-50/80 to-white shadow-md ring-1 ring-inset ring-blue-100", iconBg: "bg-blue-100 text-blue-600 group-hover:bg-blue-200", text: "text-blue-600" },
-      emerald: { card: "border-emerald-100 bg-gradient-to-br from-emerald-50/80 to-white shadow-md ring-1 ring-inset ring-emerald-100", iconBg: "bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200", text: "text-emerald-600" },
-      amber: { card: "border-amber-100 bg-gradient-to-br from-amber-50/80 to-white shadow-md ring-1 ring-inset ring-amber-100", iconBg: "bg-amber-100 text-amber-600 group-hover:bg-amber-200", text: "text-amber-600" },
-      rose: { card: "border-rose-100 bg-gradient-to-br from-rose-50/80 to-white shadow-md ring-1 ring-inset ring-rose-100", iconBg: "bg-rose-100 text-rose-600 group-hover:bg-rose-200", text: "text-rose-600" },
-      indigo: { card: "border-indigo-100 bg-gradient-to-br from-indigo-50/80 to-white shadow-md ring-1 ring-inset ring-indigo-100", iconBg: "bg-indigo-100 text-indigo-600 group-hover:bg-indigo-200", text: "text-indigo-600" },
-      slate: { card: "border-slate-100 bg-gradient-to-br from-slate-50/80 to-white shadow-md ring-1 ring-inset ring-slate-100", iconBg: "bg-slate-100 text-slate-600 group-hover:bg-slate-200", text: "text-slate-600" },
+      blue: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-blue-300", iconBg: "bg-blue-50 text-blue-600 group-hover:bg-blue-100", text: "text-blue-600" },
+      emerald: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-emerald-300", iconBg: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100", text: "text-emerald-600" },
+      amber: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-amber-300", iconBg: "bg-amber-50 text-amber-600 group-hover:bg-amber-100", text: "text-amber-600" },
+      rose: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-rose-300", iconBg: "bg-rose-50 text-rose-600 group-hover:bg-rose-100", text: "text-rose-600" },
+      indigo: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-indigo-300", iconBg: "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100", text: "text-indigo-600" },
+      slate: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-slate-300", iconBg: "bg-slate-50 text-slate-600 group-hover:bg-slate-100", text: "text-slate-600" },
     };
     const t = toneStyles[tone] || toneStyles.slate;
 
     return (
-      <div className={`group relative overflow-hidden rounded-3xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${t.card}`}>
+      <div className={`group relative overflow-hidden rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${t.card}`}>
         <div className="flex items-start justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 truncate mb-1 block">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 truncate mb-1 block">
             {title}
           </span>
-          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${t.iconBg}`}>
-            <Icon className="h-4 w-4" />
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${t.iconBg}`}>
+            <Icon className="h-5 w-5" />
           </div>
         </div>
         <div className="mt-3 flex items-baseline justify-between">
-          <h3 className={`text-2xl font-semibold tracking-tight truncate ${t.text}`}>
+          <h3 className={`text-2xl font-extrabold tracking-tight truncate ${t.text}`}>
             {value}
           </h3>
         </div>
         {(subtitle || trend) && (
           <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 text-[11px]">
             {trend && (
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold shrink-0 max-w-full truncate ${
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold shrink-0 max-w-full truncate ${
                 trendUp
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
                   : "bg-rose-50 text-rose-700 border border-rose-200/60"
@@ -197,34 +198,38 @@ export default function InvoiceCenterDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-12 pt-6 px-4 sm:px-6 lg:px-8 font-sans">
-      {/* ══════════════════════════════════════════════
-          HEADER SECTION
-      ══════════════════════════════════════════════ */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Receipt className="h-6 w-6 text-brand-600" />
-            Invoice & Receivables Center
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 font-medium">
-            Manage billing, monitor collections, and track AR aging in real-time.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={fetchDashboardData}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Refresh Data</span>
-          </button>
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Create Invoice</span>
-          </button>
-        </div>
-      </div>
+    <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
+      {/* ── TOP PAGE HEADER ── */}
+      <DashboardHeroCard
+        title="Invoice & Receivables Center"
+        subtitle="Customer billing, collection cycles, real-time receipts, and credit limit risk governance."
+        moduleTag="Billing & Receivables"
+        icon={Receipt}
+        quote={{
+          text: "Accelerated billing cycles, transparent customer credit, and verified revenue collection.",
+          author: "Ceylon Med Revenue Assurance"
+        }}
+        accent="blue"
+        actions={
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={fetchDashboardData}
+              disabled={loading}
+              className="flex items-center gap-2 px-3.5 py-2 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 text-slate-400 ${loading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <button 
+              onClick={() => navigate("/invoice-center/invoices/new")}
+              className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs text-xs font-semibold transition-all cursor-pointer"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Create Invoice</span>
+            </button>
+          </div>
+        }
+      />
 
       {/* ══════════════════════════════════════════════
           TIER 1: Core Financial & Customer KPIs
@@ -271,7 +276,7 @@ export default function InvoiceCenterDashboard() {
       ══════════════════════════════════════════════ */}
       <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Invoice Generation vs Collections (2/3 width) */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
@@ -319,7 +324,7 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Right: AR Aging Distribution Donut (1/3 width) */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
           <div>
             <div className="mb-4">
               <h3 className="text-lg font-semibold text-slate-900">
@@ -370,7 +375,7 @@ export default function InvoiceCenterDashboard() {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left 2 Cols: Accounts Requiring Attention */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
               <div>
@@ -449,7 +454,7 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Right Col: Collection Shortcuts */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col">
           <div className="mb-6 border-b border-slate-100 pb-4">
             <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-indigo-500" />

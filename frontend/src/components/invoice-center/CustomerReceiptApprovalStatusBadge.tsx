@@ -11,8 +11,9 @@ export const CustomerReceiptApprovalStatusBadge: React.FC<Props> = ({
   status,
   className,
 }) => {
+  const s = (status || "draft").toString().toLowerCase();
   const getBadgeColor = () => {
-    switch (status) {
+    switch (s) {
       case "approved":
         return "bg-green-600 hover:bg-green-700 text-white";
       case "pending":
@@ -28,7 +29,7 @@ export const CustomerReceiptApprovalStatusBadge: React.FC<Props> = ({
     }
   };
 
-  const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+  const formattedStatus = s ? s.charAt(0).toUpperCase() + s.slice(1).replace("_", " ") : "Draft";
 
   return (
     <Badge

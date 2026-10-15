@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { complianceApi, ComplianceSummary } from "../../../api/complianceApi";
 import { toast } from "sonner";
+import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 
 const ComplianceDashboardPage = () => {
   const [selectedFacility, setSelectedFacility] = useState<string>("ALL");
@@ -58,118 +59,96 @@ const ComplianceDashboardPage = () => {
   const recentRegulatoryActions = data?.recent_regulatory_actions || [];
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-                Compliance Center • Regulatory Governance
-              </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                Regulatory Compliance & Quality Dashboard
-              </h1>
-            </div>
+    <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
+      {/* ── TOP PAGE HEADER ── */}
+      <DashboardHeroCard
+        title="Regulatory Compliance & Quality Dashboard"
+        subtitle="Real-time telemetry on NMRA licensing, quality holds, drug recalls, and pharmaceutical expiry disposals."
+        moduleTag="Regulatory Governance & NMRA"
+        icon={ShieldCheck}
+        quote={{
+          text: "Zero-compromise NMRA compliance, stringent batch pharmacovigilance, and patient safety first.",
+          author: "NMRA Regulatory Affairs Sri Lanka"
+        }}
+        accent="indigo"
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing || loading}
+              className="flex items-center gap-2 px-3.5 py-2 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 text-slate-400 ${isRefreshing ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Sync Status</span>
+            </button>
+            <button className="flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs text-xs font-semibold transition-all cursor-pointer">
+              <Download className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Export Report</span>
+            </button>
           </div>
-          <p className="mt-1 text-sm text-slate-500 pl-12">
-            Real-time telemetry on NMRA licensing, quality holds, drug recalls, and pharmaceutical expiry disposals
-          </p>
-        </div>
-
-        {/* Header Controls */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <select
-            value={selectedFacility}
-            onChange={(e) => setSelectedFacility(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
-          >
-            <option value="ALL">All Facilities & Warehouses</option>
-            <option value="HQ">Colombo Central Medical Warehouse</option>
-            <option value="COLD">Biyagama Cold Chain Vaccines Facility</option>
-            <option value="KANDY">Kandy Central Distribution Warehouse</option>
-            <option value="GALLE">Galle Maritime Warehouse</option>
-            <option value="QC">Central Quality Control & Quarantine</option>
-          </select>
-
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing || loading}
-            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
-          >
-            <RefreshCw className={`h-4 w-4 text-indigo-600 ${isRefreshing ? "animate-spin" : ""}`} />
-            {isRefreshing ? "Syncing NMRA..." : "Refresh Status"}
-          </button>
-          <button className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 hover:bg-indigo-700 transition-colors">
-            <Download className="h-4 w-4" />
-            Export Compliance Report
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* ── Tier 1: KPI Summary Cards ── */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {/* Active Licenses */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Active NMRA Registered Formulations
             </span>
-            <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600">
+            <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600">
               <FileCheck className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900">
+          <p className="mt-3 text-3xl font-extrabold text-slate-900">
             {loading ? "..." : data?.active_licenses || 65}
           </p>
-          <div className="mt-2 flex items-center justify-between text-xs">
+          <div className="mt-3 flex items-center justify-between text-xs">
             <span className="text-emerald-600 font-bold flex items-center gap-1">
               <CheckCircle2 className="h-3.5 w-3.5" /> 100% Licensed
             </span>
-            <span className="rounded bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 text-[10px]">
+            <span className="rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-bold px-2 py-0.5 text-[10px]">
               Verified & Current
             </span>
           </div>
         </div>
 
         {/* Batches Under Quarantine */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Batches Under Quarantine
             </span>
-            <div className="rounded-lg bg-amber-50 p-2 text-amber-600">
+            <div className="rounded-xl bg-amber-50 p-2.5 text-amber-600">
               <Pill className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900">
+          <p className="mt-3 text-3xl font-extrabold text-slate-900">
             {loading ? "..." : data?.quarantine_batches_count || 0}
           </p>
-          <div className="mt-2 flex items-center justify-between text-xs">
+          <div className="mt-3 flex items-center justify-between text-xs">
             <span className="text-amber-600 font-semibold">
-              LKR {(data?.quarantine_stock_value || 0).toLocaleString()} Stock Value Held
+              LKR {(data?.quarantine_stock_value || 0).toLocaleString()} Held
             </span>
             <span className="text-slate-400 font-medium">Quality Hold</span>
           </div>
         </div>
 
         {/* Active Product Recalls */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Blocked / Recalled Batches
             </span>
-            <div className="rounded-lg bg-rose-50 p-2 text-rose-600">
+            <div className="rounded-xl bg-rose-50 p-2.5 text-rose-600">
               <RotateCcw className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-rose-600">
+          <p className="mt-3 text-3xl font-extrabold text-rose-600">
             {loading ? "..." : data?.active_recalls_count || 0}
           </p>
-          <div className="mt-2 flex items-center justify-between text-xs">
+          <div className="mt-3 flex items-center justify-between text-xs">
             <span className="text-rose-600 font-bold flex items-center gap-1">
               <AlertTriangle className="h-3.5 w-3.5" /> Safety Quarantine
             </span>
@@ -178,19 +157,19 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Pending Expiry Disposals */}
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl ring-1 ring-inset ring-slate-50 relative overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Expired & Near-Expiry Batches
             </span>
-            <div className="rounded-lg bg-purple-50 p-2 text-purple-600">
+            <div className="rounded-xl bg-purple-50 p-2.5 text-purple-600">
               <Trash2 className="h-5 w-5" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900">
+          <p className="mt-3 text-3xl font-extrabold text-slate-900">
             {loading ? "..." : data?.pending_disposals_count || 0}
           </p>
-          <div className="mt-2 flex items-center justify-between text-xs">
+          <div className="mt-3 flex items-center justify-between text-xs">
             <span className="text-purple-600 font-semibold">
               LKR {(data?.pending_disposals_value || 0).toLocaleString()} at Risk
             </span>
@@ -202,7 +181,7 @@ const ComplianceDashboardPage = () => {
       {/* ── Tier 2: Tremor Analytics Charts ── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Pass Rate Area Chart */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-bold text-slate-900">
@@ -236,7 +215,7 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Quarantine Reasons Donut Chart */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs flex flex-col justify-between">
           <div>
             <h3 className="text-lg font-bold text-slate-900">
               Quarantine Root Causes
@@ -271,7 +250,7 @@ const ComplianceDashboardPage = () => {
       {/* ── Tier 3: Bar Chart & Recent Activity Table ── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Expiry Write-Off Bar Chart */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs">
           <h3 className="text-lg font-bold text-slate-900">
             Write-off & Risk Value by Category
           </h3>
@@ -298,7 +277,7 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Recent Regulatory Actions Table */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
