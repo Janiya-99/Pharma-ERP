@@ -35,6 +35,20 @@ func (h *AuthHandler) resolveLoginCompany(req dto.LoginRequest) (*gorm.DB, *plat
 		return nil, nil, err
 	}
 
+	// If no multi-tenant companies are found, fallback to default company DB
+	if len(companies) == 0 {
+		db, comp, err := h.resolver.GetDefaultCompanyDB()
+		if err == nil {
+			var user models.User
+			if err := db.Where("email = ?", req.Email).First(&user).Error; err == nil {
+				if security.CheckPasswordHash(req.Password, user.PasswordHash) {
+					return db, comp, nil
+				}
+			}
+		}
+		return nil, nil, errors.New("invalid credentials")
+	}
+
 	type result struct {
 		db      *gorm.DB
 		company *platformModels.PlatformCompany

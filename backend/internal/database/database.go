@@ -22,22 +22,9 @@ func NewMySQL(cfg *config.DatabaseConfig, zapLogger *zap.Logger) (*gorm.DB, erro
 		gormLogLevel = logger.Info
 	}
 
-	// 1. Create the database if it does not exist
-	zapLogger.Info("Checking if database exists...", zap.String("db", cfg.Name))
-	rawDB, err := gorm.Open(mysql.Open(cfg.DSNWithoutDB()), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to MySQL server: %w", err)
-	}
-	createDBSQL := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", cfg.Name)
-	if err := rawDB.Exec(createDBSQL).Error; err != nil {
-		return nil, fmt.Errorf("failed to create database: %w", err)
-	}
-	sqlRawDB, _ := rawDB.DB()
-	sqlRawDB.Close()
+	zapLogger.Info("Connecting to MySQL database...", zap.String("db", cfg.Name), zap.String("host", cfg.Host))
 
-	// 2. Connect to the actual database
+	// 1. First attempt to connect directly to the target database
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                       cfg.DSN(),
 		DefaultStringSize:         256,
@@ -48,11 +35,43 @@ func NewMySQL(cfg *config.DatabaseConfig, zapLogger *zap.Logger) (*gorm.DB, erro
 	}), &gorm.Config{
 		Logger:      logger.Default.LogMode(gormLogLevel),
 		PrepareStmt: true, // Cache prepared statements for performance
-		// Enforce InnoDB for all table creation
 		DisableForeignKeyConstraintWhenMigrating: false,
 	})
+
+	// 2. If direct connection fails, check if database needs creation (e.g. local dev)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to MySQL: %w", err)
+		zapLogger.Warn("Direct connection to database failed, attempting database creation...", zap.Error(err))
+		rawDB, rawErr := gorm.Open(mysql.Open(cfg.DSNWithoutDB()), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
+		if rawErr == nil {
+			createDBSQL := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", cfg.Name)
+			if createErr := rawDB.Exec(createDBSQL).Error; createErr != nil {
+				zapLogger.Warn("Could not execute CREATE DATABASE (user may lack permission on shared server)", zap.Error(createErr))
+			}
+			sqlRawDB, _ := rawDB.DB()
+			if sqlRawDB != nil {
+				_ = sqlRawDB.Close()
+			}
+
+			// Retry connection to target database
+			db, err = gorm.Open(mysql.New(mysql.Config{
+				DSN:                       cfg.DSN(),
+				DefaultStringSize:         256,
+				DisableDatetimePrecision:  true,
+				DontSupportRenameIndex:    true,
+				DontSupportRenameColumn:   true,
+				SkipInitializeWithVersion: false,
+			}), &gorm.Config{
+				Logger:      logger.Default.LogMode(gormLogLevel),
+				PrepareStmt: true,
+				DisableForeignKeyConstraintWhenMigrating: false,
+			})
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect to MySQL: %w", err)
+		}
 	}
 
 	// Configure connection pool

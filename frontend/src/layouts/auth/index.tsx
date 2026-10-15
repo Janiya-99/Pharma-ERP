@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import routes from "routes";
 import type { ERPRoute } from "routes";
@@ -20,10 +21,12 @@ export default function Auth() {
   return (
     <div className="relative flex min-h-screen w-full font-dm">
       {/* Full-screen split layout */}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="/" element={<Navigate to="/auth/sign-in" replace />} />
-      </Routes>
+      <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading...</div>}>
+        <Routes>
+          {getRoutes(routes)}
+          <Route path="/" element={<Navigate to="/auth/sign-in" replace />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }
