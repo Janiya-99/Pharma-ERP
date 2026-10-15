@@ -50,17 +50,29 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 	// Group map
 	var groupOrder []string
 	groupedMap := make(map[string][]dto.RolePermissionItem)
+	softwareNameMap := make(map[string]string)
+
+	var assignedPerms []dto.RolePermissionItem
+	var assignedIDs []uint64
 
 	for _, p := range allSoftwarePermissions {
+		isAssigned := assignedMap[p.ID]
 		item := dto.RolePermissionItem{
 			PermissionID:   p.ID,
+			ID:             p.ID,
 			PermissionKey:  p.PermissionKey,
 			PermissionName: p.PermissionName,
-			Assigned:       assignedMap[p.ID],
+			SoftwareName:   p.Software.SoftwareName,
+			Assigned:       isAssigned,
+		}
+		if isAssigned {
+			assignedPerms = append(assignedPerms, item)
+			assignedIDs = append(assignedIDs, p.ID)
 		}
 		groupName := p.Software.SoftwareName + " - " + p.PermissionGroup
 		if _, ok := groupedMap[groupName]; !ok {
 			groupOrder = append(groupOrder, groupName)
+			softwareNameMap[groupName] = p.Software.SoftwareName
 		}
 		groupedMap[groupName] = append(groupedMap[groupName], item)
 	}
@@ -69,6 +81,7 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 	for _, gname := range groupOrder {
 		groups = append(groups, dto.RolePermissionGroup{
 			PermissionGroup: gname,
+			SoftwareName:    softwareNameMap[gname],
 			Permissions:     groupedMap[gname],
 		})
 	}
@@ -79,7 +92,9 @@ func (s *RolePermissionService) GetRolePermissionMatrix(roleID uint64) (*dto.Rol
 			RoleName: role.RoleName,
 			RoleCode: role.RoleCode,
 		},
-		Groups: groups,
+		Groups:                groups,
+		Permissions:           assignedPerms,
+		AssignedPermissionIDs: assignedIDs,
 	}
 
 	return res, nil
