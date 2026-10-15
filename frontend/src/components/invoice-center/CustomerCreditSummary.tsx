@@ -23,40 +23,43 @@ const CustomerCreditSummary: React.FC<CustomerCreditSummaryProps> = ({
     })}`;
 
   return (
-    <div className="rounded-2xl border border-navy-700 bg-gradient-to-br from-navy-900 to-navy-800 p-5 text-white shadow-md">
-      <div className="mb-4 flex items-center justify-between border-b border-navy-700 pb-3">
-        <span className="text-xs font-bold uppercase tracking-wider text-navy-200">
-          Credit Profile
-        </span>
+    <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white/95 via-slate-50/90 to-blue-50/20 backdrop-blur-xl p-6 shadow-xs">
+      <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-brand-500 animate-pulse" />
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+            Customer Credit Profile & Terms
+          </span>
+        </div>
         <CreditStatusBadge creditLimit={limit} currentBalance={balance} />
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div>
-          <span className="block text-xs text-navy-300">Credit Limit</span>
-          <span className="mt-0.5 block text-base font-bold">
+        <div className="rounded-xl border border-slate-100 bg-white/80 p-3.5 backdrop-blur-xs shadow-xs">
+          <span className="block text-xs font-semibold text-slate-500">Credit Limit</span>
+          <span className="mt-1 block text-base sm:text-lg font-extrabold text-slate-900">
             {formatLKR(limit)}
           </span>
         </div>
-        <div>
-          <span className="block text-xs text-navy-300">Current Balance</span>
+        <div className="rounded-xl border border-slate-100 bg-white/80 p-3.5 backdrop-blur-xs shadow-xs">
+          <span className="block text-xs font-semibold text-slate-500">Current Balance</span>
           <span
-            className={`mt-0.5 block text-base font-bold ${
-              balance > limit && limit > 0 ? "text-rose-400" : "text-amber-300"
+            className={`mt-1 block text-base sm:text-lg font-extrabold ${
+              balance > limit && limit > 0 ? "text-rose-600" : "text-amber-600"
             }`}
           >
             {formatLKR(balance)}
           </span>
         </div>
-        <div>
-          <span className="block text-xs text-navy-300">Available Credit</span>
-          <span className="text-emerald-400 mt-0.5 block text-base font-bold">
+        <div className="rounded-xl border border-slate-100 bg-white/80 p-3.5 backdrop-blur-xs shadow-xs">
+          <span className="block text-xs font-semibold text-slate-500">Available Credit</span>
+          <span className="mt-1 block text-base sm:text-lg font-extrabold text-emerald-600">
             {formatLKR(available)}
           </span>
         </div>
-        <div>
-          <span className="block text-xs text-navy-300">Credit Terms</span>
-          <span className="mt-0.5 block text-base font-bold">
+        <div className="rounded-xl border border-slate-100 bg-white/80 p-3.5 backdrop-blur-xs shadow-xs">
+          <span className="block text-xs font-semibold text-slate-500">Credit Terms</span>
+          <span className="mt-1 block text-base sm:text-lg font-extrabold text-slate-900">
             {creditDays || 0} Days
           </span>
         </div>

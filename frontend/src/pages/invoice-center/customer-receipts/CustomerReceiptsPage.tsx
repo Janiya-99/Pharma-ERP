@@ -12,6 +12,7 @@ import {
   CustomerReceiptPostedStatusBadge,
   CustomerReceiptPaymentMethodBadge,
 } from "../../../components/invoice-center";
+import PageHeader from "../../../components/common/PageHeader";
 import { formatCurrency, formatDate } from "../../../lib/utils";
 
 const CustomerReceiptsPage = () => {
@@ -125,28 +126,24 @@ const CustomerReceiptsPage = () => {
   );
 
   return (
-    <div className="py-4">
-      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-xl font-bold text-navy-700">Customer Receipts</h1>
-          <p className="mt-1 text-sm text-gray-400">
-            Manage money received from customers and allocate to sales invoices.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+    <div className="py-2">
+      <PageHeader
+        title="Customer Receipts"
+        description="Manage money received from customers, credit balances, and allocate to sales invoices."
+        action={
           <PermissionGuard permission="invoice_center.customer_receipt.create">
             <Link
               to="/invoice-center/customer-receipts/create"
-              className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600"
+              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-brand-600"
             >
               <Plus className="h-4 w-4" />
               <span>Create Receipt</span>
             </Link>
           </PermissionGuard>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md shadow-xs">
         <div className="border-b border-gray-100 p-4">
           <div className="flex max-w-md items-center gap-2">
             <div className="relative flex-1">
