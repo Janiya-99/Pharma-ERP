@@ -38,6 +38,7 @@ func Setup(
 	suppCtrl *controller.SupplierController,
 	grnCtrl *controller.GRNController,
 	authService *service.AuthService,
+	cacheService *service.CacheService,
 	cfg *config.Config,
 	platformDB *gorm.DB,
 	logger *zap.Logger,
@@ -59,8 +60,8 @@ func Setup(
 			return false
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "Cache-Control", "Pragma"},
+		ExposeHeaders:    []string{"Content-Length", "X-Cache"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
@@ -72,18 +73,26 @@ func Setup(
 		platformAdminGrp := v1.Group("/platform-admin")
 		platformAdmin.SetupRoutes(platformAdminGrp, platformDB, logger)
 
-		// Health check — returns service name from config
+		// Health check — returns service and Redis cache status
 		v1.GET("/health", func(c *gin.Context) {
+			cacheStatus := "ok"
+			if cacheService != nil {
+				if err := cacheService.Ping(c.Request.Context()); err != nil {
+					cacheStatus = "unavailable"
+				}
+			}
 			c.JSON(200, gin.H{
 				"status":  "ok",
 				"service": cfg.App.Name + " Backend",
+				"cache":   cacheStatus,
 			})
 		})
 
 		commonCtrl := controller.NewCommonController()
-		v1.GET("/countries", commonCtrl.GetCountries)
-		v1.GET("/common/countries", commonCtrl.GetCountries)
-		platformAdminGrp.GET("/countries", commonCtrl.GetCountries)
+		// Cache country lookups in Redis for 24 hours
+		v1.GET("/countries", middleware.CacheResponse(cacheService, 24*time.Hour), commonCtrl.GetCountries)
+		v1.GET("/common/countries", middleware.CacheResponse(cacheService, 24*time.Hour), commonCtrl.GetCountries)
+		platformAdminGrp.GET("/countries", middleware.CacheResponse(cacheService, 24*time.Hour), commonCtrl.GetCountries)
 
 		// Public Auth routes
 		auth := v1.Group("/auth")
