@@ -133,6 +133,7 @@ func main() {
 		suppCtrl,
 		grnCtrl,
 		authService,
+		cacheService,
 		cfg,
 		platformDB,
 		logger,

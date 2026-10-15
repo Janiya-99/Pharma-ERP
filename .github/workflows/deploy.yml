@@ -1,0 +1,124 @@
+name: CI/CD Pipeline - Pharma ERP
+
+on:
+  push:
+    branches:
+      - main
+      - janith-dev
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==========================================
+  # 1. Backend CI (Lint, Test, Build)
+  # ==========================================
+  backend-ci:
+    name: Backend CI (Go)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: backend/go.sum
+
+      - name: Download Go dependencies
+        run: go mod download
+
+      - name: Verify Go formatting and vet
+        run: go vet ./...
+
+      - name: Run Backend Unit Tests
+        run: go test -v -race -cover ./...
+
+      - name: Compile Backend Binary
+        run: CGO_ENABLED=0 go build -v -o /dev/null ./cmd/server
+
+  # ==========================================
+  # 2. Frontend CI (Lint & Build)
+  # ==========================================
+  frontend-ci:
+    name: Frontend CI (React/Vite)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Build Production Frontend Assets
+        run: npm run build
+
+  # ==========================================
+  # 3. Continuous Deployment (Production Server)
+  # ==========================================
+  deploy:
+    name: Deploy to Production Server
+    needs: [backend-ci, frontend-ci]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute Remote SSH Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST || 'erp.pixandco.lk' }}
+          username: ${{ secrets.SERVER_USER || 'deploy' }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script_stop: true
+          command_timeout: 30m
+          script: |
+            echo "🚀 Starting Deployment on $(hostname)..."
+            cd /srv/apps/pharma-erp
+            
+            # Fetch latest commit from main
+            git fetch origin main
+            git reset --hard origin/main
+            
+            # Rebuild and restart containerized services
+            echo "📦 Building and restarting Docker containers..."
+            docker compose down
+            docker compose up -d --build
+            
+            # Verify containers
+            echo "🔍 Verifying running services..."
+            docker compose ps
+            
+            # Health check probe
+            echo "🩺 Probing backend health endpoint..."
+            for i in {1..10}; do
+              if curl -s -f http://127.0.0.1:8080/api/v1/health | grep -q '"status":"ok"'; then
+                echo "✅ Backend health check passed!"
+                exit 0
+              fi
+              echo "Waiting for backend service to become ready... ($i/10)"
+              sleep 3
+            done
+            
+            echo "❌ Health check failed!"
+            docker compose logs backend --tail=50
+            exit 1
