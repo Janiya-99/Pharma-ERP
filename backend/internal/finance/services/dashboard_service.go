@@ -46,8 +46,8 @@ func (s *dashboardService) fetchSummaryMetrics(filter dto.DashboardFilter) dto.D
 	s.db.Table("chart_of_accounts").Where("company_id = ? AND is_cash_account = ?", filter.CompanyID, true).Select("COALESCE(SUM(current_balance), 0)").Scan(&totalCash)
 	s.db.Table("chart_of_accounts").Where("company_id = ? AND is_bank_account = ?", filter.CompanyID, true).Select("COALESCE(SUM(current_balance), 0)").Scan(&totalBank)
 
-	s.db.Table("chart_of_accounts").Where("company_id = ? AND account_name LIKE ?", filter.CompanyID, "%Receivable%").Select("COALESCE(SUM(current_balance), 0)").Scan(&totalAR)
-	s.db.Table("chart_of_accounts").Where("company_id = ? AND account_name LIKE ?", filter.CompanyID, "%Payable%").Select("COALESCE(SUM(current_balance), 0)").Scan(&totalAP)
+	s.db.Table("chart_of_accounts").Where("company_id = ? AND (account_name LIKE ? OR account_name LIKE ?)", filter.CompanyID, "%Receivable%", "%Debtors%").Select("COALESCE(SUM(current_balance), 0)").Scan(&totalAR)
+	s.db.Table("chart_of_accounts").Where("company_id = ? AND (account_name LIKE ? OR account_name LIKE ?)", filter.CompanyID, "%Payable%", "%Creditors%").Select("COALESCE(SUM(current_balance), 0)").Scan(&totalAP)
 
 	return dto.DashboardSummary{
 		CashBalance:        dto.KpiMetric{Value: totalCash, Trend: 8.2, ComparisonText: "vs previous month"},

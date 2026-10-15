@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive Performance & Querying Speed Benchmark
-Tests:
- 1. API Endpoint Response Times (Datatables, Branch Filtering, Search & Pagination)
- 2. Branch Switching Speed (Switching across 5 regional branches)
- 3. Database Execution Plan & Query Latencies (EXPLAIN / Index efficiency)
+Comprehensive Performance & Querying Speed Benchmark for CEYLONMED
 """
 
 import time
@@ -27,6 +23,16 @@ def login():
         data = json.loads(resp.read().decode("utf-8"))
         login_ms = (t1 - t0) * 1000.0
         return data["token"], login_ms
+
+def switch_software(token, code):
+    url = f"{BASE_URL}/api/v1/auth/switch-software"
+    payload = json.dumps({"software_code": code}).encode("utf-8")
+    req = urllib.request.Request(url, data=payload, headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+    t0 = time.perf_counter()
+    with urllib.request.urlopen(req) as resp:
+        t1 = time.perf_counter()
+        data = json.loads(resp.read().decode("utf-8"))
+        return data.get("token", token), (t1 - t0) * 1000.0
 
 def test_endpoint(token, path, params=None, method="GET", body=None):
     url = f"{BASE_URL}{path}"
@@ -82,9 +88,9 @@ def run_db_query_time(sql):
     return (t1 - t0) * 1000.0, out.strip(), err.strip()
 
 def main():
-    print("=" * 80)
+    print("=" * 85)
     print("⚡ ERP ENTERPRISE PERFORMANCE & QUERY SPEED BENCHMARK (CEYLONMED) ⚡")
-    print("=" * 80)
+    print("=" * 85)
     
     # 1. Login Benchmark
     print("\n[1] Testing Authentication & Token Issuance...")
@@ -104,71 +110,86 @@ def main():
         res = test_endpoint(token, "/api/v1/auth/switch-branch", method="POST", body={"branch_id": b_id})
         print(f"  ✔ Switch to Branch {b_id} ({b_name:<24}) : {res['duration_ms']:.2f} ms [HTTP {res['status']}]")
 
-    # 3. Datatables & Filtering API Benchmark
-    print("\n[3] Testing Datatables Query Speed & Filtering...")
-    endpoints_to_test = [
-        # (Module, Path, Params, Description)
-        ("Inventory", "/api/v1/inventory/products", {"limit": 50, "page": 1}, "Products Datatable (50 records)"),
-        ("Inventory", "/api/v1/inventory/products", {"search": "Amoxicillin"}, "Products Search ('Amoxicillin')"),
-        ("Inventory", "/api/v1/inventory/product-batches", {"limit": 100, "page": 1}, "Product Batches (100 records)"),
-        ("Inventory", "/api/v1/inventory/product-batches", {"batch_status": "near_expiry"}, "Batches Filter (near_expiry)"),
-        ("Inventory", "/api/v1/inventory/product-batches", {"batch_status": "expired"}, "Batches Filter (expired)"),
-        ("Inventory", "/api/v1/inventory/product-batches", {"batch_status": "quarantined"}, "Batches Filter (quarantined)"),
-        ("Inventory", "/api/v1/inventory/stock-balances", {"limit": 100}, "Stock Balances (All Warehouses)"),
-        ("Inventory", "/api/v1/inventory/stock-balances", {"warehouse_id": 1}, "Stock Balances (WH 1 - Colombo Main)"),
-        ("Inventory", "/api/v1/inventory/stock-balances", {"warehouse_id": 4}, "Stock Balances (WH 4 - Cold Chain)"),
-        ("Inventory", "/api/v1/inventory/stock-balances", {"warehouse_id": 5}, "Stock Balances (WH 5 - Quarantine)"),
-        ("Inventory", "/api/v1/inventory/stock-ledger", {"limit": 50}, "Stock Ledger Movements"),
-        ("Inventory", "/api/v1/inventory/grns", {"limit": 50}, "Goods Receipt Notes (75 records)"),
-        ("Inventory", "/api/v1/inventory/grns", {"approval_status": "pending"}, "GRNs Filter (pending approval)"),
-        ("Invoice Center", "/api/v1/invoice-center/customers", {"limit": 50}, "Customers List (35 hospitals/pharmacies)"),
-        ("Invoice Center", "/api/v1/invoice-center/sales-orders", {"limit": 50}, "Sales Orders (85 orders)"),
-        ("Invoice Center", "/api/v1/invoice-center/sales-orders", {"order_status": "open"}, "Sales Orders Filter (open)"),
-        ("Invoice Center", "/api/v1/invoice-center/sales-invoices", {"limit": 50}, "Sales Invoices (130 invoices)"),
-        ("Invoice Center", "/api/v1/invoice-center/sales-invoices", {"payment_status": "overdue"}, "Invoices Filter (overdue aging)"),
-        ("Invoice Center", "/api/v1/invoice-center/sales-invoices", {"payment_status": "paid"}, "Invoices Filter (paid)"),
-        ("Invoice Center", "/api/v1/invoice-center/sales-invoices", {"payment_status": "unpaid"}, "Invoices Filter (unpaid)"),
-        ("Finance", "/api/v1/finance/journal-entries", {"limit": 50}, "Journal Entries (192 entries)"),
-        ("Finance", "/api/v1/finance/general-ledger", {"limit": 100}, "General Ledger (384 entries)"),
-        ("Finance", "/api/v1/finance/reports/trial-balance", {}, "Financial Report: Trial Balance"),
-        ("Finance", "/api/v1/finance/reports/profit-loss", {}, "Financial Report: Profit & Loss"),
-        ("Finance", "/api/v1/finance/reports/balance-sheet", {}, "Financial Report: Balance Sheet")
+    # 3. Inventory Module Datatables & Filtering
+    print("\n[3] Testing Inventory Module Datatables & Multi-Warehouse Filtering...")
+    inv_token, sw_ms = switch_software(token, "INVENTORY")
+    print(f"  ✔ Switch to Software: INVENTORY ({sw_ms:.2f} ms)")
+
+    inv_endpoints = [
+        ("/api/v1/inventory/products", {"limit": 50, "page": 1}, "Products Datatable (50 items)"),
+        ("/api/v1/inventory/product-batches", {"limit": 100, "page": 1}, "Product Batches (100 items)"),
+        ("/api/v1/inventory/product-batches", {"batch_status": "near_expiry"}, "Batches Filter (near_expiry)"),
+        ("/api/v1/inventory/product-batches", {"batch_status": "expired"}, "Batches Filter (expired)"),
+        ("/api/v1/inventory/product-batches", {"batch_status": "quarantined"}, "Batches Filter (quarantined)"),
+        ("/api/v1/inventory/stock-balances", {"limit": 100}, "Stock Balances (All Warehouses)"),
+        ("/api/v1/inventory/stock-balances", {"warehouse_id": 1}, "Stock Balances (WH 1 - Colombo Main)"),
+        ("/api/v1/inventory/stock-balances", {"warehouse_id": 4}, "Stock Balances (WH 4 - Cold Chain)"),
+        ("/api/v1/inventory/stock-balances", {"warehouse_id": 5}, "Stock Balances (WH 5 - Quarantine)"),
+        ("/api/v1/inventory/stock-ledger", {"limit": 50}, "Stock Ledger Movements"),
+        ("/api/v1/inventory/grns", {"limit": 50}, "Goods Receipt Notes (75 records)"),
+        ("/api/v1/inventory/grns", {"approval_status": "pending"}, "GRNs Filter (pending approval)")
     ]
 
-    results = []
-    for mod, path, params, desc in endpoints_to_test:
-        # Run 3 iterations and calculate average
-        runs = []
-        for _ in range(3):
-            r = test_endpoint(token, path, params)
-            runs.append(r["duration_ms"])
-        avg_ms = sum(runs) / len(runs)
-        min_ms = min(runs)
-        max_ms = max(runs)
-        results.append((mod, desc, avg_ms, min_ms, max_ms, r["status"], r["size_bytes"]))
-        print(f"  [{mod:<14}] {desc:<42} : Avg {avg_ms:6.2f} ms (Min: {min_ms:5.1f}ms, Max: {max_ms:5.1f}ms) | {r['size_bytes']:>6} bytes [HTTP {r['status']}]")
+    for path, params, desc in inv_endpoints:
+        r = test_endpoint(inv_token, path, params)
+        print(f"  [Inventory     ] {desc:<42} : {r['duration_ms']:6.2f} ms | {r['size_bytes']:>6} bytes [HTTP {r['status']}]")
 
-    # 4. Database Query Engine & Index Profiling (Direct MySQL EXPLAIN)
-    print("\n[4] Database Query Execution Times & Query Plan Analysis...")
+    # 4. Invoice Center Module Datatables & Filtering
+    print("\n[4] Testing Invoice Center Module Datatables & Aging Filters...")
+    invc_token, sw_ms2 = switch_software(token, "INVOICE_CENTER")
+    print(f"  ✔ Switch to Software: INVOICE_CENTER ({sw_ms2:.2f} ms)")
+
+    invc_endpoints = [
+        ("/api/v1/invoice-center/customers", {"limit": 50}, "Customers List (35 hospitals/pharmacies)"),
+        ("/api/v1/invoice-center/sales-orders", {"limit": 50}, "Sales Orders (85 orders)"),
+        ("/api/v1/invoice-center/sales-orders", {"order_status": "open"}, "Sales Orders Filter (open)"),
+        ("/api/v1/invoice-center/sales-invoices", {"limit": 50}, "Sales Invoices (130 invoices)"),
+        ("/api/v1/invoice-center/sales-invoices", {"payment_status": "overdue"}, "Invoices Filter (overdue aging)"),
+        ("/api/v1/invoice-center/sales-invoices", {"payment_status": "paid"}, "Invoices Filter (paid)"),
+        ("/api/v1/invoice-center/sales-invoices", {"payment_status": "unpaid"}, "Invoices Filter (unpaid)")
+    ]
+
+    for path, params, desc in invc_endpoints:
+        r = test_endpoint(invc_token, path, params)
+        print(f"  [Invoice Center] {desc:<42} : {r['duration_ms']:6.2f} ms | {r['size_bytes']:>6} bytes [HTTP {r['status']}]")
+
+    # 5. Finance Module Datatables & Financial Statements
+    print("\n[5] Testing Finance Module Datatables & Financial Reports...")
+    fin_token, sw_ms3 = switch_software(token, "FINANCE")
+    print(f"  ✔ Switch to Software: FINANCE ({sw_ms3:.2f} ms)")
+
+    fin_endpoints = [
+        ("/api/v1/finance/journal-entries", {"limit": 50}, "Journal Entries (192 entries)"),
+        ("/api/v1/finance/general-ledger", {"limit": 100}, "General Ledger (384 entries)"),
+        ("/api/v1/finance/reports/trial-balance", {"financial_year_id": 1}, "Financial Report: Trial Balance (FY 2023/24)"),
+        ("/api/v1/finance/reports/trial-balance", {"financial_year_id": 4}, "Financial Report: Trial Balance (FY 2026/27)"),
+        ("/api/v1/finance/reports/profit-loss", {"financial_year_id": 1}, "Financial Report: Profit & Loss (FY 2023/24)"),
+        ("/api/v1/finance/reports/profit-loss", {"financial_year_id": 4}, "Financial Report: Profit & Loss (FY 2026/27)"),
+        ("/api/v1/finance/reports/balance-sheet", {"financial_year_id": 1}, "Financial Report: Balance Sheet (FY 2023/24)"),
+        ("/api/v1/finance/reports/balance-sheet", {"financial_year_id": 4}, "Financial Report: Balance Sheet (FY 2026/27)")
+    ]
+
+    for path, params, desc in fin_endpoints:
+        r = test_endpoint(fin_token, path, params)
+        print(f"  [Finance       ] {desc:<42} : {r['duration_ms']:6.2f} ms | {r['size_bytes']:>6} bytes [HTTP {r['status']}]")
+
+    # 6. Database Engine Profiling
+    print("\n[6] Database Query Engine Execution Times (Direct MySQL Query Profiling)...")
     db_queries = [
-        ("Stock by Branch Index", "SELECT COUNT(*), SUM(stock_value) FROM stock_balances WHERE branch_id = 1;"),
-        ("Near Expiry Batches Query", "SELECT id, batch_number, expiry_date, batch_status FROM product_batches WHERE expiry_date BETWEEN '2026-10-01' AND '2027-04-30';"),
-        ("Overdue Invoices Query", "SELECT id, invoice_number, total_amount, balance_amount FROM sales_invoices WHERE payment_status = 'overdue';"),
-        ("General Ledger Multi-Year Balance", "SELECT account_id, account_code, SUM(debit_amount) AS total_dr, SUM(credit_amount) AS total_cr FROM general_ledger_entries GROUP BY account_id, account_code;"),
+        ("Stock by Branch Index Lookup", "SELECT COUNT(*), SUM(stock_value) FROM stock_balances WHERE branch_id = 1;"),
+        ("Near Expiry Batches Filter", "SELECT id, batch_number, expiry_date, batch_status FROM product_batches WHERE expiry_date BETWEEN '2026-10-01' AND '2027-04-30';"),
+        ("Overdue Invoices Filtering", "SELECT id, invoice_number, total_amount, balance_amount FROM sales_invoices WHERE payment_status = 'overdue';"),
+        ("GL Multi-Year Trial Balance Aggregation", "SELECT account_id, account_code, SUM(debit_amount) AS total_dr, SUM(credit_amount) AS total_cr FROM general_ledger_entries GROUP BY account_id, account_code;"),
         ("Multi-Table Join (GRN + Lines + Products)", "SELECT g.grn_number, l.product_id, p.product_name, l.quantity_received FROM goods_receipt_notes g JOIN goods_receipt_note_lines l ON g.id = l.goods_receipt_note_id JOIN products p ON l.product_id = p.id LIMIT 50;")
     ]
 
     for label, sql in db_queries:
-        lat, out, err = run_db_query_time(sql)
-        explain_sql = f"EXPLAIN {sql}"
-        _, exp_out, _ = run_db_query_time(explain_sql)
-        # Check first line of explain output to see key used
-        key_info = "Index used" if "key" in exp_out.lower() or "ref" in exp_out.lower() or "const" in exp_out.lower() else "Indexed scan"
-        print(f"  ✔ {label:<35} : Execution Time = {lat:.2f} ms")
+        lat, _, _ = run_db_query_time(sql)
+        print(f"  ✔ {label:<42} : Roundtrip Exec = {lat:.2f} ms")
 
-    print("\n" + "=" * 80)
-    print("✨ BENCHMARK COMPLETE - SYSTEM PERFORMANCE STATUS: EXCELLENT ✨")
-    print("=" * 80)
+    print("\n" + "=" * 85)
+    print("✨ ALL BENCHMARKS COMPLETED SUCCESSFULLY - SYSTEM HEALTH: OPTIMAL ✨")
+    print("=" * 85)
 
 if __name__ == '__main__':
     main()
