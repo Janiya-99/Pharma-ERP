@@ -14,8 +14,11 @@ func SeedChartOfAccounts(db *gorm.DB, logger *zap.Logger) error {
 		logger.Warn("Main company not found, skipping COA seeder", zap.Error(err))
 		return nil
 	}
+	return SeedChartOfAccountsForCompany(db, company.ID, logger)
+}
 
-	companyID := company.ID
+// SeedChartOfAccountsForCompany inserts default ledger accounts for a specific company ID.
+func SeedChartOfAccountsForCompany(db *gorm.DB, companyID uint64, logger *zap.Logger) error {
 
 	// Helper to get classification ID by name
 	getClassID := func(name string) uint64 {

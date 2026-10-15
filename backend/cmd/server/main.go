@@ -4,9 +4,14 @@ import (
 	"os"
 
 	"github.com/pixandco/erp-phrma/internal/auth/handlers"
+	companyModels "github.com/pixandco/erp-phrma/internal/company/models"
 	"github.com/pixandco/erp-phrma/internal/config"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
+	financeModels "github.com/pixandco/erp-phrma/internal/finance/models"
+	financeSeeders "github.com/pixandco/erp-phrma/internal/finance/seeders"
+	inventoryModels "github.com/pixandco/erp-phrma/internal/inventory/models"
+	inventorySeeders "github.com/pixandco/erp-phrma/internal/inventory/seeders"
 	platformMigrations "github.com/pixandco/erp-phrma/internal/platform/migrations"
 	"github.com/pixandco/erp-phrma/internal/repository"
 	"github.com/pixandco/erp-phrma/internal/router"
@@ -49,9 +54,27 @@ func main() {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
 
-	// 4.1. Startup Company Migrations Disabled
-	// Company migrations are not run on startup. They are executed dynamically when a company is created from the platform.
-	logger.Info("Company migrations on startup disabled (migrated dynamically on company creation)")
+	// 4.1. Auto-seed missing foundation data for active companies
+	var activeCompanies []companyModels.Company
+	if err := db.Find(&activeCompanies).Error; err == nil {
+		for _, comp := range activeCompanies {
+			var coaCount int64
+			db.Model(&financeModels.ChartOfAccount{}).Where("company_id = ?", comp.ID).Count(&coaCount)
+			if coaCount == 0 {
+				logger.Info("Auto-seeding initial finance accounts for company", zap.String("code", comp.CompanyCode))
+				_ = financeSeeders.SeedAccountClassificationsForCompany(db, comp.ID, logger)
+				_ = financeSeeders.SeedChartOfAccountsForCompany(db, comp.ID, logger)
+			}
+			var unitCount int64
+			db.Model(&inventoryModels.ProductUnit{}).Where("company_id = ?", comp.ID).Count(&unitCount)
+			if unitCount == 0 {
+				logger.Info("Auto-seeding initial inventory master data for company", zap.String("code", comp.CompanyCode))
+				_ = inventorySeeders.SeedProductUnits(db, comp.ID, logger)
+				_ = inventorySeeders.SeedDosageForms(db, comp.ID, logger)
+				_ = inventorySeeders.SeedProductCategories(db, comp.ID, logger)
+			}
+		}
+	}
 
 	// 5. Setup Redis and Cache
 	redisClient := redis.NewClient(&redis.Options{

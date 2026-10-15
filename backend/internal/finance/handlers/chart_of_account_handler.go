@@ -80,7 +80,7 @@ func (h *ChartOfAccountHandler) List(c *gin.Context) {
 		return
 	}
 
-	var response []dto.ChartOfAccountResponse
+	response := make([]dto.ChartOfAccountResponse, 0)
 	for _, coa := range accounts {
 		resp := dto.ChartOfAccountResponse{
 			ID:                      coa.ID,

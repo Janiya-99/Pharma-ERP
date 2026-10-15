@@ -14,8 +14,11 @@ func SeedAccountClassifications(db *gorm.DB, logger *zap.Logger) error {
 		logger.Warn("Main company not found, skipping account classification seeder", zap.Error(err))
 		return nil
 	}
+	return SeedAccountClassificationsForCompany(db, company.ID, logger)
+}
 
-	companyID := company.ID
+// SeedAccountClassificationsForCompany inserts classifications for a specific company ID.
+func SeedAccountClassificationsForCompany(db *gorm.DB, companyID uint64, logger *zap.Logger) error {
 
 	type Node struct {
 		Name          string
