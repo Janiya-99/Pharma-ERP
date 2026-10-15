@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { getControlDashboardSummary } from "../../../api/controlApi";
 import {
   Building2,
   Users,
@@ -126,6 +127,42 @@ const ConcentricRings: React.FC<{ modulesCount: number; totalModules: number }> 
 /* ── Main Dashboard Component ── */
 const ControlCenterDashboardPage: React.FC = () => {
   const [telemetryTab, setTelemetryTab] = useState<"users" | "transactions" | "api">("users");
+  const [stats, setStats] = useState({
+    total_branches: 5,
+    total_users: 1,
+    activated_modules: 4,
+    total_modules: 6,
+    security_alerts: 0,
+  });
+  const [telemetry, setTelemetry] = useState(telemetryData);
+  const [roleDistribution, setRoleDistribution] = useState(roleDistributionData);
+  const [moduleAdoptions, setModuleAdoptions] = useState(moduleAdoptionList);
+  const [events, setEvents] = useState(securityEvents);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const res = await getControlDashboardSummary();
+        if (res?.data) {
+          const d = res.data;
+          setStats({
+            total_branches: d.total_branches ?? 5,
+            total_users: d.total_users ?? 1,
+            activated_modules: d.activated_modules ?? 4,
+            total_modules: d.total_modules ?? 6,
+            security_alerts: d.security_alerts ?? 0,
+          });
+          if (d.telemetry && d.telemetry.length > 0) setTelemetry(d.telemetry);
+          if (d.role_distribution && d.role_distribution.length > 0) setRoleDistribution(d.role_distribution);
+          if (d.module_adoption && d.module_adoption.length > 0) setModuleAdoptions(d.module_adoption);
+          if (d.security_events && d.security_events.length > 0) setEvents(d.security_events);
+        }
+      } catch (err) {
+        console.error("Failed to load control center dashboard summary", err);
+      }
+    };
+    fetchSummary();
+  }, []);
 
   // Telemetry Area Chart Data
   const telemetryData = [
@@ -254,7 +291,7 @@ const ControlCenterDashboardPage: React.FC = () => {
 
           <div className="mt-4 flex items-end justify-between">
             <div>
-              <div className="text-3xl font-extrabold text-blue-600 tracking-tight">24</div>
+              <div className="text-3xl font-extrabold text-blue-600 tracking-tight">{stats.total_branches}</div>
               <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 mt-1">
                 <TrendingUp className="h-3.5 w-3.5" />
                 <span>+10%</span>
@@ -286,7 +323,7 @@ const ControlCenterDashboardPage: React.FC = () => {
 
           <div className="mt-4 flex items-end justify-between">
             <div>
-              <div className="text-3xl font-extrabold text-purple-600 tracking-tight">1,248</div>
+              <div className="text-3xl font-extrabold text-purple-600 tracking-tight">{stats.total_users.toLocaleString()}</div>
               <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 mt-1">
                 <TrendingUp className="h-3.5 w-3.5" />
                 <span>+12%</span>
@@ -318,7 +355,7 @@ const ControlCenterDashboardPage: React.FC = () => {
 
           <div className="mt-4 flex items-end justify-between">
             <div>
-              <div className="text-3xl font-extrabold text-emerald-600 tracking-tight">8</div>
+              <div className="text-3xl font-extrabold text-emerald-600 tracking-tight">{stats.activated_modules}</div>
               <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 mt-1">
                 <TrendingUp className="h-3.5 w-3.5" />
                 <span>+2 new modules</span>
@@ -346,7 +383,7 @@ const ControlCenterDashboardPage: React.FC = () => {
 
           <div className="mt-4 flex items-end justify-between">
             <div>
-              <div className="text-3xl font-extrabold text-rose-600 tracking-tight">3</div>
+              <div className="text-3xl font-extrabold text-rose-600 tracking-tight">{stats.security_alerts}</div>
               <div className="flex items-center gap-1 text-xs font-bold text-rose-600 mt-1">
                 <TrendingDown className="h-3.5 w-3.5" />
                 <span>-25%</span>
@@ -415,7 +452,7 @@ const ControlCenterDashboardPage: React.FC = () => {
             {/* Area Chart Container */}
             <div className="h-64 w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={telemetryData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={telemetry} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="trafficGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
@@ -484,12 +521,12 @@ const ControlCenterDashboardPage: React.FC = () => {
 
             {/* Concentric Rings Visual */}
             <div className="my-2">
-              <ConcentricRings modulesCount={8} totalModules={10} />
+              <ConcentricRings modulesCount={stats.activated_modules} totalModules={stats.total_modules} />
             </div>
 
             {/* Module Breakdown List */}
             <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2">
-              {moduleAdoptionList.map((m) => (
+              {moduleAdoptions.map((m) => (
                 <div key={m.name} className="flex items-center justify-between text-[11px]">
                   <span className="flex items-center gap-1.5 text-slate-600 truncate">
                     <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${m.color}`} />
@@ -503,9 +540,9 @@ const ControlCenterDashboardPage: React.FC = () => {
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 text-[10.5px] font-semibold text-slate-500">
-            <span>Total registered users: 1,248</span>
+            <span>Total registered users: {stats.total_users}</span>
             <span className="text-blue-600 font-bold flex items-center gap-1">
-              <BarChart2 className="h-3 w-3" /> 80% License Utilization
+              <BarChart2 className="h-3 w-3" /> 100% System Availability
             </span>
           </div>
         </div>
@@ -533,28 +570,28 @@ const ControlCenterDashboardPage: React.FC = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={roleDistributionData}
+                    data={roleDistribution}
                     innerRadius={44}
                     outerRadius={62}
                     dataKey="percentage"
                     strokeWidth={2}
                     stroke="#ffffff"
                   >
-                    {roleDistributionData.map((entry, index) => (
+                    {roleDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span className="text-sm font-extrabold text-slate-900 leading-tight">1,248</span>
+                <span className="text-sm font-extrabold text-slate-900 leading-tight">{stats.total_users}</span>
                 <span className="text-[9.5px] font-semibold text-slate-400">Total Users</span>
               </div>
             </div>
 
             {/* Role Legend List */}
             <div className="space-y-1.5 mt-2">
-              {roleDistributionData.map((r) => (
+              {roleDistribution.map((r) => (
                 <div key={r.name} className="flex items-center justify-between text-[11px]">
                   <span className="flex items-center gap-1.5 text-slate-600 truncate">
                     <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: r.color }} />
@@ -625,7 +662,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {securityEvents.map((ev) => (
+                  {events.map((ev) => (
                     <tr key={ev.id} className="hover:bg-slate-50/70 transition-colors">
                       <td className="py-3">
                         <span
@@ -660,7 +697,7 @@ const ControlCenterDashboardPage: React.FC = () => {
 
           {/* Table Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-slate-100 text-xs">
-            <span className="text-slate-400">Showing 5 of 320 recent security events</span>
+            <span className="text-slate-400">Showing {events.length} recent security & governance events</span>
             <Link
               to="/control-center/audit-logs"
               className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"

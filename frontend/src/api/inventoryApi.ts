@@ -4,6 +4,8 @@ export const inventoryApi = {
   // Dashboard
   getInventoryDashboard: (params: Record<string, unknown> = {}) =>
     apiClient.get("/inventory/dashboard", { params }),
+  getDashboardStats: (params: Record<string, unknown> = {}) =>
+    apiClient.get("/inventory/dashboard", { params }),
 
   // Warehouses
   getWarehouses: (params: Record<string, unknown>) =>

@@ -112,15 +112,23 @@ const formatYAxis = (value: number) => {
 export default function InventoryDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState<InventoryStats>(fallbackStats);
+  const [stockTrends, setStockTrends] = useState<any[]>(stockTrendData);
+  const [warehouses, setWarehouses] = useState<any[]>(warehouseData);
+  const [alerts, setAlerts] = useState<any[]>(batchAlerts);
+  const [topProducts, setTopProducts] = useState<any[]>(topMovingProducts);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mocking an API call
     const fetchStats = async () => {
       try {
         const response = await inventoryApi.getDashboardStats();
         if (response?.data?.data) {
-          setStats(response.data.data);
+          const d = response.data.data;
+          setStats(d);
+          if (d.stock_trends && d.stock_trends.length > 0) setStockTrends(d.stock_trends);
+          if (d.warehouse_distribution && d.warehouse_distribution.length > 0) setWarehouses(d.warehouse_distribution);
+          if (d.batch_alerts && d.batch_alerts.length > 0) setAlerts(d.batch_alerts);
+          if (d.top_moving_products && d.top_moving_products.length > 0) setTopProducts(d.top_moving_products);
         }
       } catch (err) {
         console.error("Failed to fetch inventory stats", err);
@@ -264,7 +272,7 @@ export default function InventoryDashboard() {
 
             <div className="h-72 w-full mt-6">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={stockTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={stockTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorStock" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.3} />
@@ -314,8 +322,8 @@ export default function InventoryDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: number) => [money(value), "Value"]} />
-                  <Pie data={warehouseData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                    {warehouseData.map((entry, index) => (
+                  <Pie data={warehouses} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                    {warehouses.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="transparent" />
                     ))}
                   </Pie>
@@ -324,8 +332,8 @@ export default function InventoryDashboard() {
             </div>
 
             <div className="mt-6 space-y-3 border-t border-slate-100 pt-4 text-xs">
-              {warehouseData.map((item, idx) => {
-                const total = warehouseData.reduce((acc, curr) => acc + curr.value, 0);
+              {warehouses.map((item, idx) => {
+                const total = warehouses.reduce((acc, curr) => acc + curr.value, 0) || 1;
                 const pct = Math.round((item.value / total) * 100);
                 return (
                   <div key={idx} className="flex items-center justify-between">
@@ -379,7 +387,7 @@ export default function InventoryDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {batchAlerts.map((alert) => (
+                  {alerts.map((alert) => (
                     <tr key={alert.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-slate-900">
                         {alert.batch}
@@ -438,7 +446,7 @@ export default function InventoryDashboard() {
             </div>
 
             <div className="space-y-5">
-              {topMovingProducts.map((product, idx) => (
+              {topProducts.map((product, idx) => (
                 <div key={idx} className="group">
                   <div className="flex justify-between items-center mb-1.5">
                     <span className="text-sm font-semibold text-slate-800 group-hover:text-brand-600 transition-colors">
