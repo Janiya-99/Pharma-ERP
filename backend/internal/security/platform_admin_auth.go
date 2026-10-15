@@ -44,6 +44,9 @@ func ValidatePlatformToken(tokenString string) (*PlatformAdminClaims, error) {
 	}
 
 	if claims, ok := token.Claims.(*PlatformAdminClaims); ok && token.Valid {
+		if !claims.IsAdmin || claims.UserID == 0 {
+			return nil, errors.New("forbidden: platform admin authorization required")
+		}
 		return claims, nil
 	}
 

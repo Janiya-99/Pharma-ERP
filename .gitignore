@@ -17,3 +17,10 @@ build/
 .htaccess
 go-backend
 scratch/
+
+# QA Test Reports and Evidence
+Test/0*
+Test/1*
+Test/evidence/
+Test/run_e2e_qa.py
+Test/.~lock.*
