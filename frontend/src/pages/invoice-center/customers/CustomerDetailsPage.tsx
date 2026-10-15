@@ -35,22 +35,35 @@ interface Customer {
   trade_name?: string;
   customer_type: string;
   category?: Category;
+  customer_category?: Category;
   currency: string;
   tax_id?: string;
+  tax_registration_number?: string;
   registration_no?: string;
+  business_registration_number?: string;
   email?: string;
+  primary_email?: string;
   phone?: string;
+  primary_contact_number?: string;
+  primary_contact_person?: string;
   mobile?: string;
   website?: string;
-  credit_limit: number;
-  credit_days: number;
+  credit_limit?: number;
+  credit_days?: number;
+  current_balance?: number;
+  credit_summary?: {
+    credit_limit: number;
+    credit_days: number;
+    current_balance: number;
+    available_credit: number;
+    credit_limit_exceeded: boolean;
+  };
   payment_terms?: string;
   discount_percentage?: number;
   billing_address?: string;
   shipping_address?: string;
   notes?: string;
   status: string;
-  current_balance: number;
 }
 
 const CustomerDetailsPage: React.FC = () => {
@@ -172,9 +185,9 @@ const CustomerDetailsPage: React.FC = () => {
 
       {/* Credit Summary Card */}
       <CustomerCreditSummary
-        creditLimit={customer.credit_limit}
-        currentBalance={customer.current_balance}
-        creditDays={customer.credit_days}
+        creditLimit={customer.credit_summary?.credit_limit ?? customer.credit_limit}
+        currentBalance={customer.credit_summary?.current_balance ?? customer.current_balance}
+        creditDays={customer.credit_summary?.credit_days ?? customer.credit_days}
       />
 
       {/* Navigation Tabs */}
@@ -215,81 +228,65 @@ const CustomerDetailsPage: React.FC = () => {
       {/* Tab Contents */}
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm  ">
-            <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900  ">
+          <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs">
+            <h3 className="flex items-center gap-2 border-b border-slate-100 pb-3 text-base font-bold text-slate-900">
               <Building2 className="h-4 w-4 text-brand-500" /> Basic & Legal
               Profile
             </h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between border-b border-gray-50 py-1 ">
-                <span className="text-gray-500 ">
-                  Category
-                </span>
-                <span className="font-semibold text-navy-900 ">
-                  {customer.category?.category_name || "—"}
+              <div className="flex justify-between border-b border-slate-50 py-1">
+                <span className="text-slate-500">Category</span>
+                <span className="font-semibold text-slate-900">
+                  {customer.customer_category?.category_name || customer.category?.category_name || "—"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 ">
-                <span className="text-gray-500 ">
-                  Currency
-                </span>
-                <span className="font-semibold text-navy-900 ">
+              <div className="flex justify-between border-b border-slate-50 py-1">
+                <span className="text-slate-500">Currency</span>
+                <span className="font-semibold text-slate-900">
                   {customer.currency || "LKR"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 ">
-                <span className="text-gray-500 ">
-                  Tax ID / VAT No
-                </span>
-                <span className="font-mono font-medium text-navy-900 ">
-                  {customer.tax_id || "—"}
+              <div className="flex justify-between border-b border-slate-50 py-1">
+                <span className="text-slate-500">Tax ID / VAT No</span>
+                <span className="font-mono font-medium text-slate-900">
+                  {customer.tax_registration_number || customer.tax_id || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-gray-500 ">
-                  Company Registration No
-                </span>
-                <span className="font-mono font-medium text-navy-900 ">
-                  {customer.registration_no || "—"}
+                <span className="text-slate-500">Company Registration No</span>
+                <span className="font-mono font-medium text-slate-900">
+                  {customer.business_registration_number || customer.registration_no || "—"}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm  ">
-            <h3 className="flex items-center gap-2 border-b border-gray-100 pb-3 text-base font-bold text-navy-900  ">
+          <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs">
+            <h3 className="flex items-center gap-2 border-b border-slate-100 pb-3 text-base font-bold text-slate-900">
               <Mail className="h-4 w-4 text-indigo-500" /> Primary Contact Info
             </h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between border-b border-gray-50 py-1 ">
-                <span className="text-gray-500 ">
-                  Email Address
-                </span>
-                <span className="font-medium text-indigo-600 ">
-                  {customer.email || "—"}
+              <div className="flex justify-between border-b border-slate-50 py-1">
+                <span className="text-slate-500">Contact Person</span>
+                <span className="font-semibold text-slate-900">
+                  {customer.primary_contact_person || "—"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 ">
-                <span className="text-gray-500 ">
-                  Phone Number
-                </span>
-                <span className="font-medium text-navy-900 ">
-                  {customer.phone || "—"}
+              <div className="flex justify-between border-b border-slate-50 py-1">
+                <span className="text-slate-500">Email Address</span>
+                <span className="font-medium text-indigo-600">
+                  {customer.primary_email || customer.email || "—"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-50 py-1 ">
-                <span className="text-gray-500 ">
-                  Mobile Number
-                </span>
-                <span className="font-medium text-navy-900 ">
-                  {customer.mobile || "—"}
+              <div className="flex justify-between border-b border-slate-50 py-1">
+                <span className="text-slate-500">Phone Number</span>
+                <span className="font-medium text-slate-900">
+                  {customer.primary_contact_number || customer.phone || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-gray-500 ">
-                  Website
-                </span>
-                <span className="font-medium text-navy-900 ">
+                <span className="text-slate-500">Website</span>
+                <span className="font-medium text-slate-900">
                   {customer.website || "—"}
                 </span>
               </div>
@@ -352,40 +349,40 @@ const CustomerDetailsPage: React.FC = () => {
       )}
 
       {activeTab === "terms" && (
-        <div className="space-y-6 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm  ">
-          <h3 className="border-b border-gray-100 pb-4 text-lg font-bold text-navy-900  ">
+        <div className="space-y-6 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs">
+          <h3 className="border-b border-slate-100 pb-4 text-base font-bold text-slate-900">
             Credit & Financial Policies
           </h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-            <div className="rounded-2xl bg-gray-50 p-4 ">
-              <span className="block text-xs font-bold uppercase text-gray-400">
+            <div className="rounded-xl border border-slate-100 bg-white/80 p-4 shadow-xs">
+              <span className="block text-xs font-bold uppercase text-slate-400">
                 Credit Limit
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
-                LKR {Number(customer.credit_limit || 0).toLocaleString()}
+              <span className="mt-1 block text-lg font-extrabold text-slate-900">
+                LKR {Number(customer.credit_summary?.credit_limit ?? customer.credit_limit ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
-            <div className="rounded-2xl bg-gray-50 p-4 ">
-              <span className="block text-xs font-bold uppercase text-gray-400">
+            <div className="rounded-xl border border-slate-100 bg-white/80 p-4 shadow-xs">
+              <span className="block text-xs font-bold uppercase text-slate-400">
                 Credit Period
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
-                {customer.credit_days || 0} Days
+              <span className="mt-1 block text-lg font-extrabold text-slate-900">
+                {customer.credit_summary?.credit_days ?? customer.credit_days ?? 0} Days
               </span>
             </div>
-            <div className="rounded-2xl bg-gray-50 p-4 ">
-              <span className="block text-xs font-bold uppercase text-gray-400">
+            <div className="rounded-xl border border-slate-100 bg-white/80 p-4 shadow-xs">
+              <span className="block text-xs font-bold uppercase text-slate-400">
                 Fixed Discount
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
+              <span className="mt-1 block text-lg font-extrabold text-slate-900">
                 {customer.discount_percentage || 0}%
               </span>
             </div>
-            <div className="rounded-2xl bg-gray-50 p-4 ">
-              <span className="block text-xs font-bold uppercase text-gray-400">
+            <div className="rounded-xl border border-slate-100 bg-white/80 p-4 shadow-xs">
+              <span className="block text-xs font-bold uppercase text-slate-400">
                 Payment Terms
               </span>
-              <span className="mt-1 block text-xl font-extrabold text-navy-900 ">
+              <span className="mt-1 block text-lg font-extrabold text-slate-900">
                 {customer.payment_terms || "Standard EOM"}
               </span>
             </div>
