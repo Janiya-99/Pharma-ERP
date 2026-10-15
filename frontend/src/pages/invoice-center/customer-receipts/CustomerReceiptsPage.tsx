@@ -95,9 +95,9 @@ const CustomerReceiptsPage = () => {
         ),
       },
       {
-        accessorKey: "receipt_amount",
+        accessorKey: "received_amount",
         header: "Amount",
-        cell: (row: any) => formatCurrency(row.receipt_amount),
+        cell: (row: any) => formatCurrency(row.received_amount ?? row.receipt_amount ?? 0),
       },
       {
         accessorKey: "receipt_status",

@@ -18,17 +18,17 @@ export const ReportPageShell: React.FC<ReportPageShellProps> = ({
   actions,
 }) => {
   return (
-    <div className="bg-slate-50 min-h-screen flex-1 space-y-4 p-8 pt-6">
-      <div className="flex flex-col justify-between space-y-2 border-b pb-4 md:flex-row md:items-center md:space-y-0">
+    <div className="min-h-screen flex-1 space-y-6 p-6 sm:p-8 bg-slate-50/50">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white/95 via-slate-50/90 to-blue-50/30 backdrop-blur-xl p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-navy-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
             {title}
           </h2>
           {description && (
-            <p className="text-slate-500 mt-1 text-sm">{description}</p>
+            <p className="text-slate-500 mt-1 text-xs sm:text-sm font-medium">{description}</p>
           )}
         </div>
-        <div className="flex items-center space-x-2">{actions}</div>
+        <div className="flex items-center space-x-2 shrink-0">{actions}</div>
       </div>
 
       <div className="space-y-6">

@@ -23,6 +23,7 @@ import { AlertCircle } from "lucide-react";
 // Components
 import { FinanceDashboardFilters } from "./components/FinanceDashboardFilters";
 import { FinanceKpiCard } from "./components/FinanceKpiCard";
+import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 import { FinanceSummaryCard } from "./components/FinanceSummaryCard";
 import { RevenueProfitTrendChart } from "./components/RevenueProfitTrendChart";
 import { ExpenseDistributionChart } from "./components/ExpenseDistributionChart";
@@ -55,52 +56,61 @@ const FinanceDashboardPage = () => {
   const dashboardData = response;
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
-      {/* Page Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 ">
-            Finance Dashboard
-          </h1>
-          <p className="text-sm text-gray-500 ">
-            {user?.company_name || "Company"} • Overview & Analytics
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <FinanceDashboardFilters onFilterChange={handleFilterChange} />
-          <Button variant="outline" size="icon" onClick={() => refetch()} disabled={isLoading}>
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/20 px-4 transition-all">
-                <Plus className="mr-2 h-4 w-4" />
-                New Action
-                <ChevronDown className="ml-2 h-4 w-4 opacity-70" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl border-slate-100">
-              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
-                <FileText className="mr-3 h-4 w-4 text-indigo-500" />
-                <span className="font-medium">New Journal Entry</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
-                <Receipt className="mr-3 h-4 w-4 text-emerald-500" />
-                <span className="font-medium">Create Invoice</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
-                <Wallet className="mr-3 h-4 w-4 text-amber-500" />
-                <span className="font-medium">Record Payment</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-slate-100 my-1" />
-              <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
-                <Landmark className="mr-3 h-4 w-4 text-blue-500" />
-                <span className="font-medium">Bank Transfer</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+    <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
+      {/* ── TOP PAGE HEADER ── */}
+      <DashboardHeroCard
+        title="Financial Operations & Treasury"
+        subtitle={`Audited fiscal analytics, liquidity positions, and statutory ledger governance for ${user?.company_name || "Ceylon Med Global"}.`}
+        moduleTag="Fiscal Intelligence & Ledger"
+        icon={Landmark}
+        quote={{
+          text: "Audited financial transparency, real-time fiscal control, and statutory governance.",
+          author: "SLFRS / LKAS Compliant Accounting"
+        }}
+        accent="emerald"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer h-9"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 text-slate-400 ${isLoading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl shadow-xs text-xs font-semibold px-3.5 py-2 transition-all h-9">
+                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                  New Action
+                  <ChevronDown className="ml-1.5 h-3.5 w-3.5 opacity-70" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl border-slate-200/80 bg-white/95 backdrop-blur-md">
+                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                  <FileText className="mr-2.5 h-4 w-4 text-emerald-500" />
+                  <span className="font-semibold">New Journal Entry</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                  <Receipt className="mr-2.5 h-4 w-4 text-blue-500" />
+                  <span className="font-semibold">Create Invoice</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                  <Wallet className="mr-2.5 h-4 w-4 text-amber-500" />
+                  <span className="font-semibold">Record Payment</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-slate-100 my-1" />
+                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                  <Landmark className="mr-2.5 h-4 w-4 text-indigo-500" />
+                  <span className="font-semibold">Bank Transfer</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        }
+      />
 
       <div className="w-full">
         {isLoading && (

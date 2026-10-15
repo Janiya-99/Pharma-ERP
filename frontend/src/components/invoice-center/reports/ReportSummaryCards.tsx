@@ -63,7 +63,7 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {items.map((item, index) => (
-        <Card key={index} className="border-slate-200 bg-white shadow-sm">
+        <Card key={index} className="border border-slate-200/80 bg-white/80 backdrop-blur-md shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 rounded-2xl">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-slate-500 text-sm font-medium">
               {item.title}

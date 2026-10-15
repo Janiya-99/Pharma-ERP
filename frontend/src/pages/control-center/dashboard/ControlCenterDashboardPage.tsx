@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getControlDashboardSummary } from "../../../api/controlApi";
+import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 import {
   Building2,
   Users,
@@ -244,34 +245,22 @@ const ControlCenterDashboardPage: React.FC = () => {
   return (
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
       {/* ── TOP PAGE HEADER ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Control Center</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            System administration, performance, and organisational overview.
-          </p>
-        </div>
-
-        {/* Global Filter Pills */}
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition-colors">
-            <Calendar className="h-3.5 w-3.5 text-slate-400" />
-            <span>This Week</span>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400 ml-1" />
-          </div>
-
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition-colors">
-            <Globe className="h-3.5 w-3.5 text-slate-400" />
-            <span>All Branches (Global)</span>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400 ml-1" />
-          </div>
-        </div>
-      </div>
+      <DashboardHeroCard
+        title="Control Center"
+        subtitle="System administration, performance telemetry, and organisational governance."
+        moduleTag="Enterprise Administration"
+        icon={Building2}
+        quote={{
+          text: "Integrity in enterprise operations, excellence in healthcare delivery across Sri Lanka.",
+          author: "Ceylon Med Global Governance"
+        }}
+        accent="blue"
+      />
 
       {/* ── TOP 4 KPI CARDS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Total Branches */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
@@ -303,7 +292,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         </div>
 
         {/* Card 2: Total Users */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600">
@@ -335,7 +324,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         </div>
 
         {/* Card 3: Activated Modules */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
@@ -366,7 +355,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         </div>
 
         {/* Card 4: Active Incidents */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600">
@@ -398,7 +387,7 @@ const ControlCenterDashboardPage: React.FC = () => {
       {/* ── MIDDLE ROW: Telemetry Area Chart + Module Adoption + Role Donut ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left (6 Cols): System Traffic & User Telemetry */}
-        <div className="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-6 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2.5">
@@ -502,7 +491,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         </div>
 
         {/* Middle (3 Cols): Module Adoption & License Usage */}
-        <div className="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-3 bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -548,7 +537,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         </div>
 
         {/* Right (3 Cols): Role Privilege Distribution */}
-        <div className="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-3 bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -620,7 +609,7 @@ const ControlCenterDashboardPage: React.FC = () => {
       {/* ── LOWER SECTION: Security Governance + Quick Actions + Actions/Health ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Column (6 Cols): Security Governance & Audit Trail */}
-        <div className="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-6 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
@@ -708,7 +697,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         </div>
 
         {/* Middle Column (3 Cols): Administrative Quick Actions */}
-        <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-3 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100">
               <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
@@ -806,7 +795,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         {/* Right Column (3 Cols): Pending Administrative Actions + System Health */}
         <div className="lg:col-span-3 space-y-5">
           {/* Top: Pending Administrative Actions */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-amber-500" />
@@ -869,7 +858,7 @@ const ControlCenterDashboardPage: React.FC = () => {
           </div>
 
           {/* Bottom: System Health */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <HeartPulse className="h-4 w-4 text-emerald-500" />

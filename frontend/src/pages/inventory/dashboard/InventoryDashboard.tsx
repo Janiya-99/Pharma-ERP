@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Package,
   AlertTriangle,
@@ -21,6 +22,7 @@ import {
 import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from "recharts";
 import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
+import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 
 /* ─────────────────────────────────────────────────
    Type Declarations
@@ -111,6 +113,7 @@ const formatYAxis = (value: number) => {
 
 export default function InventoryDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<InventoryStats>(fallbackStats);
   const [stockTrends, setStockTrends] = useState<any[]>(stockTrendData);
   const [warehouses, setWarehouses] = useState<any[]>(warehouseData);
@@ -118,24 +121,26 @@ export default function InventoryDashboard() {
   const [topProducts, setTopProducts] = useState<any[]>(topMovingProducts);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await inventoryApi.getDashboardStats();
-        if (response?.data?.data) {
-          const d = response.data.data;
-          setStats(d);
-          if (d.stock_trends && d.stock_trends.length > 0) setStockTrends(d.stock_trends);
-          if (d.warehouse_distribution && d.warehouse_distribution.length > 0) setWarehouses(d.warehouse_distribution);
-          if (d.batch_alerts && d.batch_alerts.length > 0) setAlerts(d.batch_alerts);
-          if (d.top_moving_products && d.top_moving_products.length > 0) setTopProducts(d.top_moving_products);
-        }
-      } catch (err) {
-        console.error("Failed to fetch inventory stats", err);
-      } finally {
-        setLoading(false);
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const response = await inventoryApi.getDashboardStats();
+      if (response?.data?.data) {
+        const d = response.data.data;
+        setStats(d);
+        if (d.stock_trends && d.stock_trends.length > 0) setStockTrends(d.stock_trends);
+        if (d.warehouse_distribution && d.warehouse_distribution.length > 0) setWarehouses(d.warehouse_distribution);
+        if (d.batch_alerts && d.batch_alerts.length > 0) setAlerts(d.batch_alerts);
+        if (d.top_moving_products && d.top_moving_products.length > 0) setTopProducts(d.top_moving_products);
       }
-    };
+    } catch (err) {
+      console.error("Failed to fetch inventory stats", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchStats();
   }, []);
 
@@ -151,25 +156,25 @@ export default function InventoryDashboard() {
     const t = toneMap[tone] || toneMap.blue;
 
     return (
-      <div className={`relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-5 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5`}>
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+            <p className="text-[12px] font-bold uppercase tracking-wider text-slate-400 mb-1">
               {title}
             </p>
-            <h3 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h3 className="text-2xl font-extrabold tracking-tight text-slate-900">
               {value}
             </h3>
           </div>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${t.iconBg} shadow-sm transition-transform duration-300 hover:scale-110`}>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${t.iconBg} shadow-xs transition-transform duration-300 hover:scale-110`}>
             <Icon className={`h-6 w-6 ${t.text}`} />
           </div>
         </div>
         {(subtitle || trend) && (
-          <div className="mt-4 flex items-center justify-between text-[13px]">
+          <div className="mt-4 flex items-center justify-between text-[12px]">
             {subtitle && <span className="text-slate-500 font-medium">{subtitle}</span>}
             {trend && (
-              <span className={`flex items-center font-semibold ${trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <span className={`flex items-center font-bold ${trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {trendUp ? <TrendingUp className="mr-1 h-3.5 w-3.5" /> : <TrendingDown className="mr-1 h-3.5 w-3.5" />}
                 {trend}
               </span>
@@ -181,31 +186,38 @@ export default function InventoryDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-12 pt-6 px-4 sm:px-6 lg:px-8 font-sans">
-      {/* ══════════════════════════════════════════════
-          HEADER SECTION
-      ══════════════════════════════════════════════ */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Package className="h-6 w-6 text-brand-600" />
-            Inventory Command Center
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 font-medium">
-            Real-time tracking of multi-warehouse stock, batches, and valuations.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
-            <RefreshCw className="h-4 w-4" />
-            <span className="hidden sm:inline">Refresh Data</span>
-          </button>
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Receive Stock</span>
-          </button>
-        </div>
-      </div>
+    <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
+      {/* ── TOP PAGE HEADER ── */}
+      <DashboardHeroCard
+        title="Inventory Command Center"
+        subtitle="Real-time multi-warehouse stock tracking, batch serialization, and valuation analytics."
+        moduleTag="Supply Chain & Batches"
+        icon={Package}
+        quote={{
+          text: "Precision batch custody and cold-chain integrity across every healthcare facility in Sri Lanka.",
+          author: "WHO-GDP Certified Logistics"
+        }}
+        accent="indigo"
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchStats}
+              disabled={loading}
+              className="flex items-center gap-2 px-3.5 py-2 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 text-slate-400 ${loading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <button
+              onClick={() => navigate("/inventory/grn/new")}
+              className="flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs text-xs font-semibold transition-all cursor-pointer"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Receive Stock</span>
+            </button>
+          </div>
+        }
+      />
 
       {/* ══════════════════════════════════════════════
           TIER 1: Core KPI Cards
@@ -254,7 +266,7 @@ export default function InventoryDashboard() {
       ══════════════════════════════════════════════ */}
       <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Stock Value Trend Area Chart (2/3 width) */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
@@ -307,7 +319,7 @@ export default function InventoryDashboard() {
         </div>
 
         {/* Right: Warehouse Distribution Donut Chart (1/3 width) */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
           <div>
             <div className="mb-4">
               <h3 className="text-lg font-semibold text-slate-900">
@@ -358,7 +370,7 @@ export default function InventoryDashboard() {
       ══════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left 2 Cols: Critical Batch Expiration Alerts */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
               <div>
@@ -433,7 +445,7 @@ export default function InventoryDashboard() {
         </div>
 
         {/* Right Col: High-Velocity Products (1/3 width) */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
           <div>
             <div className="mb-6 border-b border-slate-100 pb-4">
               <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
