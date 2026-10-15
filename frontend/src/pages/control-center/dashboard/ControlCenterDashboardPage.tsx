@@ -124,6 +124,83 @@ const ConcentricRings: React.FC<{ modulesCount: number; totalModules: number }> 
   );
 };
 
+// Telemetry Area Chart Data
+const telemetryData = [
+  { day: "Mon", users: 11200, transactions: 18400, api: 42000 },
+  { day: "Tue", users: 14800, transactions: 24200, api: 56000 },
+  { day: "Wed", users: 15600, transactions: 26800, api: 61000 },
+  { day: "Thu", users: 18430, transactions: 31200, api: 74000 },
+  { day: "Fri", users: 16900, transactions: 28500, api: 68000 },
+  { day: "Sat", users: 9400, transactions: 15400, api: 38000 },
+  { day: "Sun", users: 8200, transactions: 12800, api: 31000 },
+];
+
+// Role Privilege Donut Chart Data
+const roleDistributionData = [
+  { name: "Administrators", percentage: 28, count: 352, color: "#3b82f6" },
+  { name: "Managers", percentage: 24, count: 299, color: "#6366f1" },
+  { name: "Pharmacists", percentage: 20, count: 250, color: "#06b6d4" },
+  { name: "Sales Staff", percentage: 16, count: 200, color: "#f43f5e" },
+  { name: "Warehouse", percentage: 8, count: 100, color: "#f59e0b" },
+  { name: "View Only", percentage: 4, count: 47, color: "#10b981" },
+];
+
+// Module Adoption List
+const moduleAdoptionList = [
+  { name: "Inventory", rate: "92%", color: "bg-blue-500" },
+  { name: "Sales & Distribution", rate: "78%", color: "bg-indigo-500" },
+  { name: "Purchasing", rate: "64%", color: "bg-sky-500" },
+  { name: "Finance", rate: "56%", color: "bg-cyan-500" },
+  { name: "Reports", rate: "48%", color: "bg-teal-500" },
+  { name: "Administration", rate: "32%", color: "bg-slate-400" },
+  { name: "HR & Payroll", rate: "24%", color: "bg-rose-400" },
+  { name: "Others", rate: "12%", color: "bg-slate-300" },
+];
+
+// Security Governance Events
+const securityEvents = [
+  {
+    id: 1,
+    severity: "CRITICAL",
+    description: "Multiple failed login attempts",
+    user: "john.doe",
+    ip: "192.168.1.105",
+    time: "Today 10:24",
+  },
+  {
+    id: 2,
+    severity: "WARNING",
+    description: "Elevated user permissions assigned",
+    user: "system.admin",
+    ip: "203.0.113.42",
+    time: "Today 09:17",
+  },
+  {
+    id: 3,
+    severity: "INFO",
+    description: "New API access key generated",
+    user: "api_user",
+    ip: "198.51.100.27",
+    time: "Yesterday 16:03",
+  },
+  {
+    id: 4,
+    severity: "INFO",
+    description: "Record data updated successfully",
+    user: "maria.santos",
+    ip: "203.0.113.88",
+    time: "Jul 6, 2024 14:21",
+  },
+  {
+    id: 5,
+    severity: "SUCCESS",
+    description: "User password reset",
+    user: "support.team",
+    ip: "198.51.100.73",
+    time: "Jul 6, 2024 11:09",
+  },
+];
+
 /* ── Main Dashboard Component ── */
 const ControlCenterDashboardPage: React.FC = () => {
   const [telemetryTab, setTelemetryTab] = useState<"users" | "transactions" | "api">("users");
@@ -163,83 +240,6 @@ const ControlCenterDashboardPage: React.FC = () => {
     };
     fetchSummary();
   }, []);
-
-  // Telemetry Area Chart Data
-  const telemetryData = [
-    { day: "Mon", users: 11200, transactions: 18400, api: 42000 },
-    { day: "Tue", users: 14800, transactions: 24200, api: 56000 },
-    { day: "Wed", users: 15600, transactions: 26800, api: 61000 },
-    { day: "Thu", users: 18430, transactions: 31200, api: 74000 },
-    { day: "Fri", users: 16900, transactions: 28500, api: 68000 },
-    { day: "Sat", users: 9400, transactions: 15400, api: 38000 },
-    { day: "Sun", users: 8200, transactions: 12800, api: 31000 },
-  ];
-
-  // Role Privilege Donut Chart Data
-  const roleDistributionData = [
-    { name: "Administrators", percentage: 28, count: 352, color: "#3b82f6" },
-    { name: "Managers", percentage: 24, count: 299, color: "#6366f1" },
-    { name: "Pharmacists", percentage: 20, count: 250, color: "#06b6d4" },
-    { name: "Sales Staff", percentage: 16, count: 200, color: "#f43f5e" },
-    { name: "Warehouse", percentage: 8, count: 100, color: "#f59e0b" },
-    { name: "View Only", percentage: 4, count: 47, color: "#10b981" },
-  ];
-
-  // Module Adoption List
-  const moduleAdoptionList = [
-    { name: "Inventory", rate: "92%", color: "bg-blue-500" },
-    { name: "Sales & Distribution", rate: "78%", color: "bg-indigo-500" },
-    { name: "Purchasing", rate: "64%", color: "bg-sky-500" },
-    { name: "Finance", rate: "56%", color: "bg-cyan-500" },
-    { name: "Reports", rate: "48%", color: "bg-teal-500" },
-    { name: "Administration", rate: "32%", color: "bg-slate-400" },
-    { name: "HR & Payroll", rate: "24%", color: "bg-rose-400" },
-    { name: "Others", rate: "12%", color: "bg-slate-300" },
-  ];
-
-  // Security Governance Events
-  const securityEvents = [
-    {
-      id: 1,
-      severity: "CRITICAL",
-      description: "Multiple failed login attempts",
-      user: "john.doe",
-      ip: "192.168.1.105",
-      time: "Today 10:24",
-    },
-    {
-      id: 2,
-      severity: "WARNING",
-      description: "Elevated user permissions assigned",
-      user: "system.admin",
-      ip: "203.0.113.42",
-      time: "Today 09:17",
-    },
-    {
-      id: 3,
-      severity: "INFO",
-      description: "New API access key generated",
-      user: "api_user",
-      ip: "198.51.100.27",
-      time: "Yesterday 16:03",
-    },
-    {
-      id: 4,
-      severity: "INFO",
-      description: "Record data updated successfully",
-      user: "maria.santos",
-      ip: "203.0.113.88",
-      time: "Jul 6, 2024 14:21",
-    },
-    {
-      id: 5,
-      severity: "SUCCESS",
-      description: "User password reset",
-      user: "support.team",
-      ip: "198.51.100.73",
-      time: "Jul 6, 2024 11:09",
-    },
-  ];
 
   return (
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
