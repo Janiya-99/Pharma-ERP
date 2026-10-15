@@ -32,6 +32,17 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 	db.Model(&models.ProductBatch{}).Where("company_id = ? AND expiry_date < NOW()", companyID).Count(&expiredBatches)
 	db.Model(&models.ProductBatch{}).Where("company_id = ? AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 90 DAY)", companyID).Count(&nearExpiryBatches)
 
+	db.Raw(`
+		SELECT COUNT(*) FROM (
+			SELECT p.id
+			FROM products p
+			LEFT JOIN stock_balances sb ON sb.product_id = p.id AND sb.company_id = p.company_id
+			WHERE p.company_id = ? AND p.status = 'active' AND p.reorder_level > 0
+			GROUP BY p.id, p.reorder_level
+			HAVING COALESCE(SUM(sb.quantity_available), 0) <= p.reorder_level
+		) as low_stock
+	`, companyID).Scan(&lowStockProducts)
+
 	db.Model(&models.StockBalance{}).Select("COALESCE(SUM(quantity_available * average_cost), 0)").Where("company_id = ?", companyID).Scan(&totalStockValue)
 
 	c.JSON(http.StatusOK, gin.H{
