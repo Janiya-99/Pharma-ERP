@@ -86,8 +86,16 @@ const StepRolesPermissions = ({ formData, onChange }: StepRolesPermissionsProps)
     let permissionCount = 0;
     try {
       const res = await getRolePermissionMatrix(roleId);
-      if (res.success) {
-        permissions = res.data?.permissions || [];
+      const data = res?.data || res;
+      if (Array.isArray(data?.permissions) && data.permissions.length > 0) {
+        permissions = data.permissions.filter((p: any) => p.assigned !== false);
+        permissionCount = permissions.length;
+      } else if (Array.isArray(data?.groups)) {
+        data.groups.forEach((g: any) => {
+          (g.permissions || []).forEach((p: any) => {
+            if (p.assigned !== false) permissions.push(p);
+          });
+        });
         permissionCount = permissions.length;
       }
     } catch {

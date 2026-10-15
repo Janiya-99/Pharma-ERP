@@ -47,7 +47,7 @@ func (h *RolePermissionHandler) GetMatrix(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, matrix) // Root response
+	c.JSON(http.StatusOK, dto.SuccessResponse("Role permissions loaded successfully", matrix))
 }
 
 func (h *RolePermissionHandler) Assign(c *gin.Context) {

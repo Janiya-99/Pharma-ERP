@@ -41,9 +41,12 @@ const RoleFormModal = ({ isOpen, onClose, role, onSuccess, softwareModules }: { 
           setAssignedPermissionIds(role.permission_ids);
         } else if (role.id) {
           getRolePermissionMatrix(role.id).then((res: any) => {
-            if (res.success) {
-              const perms = Array.isArray(res.data.permissions) ? res.data.permissions : (Array.isArray(res.data) ? res.data : []);
-              setAssignedPermissionIds(perms.map((p: any) => p.id));
+            if (res.success || res.groups || res.data) {
+              const perms = Array.isArray(res.data?.permissions) ? res.data.permissions : (Array.isArray(res.data) ? res.data : []);
+              const ids = Array.isArray(res.data?.assigned_permission_ids)
+                ? res.data.assigned_permission_ids
+                : perms.map((p: any) => p.id || p.permission_id);
+              setAssignedPermissionIds(ids);
             }
           });
         }

@@ -107,7 +107,9 @@ const RolePermissionMatrixPage = () => {
       if (res.success) {
         // Backend could return an array of objects or IDs. Assuming array of objects.
         const perms = Array.isArray(res.data.permissions) ? res.data.permissions : (Array.isArray(res.data) ? res.data : []);
-        const ids = perms.map((p: any) => p.id);
+        const ids = Array.isArray(res.data?.assigned_permission_ids)
+          ? res.data.assigned_permission_ids
+          : perms.map((p: any) => p.id || p.permission_id);
         setAssignedPermissionIds(ids);
         setInitialAssignedIds(ids);
       }
