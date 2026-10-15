@@ -135,18 +135,35 @@ func (r *CompanyResolver) GetOrCreateCompanyDBConnection(company models.Platform
 		sqlDB.SetConnMaxLifetime(5 * time.Minute)
 	}
 
-	// Run migrations (skip if requested)
-	if os.Getenv("SKIP_MIGRATIONS") != "true" {
+	// Run migrations (skip if requested or in production)
+	skipMigrations := os.Getenv("SKIP_MIGRATIONS") == "true" || r.cfg.App.Env == "production"
+	if !skipMigrations {
 		if err := companyMigrations.RunCompanyMigrations(newDB, r.logger); err != nil {
 			r.logger.Error("Failed to run migrations for company database", zap.String("db_name", company.DatabaseName), zap.Error(err))
 			return nil, err
 		}
 	} else {
-		r.logger.Info("Skipping company migrations (SKIP_MIGRATIONS=true)", zap.String("db_name", company.DatabaseName))
+		r.logger.Info("Skipping company migrations on connection", zap.String("db_name", company.DatabaseName))
 	}
 
 	r.dbs[company.DatabaseName] = newDB
-	r.logger.Info("Established new company database connection and migrated schema", zap.String("company_code", company.CompanyCode), zap.String("db_name", company.DatabaseName))
+	r.logger.Info("Established new company database connection", zap.String("company_code", company.CompanyCode), zap.String("db_name", company.DatabaseName))
 
 	return newDB, nil
+}
+
+// GetDefaultCompanyDB returns the default single-company connection.
+func (r *CompanyResolver) GetDefaultCompanyDB() (*gorm.DB, *models.PlatformCompany, error) {
+	comp := models.PlatformCompany{
+		CompanyCode:        "DEFAULT",
+		CompanyName:        "Default Company",
+		DatabaseName:       r.cfg.Database.Name,
+		Status:             "active",
+		SubscriptionStatus: "active",
+	}
+	db, err := r.GetOrCreateCompanyDBConnection(comp)
+	if err != nil {
+		return nil, nil, err
+	}
+	return db, &comp, nil
 }

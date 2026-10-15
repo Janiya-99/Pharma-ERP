@@ -26,22 +26,9 @@ func NewPlatformDB(cfg *config.DatabaseConfig, zapLogger *zap.Logger) (*gorm.DB,
 		gormLogLevel = logger.Info
 	}
 
-	// 1. Create the platform database if it does not exist
-	zapLogger.Info("Checking if platform database exists...", zap.String("db", cfg.Name))
-	rawDB, err := gorm.Open(mysql.Open(cfg.DSNWithoutDB()), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to MySQL server for platform DB: %w", err)
-	}
-	createDBSQL := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", cfg.Name)
-	if err := rawDB.Exec(createDBSQL).Error; err != nil {
-		return nil, fmt.Errorf("failed to create platform database: %w", err)
-	}
-	sqlRawDB, _ := rawDB.DB()
-	sqlRawDB.Close()
+	zapLogger.Info("Connecting to platform database...", zap.String("db", cfg.Name), zap.String("host", cfg.Host))
 
-	// 2. Connect to the platform database
+	// 1. First attempt to connect directly to the target platform database
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                       cfg.DSN(),
 		DefaultStringSize:         256,
@@ -54,8 +41,41 @@ func NewPlatformDB(cfg *config.DatabaseConfig, zapLogger *zap.Logger) (*gorm.DB,
 		PrepareStmt:                              true,
 		DisableForeignKeyConstraintWhenMigrating: false,
 	})
+
+	// 2. If direct connection fails, check if database needs creation (e.g. local dev)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to platform MySQL: %w", err)
+		zapLogger.Warn("Direct connection to platform DB failed, attempting database creation...", zap.Error(err))
+		rawDB, rawErr := gorm.Open(mysql.Open(cfg.DSNWithoutDB()), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
+		if rawErr == nil {
+			createDBSQL := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", cfg.Name)
+			if createErr := rawDB.Exec(createDBSQL).Error; createErr != nil {
+				zapLogger.Warn("Could not execute CREATE DATABASE (user may lack permission on shared server)", zap.Error(createErr))
+			}
+			sqlRawDB, _ := rawDB.DB()
+			if sqlRawDB != nil {
+				_ = sqlRawDB.Close()
+			}
+
+			// Retry connection to target database
+			db, err = gorm.Open(mysql.New(mysql.Config{
+				DSN:                       cfg.DSN(),
+				DefaultStringSize:         256,
+				DisableDatetimePrecision:  true,
+				DontSupportRenameIndex:    true,
+				DontSupportRenameColumn:   true,
+				SkipInitializeWithVersion: false,
+			}), &gorm.Config{
+				Logger:                                   logger.Default.LogMode(gormLogLevel),
+				PrepareStmt:                              true,
+				DisableForeignKeyConstraintWhenMigrating: false,
+			})
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect to platform MySQL: %w", err)
+		}
 	}
 
 	// Configure connection pool

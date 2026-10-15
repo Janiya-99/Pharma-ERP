@@ -8,7 +8,7 @@ services:
     container_name: pharma-erp-frontend
 
     ports:
-      - "127.0.0.1:8081:80"
+      - "8081:80"
 
     depends_on:
       - backend
@@ -34,12 +34,19 @@ services:
       APP_ENV: production
       APP_PORT: 8080
 
-      # Shared MySQL
+      # Shared MySQL - Platform DB
       PLATFORM_DB_HOST: shared-mysql
       PLATFORM_DB_PORT: 3306
       PLATFORM_DB_USER: pharma_erp_user
       PLATFORM_DB_PASSWORD: ${PLATFORM_DB_PASSWORD}
       PLATFORM_DB_NAME: erp_phrma
+
+      # Shared MySQL - Company DB Fallback
+      DB_HOST: shared-mysql
+      DB_PORT: 3306
+      DB_USER: pharma_erp_user
+      DB_PASSWORD: ${PLATFORM_DB_PASSWORD}
+      DB_NAME: erp_phrma
 
       # Redis
       REDIS_HOST: redis
@@ -48,6 +55,9 @@ services:
       # JWT
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+
+      # Migrations
+      SKIP_MIGRATIONS: "true"
 
     depends_on:
       - redis
