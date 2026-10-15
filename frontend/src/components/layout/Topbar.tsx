@@ -85,9 +85,16 @@ const Topbar = () => {
       <div className="flex shrink-0 items-center gap-4 pl-2">
         {/* 4. User Info */}
         <div className="hidden items-center gap-2.5 sm:flex">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-[#4854CC] text-xs font-bold text-white shadow-sm overflow-hidden">
-            {user?.avatar_url ? (
-              <img src={user.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/60 bg-[#4854CC] text-xs font-bold text-white shadow-sm overflow-hidden ring-1 ring-slate-900/5">
+            {user?.profile_image_url || user?.avatar_url ? (
+              <img
+                src={user?.profile_image_url || user?.avatar_url}
+                alt={user?.name || "Profile"}
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = "none";
+                }}
+              />
             ) : (
               initials
             )}

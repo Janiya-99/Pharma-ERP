@@ -158,10 +158,12 @@ func (s *AuthService) BuildLoginContext(token string, user models.User, company 
 	return &dto.LoginResponse{
 		Token: token,
 		User: dto.UserDTO{
-			ID:       user.ID,
-			Name:     user.Name,
-			Email:    user.Email,
-			UserType: user.UserType,
+			ID:              user.ID,
+			Name:            user.Name,
+			Email:           user.Email,
+			UserType:        user.UserType,
+			AvatarURL:       user.ProfileImageURL,
+			ProfileImageURL: user.ProfileImageURL,
 		},
 		Company: dto.CompanyDTO{
 			ID:          companyID,

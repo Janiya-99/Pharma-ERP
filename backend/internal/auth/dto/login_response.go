@@ -12,10 +12,12 @@ type LoginResponse struct {
 }
 
 type UserDTO struct {
-	ID       uint64 `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	UserType string `json:"user_type"`
+	ID              uint64 `json:"id"`
+	Name            string `json:"name"`
+	Email           string `json:"email"`
+	UserType        string `json:"user_type"`
+	AvatarURL       string `json:"avatar_url"`
+	ProfileImageURL string `json:"profile_image_url"`
 }
 
 type CompanyDTO struct {
