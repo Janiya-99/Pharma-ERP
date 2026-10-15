@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { invoiceCenterApi } from "@/api/invoiceCenterApi";
 import { ReportPageShell } from "@/components/invoice-center/reports/ReportPageShell";
 import { ReportFilterBar } from "@/components/invoice-center/reports/ReportFilterBar";
@@ -33,6 +33,34 @@ export const CustomerBalanceReportPage: React.FC = () => {
   });
 
   const [data, setData] = useState<CustomerBalanceReportRow[]>([]);
+  const [customerTypeFilter, setCustomerTypeFilter] = useState<string>("all");
+  const [creditStatusFilter, setCreditStatusFilter] = useState<string>("all");
+  const [minBalanceFilter, setMinBalanceFilter] = useState<string>("all");
+
+  const filteredData = useMemo(() => {
+    return data.filter((row) => {
+      if (
+        customerTypeFilter !== "all" &&
+        row.customer_type?.toLowerCase() !== customerTypeFilter.toLowerCase()
+      ) {
+        return false;
+      }
+      if (creditStatusFilter !== "all" && row.credit_status !== creditStatusFilter) {
+        return false;
+      }
+      if (minBalanceFilter === "has_balance" && row.current_balance <= 0) {
+        return false;
+      }
+      if (minBalanceFilter === "500000" && row.current_balance < 500000) {
+        return false;
+      }
+      if (minBalanceFilter === "1000000" && row.current_balance < 1000000) {
+        return false;
+      }
+      return true;
+    });
+  }, [data, customerTypeFilter, creditStatusFilter, minBalanceFilter]);
+
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
@@ -86,6 +114,9 @@ export const CustomerBalanceReportPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
+    setCustomerTypeFilter("all");
+    setCreditStatusFilter("all");
+    setMinBalanceFilter("all");
     setFilters({ page: 1, limit: 10, search: "", status: "all" });
     setTimeout(() => handleApplyFilters(), 0);
   };
@@ -173,10 +204,10 @@ export const CustomerBalanceReportPage: React.FC = () => {
           isLoading={isLoading}
         >
           <div className="space-y-1">
-            <Label htmlFor="search">Search</Label>
+            <Label htmlFor="search">Search Customer</Label>
             <Input
               id="search"
-              placeholder="Search customers..."
+              placeholder="Search code or name..."
               value={filters.search || ""}
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, search: e.target.value }))
@@ -184,7 +215,7 @@ export const CustomerBalanceReportPage: React.FC = () => {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">Account Status</Label>
             <Select
               value={filters.status || "all"}
               onValueChange={(val) =>
@@ -202,12 +233,63 @@ export const CustomerBalanceReportPage: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-1">
+            <Label htmlFor="customer_type">Customer Type</Label>
+            <Select
+              value={customerTypeFilter}
+              onValueChange={(val) => setCustomerTypeFilter(val)}
+            >
+              <SelectTrigger id="customer_type">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="pharmacy">Pharmacy</SelectItem>
+                <SelectItem value="hospital">Hospital</SelectItem>
+                <SelectItem value="clinic">Clinic</SelectItem>
+                <SelectItem value="distributor">Distributor</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="credit_status">Credit Status</Label>
+            <Select
+              value={creditStatusFilter}
+              onValueChange={(val) => setCreditStatusFilter(val)}
+            >
+              <SelectTrigger id="credit_status">
+                <SelectValue placeholder="All Credit" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Accounts</SelectItem>
+                <SelectItem value="over_limit">Over Credit Limit</SelectItem>
+                <SelectItem value="within_limit">Within Limit</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="min_balance">Balance Filter</Label>
+            <Select
+              value={minBalanceFilter}
+              onValueChange={(val) => setMinBalanceFilter(val)}
+            >
+              <SelectTrigger id="min_balance">
+                <SelectValue placeholder="All Balances" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Balances</SelectItem>
+                <SelectItem value="has_balance">Active Balances (&gt; 0)</SelectItem>
+                <SelectItem value="500000">&gt; 500,000 LKR</SelectItem>
+                <SelectItem value="1000000">&gt; 1,000,000 LKR</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </ReportFilterBar>
       }
       table={
         <ReportDataTable
           columns={columns}
-          data={data}
+          data={filteredData}
           isLoading={isLoading}
           pagination={pagination}
           onPageChange={handlePageChange}

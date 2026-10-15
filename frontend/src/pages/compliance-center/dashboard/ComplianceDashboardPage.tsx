@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AreaChart,
   BarChart,
@@ -16,12 +17,14 @@ import {
   Download,
   RefreshCw,
   TrendingUp,
+  ArrowRight,
 } from "lucide-react";
 import { complianceApi, ComplianceSummary } from "../../../api/complianceApi";
 import { toast } from "sonner";
 import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 
 const ComplianceDashboardPage = () => {
+  const navigate = useNavigate();
   const [selectedFacility, setSelectedFacility] = useState<string>("ALL");
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -92,13 +95,21 @@ const ComplianceDashboardPage = () => {
       {/* ── Tier 1: KPI Summary Cards ── */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {/* Active Licenses */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
+        <div
+          onClick={() => navigate("/compliance-center/licenses")}
+          className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:border-indigo-400 hover:-translate-y-0.5 relative overflow-hidden cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-indigo-600 transition-colors">
               Active NMRA Registered Formulations
             </span>
-            <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600">
-              <FileCheck className="h-5 w-5" />
+            <div className="flex items-center gap-1.5">
+              <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600 group-hover:bg-indigo-100 transition-colors">
+                <FileCheck className="h-5 w-5" />
+              </div>
+              <div className="h-5 w-5 rounded-full bg-slate-100 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-colors">
+                <ArrowRight className="h-3 w-3" />
+              </div>
             </div>
           </div>
           <p className="mt-3 text-3xl font-extrabold text-slate-900">
@@ -115,13 +126,21 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Batches Under Quarantine */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
+        <div
+          onClick={() => navigate("/compliance-center/batch-holds")}
+          className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:border-amber-400 hover:-translate-y-0.5 relative overflow-hidden cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-amber-600 transition-colors">
               Batches Under Quarantine
             </span>
-            <div className="rounded-xl bg-amber-50 p-2.5 text-amber-600">
-              <Pill className="h-5 w-5" />
+            <div className="flex items-center gap-1.5">
+              <div className="rounded-xl bg-amber-50 p-2.5 text-amber-600 group-hover:bg-amber-100 transition-colors">
+                <Pill className="h-5 w-5" />
+              </div>
+              <div className="h-5 w-5 rounded-full bg-slate-100 text-slate-400 group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center transition-colors">
+                <ArrowRight className="h-3 w-3" />
+              </div>
             </div>
           </div>
           <p className="mt-3 text-3xl font-extrabold text-slate-900">
@@ -136,13 +155,21 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Active Product Recalls */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
+        <div
+          onClick={() => navigate("/compliance-center/recalls")}
+          className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:border-rose-400 hover:-translate-y-0.5 relative overflow-hidden cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-rose-600 transition-colors">
               Blocked / Recalled Batches
             </span>
-            <div className="rounded-xl bg-rose-50 p-2.5 text-rose-600">
-              <RotateCcw className="h-5 w-5" />
+            <div className="flex items-center gap-1.5">
+              <div className="rounded-xl bg-rose-50 p-2.5 text-rose-600 group-hover:bg-rose-100 transition-colors">
+                <RotateCcw className="h-5 w-5" />
+              </div>
+              <div className="h-5 w-5 rounded-full bg-slate-100 text-slate-400 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center transition-colors">
+                <ArrowRight className="h-3 w-3" />
+              </div>
             </div>
           </div>
           <p className="mt-3 text-3xl font-extrabold text-rose-600">
@@ -157,13 +184,21 @@ const ComplianceDashboardPage = () => {
         </div>
 
         {/* Pending Expiry Disposals */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
+        <div
+          onClick={() => navigate("/compliance-center/disposals")}
+          className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:border-purple-400 hover:-translate-y-0.5 relative overflow-hidden cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-purple-600 transition-colors">
               Expired & Near-Expiry Batches
             </span>
-            <div className="rounded-xl bg-purple-50 p-2.5 text-purple-600">
-              <Trash2 className="h-5 w-5" />
+            <div className="flex items-center gap-1.5">
+              <div className="rounded-xl bg-purple-50 p-2.5 text-purple-600 group-hover:bg-purple-100 transition-colors">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div className="h-5 w-5 rounded-full bg-slate-100 text-slate-400 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-colors">
+                <ArrowRight className="h-3 w-3" />
+              </div>
             </div>
           </div>
           <p className="mt-3 text-3xl font-extrabold text-slate-900">
@@ -288,9 +323,12 @@ const ComplianceDashboardPage = () => {
                   Recent licensing actions, quality quarantine triggers, and governance audits
                 </p>
               </div>
-              <span className="text-xs font-semibold text-indigo-600 hover:underline cursor-pointer">
+              <button
+                onClick={() => navigate("/compliance-center/records")}
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer flex items-center gap-1"
+              >
                 View All Records →
-              </span>
+              </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -306,7 +344,11 @@ const ComplianceDashboardPage = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {recentRegulatoryActions.map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50 transition-colors">
+                    <tr
+                      key={row.id}
+                      onClick={() => navigate("/compliance-center/records")}
+                      className="hover:bg-indigo-50/40 transition-colors cursor-pointer"
+                    >
                       <td className="px-4 py-3.5">
                         <p className="font-mono font-bold text-xs text-indigo-600">{row.id}</p>
                         <span className="text-[11px] text-slate-400 font-medium">{row.timestamp}</span>

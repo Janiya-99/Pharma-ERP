@@ -1,4 +1,5 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { SummaryMetric } from "../types";
 import { money } from "../utils";
 
@@ -7,6 +8,8 @@ interface FinanceSummaryCardProps {
   metric: SummaryMetric;
   icon: LucideIcon;
   tone?: "rose" | "blue" | "emerald" | "indigo" | "amber";
+  to?: string;
+  onClick?: () => void;
 }
 
 export function FinanceSummaryCard({
@@ -14,7 +17,16 @@ export function FinanceSummaryCard({
   metric,
   icon: Icon,
   tone = "indigo",
+  to,
+  onClick,
 }: FinanceSummaryCardProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) onClick();
+    else if (to) navigate(to);
+  };
+
   const containerClasses = 
     tone === "rose"
       ? "border-rose-100 bg-gradient-to-br from-rose-50/80 to-white shadow-md ring-1 ring-inset ring-rose-100"
@@ -45,13 +57,23 @@ export function FinanceSummaryCard({
     : "text-indigo-600";
     
   return (
-    <div className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${containerClasses}`}>
+    <div
+      onClick={handleClick}
+      className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${to || onClick ? "cursor-pointer" : ""} ${containerClasses}`}
+    >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 truncate">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 truncate group-hover:text-slate-800 transition-colors">
           {label}
         </span>
-        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${iconBgClass}`}>
-          <Icon className="h-4 w-4" />
+        <div className="flex items-center gap-1.5">
+          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${iconBgClass}`}>
+            <Icon className="h-4 w-4" />
+          </div>
+          {to && (
+            <div className="h-5 w-5 rounded-full bg-slate-100 text-slate-400 group-hover:bg-slate-900 group-hover:text-white flex items-center justify-center transition-colors">
+              <ChevronRight className="h-3 w-3" />
+            </div>
+          )}
         </div>
       </div>
       <div className="mt-4">

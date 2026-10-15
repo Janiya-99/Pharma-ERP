@@ -2445,15 +2445,62 @@ function ReportPage({
     setFilters((current) => ({ ...current, [name]: value === "all" ? "" : value }));
   };
 
+  const handlePresetChange = (val: string) => {
+    const today = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const formatDate = (d: Date) =>
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    if (val === "this_month") {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      setFilters((prev) => ({
+        ...prev,
+        date_from: formatDate(startOfMonth),
+        date_to: formatDate(today),
+      }));
+    } else if (val === "last_month") {
+      const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      setFilters((prev) => ({
+        ...prev,
+        date_from: formatDate(startOfLastMonth),
+        date_to: formatDate(endOfLastMonth),
+      }));
+    } else if (val === "ytd") {
+      const startOfYear = new Date(today.getFullYear(), 0, 1);
+      setFilters((prev) => ({
+        ...prev,
+        date_from: formatDate(startOfYear),
+        date_to: formatDate(today),
+      }));
+    } else if (val === "clear") {
+      setFilters({ warehouse_id: "", product_id: "", date_from: "", date_to: "", status: "" });
+    }
+  };
+
   return (
     <InventoryPage
       title={title}
       description={description}
       icon={icon}
-      actions={<Button variant="outline" onClick={report.refresh}>Refresh</Button>}
+      actions={
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() =>
+              setFilters({ warehouse_id: "", product_id: "", date_from: "", date_to: "", status: "" })
+            }
+          >
+            Clear Filters
+          </Button>
+          <Button variant="outline" onClick={report.refresh}>
+            Refresh
+          </Button>
+        </div>
+      }
     >
       <Card className="border border-slate-200 bg-white shadow-sm">
-        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-slate-600">Warehouse</Label>
             <Select value={filters.warehouse_id || "all"} onValueChange={(value) => setFilter("warehouse_id", value)}>
@@ -2473,6 +2520,21 @@ function ReportPage({
               </SelectTrigger>
               <SelectContent>
                 {productOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-slate-600">Quick Period</Label>
+            <Select value="custom" onValueChange={handlePresetChange}>
+              <SelectTrigger className="h-9 w-full rounded-lg border-slate-200">
+                <SelectValue placeholder="Quick Range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Quick Range...</SelectItem>
+                <SelectItem value="this_month">This Month</SelectItem>
+                <SelectItem value="last_month">Last Month</SelectItem>
+                <SelectItem value="ytd">Year to Date (YTD)</SelectItem>
+                <SelectItem value="clear">Reset Dates</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -260,22 +260,22 @@ const ControlCenterDashboardPage: React.FC = () => {
       {/* ── TOP 4 KPI CARDS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Total Branches */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+        <Link
+          to="/control-center/branches"
+          className="group bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:border-blue-400 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 group-hover:scale-105 transition-transform">
                 <Building2 className="h-5 w-5" />
               </div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-600 transition-colors">
                 Total Branches
               </span>
             </div>
-            <Link
-              to="/control-center/branches"
-              className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 hover:bg-blue-100 flex items-center justify-center transition-colors"
-            >
+            <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
               <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+            </div>
           </div>
 
           <div className="mt-4 flex items-end justify-between">
@@ -289,25 +289,25 @@ const ControlCenterDashboardPage: React.FC = () => {
             </div>
             <SparklineBars data={[35, 45, 60, 50, 75, 65, 85, 100]} color="bg-blue-400" />
           </div>
-        </div>
+        </Link>
 
         {/* Card 2: Total Users */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+        <Link
+          to="/control-center/users"
+          className="group bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 group-hover:scale-105 transition-transform">
                 <Users className="h-5 w-5" />
               </div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider group-hover:text-purple-600 transition-colors">
                 Total Users
               </span>
             </div>
-            <Link
-              to="/control-center/users"
-              className="h-6 w-6 rounded-full bg-purple-50 text-purple-500 hover:bg-purple-100 flex items-center justify-center transition-colors"
-            >
+            <div className="h-6 w-6 rounded-full bg-purple-50 text-purple-500 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-colors">
               <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+            </div>
           </div>
 
           <div className="mt-4 flex items-end justify-between">
@@ -321,25 +321,25 @@ const ControlCenterDashboardPage: React.FC = () => {
             </div>
             <SparklineBars data={[40, 55, 45, 70, 60, 80, 90, 100]} color="bg-purple-400" />
           </div>
-        </div>
+        </Link>
 
         {/* Card 3: Activated Modules */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+        <Link
+          to="/control-center/software-modules"
+          className="group bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:border-emerald-400 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-105 transition-transform">
                 <Layers className="h-5 w-5" />
               </div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider group-hover:text-emerald-600 transition-colors">
                 Activated Modules
               </span>
             </div>
-            <Link
-              to="/modules"
-              className="h-6 w-6 rounded-full bg-emerald-50 text-emerald-500 hover:bg-emerald-100 flex items-center justify-center transition-colors"
-            >
+            <div className="h-6 w-6 rounded-full bg-emerald-50 text-emerald-500 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center transition-colors">
               <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+            </div>
           </div>
 
           <div className="mt-4 flex items-end justify-between">
@@ -352,20 +352,23 @@ const ControlCenterDashboardPage: React.FC = () => {
             </div>
             <SparklineBars data={[50, 50, 65, 65, 80, 80, 100, 100]} color="bg-emerald-400" />
           </div>
-        </div>
+        </Link>
 
         {/* Card 4: Active Incidents */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+        <Link
+          to="/control-center/audit-logs"
+          className="group bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:border-rose-400 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600">
+              <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600 group-hover:scale-105 transition-transform">
                 <AlertTriangle className="h-5 w-5" />
               </div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider group-hover:text-rose-600 transition-colors">
                 Active Incidents
               </span>
             </div>
-            <div className="h-6 w-6 rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 flex items-center justify-center cursor-pointer transition-colors">
+            <div className="h-6 w-6 rounded-full bg-rose-50 text-rose-500 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center transition-colors">
               <ChevronRight className="h-3.5 w-3.5" />
             </div>
           </div>
@@ -381,7 +384,7 @@ const ControlCenterDashboardPage: React.FC = () => {
             </div>
             <SparklineBars data={[100, 90, 75, 60, 45, 55, 40, 30]} color="bg-rose-400" />
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* ── MIDDLE ROW: Telemetry Area Chart + Module Adoption + Role Donut ── */}
@@ -482,10 +485,10 @@ const ControlCenterDashboardPage: React.FC = () => {
               Peak concurrency: <strong className="text-slate-800">18,430</strong> users on Thu 10:24 AM
             </span>
             <Link
-              to="/control-center/analytics"
+              to="/control-center/login-history"
               className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"
             >
-              View detailed analytics <ArrowRight className="h-3.5 w-3.5" />
+              View login activity logs <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
@@ -494,18 +497,18 @@ const ControlCenterDashboardPage: React.FC = () => {
         <div className="lg:col-span-3 bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+              <Link to="/control-center/software-modules" className="flex items-center gap-2 group cursor-pointer">
+                <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
                   <Layers className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-slate-900">Module Adoption & License Usage</h3>
+                  <h3 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Module Adoption & License Usage</h3>
                   <p className="text-[10px] text-slate-400">Active modules and distribution across all branches.</p>
                 </div>
-              </div>
-              <button className="text-slate-400 hover:text-slate-600 p-1">
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
+              </Link>
+              <Link to="/control-center/software-modules" className="text-slate-400 hover:text-blue-600 p-1">
+                <ChevronRight className="h-4 w-4" />
+              </Link>
             </div>
 
             {/* Concentric Rings Visual */}

@@ -151,36 +151,42 @@ const FinanceDashboardPage = () => {
                 metric={dashboardData.summary.cash_balance}
                 icon={Wallet}
                 tone="emerald"
+                to="/finance/banking/cash-accounts"
               />
               <FinanceKpiCard
                 label="Bank Balance"
                 metric={dashboardData.summary.bank_balance}
                 icon={Landmark}
                 tone="indigo"
+                to="/finance/banking/bank-accounts"
               />
               <FinanceKpiCard
                 label="Accounts Receivable"
                 metric={dashboardData.summary.accounts_receivable}
                 icon={Receipt}
                 tone="blue"
+                to="/invoice-center/reports/customer-aging"
               />
               <FinanceKpiCard
                 label="Accounts Payable"
                 metric={dashboardData.summary.accounts_payable}
                 icon={FileText}
                 tone="amber"
+                to="/finance/banking/payment-vouchers"
               />
               <FinanceKpiCard
                 label="Monthly Revenue"
                 metric={dashboardData.summary.monthly_revenue}
                 icon={TrendingUp}
                 tone="emerald"
+                to="/finance/reports/profit-and-loss"
               />
               <FinanceKpiCard
                 label="Monthly Expenses"
                 metric={dashboardData.summary.monthly_expenses}
                 icon={TrendingDown}
                 tone="rose"
+                to="/finance/reports/profit-and-loss"
               />
             </div>
 
@@ -191,24 +197,28 @@ const FinanceDashboardPage = () => {
                 metric={dashboardData.summary.gross_profit}
                 icon={BarChart3}
                 tone="emerald"
+                to="/finance/reports/profit-and-loss"
               />
               <FinanceSummaryCard
                 label="Net Profit"
                 metric={dashboardData.summary.net_profit}
                 icon={BadgeDollarSign}
                 tone="indigo"
+                to="/finance/reports/profit-and-loss"
               />
               <FinanceSummaryCard
                 label="Pending Payments"
                 metric={dashboardData.summary.pending_payments}
                 icon={ClipboardCheck}
                 tone="amber"
+                to="/finance/banking/payment-vouchers"
               />
               <FinanceSummaryCard
                 label="Pending Receipts"
                 metric={dashboardData.summary.pending_receipts}
                 icon={CircleDollarSign}
                 tone="blue"
+                to="/finance/banking/receipt-vouchers"
               />
             </div>
 

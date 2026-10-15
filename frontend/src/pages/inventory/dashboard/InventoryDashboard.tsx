@@ -18,6 +18,7 @@ import {
   Search,
   ExternalLink,
   SlidersHorizontal,
+  ChevronRight,
 } from "lucide-react";
 import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from "recharts";
 import { inventoryApi } from "../../../api/inventoryApi";
@@ -48,6 +49,8 @@ interface StatCardProps {
   subtitle?: string;
   trend?: string;
   trendUp?: boolean;
+  to?: string;
+  onClick?: () => void;
 }
 
 /* ─────────────────────────────────────────────────
@@ -144,30 +147,45 @@ export default function InventoryDashboard() {
     fetchStats();
   }, []);
 
-  const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => {
-    const toneMap: Record<string, { bg: string; text: string; iconBg: string }> = {
-      blue: { bg: "bg-blue-50/50", text: "text-blue-700", iconBg: "bg-blue-100" },
-      emerald: { bg: "bg-emerald-50/50", text: "text-emerald-700", iconBg: "bg-emerald-100" },
-      indigo: { bg: "bg-indigo-50/50", text: "text-indigo-700", iconBg: "bg-indigo-100" },
-      amber: { bg: "bg-amber-50/50", text: "text-amber-700", iconBg: "bg-amber-100" },
-      rose: { bg: "bg-rose-50/50", text: "text-rose-700", iconBg: "bg-rose-100" },
-      slate: { bg: "bg-slate-50/50", text: "text-slate-700", iconBg: "bg-slate-100" },
+  const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp, to, onClick }: StatCardProps) => {
+    const toneMap: Record<string, { bg: string; text: string; iconBg: string; borderHover: string }> = {
+      blue: { bg: "bg-blue-50/50", text: "text-blue-700", iconBg: "bg-blue-100", borderHover: "hover:border-blue-400" },
+      emerald: { bg: "bg-emerald-50/50", text: "text-emerald-700", iconBg: "bg-emerald-100", borderHover: "hover:border-emerald-400" },
+      indigo: { bg: "bg-indigo-50/50", text: "text-indigo-700", iconBg: "bg-indigo-100", borderHover: "hover:border-indigo-400" },
+      amber: { bg: "bg-amber-50/50", text: "text-amber-700", iconBg: "bg-amber-100", borderHover: "hover:border-amber-400" },
+      rose: { bg: "bg-rose-50/50", text: "text-rose-700", iconBg: "bg-rose-100", borderHover: "hover:border-rose-400" },
+      slate: { bg: "bg-slate-50/50", text: "text-slate-700", iconBg: "bg-slate-100", borderHover: "hover:border-slate-400" },
     };
     const t = toneMap[tone] || toneMap.blue;
 
+    const handleClick = () => {
+      if (onClick) onClick();
+      else if (to) navigate(to);
+    };
+
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+      <div
+        onClick={handleClick}
+        className={`group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${to || onClick ? `cursor-pointer ${t.borderHover}` : ''}`}
+      >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[12px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+            <p className="text-[12px] font-bold uppercase tracking-wider text-slate-400 mb-1 group-hover:text-slate-600 transition-colors">
               {title}
             </p>
             <h3 className="text-2xl font-extrabold tracking-tight text-slate-900">
               {value}
             </h3>
           </div>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${t.iconBg} shadow-xs transition-transform duration-300 hover:scale-110`}>
-            <Icon className={`h-6 w-6 ${t.text}`} />
+          <div className="flex items-center gap-2">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${t.iconBg} shadow-xs transition-transform duration-300 group-hover:scale-105`}>
+              <Icon className={`h-6 w-6 ${t.text}`} />
+            </div>
+            {to && (
+              <div className="h-6 w-6 rounded-full bg-slate-100 text-slate-400 group-hover:bg-slate-900 group-hover:text-white flex items-center justify-center transition-colors">
+                <ChevronRight className="h-3.5 w-3.5" />
+              </div>
+            )}
           </div>
         </div>
         {(subtitle || trend) && (
@@ -231,6 +249,7 @@ export default function InventoryDashboard() {
           subtitle="Across all warehouses"
           trend="+4.2% vs last month"
           trendUp={true}
+          to="/inventory/reports/stock-balance"
         />
         <StatCard
           title="Active SKUs"
@@ -240,6 +259,7 @@ export default function InventoryDashboard() {
           subtitle={`Out of ${stats.total_products} total`}
           trend="+12 new this week"
           trendUp={true}
+          to="/inventory/products"
         />
         <StatCard
           title="Low Stock Alerts"
@@ -249,6 +269,7 @@ export default function InventoryDashboard() {
           subtitle="Requires reordering"
           trend="-2 from yesterday"
           trendUp={true}
+          to="/inventory/products"
         />
         <StatCard
           title="Blocked/Quarantine"
@@ -258,6 +279,7 @@ export default function InventoryDashboard() {
           subtitle="Non-sellable batches"
           trend="Action required"
           trendUp={false}
+          to="/compliance-center/batch-holds"
         />
       </div>
 
@@ -312,22 +334,33 @@ export default function InventoryDashboard() {
           </div>
           <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 font-medium">
             <span>Peak Inventory Asset Value: {money(48500000)} (June)</span>
-            <span className="font-semibold text-brand-600 cursor-pointer hover:text-brand-700 flex items-center gap-1 transition-colors">
+            <button
+              onClick={() => navigate("/inventory/reports/stock-ledger")}
+              className="font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition-colors cursor-pointer"
+            >
               View warehouse ledger <ArrowUpRight className="h-3 w-3" />
-            </span>
+            </button>
           </div>
         </div>
 
         {/* Right: Warehouse Distribution Donut Chart (1/3 width) */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
+        <div
+          onClick={() => navigate("/inventory/warehouses")}
+          className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md hover:border-indigo-300 ring-1 ring-slate-900/5 flex flex-col justify-between cursor-pointer group"
+        >
           <div>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">
-                Warehouse Asset Distribution
-              </h3>
-              <p className="text-xs text-slate-500 font-medium mt-1">
-                Stock valuation share by storage facility
-              </p>
+            <div className="mb-4 flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                  Warehouse Asset Distribution
+                </h3>
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  Stock valuation share by storage facility
+                </p>
+              </div>
+              <div className="h-6 w-6 rounded-full bg-slate-100 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-colors">
+                <ChevronRight className="h-3.5 w-3.5" />
+              </div>
             </div>
 
             <div className="mt-6 flex flex-col items-center h-52 w-full">
@@ -382,8 +415,11 @@ export default function InventoryDashboard() {
                   Batches requiring immediate quality inspection, discount allocation, or disposal quarantine
                 </p>
               </div>
-              <button className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 transition-all shadow-sm shrink-0">
-                View All 20 Alerts
+              <button
+                onClick={() => navigate("/inventory/reports/expiry-report")}
+                className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 transition-all shadow-sm shrink-0 cursor-pointer"
+              >
+                View Expiry Report
               </button>
             </div>
 
@@ -400,8 +436,12 @@ export default function InventoryDashboard() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {alerts.map((alert) => (
-                    <tr key={alert.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-slate-900">
+                    <tr
+                      key={alert.id}
+                      onClick={() => navigate("/inventory/reports/expiry-report")}
+                      className="hover:bg-indigo-50/40 transition-colors cursor-pointer"
+                    >
+                      <td className="whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-indigo-700">
                         {alert.batch}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700">

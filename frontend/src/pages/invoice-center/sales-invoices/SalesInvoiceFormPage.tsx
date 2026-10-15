@@ -9,8 +9,10 @@ import {
   Package,
   Receipt,
   Save,
+  Sparkles,
   UserRound,
 } from "lucide-react";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -107,8 +109,71 @@ const SalesInvoiceFormPage: React.FC = () => {
   const [branches, setBranches] = useState<any[]>([]);
   const [warehouses, setWarehouses] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [lookupsLoading, setLookupsLoading] = useState(false);
   const [salesOrderInfo, setSalesOrderInfo] = useState<any | null>(null);
+
+  const handleAiApply = (aiData: any) => {
+    // 1. Customer matching
+    if (aiData.customer_id) {
+      setValue("customer_id", String(aiData.customer_id), { shouldValidate: true });
+    } else if (aiData.customer_name && customers.length > 0) {
+      const match = customers.find((c: any) =>
+        c.customer_name?.toLowerCase().includes(aiData.customer_name.toLowerCase()) ||
+        aiData.customer_name.toLowerCase().includes(c.customer_name?.toLowerCase()) ||
+        c.customer_code?.toLowerCase() === aiData.customer_name.toLowerCase()
+      );
+      if (match) {
+        setValue("customer_id", String(match.id), { shouldValidate: true });
+      }
+    }
+
+    // 2. Warehouse matching
+    if (aiData.warehouse_id) {
+      setValue("warehouse_id", String(aiData.warehouse_id), { shouldValidate: true });
+    } else if (warehouses.length > 0 && !watch("warehouse_id")) {
+      setValue("warehouse_id", String(warehouses[0].id), { shouldValidate: true });
+    }
+
+    // 3. Dates & references
+    if (aiData.invoice_date) setValue("invoice_date", aiData.invoice_date, { shouldValidate: true });
+    if (aiData.due_date) setValue("due_date", aiData.due_date, { shouldValidate: true });
+    if (aiData.customer_reference_number) setValue("customer_reference_number", aiData.customer_reference_number);
+    if (aiData.remarks) setValue("remarks", aiData.remarks);
+
+    // 4. Lines mapping
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mappedLines = aiData.lines.map((l: any) => {
+        let matchedProduct = null;
+        if (l.product_id) {
+          matchedProduct = products.find((p: any) => String(p.id) === String(l.product_id));
+        }
+        if (!matchedProduct && l.product_name && products.length > 0) {
+          const searchName = l.product_name.toLowerCase();
+          matchedProduct = products.find((p: any) =>
+            p.product_name?.toLowerCase().includes(searchName) ||
+            searchName.includes(p.product_name?.toLowerCase()) ||
+            p.product_code?.toLowerCase() === searchName
+          );
+        }
+        const prodId = matchedProduct ? String(matchedProduct.id) : (products[0]?.id ? String(products[0].id) : "");
+        const unitPrice = Number(l.unit_price || matchedProduct?.unit_price || 0);
+
+        return {
+          product_id: prodId,
+          product_batch_id: "",
+          quantity: Number(l.quantity) || 1,
+          unit_price: unitPrice,
+          discount_amount: Number(l.discount_amount) || 0,
+          tax_amount: Number(l.tax_amount) || 0,
+          line_remarks: l.line_remarks || "",
+        };
+      });
+
+      setValue("lines", mappedLines, { shouldValidate: true });
+    }
+  };
 
   const {
     register,
@@ -184,15 +249,17 @@ const SalesInvoiceFormPage: React.FC = () => {
   const loadLookups = async () => {
     setLookupsLoading(true);
     try {
-      const [branchRes, warehouseRes, customerRes] = await Promise.all([
+      const [branchRes, warehouseRes, customerRes, productRes] = await Promise.all([
         getBranches({ limit: 500, status: "active" }),
         inventoryApi.getWarehouses({ limit: 1000, status: "active" }),
         invoiceCenterApi.getCustomers({ limit: 1000, status: "active" }),
+        inventoryApi.getProducts({ limit: 1000, status: "active" }),
       ]);
 
       setBranches(listFromResponse(branchRes));
       setWarehouses(listFromResponse(warehouseRes));
       setCustomers(listFromResponse(customerRes));
+      setProducts(listFromResponse(productRes));
     } catch (err) {
       console.error("Failed to load invoice form dropdowns", err);
       toast.error("Failed to load form dropdowns.");
@@ -433,26 +500,38 @@ const SalesInvoiceFormPage: React.FC = () => {
             </p>
           </div>
         </div>
-        <PermissionGuard
-          permission={
-            isEdit
-              ? "invoice_center.sales_invoice.update"
-              : "invoice_center.sales_invoice.create"
-          }
-        >
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            disabled={saving || loading}
-            className="bg-[#002137] text-white hover:bg-[#003452]"
+        <div className="flex items-center gap-3">
+          {!isEdit && (
+            <Button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-sm"
+            >
+              <Sparkles className="mr-2 h-4 w-4 text-amber-300 animate-pulse" />
+              <span>✨ AI Auto-Fill</span>
+            </Button>
+          )}
+          <PermissionGuard
+            permission={
+              isEdit
+                ? "invoice_center.sales_invoice.update"
+                : "invoice_center.sales_invoice.create"
+            }
           >
-            {saving ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-2 h-4 w-4" />
-            )}
-            {saving ? "Saving..." : "Save Draft"}
-          </Button>
-        </PermissionGuard>
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              disabled={saving || loading}
+              className="bg-[#002137] text-white hover:bg-[#003452]"
+            >
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              {saving ? "Saving..." : "Save Draft"}
+            </Button>
+          </PermissionGuard>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -830,6 +909,31 @@ const SalesInvoiceFormPage: React.FC = () => {
           </aside>
         </div>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="sales_invoice"
+        title="Gemini AI Sales Invoice Draft"
+        contextData={{
+          customers: customers.map((c: any) => ({
+            id: c.id,
+            name: c.customer_name,
+            code: c.customer_code,
+          })),
+          products: products.map((p: any) => ({
+            id: p.id,
+            name: p.product_name,
+            code: p.product_code,
+            unit_price: p.unit_price,
+          })),
+          warehouses: warehouses.map((w: any) => ({
+            id: w.id,
+            name: w.warehouse_name || w.name,
+          })),
+        }}
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

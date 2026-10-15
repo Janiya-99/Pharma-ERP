@@ -43,6 +43,8 @@ interface StatCardProps {
   subtitle?: string;
   trend?: string;
   trendUp?: boolean;
+  to?: string;
+  onClick?: () => void;
 }
 
 interface DashboardSummary {
@@ -152,25 +154,40 @@ export default function InvoiceCenterDashboard() {
     }
   };
 
-  const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp }: StatCardProps) => {
-    const toneStyles: Record<string, { card: string; iconBg: string; text: string }> = {
-      blue: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-blue-300", iconBg: "bg-blue-50 text-blue-600 group-hover:bg-blue-100", text: "text-blue-600" },
-      emerald: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-emerald-300", iconBg: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100", text: "text-emerald-600" },
-      amber: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-amber-300", iconBg: "bg-amber-50 text-amber-600 group-hover:bg-amber-100", text: "text-amber-600" },
-      rose: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-rose-300", iconBg: "bg-rose-50 text-rose-600 group-hover:bg-rose-100", text: "text-rose-600" },
-      indigo: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-indigo-300", iconBg: "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100", text: "text-indigo-600" },
-      slate: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md hover:border-slate-300", iconBg: "bg-slate-50 text-slate-600 group-hover:bg-slate-100", text: "text-slate-600" },
+  const StatCard = ({ title, value, icon: Icon, tone, subtitle, trend, trendUp, to, onClick }: StatCardProps) => {
+    const toneStyles: Record<string, { card: string; iconBg: string; text: string; hoverBorder: string }> = {
+      blue: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md", hoverBorder: "hover:border-blue-400", iconBg: "bg-blue-50 text-blue-600 group-hover:bg-blue-100", text: "text-blue-600" },
+      emerald: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md", hoverBorder: "hover:border-emerald-400", iconBg: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100", text: "text-emerald-600" },
+      amber: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md", hoverBorder: "hover:border-amber-400", iconBg: "bg-amber-50 text-amber-600 group-hover:bg-amber-100", text: "text-amber-600" },
+      rose: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md", hoverBorder: "hover:border-rose-400", iconBg: "bg-rose-50 text-rose-600 group-hover:bg-rose-100", text: "text-rose-600" },
+      indigo: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md", hoverBorder: "hover:border-indigo-400", iconBg: "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100", text: "text-indigo-600" },
+      slate: { card: "border-slate-200/80 bg-white/80 backdrop-blur-md", hoverBorder: "hover:border-slate-400", iconBg: "bg-slate-50 text-slate-600 group-hover:bg-slate-100", text: "text-slate-600" },
     };
     const t = toneStyles[tone] || toneStyles.slate;
 
+    const handleClick = () => {
+      if (onClick) onClick();
+      else if (to) navigate(to);
+    };
+
     return (
-      <div className={`group relative overflow-hidden rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${t.card}`}>
+      <div
+        onClick={handleClick}
+        className={`group relative overflow-hidden rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${t.card} ${to || onClick ? `cursor-pointer ${t.hoverBorder}` : ''}`}
+      >
         <div className="flex items-start justify-between gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 truncate mb-1 block">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 truncate mb-1 block group-hover:text-slate-700 transition-colors">
             {title}
           </span>
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${t.iconBg}`}>
-            <Icon className="h-5 w-5" />
+          <div className="flex items-center gap-1.5">
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${t.iconBg}`}>
+              <Icon className="h-5 w-5" />
+            </div>
+            {to && (
+              <div className="h-5 w-5 rounded-full bg-slate-100 text-slate-400 group-hover:bg-slate-900 group-hover:text-white flex items-center justify-center transition-colors">
+                <ArrowRight className="h-3 w-3" />
+              </div>
+            )}
           </div>
         </div>
         <div className="mt-3 flex items-baseline justify-between">
@@ -243,6 +260,7 @@ export default function InvoiceCenterDashboard() {
           subtitle="Outstanding Receivables"
           trend="-2.4% vs last month"
           trendUp={true}
+          to="/invoice-center/reports/customer-aging"
         />
         <StatCard
           title="Total Customers"
@@ -252,6 +270,7 @@ export default function InvoiceCenterDashboard() {
           subtitle={`${summary.active_customers || 0} active accounts`}
           trend="+8 new this month"
           trendUp={true}
+          to="/invoice-center/customers"
         />
         <StatCard
           title="Over Credit Limit"
@@ -261,6 +280,7 @@ export default function InvoiceCenterDashboard() {
           subtitle="Requires intervention"
           trend="Action required"
           trendUp={false}
+          to="/invoice-center/reports/customer-balance"
         />
         <StatCard
           title="Total Credit Granted"
@@ -268,6 +288,7 @@ export default function InvoiceCenterDashboard() {
           icon={CreditCard}
           tone="indigo"
           subtitle="Across all accounts"
+          to="/invoice-center/reports/customer-balance"
         />
       </div>
 
@@ -317,22 +338,33 @@ export default function InvoiceCenterDashboard() {
           </div>
           <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 font-medium">
             <span>Live Collection Ledger</span>
-            <span className="font-semibold text-brand-600 cursor-pointer hover:text-brand-700 flex items-center gap-1 transition-colors">
+            <button
+              onClick={() => navigate("/invoice-center/reports/collection-summary")}
+              className="font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors cursor-pointer"
+            >
               View Detailed Ledger <ArrowUpRight className="h-3 w-3" />
-            </span>
+            </button>
           </div>
         </div>
 
         {/* Right: AR Aging Distribution Donut (1/3 width) */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 flex flex-col justify-between">
+        <div
+          onClick={() => navigate("/invoice-center/reports/customer-aging")}
+          className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md hover:border-blue-400 ring-1 ring-slate-900/5 flex flex-col justify-between cursor-pointer group"
+        >
           <div>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">
-                AR Aging Distribution
-              </h3>
-              <p className="text-xs text-slate-500 font-medium mt-1">
-                Outstanding balances by overdue period
-              </p>
+            <div className="mb-4 flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  AR Aging Distribution
+                </h3>
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  Outstanding balances by overdue period
+                </p>
+              </div>
+              <div className="h-6 w-6 rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
+                <ArrowRight className="h-3.5 w-3.5" />
+              </div>
             </div>
 
             <div className="mt-6 flex flex-col items-center h-52 w-full">
@@ -389,7 +421,7 @@ export default function InvoiceCenterDashboard() {
               </div>
               <button 
                 onClick={() => navigate("/invoice-center/customers")}
-                className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 transition-all shadow-sm shrink-0"
+                className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all shadow-sm shrink-0 cursor-pointer"
               >
                 View Customer Directory
               </button>
@@ -411,10 +443,14 @@ export default function InvoiceCenterDashboard() {
                     const isOverLimit = c.current_balance > c.credit_limit;
                     const exposure = Math.max(0, c.current_balance - c.credit_limit);
                     return (
-                      <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                      <tr
+                        key={c.id}
+                        onClick={() => navigate(`/invoice-center/customers/${c.id}`)}
+                        className="hover:bg-blue-50/40 transition-colors cursor-pointer"
+                      >
                         <td className="whitespace-nowrap px-4 py-4">
                           <div className="flex flex-col">
-                            <span className="font-semibold text-slate-900">{c.customer_name}</span>
+                            <span className="font-semibold text-slate-900 hover:text-blue-600">{c.customer_name}</span>
                             <span className="text-xs text-slate-500 font-medium">{c.customer_code}</span>
                           </div>
                         </td>
@@ -447,9 +483,12 @@ export default function InvoiceCenterDashboard() {
           </div>
           <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>Showing top critical accounts</span>
-            <span className="flex items-center gap-1 cursor-pointer hover:text-brand-600 transition-colors font-semibold">
+            <button
+              onClick={() => navigate("/invoice-center/reports/customer-balance")}
+              className="flex items-center gap-1 cursor-pointer hover:text-blue-600 transition-colors font-semibold"
+            >
               Generate Risk Report <FileText className="h-3.5 w-3.5" />
-            </span>
+            </button>
           </div>
         </div>
 

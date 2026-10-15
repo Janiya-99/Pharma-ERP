@@ -6,7 +6,8 @@ import {
   CustomerCategorySelect,
 } from "../../../components/invoice-center";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, AlertCircle, Sparkles } from "lucide-react";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import {
   Select,
   SelectContent,
@@ -50,6 +51,33 @@ const CustomerFormPage: React.FC = () => {
   const [fetching, setFetching] = useState(isEdit);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
+  const handleAiApply = (aiData: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      customer_code: prev.customer_code || aiData.customer_code || `CUST-${Math.floor(1000 + Math.random() * 9000)}`,
+      customer_name: aiData.customer_name || prev.customer_name,
+      trade_name: aiData.trade_name || aiData.customer_name || prev.trade_name,
+      customer_type: aiData.customer_type || prev.customer_type,
+      category_id: aiData.category_id ? String(aiData.category_id) : (prev.category_id || "1"),
+      currency: aiData.currency || prev.currency,
+      tax_id: aiData.tax_id || prev.tax_id,
+      registration_no: aiData.registration_no || prev.registration_no,
+      email: aiData.email || prev.email,
+      phone: aiData.phone || prev.phone,
+      mobile: aiData.mobile || prev.mobile,
+      website: aiData.website || prev.website,
+      credit_limit: aiData.credit_limit !== undefined ? String(aiData.credit_limit) : prev.credit_limit,
+      credit_days: aiData.credit_days !== undefined ? String(aiData.credit_days) : prev.credit_days,
+      payment_terms: aiData.payment_terms || prev.payment_terms,
+      discount_percentage: aiData.discount_percentage !== undefined ? String(aiData.discount_percentage) : prev.discount_percentage,
+      billing_address: aiData.billing_address || prev.billing_address,
+      shipping_address: aiData.shipping_address || aiData.billing_address || prev.shipping_address,
+      notes: aiData.notes || prev.notes,
+      status: aiData.status || prev.status,
+    }));
+  };
 
   const setFieldValue = (field: keyof typeof formData, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
@@ -223,17 +251,29 @@ const CustomerFormPage: React.FC = () => {
           </div>
         </div>
 
-        {isEdit && (
-          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-            <span className="text-xs font-semibold uppercase text-[#64748B]">
-              Credit Status:
-            </span>
-            <CreditStatusBadge
-              creditLimit={formData.credit_limit}
-              currentBalance={currentBalance}
-            />
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {!isEdit && (
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:from-purple-700 hover:to-indigo-700 transition-all shadow-indigo-100"
+            >
+              <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+          )}
+          {isEdit && (
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+              <span className="text-xs font-semibold uppercase text-[#64748B]">
+                Credit Status:
+              </span>
+              <CreditStatusBadge
+                creditLimit={formData.credit_limit}
+                currentBalance={currentBalance}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -616,6 +656,14 @@ const CustomerFormPage: React.FC = () => {
           </button>
         </div>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="customer"
+        title="Gemini AI Customer Registration"
+        onApply={handleAiApply}
+      />
     </div>
   );
 };
