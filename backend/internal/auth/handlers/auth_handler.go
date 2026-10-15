@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pixandco/erp-phrma/internal/auth/dto"
@@ -25,7 +27,23 @@ func NewAuthHandler(resolver *database.CompanyResolver) *AuthHandler {
 	return &AuthHandler{resolver: resolver}
 }
 
-func (h *AuthHandler) resolveLoginCompany(req dto.LoginRequest) (*gorm.DB, *platformModels.PlatformCompany, error) {
+func getClientIP(c *gin.Context) string {
+	if cfIP := strings.TrimSpace(c.GetHeader("CF-Connecting-IP")); cfIP != "" {
+		return cfIP
+	}
+	if realIP := strings.TrimSpace(c.GetHeader("X-Real-IP")); realIP != "" {
+		return realIP
+	}
+	if xff := strings.TrimSpace(c.GetHeader("X-Forwarded-For")); xff != "" {
+		parts := strings.Split(xff, ",")
+		if len(parts) > 0 && strings.TrimSpace(parts[0]) != "" {
+			return strings.TrimSpace(parts[0])
+		}
+	}
+	return c.ClientIP()
+}
+
+func (h *AuthHandler) resolveLoginCompany(req dto.LoginRequest, ip string, userAgent string) (*gorm.DB, *platformModels.PlatformCompany, error) {
 	if req.CompanyCode != "" {
 		return h.resolver.ResolveCompanyDB(req.CompanyCode)
 	}
@@ -43,6 +61,17 @@ func (h *AuthHandler) resolveLoginCompany(req dto.LoginRequest) (*gorm.DB, *plat
 			if err := db.Where("email = ?", req.Email).First(&user).Error; err == nil {
 				if security.CheckPasswordHash(req.Password, user.PasswordHash) {
 					return db, comp, nil
+				} else {
+					now := time.Now()
+					db.Create(&models.LoginLog{
+						UserID:        &user.ID,
+						Email:         req.Email,
+						LoginStatus:   "failed",
+						FailureReason: "Invalid password",
+						IPAddress:     ip,
+						UserAgent:     userAgent,
+						LoggedAt:      &now,
+					})
 				}
 			}
 		}
@@ -80,6 +109,17 @@ func (h *AuthHandler) resolveLoginCompany(req dto.LoginRequest) (*gorm.DB, *plat
 					cancel()
 				default:
 				}
+			} else {
+				now := time.Now()
+				db.Create(&models.LoginLog{
+					UserID:        &user.ID,
+					Email:         req.Email,
+					LoginStatus:   "failed",
+					FailureReason: "Invalid password",
+					IPAddress:     ip,
+					UserAgent:     userAgent,
+					LoggedAt:      &now,
+				})
 			}
 		}(companies[i])
 	}
@@ -104,8 +144,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	ip := getClientIP(c)
+	userAgent := c.Request.UserAgent()
+
 	// 1. Resolve Company DB from the submitted credentials.
-	db, platformCompany, err := h.resolveLoginCompany(req)
+	db, platformCompany, err := h.resolveLoginCompany(req, ip, userAgent)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
 		return
@@ -113,7 +156,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	// 2. Perform Login via AuthService in company context
 	authService := services.NewAuthService(db)
-	resp, err := authService.Login(req, platformCompany)
+	resp, err := authService.Login(req, platformCompany, ip, userAgent)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
 		return

@@ -67,7 +67,7 @@ const BrandToggle: React.FC<{ checked: boolean; onChange: (v: boolean) => void; 
       {description && <p className="text-xs text-slate-400 mt-0.5">{description}</p>}
     </div>
     <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)}
-      className={`relative flex-shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-all ${checked ? "bg-[#7C3AED]" : "bg-slate-200"}`}>
+      className={`relative flex-shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-all ${checked ? "bg-blue-600" : "bg-slate-200"}`}>
       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? "translate-x-6" : "translate-x-1"}`} />
     </button>
   </div>
@@ -257,11 +257,11 @@ const UserCreatePage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{isEdit ? "Edit User Profile" : "Create New User"}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/control-center/users")} className="px-5 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium text-sm transition-colors shadow-sm bg-white hidden sm:block">
+          <button onClick={() => navigate("/control-center/users")} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-all shadow-sm bg-white active:scale-[0.98]">
             Cancel
           </button>
-          <button onClick={handleSave} disabled={saving} className="px-6 py-2 rounded-lg bg-[#002137] text-white font-medium text-sm shadow-sm hover:bg-[#001726] disabled:opacity-50 flex items-center gap-2 transition-colors hidden sm:flex">
-            <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Profile"}
+          <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-sm hover:bg-blue-700 hover:shadow-md transition-all flex items-center gap-2 active:scale-[0.98] disabled:opacity-50">
+            <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save User"}
           </button>
         </div>
       </div>
@@ -395,7 +395,7 @@ const UserCreatePage: React.FC = () => {
                 <Lock className="h-4 w-4" /> Login Access
               </div>
               <button type="button" role="switch" aria-checked={form.login_enabled} onClick={() => sf("login_enabled", !form.login_enabled)}
-                className={`relative flex-shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-all ${form.login_enabled ? "bg-[#7C3AED]" : "bg-slate-200"}`}>
+                className={`relative flex-shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-all ${form.login_enabled ? "bg-blue-600" : "bg-slate-200"}`}>
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.login_enabled ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
@@ -436,6 +436,16 @@ const UserCreatePage: React.FC = () => {
           </div>
           
         </div>
+      </div>
+
+      {/* Bottom Sticky Action Bar */}
+      <div className="flex items-center justify-between border-t border-slate-200/80 pt-6 mt-8">
+        <button type="button" onClick={() => navigate("/control-center/users")} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-all shadow-sm bg-white active:scale-[0.98]">
+          Cancel
+        </button>
+        <button type="button" onClick={handleSave} disabled={saving} className="px-7 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-sm hover:bg-blue-700 hover:shadow-md transition-all flex items-center gap-2 active:scale-[0.98] disabled:opacity-50">
+          <Save className="h-4 w-4" /> {saving ? "Saving User..." : "Save User"}
+        </button>
       </div>
 
     </div>

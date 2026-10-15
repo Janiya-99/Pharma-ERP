@@ -19,24 +19,24 @@ func NewAuthService(db *gorm.DB) *AuthService {
 	return &AuthService{db: db}
 }
 
-func (s *AuthService) Login(req dto.LoginRequest, platformCompany *platformModels.PlatformCompany) (*dto.LoginResponse, error) {
+func (s *AuthService) Login(req dto.LoginRequest, platformCompany *platformModels.PlatformCompany, ipAddress string, userAgent string) (*dto.LoginResponse, error) {
 	var user models.User
 
 	// 1. Find user by email
 	if err := s.db.Where("email = ?", req.Email).First(&user).Error; err != nil {
-		s.logFailedLogin(nil, req.Email, "User not found")
+		s.logFailedLogin(nil, req.Email, "User not found", ipAddress, userAgent)
 		return nil, errors.New("invalid credentials")
 	}
 
 	// 2. Check user status
 	if user.Status != "active" {
-		s.logFailedLogin(&user.ID, req.Email, "User is not active: "+user.Status)
+		s.logFailedLogin(&user.ID, req.Email, "User is not active: "+user.Status, ipAddress, userAgent)
 		return nil, errors.New("user account is " + user.Status)
 	}
 
 	// 3. Verify password
 	if !security.CheckPasswordHash(req.Password, user.PasswordHash) {
-		s.logFailedLogin(&user.ID, req.Email, "Invalid password")
+		s.logFailedLogin(&user.ID, req.Email, "Invalid password", ipAddress, userAgent)
 		return nil, errors.New("invalid credentials")
 	}
 
@@ -44,7 +44,7 @@ func (s *AuthService) Login(req dto.LoginRequest, platformCompany *platformModel
 	var branchAccesses []models.UserBranchAccess
 	s.db.Preload("Branch").Where("user_id = ? AND status = ?", user.ID, "active").Find(&branchAccesses)
 	if len(branchAccesses) == 0 {
-		s.logFailedLogin(&user.ID, req.Email, "No branch access")
+		s.logFailedLogin(&user.ID, req.Email, "No branch access", ipAddress, userAgent)
 		return nil, errors.New("No branch access assigned to this user")
 	}
 
@@ -65,7 +65,7 @@ func (s *AuthService) Login(req dto.LoginRequest, platformCompany *platformModel
 	var softwareAccesses []models.UserSoftwareAccess
 	s.db.Preload("Software").Where("user_id = ? AND status = ?", user.ID, "active").Find(&softwareAccesses)
 	if len(softwareAccesses) == 0 {
-		s.logFailedLogin(&user.ID, req.Email, "No software access")
+		s.logFailedLogin(&user.ID, req.Email, "No software access", ipAddress, userAgent)
 		return nil, errors.New("No software access assigned to this user")
 	}
 
@@ -102,6 +102,8 @@ func (s *AuthService) Login(req dto.LoginRequest, platformCompany *platformModel
 		UserID:      &user.ID,
 		Email:       user.Email,
 		LoginStatus: "success",
+		IPAddress:   ipAddress,
+		UserAgent:   userAgent,
 		LoggedAt:    &now,
 	})
 
@@ -233,13 +235,15 @@ func (s *AuthService) GetUserPermissionsForActiveContext(userID, branchID, softw
 	return permissions
 }
 
-func (s *AuthService) logFailedLogin(userID *uint64, email string, reason string) {
+func (s *AuthService) logFailedLogin(userID *uint64, email string, reason string, ipAddress string, userAgent string) {
 	now := time.Now()
 	s.db.Create(&models.LoginLog{
 		UserID:        userID,
 		Email:         email,
 		LoginStatus:   "failed",
 		FailureReason: reason,
+		IPAddress:     ipAddress,
+		UserAgent:     userAgent,
 		LoggedAt:      &now,
 	})
 }
