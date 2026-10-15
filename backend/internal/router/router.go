@@ -11,6 +11,7 @@ import (
 	"github.com/pixandco/erp-phrma/internal/control"
 	"github.com/pixandco/erp-phrma/internal/controller"
 	"github.com/pixandco/erp-phrma/internal/database"
+	complianceModule "github.com/pixandco/erp-phrma/internal/compliance"
 	financeModule "github.com/pixandco/erp-phrma/internal/finance"
 	inventoryModule "github.com/pixandco/erp-phrma/internal/inventory"
 	invoiceCenterRoutes "github.com/pixandco/erp-phrma/internal/invoicecenter/routes"
@@ -204,6 +205,14 @@ func Setup(
 		invoiceCenterGrp.Use(middleware.SoftwareAccessMiddleware())
 		invoiceCenterRoutes.SetupRoutes(invoiceCenterGrp, logger)
 		invoiceCenterGrp.GET("/countries", commonCtrl.GetCountries)
+
+		// Compliance Center routes
+		complianceGrp := v1.Group("/compliance")
+		complianceGrp.Use(middleware.CompanyAuthMiddleware(resolver))
+		complianceGrp.Use(middleware.BranchAccessMiddleware())
+		complianceGrp.Use(middleware.SoftwareAccessMiddleware())
+		complianceModule.SetupRoutes(complianceGrp, logger)
+		complianceGrp.GET("/countries", commonCtrl.GetCountries)
 	}
 
 	return r
