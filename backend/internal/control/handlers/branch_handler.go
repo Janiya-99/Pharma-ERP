@@ -31,11 +31,13 @@ func (h *BranchHandler) List(c *gin.Context) {
 	companyDB, _ := c.Get("companyDB")
 	db := companyDB.(*gorm.DB)
 
+	authCtx := c.MustGet("authContext").(*middleware.AuthContext)
+
 	repo := repositories.NewBranchRepository(db)
 	auditService := services.NewAuditService(db, h.logger)
 	service := services.NewBranchService(repo, auditService)
 
-	branches, pagination, err := service.List(status, branchType, search, page, limit)
+	branches, pagination, err := service.List(authCtx.CompanyID, status, branchType, search, page, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse(err.Error(), nil))
 		return
@@ -54,12 +56,14 @@ func (h *BranchHandler) Get(c *gin.Context) {
 	companyDB, _ := c.Get("companyDB")
 	db := companyDB.(*gorm.DB)
 
+	authCtx := c.MustGet("authContext").(*middleware.AuthContext)
+
 	repo := repositories.NewBranchRepository(db)
 	auditService := services.NewAuditService(db, h.logger)
 	service := services.NewBranchService(repo, auditService)
 
 	branch, err := service.GetByID(id)
-	if err != nil {
+	if err != nil || (authCtx.CompanyID > 0 && branch.CompanyID != authCtx.CompanyID) {
 		c.JSON(http.StatusNotFound, dto.ErrorResponse("Branch not found", nil))
 		return
 	}

@@ -19,7 +19,7 @@ func NewBranchService(repo *repositories.BranchRepository, auditService *AuditSe
 	return &BranchService{repo: repo, auditService: auditService}
 }
 
-func (s *BranchService) List(status, branchType, search string, page, limit int) ([]models.Branch, *dto.Pagination, error) {
+func (s *BranchService) List(companyID uint64, status, branchType, search string, page, limit int) ([]models.Branch, *dto.Pagination, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -28,7 +28,7 @@ func (s *BranchService) List(status, branchType, search string, page, limit int)
 	}
 	offset := (page - 1) * limit
 
-	branches, count, err := s.repo.List(status, branchType, search, offset, limit)
+	branches, count, err := s.repo.List(companyID, status, branchType, search, offset, limit)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,13 +50,13 @@ func (s *BranchService) GetByID(id uint64) (*models.Branch, error) {
 }
 
 func (s *BranchService) Create(req dto.CreateBranchRequest, companyID, userID, activeBranchID uint64, ipAddress, userAgent string) (*models.Branch, error) {
-	existing, _ := s.repo.GetByCode(req.BranchCode)
+	existing, _ := s.repo.GetByCode(companyID, req.BranchCode)
 	if existing != nil {
 		return nil, errors.New("Branch code already exists")
 	}
 
 	if req.IsMainBranch {
-		s.repo.UnsetMainBranches(0)
+		s.repo.UnsetMainBranches(companyID, 0)
 	}
 
 	branch := &models.Branch{
@@ -89,15 +89,19 @@ func (s *BranchService) Update(id uint64, req dto.UpdateBranchRequest, companyID
 		return nil, errors.New("Branch not found")
 	}
 
+	if companyID > 0 && branch.CompanyID != companyID {
+		return nil, errors.New("Branch not found")
+	}
+
 	if req.BranchCode != branch.BranchCode {
-		existing, _ := s.repo.GetByCode(req.BranchCode)
+		existing, _ := s.repo.GetByCode(companyID, req.BranchCode)
 		if existing != nil && existing.ID != id {
 			return nil, errors.New("Branch code already exists")
 		}
 	}
 
 	if req.IsMainBranch && !branch.IsMainBranch {
-		s.repo.UnsetMainBranches(branch.ID)
+		s.repo.UnsetMainBranches(companyID, branch.ID)
 	}
 
 	oldValues := *branch
@@ -132,13 +136,17 @@ func (s *BranchService) Delete(id uint64, companyID, userID, activeBranchID uint
 		return err
 	}
 
+	if companyID > 0 && branch.CompanyID != companyID {
+		return errors.New("Branch not found")
+	}
+
 	hasUsers, _ := s.repo.HasActiveUsers(id)
 	if hasUsers {
 		return errors.New("Cannot delete branch with active users")
 	}
 
 	if branch.Status == "active" {
-		activeCount, _ := s.repo.CountActiveBranches()
+		activeCount, _ := s.repo.CountActiveBranches(companyID)
 		if activeCount <= 1 {
 			return errors.New("Cannot delete the only active branch")
 		}
