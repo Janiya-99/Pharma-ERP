@@ -42,7 +42,7 @@ func (r *FinanceReportRepository) GetTrialBalanceReport(
 			gl.account_id,
 			coa.account_code,
 			coa.account_name,
-			coa.classification_id,
+			coa.account_classification_id as classification_id,
 			c.type as classification_type,
 			c.normal_balance,
 			SUM(CASE WHEN ? AND gl.transaction_date < ? THEN gl.debit_amount ELSE 0 END) as opening_debit,
@@ -55,14 +55,14 @@ func (r *FinanceReportRepository) GetTrialBalanceReport(
 			hasDateFrom, req.DateFrom, hasDateTo, req.DateTo,
 			hasDateFrom, req.DateFrom, hasDateTo, req.DateTo).
 		Joins("JOIN chart_of_accounts coa ON gl.account_id = coa.id").
-		Joins("JOIN account_classifications c ON coa.classification_id = c.id").
+		Joins("JOIN account_classifications c ON coa.account_classification_id = c.id").
 		Where("gl.company_id = ? AND gl.financial_year_id = ?", companyID, req.FinancialYearID)
 
 	if req.BranchID != nil {
 		query = query.Where("gl.branch_id = ?", *req.BranchID)
 	}
 
-	query = query.Group("gl.account_id, coa.account_code, coa.account_name, coa.classification_id, c.type, c.normal_balance")
+	query = query.Group("gl.account_id, coa.account_code, coa.account_name, coa.account_classification_id, c.type, c.normal_balance")
 
 	var results []TrialBalanceRawLine
 	if err := query.Find(&results).Error; err != nil {
