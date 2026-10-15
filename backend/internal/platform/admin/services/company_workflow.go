@@ -10,6 +10,8 @@ import (
 
 	companyMigrations "github.com/pixandco/erp-phrma/internal/company/migrations"
 	companyModels "github.com/pixandco/erp-phrma/internal/company/models"
+	financeSeeders "github.com/pixandco/erp-phrma/internal/finance/seeders"
+	inventorySeeders "github.com/pixandco/erp-phrma/internal/inventory/seeders"
 	"github.com/pixandco/erp-phrma/internal/platform/models"
 	"github.com/pixandco/erp-phrma/internal/security"
 	"go.uber.org/zap"
@@ -348,7 +350,24 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		companyDB.Save(&tenantCo)
 	}
 
-	// Remove structural inventory and invoice center data seeders for new company as requested
+	// Seed standard Chart of Accounts & Classifications for this tenant company
+	if err := financeSeeders.SeedAccountClassificationsForCompany(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Warn("Failed to seed account classifications for tenant", zap.Error(err))
+	}
+	if err := financeSeeders.SeedChartOfAccountsForCompany(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Warn("Failed to seed chart of accounts for tenant", zap.Error(err))
+	}
+
+	// Seed product units, dosage forms, categories for this tenant company
+	if err := inventorySeeders.SeedProductUnits(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Warn("Failed to seed product units for tenant", zap.Error(err))
+	}
+	if err := inventorySeeders.SeedDosageForms(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Warn("Failed to seed dosage forms for tenant", zap.Error(err))
+	}
+	if err := inventorySeeders.SeedProductCategories(companyDB, tenantCo.ID, logger); err != nil {
+		logger.Warn("Failed to seed product categories for tenant", zap.Error(err))
+	}
 
 	// Seed branch
 	var tenantBranch companyModels.Branch
