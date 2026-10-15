@@ -14,11 +14,11 @@ func NewProductRepository() *ProductRepository {
 }
 
 func (r *ProductRepository) List(db *gorm.DB, companyID uint64, filters map[string]interface{}, search string, page, limit int) ([]models.Product, int64, error) {
-	query := db.Where("company_id = ?", companyID)
+	query := db.Where("products.company_id = ?", companyID)
 
 	for k, v := range filters {
 		if v != "" {
-			query = query.Where(k+" = ?", v)
+			query = query.Where("products."+k+" = ?", v)
 		}
 	}
 
