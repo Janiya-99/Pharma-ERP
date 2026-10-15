@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../../auth/AuthContext';
 import { financeApi } from '../../../../api/financeApi';
+import { getBranches } from '../../../../api/controlApi';
 import { toast } from 'react-hot-toast';
 import DataTable from '../../../../components/common/DataTable';
 import ReportPageHeader from '../../../../components/finance/reports/ReportPageHeader';
@@ -21,18 +22,24 @@ const TrialBalanceReportPage = () => {
 
   // Filter State
   const [financialYears, setFinancialYears] = useState([]);
+  const [branches, setBranches] = useState([]);
 
   const [filters, setFilters] = useState({
     financial_year_id: "",
     date_from: "",
     date_to: "",
-    branch_id: activeBranch?.id || ""
+    branch_id: activeBranch?.id ? String(activeBranch.id) : ""
   });
 
   const fetchFiltersData = async () => {
     try {
-      const fyRes = await financeApi.getFinancialYears({ limit: 100 });
+      const [fyRes, branchRes] = await Promise.all([
+        financeApi.getFinancialYears({ limit: 100 }),
+        getBranches({ limit: 100, status: "active" })
+      ]);
       if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
+      const bList = branchRes.data?.data?.items || branchRes.data?.data || branchRes.data || [];
+      if (Array.isArray(bList)) setBranches(bList);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -157,6 +164,24 @@ const TrialBalanceReportPage = () => {
         isLoading={loading}
       >
         <div className="space-y-2">
+          <Label>Operating Branch</Label>
+          <Select 
+            value={filters.branch_id || "all"} 
+            onValueChange={(val: string) => handleFilterChange('branch_id', val === "all" ? "" : val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="All Branches" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Branches (Consolidated)</SelectItem>
+              {(branches || []).map((b: any) => (
+                <SelectItem key={b.id} value={b.id.toString()}>{b.branch_name || b.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
           <Label>Financial Year</Label>
           <Select 
             value={filters.financial_year_id} 
@@ -175,12 +200,50 @@ const TrialBalanceReportPage = () => {
         </div>
 
         <div className="space-y-2">
+          <Label>Quick Period Preset</Label>
+          <Select
+            value="custom"
+            onValueChange={(val: string) => {
+              const today = new Date();
+              const pad = (n: number) => String(n).padStart(2, "0");
+              const formatDate = (d: Date) =>
+                `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+              if (val === "this_month") {
+                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                handleFilterChange('date_from', formatDate(startOfMonth));
+                handleFilterChange('date_to', formatDate(today));
+              } else if (val === "last_month") {
+                const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                handleFilterChange('date_from', formatDate(startOfLastMonth));
+                handleFilterChange('date_to', formatDate(endOfLastMonth));
+              } else if (val === "ytd") {
+                const startOfYear = new Date(today.getFullYear(), 0, 1);
+                handleFilterChange('date_from', formatDate(startOfYear));
+                handleFilterChange('date_to', formatDate(today));
+              }
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Quick Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="custom">Quick Range...</SelectItem>
+              <SelectItem value="this_month">This Month</SelectItem>
+              <SelectItem value="last_month">Last Month</SelectItem>
+              <SelectItem value="ytd">Year to Date (YTD)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
           <Label>Date From</Label>
           <Input 
             type="date" 
             value={filters.date_from}
             onChange={(e: any) => handleFilterChange('date_from', e.target.value)}
-           placeholder="Enter value" />
+            placeholder="Enter value" />
         </div>
 
         <div className="space-y-2">
@@ -189,7 +252,7 @@ const TrialBalanceReportPage = () => {
             type="date" 
             value={filters.date_to}
             onChange={(e: any) => handleFilterChange('date_to', e.target.value)}
-           placeholder="Enter value" />
+            placeholder="Enter value" />
         </div>
       </ReportFilterCard>
 

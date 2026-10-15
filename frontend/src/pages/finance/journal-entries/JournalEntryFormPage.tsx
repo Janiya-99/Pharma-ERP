@@ -7,16 +7,20 @@ import FinancialYearSelect from "../../../components/finance/FinancialYearSelect
 import AccountingPeriodSelect from "../../../components/finance/AccountingPeriodSelect";
 import JournalEntryLinesTable from "./JournalEntryLinesTable";
 import { MdArrowBack, MdSave } from "react-icons/md";
+import { Sparkles } from "lucide-react";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 
 export default function JournalEntryFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { activeSoftware } = useAuth();
+  const { activeSoftware, activeBranch } = useAuth();
   const isEdit = Boolean(id);
 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [accountsList, setAccountsList] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     branch_id: "",
@@ -31,6 +35,58 @@ export default function JournalEntryFormPage() {
     { account_id: "", line_description: "", debit_amount: 0, credit_amount: 0 },
     { account_id: "", line_description: "", debit_amount: 0, credit_amount: 0 }
   ]);
+
+  useEffect(() => {
+    if (activeBranch?.id && !formData.branch_id) {
+      setFormData((prev: any) => ({ ...prev, branch_id: String(activeBranch.id) }));
+    }
+    financeApi
+      .getChartOfAccounts({ limit: 1000 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setAccountsList(list);
+      })
+      .catch(console.error);
+  }, [activeBranch]);
+
+  const handleAiApply = (aiData: any) => {
+    if (aiData.journal_date) {
+      setFormData((prev: any) => ({ ...prev, journal_date: aiData.journal_date }));
+    }
+    if (aiData.reference_number) {
+      setFormData((prev: any) => ({ ...prev, reference_number: aiData.reference_number }));
+    }
+    if (aiData.description) {
+      setFormData((prev: any) => ({ ...prev, description: aiData.description }));
+    }
+
+    if (Array.isArray(aiData.lines) && aiData.lines.length > 0) {
+      const mapped = aiData.lines.map((l: any) => {
+        let matchedAccount = null;
+        if (l.account_id) {
+          matchedAccount = accountsList.find((a: any) => String(a.id) === String(l.account_id));
+        }
+        if (!matchedAccount && l.account_name && accountsList.length > 0) {
+          const searchName = l.account_name.toLowerCase();
+          matchedAccount = accountsList.find((a: any) =>
+            a.account_name?.toLowerCase().includes(searchName) ||
+            searchName.includes(a.account_name?.toLowerCase()) ||
+            a.account_code?.toLowerCase() === searchName
+          );
+        }
+        const accId = matchedAccount ? String(matchedAccount.id) : (accountsList[0]?.id ? String(accountsList[0].id) : "");
+
+        return {
+          account_id: accId,
+          line_description: l.line_description || aiData.description || "",
+          debit_amount: Number(l.debit_amount) || 0,
+          credit_amount: Number(l.credit_amount) || 0,
+        };
+      });
+
+      setLines(mapped);
+    }
+  };
 
   useEffect(() => {
     if (isEdit && activeSoftware?.software_code === "FINANCE") {
@@ -176,14 +232,26 @@ export default function JournalEntryFormPage() {
             {isEdit ? "Edit Journal Entry" : "Create Journal Entry"}
           </h1>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={submitting || !isBalanced}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <MdSave size={20} />
-          {submitting ? "Saving..." : "Save Journal"}
-        </button>
+        <div className="flex items-center gap-3">
+          {!isEdit && (
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={submitting || !isBalanced}
+            className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+          >
+            <MdSave size={20} />
+            {submitting ? "Saving..." : "Save Journal"}
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -254,6 +322,21 @@ export default function JournalEntryFormPage() {
         lines={lines}
         setLines={setLines}
         disabled={submitting}
+      />
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="journal_entry"
+        title="Gemini AI Journal Entry"
+        contextData={{
+          accounts: accountsList.map((a: any) => ({
+            id: a.id,
+            name: a.account_name,
+            code: a.account_code,
+          })),
+        }}
+        onApply={handleAiApply}
       />
     </div>
   );

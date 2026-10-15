@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { Save, ArrowLeft, Plus, Trash2, Sparkles } from "lucide-react";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import { inventoryApi } from "../../../api/inventoryApi";
 import ProductCategorySelect from "../../../components/inventory/ProductCategorySelect";
 import GenericNameSelect from "../../../components/inventory/GenericNameSelect";
@@ -16,6 +17,26 @@ const ProductFormPage = () => {
   const isEdit = Boolean(id);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
+  const handleAiApply = (aiData: any) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      product_code: prev.product_code || aiData.product_code || `MED-${Math.floor(1000 + Math.random() * 9000)}`,
+      product_name: aiData.product_name || prev.product_name,
+      product_type: aiData.product_type || prev.product_type,
+      strength: aiData.strength || prev.strength,
+      pack_size: aiData.pack_size || prev.pack_size,
+      nmra_registration_number: aiData.nmra_registration_number || prev.nmra_registration_number,
+      nmra_expiry_date: aiData.nmra_expiry_date || prev.nmra_expiry_date,
+      requires_batch_tracking: aiData.requires_batch_tracking !== undefined ? aiData.requires_batch_tracking : prev.requires_batch_tracking,
+      requires_expiry_tracking: aiData.requires_expiry_tracking !== undefined ? aiData.requires_expiry_tracking : prev.requires_expiry_tracking,
+      storage_condition: aiData.storage_condition || prev.storage_condition,
+      reorder_level: aiData.reorder_level !== undefined ? aiData.reorder_level : prev.reorder_level,
+      reorder_quantity: aiData.reorder_quantity !== undefined ? aiData.reorder_quantity : prev.reorder_quantity,
+      status: aiData.status || prev.status,
+    }));
+  };
 
   const [formData, setFormData] = useState({
     product_code: "",
@@ -156,9 +177,21 @@ const ProductFormPage = () => {
             {isEdit ? "Edit Product" : "New Product"}
           </h1>
         </div>
-        <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium disabled:opacity-50">
-          <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Product"}
-        </button>
+        <div className="flex items-center gap-3">
+          {!isEdit && (
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium text-sm shadow-sm transition-all shadow-indigo-100"
+            >
+              <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
+              <span>✨ AI Auto-Fill</span>
+            </button>
+          )}
+          <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium disabled:opacity-50">
+            <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Product"}
+          </button>
+        </div>
       </div>
 
       <form className="space-y-6">
@@ -307,6 +340,14 @@ const ProductFormPage = () => {
           )}
         </div>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="product"
+        title="Gemini AI Formulation / Product Registration"
+        onApply={handleAiApply}
+      />
     </div>
   );
 };

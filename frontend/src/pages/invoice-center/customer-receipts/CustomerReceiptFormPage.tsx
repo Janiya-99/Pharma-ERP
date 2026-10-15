@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import {
   Loader2,
   ReceiptText,
   Save,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
@@ -19,6 +20,7 @@ import { Button } from "../../../components/ui/button";
 import { DatePicker } from "../../../components/ui/date-picker";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 import {
   Select,
   SelectContent,
@@ -64,6 +66,38 @@ const CustomerReceiptFormPage = () => {
   const [saving, setSaving] = useState(false);
   const [allocations, setAllocations] = useState<any[]>([]);
   const [initialData, setInitialData] = useState<any>(null);
+  const [customersList, setCustomersList] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
+  useEffect(() => {
+    invoiceCenterApi
+      .getCustomers({ limit: 100 })
+      .then((res: any) => {
+        const list = res.data?.data?.items || res.data?.data || res.data || [];
+        if (Array.isArray(list)) setCustomersList(list);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAiApply = (aiData: any) => {
+    if (aiData.receipt_date) setValue("receipt_date", aiData.receipt_date);
+    if (aiData.payment_method) setValue("payment_method", aiData.payment_method);
+    if (aiData.payment_reference) setValue("payment_reference", aiData.payment_reference);
+    if (aiData.receipt_amount) setValue("receipt_amount", Number(aiData.receipt_amount));
+    if (aiData.remarks) setValue("remarks", aiData.remarks);
+
+    if (aiData.customer_id) {
+      setValue("customer_id", Number(aiData.customer_id));
+    } else if (aiData.customer_name && customersList.length > 0) {
+      const match = customersList.find((c: any) =>
+        c.customer_name?.toLowerCase().includes(aiData.customer_name.toLowerCase()) ||
+        aiData.customer_name.toLowerCase().includes(c.customer_name?.toLowerCase())
+      );
+      if (match) {
+        setValue("customer_id", Number(match.id));
+      }
+    }
+  };
 
   const {
     control,
@@ -235,6 +269,16 @@ const CustomerReceiptFormPage = () => {
         }
         actions={
           <>
+            {!isEditMode && (
+              <Button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-sm"
+              >
+                <Sparkles className="mr-2 h-4 w-4 text-amber-300 animate-pulse" />
+                <span>✨ AI Auto-Fill</span>
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -475,6 +519,21 @@ const CustomerReceiptFormPage = () => {
           </InvoiceCenterFormSection>
         </InvoiceCenterFormBody>
       </form>
+
+      <AiAutoFillModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        formType="customer_receipt"
+        title="Gemini AI Customer Receipt"
+        contextData={{
+          customers: customersList.map((c: any) => ({
+            id: c.id,
+            name: c.customer_name,
+            code: c.customer_code,
+          })),
+        }}
+        onApply={handleAiApply}
+      />
     </InvoiceCenterFormPage>
   );
 };

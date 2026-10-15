@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { invoiceCenterApi } from "@/api/invoiceCenterApi";
 import { ReportPageShell } from "@/components/invoice-center/reports/ReportPageShell";
 import { ReportFilterBar } from "@/components/invoice-center/reports/ReportFilterBar";
@@ -11,6 +11,13 @@ import { ReportExportActions } from "@/components/invoice-center/reports/ReportE
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   CustomerAgingReportParams,
   CustomerAgingReportRow,
@@ -26,6 +33,33 @@ export const CustomerAgingReportPage: React.FC = () => {
   });
 
   const [data, setData] = useState<CustomerAgingReportRow[]>([]);
+  const [riskFilter, setRiskFilter] = useState<string>("all");
+  const [minBalanceFilter, setMinBalanceFilter] = useState<string>("0");
+
+  const filteredData = useMemo(() => {
+    return data.filter((row) => {
+      if (
+        riskFilter === "overdue" &&
+        row.days_61_90 <= 0 &&
+        row.days_91_120 <= 0 &&
+        row.over_120 <= 0
+      ) {
+        return false;
+      }
+      if (riskFilter === "critical" && row.over_120 <= 0) {
+        return false;
+      }
+      if (riskFilter === "current" && row.current <= 0 && row.days_1_30 <= 0) {
+        return false;
+      }
+      const minBal = Number(minBalanceFilter) || 0;
+      if (minBal > 0 && row.total_outstanding < minBal) {
+        return false;
+      }
+      return true;
+    });
+  }, [data, riskFilter, minBalanceFilter]);
+
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
@@ -76,6 +110,8 @@ export const CustomerAgingReportPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
+    setRiskFilter("all");
+    setMinBalanceFilter("0");
     setFilters({
       page: 1,
       limit: 10,
@@ -178,10 +214,10 @@ export const CustomerAgingReportPage: React.FC = () => {
           isLoading={isLoading}
         >
           <div className="space-y-1">
-            <Label htmlFor="search">Search</Label>
+            <Label htmlFor="search">Search Customer</Label>
             <Input
               id="search"
-              placeholder="Search customers..."
+              placeholder="Search code or name..."
               value={filters.search || ""}
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, search: e.target.value }))
@@ -197,14 +233,99 @@ export const CustomerAgingReportPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, as_of_date: e.target.value }))
               }
-             placeholder="Enter As Of Date" />
+              placeholder="Enter As Of Date"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="date_preset">Date Preset</Label>
+            <Select
+              value="custom"
+              onValueChange={(val) => {
+                const today = new Date();
+                if (val === "today") {
+                  setFilters((prev) => ({
+                    ...prev,
+                    as_of_date: today.toISOString().split("T")[0],
+                  }));
+                } else if (val === "last_month") {
+                  const endOfLastMonth = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    0
+                  );
+                  setFilters((prev) => ({
+                    ...prev,
+                    as_of_date: endOfLastMonth.toISOString().split("T")[0],
+                  }));
+                } else if (val === "30_days_ago") {
+                  const d = new Date(today);
+                  d.setDate(d.getDate() - 30);
+                  setFilters((prev) => ({
+                    ...prev,
+                    as_of_date: d.toISOString().split("T")[0],
+                  }));
+                } else if (val === "90_days_ago") {
+                  const d = new Date(today);
+                  d.setDate(d.getDate() - 90);
+                  setFilters((prev) => ({
+                    ...prev,
+                    as_of_date: d.toISOString().split("T")[0],
+                  }));
+                }
+              }}
+            >
+              <SelectTrigger id="date_preset">
+                <SelectValue placeholder="Quick Presets" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Quick Presets...</SelectItem>
+                <SelectItem value="today">Today (Latest)</SelectItem>
+                <SelectItem value="last_month">End of Last Month</SelectItem>
+                <SelectItem value="30_days_ago">30 Days Ago</SelectItem>
+                <SelectItem value="90_days_ago">90 Days Ago</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="risk_filter">Aging Risk</Label>
+            <Select
+              value={riskFilter}
+              onValueChange={(val) => setRiskFilter(val)}
+            >
+              <SelectTrigger id="risk_filter">
+                <SelectValue placeholder="All Risk Profiles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Accounts</SelectItem>
+                <SelectItem value="current">Current Only (&lt; 30d)</SelectItem>
+                <SelectItem value="overdue">Overdue (&gt; 60d)</SelectItem>
+                <SelectItem value="critical">Critical High Risk (&gt; 120d)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="min_balance">Min Outstanding</Label>
+            <Select
+              value={minBalanceFilter}
+              onValueChange={(val) => setMinBalanceFilter(val)}
+            >
+              <SelectTrigger id="min_balance">
+                <SelectValue placeholder="All Balances" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">All Balances</SelectItem>
+                <SelectItem value="100000">&gt; 100,000 LKR</SelectItem>
+                <SelectItem value="500000">&gt; 500,000 LKR</SelectItem>
+                <SelectItem value="1000000">&gt; 1,000,000 LKR</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </ReportFilterBar>
       }
       table={
         <ReportDataTable
           columns={columns}
-          data={data}
+          data={filteredData}
           isLoading={isLoading}
           pagination={pagination}
           onPageChange={handlePageChange}

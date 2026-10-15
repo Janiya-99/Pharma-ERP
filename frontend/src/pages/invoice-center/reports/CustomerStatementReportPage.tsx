@@ -226,7 +226,73 @@ export const CustomerStatementReportPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, date_to: e.target.value }))
               }
-             placeholder="Enter Date To" />
+              placeholder="Enter Date To"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="date_preset">Date Preset</Label>
+            <Select
+              value="custom"
+              onValueChange={(val) => {
+                const today = new Date();
+                const pad = (n: number) => String(n).padStart(2, "0");
+                const formatDate = (d: Date) =>
+                  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+                if (val === "this_month") {
+                  const startOfMonth = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    1
+                  );
+                  setFilters((prev) => ({
+                    ...prev,
+                    date_from: formatDate(startOfMonth),
+                    date_to: formatDate(today),
+                  }));
+                } else if (val === "last_month") {
+                  const startOfLastMonth = new Date(
+                    today.getFullYear(),
+                    today.getMonth() - 1,
+                    1
+                  );
+                  const endOfLastMonth = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    0
+                  );
+                  setFilters((prev) => ({
+                    ...prev,
+                    date_from: formatDate(startOfLastMonth),
+                    date_to: formatDate(endOfLastMonth),
+                  }));
+                } else if (val === "this_year") {
+                  const startOfYear = new Date(today.getFullYear(), 0, 1);
+                  setFilters((prev) => ({
+                    ...prev,
+                    date_from: formatDate(startOfYear),
+                    date_to: formatDate(today),
+                  }));
+                } else if (val === "all_time") {
+                  setFilters((prev) => ({
+                    ...prev,
+                    date_from: "",
+                    date_to: "",
+                  }));
+                }
+              }}
+            >
+              <SelectTrigger id="date_preset">
+                <SelectValue placeholder="Quick Range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Quick Range...</SelectItem>
+                <SelectItem value="this_month">This Month</SelectItem>
+                <SelectItem value="last_month">Last Month</SelectItem>
+                <SelectItem value="this_year">Year to Date (YTD)</SelectItem>
+                <SelectItem value="all_time">All Time</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-end space-y-1 pb-2">
             <div className="flex items-center space-x-2">
