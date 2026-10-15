@@ -161,7 +161,7 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 	db.Raw(`
 		SELECT p.product_name as name,
 		       COALESCE(SUM(sil.quantity), 0) as units_sold,
-		       ROUND(COALESCE(SUM(sil.total_amount), 0), 2) as turnover,
+		       ROUND(COALESCE(SUM(sil.line_total), 0), 2) as turnover,
 		       CASE
 		         WHEN COALESCE(SUM(sb.quantity_available), 0) <= p.reorder_level THEN 'Low Stock'
 		         ELSE 'Optimal'

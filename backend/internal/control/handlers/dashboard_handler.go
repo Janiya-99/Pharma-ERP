@@ -135,7 +135,7 @@ func (h *ControlDashboardHandler) GetSummary(c *gin.Context) {
 	db.Raw(`
 		SELECT r.role_name as name, COUNT(ur.user_id) as count
 		FROM roles r
-		LEFT JOIN user_roles ur ON ur.role_id = r.id
+		LEFT JOIN user_branch_roles ur ON ur.role_id = r.id
 		GROUP BY r.id, r.role_name
 		ORDER BY count DESC
 	`).Scan(&roleCounts)
