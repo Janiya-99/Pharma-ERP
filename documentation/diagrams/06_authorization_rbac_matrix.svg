@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <text x="50" y="40" font-size="20" font-weight="700" fill="#0f172a">Figure 6: Multi-Tenant RBAC Authorization Architecture</text>
+  <text x="50" y="65" font-size="13" fill="#64748b">Decentralized Company Scoping, Role Assignment, Granular Permissions &amp; Middleware Enforcement</text>
+
+  <!-- Left: Users & Roles -->
+  <g transform="translate(50, 100)" filter="url(#shadow)">
+    <rect width="250" height="350" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="250" height="36" rx="10" fill="#eff6ff" />
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#1e40af">1. ROLES &amp; USERS</text>
+
+    <rect x="15" y="50" width="220" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="25" y="70" font-size="11" font-weight="700" fill="#0f172a">Super Admin</text>
+    <text x="25" y="85" font-size="9" fill="#64748b">All modules • Company configuration</text>
+
+    <rect x="15" y="110" width="220" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="25" y="130" font-size="11" font-weight="700" fill="#0f172a">Finance Manager</text>
+    <text x="25" y="145" font-size="9" fill="#64748b">GL • CoA • Journal approval • Taxes</text>
+
+    <rect x="15" y="170" width="220" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="25" y="190" font-size="11" font-weight="700" fill="#0f172a">Warehouse Officer</text>
+    <text x="25" y="205" font-size="9" fill="#64748b">GRN receipt • Putaway • Stock ledger</text>
+
+    <rect x="15" y="230" width="220" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="25" y="250" font-size="11" font-weight="700" fill="#0f172a">Billing Officer</text>
+    <text x="25" y="265" font-size="9" fill="#64748b">Orders • Invoices • Customer receipts</text>
+
+    <rect x="15" y="290" width="220" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="25" y="310" font-size="11" font-weight="700" fill="#0f172a">Compliance Officer</text>
+    <text x="25" y="325" font-size="9" fill="#64748b">Batch holds • Recall quarantine • Audit</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 305 275 L 365 275" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="365,271 375,275 365,279" fill="#94a3b8" />
+
+  <!-- Middle: Permission Matrix -->
+  <g transform="translate(375, 100)" filter="url(#shadow)">
+    <rect width="280" height="350" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="280" height="36" rx="10" fill="#f1f5f9" />
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#334155">2. PERMISSION SLUGS (VERIFIED)</text>
+
+    <g font-size="10" fill="#334155" transform="translate(20, 55)">
+      <text y="15" font-weight="600" fill="#1e40af">CONTROL CENTER</text>
+      <text y="30" font-family="monospace">control:company:write, control:user:manage</text>
+      <text y="45" font-family="monospace">control:branch:access, control:audit:view</text>
+
+      <text y="75" font-weight="600" fill="#166534">FINANCE</text>
+      <text y="90" font-family="monospace">finance:coa:view, finance:coa:edit</text>
+      <text y="105" font-family="monospace">finance:journal:post, finance:tax:manage</text>
+
+      <text y="135" font-weight="600" fill="#92400e">INVENTORY</text>
+      <text y="150" font-family="monospace">inventory:product:read, inventory:batch:edit</text>
+      <text y="165" font-family="monospace">inventory:grn:approve, inventory:stock:adjust</text>
+
+      <text y="195" font-weight="600" fill="#6b21a8">INVOICE CENTER</text>
+      <text y="210" font-family="monospace">invoice:order:create, invoice:order:approve</text>
+      <text y="225" font-family="monospace">invoice:bill:issue, invoice:receipt:collect</text>
+
+      <text y="255" font-weight="600" fill="#b91c1c">COMPLIANCE CENTER</text>
+      <text y="270" font-family="monospace">compliance:batch:quarantine, recall:manage</text>
+    </g>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 660 275 L 715 275" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="715,271 725,275 715,279" fill="#94a3b8" />
+
+  <!-- Right: Enforcement Engine -->
+  <g transform="translate(725, 100)" filter="url(#shadow)">
+    <rect width="225" height="350" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="225" height="36" rx="10" fill="#ecfdf5" />
+    <text x="15" y="24" font-size="13" font-weight="700" fill="#065f46">3. ENFORCEMENT</text>
+
+    <rect x="12" y="55" width="200" height="75" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="20" y="75" font-size="11" font-weight="700" fill="#0f172a">JWT Claims Guard</text>
+    <text x="20" y="92" font-size="9" fill="#64748b">• Parses Bearer Token</text>
+    <text x="20" y="106" font-size="9" fill="#64748b">• Extracts User &amp; Company ID</text>
+    <text x="20" y="120" font-size="9" fill="#64748b">• Rejects Cross-Tenant Calls</text>
+
+    <rect x="12" y="145" width="200" height="90" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="20" y="165" font-size="11" font-weight="700" fill="#0f172a">RequirePermission(perm)</text>
+    <text x="20" y="182" font-size="9" fill="#64748b">• In-Memory &amp; Redis Cache</text>
+    <text x="20" y="196" font-size="9" fill="#64748b">• Fast O(1) Bitset/Hash Map</text>
+    <text x="20" y="210" font-size="9" fill="#64748b">• Yields 403 Forbidden on fail</text>
+    <text x="20" y="224" font-size="9" fill="#64748b">• Logs Security Audit Violation</text>
+
+    <rect x="12" y="250" width="200" height="80" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="270" font-size="11" font-weight="700" fill="#1e40af">Tenant Scoped Query</text>
+    <text x="20" y="287" font-size="9" fill="#3b82f6">• GORM automatic injection</text>
+    <text x="20" y="301" font-size="9" fill="#3b82f6">• `WHERE company_id = ?`</text>
+    <text x="20" y="315" font-size="9" fill="#3b82f6">• Strict Tenant Data Barrier</text>
+  </g>
+</svg>

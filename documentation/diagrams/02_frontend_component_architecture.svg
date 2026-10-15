@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550" width="1000" height="550" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <rect width="1000" height="550" fill="#f8fafc" />
+  <text x="50" y="40" font-size="20" font-weight="700" fill="#0f172a">Figure 2: Frontend Component &amp; State Architecture</text>
+  <text x="50" y="65" font-size="13" fill="#64748b">React 19, TypeScript, React Router v6, TanStack Query v5, Zustand, Radix UI &amp; Axios Pipeline</text>
+
+  <!-- Router & Shell -->
+  <g transform="translate(50, 100)">
+    <rect width="200" height="400" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="200" height="35" rx="8" fill="#f1f5f9" />
+    <text x="15" y="23" font-size="12" font-weight="700" fill="#334155">APP SHELL &amp; ROUTING</text>
+    
+    <rect x="12" y="50" width="176" height="50" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="72" font-size="11" font-weight="600" fill="#1e40af">React Router v6</text>
+    <text x="20" y="88" font-size="9" fill="#3b82f6">BrowserRouter, Route Tree</text>
+
+    <rect x="12" y="110" width="176" height="70" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="132" font-size="11" font-weight="600" fill="#1e40af">AuthGuard &amp; RoleGuard</text>
+    <text x="20" y="148" font-size="9" fill="#3b82f6">• Token Expiry Check</text>
+    <text x="20" y="162" font-size="9" fill="#3b82f6">• Permission Matrix Verification</text>
+
+    <rect x="12" y="190" width="176" height="80" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="20" y="212" font-size="11" font-weight="600" fill="#334155">Main Layout</text>
+    <text x="20" y="228" font-size="9" fill="#64748b">• Topbar (Branch Switcher)</text>
+    <text x="20" y="242" font-size="9" fill="#64748b">• Sidebar (Module Nav)</text>
+    <text x="20" y="256" font-size="9" fill="#64748b">• Notification Toast Provider</text>
+
+    <rect x="12" y="280" width="176" height="95" rx="6" fill="#faf5ff" stroke="#e9d5ff" />
+    <text x="20" y="302" font-size="11" font-weight="600" fill="#6b21a8">Zustand State</text>
+    <text x="20" y="318" font-size="9" fill="#7e22ce">• useAuthStore (user, token)</text>
+    <text x="20" y="332" font-size="9" fill="#7e22ce">• useBranchStore (activeBranch)</text>
+    <text x="20" y="346" font-size="9" fill="#7e22ce">• usePermissionStore</text>
+    <text x="20" y="360" font-size="9" fill="#7e22ce">• useCart / Form Wizard</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 255 280 L 295 280" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="295,276 303,280 295,284" fill="#94a3b8" />
+
+  <!-- Feature Modules -->
+  <g transform="translate(305, 100)">
+    <rect width="420" height="400" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="420" height="35" rx="8" fill="#f1f5f9" />
+    <text x="15" y="23" font-size="12" font-weight="700" fill="#334155">MODULE FEATURE PAGES &amp; WIZARDS</text>
+
+    <!-- 5 module boxes -->
+    <rect x="15" y="50" width="185" height="75" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="25" y="72" font-size="11" font-weight="700" fill="#166534">Control Center</text>
+    <text x="25" y="88" font-size="9" fill="#15803d">• User Management Wizard</text>
+    <text x="25" y="102" font-size="9" fill="#15803d">• Branch Scoping &amp; Roles</text>
+    <text x="25" y="116" font-size="9" fill="#15803d">• Document Numbering Rules</text>
+
+    <rect x="215" y="50" width="190" height="75" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="225" y="72" font-size="11" font-weight="700" fill="#1e40af">Finance</text>
+    <text x="225" y="88" font-size="9" fill="#3b82f6">• Chart of Accounts Hierarchy</text>
+    <text x="225" y="102" font-size="9" fill="#3b82f6">• Double-Entry Journal Entry</text>
+    <text x="225" y="116" font-size="9" fill="#3b82f6">• General Ledger &amp; Tax Settings</text>
+
+    <rect x="15" y="135" width="185" height="80" rx="6" fill="#fffbeb" stroke="#fde68a" />
+    <text x="25" y="157" font-size="11" font-weight="700" fill="#92400e">Inventory</text>
+    <text x="25" y="173" font-size="9" fill="#b45309">• Product Catalog &amp; Units</text>
+    <text x="25" y="187" font-size="9" fill="#b45309">• GRN Inspection &amp; Batches</text>
+    <text x="25" y="201" font-size="9" fill="#b45309">• FEFO Stock Ledger &amp; Transfers</text>
+
+    <rect x="215" y="135" width="190" height="80" rx="6" fill="#fdf2f8" stroke="#fbcfe8" />
+    <text x="225" y="157" font-size="11" font-weight="700" fill="#9d174d">Invoice Center</text>
+    <text x="225" y="173" font-size="9" fill="#db2777">• Sales Orders &amp; Invoices</text>
+    <text x="225" y="187" font-size="9" fill="#db2777">• Customer Receipts &amp; Allocation</text>
+    <text x="225" y="201" font-size="9" fill="#db2777">• Credit/Debit Notes &amp; Print</text>
+
+    <rect x="15" y="225" width="390" height="65" rx="6" fill="#fff1f2" stroke="#fecdd3" />
+    <text x="25" y="247" font-size="11" font-weight="700" fill="#9f1239">Compliance Center</text>
+    <text x="25" y="263" font-size="9" fill="#be123c">• Batch Quarantine / Holds &amp; Emergency Recalls</text>
+    <text x="25" y="277" font-size="9" fill="#be123c">• Regulatory Audit Logs &amp; Statutory NMRA Reports</text>
+
+    <rect x="15" y="300" width="390" height="80" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="25" y="322" font-size="11" font-weight="700" fill="#334155">Shared UI Primitives (Radix UI / shadcn)</text>
+    <text x="25" y="338" font-size="9" fill="#64748b">• DataTable (Sorting, Pagination, Column Filters via TanStack Table)</text>
+    <text x="25" y="352" font-size="9" fill="#64748b">• Form Controls (React Hook Form + Zod Schema Validation)</text>
+    <text x="25" y="366" font-size="9" fill="#64748b">• Modal Dialogs, Combobox, DatePicker, Badges, Tabs</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 730 280 L 765 280" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="765,276 773,280 765,284" fill="#94a3b8" />
+
+  <!-- Data Fetching Layer -->
+  <g transform="translate(775, 100)">
+    <rect width="180" height="400" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="180" height="35" rx="8" fill="#f1f5f9" />
+    <text x="15" y="23" font-size="12" font-weight="700" fill="#334155">DATA ACCESS</text>
+
+    <rect x="12" y="50" width="156" height="95" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="72" font-size="11" font-weight="600" fill="#1e40af">TanStack Query v5</text>
+    <text x="20" y="90" font-size="9" fill="#3b82f6">• Query Hooks (useQuery)</text>
+    <text x="20" y="104" font-size="9" fill="#3b82f6">• Mutation Hooks</text>
+    <text x="20" y="118" font-size="9" fill="#3b82f6">• Invalidation on Post</text>
+    <text x="20" y="132" font-size="9" fill="#3b82f6">• Stale Time Management</text>
+
+    <rect x="12" y="160" width="156" height="110" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="20" y="182" font-size="11" font-weight="600" fill="#334155">Axios Client</text>
+    <text x="20" y="200" font-size="9" fill="#64748b">• BaseURL Config</text>
+    <text x="20" y="214" font-size="9" fill="#64748b">• Auth Bearer Interceptor</text>
+    <text x="20" y="228" font-size="9" fill="#64748b">• Active Branch Header</text>
+    <text x="20" y="242" font-size="9" fill="#64748b">• Error Parser Interceptor</text>
+    <text x="20" y="256" font-size="9" fill="#64748b">• Token Refresh Queue</text>
+  </g>
+</svg>

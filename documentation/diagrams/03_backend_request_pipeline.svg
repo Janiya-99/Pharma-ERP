@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <rect width="1000" height="500" fill="#f8fafc" />
+  <text x="50" y="40" font-size="20" font-weight="700" fill="#0f172a">Figure 3: Go Gin Backend Request-Processing Pipeline</text>
+  <text x="50" y="65" font-size="13" fill="#64748b">Comprehensive Middleware Lifecycle, DTO Validation, Service Business Logic &amp; GORM Database Transactions</text>
+
+  <!-- Step 1: Gin Engine & Global Middleware -->
+  <g transform="translate(50, 100)">
+    <rect width="170" height="350" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="170" height="35" rx="8" fill="#f1f5f9" />
+    <text x="15" y="23" font-size="11" font-weight="700" fill="#334155">1. GLOBAL MIDDLEWARE</text>
+
+    <g transform="translate(10, 50)" font-size="9">
+      <rect width="150" height="50" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+      <text x="10" y="22" font-weight="600" fill="#1e40af">CORS &amp; Security</text>
+      <text x="10" y="38" fill="#3b82f6">Allowed Origins, Headers</text>
+
+      <rect y="60" width="150" height="50" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+      <text x="10" y="82" font-weight="600" fill="#1e40af">Zap Logger</text>
+      <text x="10" y="98" fill="#3b82f6">Latency, Path, Status</text>
+
+      <rect y="120" width="150" height="50" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+      <text x="10" y="142" font-weight="600" fill="#1e40af">Recovery (Panic)</text>
+      <text x="10" y="158" fill="#3b82f6">Safe 500 Stack Capture</text>
+
+      <rect y="180" width="150" height="50" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+      <text x="10" y="202" font-weight="600" fill="#1e40af">Rate Limiter</text>
+      <text x="10" y="218" fill="#3b82f6">Redis Sliding Window</text>
+    </g>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 225 270 L 255 270" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="255,266 263,270 255,274" fill="#94a3b8" />
+
+  <!-- Step 2: Auth & Tenant Scope -->
+  <g transform="translate(265, 100)">
+    <rect width="170" height="350" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="170" height="35" rx="8" fill="#f1f5f9" />
+    <text x="15" y="23" font-size="11" font-weight="700" fill="#334155">2. AUTH &amp; SCOPE</text>
+
+    <g transform="translate(10, 50)" font-size="9">
+      <rect width="150" height="65" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+      <text x="10" y="22" font-weight="600" fill="#166534">JWT Auth Handler</text>
+      <text x="10" y="38" fill="#15803d">• Verify HMAC-SHA256</text>
+      <text x="10" y="52" fill="#15803d">• Check Redis Revocation</text>
+
+      <rect y="75" width="150" height="65" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+      <text x="10" y="97" font-weight="600" fill="#166534">Claims Extractor</text>
+      <text x="10" y="113" fill="#15803d">• user_id, company_id</text>
+      <text x="10" y="127" fill="#15803d">• branch_id, roles</text>
+
+      <rect y="150" width="150" height="70" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+      <text x="10" y="172" font-weight="600" fill="#166534">Tenant Resolver</text>
+      <text x="10" y="188" fill="#15803d">• Resolve DB Conn Pool</text>
+      <text x="10" y="202" fill="#15803d">• Set  Vars</text>
+    </g>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 440 270 L 470 270" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="470,266 478,270 470,274" fill="#94a3b8" />
+
+  <!-- Step 3: Handler & DTO -->
+  <g transform="translate(480, 100)">
+    <rect width="160" height="350" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="160" height="35" rx="8" fill="#f1f5f9" />
+    <text x="15" y="23" font-size="11" font-weight="700" fill="#334155">3. HANDLER &amp; DTO</text>
+
+    <g transform="translate(10, 50)" font-size="9">
+      <rect width="140" height="65" rx="6" fill="#faf5ff" stroke="#e9d5ff" />
+      <text x="10" y="22" font-weight="600" fill="#6b21a8">JSON Binding</text>
+      <text x="10" y="38" fill="#7e22ce">• c.ShouldBindJSON</text>
+      <text x="10" y="52" fill="#7e22ce">• Struct Deserialization</text>
+
+      <rect y="75" width="140" height="75" rx="6" fill="#faf5ff" stroke="#e9d5ff" />
+      <text x="10" y="97" font-weight="600" fill="#6b21a8">Go Validator</text>
+      <text x="10" y="113" fill="#7e22ce">• required, gt=0</text>
+      <text x="10" y="127" fill="#7e22ce">• email, len, oneof</text>
+      <text x="10" y="141" fill="#7e22ce">• Returns 422 on Error</text>
+
+      <rect y="160" width="140" height="60" rx="6" fill="#faf5ff" stroke="#e9d5ff" />
+      <text x="10" y="182" font-weight="600" fill="#6b21a8">Permission Check</text>
+      <text x="10" y="198" fill="#7e22ce">RequirePermission()</text>
+      <text x="10" y="212" fill="#7e22ce">Returns 403 on Deny</text>
+    </g>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 645 270 L 675 270" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="675,266 683,270 675,274" fill="#94a3b8" />
+
+  <!-- Step 4: Service Layer -->
+  <g transform="translate(685, 100)">
+    <rect width="145" height="350" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="145" height="35" rx="8" fill="#f1f5f9" />
+    <text x="12" y="23" font-size="11" font-weight="700" fill="#334155">4. SERVICE LAYER</text>
+
+    <g transform="translate(8, 50)" font-size="9">
+      <rect width="129" height="70" rx="6" fill="#fff7ed" stroke="#fed7aa" />
+      <text x="8" y="22" font-weight="600" fill="#c2410c">Business Rules</text>
+      <text x="8" y="38" fill="#ea580c">• Invariants Check</text>
+      <text x="8" y="52" fill="#ea580c">• FEFO Expiry Sorting</text>
+      <text x="8" y="66" fill="#ea580c">• Tax Computations</text>
+
+      <rect y="80" width="129" height="70" rx="6" fill="#fff7ed" stroke="#fed7aa" />
+      <text x="8" y="102" font-weight="600" fill="#c2410c">Cross-Module</text>
+      <text x="8" y="118" fill="#ea580c">• Invoice -&gt; Inventory</text>
+      <text x="8" y="132" fill="#ea580c">• Invoice -&gt; Finance GL</text>
+      <text x="8" y="146" fill="#ea580c">• GRN -&gt; Inventory/AP</text>
+    </g>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 835 270 L 865 270" stroke="#94a3b8" stroke-width="2" />
+  <polygon points="865,266 873,270 865,274" fill="#94a3b8" />
+
+  <!-- Step 5: Repository & GORM -->
+  <g transform="translate(875, 100)">
+    <rect width="105" height="350" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+    <rect width="105" height="35" rx="8" fill="#f1f5f9" />
+    <text x="10" y="23" font-size="10" font-weight="700" fill="#334155">5. GORM / DB</text>
+
+    <g transform="translate(8, 50)" font-size="8.5">
+      <rect width="89" height="65" rx="6" fill="#ecfdf5" stroke="#a7f3d0" />
+      <text x="6" y="20" font-weight="600" fill="#065f46">Transactions</text>
+      <text x="6" y="34" fill="#059669">• db.Begin()</text>
+      <text x="6" y="46" fill="#059669">• Commit/Rollback</text>
+      <text x="6" y="58" fill="#059669">• Row Locks (FOR UPDATE)</text>
+
+      <rect y="75" width="89" height="75" rx="6" fill="#ecfdf5" stroke="#a7f3d0" />
+      <text x="6" y="95" font-weight="600" fill="#065f46">Auditing</text>
+      <text x="6" y="109" fill="#059669">• created_by</text>
+      <text x="6" y="121" fill="#059669">• updated_by</text>
+      <text x="6" y="133" fill="#059669">• audit_logs record</text>
+      <text x="6" y="145" fill="#059669">• deleted_at</text>
+    </g>
+  </g>
+</svg>

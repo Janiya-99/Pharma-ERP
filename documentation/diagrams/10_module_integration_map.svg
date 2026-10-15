@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <rect width="1000" height="520" fill="#f8fafc" />
+  <text x="50" y="40" font-size="20" font-weight="700" fill="#0f172a">Figure 10: Multi-Module Cross-Integration &amp; Event Topology</text>
+  <text x="50" y="65" font-size="13" fill="#64748b">Central Control Context, Real-Time Inventory-Finance Synchronization, Invoicing &amp; Regulatory Quarantine</text>
+
+  <!-- Center Hub: Control Center -->
+  <g transform="translate(370, 180)">
+    <rect width="260" height="150" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />
+    <text x="130" y="30" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">CONTROL CENTER (CORE HUB)</text>
+    <text x="130" y="55" font-size="10" fill="#3b82f6" text-anchor="middle">• Tenant Company Isolation</text>
+    <text x="130" y="72" font-size="10" fill="#3b82f6" text-anchor="middle">• Multi-Branch Scoping &amp; Warehouses</text>
+    <text x="130" y="89" font-size="10" fill="#3b82f6" text-anchor="middle">• User Lifecycle &amp; Role-Permission Matrix</text>
+    <text x="130" y="106" font-size="10" fill="#3b82f6" text-anchor="middle">• Document Numbering Sequencing</text>
+    <text x="130" y="123" font-size="10" fill="#3b82f6" text-anchor="middle">• System Security &amp; Audit Trail</text>
+  </g>
+
+  <!-- Top-Left: Finance -->
+  <g transform="translate(60, 80)">
+    <rect width="230" height="130" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.5" />
+    <rect width="230" height="28" rx="10" fill="#ecfdf5" />
+    <text x="15" y="19" font-size="12" font-weight="700" fill="#065f46">FINANCE MODULE</text>
+    <text x="15" y="45" font-size="9.5" fill="#059669">• Chart of Accounts &amp; General Ledger</text>
+    <text x="15" y="60" font-size="9.5" fill="#059669">• Balanced Double-Entry Journals</text>
+    <text x="15" y="75" font-size="9.5" fill="#059669">• Sri Lankan Taxes (18% VAT, 2.5% SSCL)</text>
+    <text x="15" y="90" font-size="9.5" fill="#059669">• Accounts Receivable &amp; Accounts Payable</text>
+    <text x="15" y="105" font-size="9.5" fill="#059669">• Real-Time Balance Sheet &amp; P&amp;L</text>
+  </g>
+
+  <!-- Top-Right: Inventory -->
+  <g transform="translate(710, 80)">
+    <rect width="230" height="130" rx="10" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5" />
+    <rect width="230" height="28" rx="10" fill="#fffbeb" />
+    <text x="15" y="19" font-size="12" font-weight="700" fill="#92400e">INVENTORY MODULE</text>
+    <text x="15" y="45" font-size="9.5" fill="#b45309">• Product Catalog &amp; Dosage Forms</text>
+    <text x="15" y="60" font-size="9.5" fill="#b45309">• GRN Receiving &amp; Batch Creation</text>
+    <text x="15" y="75" font-size="9.5" fill="#b45309">• FEFO Auto-Picking Algorithm</text>
+    <text x="15" y="90" font-size="9.5" fill="#b45309">• Multi-Warehouse Stock Transfers</text>
+    <text x="15" y="105" font-size="9.5" fill="#b45309">• Append-Only Stock Ledger</text>
+  </g>
+
+  <!-- Bottom-Left: Invoice Center -->
+  <g transform="translate(60, 320)">
+    <rect width="230" height="130" rx="10" fill="#ffffff" stroke="#ec4899" stroke-width="1.5" />
+    <rect width="230" height="28" rx="10" fill="#fdf2f8" />
+    <text x="15" y="19" font-size="12" font-weight="700" fill="#9d174d">INVOICE CENTER</text>
+    <text x="15" y="45" font-size="9.5" fill="#db2777">• Customer Master &amp; Credit Limits</text>
+    <text x="15" y="60" font-size="9.5" fill="#db2777">• Sales Orders with Approval Gates</text>
+    <text x="15" y="75" font-size="9.5" fill="#db2777">• Sales Invoices with Tax Breakdown</text>
+    <text x="15" y="90" font-size="9.5" fill="#db2777">• Customer Receipts &amp; Allocation</text>
+    <text x="15" y="105" font-size="9.5" fill="#db2777">• Credit / Debit Note Adjustments</text>
+  </g>
+
+  <!-- Bottom-Right: Compliance Center -->
+  <g transform="translate(710, 320)">
+    <rect width="230" height="130" rx="10" fill="#ffffff" stroke="#f43f5e" stroke-width="1.5" />
+    <rect width="230" height="28" rx="10" fill="#fff1f2" />
+    <text x="15" y="19" font-size="12" font-weight="700" fill="#9f1239">COMPLIANCE CENTER</text>
+    <text x="15" y="45" font-size="9.5" fill="#e11d48">• Batch Quality Quarantine &amp; Holds</text>
+    <text x="15" y="60" font-size="9.5" fill="#e11d48">• Multi-Tier Regulatory Recalls</text>
+    <text x="15" y="75" font-size="9.5" fill="#e11d48">• Forward &amp; Backward Traceability</text>
+    <text x="15" y="90" font-size="9.5" fill="#e11d48">• Statutory Disposal Certificates</text>
+    <text x="15" y="105" font-size="9.5" fill="#e11d48">• NMRA Inspection Audit Reports</text>
+  </g>
+
+  <!-- Integration Connectors -->
+  <!-- Hub to Finance -->
+  <path d="M 370 210 L 290 170" stroke="#3b82f6" stroke-width="2" />
+  <!-- Hub to Inventory -->
+  <path d="M 630 210 L 710 170" stroke="#3b82f6" stroke-width="2" />
+  <!-- Hub to Invoice -->
+  <path d="M 370 290 L 290 350" stroke="#3b82f6" stroke-width="2" />
+  <!-- Hub to Compliance -->
+  <path d="M 630 290 L 710 350" stroke="#3b82f6" stroke-width="2" />
+
+  <!-- Inventory to Finance (GRN -> AP) -->
+  <path d="M 710 110 L 290 110" stroke="#10b981" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="500" y="102" font-size="9" font-weight="600" fill="#059669" text-anchor="middle">GRN Receipt triggers Accounts Payable &amp; Inventory Asset Journal</text>
+
+  <!-- Invoice to Inventory (Stock Depletion) -->
+  <path d="M 290 390 L 710 190" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="540" y="340" font-size="9" font-weight="600" fill="#b45309">Sales Invoice depletes FEFO Batch Stock &amp; writes Stock Ledger</text>
+
+  <!-- Invoice to Finance (Revenue & AR) -->
+  <path d="M 175 320 L 175 210" stroke="#ec4899" stroke-width="2" />
+  <text x="180" y="270" font-size="9" font-weight="600" fill="#db2777">Invoice Posts AR, VAT/SSCL &amp; Sales Revenue</text>
+
+  <!-- Compliance to Inventory (Hold & Recall) -->
+  <path d="M 825 320 L 825 210" stroke="#f43f5e" stroke-width="2" />
+  <text x="830" y="270" font-size="9" font-weight="600" fill="#e11d48">Quarantine locks batch against picking</text>
+</svg>
