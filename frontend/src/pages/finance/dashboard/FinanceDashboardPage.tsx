@@ -217,6 +217,11 @@ const FinanceDashboardPage = () => {
                   <ReceivablesAgingCard data={dashboardData.receivables} />
                   <PayablesAgingCard data={dashboardData.payables} />
                 </div>
+                {/* Cash Flow Liquidity & Period Status */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <CashFlowLiquidityCard data={dashboardData.liquidity} />
+                  <AccountingPeriodStatusCard data={dashboardData.period_status} />
+                </div>
                 {/* Accounting Activity Tabs */}
                 <AccountingActivityTabs 
                   recentTransactions={dashboardData.recent_transactions} 
@@ -227,8 +232,6 @@ const FinanceDashboardPage = () => {
               {/* Right Side Panel (4 columns) */}
               <div className="space-y-4 lg:col-span-4">
                 <FinanceQuickActions />
-                <CashFlowLiquidityCard data={dashboardData.liquidity} />
-                <AccountingPeriodStatusCard data={dashboardData.period_status} />
                 <FinanceReportShortcuts />
               </div>
               

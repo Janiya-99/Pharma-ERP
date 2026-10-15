@@ -35,7 +35,7 @@ export function PayablesAgingCard({ data }: PayablesAgingCardProps) {
         
         <div className="space-y-4 pt-1">
           {data.aging.map((bucket, index) => {
-            const percentage = (bucket.amount / data.total_payable) * 100;
+            const percentage = data.total_payable > 0 ? (bucket.amount / data.total_payable) * 100 : 0;
             // Modern gradient colors for payables
             const colors = [
               "from-amber-400 to-orange-500 shadow-orange-500/20",

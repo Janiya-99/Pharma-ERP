@@ -35,7 +35,7 @@ export function ReceivablesAgingCard({ data }: ReceivablesAgingCardProps) {
         
         <div className="space-y-4 pt-1">
           {data.aging.map((bucket, index) => {
-            const percentage = (bucket.amount / data.total_outstanding) * 100;
+            const percentage = data.total_outstanding > 0 ? (bucket.amount / data.total_outstanding) * 100 : 0;
             // Create a gradient for each bar from a predefined set of modern colors based on index
             const colors = [
               "from-blue-400 to-blue-500 shadow-blue-500/20",

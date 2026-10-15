@@ -46,7 +46,7 @@ const statusBadge = (status: string) => {
 
 export function AccountingActivityTabs({ recentTransactions, pendingApprovals }: AccountingActivityTabsProps) {
   return (
-    <Card className="col-span-1 h-full rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group/card transition-all hover:shadow-2xl hover:shadow-slate-200/60 lg:col-span-8">
+    <Card className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group/card transition-all hover:shadow-2xl hover:shadow-slate-200/60">
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/20 to-purple-50/10 opacity-50 pointer-events-none" />
       
       <CardHeader className="pb-4 relative z-10 border-b border-slate-100/50 flex flex-row items-center justify-between">
