@@ -24,7 +24,7 @@ USERS = [
         "role": "SUPER_ADMIN",
         "expected_modules": ["CONTROL_CENTER", "FINANCE", "INVENTORY", "INVOICE_CENTER", "COMPLIANCE_CENTER"],
         "expected_branch_count": 5,
-        "must_have_perms": ["inventory.goods_receipt_note.approve", "finance.journal.approve", "invoice_center.sales_order.approve", "compliance.batch_recall.approve"],
+        "must_have_perms": ["inventory.grn.approve", "finance.journal.approve", "invoice_center.sales_order.approve", "compliance.batch_recall.approve"],
         "must_not_have_perms": []
     },
     {
@@ -34,7 +34,7 @@ USERS = [
         "expected_modules": ["CONTROL_CENTER", "FINANCE", "INVOICE_CENTER"],
         "expected_branch_count": 5,
         "must_have_perms": ["finance.journal.approve", "finance.accounting_period.close"],
-        "must_not_have_perms": ["inventory.goods_receipt_note.approve", "compliance.batch_recall.approve"]
+        "must_not_have_perms": ["inventory.grn.approve", "compliance.batch_recall.approve"]
     },
     {
         "email": "accountant@ceylonmed.lk",
@@ -51,7 +51,7 @@ USERS = [
         "role": "WAREHOUSE_MANAGER",
         "expected_modules": ["CONTROL_CENTER", "INVENTORY"],
         "expected_branch_count": 5,
-        "must_have_perms": ["inventory.goods_receipt_note.approve", "inventory.stock_transfer.approve", "inventory.stock_adjustment.approve"],
+        "must_have_perms": ["inventory.grn.approve", "inventory.stock_transfer.approve", "inventory.stock_adjustment.approve"],
         "must_not_have_perms": ["finance.journal.approve", "invoice_center.sales_order.approve"]
     },
     {
@@ -60,8 +60,8 @@ USERS = [
         "role": "STOREKEEPER",
         "expected_modules": ["INVENTORY"],
         "expected_branch_count": 1,
-        "must_have_perms": ["inventory.goods_receipt_note.view", "inventory.goods_receipt_note.create"],
-        "must_not_have_perms": ["inventory.goods_receipt_note.approve", "inventory.stock_transfer.approve"]
+        "must_have_perms": ["inventory.grn.view", "inventory.grn.create"],
+        "must_not_have_perms": ["inventory.grn.approve", "inventory.stock_transfer.approve"]
     },
     {
         "email": "qa.director@ceylonmed.lk",
@@ -88,7 +88,7 @@ USERS = [
         "expected_modules": ["CONTROL_CENTER", "INVOICE_CENTER"],
         "expected_branch_count": 5,
         "must_have_perms": ["invoice_center.sales_order.approve", "invoice_center.credit_note.approve"],
-        "must_not_have_perms": ["inventory.goods_receipt_note.approve", "finance.journal.approve"]
+        "must_not_have_perms": ["inventory.grn.approve", "finance.journal.approve"]
     },
     {
         "email": "billing.officer@ceylonmed.lk",
@@ -105,8 +105,8 @@ USERS = [
         "role": "INTERNAL_AUDITOR",
         "expected_modules": ["CONTROL_CENTER", "FINANCE", "INVENTORY", "INVOICE_CENTER", "COMPLIANCE_CENTER"],
         "expected_branch_count": 5,
-        "must_have_perms": ["finance.report.trial_balance.view", "inventory.stock_ledger.view", "compliance.regulatory_record.view"],
-        "must_not_have_perms": ["finance.journal.create", "inventory.goods_receipt_note.create", "inventory.goods_receipt_note.approve", "invoice_center.sales_order.create"]
+        "must_have_perms": ["finance.report.trial_balance.view", "inventory.stock_ledger.view", "compliance.nmra.view"],
+        "must_not_have_perms": ["finance.journal.create", "inventory.grn.create", "inventory.grn.approve", "invoice_center.sales_order.create"]
     },
     {
         "email": "cashier@ceylonmed.lk",
@@ -159,12 +159,12 @@ def main():
         print(f"\n[{idx}/{total_tests}] Testing User: {name} ({email}) - Role: {role}")
 
         data = login(email, PASSWORD)
-        if not data or not data.get("success"):
+        if not data or "token" not in data:
             print(f"  ❌ FAILED: Login failed for {email}")
             failures.append((email, "Login failed"))
             continue
 
-        resp = data.get("data", {})
+        resp = data
         user_info = resp.get("user", {})
         software_modules = resp.get("software_modules", [])
         branches = resp.get("branches", [])
