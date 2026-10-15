@@ -123,8 +123,23 @@ func (r *CompanyResolver) GetOrCreateCompanyDBConnection(company models.Platform
 	})
 
 	if err != nil {
-		r.logger.Error("Failed to connect to company database", zap.String("db_name", company.DatabaseName), zap.Error(err))
-		return nil, err
+		r.logger.Warn("Failed to connect to company database, trying default company DB fallback", zap.String("db_name", company.DatabaseName), zap.Error(err))
+		if company.DatabaseName != r.cfg.Database.Name {
+			fallbackDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+				r.cfg.Database.User,
+				r.cfg.Database.Password,
+				r.cfg.Database.Host,
+				r.cfg.Database.Port,
+				r.cfg.Database.Name,
+			)
+			newDB, err = gorm.Open(mysql.Open(fallbackDsn), &gorm.Config{
+				Logger: logger.Default.LogMode(logger.Info),
+			})
+		}
+		if err != nil {
+			r.logger.Error("Failed to connect to company database or fallback", zap.String("db_name", company.DatabaseName), zap.Error(err))
+			return nil, err
+		}
 	}
 
 	// Configure connection pool

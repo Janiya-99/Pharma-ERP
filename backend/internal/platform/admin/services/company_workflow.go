@@ -3,6 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -104,8 +106,52 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		}
 	}()
 
-	// 2. Encrypt database password (we store a dummy key or actual local root credentials encrypted)
-	encryptedDbPwd, err := security.Encrypt("root")
+	// 2. Resolve database environment variables
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost == "" {
+		dbHost = os.Getenv("PLATFORM_DB_HOST")
+	}
+	if dbHost == "" {
+		dbHost = "127.0.0.1"
+	}
+
+	dbPortStr := os.Getenv("DB_PORT")
+	if dbPortStr == "" {
+		dbPortStr = os.Getenv("PLATFORM_DB_PORT")
+	}
+	if dbPortStr == "" {
+		dbPortStr = "3306"
+	}
+	dbPort, _ := strconv.Atoi(dbPortStr)
+	if dbPort == 0 {
+		dbPort = 3306
+	}
+
+	dbUser := os.Getenv("DB_USER")
+	if dbUser == "" {
+		dbUser = os.Getenv("PLATFORM_DB_USER")
+	}
+	if dbUser == "" {
+		dbUser = "root"
+	}
+
+	dbPass := os.Getenv("DB_PASSWORD")
+	if dbPass == "" {
+		dbPass = os.Getenv("PLATFORM_DB_PASSWORD")
+	}
+	if dbPass == "" {
+		dbPass = "root"
+	}
+
+	fallbackDBName := os.Getenv("DB_NAME")
+	if fallbackDBName == "" {
+		fallbackDBName = os.Getenv("PLATFORM_DB_NAME")
+	}
+	if fallbackDBName == "" {
+		fallbackDBName = "erp_phrma"
+	}
+
+	encryptedDbPwd, err := security.Encrypt(dbPass)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to encrypt database credentials: %w", err)
@@ -130,9 +176,9 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		Country:             req.Country,
 		Timezone:            req.Timezone,
 		DatabaseName:        dbName,
-		DatabaseHost:        "127.0.0.1",
-		DatabasePort:        3306,
-		DatabaseUser:        "root",
+		DatabaseHost:        dbHost,
+		DatabasePort:        dbPort,
+		DatabaseUser:        dbUser,
 		DatabasePasswordKey: encryptedDbPwd,
 		Status:              "active",
 		SubscriptionStatus:  "active",
@@ -213,12 +259,51 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		}
 	}
 
-	// 7. Save Tenant Database Catalog Entry
+	// 7. Provision Tenant Database SQL
+	// Try creating a separate database if MySQL user permissions allow it
+	actualDBName := dbName
+	createSQL := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", dbName)
+	rawDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPortStr)
+	rawDB, err := gorm.Open(mysql.Open(rawDsn), &gorm.Config{})
+	canCreateDB := false
+	if err == nil {
+		sqlRaw, _ := rawDB.DB()
+		if execErr := rawDB.Exec(createSQL).Error; execErr == nil {
+			canCreateDB = true
+		} else {
+			logger.Warn("Could not create independent database (restricted user privileges), falling back to shared database", zap.String("db_name", dbName), zap.Error(execErr))
+		}
+		sqlRaw.Close()
+	} else {
+		logger.Warn("Could not connect to raw MySQL server, using fallback database", zap.Error(err))
+	}
+
+	if !canCreateDB {
+		actualDBName = fallbackDBName
+	}
+
+	// Connect to company database
+	companyDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPortStr, actualDBName)
+	companyDB, err := gorm.Open(mysql.Open(companyDsn), &gorm.Config{})
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to connect to company database (%s): %w", actualDBName, err)
+	}
+	sqlComp, _ := companyDB.DB()
+	defer sqlComp.Close()
+
+	// Update tenant company record if using fallback database
+	if actualDBName != dbName {
+		tenantCompany.DatabaseName = actualDBName
+		tx.Model(&tenantCompany).Update("database_name", actualDBName)
+	}
+
+	// 8. Save Tenant Database Catalog Entry
 	tenantDBMeta := models.TenantCompanyDatabase{
 		TenantCompanyID:           tenantCompany.ID,
-		DatabaseName:              dbName,
-		DatabaseHost:              "127.0.0.1",
-		DatabaseUsername:          "root",
+		DatabaseName:              actualDBName,
+		DatabaseHost:              dbHost,
+		DatabaseUsername:          dbUser,
 		DatabasePasswordEncrypted: encryptedDbPwd,
 		DatabaseStatus:            "created",
 		MigrationStatus:           "migration_completed",
@@ -228,32 +313,6 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to save database catalog: %w", err)
 	}
-
-	// 8. Provision Tenant Database SQL
-	rawDsn := "root:root@tcp(127.0.0.1:3306)/?charset=utf8mb4&parseTime=True&loc=Local"
-	rawDB, err := gorm.Open(mysql.Open(rawDsn), &gorm.Config{})
-	if err != nil {
-		tx.Rollback()
-		return nil, fmt.Errorf("failed to connect to local MySQL server: %w", err)
-	}
-	sqlRaw, _ := rawDB.DB()
-	defer sqlRaw.Close()
-
-	createSQL := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", dbName)
-	if err := rawDB.Exec(createSQL).Error; err != nil {
-		tx.Rollback()
-		return nil, fmt.Errorf("failed to execute CREATE DATABASE: %w", err)
-	}
-
-	// Connect to the new database
-	companyDsn := fmt.Sprintf("root:root@tcp(127.0.0.1:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbName)
-	companyDB, err := gorm.Open(mysql.Open(companyDsn), &gorm.Config{})
-	if err != nil {
-		tx.Rollback()
-		return nil, fmt.Errorf("failed to connect to newly created company DB: %w", err)
-	}
-	sqlComp, _ := companyDB.DB()
-	defer sqlComp.Close()
 
 	// 9. Run Migrations & Seeding in Company Database context
 	// We pass 'true' to skipAdminSeeder so it doesn't seed the default 'OMACX' company and user.
@@ -374,12 +433,14 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 	var companyModules []companyModels.SoftwareModule
 	if err := companyDB.Find(&companyModules).Error; err == nil {
 		for _, m := range companyModules {
-			// check if this module is in the enabled list
-			isEnabled := false
-			for _, reqMod := range req.Modules {
-				if reqMod == m.SoftwareCode {
-					isEnabled = true
-					break
+			// check if this module is in the enabled list or if user is super admin
+			isEnabled := companyUser.UserType == "super_admin"
+			if !isEnabled {
+				for _, reqMod := range req.Modules {
+					if strings.EqualFold(reqMod, m.SoftwareCode) || strings.EqualFold(reqMod, m.SoftwareName) {
+						isEnabled = true
+						break
+					}
 				}
 			}
 
@@ -412,7 +473,7 @@ func CreateTenantCompany(platformDB *gorm.DB, req CompanyCreationRequest, logger
 	// 12. Save First User Details Log in Platform DB
 	platformFirstUser := models.TenantCompanyFirstUser{
 		TenantCompanyID:         tenantCompany.ID,
-		CompanyDatabaseName:     dbName,
+		CompanyDatabaseName:     actualDBName,
 		FirstUserName:           req.FirstUser.Name,
 		FirstUserEmail:          req.FirstUser.Email,
 		FirstUserPhone:          req.FirstUser.Phone,
