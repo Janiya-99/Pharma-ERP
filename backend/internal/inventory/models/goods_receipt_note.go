@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	companyModels "github.com/pixandco/erp-phrma/internal/company/models"
 	"gorm.io/gorm"
 )
 
@@ -55,6 +56,7 @@ type GoodsReceiptNote struct {
 
 	Warehouse Warehouse                  `gorm:"foreignKey:WarehouseID" json:"warehouse"`
 	Supplier  Supplier                   `gorm:"foreignKey:SupplierID" json:"supplier"`
+	Branch    *companyModels.Branch      `gorm:"foreignKey:BranchID" json:"branch,omitempty"`
 	Lines     []GoodsReceiptNoteLine     `gorm:"foreignKey:GoodsReceiptNoteID" json:"lines"`
 	Approvals []GoodsReceiptNoteApproval `gorm:"foreignKey:GoodsReceiptNoteID" json:"approvals"`
 }
