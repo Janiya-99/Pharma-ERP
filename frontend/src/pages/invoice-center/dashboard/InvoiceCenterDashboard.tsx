@@ -126,6 +126,8 @@ export default function InvoiceCenterDashboard() {
   const [summary, setSummary] = useState<DashboardSummary>(fallbackSummary);
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState<Customer[]>(fallbackCustomers);
+  const [trends, setTrends] = useState<any[]>(invoiceTrendData);
+  const [aging, setAging] = useState<any[]>(agingDistribution);
 
   useEffect(() => {
     fetchDashboardData();
@@ -136,7 +138,11 @@ export default function InvoiceCenterDashboard() {
       setLoading(true);
       const res = await invoiceCenterApi.getDashboardSummary();
       if (res?.data?.data) {
-        setSummary(res.data.data);
+        const d = res.data.data;
+        setSummary(d);
+        if (d.invoice_trends && d.invoice_trends.length > 0) setTrends(d.invoice_trends);
+        if (d.aging_distribution && d.aging_distribution.length > 0) setAging(d.aging_distribution);
+        if (d.critical_customers && d.critical_customers.length > 0) setCustomers(d.critical_customers);
       }
     } catch (error) {
       console.error("Error fetching invoice dashboard summary:", error);
@@ -283,7 +289,7 @@ export default function InvoiceCenterDashboard() {
 
             <div className="h-72 w-full mt-6">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={invoiceTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorInvoice" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.3} />
@@ -305,7 +311,7 @@ export default function InvoiceCenterDashboard() {
             </div>
           </div>
           <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 font-medium">
-            <span>YTD Collected: {formatCurrency(114600000)}</span>
+            <span>Live Collection Ledger</span>
             <span className="font-semibold text-brand-600 cursor-pointer hover:text-brand-700 flex items-center gap-1 transition-colors">
               View Detailed Ledger <ArrowUpRight className="h-3 w-3" />
             </span>
@@ -328,8 +334,8 @@ export default function InvoiceCenterDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: number) => [formatCurrency(value), "Value"]} />
-                  <Pie data={agingDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                    {agingDistribution.map((entry, index) => (
+                  <Pie data={aging} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                    {aging.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={AGING_COLORS[index % AGING_COLORS.length]} stroke="transparent" />
                     ))}
                   </Pie>
@@ -338,8 +344,8 @@ export default function InvoiceCenterDashboard() {
             </div>
 
             <div className="mt-6 space-y-3 border-t border-slate-100 pt-4 text-xs">
-              {agingDistribution.map((item, idx) => {
-                const total = agingDistribution.reduce((acc, curr) => acc + curr.value, 0);
+              {aging.map((item, idx) => {
+                const total = aging.reduce((acc, curr) => acc + curr.value, 0) || 1;
                 const pct = Math.round((item.value / total) * 100);
                 return (
                   <div key={idx} className="flex items-center justify-between">

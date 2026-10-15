@@ -21,6 +21,10 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	workflowHandler := handlers.NewApprovalWorkflowHandler(logger)
 	docNumHandler := handlers.NewDocumentNumberingHandler(logger)
 	secSettingsHandler := handlers.NewSecuritySettingsHandler(logger)
+	dashboardHandler := handlers.NewControlDashboardHandler(logger)
+
+	// --- Dashboard Summary ---
+	router.GET("/dashboard/summary", dashboardHandler.GetSummary)
 
 	// --- Company Profile ---
 	router.GET("/company", middleware.RequirePermission("control.company.view"), companyHandler.GetCompanyProfile)

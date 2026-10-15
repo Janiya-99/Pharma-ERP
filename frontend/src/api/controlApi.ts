@@ -1,5 +1,10 @@
 import apiClient from "./apiClient";
 
+export const getControlDashboardSummary = async () => {
+  const res = await apiClient.get("/control/dashboard/summary");
+  return res.data;
+};
+
 export const getCompanyProfile = async () => {
   const res = await apiClient.get("/control/company");
   return res.data;
