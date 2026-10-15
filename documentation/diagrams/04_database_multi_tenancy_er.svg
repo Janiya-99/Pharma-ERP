@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" width="1000" height="650" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <rect width="1000" height="650" fill="#f8fafc" />
+  <text x="50" y="40" font-size="20" font-weight="700" fill="#0f172a">Figure 4: Multi-Tenant Database Entity-Relationship Architecture</text>
+  <text x="50" y="65" font-size="13" fill="#64748b">Platform Database Isolation, Tenant Core Entities, Financial Accounts, Inventory Batches &amp; Sales Invoices</text>
+
+  <!-- Platform DB Cluster -->
+  <g transform="translate(50, 100)">
+    <rect width="260" height="240" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <rect width="260" height="36" rx="10" fill="#eff6ff" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#1e40af">PLATFORM DB: erp_platform</text>
+
+    <!-- Table 1: tenant_companies -->
+    <g transform="translate(15, 50)" font-size="10">
+      <rect width="230" height="85" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+      <rect width="230" height="22" rx="6" fill="#f1f5f9" />
+      <text x="10" y="15" font-weight="700" fill="#334155">tenant_companies</text>
+      <text x="10" y="36" fill="#64748b">PK id (BIGINT)</text>
+      <text x="10" y="50" fill="#64748b">code (VARCHAR 50, UNIQUE)</text>
+      <text x="10" y="64" fill="#64748b">name, db_name, status, plan</text>
+      <text x="10" y="78" fill="#64748b">created_at, updated_at</text>
+    </g>
+
+    <!-- Table 2: platform_admin_users -->
+    <g transform="translate(15, 145)" font-size="10">
+      <rect width="230" height="80" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+      <rect width="230" height="22" rx="6" fill="#f1f5f9" />
+      <text x="10" y="15" font-weight="700" fill="#334155">platform_admin_users</text>
+      <text x="10" y="36" fill="#64748b">PK id, email (UNIQUE)</text>
+      <text x="10" y="50" fill="#64748b">password_hash (bcrypt)</text>
+      <text x="10" y="64" fill="#64748b">role (SUPERADMIN), status</text>
+    </g>
+  </g>
+
+  <!-- Tenant DB Cluster -->
+  <g transform="translate(350, 100)">
+    <rect width="600" height="510" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <rect width="600" height="36" rx="10" fill="#ecfdf5" />
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#065f46">TENANT DATABASE: erp_phrma (Company-Scoped Entities)</text>
+
+    <!-- Control Group -->
+    <g transform="translate(20, 50)" font-size="9.5">
+      <!-- branches -->
+      <rect width="170" height="95" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+      <rect width="170" height="20" rx="6" fill="#f1f5f9" />
+      <text x="10" y="14" font-weight="700" fill="#334155">branches</text>
+      <text x="10" y="32" fill="#64748b">PK id (BIGINT)</text>
+      <text x="10" y="46" fill="#64748b">FK company_id</text>
+      <text x="10" y="60" fill="#64748b">code, name, is_hq</text>
+      <text x="10" y="74" fill="#64748b">address, phone, status</text>
+      <text x="10" y="88" fill="#64748b">created_at, updated_at</text>
+
+      <!-- users -->
+      <g transform="translate(0, 105)">
+        <rect width="170" height="110" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+        <rect width="170" height="20" rx="6" fill="#f1f5f9" />
+        <text x="10" y="14" font-weight="700" fill="#334155">users</text>
+        <text x="10" y="32" fill="#64748b">PK id (BIGINT)</text>
+        <text x="10" y="46" fill="#64748b">FK company_id, branch_id</text>
+        <text x="10" y="60" fill="#64748b">username, email (UNIQUE)</text>
+        <text x="10" y="74" fill="#64748b">password_hash, role_id</text>
+        <text x="10" y="88" fill="#64748b">is_active, department_id</text>
+        <text x="10" y="102" fill="#64748b">last_login_at</text>
+      </g>
+
+      <!-- roles & permissions -->
+      <g transform="translate(0, 225)">
+        <rect width="170" height="95" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+        <rect width="170" height="20" rx="6" fill="#f1f5f9" />
+        <text x="10" y="14" font-weight="700" fill="#334155">roles / permissions</text>
+        <text x="10" y="32" fill="#64748b">PK id, name, slug</text>
+        <text x="10" y="46" fill="#64748b">FK company_id</text>
+        <text x="10" y="60" fill="#64748b">NN: role_permissions</text>
+        <text x="10" y="74" fill="#64748b">NN: user_branch_access</text>
+        <text x="10" y="88" fill="#64748b">NN: user_software_access</text>
+      </g>
+    </g>
+
+    <!-- Finance Group -->
+    <g transform="translate(210, 50)" font-size="9.5">
+      <!-- chart_of_accounts -->
+      <rect width="175" height="110" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+      <rect width="175" height="20" rx="6" fill="#eff6ff" />
+      <text x="10" y="14" font-weight="700" fill="#1e40af">chart_of_accounts</text>
+      <text x="10" y="32" fill="#64748b">PK id (BIGINT)</text>
+      <text x="10" y="46" fill="#64748b">FK company_id, parent_id</text>
+      <text x="10" y="60" fill="#64748b">code (e.g. 1010, 4000)</text>
+      <text x="10" y="74" fill="#64748b">name, account_type</text>
+      <text x="10" y="88" fill="#64748b">is_reconciled, currency</text>
+      <text x="10" y="102" fill="#64748b">current_balance (Decimal)</text>
+
+      <!-- journal_entries -->
+      <g transform="translate(0, 120)">
+        <rect width="175" height="100" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+        <rect width="175" height="20" rx="6" fill="#eff6ff" />
+        <text x="10" y="14" font-weight="700" fill="#1e40af">journal_entries &amp; lines</text>
+        <text x="10" y="32" fill="#64748b">PK id, voucher_no</text>
+        <text x="10" y="46" fill="#64748b">FK company_id, branch_id</text>
+        <text x="10" y="60" fill="#64748b">posting_date, total_debit</text>
+        <text x="10" y="74" fill="#64748b">total_credit (Invar: Dr==Cr)</text>
+        <text x="10" y="88" fill="#64748b">status: DRAFT, POSTED</text>
+      </g>
+
+      <!-- tax_settings -->
+      <g transform="translate(0, 230)">
+        <rect width="175" height="90" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+        <rect width="175" height="20" rx="6" fill="#eff6ff" />
+        <text x="10" y="14" font-weight="700" fill="#1e40af">tax_settings</text>
+        <text x="10" y="32" fill="#64748b">PK id, code (VAT_18, SSCL)</text>
+        <text x="10" y="46" fill="#64748b">tax_rate (18.00%, 2.50%)</text>
+        <text x="10" y="60" fill="#64748b">is_compound, applies_to</text>
+        <text x="10" y="74" fill="#64748b">liability_account_id</text>
+      </g>
+    </g>
+
+    <!-- Inventory & Invoice Group -->
+    <g transform="translate(405, 50)" font-size="9.5">
+      <!-- products & batches -->
+      <rect width="175" height="120" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+      <rect width="175" height="20" rx="6" fill="#f0fdf4" />
+      <text x="10" y="14" font-weight="700" fill="#166534">products &amp; batches</text>
+      <text x="10" y="32" fill="#64748b">PK id, sku, generic_name</text>
+      <text x="10" y="46" fill="#64748b">dosage_form_id, category_id</text>
+      <text x="10" y="60" fill="#64748b">NN: product_batches</text>
+      <text x="10" y="74" fill="#64748b">• batch_no, mfg_date</text>
+      <text x="10" y="88" fill="#64748b">• expiry_date (FEFO index)</text>
+      <text x="10" y="102" fill="#64748b">• buy_price, mrp, stock_qty</text>
+      <text x="10" y="116" fill="#64748b">• status: ACTIVE, HOLD</text>
+
+      <!-- sales_invoices -->
+      <g transform="translate(0, 130)">
+        <rect width="175" height="120" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+        <rect width="175" height="20" rx="6" fill="#fdf2f8" />
+        <text x="10" y="14" font-weight="700" fill="#9d174d">sales_invoices &amp; items</text>
+        <text x="10" y="32" fill="#64748b">PK id, invoice_number</text>
+        <text x="10" y="46" fill="#64748b">FK customer_id, branch_id</text>
+        <text x="10" y="60" fill="#64748b">subtotal, sscl_amount, vat</text>
+        <text x="10" y="74" fill="#64748b">grand_total, paid_amount</text>
+        <text x="10" y="88" fill="#64748b">status: DRAFT, POSTED, PAID</text>
+        <text x="10" y="102" fill="#64748b">NN: sales_invoice_items</text>
+        <text x="10" y="116" fill="#64748b">• batch_id, qty, unit_price</text>
+      </g>
+
+      <!-- customer_receipts -->
+      <g transform="translate(0, 260)">
+        <rect width="175" height="80" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+        <rect width="175" height="20" rx="6" fill="#fdf2f8" />
+        <text x="10" y="14" font-weight="700" fill="#9d174d">customer_receipts</text>
+        <text x="10" y="32" fill="#64748b">PK id, receipt_number</text>
+        <text x="10" y="46" fill="#64748b">amount, payment_mode</text>
+        <text x="10" y="60" fill="#64748b">FK invoice_id, customer_id</text>
+        <text x="10" y="74" fill="#64748b">receipt_allocations table</text>
+      </g>
+    </g>
+
+    <!-- Bottom note -->
+    <rect x="20" y="430" width="560" height="60" rx="6" fill="#f1f5f9" />
+    <text x="35" y="452" font-size="11" font-weight="600" fill="#334155">Multi-Tenancy Guarantees:</text>
+    <text x="35" y="470" font-size="10" fill="#64748b">Every tenant table contains `company_id` and compound indexes (company_id, id). Foreign keys strictly enforce</text>
+    <text x="35" y="484" font-size="10" fill="#64748b">referential integrity with ON DELETE RESTRICT to protect financial transactions and batch audit logs from corruption.</text>
+  </g>
+</svg>

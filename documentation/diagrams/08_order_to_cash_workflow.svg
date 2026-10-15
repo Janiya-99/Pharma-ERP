@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <text x="50" y="40" font-size="20" font-weight="700" fill="#0f172a">Figure 8: Order-to-Cash &amp; Automated Financial Posting Pipeline</text>
+  <text x="50" y="65" font-size="13" fill="#64748b">End-to-End Sales Order, Sri Lankan Tax Engine (VAT 18% + SSCL 2.5%), Invoicing, Receipts &amp; Balanced GL Posting</text>
+
+  <!-- Step 1: Customer Order -->
+  <g transform="translate(50, 100)" filter="url(#shadow)">
+    <rect width="165" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="165" height="36" rx="10" fill="#eff6ff" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#1e40af">1. SALES ORDER</text>
+
+    <text x="15" y="60" font-size="11" font-weight="600" fill="#334155">Draft Creation</text>
+    <text x="15" y="75" font-size="9" fill="#64748b">Customer, Credit Limit,</text>
+    <text x="15" y="90" font-size="9" fill="#64748b">Branch, Delivery Date</text>
+
+    <rect x="10" y="110" width="145" height="75" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="20" y="130" font-size="10" font-weight="600" fill="#334155">Credit Validation</text>
+    <text x="20" y="145" font-size="9" fill="#64748b">• Current Outstanding</text>
+    <text x="20" y="159" font-size="9" fill="#64748b">• Overdue Invoices</text>
+    <text x="20" y="173" font-size="9" fill="#64748b">• Hard Credit Limit Block</text>
+
+    <rect x="10" y="200" width="145" height="75" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="20" y="220" font-size="10" font-weight="600" fill="#334155">Approval Flow</text>
+    <text x="20" y="235" font-size="9" fill="#64748b">DRAFT → PENDING</text>
+    <text x="20" y="249" font-size="9" fill="#64748b">→ APPROVED</text>
+    <text x="20" y="263" font-size="9" fill="#64748b">Reserve Batch Stock</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 220 280 L 255 280" stroke="#0284c7" stroke-width="2" />
+  <polygon points="255,276 263,280 255,284" fill="#0284c7" />
+
+  <!-- Step 2: Invoicing & Taxes -->
+  <g transform="translate(265, 100)" filter="url(#shadow)">
+    <rect width="180" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="180" height="36" rx="10" fill="#eff6ff" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#1e40af">2. SALES INVOICE</text>
+
+    <text x="15" y="60" font-size="11" font-weight="600" fill="#334155">Invoice Generation</text>
+    <text x="15" y="75" font-size="9" fill="#64748b">Document No: INV-2026-XXXX</text>
+
+    <rect x="10" y="90" width="160" height="120" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="20" y="110" font-size="10" font-weight="700" fill="#166534">Sri Lankan Tax Engine</text>
+    <text x="20" y="125" font-size="9" fill="#15803d">1. Subtotal: LKR 100,000</text>
+    <text x="20" y="140" font-size="9" fill="#15803d">2. SSCL (2.5% on wholesale):</text>
+    <text x="30" y="153" font-size="9" font-weight="600" fill="#166534">+ LKR 2,500</text>
+    <text x="20" y="168" font-size="9" fill="#15803d">3. VAT Liable Base (102,500):</text>
+    <text x="30" y="181" font-size="9" font-weight="600" fill="#166534">18% VAT = LKR 18,450</text>
+    <text x="20" y="198" font-size="9" font-weight="700" fill="#166534">Total: LKR 120,950</text>
+
+    <rect x="10" y="220" width="160" height="120" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="240" font-size="10" font-weight="600" fill="#1e40af">Stock Depletion</text>
+    <text x="20" y="255" font-size="9" fill="#3b82f6">• Deduct Batch Quantities</text>
+    <text x="20" y="270" font-size="9" fill="#3b82f6">• Stock Ledger Entry</text>
+    <text x="20" y="285" font-size="9" fill="#3b82f6">• Cost of Goods Sold Calc</text>
+    <text x="20" y="300" font-size="9" fill="#3b82f6">• Status → POSTED</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 450 280 L 485 280" stroke="#059669" stroke-width="2" />
+  <polygon points="485,276 493,280 485,284" fill="#059669" />
+
+  <!-- Step 3: Automated Journal Posting -->
+  <g transform="translate(495, 100)" filter="url(#shadow)">
+    <rect width="240" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="240" height="36" rx="10" fill="#f0fdf4" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#166534">3. GENERAL LEDGER POSTING</text>
+
+    <text x="15" y="60" font-size="11" font-weight="600" fill="#334155">Balanced Double-Entry Journal</text>
+    <text x="15" y="75" font-size="9" fill="#64748b">Journal No: JV-2026-INV-XXXX</text>
+
+    <rect x="10" y="90" width="220" height="135" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="18" y="108" font-size="9" font-weight="700" fill="#0f172a">ACCOUNT | DEBIT | CREDIT</text>
+    <line x1="18" y1="114" x2="220" y2="114" stroke="#e2e8f0" stroke-width="1" />
+    <text x="18" y="130" font-size="8.5" fill="#1e40af">DR 1100 Accounts Receivable</text>
+    <text x="165" y="130" font-size="8.5" font-weight="600" fill="#1e40af">120,950</text>
+    <text x="18" y="148" font-size="8.5" fill="#15803d">CR 4000 Sales Revenue</text>
+    <text x="175" y="148" font-size="8.5" font-weight="600" fill="#15803d">100,000</text>
+    <text x="18" y="166" font-size="8.5" fill="#92400e">CR 2200 VAT Output Payable</text>
+    <text x="175" y="166" font-size="8.5" font-weight="600" fill="#92400e">18,450</text>
+    <text x="18" y="184" font-size="8.5" fill="#92400e">CR 2210 SSCL Output Payable</text>
+    <text x="180" y="184" font-size="8.5" font-weight="600" fill="#92400e">2,500</text>
+    <line x1="18" y1="192" x2="220" y2="192" stroke="#e2e8f0" stroke-width="1" />
+    <text x="18" y="206" font-size="9" font-weight="700" fill="#0f172a">TOTALS (BALANCED)</text>
+    <text x="140" y="206" font-size="8.5" font-weight="700" fill="#0f172a">120,950 | 120,950</text>
+
+    <rect x="10" y="235" width="220" height="105" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="18" y="253" font-size="9" font-weight="700" fill="#0f172a">COGS &amp; INVENTORY MOVEMENT</text>
+    <line x1="18" y1="259" x2="220" y2="259" stroke="#e2e8f0" stroke-width="1" />
+    <text x="18" y="275" font-size="8.5" fill="#dc2626">DR 5000 Cost of Goods Sold</text>
+    <text x="170" y="275" font-size="8.5" font-weight="600" fill="#dc2626">75,000</text>
+    <text x="18" y="295" font-size="8.5" fill="#dc2626">CR 1200 Inventory Asset</text>
+    <text x="175" y="295" font-size="8.5" font-weight="600" fill="#dc2626">75,000</text>
+    <line x1="18" y1="305" x2="220" y2="305" stroke="#e2e8f0" stroke-width="1" />
+    <text x="18" y="322" font-size="8.5" font-weight="700" fill="#0f172a">COGS POSTED (BALANCED)</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 740 280 L 775 280" stroke="#166534" stroke-width="2" />
+  <polygon points="775,276 783,280 775,284" fill="#166534" />
+
+  <!-- Step 4: Receipt & Settlement -->
+  <g transform="translate(785, 100)" filter="url(#shadow)">
+    <rect width="165" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="165" height="36" rx="10" fill="#eff6ff" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#1e40af">4. SETTLEMENT</text>
+
+    <text x="15" y="60" font-size="11" font-weight="600" fill="#334155">Customer Receipt</text>
+    <text x="15" y="75" font-size="9" fill="#64748b">Cheque / Bank / Cash</text>
+
+    <rect x="10" y="90" width="145" height="110" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="18" y="110" font-size="10" font-weight="600" fill="#166534">Invoice Allocation</text>
+    <text x="18" y="125" font-size="8.5" fill="#15803d">• Allocate to Invoice</text>
+    <text x="18" y="139" font-size="8.5" fill="#15803d">• Update Paid Amount</text>
+    <text x="18" y="153" font-size="8.5" fill="#15803d">• Status → PAID</text>
+    <text x="18" y="168" font-size="8.5" fill="#15803d">• Release Credit Limit</text>
+
+    <rect x="10" y="210" width="145" height="130" rx="6" fill="#faf5ff" stroke="#e9d5ff" />
+    <text x="18" y="230" font-size="10" font-weight="600" fill="#6b21a8">Receipt Journal</text>
+    <text x="18" y="248" font-size="8.5" fill="#7e22ce">DR 1010 Bank / Cash</text>
+    <text x="18" y="262" font-size="8.5" font-weight="600" fill="#6b21a8">LKR 120,950</text>
+    <text x="18" y="280" font-size="8.5" fill="#7e22ce">CR 1100 AR Customer</text>
+    <text x="18" y="294" font-size="8.5" font-weight="600" fill="#6b21a8">LKR 120,950</text>
+    <text x="18" y="318" font-size="8.5" font-weight="700" fill="#6b21a8">AR Zeroed &amp; Cleared</text>
+  </g>
+</svg>

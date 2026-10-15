@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" style="background:#0f172a; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <rect width="1000" height="600" fill="#0f172a" />
+  <rect width="1000" height="42" fill="#1e293b" />
+  <circle cx="20" cy="21" r="6" fill="#ef4444" /><circle cx="38" cy="21" r="6" fill="#eab308" /><circle cx="56" cy="21" r="6" fill="#22c55e" />
+  <rect x="120" y="8" width="500" height="26" rx="6" fill="#0f172a" />
+  <text x="140" y="25" font-size="12" fill="#94a3b8">https://erp.pixandco.lk/compliance-center/recalls</text>
+
+  <rect x="0" y="42" width="220" height="558" fill="#1e293b" />
+  <text x="24" y="80" font-size="15" font-weight="700" fill="#ffffff">PHARMA ERP</text>
+  <text x="24" y="98" font-size="10" fill="#f43f5e">COMPLIANCE CENTER</text>
+
+  <g font-size="12" fill="#94a3b8" transform="translate(24, 130)">
+    <rect x="-10" y="10" width="190" height="32" rx="6" fill="#e11d48" />
+    <text y="31" fill="#ffffff" font-weight="600">🚨 Batch Recalls &amp; Holds</text>
+    <text y="70" fill="#94a3b8">🔍 Forward/Backward Trace</text>
+    <text y="105" fill="#94a3b8">🗑️ Disposal Certificates</text>
+    <text y="140" fill="#94a3b8">📜 NMRA Regulatory Reports</text>
+  </g>
+
+  <!-- Main Canvas -->
+  <rect x="235" y="55" width="750" height="530" rx="10" fill="#ffffff" />
+  <text x="260" y="95" font-size="18" font-weight="700" fill="#0f172a">Batch Quarantine &amp; Statutory Recall Console</text>
+  <text x="260" y="115" font-size="12" fill="#64748b">Rapid isolation of defective drug lots, customer notification list, and stock quarantine enforcement</text>
+
+  <!-- Form & Table -->
+  <g transform="translate(260, 140)">
+    <rect width="700" height="85" rx="8" fill="#fff1f2" stroke="#fecdd3" />
+    <text x="20" y="25" font-size="12" font-weight="700" fill="#be123c">IMMEDIATE BATCH QUARANTINE ACTION</text>
+    <text x="20" y="45" font-size="10" fill="#9f1239">Triggering a batch quarantine instantly prevents all dispatch officers from selecting or billing this batch.</text>
+    <text x="20" y="65" font-size="10" font-weight="600" fill="#be123c">Automated Customer Recall Notification generated for all invoices issued within the batch validity period.</text>
+
+    <!-- Table -->
+    <g transform="translate(0, 105)">
+      <rect width="700" height="315" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+      <rect width="700" height="32" rx="8" fill="#f1f5f9" />
+      <text x="15" y="21" font-size="10" font-weight="700" fill="#475569">RECALL ID</text>
+      <text x="110" y="21" font-size="10" font-weight="700" fill="#475569">BATCH NO</text>
+      <text x="220" y="21" font-size="10" font-weight="700" fill="#475569">PRODUCT</text>
+      <text x="360" y="21" font-size="10" font-weight="700" fill="#475569">SEVERITY</text>
+      <text x="470" y="21" font-size="10" font-weight="700" fill="#475569">QUARANTINED</text>
+      <text x="590" y="21" font-size="10" font-weight="700" fill="#475569">AFFECTED INVS</text>
+
+      <g transform="translate(0, 45)" font-size="11">
+        <text x="15" y="18" font-weight="700" fill="#0284c7">RCL-2026-001</text>
+        <text x="110" y="18" font-weight="600" fill="#0f172a">LOT-Q-202611</text>
+        <text x="220" y="18" font-weight="600" fill="#0f172a">Ceftriaxone 1g</text>
+        <rect x="360" y="4" width="80" height="20" rx="4" fill="#fee2e2" />
+        <text x="368" y="18" font-size="10" font-weight="700" fill="#dc2626">CLASS I (NMRA)</text>
+        <text x="470" y="18" font-weight="600" fill="#be123c">800 Vials</text>
+        <text x="590" y="18" font-weight="600" fill="#0f172a">12 Invoices</text>
+      </g>
+    </g>
+  </g>
+</svg>

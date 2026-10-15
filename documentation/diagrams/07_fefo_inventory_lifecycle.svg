@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="50" y="40" font-size="20" font-weight="700" fill="#0f172a">Figure 7: Pharmaceutical Batch Lifecycle &amp; FEFO Dispatch Pipeline</text>
+  <text x="50" y="65" font-size="13" fill="#64748b">Regulatory Traceability (First-Expiry-First-Out, Quarantine, Batch Recall &amp; Audit Trail)</text>
+
+  <!-- Stage 1 -->
+  <g transform="translate(50, 100)" filter="url(#shadow)">
+    <rect width="160" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="160" height="36" rx="10" fill="#f1f5f9" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#334155">1. RECEIPT (GRN)</text>
+
+    <rect x="12" y="50" width="136" height="55" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="72" font-size="11" font-weight="600" fill="#1e40af">PO Matching</text>
+    <text x="20" y="90" font-size="9" fill="#3b82f6">Match Supplier PO</text>
+
+    <rect x="12" y="115" width="136" height="75" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="137" font-size="11" font-weight="600" fill="#1e40af">Batch Creation</text>
+    <text x="20" y="153" font-size="9" fill="#3b82f6">• Batch / Lot No.</text>
+    <text x="20" y="167" font-size="9" fill="#3b82f6">• Mfg &amp; Expiry Date</text>
+    <text x="20" y="181" font-size="9" fill="#3b82f6">• Buy &amp; MRP Price</text>
+
+    <rect x="12" y="200" width="136" height="65" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="20" y="222" font-size="11" font-weight="600" fill="#1e40af">Physical Inspection</text>
+    <text x="20" y="238" font-size="9" fill="#3b82f6">• Cold Chain Check</text>
+    <text x="20" y="252" font-size="9" fill="#3b82f6">• Seal &amp; Damage</text>
+
+    <rect x="12" y="275" width="136" height="65" rx="6" fill="#ecfdf5" stroke="#a7f3d0" />
+    <text x="20" y="297" font-size="11" font-weight="600" fill="#065f46">GRN Approval</text>
+    <text x="20" y="313" font-size="9" fill="#059669">Status → APPROVED</text>
+    <text x="20" y="327" font-size="9" fill="#059669">Creates AP Entry</text>
+  </g>
+
+  <!-- Arrow 1 to 2 -->
+  <path d="M 215 280 L 255 280" stroke="#0284c7" stroke-width="2" />
+  <polygon points="255,276 263,280 255,284" fill="#0284c7" />
+
+  <!-- Stage 2 -->
+  <g transform="translate(265, 100)" filter="url(#shadow)">
+    <rect width="160" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="160" height="36" rx="10" fill="#f1f5f9" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#334155">2. WAREHOUSE</text>
+
+    <rect x="12" y="50" width="136" height="75" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="20" y="72" font-size="11" font-weight="600" fill="#166534">Location Putaway</text>
+    <text x="20" y="90" font-size="9" fill="#15803d">Assign Aisle / Bin</text>
+    <text x="20" y="105" font-size="9" fill="#15803d">Stock Balances Init</text>
+    <text x="20" y="117" font-size="9" fill="#15803d">Storage Type Tag</text>
+
+    <rect x="12" y="135" width="136" height="85" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="20" y="157" font-size="11" font-weight="600" fill="#166534">Stock Ledger</text>
+    <text x="20" y="175" font-size="9" fill="#15803d">Append-only log</text>
+    <text x="20" y="190" font-size="9" fill="#15803d">Transaction Type:</text>
+    <text x="20" y="203" font-size="9" font-weight="600" fill="#166534">GRN_RECEIPT (+Qty)</text>
+
+    <rect x="12" y="230" width="136" height="110" rx="6" fill="#fffbeb" stroke="#fde68a" />
+    <text x="20" y="252" font-size="11" font-weight="600" fill="#92400e">FEFO Expiry Queue</text>
+    <text x="20" y="270" font-size="9" fill="#b45309">Indexed by:</text>
+    <text x="20" y="285" font-size="9" font-weight="600" fill="#92400e">1. expiry_date ASC</text>
+    <text x="20" y="300" font-size="9" fill="#b45309">2. received_date ASC</text>
+    <text x="20" y="320" font-size="9" fill="#b45309">Guarantees zero waste</text>
+  </g>
+
+  <!-- Arrow 2 to 3 -->
+  <path d="M 430 280 L 470 280" stroke="#059669" stroke-width="2" />
+  <polygon points="470,276 478,280 470,284" fill="#059669" />
+
+  <!-- Stage 3 -->
+  <g transform="translate(480, 100)" filter="url(#shadow)">
+    <rect width="160" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="160" height="36" rx="10" fill="#f1f5f9" />
+    <text x="15" y="24" font-size="12" font-weight="700" fill="#334155">3. SALES PICKING</text>
+
+    <rect x="12" y="50" width="136" height="85" rx="6" fill="#faf5ff" stroke="#e9d5ff" />
+    <text x="20" y="72" font-size="11" font-weight="600" fill="#6b21a8">FEFO Auto-Select</text>
+    <text x="20" y="90" font-size="9" fill="#7e22ce">System selects earliest</text>
+    <text x="20" y="105" font-size="9" fill="#7e22ce">qualifying batch</text>
+    <text x="20" y="122" font-size="9" font-weight="600" fill="#6b21a8">Lot B (Jun) &lt; Lot A (Dec)</text>
+
+    <rect x="12" y="145" width="136" height="95" rx="6" fill="#faf5ff" stroke="#e9d5ff" />
+    <text x="20" y="167" font-size="11" font-weight="600" fill="#6b21a8">Safety Checks</text>
+    <text x="20" y="185" font-size="9" fill="#7e22ce">• Status == ACTIVE</text>
+    <text x="20" y="199" font-size="9" fill="#7e22ce">• Not in Quarantine</text>
+    <text x="20" y="213" font-size="9" fill="#7e22ce">• Expiry &gt; min_shelf_life</text>
+    <text x="20" y="227" font-size="9" fill="#7e22ce">• Qty Reserved &lt; Avail</text>
+
+    <rect x="12" y="250" width="136" height="90" rx="6" fill="#f1f5f9" stroke="#cbd5e1" />
+    <text x="20" y="272" font-size="11" font-weight="600" fill="#334155">Picking Ticket</text>
+    <text x="20" y="290" font-size="9" fill="#475569">Prints Exact Batch &amp;</text>
+    <text x="20" y="305" font-size="9" fill="#475569">Warehouse Location</text>
+    <text x="20" y="325" font-size="9" fill="#475569">Barcode Scanning</text>
+  </g>
+
+  <!-- Arrow 3 to 4 -->
+  <path d="M 645 280 L 685 280" stroke="#7e22ce" stroke-width="2" />
+  <polygon points="685,276 693,280 685,284" fill="#7e22ce" />
+
+  <!-- Stage 4 -->
+  <g transform="translate(695, 100)" filter="url(#shadow)">
+    <rect width="135" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="135" height="36" rx="10" fill="#f1f5f9" />
+    <text x="12" y="24" font-size="12" font-weight="700" fill="#334155">4. DISPATCH</text>
+
+    <rect x="10" y="50" width="115" height="85" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="18" y="72" font-size="10" font-weight="600" fill="#166534">Sales Invoice</text>
+    <text x="18" y="90" font-size="8" fill="#15803d">Deducts Stock</text>
+    <text x="18" y="103" font-size="8" fill="#15803d">Ledger Entry:</text>
+    <text x="18" y="116" font-size="8" font-weight="600" fill="#166534">INVOICE_ISSUE (-Qty)</text>
+    <text x="18" y="128" font-size="8" fill="#15803d">Calculates Taxes</text>
+
+    <rect x="10" y="145" width="115" height="95" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="18" y="167" font-size="10" font-weight="600" fill="#166534">Customer Delivery</text>
+    <text x="18" y="185" font-size="8" fill="#15803d">Batch &amp; Expiry printed</text>
+    <text x="18" y="198" font-size="8" fill="#15803d">on customer invoice</text>
+    <text x="18" y="215" font-size="8" fill="#15803d">Proof of Delivery</text>
+
+    <rect x="10" y="250" width="115" height="90" rx="6" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="18" y="272" font-size="10" font-weight="600" fill="#1e40af">GL Posting</text>
+    <text x="18" y="290" font-size="8" fill="#3b82f6">DR: COGS</text>
+    <text x="18" y="305" font-size="8" fill="#3b82f6">CR: Inventory Asset</text>
+    <text x="18" y="325" font-size="8" fill="#3b82f6">Real-time Balance</text>
+  </g>
+
+  <!-- Compliance Overlay / Recall -->
+  <g transform="translate(845, 100)" filter="url(#shadow)">
+    <rect width="115" height="360" rx="10" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5" />
+    <rect width="115" height="36" rx="10" fill="#ffe4e6" />
+    <text x="10" y="24" font-size="10" font-weight="700" fill="#9f1239">COMPLIANCE</text>
+
+    <rect x="8" y="50" width="99" height="85" rx="6" fill="#ffffff" stroke="#f43f5e" />
+    <text x="14" y="70" font-size="10" font-weight="700" fill="#e11d48">Batch Hold</text>
+    <text x="14" y="85" font-size="8" fill="#be123c">Quarantine Batch</text>
+    <text x="14" y="98" font-size="8" fill="#be123c">Status → HOLD</text>
+    <text x="14" y="112" font-size="8" fill="#be123c">Blocks Billing</text>
+    <text x="14" y="125" font-size="8" fill="#be123c">Instantly</text>
+
+    <rect x="8" y="145" width="99" height="110" rx="6" fill="#ffffff" stroke="#f43f5e" />
+    <text x="14" y="165" font-size="10" font-weight="700" fill="#e11d48">Recall Trace</text>
+    <text x="14" y="180" font-size="8" fill="#be123c">100% Traceability:</text>
+    <text x="14" y="195" font-size="8" fill="#be123c">• Which Supplier</text>
+    <text x="14" y="208" font-size="8" fill="#be123c">• Which GRN</text>
+    <text x="14" y="221" font-size="8" fill="#be123c">• Warehouses In</text>
+    <text x="14" y="234" font-size="8" fill="#be123c">• Customers Sold</text>
+    <text x="14" y="247" font-size="8" fill="#be123c">• Invoices Issued</text>
+
+    <rect x="8" y="265" width="99" height="75" rx="6" fill="#ffffff" stroke="#f43f5e" />
+    <text x="14" y="285" font-size="10" font-weight="700" fill="#e11d48">Disposal</text>
+    <text x="14" y="300" font-size="8" fill="#be123c">Destruction Log</text>
+    <text x="14" y="313" font-size="8" fill="#be123c">Write-off Journal</text>
+    <text x="14" y="326" font-size="8" fill="#be123c">NMRA Report</text>
+  </g>
+</svg>

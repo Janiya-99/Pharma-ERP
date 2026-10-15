@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" style="background:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="grad-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="grad-indigo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#4338ca" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <rect width="1000" height="600" fill="#f8fafc" />
+  
+  <!-- Title -->
+  <text x="50" y="45" font-size="22" font-weight="700" fill="#0f172a">Figure 1: Pharmacy Distribution ERP — Overall System Architecture</text>
+  <text x="50" y="70" font-size="13" fill="#64748b">Multi-Tenant High-Availability Enterprise Architecture (React 19 + Go Gin 1.23 + MySQL 8.0 + Redis 7)</text>
+
+  <!-- Client Layer -->
+  <g transform="translate(50, 100)" filter="url(#shadow)">
+    <rect width="250" height="450" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="250" height="42" rx="12" fill="#f1f5f9" />
+    <text x="20" y="27" font-size="14" font-weight="700" fill="#334155">CLIENT &amp; PRESENTATION LAYER</text>
+    
+    <!-- Items -->
+    <rect x="20" y="60" width="210" height="65" rx="8" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="35" y="85" font-size="13" font-weight="600" fill="#1e40af">React 19 + TypeScript SPA</text>
+    <text x="35" y="105" font-size="11" fill="#3b82f6">Vite 8 • Tailwind CSS • Radix UI</text>
+
+    <rect x="20" y="140" width="210" height="65" rx="8" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="35" y="165" font-size="13" font-weight="600" fill="#166534">TanStack Query v5</text>
+    <text x="35" y="185" font-size="11" fill="#15803d">Asynchronous Server State Cache</text>
+
+    <rect x="20" y="220" width="210" height="65" rx="8" fill="#faf5ff" stroke="#e9d5ff" />
+    <text x="35" y="245" font-size="13" font-weight="600" fill="#6b21a8">Zustand Client Store</text>
+    <text x="35" y="265" font-size="11" fill="#7e22ce">Auth Session • Active Branch</text>
+
+    <rect x="20" y="300" width="210" height="65" rx="8" fill="#fef2f2" stroke="#fecaca" />
+    <text x="35" y="325" font-size="13" font-weight="600" fill="#991b1b">Role Matrix Guard</text>
+    <text x="35" y="345" font-size="11" fill="#b91c1c">Client-side Route Protection</text>
+
+    <rect x="20" y="380" width="210" height="50" rx="8" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="35" y="405" font-size="12" font-weight="600" fill="#475569">Axios Interceptors</text>
+    <text x="35" y="420" font-size="10" fill="#64748b">JWT Injection &amp; 401 Auto-Refresh</text>
+  </g>
+
+  <!-- Connection arrow 1 -->
+  <path d="M 305 325 L 375 325" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4" />
+  <polygon points="375,321 385,325 375,329" fill="#94a3b8" />
+  <text x="315" y="315" font-size="10" fill="#64748b">HTTPS / JSON</text>
+
+  <!-- Gateway & Backend Layer -->
+  <g transform="translate(385, 100)" filter="url(#shadow)">
+    <rect width="280" height="450" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="280" height="42" rx="12" fill="#f1f5f9" />
+    <text x="20" y="27" font-size="14" font-weight="700" fill="#334155">BACKEND CORE (GO GIN API)</text>
+
+    <rect x="20" y="60" width="240" height="50" rx="8" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="35" y="82" font-size="12" font-weight="600" fill="#334155">Nginx Reverse Proxy / SSL</text>
+    <text x="35" y="98" font-size="10" fill="#64748b">TLS Termination • Rate Limiting</text>
+
+    <rect x="20" y="125" width="240" height="75" rx="8" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="35" y="145" font-size="12" font-weight="600" fill="#1e40af">Middleware Pipeline</text>
+    <text x="35" y="163" font-size="10" fill="#3b82f6">• CORS, Recovery &amp; Zap Logger</text>
+    <text x="35" y="178" font-size="10" fill="#3b82f6">• JWT Claims Extraction &amp; Tenant Scope</text>
+    <text x="35" y="193" font-size="10" fill="#3b82f6">• Strict RBAC Permission Evaluator</text>
+
+    <rect x="20" y="215" width="240" height="135" rx="8" fill="#f0fdf4" stroke="#bbf7d0" />
+    <text x="35" y="235" font-size="12" font-weight="600" fill="#166534">Modular Service Architecture</text>
+    <text x="35" y="255" font-size="10" fill="#15803d">• Control Center (Tenant, RBAC, Policy)</text>
+    <text x="35" y="270" font-size="10" fill="#15803d">• Finance Engine (GL, CoA, Journals)</text>
+    <text x="35" y="285" font-size="10" fill="#15803d">• Inventory (FEFO, Batches, Stock Ledger)</text>
+    <text x="35" y="300" font-size="10" fill="#15803d">• Invoice Center (Orders, Invoices, Receipts)</text>
+    <text x="35" y="315" font-size="10" fill="#15803d">• Compliance Center (Recalls, Holds, NMRA)</text>
+    <text x="35" y="330" font-size="10" fill="#15803d">• Platform Admin (Tenant Provisioning)</text>
+
+    <rect x="20" y="365" width="240" height="65" rx="8" fill="#fff7ed" stroke="#fed7aa" />
+    <text x="35" y="387" font-size="12" font-weight="600" fill="#c2410c">GORM Data Access Layer</text>
+    <text x="35" y="405" font-size="10" fill="#ea580c">Tenant Scoped Transactions • Auditing</text>
+    <text x="35" y="420" font-size="10" fill="#ea580c">Shopspring Decimal • Soft Delete</text>
+  </g>
+
+  <!-- Connection arrow 2 -->
+  <path d="M 670 325 L 735 325" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4" />
+  <polygon points="735,321 745,325 735,329" fill="#94a3b8" />
+  <text x="680" y="315" font-size="10" fill="#64748b">TCP / Socket</text>
+
+  <!-- Data & Storage Layer -->
+  <g transform="translate(745, 100)" filter="url(#shadow)">
+    <rect width="210" height="450" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <rect width="210" height="42" rx="12" fill="#f1f5f9" />
+    <text x="20" y="27" font-size="14" font-weight="700" fill="#334155">DATA &amp; CACHE LAYER</text>
+
+    <rect x="15" y="60" width="180" height="95" rx="8" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="25" y="82" font-size="12" font-weight="600" fill="#1e40af">Platform Database</text>
+    <text x="25" y="100" font-size="10" fill="#3b82f6">• `erp_platform`</text>
+    <text x="25" y="115" font-size="10" fill="#3b82f6">• `tenant_companies`</text>
+    <text x="25" y="130" font-size="10" fill="#3b82f6">• `platform_admins`</text>
+    <text x="25" y="145" font-size="10" fill="#3b82f6">• `subscription_plans`</text>
+
+    <rect x="15" y="170" width="180" height="150" rx="8" fill="#ecfdf5" stroke="#a7f3d0" />
+    <text x="25" y="192" font-size="12" font-weight="600" fill="#065f46">Tenant Database(s)</text>
+    <text x="25" y="210" font-size="10" fill="#059669">• `erp_phrma` (Isolated / Schema)</text>
+    <text x="25" y="225" font-size="10" fill="#059669">• Control (Users, Roles, Branch)</text>
+    <text x="25" y="240" font-size="10" fill="#059669">• Finance (GL, CoA, Journals)</text>
+    <text x="25" y="255" font-size="10" fill="#059669">• Inventory (Batches, GRN, FEFO)</text>
+    <text x="25" y="270" font-size="10" fill="#059669">• Invoicing (Orders, Invoices)</text>
+    <text x="25" y="285" font-size="10" fill="#059669">• Strict FK Referential Integrity</text>
+    <text x="25" y="300" font-size="10" fill="#059669">• InnoDB Engine (ACID)</text>
+
+    <rect x="15" y="335" width="180" height="95" rx="8" fill="#fdf2f8" stroke="#fbcfe8" />
+    <text x="25" y="357" font-size="12" font-weight="600" fill="#9d174d">Redis 7 Alpine</text>
+    <text x="25" y="375" font-size="10" fill="#db2777">• Token Blacklist Cache</text>
+    <text x="25" y="390" font-size="10" fill="#db2777">• RBAC Permissions Cache</text>
+    <text x="25" y="405" font-size="10" fill="#db2777">• Rate Limiter Counters</text>
+    <text x="25" y="420" font-size="10" fill="#db2777">• Ephemeral Session Locks</text>
+  </g>
+</svg>
