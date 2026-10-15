@@ -183,24 +183,20 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     }
   };
 
-  const hasPermission = (permissionKey: unknown) => {
-    if (
-      user?.user_type === "super_admin" &&
-      activeSoftware?.software_code === "CONTROL_CENTER"
-    ) {
+  const hasPermission = (permissionKey: any) => {
+    if (user?.user_type === "super_admin") {
       return true;
     }
+    if (!permissionKey) return true;
     return permissions.includes(permissionKey);
   };
 
-  const hasAnyPermission = (permissionKeys: unknown) => {
-    if (
-      user?.user_type === "super_admin" &&
-      activeSoftware?.software_code === "CONTROL_CENTER"
-    ) {
+  const hasAnyPermission = (permissionKeys: any[]) => {
+    if (user?.user_type === "super_admin") {
       return true;
     }
-    return permissionKeys.some((key: unknown) => permissions.includes(key));
+    if (!permissionKeys || permissionKeys.length === 0) return true;
+    return permissionKeys.some((key: any) => permissions.includes(key));
   };
 
   const value = {

@@ -6,6 +6,7 @@ import {
   Package,
   Landmark,
   Receipt,
+  ShieldCheck,
   LogOut,
   Building,
 } from "lucide-react";
@@ -48,6 +49,13 @@ const MODULE_UI_CONFIG: Record<
     borderColor: "border-slate-200/60",
     iconBg: "bg-orange-50 text-orange-600 border border-orange-100/50",
     desc: "Process AP/AR documentation, manage vendor billing cycles, and automate payment approvals.",
+  },
+  COMPLIANCE_CENTER: {
+    icon: <ShieldCheck className="h-7 w-7 text-purple-600 transition-transform group-hover:scale-110 group-hover:rotate-3" />,
+    glowColor: "hover:shadow-[0_20px_60px_-15px_rgba(147,51,234,0.3)] hover:border-purple-200",
+    borderColor: "border-slate-200/60",
+    iconBg: "bg-purple-50 text-purple-600 border border-purple-100/50",
+    desc: "Regulatory standards auditing, NMRA licensing, quality holds, recalls, and batch disposal records.",
   },
 };
 
