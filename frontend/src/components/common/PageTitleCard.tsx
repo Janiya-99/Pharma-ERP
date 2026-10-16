@@ -1,6 +1,7 @@
 import React from "react";
-import { ArrowLeft, LucideIcon } from "lucide-react";
+import { ArrowLeft, LucideIcon, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAiCopilot } from "../../context/AiCopilotContext";
 
 export interface PageTitleCardProps {
   title: string | React.ReactNode;
@@ -85,6 +86,7 @@ export const PageTitleCard: React.FC<PageTitleCardProps> = ({
   className = "",
 }) => {
   const navigate = useNavigate();
+  const { openCopilot } = useAiCopilot();
   const currentAccent = accentStyles[accent] || accentStyles.indigo;
 
   const handleBack = () => {
@@ -201,11 +203,18 @@ export const PageTitleCard: React.FC<PageTitleCardProps> = ({
           </div>
 
           {/* Right: Actions */}
-          {actions && (
-            <div className="flex items-center gap-2.5 flex-wrap shrink-0">
-              {actions}
-            </div>
-          )}
+          <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+            <button
+              type="button"
+              onClick={() => openCopilot("summary")}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10 hover:from-purple-600/20 hover:via-indigo-600/20 hover:to-blue-600/20 border border-indigo-200/80 text-indigo-700 font-semibold text-xs transition-all shadow-2xs hover:shadow-xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              title="View AI Page Summary & SOP Documentation"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-indigo-600 animate-pulse" />
+              <span>AI Insights & SOP</span>
+            </button>
+            {actions}
+          </div>
         </div>
 
         {/* Optional sub-row */}

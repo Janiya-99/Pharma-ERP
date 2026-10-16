@@ -296,11 +296,11 @@ const CustomersPage: React.FC = () => {
                     <td className="px-4 py-3.5">
                       <CustomerTypeBadge type={cust.customer_type} />
                     </td>
-                    <td className="px-4 py-3.5 text-gray-700 ">
-                      {cust.category?.category_name || "—"}
+                    <td className="px-4 py-3.5 text-gray-700 font-medium">
+                      {cust.customer_category_name || cust.category_name || cust.category?.category_name || "—"}
                     </td>
-                    <td className="px-4 py-3.5 text-gray-600 ">
-                      {cust.phone || "—"}
+                    <td className="px-4 py-3.5 text-gray-600 font-mono text-xs">
+                      {cust.primary_contact_number || cust.phone || cust.mobile || "—"}
                     </td>
                     <td className="px-4 py-3.5 font-medium text-gray-700 ">
                       {formatLKR(cust.credit_limit)}

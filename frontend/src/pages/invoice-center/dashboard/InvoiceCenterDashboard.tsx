@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
+import { DashboardAiAnalysisSection } from "../../../components/common/DashboardAiAnalysisSection";
 import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
 
 /* ─────────────────────────────────────────────────
@@ -287,6 +288,14 @@ export default function InvoiceCenterDashboard() {
           to="/invoice-center/reports/customer-balance"
         />
       </div>
+
+      {/* AI Copilot & Receivables Telemetry */}
+      <DashboardAiAnalysisSection
+        dashboardType="invoice_center"
+        kpiData={summary}
+        title="Receivables AI Copilot & Debt Collection Intelligence"
+        className="mb-8"
+      />
 
       {/* ══════════════════════════════════════════════
           TIER 2: Main Charts

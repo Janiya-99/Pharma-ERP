@@ -28,13 +28,26 @@ interface DocRule {
 }
 
 const initialRules: DocRule[] = [
-  { id: "doc-1", name: "Sales Invoice", module: "Invoice Center", prefix: "INV-2026-", suffix: "", padding: 4, nextNumber: 42, resetFreq: "YEARLY", description: "Customer billing invoices generated from sales orders" },
-  { id: "doc-2", name: "Payment Voucher", module: "Finance & Banking", prefix: "PV-", suffix: "/HQ", padding: 4, nextNumber: 189, resetFreq: "YEARLY", description: "Supplier bill settlements and expense disbursements" },
-  { id: "doc-3", name: "Receipt Voucher", module: "Finance & Banking", prefix: "RV-", suffix: "", padding: 4, nextNumber: 205, resetFreq: "YEARLY", description: "Incoming cash and bank transfer receipts" },
-  { id: "doc-4", name: "Journal Voucher", module: "Finance & Ledger", prefix: "JV-2026-", suffix: "", padding: 4, nextNumber: 42, resetFreq: "YEARLY", description: "General ledger manual adjustments and accruals" },
-  { id: "doc-5", name: "Goods Received Note (GRN)", module: "Inventory", prefix: "GRN-", suffix: "", padding: 5, nextNumber: 882, resetFreq: "YEARLY", description: "Warehouse intake receipts from supplier purchase orders" },
+  { id: "doc-cust", name: "Customer", module: "Invoice Center", prefix: "CUST-", suffix: "", padding: 6, nextNumber: 36, resetFreq: "NEVER", description: "Customer accounts and hospital client profiles" },
+  { id: "doc-sup", name: "Supplier", module: "Inventory", prefix: "SUP-", suffix: "", padding: 5, nextNumber: 18, resetFreq: "NEVER", description: "Pharmaceutical manufacturers and local distributors" },
+  { id: "doc-prod", name: "Product Master", module: "Inventory", prefix: "PROD-", suffix: "", padding: 5, nextNumber: 343, resetFreq: "NEVER", description: "Finished pharmaceuticals, raw materials and medical devices" },
+  { id: "doc-bat", name: "Product Batch", module: "Inventory", prefix: "BAT-", suffix: "", padding: 6, nextNumber: 890, resetFreq: "NEVER", description: "Unique batch and lot tracking records" },
+  { id: "doc-1", name: "Sales Invoice", module: "Invoice Center", prefix: "INV-2026-", suffix: "", padding: 4, nextNumber: 43, resetFreq: "YEARLY", description: "Customer billing invoices generated from sales orders" },
+  { id: "doc-so", name: "Sales Order", module: "Invoice Center", prefix: "SO-2026-", suffix: "", padding: 4, nextNumber: 112, resetFreq: "YEARLY", description: "Customer sales orders and wholesale consignments" },
+  { id: "doc-cr", name: "Customer Receipt", module: "Invoice Center", prefix: "CR-2026-", suffix: "", padding: 4, nextNumber: 78, resetFreq: "YEARLY", description: "Customer payments received against invoices" },
+  { id: "doc-cn", name: "Credit Note", module: "Invoice Center", prefix: "CN-2026-", suffix: "", padding: 4, nextNumber: 14, resetFreq: "YEARLY", description: "Sales returns and customer credit adjustments" },
+  { id: "doc-dn", name: "Debit Note", module: "Invoice Center", prefix: "DN-2026-", suffix: "", padding: 4, nextNumber: 8, resetFreq: "YEARLY", description: "Price revisions and supplementary customer charges" },
+  { id: "doc-5", name: "Goods Received Note (GRN)", module: "Inventory", prefix: "GRN-2026-", suffix: "", padding: 5, nextNumber: 883, resetFreq: "YEARLY", description: "Warehouse intake receipts from supplier purchase orders" },
+  { id: "doc-po", name: "Purchase Order", module: "Inventory", prefix: "PO-2026-", suffix: "", padding: 4, nextNumber: 260, resetFreq: "YEARLY", description: "Procurement purchase orders placed with suppliers" },
+  { id: "doc-st", name: "Stock Transfer", module: "Inventory", prefix: "ST-", suffix: "", padding: 5, nextNumber: 145, resetFreq: "YEARLY", description: "Inter-warehouse pharmaceutical stock transfers" },
+  { id: "doc-adj", name: "Stock Adjustment", module: "Inventory", prefix: "ADJ-", suffix: "", padding: 5, nextNumber: 52, resetFreq: "YEARLY", description: "Inventory write-offs, damages, and cycle count reconciliations" },
+  { id: "doc-pr", name: "Purchase Return", module: "Inventory", prefix: "PR-", suffix: "", padding: 4, nextNumber: 19, resetFreq: "YEARLY", description: "Defective and near-expiry returns to manufacturers" },
+  { id: "doc-2", name: "Payment Voucher", module: "Finance & Banking", prefix: "PV-2026-", suffix: "", padding: 4, nextNumber: 190, resetFreq: "YEARLY", description: "Supplier bill settlements and expense disbursements" },
+  { id: "doc-3", name: "Receipt Voucher", module: "Finance & Banking", prefix: "RV-2026-", suffix: "", padding: 4, nextNumber: 206, resetFreq: "YEARLY", description: "Incoming cash, RTGS, and bank transfer receipts" },
+  { id: "doc-4", name: "Journal Voucher", module: "Finance & Ledger", prefix: "JV-2026-", suffix: "", padding: 4, nextNumber: 43, resetFreq: "YEARLY", description: "General ledger manual adjustments, depreciation, and accruals" },
+  { id: "doc-pcv", name: "Petty Cash Voucher", module: "Finance & Banking", prefix: "PCV-", suffix: "", padding: 4, nextNumber: 89, resetFreq: "YEARLY", description: "Office petty cash vouchers and emergency clinic dispatches" },
+  { id: "doc-fa", name: "Fixed Asset Code", module: "Finance & Ledger", prefix: "FA-", suffix: "", padding: 4, nextNumber: 24, resetFreq: "NEVER", description: "Laboratory chillers, cold-chain transport vehicles, and machinery" },
   { id: "doc-6", name: "Batch Quarantine Order", module: "Compliance", prefix: "QUAR-", suffix: "-QC", padding: 4, nextNumber: 15, resetFreq: "NEVER", description: "Quality assurance quarantine holds and recall notices" },
-  { id: "doc-7", name: "Stock Intake Voucher", module: "Inventory", prefix: "STK-", suffix: "", padding: 5, nextNumber: 1204, resetFreq: "NEVER", description: "Internal stock transfers and initial balance loading" },
 ];
 
 const DocumentNumberingPage = () => {
@@ -51,18 +64,39 @@ const DocumentNumberingPage = () => {
         const res = await getDocumentNumberingRules();
         const items = res?.data || [];
         if (Array.isArray(items) && items.length > 0) {
-          const mapped = items.map((item: any, idx: number) => ({
-            id: String(item.id || `doc-${idx}`),
-            name: item.document_type || "Document",
-            module: item.module || "Finance",
-            prefix: item.prefix || "",
-            suffix: item.suffix || "",
-            padding: item.padding || 4,
-            nextNumber: item.next_number || 1,
-            resetFreq: (item.reset_frequency?.toUpperCase() || "YEARLY") as any,
-            description: item.description || "Configured sequence rule",
-          }));
-          setRules(mapped);
+          const merged = [...initialRules];
+          items.forEach((item: any) => {
+            const idx = merged.findIndex(
+              (r) =>
+                r.name.toLowerCase() === (item.document_type || "").toLowerCase() ||
+                r.id === String(item.id)
+            );
+            if (idx >= 0) {
+              merged[idx] = {
+                ...merged[idx],
+                id: String(item.id || merged[idx].id),
+                prefix: item.prefix ?? merged[idx].prefix,
+                suffix: item.suffix ?? merged[idx].suffix,
+                padding: item.padding ?? merged[idx].padding,
+                nextNumber: item.next_number ?? merged[idx].nextNumber,
+                resetFreq: (item.reset_frequency?.toUpperCase() || merged[idx].resetFreq) as any,
+                description: item.description || merged[idx].description,
+              };
+            } else {
+              merged.push({
+                id: String(item.id),
+                name: item.document_type || "Document",
+                module: item.module || "Finance",
+                prefix: item.prefix || "",
+                suffix: item.suffix || "",
+                padding: item.padding || 4,
+                nextNumber: item.next_number || 1,
+                resetFreq: (item.reset_frequency?.toUpperCase() || "YEARLY") as any,
+                description: item.description || "Configured sequence rule",
+              });
+            }
+          });
+          setRules(merged);
         }
       } catch (err) {
         console.error("Failed to fetch document numbering rules:", err);
