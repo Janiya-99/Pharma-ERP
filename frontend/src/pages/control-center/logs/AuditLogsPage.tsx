@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { FormEvent, ChangeEvent } from "react";
 import { getAuditLogs, getSoftwareModules, getBranches, getUsers } from "../../../api/controlApi";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
@@ -140,12 +141,12 @@ const AuditLogsPage = () => {
     }
   };
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFilters({ ...filters, search: searchDraft, page: 1 });
   };
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });
   };
 
@@ -178,11 +179,11 @@ const AuditLogsPage = () => {
     setIsDetailOpen(true);
   };
 
-  const getRowActions = () => [
+  const getRowActions = (row?: any) => [
     {
       label: "View Details",
       icon: Activity,
-      onClick: openDetails,
+      onClick: (item: any) => openDetails(item || row),
     },
   ];
 
