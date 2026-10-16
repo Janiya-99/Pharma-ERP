@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import UserSelector from "../../../components/common/UserSelector";
 import AccessMatrixTable from "../../../components/common/AccessMatrixTable";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
@@ -111,10 +112,14 @@ const UserAccessMatrixPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
-        title="User Access"
-        description="Assign exact roles to users across specific branches and software modules."
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <PageTitleCard
+        title="User Access Matrix"
+        description="Assign exact roles and security entitlements to users across specific branches and software modules."
+        moduleTag="Control Center"
+        icon={Shield}
+        accent="indigo"
+        backTo="/control-center/dashboard"
       />
 
       <FormError message={error} />

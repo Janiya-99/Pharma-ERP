@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pixandco/erp-phrma/internal/inventory/dto"
@@ -109,8 +110,8 @@ func (s *grnService) buildGRNLines(db *gorm.DB, companyID uint64, payloadLines [
 		}
 
 		if product.RequiresBatchTracking {
-			if l.ProductBatchID == nil && l.BatchNumber == "" {
-				return nil, 0, 0, 0, 0, 0, 0, 0, fmt.Errorf("line %d: product requires batch tracking, please provide batch ID or batch number", i+1)
+			if l.ProductBatchID == nil && strings.TrimSpace(l.BatchNumber) == "" {
+				l.BatchNumber = fmt.Sprintf("BAT-%s-%04d", time.Now().Format("200601"), i+1)
 			}
 		}
 
@@ -200,6 +201,17 @@ func (s *grnService) CreateGRN(db *gorm.DB, payload dto.CreateGRNPayload) (*mode
 	}
 	if supplier.Status != "active" {
 		return nil, errors.New("supplier is not active")
+	}
+
+	if strings.TrimSpace(payload.SupplierInvoiceNumber) != "" {
+		var existingCount int64
+		err := db.Model(&models.GoodsReceiptNote{}).
+			Where("company_id = ? AND supplier_id = ? AND supplier_invoice_number = ? AND approval_status != 'cancelled'",
+				payload.CompanyID, payload.SupplierID, strings.TrimSpace(payload.SupplierInvoiceNumber)).
+			Count(&existingCount).Error
+		if err == nil && existingCount > 0 {
+			return nil, fmt.Errorf("a GRN with supplier invoice number '%s' already exists for this supplier", payload.SupplierInvoiceNumber)
+		}
 	}
 
 	warehouse, err := s.stockRepo.FindWarehouseByID(db, payload.WarehouseID)

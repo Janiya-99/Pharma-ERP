@@ -133,6 +133,44 @@ func (s *ConfigurationResolverService) ListEffectiveSettings(companyID uint64, g
 		return nil, err
 	}
 
+	if len(settings) == 0 {
+		defaultItems := []struct {
+			Group string
+			Key   string
+			Val   interface{}
+		}{
+			{"LOCALIZATION", "fiscal_start", "APR_1"},
+			{"LOCALIZATION", "currency", "LKR"},
+			{"LOCALIZATION", "timezone", "Asia/Colombo"},
+			{"LOCALIZATION", "date_format", "DD/MM/YYYY"},
+			{"LOCALIZATION", "number_format", "EN_IN"},
+			{"NOTIFICATIONS", "alert_low_stock", true},
+			{"NOTIFICATIONS", "alert_expiry", true},
+			{"NOTIFICATIONS", "alert_overdue_invoices", true},
+			{"NOTIFICATIONS", "alert_security", true},
+			{"NOTIFICATIONS", "expiry_days_warning", "90"},
+			{"BACKUP", "backup_freq", "DAILY"},
+			{"BACKUP", "retention_years", "7"},
+		}
+		now := time.Now()
+		for _, di := range defaultItems {
+			b, _ := json.Marshal(di.Val)
+			st := models.SystemSetting{
+				CompanyID:        companyID,
+				SettingGroup:     di.Group,
+				SettingKey:       di.Key,
+				SettingValueJSON: b,
+				Status:           "published",
+				VersionNumber:    1,
+				EffectiveFrom:    &now,
+				CreatedAt:        now,
+				UpdatedAt:        now,
+			}
+			_ = s.repo.SaveSetting(&st)
+		}
+		settings, _ = s.repo.ListSettings(companyID, groupCode, nil)
+	}
+
 	var branchOverridesMap map[string]json.RawMessage
 	if branchID != nil && *branchID != 0 {
 		overrides, err := s.repo.GetBranchOverrides(companyID, *branchID)

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getRoles, deleteRole, getSoftwareModules } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
@@ -186,14 +187,22 @@ const RolesPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <PermissionGuard permission="control.role.create">
-          <Button onClick={openCreateModal}>
-            <Plus className="w-4 h-4 mr-2" />
-            Create Role
-          </Button>
-        </PermissionGuard>
-      </div>
+      <PageTitleCard
+        title="Roles & Access Governance"
+        description="Define enterprise roles, security clearance profiles, and permission catalogue assignments."
+        moduleTag="Control Center"
+        icon={Shield}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <PermissionGuard permission="control.role.create">
+            <Button onClick={openCreateModal} className="gap-2 rounded-xl">
+              <Plus className="w-4 h-4" />
+              Create Role
+            </Button>
+          </PermissionGuard>
+        }
+      />
 
       <FormError message={error} />
 

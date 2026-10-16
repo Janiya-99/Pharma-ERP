@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getSoftwareModules } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Badge from "../../../components/common/Badge";
 import FormError from "../../../components/common/FormError";
@@ -62,10 +63,14 @@ const SoftwareModulesPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <PageHeader
-        title="Software Modules"
-        description="View system-registered ERP software modules."
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <PageTitleCard
+        title="Enterprise Software Modules"
+        description="View registered system suites, module enablement flags, and core operational licenses."
+        moduleTag="Control Center"
+        icon={LayoutGrid}
+        accent="indigo"
+        backTo="/control-center/dashboard"
       />
 
       <FormError message={error} />

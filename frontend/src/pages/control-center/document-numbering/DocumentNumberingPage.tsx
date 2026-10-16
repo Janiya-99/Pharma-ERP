@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { getDocumentNumberingRules, saveDocumentNumberingRule } from "../../../api/controlApi";
 import SettingsImpactPreview from "../../../components/common/SettingsImpactPreview";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 
 interface DocRule {
   id: string;
@@ -173,43 +174,31 @@ const DocumentNumberingPage = () => {
         isLoading={isSaving}
       />
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-              <Hash className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
-                Control Center • System Configuration
-              </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
-                Document Numbering & Sequence Rules
-              </h1>
-            </div>
+      <PageTitleCard
+        title="Document Numbering & Sequence Rules"
+        description="Configure prefixes, suffixes, sequence padding, and automatic reset frequencies for all ERP vouchers."
+        moduleTag="Control Center"
+        icon={Hash}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <div className="flex items-center gap-3">
+            {saveSuccess && (
+              <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-700 border border-emerald-200/60 animate-in fade-in">
+                <CheckCircle2 className="h-4 w-4" /> Sequence Rules Enforced!
+              </span>
+            )}
+            <button
+              onClick={handleSaveClick}
+              disabled={isSaving}
+              className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50"
+            >
+              {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {isSaving ? "Saving Sequences..." : "Save Numbering Rules"}
+            </button>
           </div>
-          <p className="mt-1 text-sm text-slate-500  pl-12">
-            Configure prefixes, suffixes, sequence padding, and automatic reset frequencies for all ERP vouchers
-          </p>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex items-center gap-3">
-          {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50  px-3.5 py-2 text-xs font-bold text-emerald-700  border border-emerald-200/60  animate-in fade-in">
-              <CheckCircle2 className="h-4 w-4" /> Sequence Rules Enforced!
-            </span>
-          )}
-          <button
-            onClick={handleSaveClick}
-            disabled={isSaving}
-            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50"
-          >
-            {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            {isSaving ? "Saving Sequences..." : "Save Numbering Rules"}
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* ── Filter & Search Bar ── */}
       <div className="flex flex-col gap-4 rounded-xl border border-slate-200  bg-white  p-4 shadow-sm md:flex-row md:items-center md:justify-between">

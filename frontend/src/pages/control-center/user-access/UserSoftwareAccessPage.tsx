@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import UserSelector from "../../../components/common/UserSelector";
 import MultiSelect from "../../../components/common/MultiSelect";
 import Button from "../../../components/common/Button";
@@ -7,7 +8,7 @@ import FormError from "../../../components/common/FormError";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { getSoftwareModules, getUserSoftware, assignUserSoftware, removeUserSoftware } from "../../../api/controlApi";
-import { LayoutDashboard, Shield, Trash2, CheckCircle2 } from "lucide-react";
+import { LayoutDashboard, LayoutGrid, Shield, Trash2, CheckCircle2 } from "lucide-react";
 
 const UserSoftwareAccessPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -122,10 +123,14 @@ const UserSoftwareAccessPage = () => {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <PageTitleCard
         title="User Software Access"
-        description="Assign or remove software module access for users."
+        description="Assign or revoke granular software module subscriptions and enterprise license access for users."
+        moduleTag="Control Center"
+        icon={LayoutGrid}
+        accent="indigo"
+        backTo="/control-center/dashboard"
       />
 
       <FormError message={error} />

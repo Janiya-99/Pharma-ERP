@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getBranches, deleteBranch } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
@@ -11,7 +12,7 @@ import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import BranchFormModal from "./BranchFormModal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, Building2 } from "lucide-react";
 
 interface Branch {
   id: number;
@@ -170,14 +171,18 @@ const BranchesPage = () => {
   ];
 
   return (
-    <div className="page-content">
-      <PageHeader
-        title="Branches"
-        description="Manage company branches, warehouses, and distribution centers."
-        action={
+    <div className="page-content space-y-6">
+      <PageTitleCard
+        title="Branches & Warehousing Units"
+        description="Manage company branches, physical warehouses, regional distribution centers, and licensing parameters."
+        moduleTag="Control Center"
+        icon={Building2}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
           <PermissionGuard permission="control.branch.create">
-            <Button onClick={openCreateModal}>
-              <Plus className="w-3.5 h-3.5" />
+            <Button onClick={openCreateModal} className="gap-2 rounded-xl">
+              <Plus className="w-4 h-4" />
               Create Branch
             </Button>
           </PermissionGuard>

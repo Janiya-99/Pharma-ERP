@@ -24,6 +24,7 @@ import {
   deleteTrustedIPRule,
 } from "../../../api/controlApi";
 import SettingsImpactPreview from "../../../components/common/SettingsImpactPreview";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 
 interface IPRange {
   id: string;
@@ -179,44 +180,31 @@ const SecuritySettingsPage = () => {
         isLoading={isSaving}
       />
       {/* ── Page Header ── */}
-
-      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-              <Shield className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
-                Control Center • System Protection
-              </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
-                Global Security & Authentication Policies
-              </h1>
-            </div>
+      <PageTitleCard
+        title="Global Security & Authentication Policies"
+        description="Configure password hardness, session lifespans, MFA enforcement, and network IP whitelisting."
+        moduleTag="Control Center"
+        icon={Shield}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <div className="flex items-center gap-3">
+            {saveSuccess && (
+              <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-700 border border-emerald-200/60 animate-in fade-in">
+                <CheckCircle2 className="h-4 w-4" /> Policies Enforced Globally!
+              </span>
+            )}
+            <button
+              onClick={handleSaveClick}
+              disabled={isSaving}
+              className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50 cursor-pointer"
+            >
+              {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {isSaving ? "Applying Policies..." : "Save Security Settings"}
+            </button>
           </div>
-          <p className="mt-1 text-sm text-slate-500  pl-12">
-            Configure password hardness, session lifespans, MFA enforcement, and network IP whitelisting
-          </p>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex items-center gap-3">
-          {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50  px-3.5 py-2 text-xs font-bold text-emerald-700  border border-emerald-200/60  animate-in fade-in">
-              <CheckCircle2 className="h-4 w-4" /> Policies Enforced Globally!
-            </span>
-          )}
-          <button
-            onClick={handleSaveClick}
-            disabled={isSaving}
-            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50"
-          >
-            {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            {isSaving ? "Applying Policies..." : "Save Security Settings"}
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* ══════════════════════════════════════════════

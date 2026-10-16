@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -61,6 +62,17 @@ func (s *SalesOrderService) ValidateProductForSalesOrder(db *gorm.DB, companyID,
 		b, err := s.repo.ValidateProductBatch(db, companyID, productID, *batchID)
 		if err != nil {
 			return nil, nil, err
+		}
+		if b != nil {
+			if b.IsBlocked {
+				return nil, nil, fmt.Errorf("cannot order blocked batch %s: %s", b.BatchNumber, b.BlockReason)
+			}
+			if b.BatchStatus == "quarantine" || b.BatchStatus == "recalled" || b.BatchStatus == "blocked" {
+				return nil, nil, fmt.Errorf("cannot order batch %s because its regulatory status is '%s'", b.BatchNumber, b.BatchStatus)
+			}
+			if b.ExpiryDate != nil && b.ExpiryDate.Before(time.Now()) {
+				return nil, nil, fmt.Errorf("cannot order expired batch %s (expired on %s)", b.BatchNumber, b.ExpiryDate.Format("2006-01-02"))
+			}
 		}
 		batch = b
 	}

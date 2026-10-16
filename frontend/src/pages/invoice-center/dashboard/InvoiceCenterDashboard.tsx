@@ -141,8 +141,8 @@ export default function InvoiceCenterDashboard() {
     try {
       setLoading(true);
       const res = await invoiceCenterApi.getDashboardSummary();
-      if (res?.data?.data) {
-        const d = res.data.data;
+      const d = res?.data?.data || (res?.data?.total_customers !== undefined ? res?.data : null);
+      if (d) {
         setSummary(d);
         if (d.invoice_trends && d.invoice_trends.length > 0) setTrends(d.invoice_trends);
         if (d.aging_distribution && d.aging_distribution.length > 0) setAging(d.aging_distribution);
@@ -334,7 +334,7 @@ export default function InvoiceCenterDashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} tickFormatter={formatYAxis} />
-                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: number) => [formatCurrency(value), undefined]} />
+                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} formatter={(value: any) => [formatCurrency(Number(value) || 0), undefined]} />
                   <Area type="monotone" dataKey="Invoiced Amount" stroke="#4F46E5" strokeWidth={2} fillOpacity={1} fill="url(#colorInvoice)" />
                   <Area type="monotone" dataKey="Collected Receipts" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorCollected)" />
                 </AreaChart>

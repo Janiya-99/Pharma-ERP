@@ -7,6 +7,7 @@ import {
 import { useAuth } from "../../../auth/AuthContext";
 import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import { toast } from "sonner";
 import {
   Save,
@@ -207,16 +208,25 @@ const CompanyProfilePage = () => {
 
   return (
     <div className="page-content space-y-8 pb-32 font-sans">
-      <div>
-        <h1 className="text-slate-950 text-3xl font-bold tracking-tight">
-          Company Profile
-        </h1>
-        <p className="text-slate-600 mt-1 max-w-3xl">
-          Update your organization's legal information, contact details, and
-          branding. These details will be reflected across your workspace and in
-          all outgoing communications.
-        </p>
-      </div>
+      <PageTitleCard
+        title="Company Profile & Statutory Entity"
+        description="Update your organization's legal information, tax registration, corporate branding, and regulatory contact details."
+        moduleTag="Control Center"
+        icon={Building2}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <Button
+            type="submit"
+            form="company-profile-form"
+            disabled={saving || !isDirty}
+            className="gap-2 rounded-xl"
+          >
+            <Save className="h-4 w-4" />
+            {saving ? "Saving Changes..." : "Save Profile"}
+          </Button>
+        }
+      />
 
       <FormError message={error} />
 
@@ -252,6 +262,7 @@ const CompanyProfilePage = () => {
         </div>
       ) : (
         <form
+          id="company-profile-form"
           onSubmit={handleSubmit}
           className="grid grid-cols-1 gap-8 lg:grid-cols-3"
         >

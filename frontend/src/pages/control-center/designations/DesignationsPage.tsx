@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getDesignations, deleteDesignation } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
@@ -10,7 +11,7 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import DesignationFormModal from "./DesignationFormModal";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, Briefcase } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const DesignationsPage = () => {
@@ -146,14 +147,18 @@ const DesignationsPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
-        title="Designations"
-        description="Manage company job titles and designations."
-        action={
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <PageTitleCard
+        title="Designations & Job Roles"
+        description="Configure corporate job titles, operational designations, and organisational hierarchy bands."
+        moduleTag="Control Center"
+        icon={Briefcase}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
           <PermissionGuard permission="control.designation.create">
-            <Button onClick={openCreateModal}>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button onClick={openCreateModal} className="gap-2 rounded-xl">
+              <Plus className="w-4 h-4" />
               Create Designation
             </Button>
           </PermissionGuard>

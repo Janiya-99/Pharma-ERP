@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getAuditLogs, getSoftwareModules, getBranches, getUsers } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
@@ -287,26 +288,28 @@ const AuditLogsPage = () => {
   }));
 
   return (
-    <div className="min-h-full bg-slate-50">
-      <PageHeader
-        title="Audit Logs"
-        description="Track system activity, configuration changes, and user actions."
-        badge={
-          <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
-            {Number(totalResults || 0).toLocaleString()} total
-          </span>
-        }
-        action={
-          <>
-            <Button type="button" variant="outline" size="sm" className="gap-2" onClick={fetchLogs}>
+    <div className="min-h-full space-y-6">
+      <PageTitleCard
+        title="Audit Logs & Compliance Trail"
+        description="Immutable system activity records, configuration changes, client IP telemetry, and regulatory access audits."
+        moduleTag="Control Center"
+        icon={Activity}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs">
+              {Number(totalResults || 0).toLocaleString()} records
+            </span>
+            <Button type="button" variant="outline" size="sm" className="gap-2 rounded-xl" onClick={fetchLogs}>
               <RefreshCw className="h-4 w-4" />
               Refresh
             </Button>
-            <Button type="button" variant="ghost" size="sm" className="gap-2" onClick={clearFilters} disabled={!activeFilterCount}>
+            <Button type="button" variant="ghost" size="sm" className="gap-2 rounded-xl" onClick={clearFilters} disabled={!activeFilterCount}>
               <FilterX className="h-4 w-4" />
               Clear
             </Button>
-          </>
+          </div>
         }
       />
 

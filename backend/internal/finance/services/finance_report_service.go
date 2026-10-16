@@ -563,3 +563,7 @@ func (s *FinanceReportService) GetReceiptRegisterReport(companyID uint64, req dt
 func (s *FinanceReportService) AuditLog(companyID uint64, userID uint64, action string, details string) {
 	s.auditService.LogAction(companyID, userID, action, details, 0)
 }
+
+func (s *FinanceReportService) AuditLogWithContext(companyID uint64, branchID *uint64, userID uint64, action string, details string, entityID uint64, ipAddress string, userAgent string) {
+	s.auditService.LogActionWithContext(companyID, branchID, userID, action, details, entityID, ipAddress, userAgent)
+}
