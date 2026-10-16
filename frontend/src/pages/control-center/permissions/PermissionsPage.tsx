@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getPermissions, getPermissionsGrouped, getSoftwareModules } from "../../../api/controlApi";
-import PageHeader from "../../../components/common/PageHeader";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
@@ -8,7 +7,7 @@ import Button from "../../../components/common/Button";
 import Input from "../../../components/common/Input";
 import FormError from "../../../components/common/FormError";
 import StatusBadge from "../../../components/common/StatusBadge";
-import { Search, LayoutList, Layers, Key, Shield } from "lucide-react";
+import { Search, LayoutList, Layers, Key } from "lucide-react";
 
 const PermissionsPage = () => {
   const [permissions, setPermissions] = useState([]);
@@ -60,7 +59,7 @@ const PermissionsPage = () => {
         setPermissions(res.data.items || res.data);
         setPagination(res.meta || res.pagination);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.message || "Failed to load permissions");
     } finally {
       setLoading(false);
@@ -79,7 +78,7 @@ const PermissionsPage = () => {
       if (res.success) {
         setGroupedPermissions(res.data || []);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.message || "Failed to load grouped permissions");
     } finally {
       setLoading(false);
@@ -111,7 +110,7 @@ const PermissionsPage = () => {
     {
       header: "Permission Group",
       accessor: "permission_group",
-      cell: (row: unknown) => <span className="capitalize">{formatLabel(row.permission_group)}</span>,
+      cell: (row: any) => <span className="capitalize">{formatLabel(row.permission_group)}</span>,
     },
     {
       header: "Permission Name",
@@ -121,16 +120,16 @@ const PermissionsPage = () => {
     {
       header: "Permission Key",
       accessor: "permission_key",
-      cell: (row: unknown) => <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">{row.permission_key}</span>,
+      cell: (row: any) => <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">{row.permission_key}</span>,
     },
     {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => <span className="text-gray-500 truncate block max-w-xs">{row.description || "-"}</span>,
+      cell: (row: any) => <span className="text-gray-500 truncate block max-w-xs">{row.description || "-"}</span>,
     },
     {
       header: "Status",
-      cell: (row: unknown) => <StatusBadge status={row.status} />,
+      cell: (row: any) => <StatusBadge status={row.status} />,
     },
   ];
 
@@ -189,7 +188,7 @@ const PermissionsPage = () => {
             className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900"
           >
             <option value="">All Software Modules</option>
-            {softwareModules.map((s: unknown) => (
+            {softwareModules.map((s: any) => (
               <option key={s.id} value={s.id}>{s.software_name}</option>
             ))}
           </select>
@@ -214,27 +213,6 @@ const PermissionsPage = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          
-          <div className="border-l border-gray-300 mx-1 hidden xl:block"></div>
-          
-          <div className="flex bg-gray-100 rounded-md p-1 border border-gray-200">
-            <button
-              onClick={() => setViewMode("flat")}
-              className={`px-3 py-1 text-sm font-medium rounded flex items-center transition-colors ${
-                viewMode === "flat" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <LayoutList className="w-4 h-4 mr-1.5" /> List
-            </button>
-            <button
-              onClick={() => setViewMode("grouped")}
-              className={`px-3 py-1 text-sm font-medium rounded flex items-center transition-colors ${
-                viewMode === "grouped" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <Layers className="w-4 h-4 mr-1.5" /> Grouped
-            </button>
-          </div>
         </div>
       </div>
 
@@ -248,7 +226,7 @@ const PermissionsPage = () => {
           />
           <Pagination
             pagination={pagination}
-            onPageChange={(page: unknown) => setFilters({ ...filters, page })}
+            onPageChange={(page: number) => setFilters({ ...filters, page })}
           />
         </>
       ) : (

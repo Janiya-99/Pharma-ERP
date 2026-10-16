@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getAuditLogs, getSoftwareModules, getBranches, getUsers } from "../../../api/controlApi";
-import PageHeader from "../../../components/common/PageHeader";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
@@ -361,7 +360,7 @@ const AuditLogsPage = () => {
                 />
               </div>
 
-              <Button type="submit" variant="info" className="h-11 w-11 rounded-xl px-0">
+              <Button type="submit" variant="info" className="h-11 w-11 rounded-xl px-0 self-end">
                 <Search className="h-4 w-4" />
               </Button>
             </form>

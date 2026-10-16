@@ -13,7 +13,6 @@ import {
   Plus,
   Trash2,
   RefreshCw,
-  Sliders,
   Shield,
 } from "lucide-react";
 import {

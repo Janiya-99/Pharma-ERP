@@ -2,7 +2,7 @@ import Modal from "../../../components/common/Modal";
 import Button from "../../../components/common/Button";
 import JsonViewer from "../../../components/common/JsonViewer";
 
-const AuditLogDetailModal = ({ isOpen, onClose, log }: { isOpen?: boolean; onClose?: unknown; log?: unknown }) => {
+const AuditLogDetailModal = ({ isOpen, onClose, log }: { isOpen?: boolean; onClose?: () => void; log?: any }) => {
   if (!log) return null;
 
   return (
