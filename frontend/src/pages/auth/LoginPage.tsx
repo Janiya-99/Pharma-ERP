@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import { 
-  MdVisibility, 
-  MdVisibilityOff, 
+import {
+  MdVisibility,
+  MdVisibilityOff,
   MdMailOutline,
   MdLockOutline,
   MdArrowForward
@@ -12,12 +12,12 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Checkbox } from "../../components/ui/checkbox";
-import { 
-  LayoutDashboard, 
-  Package, 
-  Landmark, 
-  Receipt, 
-  Users, 
+import {
+  LayoutDashboard,
+  Package,
+  Landmark,
+  Receipt,
+  Users,
   Briefcase,
   ShieldCheck,
   Sparkles,
@@ -69,7 +69,7 @@ const LoginPage = () => {
       {/* LEFT PANEL - Symmetrical 50% Showcase (No flickering, crisp high-end aesthetics) */}
       <div className="hidden lg:flex w-1/2 relative bg-slate-900 overflow-hidden z-20 group/left">
         {/* Crisp static high-resolution background with smooth hover parallax micro-scale */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-out group-hover/left:scale-[1.02] opacity-95"
           style={{ backgroundImage: "url('/login-bg-light.png')" }}
         />
@@ -92,7 +92,7 @@ const LoginPage = () => {
           </div>
 
           <h3 className="text-xl font-extrabold text-slate-900 tracking-tight mb-2">
-            Pixand Co Enterprise Suite
+            PIXANDCO Enterprise Suite
           </h3>
 
           <p className="text-[13px] text-slate-600 leading-relaxed font-medium mb-6">
@@ -109,8 +109,8 @@ const LoginPage = () => {
               { name: "HR & Payroll", icon: <Users size={14} className="text-blue-600" />, bg: "bg-blue-50/90 hover:bg-blue-100/90", border: "border-blue-200/60", text: "text-blue-800" },
               { name: "CRM", icon: <Briefcase size={14} className="text-purple-600" />, bg: "bg-purple-50/90 hover:bg-purple-100/90", border: "border-purple-200/60", text: "text-purple-800" },
             ].map((mod) => (
-              <div 
-                key={mod.name} 
+              <div
+                key={mod.name}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-xl ${mod.bg} border ${mod.border} transition-all duration-200 hover:scale-[1.02] hover:shadow-sm cursor-default`}
               >
                 <div className="p-1 rounded-lg bg-white shadow-xs shrink-0">
@@ -139,14 +139,14 @@ const LoginPage = () => {
           {/* Brand Header */}
           <div className="flex flex-col items-center justify-center mb-8">
             <div className="flex items-center gap-3 mb-2">
-              <div 
+              <div
                 className="w-12 h-12 bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-[0_10px_25px_-5px_rgba(79,70,229,0.5)] ring-4 ring-indigo-500/10 transition-transform duration-300 hover:scale-105"
                 style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}
               >
                 P
               </div>
               <span className="text-2xl font-black tracking-tight text-slate-900">
-                Pixand Co
+                PIXANDCO
               </span>
             </div>
             <p className="text-[12px] font-bold text-slate-400 tracking-wider uppercase text-center">
@@ -170,11 +170,11 @@ const LoginPage = () => {
               </Label>
               <div className="relative">
                 <MdMailOutline className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors duration-200" size={19} />
-                <Input 
+                <Input
                   id="email"
-                  type="email" 
+                  type="email"
                   name="email"
-                  placeholder="name@company.com" 
+                  placeholder="name@company.com"
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -191,11 +191,11 @@ const LoginPage = () => {
               </Label>
               <div className="relative">
                 <MdLockOutline className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors duration-200" size={19} />
-                <Input 
+                <Input
                   id="password"
-                  type={showPassword ? "text" : "password"} 
+                  type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="••••••••••••" 
+                  placeholder="••••••••••••"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -215,10 +215,10 @@ const LoginPage = () => {
             {/* Remember Me & Recovery Options */}
             <div className="flex items-center justify-between pt-0.5">
               <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="remember" 
-                  className="w-4 h-4 rounded data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600" 
-                  defaultChecked 
+                <Checkbox
+                  id="remember"
+                  className="w-4 h-4 rounded data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
+                  defaultChecked
                 />
                 <label
                   htmlFor="remember"
@@ -227,8 +227,8 @@ const LoginPage = () => {
                   Keep me logged in
                 </label>
               </div>
-              <a 
-                href="#" 
+              <a
+                href="#"
                 onClick={(e) => { e.preventDefault(); alert("Please contact your system administrator to reset credentials."); }}
                 className="text-[12.5px] text-indigo-600 hover:text-indigo-700 font-semibold transition-colors"
               >
@@ -257,10 +257,10 @@ const LoginPage = () => {
 
             {/* Request Access */}
             <div className="text-center mt-2 border-t border-slate-100 pt-5">
-              <span className="text-[13px] text-slate-500 font-medium">New to Pixand Co? </span>
-              <a 
-                href="#" 
-                onClick={(e) => { e.preventDefault(); alert("Contact Pixand Co Support or your system administrator to provision access."); }}
+              <span className="text-[13px] text-slate-500 font-medium">New to PIXANDCO? </span>
+              <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); alert("Contact PIXANDCO Support or your system administrator to provision access."); }}
                 className="text-[13px] text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
               >
                 Request access

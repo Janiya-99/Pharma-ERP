@@ -38,13 +38,13 @@ const ControlCenterIllustration = () => (
       <circle cx="38" cy="32" r="3" fill="#C7D2FE" />
       <circle cx="48" cy="32" r="3" fill="#C7D2FE" />
       <circle cx="58" cy="32" r="3" fill="#C7D2FE" />
-      
+
       {/* Analytics Bars */}
       <rect x="36" y="75" width="14" height="28" rx="4" fill="#818CF8" />
       <rect x="58" y="55" width="14" height="48" rx="4" fill="#6366F1" />
       <rect x="80" y="42" width="14" height="61" rx="4" fill="#4F46E5" />
       <rect x="102" y="60" width="14" height="43" rx="4" fill="#A5B4FC" />
-      
+
       {/* Floating 3D Metric Card */}
       <rect x="55" y="65" width="85" height="55" rx="12" fill="white" fillOpacity="0.9" stroke="#E0E7FF" strokeWidth="1.5" filter="drop-shadow(0 8px 16px rgba(79, 70, 229, 0.12))" />
       <path d="M68 95 L84 83 L100 89 L122 75" stroke="#4F46E5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -58,16 +58,16 @@ const FinanceIllustration = () => (
     <svg viewBox="0 0 160 160" fill="none" className="w-full h-full drop-shadow-md">
       {/* Ambient Glow */}
       <circle cx="95" cy="80" r="45" fill="#ECFDF5" />
-      
+
       {/* Background Chart Panel */}
       <rect x="30" y="25" width="105" height="85" rx="14" fill="#F0FDF4" stroke="#DCFCE7" strokeWidth="1.5" />
       <circle cx="42" cy="36" r="3" fill="#BBF7D0" />
       <circle cx="52" cy="36" r="3" fill="#BBF7D0" />
-      
+
       {/* Upward Growth Curve */}
       <path d="M42 85 Q 65 80, 80 65 T 120 40" stroke="#10B981" strokeWidth="3.5" strokeLinecap="round" fill="none" />
       <polygon points="120,40 112,40 120,48" fill="#10B981" />
-      
+
       {/* 3D Mint/Green Coin Stacks */}
       <g transform="translate(42, 60)">
         <ellipse cx="20" cy="48" rx="16" ry="6" fill="#059669" />
@@ -94,22 +94,22 @@ const InventoryIllustration = () => (
     <svg viewBox="0 0 160 160" fill="none" className="w-full h-full drop-shadow-md">
       {/* Background Soft Sky Blue Panel */}
       <rect x="25" y="25" width="110" height="95" rx="14" fill="#F0F9FF" stroke="#E0F2FE" strokeWidth="1.5" />
-      
+
       {/* 3D Warehouse Metal Shelving Unit */}
       <path d="M45 35 L45 110 M115 35 L115 110" stroke="#0284C7" strokeWidth="3.5" strokeLinecap="round" />
       <path d="M42 55 L118 55 M42 85 L118 85 M42 110 L118 110" stroke="#0369A1" strokeWidth="3" strokeLinecap="round" />
-      
+
       {/* Layered Warehouse Boxes */}
       {/* Shelf 1 Box */}
       <rect x="52" y="38" width="22" height="17" rx="3" fill="#BAE6FD" stroke="#38BDF8" strokeWidth="1.5" />
       <rect x="78" y="38" width="26" height="17" rx="3" fill="#38BDF8" />
-      
+
       {/* Shelf 2 Boxes (Wood / Cardboard tone) */}
       <rect x="50" y="66" width="30" height="19" rx="3" fill="#D97706" />
       <rect x="52" y="67" width="26" height="8" fill="#F59E0B" rx="2" />
       <rect x="84" y="66" width="28" height="19" rx="3" fill="#B45309" />
       <rect x="86" y="67" width="24" height="8" fill="#D97706" rx="2" />
-      
+
       {/* Shelf 3 Boxes */}
       <rect x="50" y="91" width="30" height="19" rx="3" fill="#B45309" />
       <rect x="84" y="91" width="28" height="19" rx="3" fill="#D97706" />
@@ -122,24 +122,24 @@ const InvoiceCenterIllustration = () => (
     <svg viewBox="0 0 160 160" fill="none" className="w-full h-full drop-shadow-md">
       {/* Background Panel */}
       <rect x="35" y="25" width="95" height="95" rx="14" fill="#FFFBEB" stroke="#FEF3C7" strokeWidth="1.5" />
-      
+
       {/* 3D Invoice / Receipt Document */}
       <g transform="translate(48, 30)">
         <path d="M10 5 L55 5 L65 15 L65 78 L55 75 L45 78 L35 75 L25 78 L15 75 L5 78 L5 10 C5 7.2 7.2 5 10 5 Z" fill="white" stroke="#FDE68A" strokeWidth="1.5" filter="drop-shadow(0 6px 12px rgba(217, 119, 6, 0.15))" />
         {/* Document Folded Corner */}
         <polygon points="55,5 65,15 55,15" fill="#FDE68A" />
-        
+
         {/* Document Content Lines */}
         <rect x="14" y="16" width="22" height="4" rx="2" fill="#F59E0B" />
         <rect x="14" y="26" width="36" height="3" rx="1.5" fill="#E5E7EB" />
         <rect x="14" y="34" width="30" height="3" rx="1.5" fill="#E5E7EB" />
         <rect x="14" y="42" width="36" height="3" rx="1.5" fill="#E5E7EB" />
-        
+
         {/* Dollar Badge / Amount */}
         <text x="14" y="62" fill="#D97706" fontSize="13" fontWeight="bold" fontFamily="sans-serif">$</text>
         <rect x="26" y="54" width="24" height="7" rx="2" fill="#FCD34D" />
       </g>
-      
+
       {/* 3D Floating Orange Coin */}
       <g transform="translate(92, 70)">
         <ellipse cx="14" cy="14" rx="12" ry="12" fill="#F59E0B" />
@@ -155,10 +155,10 @@ const ComplianceCenterIllustration = () => (
     <svg viewBox="0 0 160 160" fill="none" className="w-full h-full drop-shadow-md">
       {/* Ambient Purple Glow */}
       <circle cx="95" cy="80" r="45" fill="#FAF5FF" />
-      
+
       {/* Background Soft Verification Panel */}
       <rect x="30" y="25" width="105" height="90" rx="14" fill="#F3E8FF" fillOpacity="0.6" stroke="#E9D5FF" strokeWidth="1.5" />
-      
+
       {/* 3D Purple Shield */}
       <g transform="translate(68, 42)">
         <path d="M28 4 L52 14 C52 35 38 52 28 58 C18 52 4 35 4 14 Z" fill="#9333EA" filter="drop-shadow(0 8px 16px rgba(147, 51, 234, 0.25))" />
@@ -166,7 +166,7 @@ const ComplianceCenterIllustration = () => (
         {/* Checkmark inside Shield */}
         <path d="M19 28 L25 34 L38 21" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </g>
-      
+
       {/* Layered Document Card */}
       <g transform="translate(38, 48)">
         <rect x="0" y="0" width="38" height="48" rx="8" fill="white" fillOpacity="0.9" stroke="#E9D5FF" strokeWidth="1.5" />
@@ -275,32 +275,32 @@ export const ModuleSelectionPage = () => {
   // Build the list of active modules
   const displayModules: ModuleConfig[] = (softwareModules && softwareModules.length > 0)
     ? softwareModules.map((mod: any) => {
-        const fallback = MODULE_DEFINITIONS[mod.software_code] || {
-          code: mod.software_code,
-          name: mod.software_name || mod.software_code,
-          icon: LayoutGrid,
-          desc: mod.description || "Enter this module to manage related operations and settings.",
-          badgeBg: "bg-indigo-50",
-          badgeText: "text-indigo-600",
-          ctaBg: "bg-indigo-50/80",
-          ctaHoverBg: "hover:bg-indigo-100",
-          ctaText: "text-indigo-600",
-          ringColor: "hover:ring-indigo-200",
-          illustration: <ControlCenterIllustration />,
-        };
-        return {
-          ...fallback,
-          name: mod.software_name || fallback.name,
-          desc: fallback.desc,
-        };
-      })
+      const fallback = MODULE_DEFINITIONS[mod.software_code] || {
+        code: mod.software_code,
+        name: mod.software_name || mod.software_code,
+        icon: LayoutGrid,
+        desc: mod.description || "Enter this module to manage related operations and settings.",
+        badgeBg: "bg-indigo-50",
+        badgeText: "text-indigo-600",
+        ctaBg: "bg-indigo-50/80",
+        ctaHoverBg: "hover:bg-indigo-100",
+        ctaText: "text-indigo-600",
+        ringColor: "hover:ring-indigo-200",
+        illustration: <ControlCenterIllustration />,
+      };
+      return {
+        ...fallback,
+        name: mod.software_name || fallback.name,
+        desc: fallback.desc,
+      };
+    })
     : [
-        MODULE_DEFINITIONS.CONTROL_CENTER,
-        MODULE_DEFINITIONS.FINANCE,
-        MODULE_DEFINITIONS.INVENTORY,
-        MODULE_DEFINITIONS.INVOICE_CENTER,
-        MODULE_DEFINITIONS.COMPLIANCE_CENTER,
-      ];
+      MODULE_DEFINITIONS.CONTROL_CENTER,
+      MODULE_DEFINITIONS.FINANCE,
+      MODULE_DEFINITIONS.INVENTORY,
+      MODULE_DEFINITIONS.INVOICE_CENTER,
+      MODULE_DEFINITIONS.COMPLIANCE_CENTER,
+    ];
 
   return (
     <div className="relative min-h-screen bg-[#F8FAFC] flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
@@ -503,7 +503,7 @@ export const ModuleSelectionPage = () => {
         {/* Footer */}
         <footer className="text-center py-4 border-t border-slate-100/80">
           <p className="text-xs font-medium text-slate-400">
-            Engineered by <span className="font-bold text-slate-700">Pixand Co</span>
+            Engineered by <span className="font-bold text-slate-700">PIXANDCO</span>
           </p>
         </footer>
       </main>

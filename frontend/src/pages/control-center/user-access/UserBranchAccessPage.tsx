@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import UserSelector from "../../../components/common/UserSelector";
 import MultiSelect from "../../../components/common/MultiSelect";
 import Button from "../../../components/common/Button";
@@ -7,7 +8,7 @@ import FormError from "../../../components/common/FormError";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { getBranches, getUserBranches, assignUserBranches, removeUserBranch, updateUser } from "../../../api/controlApi";
-import { MapPin, Shield, Trash2, CheckCircle2 } from "lucide-react";
+import { MapPin, Building2, Shield, Trash2, CheckCircle2 } from "lucide-react";
 
 const UserBranchAccessPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -156,10 +157,14 @@ const UserBranchAccessPage = () => {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <PageTitleCard
         title="User Branch Access"
-        description="Assign or remove branch access for users."
+        description="Configure regional branch authorization, warehouse allocations, and primary branch defaults for staff."
+        moduleTag="Control Center"
+        icon={Building2}
+        accent="indigo"
+        backTo="/control-center/dashboard"
       />
 
       <FormError message={error} />

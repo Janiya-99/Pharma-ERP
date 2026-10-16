@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { getPermissions, getPermissionsGrouped, getSoftwareModules } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
 import Input from "../../../components/common/Input";
 import FormError from "../../../components/common/FormError";
 import StatusBadge from "../../../components/common/StatusBadge";
-import { Search, LayoutList, Layers } from "lucide-react";
+import { Search, LayoutList, Layers, Key, Shield } from "lucide-react";
 
 const PermissionsPage = () => {
   const [permissions, setPermissions] = useState([]);
@@ -135,6 +136,34 @@ const PermissionsPage = () => {
 
   return (
     <div className="space-y-6">
+      <PageTitleCard
+        title="System Permissions Registry"
+        description="Explore the comprehensive security registry of system capability keys, actions, and software scopes."
+        moduleTag="Control Center"
+        icon={Key}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button
+              onClick={() => setViewMode("flat")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center transition-all ${
+                viewMode === "flat" ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <LayoutList className="w-3.5 h-3.5 mr-1.5" /> List
+            </button>
+            <button
+              onClick={() => setViewMode("grouped")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center transition-all ${
+                viewMode === "grouped" ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 mr-1.5" /> Grouped
+            </button>
+          </div>
+        }
+      />
 
       <FormError message={error} />
 

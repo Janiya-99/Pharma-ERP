@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getLoginLogs, getUsers } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
@@ -311,22 +312,24 @@ const LoginLogsPage = () => {
   }));
 
   return (
-    <div className="bg-slate-50 min-h-full">
-      <PageHeader
-        title="Login Logs"
-        description="Monitor user authentication attempts and access history."
-        badge={
-          <span className="border-slate-200 bg-slate-50 text-slate-600 inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold">
-            {Number(totalResults || 0).toLocaleString()} total
-          </span>
-        }
-        action={
-          <>
+    <div className="min-h-full space-y-6">
+      <PageTitleCard
+        title="Login History & Authentication Telemetry"
+        description="Monitor user authentication attempts, multi-factor challenges, and access session security."
+        moduleTag="Control Center"
+        icon={ShieldCheck}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs">
+              {Number(totalResults || 0).toLocaleString()} attempts
+            </span>
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="gap-2"
+              className="gap-2 rounded-xl"
               onClick={fetchLogs}
             >
               <RefreshCw className="h-4 w-4" />
@@ -336,14 +339,14 @@ const LoginLogsPage = () => {
               type="button"
               variant="ghost"
               size="sm"
-              className="gap-2"
+              className="gap-2 rounded-xl"
               onClick={clearFilters}
               disabled={!activeFilterCount}
             >
               <FilterX className="h-4 w-4" />
               Clear
             </Button>
-          </>
+          </div>
         }
       />
 

@@ -29,7 +29,25 @@ func (r *SecuritySettingsRepository) GetSecurityPolicy(companyID uint64, branchI
 	}
 	err := query.Where("branch_id IS NULL").First(&pol).Error
 	if err != nil {
-		return nil, err
+		// Provide default enterprise security policy
+		defaultPolicy := models.SecurityPolicy{
+			CompanyID:                 companyID,
+			MinPasswordLength:         12,
+			RequireUppercase:          true,
+			RequireLowercase:          true,
+			RequireNumber:             true,
+			RequireSpecialChar:        true,
+			PasswordExpiryDays:        90,
+			MaxFailedLoginAttempts:    5,
+			LockoutDurationMinutes:    30,
+			SessionIdleTimeoutMinutes: 30,
+			MaxConcurrentSessions:     3,
+			RequireMFA:                true,
+			MFAPolicy:                 "required_admin",
+			Status:                    "published",
+		}
+		_ = r.db.Create(&defaultPolicy)
+		return &defaultPolicy, nil
 	}
 	return &pol, nil
 }

@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { getPermissionsGrouped, getRolePermissionMatrix, assignRolePermissions } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";
 import SoftwareSelector from "../../../components/common/SoftwareSelector";
@@ -159,6 +160,28 @@ const RolePermissionMatrixPage = () => {
 
   return (
     <div className="space-y-6">
+      <PageTitleCard
+        title="Role Permission Matrix"
+        description="Map system privileges, software scope, and granular actions directly across corporate roles."
+        moduleTag="Control Center"
+        icon={Shield}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          selectedRole && canAssign ? (
+            <div className="flex items-center gap-2">
+              {hasUnsavedChanges && (
+                <span className="text-orange-600 text-xs font-semibold flex items-center bg-orange-50 px-2.5 py-1.5 rounded-lg border border-orange-200">
+                  <AlertTriangle className="w-3.5 h-3.5 mr-1" /> Unsaved
+                </span>
+              )}
+              <Button onClick={handleSave} isLoading={saving} disabled={!hasUnsavedChanges} className="gap-2 rounded-xl">
+                <Save className="w-4 h-4" /> Save Permissions
+              </Button>
+            </div>
+          ) : undefined
+        }
+      />
       <FormError message={error} />
       {successMsg && (
         <div className="mb-6 bg-green-50 text-green-800 p-3 rounded-md text-sm border border-green-200 flex items-center">

@@ -210,16 +210,24 @@ export default function InventoryDashboard() {
   const [selectedIds, setSelectedIds] = useState<Record<string | number, boolean>>({});
 
   // Dynamic Data from Backend API
-  const [totalProducts, setTotalProducts] = useState(2465);
-  const [totalStockValue, setTotalStockValue] = useState(34934760);
-  const [lowStockCount, setLowStockCount] = useState(48);
-  const [outOfStockCount, setOutOfStockCount] = useState(12);
-  const [expiringSoonCount, setExpiringSoonCount] = useState(60);
-  const [activeBatchesCount, setActiveBatchesCount] = useState(275);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalStockValue, setTotalStockValue] = useState(0);
+  const [lowStockCount, setLowStockCount] = useState(0);
+  const [outOfStockCount, setOutOfStockCount] = useState(0);
+  const [expiringSoonCount, setExpiringSoonCount] = useState(0);
+  const [activeBatchesCount, setActiveBatchesCount] = useState(0);
 
   const [categoryData, setCategoryData] = useState<CategoryBarItem[]>(defaultCategoryData);
   const [expiryList, setExpiryList] = useState<ExpiryRiskRow[]>(defaultExpiryRisk);
   const [tableData, setTableData] = useState<TableRow[]>(defaultTableData);
+  const [stockStatusOverview, setStockStatusOverview] = useState<StockOverviewItem[]>([
+    { name: "In Stock", count: 0, pct: 0, color: "#0EA5E9" },
+    { name: "Low Stock", count: 0, pct: 0, color: "#F59E0B" },
+    { name: "Out of Stock", count: 0, pct: 0, color: "#EF4444" },
+    { name: "Expiring Soon", count: 0, pct: 0, color: "#F97316" },
+    { name: "Blocked / Hold", count: 0, pct: 0, color: "#8B5CF6" },
+    { name: "Inactive", count: 0, pct: 0, color: "#94A3B8" },
+  ]);
 
   // Fetch True Data
   const fetchData = async () => {
@@ -228,12 +236,12 @@ export default function InventoryDashboard() {
       const res = await inventoryApi.getInventoryDashboard();
       if (res?.data?.data) {
         const d = res.data.data;
-        if (d.total_products) setTotalProducts(Number(d.total_products) > 100 ? Number(d.total_products) : 2465);
-        if (d.total_stock_value) setTotalStockValue(Number(d.total_stock_value));
-        if (d.low_stock_products !== undefined) setLowStockCount(Number(d.low_stock_products) > 0 ? Number(d.low_stock_products) : 48);
-        if (d.out_of_stock_items !== undefined) setOutOfStockCount(Number(d.out_of_stock_items) > 0 ? Number(d.out_of_stock_items) : 12);
-        if (d.near_expiry_batches !== undefined) setExpiringSoonCount(Number(d.near_expiry_batches) > 0 ? Number(d.near_expiry_batches) : 60);
-        if (d.total_batches !== undefined) setActiveBatchesCount(Number(d.total_batches) > 0 ? Number(d.total_batches) : 275);
+        if (d.total_products !== undefined) setTotalProducts(Number(d.total_products));
+        if (d.total_stock_value !== undefined) setTotalStockValue(Number(d.total_stock_value));
+        if (d.low_stock_products !== undefined) setLowStockCount(Number(d.low_stock_products));
+        if (d.out_of_stock_items !== undefined) setOutOfStockCount(Number(d.out_of_stock_items));
+        if (d.near_expiry_batches !== undefined) setExpiringSoonCount(Number(d.near_expiry_batches));
+        if (d.total_batches !== undefined) setActiveBatchesCount(Number(d.total_batches));
 
         // Category valuation
         if (d.category_distribution && d.category_distribution.length > 0) {
@@ -250,7 +258,20 @@ export default function InventoryDashboard() {
           setCategoryData(mapped);
         }
 
-        // Expiry risk items
+        // Stock status breakdown overview
+        if (d.stock_status_overview) {
+          const so = d.stock_status_overview;
+          setStockStatusOverview([
+            { name: "In Stock", count: Number(so.in_stock) || 0, pct: Number(so.in_stock_pct) || 0, color: "#0EA5E9" },
+            { name: "Low Stock", count: Number(so.low_stock) || 0, pct: Number(so.low_stock_pct) || 0, color: "#F59E0B" },
+            { name: "Out of Stock", count: Number(so.out_of_stock) || 0, pct: Number(so.out_of_stock_pct) || 0, color: "#EF4444" },
+            { name: "Expiring Soon", count: Number(so.expiring_soon) || 0, pct: Number(so.expiring_soon_pct) || 0, color: "#F97316" },
+            { name: "Blocked / Hold", count: Number(so.blocked_hold) || 0, pct: Number(so.blocked_hold_pct) || 0, color: "#8B5CF6" },
+            { name: "Inactive", count: Number(so.inactive) || 0, pct: Number(so.inactive_pct) || 0, color: "#94A3B8" },
+          ]);
+        }
+
+        // Expiry risk items / batch alerts
         if (d.expiry_risk_items && d.expiry_risk_items.length > 0) {
           const mappedExpiry: ExpiryRiskRow[] = d.expiry_risk_items.map((it: any) => ({
             product: it.product,
@@ -258,6 +279,15 @@ export default function InventoryDashboard() {
             expiryDate: it.expiry_date,
             daysLeft: it.days_left,
             qty: it.qty,
+          }));
+          setExpiryList(mappedExpiry);
+        } else if (d.batch_alerts && d.batch_alerts.length > 0) {
+          const mappedExpiry: ExpiryRiskRow[] = d.batch_alerts.map((it: any) => ({
+            product: it.product,
+            batch: it.batch,
+            expiryDate: it.expiry,
+            daysLeft: 30,
+            qty: Number(parseInt(String(it.qty).replace(/\D/g, "")) || 0),
           }));
           setExpiryList(mappedExpiry);
         }
@@ -364,14 +394,7 @@ export default function InventoryDashboard() {
   ];
 
   // Donut chart breakdown
-  const donutData: StockOverviewItem[] = [
-    { name: "In Stock", count: 1982, pct: 80.4, color: "#0EA5E9" },
-    { name: "Low Stock", count: 48, pct: 1.9, color: "#F59E0B" },
-    { name: "Out of Stock", count: 12, pct: 0.5, color: "#EF4444" },
-    { name: "Expiring Soon", count: 60, pct: 2.4, color: "#F97316" },
-    { name: "Blocked / Hold", count: 25, pct: 1.0, color: "#8B5CF6" },
-    { name: "Inactive", count: 338, pct: 13.7, color: "#94A3B8" },
-  ];
+  const donutData: StockOverviewItem[] = stockStatusOverview;
 
   // Table filtering
   const filteredRows = useMemo(() => {
@@ -500,7 +523,14 @@ export default function InventoryDashboard() {
       {/* AI Copilot & Real-Time Stock Analytics */}
       <DashboardAiAnalysisSection
         dashboardType="inventory"
-        kpiData={data}
+        kpiData={{
+          total_products: totalProducts,
+          total_stock_value: totalStockValue,
+          low_stock_products: lowStockCount,
+          out_of_stock_items: outOfStockCount,
+          near_expiry_batches: expiringSoonCount,
+          total_batches: activeBatchesCount,
+        }}
         title="Inventory AI Copilot & Reorder Telemetry"
         className="mb-6"
       />

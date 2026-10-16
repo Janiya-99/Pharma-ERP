@@ -11,6 +11,7 @@ import {
   getSoftwareModules,
 } from "../../../api/controlApi";
 import Breadcrumbs from "../../../components/common/Breadcrumbs";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
@@ -33,6 +34,7 @@ import {
   Download,
   RefreshCw,
   UserCog,
+  Users,
 } from "lucide-react";
 
 interface User {
@@ -276,40 +278,29 @@ const UsersPage = () => {
   ];
 
   return (
-    <div className="page-content">
-      {/* Breadcrumbs */}
-      <Breadcrumbs
-        items={[
-          { label: "Control Center", href: "/control-center/users" },
-          { label: "User & Access Center" },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">User & Access Center</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Manage system users, access controls, and permissions
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={() => refetch()}>
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-            Refresh
-          </Button>
-          <Button variant="secondary" size="sm">
-            <Download className="w-3.5 h-3.5 mr-1.5" />
-            Export
-          </Button>
-          <PermissionGuard permission="control.user.create">
-            <Button onClick={() => navigate("/control-center/users/create")}>
-              <Plus className="w-4 h-4 mr-1.5" />
-              Create User
+    <div className="page-content space-y-6">
+      <PageTitleCard
+        title="User & Access Center"
+        description="Manage system users, employee codes, security profiles, and branch role assignments."
+        moduleTag="Control Center"
+        icon={Users}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" size="sm" onClick={() => refetch()} className="gap-1.5 rounded-xl">
+              <RefreshCw className="w-3.5 h-3.5" />
+              Refresh
             </Button>
-          </PermissionGuard>
-        </div>
-      </div>
+            <PermissionGuard permission="control.user.create">
+              <Button onClick={() => navigate("/control-center/users/create")} className="gap-1.5 rounded-xl">
+                <Plus className="w-4 h-4" />
+                Create User
+              </Button>
+            </PermissionGuard>
+          </div>
+        }
+      />
 
       <FormError message={error instanceof Error ? error.message : null} />
 

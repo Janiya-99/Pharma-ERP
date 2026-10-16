@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getDepartments, deleteDepartment } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";
 import Button from "../../../components/common/Button";
@@ -10,7 +11,7 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import FormError from "../../../components/common/FormError";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import DepartmentFormModal from "./DepartmentFormModal";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, Layers } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const DepartmentsPage = () => {
@@ -150,14 +151,18 @@ const DepartmentsPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHeader
-        title="Departments"
-        description="Manage company departments and structural units."
-        action={
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <PageTitleCard
+        title="Departments & Organisational Divisions"
+        description="Organise company departments, cost centers, and structural reporting divisions."
+        moduleTag="Control Center"
+        icon={Layers}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
           <PermissionGuard permission="control.department.create">
-            <Button onClick={openCreateModal}>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button onClick={openCreateModal} className="gap-2 rounded-xl">
+              <Plus className="w-4 h-4" />
               Create Department
             </Button>
           </PermissionGuard>

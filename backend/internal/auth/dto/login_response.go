@@ -16,8 +16,10 @@ type UserDTO struct {
 	Name            string `json:"name"`
 	Email           string `json:"email"`
 	UserType        string `json:"user_type"`
-	AvatarURL       string `json:"avatar_url"`
-	ProfileImageURL string `json:"profile_image_url"`
+	AvatarURL           string `json:"avatar_url"`
+	ProfileImageURL     string `json:"profile_image_url"`
+	ForcePasswordChange bool   `json:"force_password_change"`
+	TwoFactorEnabled    bool   `json:"two_factor_enabled"`
 }
 
 type CompanyDTO struct {

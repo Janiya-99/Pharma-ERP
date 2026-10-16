@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshCw, Wallet, Landmark, Receipt, FileText, TrendingUp, TrendingDown, BarChart3, BadgeDollarSign, ClipboardCheck, CircleDollarSign, ChevronDown, Plus } from "lucide-react";
 
@@ -37,6 +38,7 @@ import { FinanceReportShortcuts } from "./components/FinanceReportShortcuts";
 import { DashboardAiAnalysisSection } from "../../../components/common/DashboardAiAnalysisSection";
 
 const FinanceDashboardPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [filters, setFilters] = useState<Record<string, string>>({
     period_type: "this_month",
@@ -84,20 +86,20 @@ const FinanceDashboardPage = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl border-slate-200/80 bg-white/95 backdrop-blur-md z-50">
-                <DropdownMenuItem onClick={() => navigate("/admin/finance/journal-entries/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/finance/journal-entries/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <FileText className="mr-2.5 h-4 w-4 text-emerald-500" />
                   <span className="font-semibold">New Journal Entry</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/admin/invoice-center/invoices/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/invoice-center/invoices/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Receipt className="mr-2.5 h-4 w-4 text-blue-500" />
                   <span className="font-semibold">Create Invoice</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/admin/finance/payment-vouchers/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/finance/payment-vouchers/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Wallet className="mr-2.5 h-4 w-4 text-amber-500" />
                   <span className="font-semibold">Record Payment</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                <DropdownMenuItem onClick={() => navigate("/admin/finance/bank-transactions/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/finance/bank-transactions/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Landmark className="mr-2.5 h-4 w-4 text-indigo-500" />
                   <span className="font-semibold">Bank Transfer</span>
                 </DropdownMenuItem>

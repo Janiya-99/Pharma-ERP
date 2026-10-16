@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/pixandco/erp-phrma/internal/company/models"
 	"go.uber.org/zap"
@@ -32,6 +33,29 @@ func (s *AuditService) LogAction(companyID uint64, branchID, userID *uint64, sof
 			str := string(b)
 			newStr = &str
 		}
+	}
+
+	if branchID == nil || *branchID == 0 {
+		if userID != nil && *userID != 0 {
+			var u models.User
+			if err := s.db.Where("id = ?", *userID).First(&u).Error; err == nil && u.DefaultBranchID != nil && *u.DefaultBranchID != 0 {
+				branchID = u.DefaultBranchID
+			}
+		}
+		if branchID == nil || *branchID == 0 {
+			var b models.Branch
+			if err := s.db.Where("company_id = ?", companyID).Order("id ASC").First(&b).Error; err == nil && b.ID != 0 {
+				defaultBid := b.ID
+				branchID = &defaultBid
+			}
+		}
+	}
+	if ipAddress == "" {
+		ipAddress = "127.0.0.1"
+	}
+	if entityID == nil || *entityID == 0 {
+		defaultEID := uint64(time.Now().Unix())
+		entityID = &defaultEID
 	}
 
 	audit := models.AuditLog{

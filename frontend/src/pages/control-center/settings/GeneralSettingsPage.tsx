@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { getSettings, publishSetting, triggerManualBackup } from "../../../api/controlApi";
 import SettingsImpactPreview from "../../../components/common/SettingsImpactPreview";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 
 const GeneralSettingsPage = () => {
   // Company Profile
@@ -163,43 +164,31 @@ const GeneralSettingsPage = () => {
         isLoading={isSaving}
       />
       {/* ── Page Header ── */}
-      <div className="flex flex-col gap-4 border-b border-slate-200/80  pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-              <Settings className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 ">
-                Control Center • Platform Administration
-              </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900  sm:text-3xl">
-                General System & Localization Settings
-              </h1>
-            </div>
+      <PageTitleCard
+        title="General System & Localization Settings"
+        description="Configure enterprise currency, timezone, date conventions, fiscal year boundaries, and operational notification thresholds."
+        moduleTag="Control Center"
+        icon={Settings}
+        accent="indigo"
+        backTo="/control-center/dashboard"
+        actions={
+          <div className="flex items-center gap-3">
+            {saveSuccess && (
+              <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-700 border border-emerald-200/60 animate-in fade-in">
+                <CheckCircle2 className="h-4 w-4" /> Global Settings Saved!
+              </span>
+            )}
+            <button
+              onClick={handleSaveClick}
+              disabled={isSaving}
+              className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50 cursor-pointer"
+            >
+              {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {isSaving ? "Saving Configuration..." : "Save Global Settings"}
+            </button>
           </div>
-          <p className="mt-1 text-sm text-slate-500  pl-12">
-            Manage corporate profile, fiscal year boundaries, currencies, regional localization, and backup policies
-          </p>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex items-center gap-3">
-          {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50  px-3.5 py-2 text-xs font-bold text-emerald-700  border border-emerald-200/60  animate-in fade-in">
-              <CheckCircle2 className="h-4 w-4" /> Global Settings Saved!
-            </span>
-          )}
-          <button
-            onClick={handleSaveClick}
-            disabled={isSaving}
-            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all disabled:opacity-50"
-          >
-            {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            {isSaving ? "Saving Configuration..." : "Save Global Settings"}
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* ══════════════════════════════════════════════

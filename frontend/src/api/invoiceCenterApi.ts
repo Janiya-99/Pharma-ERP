@@ -295,6 +295,9 @@ export const invoiceCenterApi = {
     apiClient.post(`/invoice-center/print-formats/${id}/duplicate`),
 
   // ---- Reports ----
+  getDashboardSummary: (
+    params: DashboardSummaryReportParams = {}
+  ) => apiClient.get("/invoice-center/dashboard/summary", { params }),
   getInvoiceCenterDashboardSummary: (
     params: DashboardSummaryReportParams = {}
   ) => apiClient.get("/invoice-center/dashboard/summary", { params }),
