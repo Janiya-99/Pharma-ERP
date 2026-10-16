@@ -48,10 +48,10 @@ const PlatformAdminDashboardPage = () => {
   }, []);
 
   const cards = [
-    { name: "Total Tenants", value: metrics.totalCompanies, icon: Building2, color: "text-indigo-400 bg-indigo-500/10" },
-    { name: "Active Licenses", value: metrics.activeSubscribers, icon: ShieldCheck, color: "text-emerald-400 bg-emerald-500/10" },
-    { name: "SaaS Revenue (LKR)", value: metrics.totalRevenue.toLocaleString(), icon: Landmark, color: "text-indigo-400 bg-indigo-500/10" },
-    { name: "Pending Tickets", value: metrics.pendingTickets, icon: Ticket, color: "text-amber-400 bg-amber-500/10" },
+    { name: "Total Tenants", value: metrics.totalCompanies, icon: Building2, color: "text-indigo-400 bg-indigo-500/10", path: "/platform-admin/companies" },
+    { name: "Active Licenses", value: metrics.activeSubscribers, icon: ShieldCheck, color: "text-emerald-400 bg-emerald-500/10", path: "/platform-admin/subscriptions/company-licenses" },
+    { name: "SaaS Revenue (LKR)", value: metrics.totalRevenue.toLocaleString(), icon: Landmark, color: "text-indigo-400 bg-indigo-500/10", path: "/platform-admin/subscriptions/invoices" },
+    { name: "Pending Tickets", value: metrics.pendingTickets, icon: Ticket, color: "text-amber-400 bg-amber-500/10", path: "/platform-admin/support-tickets" },
   ];
 
   return (
@@ -66,12 +66,13 @@ const PlatformAdminDashboardPage = () => {
       {/* Analytics Cards */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
-          <div
+          <Link
             key={card.name}
-            className="group relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-5 sm:p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ring-1 ring-inset ring-slate-800 hover:ring-indigo-50"
+            to={card.path}
+            className="group relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-5 sm:p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ring-1 ring-inset ring-slate-800 hover:ring-indigo-500/40 cursor-pointer block"
           >
             <div className="flex items-start justify-between gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block group-hover:text-indigo-300 transition-colors">
                 {card.name}
               </span>
               <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105 ${card.color}`}>
@@ -82,8 +83,11 @@ const PlatformAdminDashboardPage = () => {
               <span className="text-2xl font-bold tracking-tight text-white block">
                 {card.value}
               </span>
+              <span className="text-xs text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity font-semibold flex items-center gap-0.5">
+                View &rarr;
+              </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -120,9 +124,16 @@ const PlatformAdminDashboardPage = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {companies.map((company) => (
-                    <tr key={company.id} className="hover:bg-slate-800/50 transition-all">
-                      <td className="py-3.5 font-bold text-white">{company.company_code}</td>
-                      <td className="py-3.5 text-slate-200">{company.company_name}</td>
+                    <tr 
+                      key={company.id} 
+                      className="hover:bg-slate-800/80 transition-all cursor-pointer group"
+                    >
+                      <td className="py-3.5 font-bold text-white group-hover:text-indigo-400 transition-colors">
+                        <Link to="/platform-admin/companies">{company.company_code}</Link>
+                      </td>
+                      <td className="py-3.5 text-slate-200">
+                        <Link to="/platform-admin/companies">{company.company_name}</Link>
+                      </td>
                       <td className="py-3.5">{company.company_email}</td>
                       <td className="py-3.5">
                         {company.license_end_date

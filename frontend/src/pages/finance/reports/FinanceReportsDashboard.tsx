@@ -103,14 +103,18 @@ const FinanceReportsDashboard = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {visibleCards.map((card: unknown, index: unknown) => (
-            <Card key={index} className="flex flex-col border-gray-200  shadow-sm hover:shadow-md transition-shadow">
+          {visibleCards.map((card: any, index: any) => (
+            <Card 
+              key={index} 
+              onClick={() => navigate(card.path)}
+              className="flex flex-col border-gray-200 shadow-sm hover:shadow-md hover:border-brand-400 hover:-translate-y-0.5 transition-all cursor-pointer group"
+            >
               <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                <div className="p-3 bg-gray-50  rounded-lg">
+                <div className="p-3 bg-gray-50 rounded-lg group-hover:bg-brand-50 transition-colors">
                   {card.icon}
                 </div>
                 <div>
-                  <CardTitle className="text-lg text-navy-800 ">{card.title}</CardTitle>
+                  <CardTitle className="text-lg text-navy-800 group-hover:text-brand-600 transition-colors">{card.title}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="flex-1">
@@ -119,11 +123,10 @@ const FinanceReportsDashboard = () => {
               <CardFooter className="pt-4 border-t border-gray-100 ">
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-between hover:bg-brand-50 hover:text-brand-600  "
-                  onClick={() => navigate(card.path)}
+                  className="w-full justify-between hover:bg-brand-50 hover:text-brand-600 group-hover:bg-brand-50 group-hover:text-brand-600 pointer-events-none"
                 >
                   Open Report
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </CardFooter>
             </Card>

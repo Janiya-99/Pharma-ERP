@@ -305,12 +305,16 @@ export default function InvoiceCenterDashboard() {
         <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-slate-900/5 lg:col-span-2 flex flex-col justify-between">
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">
-                  Invoicing vs Collections
+              <div 
+                onClick={() => navigate("/invoice-center/reports/collection-summary")}
+                className="cursor-pointer group"
+              >
+                <h3 className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+                  <span>Invoicing vs Collections</span>
+                  <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600" />
                 </h3>
                 <p className="text-xs text-slate-500 font-medium mt-1">
-                  Monthly billed revenue compared to actual cash receipts
+                  Monthly billed revenue compared to actual cash receipts (Click to view full collection report)
                 </p>
               </div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60 shadow-sm">
@@ -510,43 +514,52 @@ export default function InvoiceCenterDashboard() {
           </div>
 
           <div className="space-y-3 flex-1">
-            <button className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-slate-50 hover:border-slate-300 transition-all text-left shadow-sm group">
+            <button
+              onClick={() => navigate("/invoice-center/customer-receipts/create")}
+              className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-blue-50/50 hover:border-blue-300 transition-all text-left shadow-sm group cursor-pointer"
+            >
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 group-hover:scale-105 transition-transform">
                   <DollarSign className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Log Payment Receipt</p>
+                  <p className="font-semibold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">Log Payment Receipt</p>
                   <p className="text-xs text-slate-500">Record incoming customer funds</p>
                 </div>
               </div>
-              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
             </button>
 
-            <button className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-slate-50 hover:border-slate-300 transition-all text-left shadow-sm group">
+            <button
+              onClick={() => navigate("/invoice-center/sales-invoices/create")}
+              className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-blue-50/50 hover:border-blue-300 transition-all text-left shadow-sm group cursor-pointer"
+            >
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 group-hover:scale-105 transition-transform">
                   <Receipt className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Create Recurring Invoice</p>
-                  <p className="text-xs text-slate-500">Setup automated billing cycles</p>
+                  <p className="font-semibold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">Create Sales Invoice</p>
+                  <p className="text-xs text-slate-500">Dispatch electronic invoice</p>
                 </div>
               </div>
-              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
             </button>
 
-            <button className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-slate-50 hover:border-slate-300 transition-all text-left shadow-sm group">
+            <button
+              onClick={() => navigate("/invoice-center/reports/customer-aging")}
+              className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 hover:bg-blue-50/50 hover:border-blue-300 transition-all text-left shadow-sm group cursor-pointer"
+            >
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 group-hover:scale-105 transition-transform">
                   <AlertCircle className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Send Reminders</p>
+                  <p className="font-semibold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">Send Reminders</p>
                   <p className="text-xs text-slate-500">Dispatch overdue notifications</p>
                 </div>
               </div>
-              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
             </button>
           </div>
         </div>

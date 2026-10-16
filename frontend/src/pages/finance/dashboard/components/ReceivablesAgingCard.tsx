@@ -1,20 +1,32 @@
+import { useNavigate } from "react-router-dom";
 import { ReceivablesSummary } from "../types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../components/ui/card";
 import { money } from "../utils";
+import { ChevronRight } from "lucide-react";
 
 interface ReceivablesAgingCardProps {
   data: ReceivablesSummary;
 }
 
 export function ReceivablesAgingCard({ data }: ReceivablesAgingCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <Card className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60">
+    <Card 
+      onClick={() => navigate("/invoice-center/reports/customer-aging")}
+      className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60 cursor-pointer hover:ring-blue-200"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/30 opacity-50 pointer-events-none" />
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100/50 to-transparent rounded-bl-full pointer-events-none opacity-50" />
       
-      <CardHeader className="pb-4 relative z-10 border-b border-slate-100/50">
-        <CardTitle className="text-lg font-semibold tracking-tight text-slate-800">Accounts Receivable</CardTitle>
-        <CardDescription className="text-sm font-medium text-slate-500">Outstanding customer invoices</CardDescription>
+      <CardHeader className="pb-4 relative z-10 border-b border-slate-100/50 flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="text-lg font-semibold tracking-tight text-slate-800 group-hover:text-blue-600 transition-colors">Accounts Receivable</CardTitle>
+          <CardDescription className="text-sm font-medium text-slate-500">Outstanding customer invoices</CardDescription>
+        </div>
+        <div className="h-7 w-7 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
+          <ChevronRight className="h-4 w-4" />
+        </div>
       </CardHeader>
       
       <CardContent className="pt-5 relative z-10">

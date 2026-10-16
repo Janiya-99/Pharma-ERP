@@ -1,21 +1,29 @@
+import { useNavigate } from "react-router-dom";
 import { LiquiditySummary } from "../types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { money } from "../utils";
-import { ArrowDownRight, ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, CheckCircle2, AlertCircle, ChevronRight } from "lucide-react";
 
 interface CashFlowLiquidityCardProps {
   data: LiquiditySummary;
 }
 
 export function CashFlowLiquidityCard({ data }: CashFlowLiquidityCardProps) {
+  const navigate = useNavigate();
   const isHealthy = data.liquidity_status === "Healthy";
   
   return (
-    <Card className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60">
+    <Card 
+      onClick={() => navigate("/finance/banking/cash-book")}
+      className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60 cursor-pointer hover:ring-emerald-200"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/40 to-teal-50/20 opacity-50 pointer-events-none" />
       
       <CardHeader className="pb-4 relative z-10 border-b border-slate-100/50 flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-semibold tracking-tight text-slate-800">Cash Flow Liquidity</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold tracking-tight text-slate-800 group-hover:text-emerald-700 transition-colors">Cash Flow Liquidity</CardTitle>
+          <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 transition-colors" />
+        </div>
         <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${
           isHealthy 
             ? "bg-emerald-50 text-emerald-700 ring-emerald-200/50" 
