@@ -31,39 +31,58 @@ const TrialBalanceReportPage = () => {
     branch_id: activeBranch?.id ? String(activeBranch.id) : ""
   });
 
+  const fetchReport = useCallback(async (customFilters?: Record<string, unknown>) => {
+    setLoading(true);
+    try {
+      const activeFilters = customFilters || filters;
+      const params: Record<string, unknown> = { ...activeFilters };
+      Object.keys(params).forEach((key: string) => {
+        if (params[key] === "") delete params[key];
+      });
+
+      if (!params.financial_year_id && financialYears.length > 0) {
+        const activeFy: any = financialYears.find((f: any) => f.is_active || f.is_current) || financialYears[0];
+        if (activeFy) params.financial_year_id = String(activeFy.id);
+      }
+
+      const response = await financeApi.getTrialBalanceReport(params);
+      if (response.data?.success) {
+        setData(response.data.data);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to fetch trial balance report");
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, financialYears]);
+
   const fetchFiltersData = async () => {
     try {
       const [fyRes, branchRes] = await Promise.all([
         financeApi.getFinancialYears({ limit: 100 }),
         getBranches({ limit: 100, status: "active" })
       ]);
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
+      const fyList = fyRes.data?.success ? (fyRes.data.data || []) : [];
+      setFinancialYears(fyList);
       const bList = branchRes.data?.data?.items || branchRes.data?.data || branchRes.data || [];
       if (Array.isArray(bList)) setBranches(bList);
+
+      const activeFy: any = fyList.find((f: any) => f.is_active || f.is_current) || fyList[0];
+      if (activeFy) {
+        const initial = {
+          financial_year_id: String(activeFy.id),
+          date_from: "",
+          date_to: "",
+          branch_id: activeBranch?.id ? String(activeBranch.id) : ""
+        };
+        setFilters(initial);
+        fetchReport(initial);
+      }
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
   };
-
-  const fetchReport = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = { ...filters };
-      Object.keys(params).forEach((key: unknown) => {
-        if (params[key] === "") delete params[key];
-      });
-
-      const response = await financeApi.getTrialBalanceReport(params);
-      if (response.data?.success) {
-        setData(response.data.data);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to fetch trial balance report");
-      setData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
 
   useEffect(() => {
     fetchFiltersData();
