@@ -59,50 +59,44 @@ const FinanceDashboardPage = () => {
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
       {/* ── TOP PAGE HEADER ── */}
       <DashboardHeroCard
-        title="Financial Operations & Treasury"
+        title="Finance Dashboard"
         subtitle={`Audited fiscal analytics, liquidity positions, and statutory ledger governance for ${user?.company_name || "Ceylon Med Global"}.`}
-        moduleTag="Fiscal Intelligence & Ledger"
+        moduleTag="Finance"
         icon={Landmark}
-        quote={{
-          text: "Audited financial transparency, real-time fiscal control, and statutory governance.",
-          author: "SLFRS / LKAS Compliant Accounting"
-        }}
         accent="emerald"
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
               onClick={() => refetch()}
               disabled={isLoading}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer h-9"
+              className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 shadow-md shadow-emerald-600/20 transition-all active:scale-[0.98] cursor-pointer"
             >
-              <RefreshCw className={`h-3.5 w-3.5 text-slate-400 ${isLoading ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">Refresh</span>
+              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+              <span>Refresh</span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl shadow-xs text-xs font-semibold px-3.5 py-2 transition-all h-9">
-                  <Plus className="mr-1.5 h-3.5 w-3.5" />
-                  New Action
-                  <ChevronDown className="ml-1.5 h-3.5 w-3.5 opacity-70" />
+                <Button className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs px-3.5 py-2.5 shadow-2xs transition-all cursor-pointer">
+                  <Plus className="h-4 w-4 text-slate-500" />
+                  <span>New Action</span>
+                  <ChevronDown className="h-3.5 w-3.5 opacity-70 text-slate-400" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl border-slate-200/80 bg-white/95 backdrop-blur-md">
-                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+              <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl border-slate-200/80 bg-white/95 backdrop-blur-md z-50">
+                <DropdownMenuItem onClick={() => navigate("/admin/finance/journal-entries/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <FileText className="mr-2.5 h-4 w-4 text-emerald-500" />
                   <span className="font-semibold">New Journal Entry</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/admin/invoice-center/invoices/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Receipt className="mr-2.5 h-4 w-4 text-blue-500" />
                   <span className="font-semibold">Create Invoice</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/admin/finance/payment-vouchers/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Wallet className="mr-2.5 h-4 w-4 text-amber-500" />
                   <span className="font-semibold">Record Payment</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                <DropdownMenuItem className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/admin/finance/bank-transactions/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Landmark className="mr-2.5 h-4 w-4 text-indigo-500" />
                   <span className="font-semibold">Bank Transfer</span>
                 </DropdownMenuItem>

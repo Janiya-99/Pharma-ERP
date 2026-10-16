@@ -36,6 +36,7 @@ import {
 import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 import { Button } from "../../../components/ui/button";
+import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 
 /* ─────────────────────────────────────────────────────────────
    Types & Interfaces
@@ -412,54 +413,24 @@ export default function InventoryDashboard() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-16 pt-3 px-4 sm:px-6 lg:px-8 font-sans selection:bg-indigo-500 selection:text-white">
       {/* Breadcrumb Header */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-3">
-        <span className="hover:text-slate-600 cursor-pointer" onClick={() => navigate("/inventory")}>
-          Inventory
-        </span>
-        <span>&gt;</span>
-        <span className="text-indigo-600 font-bold">Dashboard</span>
-      </div>
-
-      {/* Main Title Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600/10 text-indigo-600 shadow-2xs">
-            <Package className="h-6 w-6 stroke-[2.2]" />
-          </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-              Inventory Dashboard
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium">
-              Monitor stock levels, batches, expiry risks, warehouse activity, and inventory movements in real-time.
-            </p>
-          </div>
-        </div>
-
-        {/* Right Date Selector & Refresh */}
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
-          >
-            <Calendar className="h-4 w-4 text-slate-400" />
-            <div className="flex flex-col text-left leading-none">
-              <span className="text-[10px] text-slate-400">Today</span>
-              <span className="text-xs font-bold text-slate-800">Oct 16, 2026</span>
-            </div>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400 ml-1" />
-          </button>
-
+      {/* ── TOP PAGE HEADER ── */}
+      <DashboardHeroCard
+        title="Inventory Dashboard"
+        subtitle="Monitor stock levels, batches, expiry risks, warehouse activity, and inventory movements in real-time."
+        moduleTag="Inventory"
+        icon={Package}
+        accent="indigo"
+        actions={
           <Button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 shadow-md shadow-indigo-600/20 transition-all active:scale-[0.98]"
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 shadow-md shadow-indigo-600/20 transition-all active:scale-[0.98] cursor-pointer"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             <span>Refresh</span>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Row 1: 6 Tile Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">

@@ -65,28 +65,27 @@ const ComplianceDashboardPage = () => {
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
       {/* ── TOP PAGE HEADER ── */}
       <DashboardHeroCard
-        title="Regulatory Compliance & Quality Dashboard"
+        title="Compliance Center Dashboard"
         subtitle="Real-time telemetry on NMRA licensing, quality holds, drug recalls, and pharmaceutical expiry disposals."
-        moduleTag="Regulatory Governance & NMRA"
+        moduleTag="Compliance Center"
         icon={ShieldCheck}
-        quote={{
-          text: "Zero-compromise NMRA compliance, stringent batch pharmacovigilance, and patient safety first.",
-          author: "NMRA Regulatory Affairs Sri Lanka"
-        }}
         accent="indigo"
         actions={
           <div className="flex items-center gap-2">
             <button
               onClick={handleRefresh}
               disabled={isRefreshing || loading}
-              className="flex items-center gap-2 px-3.5 py-2 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 shadow-md shadow-indigo-600/20 transition-all active:scale-[0.98] cursor-pointer"
             >
-              <RefreshCw className={`h-3.5 w-3.5 text-slate-400 ${isRefreshing ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">Sync Status</span>
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+              <span>Sync Status</span>
             </button>
-            <button className="flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs text-xs font-semibold transition-all cursor-pointer">
-              <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Export Report</span>
+            <button
+              onClick={() => {}}
+              className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs px-3.5 py-2.5 shadow-2xs transition-all cursor-pointer"
+            >
+              <Download className="h-4 w-4 text-slate-500" />
+              <span>Export Report</span>
             </button>
           </div>
         }

@@ -436,15 +436,12 @@ const ControlCenterDashboardPage: React.FC = () => {
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
       {/* ── TOP PAGE HEADER ── */}
       <DashboardHeroCard
-        title="Control Center"
+        title="Control Center Dashboard"
         subtitle="System administration, performance telemetry, and organisational governance."
-        moduleTag="Enterprise Administration"
+        moduleTag="Control Center"
         icon={Building2}
-        quote={{
-          text: "Integrity in enterprise operations, excellence in healthcare delivery across Sri Lanka.",
-          author: "Ceylon Med Global Governance"
-        }}
         accent="blue"
+        onRefresh={fetchSummary}
       />
 
       {/* ── TOP 4 KPI CARDS ── */}
