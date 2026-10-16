@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom";
-import { useState, createContext, useContext, Suspense } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { useState, createContext, useContext, useEffect, Suspense } from "react";
 import type { CSSProperties } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -7,6 +7,7 @@ import LoadingScreen from "../common/LoadingScreen";
 import RouteProgressBar from "../common/RouteProgressBar";
 import { AiCopilotProvider } from "../../context/AiCopilotContext";
 import { GlobalAiCopilot } from "../common/GlobalAiCopilot";
+import { useAuth } from "../../auth/AuthContext";
 
 // ── Sidebar State Context ──
 interface SidebarContextValue {
@@ -28,6 +29,23 @@ export const useSidebarState = () => useContext(SidebarContext);
 const AppLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopExpanded, setDesktopExpanded] = useState(false);
+  const location = useLocation();
+  const { activeSoftware, switchActiveSoftware } = useAuth();
+
+  // Automatically keep activeSoftware in sync with the current URL workspace route
+  useEffect(() => {
+    const path = location.pathname;
+    let targetCode: string | null = null;
+    if (path.startsWith("/control-center")) targetCode = "CONTROL_CENTER";
+    else if (path.startsWith("/finance")) targetCode = "FINANCE";
+    else if (path.startsWith("/inventory")) targetCode = "INVENTORY";
+    else if (path.startsWith("/invoice-center")) targetCode = "INVOICE_CENTER";
+    else if (path.startsWith("/compliance-center")) targetCode = "COMPLIANCE_CENTER";
+
+    if (targetCode && activeSoftware?.software_code !== targetCode && switchActiveSoftware) {
+      switchActiveSoftware(targetCode);
+    }
+  }, [location.pathname, activeSoftware?.software_code, switchActiveSoftware]);
 
   return (
     <SidebarContext.Provider

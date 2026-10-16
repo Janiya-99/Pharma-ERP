@@ -98,7 +98,7 @@ type FormValues = z.infer<typeof formSchema>;
 const SalesInvoiceFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
-  const { activeSoftware, activeBranch } = useAuth();
+  const { user, activeSoftware, activeBranch } = useAuth();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -466,7 +466,7 @@ const SalesInvoiceFormPage: React.FC = () => {
     }
   };
 
-  if (activeSoftware?.software_code !== "INVOICE_CENTER") {
+  if (user?.user_type !== "super_admin" && activeSoftware?.software_code !== "INVOICE_CENTER") {
     return (
       <div className="m-6 rounded-xl border border-rose-200 bg-rose-50 p-8 text-center font-medium text-rose-600">
         Please switch to Invoice Center module to access this page.
