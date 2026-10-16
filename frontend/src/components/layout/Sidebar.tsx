@@ -28,6 +28,10 @@ import {
   Printer,
   Pill,
   X,
+  Globe,
+  ChevronDown,
+  ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -482,53 +486,52 @@ const Sidebar = () => {
 
   const complianceCenterMenus: MenuItem[] = [
     {
-      name: "Compliance Dashboard",
+      name: "Dashboard",
       path: "/compliance-center/dashboard",
       icon: LayoutDashboard,
       permission: "compliance.dashboard.view",
     },
     {
-      name: "Licensing & Registration",
+      name: "Quality Assurance",
+      path: "/compliance-center/records",
+      icon: ShieldCheck,
+      permission: "compliance.record.view",
+    },
+    {
+      name: "Audits",
+      path: "/compliance-center/records",
       icon: FileCheck,
-      children: [
-        {
-          name: "License Documents",
-          path: "/compliance-center/licenses",
-          permission: "compliance.license.view",
-        },
-      ],
+      permission: "compliance.record.view",
     },
     {
-      name: "Quality & Quarantine",
+      name: "Batch Release",
+      path: "/compliance-center/batch-holds",
       icon: Pill,
-      children: [
-        {
-          name: "Batch Holds & Quarantine",
-          path: "/compliance-center/batch-holds",
-          permission: "compliance.batch_hold.view",
-        },
-        {
-          name: "Product Recalls",
-          path: "/compliance-center/recalls",
-          permission: "compliance.recall.view",
-        },
-      ],
+      permission: "compliance.batch_hold.view",
     },
     {
-      name: "Disposal & Archives",
+      name: "Regulatory Filings",
+      path: "/compliance-center/licenses",
+      icon: FileText,
+      permission: "compliance.license.view",
+    },
+    {
+      name: "Deviations",
+      path: "/compliance-center/recalls",
+      icon: AlertTriangle,
+      permission: "compliance.recall.view",
+    },
+    {
+      name: "CAPA",
+      path: "/compliance-center/disposals",
       icon: BookOpen,
-      children: [
-        {
-          name: "Expiry & Disposal Logs",
-          path: "/compliance-center/disposals",
-          permission: "compliance.disposal.view",
-        },
-        {
-          name: "Regulatory Records",
-          path: "/compliance-center/records",
-          permission: "compliance.record.view",
-        },
-      ],
+      permission: "compliance.disposal.view",
+    },
+    {
+      name: "Documentation",
+      path: "/compliance-center/records",
+      icon: ClipboardList,
+      permission: "compliance.record.view",
     },
   ];
 
@@ -870,6 +873,22 @@ const Sidebar = () => {
       >
         {menus.map((m) => renderMenu(m, isMobile))}
       </nav>
+
+      {/* Regulatory Scope Selector (as featured in Compliance reference screenshot) */}
+      {(isMobile || effectiveExpanded) && (
+        <div className="mx-3 mb-2 p-2 rounded-xl border border-slate-200/80 bg-slate-50/70 backdrop-blur-xs flex flex-col gap-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Regulatory Scope
+          </span>
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 bg-white border border-slate-200/80 rounded-lg px-2.5 py-1.5 shadow-2xs hover:border-blue-400 transition-colors cursor-pointer">
+            <span className="flex items-center gap-1.5 truncate">
+              <Globe className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+              Sri Lanka (NMRA)
+            </span>
+            <ChevronDown className="h-3.5 w-3.5 text-slate-400 shrink-0 ml-1" />
+          </div>
+        </div>
+      )}
 
       {/* User info at bottom */}
       <DropdownMenu>

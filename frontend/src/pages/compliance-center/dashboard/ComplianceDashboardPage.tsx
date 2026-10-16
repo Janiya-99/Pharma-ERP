@@ -298,7 +298,7 @@ export const ComplianceDashboardPage = () => {
             <p className="mt-1 text-3xl font-extrabold text-slate-900 tracking-tight">
               {loading ? "..." : data?.quarantine_batches_count ?? 1}
             </p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-blue-600">
+            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-rose-500">
               <span>↑ +0.2%</span>
               <span className="text-slate-500 font-medium">LKR 125,000 value</span>
             </div>
@@ -328,7 +328,7 @@ export const ComplianceDashboardPage = () => {
             <p className="mt-1 text-3xl font-extrabold text-slate-900 tracking-tight">
               {loading ? "..." : data?.active_recalls_count ?? 1}
             </p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-amber-600">
+            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-rose-500">
               <span>↑ +0.1%</span>
               <span className="text-slate-500 font-medium">Safety quarantine</span>
             </div>
@@ -358,7 +358,7 @@ export const ComplianceDashboardPage = () => {
             <p className="mt-1 text-3xl font-extrabold text-slate-900 tracking-tight">
               {loading ? "..." : data?.pending_disposals_count || 122}
             </p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-purple-600">
+            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-rose-500">
               <span>↑ +12%</span>
               <span className="text-slate-500 font-medium">LKR 2,800,000 at risk</span>
             </div>
@@ -443,33 +443,35 @@ export const ComplianceDashboardPage = () => {
               </button>
             </div>
 
-            <div className="flex items-center justify-center my-4">
-              <DonutChart
-                className="h-52"
-                data={quarantineReasonsData}
-                category="value"
-                index="name"
-                colors={["blue", "amber", "teal", "rose", "slate"]}
-                valueFormatter={(val) => `${val}%`}
-                showLabel={true}
-                label="4 Factors"
-              />
-            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-2">
+              <div className="shrink-0 flex items-center justify-center">
+                <DonutChart
+                  className="h-44 w-44"
+                  data={quarantineReasonsData}
+                  category="value"
+                  index="name"
+                  colors={["blue", "amber", "teal", "rose", "slate"]}
+                  valueFormatter={(val) => `${val}%`}
+                  showLabel={true}
+                  label="4 Factors"
+                />
+              </div>
 
-            {/* Custom Legend */}
-            <div className="space-y-2 mt-4 divide-y divide-slate-100 text-xs">
-              {quarantineReasonsData.map((item, i) => {
-                const colors = ["bg-blue-600", "bg-amber-500", "bg-teal-500", "bg-rose-500", "bg-slate-400"];
-                return (
-                  <div key={i} className="flex items-center justify-between pt-2 first:pt-0">
-                    <span className="flex items-center gap-2 text-slate-600 font-medium">
-                      <span className={`h-2.5 w-2.5 rounded-full ${colors[i % colors.length]}`}></span>
-                      {item.name}
-                    </span>
-                    <span className="font-bold text-slate-900">{item.value}%</span>
-                  </div>
-                );
-              })}
+              {/* Custom Legend aligned to right */}
+              <div className="w-full sm:w-auto flex-1 space-y-2 text-xs">
+                {quarantineReasonsData.map((item, i) => {
+                  const colors = ["bg-blue-600", "bg-amber-500", "bg-teal-500", "bg-rose-500", "bg-slate-400"];
+                  return (
+                    <div key={i} className="flex items-center justify-between gap-3">
+                      <span className="flex items-center gap-2 text-slate-600 font-medium">
+                        <span className={`h-2.5 w-2.5 rounded-full ${colors[i % colors.length]}`}></span>
+                        {item.name}
+                      </span>
+                      <span className="font-bold text-slate-900">{item.value}%</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -531,36 +533,39 @@ export const ComplianceDashboardPage = () => {
               </select>
             </div>
 
-            <div className="flex items-center justify-center my-3">
-              <DonutChart
-                className="h-44"
-                data={productComplianceData}
-                category="value"
-                index="name"
-                colors={["emerald", "blue", "amber", "rose"]}
-                valueFormatter={(val) => `${val}`}
-                showLabel={true}
-                label="342 Total Products"
-              />
-            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-2">
+              <div className="shrink-0 flex items-center justify-center">
+                <DonutChart
+                  className="h-40 w-40"
+                  data={productComplianceData}
+                  category="value"
+                  index="name"
+                  colors={["emerald", "blue", "amber", "rose"]}
+                  valueFormatter={(val) => `${val}`}
+                  showLabel={true}
+                  label="342 Total Products"
+                />
+              </div>
 
-            {/* Legend with percentages */}
-            <div className="grid grid-cols-2 gap-2 mt-4 text-xs">
-              {productComplianceData.map((item, i) => (
-                <div key={i} className="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200/60">
-                  <span className="flex items-center gap-1.5 text-slate-600 font-medium">
-                    <span className={`h-2.5 w-2.5 rounded-full ${item.color}`}></span>
-                    {item.name}
-                  </span>
-                  <span className="font-bold text-slate-900">
-                    {item.percentage}% <span className="text-slate-400 font-normal">({item.value})</span>
-                  </span>
-                </div>
-              ))}
+              {/* Legend with percentages and counts aligned to right */}
+              <div className="w-full sm:w-auto flex-1 space-y-2 text-xs">
+                {productComplianceData.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2 text-slate-600 font-medium">
+                      <span className={`h-2.5 w-2.5 rounded-full ${item.color}`}></span>
+                      {item.name}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900">{item.percentage}%</span>
+                      <span className="text-slate-400 font-normal w-6 text-right">{item.value}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 text-center">
+          <div className="mt-4 pt-3 border-t border-slate-100 text-right">
             <button
               onClick={() => navigate("/inventory/products")}
               className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline inline-flex items-center gap-1 cursor-pointer"

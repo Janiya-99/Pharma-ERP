@@ -1036,6 +1036,14 @@ const AppRoutes = () => {
             element={<ComplianceDashboardPage />}
           />
           <Route
+            path="/compliance/dashboard"
+            element={<ComplianceDashboardPage />}
+          />
+          <Route
+            path="/compliance"
+            element={<Navigate to="/compliance-center/dashboard" replace />}
+          />
+          <Route
             path="/compliance-center/licenses"
             element={<LicenseDocumentsPage />}
           />
