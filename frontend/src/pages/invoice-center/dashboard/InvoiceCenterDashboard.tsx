@@ -218,31 +218,27 @@ export default function InvoiceCenterDashboard() {
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
       {/* ── TOP PAGE HEADER ── */}
       <DashboardHeroCard
-        title="Invoice & Receivables Center"
+        title="Invoice Center Dashboard"
         subtitle="Customer billing, collection cycles, real-time receipts, and credit limit risk governance."
-        moduleTag="Billing & Receivables"
+        moduleTag="Invoice Center"
         icon={Receipt}
-        quote={{
-          text: "Accelerated billing cycles, transparent customer credit, and verified revenue collection.",
-          author: "Ceylon Med Revenue Assurance"
-        }}
         accent="blue"
         actions={
           <div className="flex items-center gap-2">
             <button 
               onClick={fetchDashboardData}
               disabled={loading}
-              className="flex items-center gap-2 px-3.5 py-2 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 shadow-md shadow-blue-600/20 transition-all active:scale-[0.98] cursor-pointer"
             >
-              <RefreshCw className={`h-3.5 w-3.5 text-slate-400 ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Refresh</span>
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
             </button>
             <button 
               onClick={() => navigate("/invoice-center/invoices/new")}
-              className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs text-xs font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs px-3.5 py-2.5 shadow-2xs transition-all cursor-pointer"
             >
-              <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Create Invoice</span>
+              <Plus className="h-4 w-4 text-slate-500" />
+              <span>Create Invoice</span>
             </button>
           </div>
         }
