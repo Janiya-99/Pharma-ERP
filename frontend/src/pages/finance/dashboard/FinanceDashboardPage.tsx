@@ -200,10 +200,10 @@ const FinanceDashboardPage = () => {
                 to="/finance/reports/profit-and-loss"
               />
               <FinanceSummaryCard
-                label="Net Profit"
+                label={dashboardData.summary.net_profit.value < 0 ? "Net Loss" : "Net Profit"}
                 metric={dashboardData.summary.net_profit}
-                icon={BadgeDollarSign}
-                tone="indigo"
+                icon={dashboardData.summary.net_profit.value < 0 ? TrendingDown : BadgeDollarSign}
+                tone={dashboardData.summary.net_profit.value < 0 ? "rose" : "emerald"}
                 to="/finance/reports/profit-and-loss"
               />
               <FinanceSummaryCard
