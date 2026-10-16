@@ -581,17 +581,20 @@ const ControlCenterDashboardPage: React.FC = () => {
         <div className="lg:col-span-6 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+              <Link to="/control-center/login-history" className="flex items-center gap-2.5 group cursor-pointer">
+                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
                   <Activity className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">System Traffic & User Telemetry</h3>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+                    <span>System Traffic & User Telemetry</span>
+                    <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600" />
+                  </h3>
                   <p className="text-[11px] text-slate-400">
                     Real-time activity across your system, including logins, transactions, and API requests.
                   </p>
                 </div>
-              </div>
+              </Link>
 
               {/* Chart Filter Controls */}
               <div className="flex items-center gap-2">
@@ -731,18 +734,18 @@ const ControlCenterDashboardPage: React.FC = () => {
         <div className="lg:col-span-3 bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+              <Link to="/control-center/roles-permissions" className="flex items-center gap-2 group cursor-pointer">
+                <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                   <Users className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-slate-900">Role Privilege Distribution</h3>
+                  <h3 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Role Privilege Distribution</h3>
                   <p className="text-[10px] text-slate-400">Distribution of user roles and their system privileges.</p>
                 </div>
-              </div>
-              <button className="text-slate-400 hover:text-slate-600 p-1">
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
+              </Link>
+              <Link to="/control-center/roles-permissions" className="text-slate-400 hover:text-indigo-600 p-1">
+                <ChevronRight className="h-4 w-4" />
+              </Link>
             </div>
 
             {/* Donut Chart with Center Text */}
@@ -968,15 +971,15 @@ const ControlCenterDashboardPage: React.FC = () => {
               </Link>
 
               <Link
-                to="/control-center/analytics"
+                to="/control-center/access-audit"
                 className="p-3 bg-slate-50/70 hover:bg-blue-50/60 border border-slate-200/70 hover:border-blue-200 rounded-xl transition-all duration-200 group flex flex-col justify-between"
               >
                 <div className="p-2 rounded-lg bg-white border border-slate-200/60 text-blue-600 w-fit shadow-2xs group-hover:scale-105 transition-transform">
                   <BarChart2 className="h-4 w-4" />
                 </div>
                 <div className="mt-3">
-                  <h4 className="text-xs font-bold text-slate-800 group-hover:text-blue-700">System Health Report</h4>
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">Check performance and logs</p>
+                  <h4 className="text-xs font-bold text-slate-800 group-hover:text-blue-700">Access Audit Report</h4>
+                  <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">Check activity and logs</p>
                 </div>
               </Link>
             </div>
@@ -1023,7 +1026,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <Link
-                  to="/modules"
+                  to="/control-center/software-modules"
                   className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold shrink-0 transition-colors"
                 >
                   Configure
@@ -1039,7 +1042,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <Link
-                  to="/control-center/subscriptions"
+                  to="/control-center/software-modules"
                   className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold shrink-0 transition-colors"
                 >
                   Review
@@ -1049,11 +1052,17 @@ const ControlCenterDashboardPage: React.FC = () => {
           </div>
 
           {/* Bottom: System Health */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+          <Link
+            to="/control-center/audit-logs"
+            className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200/80 shadow-xs block group hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <HeartPulse className="h-4 w-4 text-emerald-500" />
-                <h3 className="text-xs font-bold text-slate-900">System Health</h3>
+                <h3 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                  <span>System Health</span>
+                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </h3>
               </div>
               <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -1113,7 +1122,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
 

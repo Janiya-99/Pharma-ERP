@@ -69,36 +69,36 @@ export const InvoiceCenterReportsDashboardPage: React.FC = () => {
   }
 
   const customerCards: SummaryCardItem[] = [
-    { title: "Total Customers", value: data?.total_customers || 0, format: "number", icon: <Users className="h-4 w-4" /> },
-    { title: "Active Customers", value: data?.active_customers || 0, format: "number", icon: <Building2 className="h-4 w-4 text-emerald-500" /> },
-    { title: "Blocked Customers", value: data?.blocked_customers || 0, format: "number", icon: <UserX className="h-4 w-4 text-red-500" /> },
-    { title: "Over Credit Limit", value: data?.customers_over_credit_limit || 0, format: "number", icon: <AlertTriangle className="h-4 w-4 text-amber-500" /> },
+    { title: "Total Customers", value: data?.total_customers || 0, format: "number", icon: <Users className="h-4 w-4" />, path: "/invoice-center/customers" },
+    { title: "Active Customers", value: data?.active_customers || 0, format: "number", icon: <Building2 className="h-4 w-4 text-emerald-500" />, path: "/invoice-center/customers" },
+    { title: "Blocked Customers", value: data?.blocked_customers || 0, format: "number", icon: <UserX className="h-4 w-4 text-red-500" />, path: "/invoice-center/customers" },
+    { title: "Over Credit Limit", value: data?.customers_over_credit_limit || 0, format: "number", icon: <AlertTriangle className="h-4 w-4 text-amber-500" />, path: "/invoice-center/reports/customer-balance" },
   ];
 
   const salesOrderCards: SummaryCardItem[] = [
-    { title: "Total Sales Orders", value: data?.total_sales_orders || 0, format: "number", icon: <ShoppingCart className="h-4 w-4" /> },
-    { title: "Approved Orders", value: data?.approved_sales_orders || 0, format: "number", icon: <CheckCircle className="h-4 w-4 text-emerald-500" /> },
-    { title: "Pending Orders", value: data?.pending_sales_orders || 0, format: "number", icon: <Clock className="h-4 w-4 text-amber-500" /> },
-    { title: "Closed Orders", value: data?.closed_sales_orders || 0, format: "number", icon: <XCircle className="h-4 w-4 text-slate-500" /> },
+    { title: "Total Sales Orders", value: data?.total_sales_orders || 0, format: "number", icon: <ShoppingCart className="h-4 w-4" />, path: "/invoice-center/sales-orders" },
+    { title: "Approved Orders", value: data?.approved_sales_orders || 0, format: "number", icon: <CheckCircle className="h-4 w-4 text-emerald-500" />, path: "/invoice-center/sales-orders" },
+    { title: "Pending Orders", value: data?.pending_sales_orders || 0, format: "number", icon: <Clock className="h-4 w-4 text-amber-500" />, path: "/invoice-center/sales-orders" },
+    { title: "Closed Orders", value: data?.closed_sales_orders || 0, format: "number", icon: <XCircle className="h-4 w-4 text-slate-500" />, path: "/invoice-center/sales-orders" },
   ];
 
   const invoiceCards: SummaryCardItem[] = [
-    { title: "Total Invoices", value: data?.total_sales_invoices || 0, format: "number", icon: <FileText className="h-4 w-4" /> },
-    { title: "Posted Invoices", value: data?.posted_sales_invoices || 0, format: "number", icon: <UploadCloud className="h-4 w-4 text-indigo-500" /> },
-    { title: "Unpaid Invoices", value: data?.unpaid_invoices || 0, format: "number", icon: <AlertTriangle className="h-4 w-4 text-amber-500" /> },
-    { title: "Paid Invoices", value: data?.paid_invoices || 0, format: "number", icon: <CheckCircle className="h-4 w-4 text-emerald-500" /> },
+    { title: "Total Invoices", value: data?.total_sales_invoices || 0, format: "number", icon: <FileText className="h-4 w-4" />, path: "/invoice-center/sales-invoices" },
+    { title: "Posted Invoices", value: data?.posted_sales_invoices || 0, format: "number", icon: <UploadCloud className="h-4 w-4 text-indigo-500" />, path: "/invoice-center/sales-invoices" },
+    { title: "Unpaid Invoices", value: data?.unpaid_invoices || 0, format: "number", icon: <AlertTriangle className="h-4 w-4 text-amber-500" />, path: "/invoice-center/sales-invoices" },
+    { title: "Paid Invoices", value: data?.paid_invoices || 0, format: "number", icon: <CheckCircle className="h-4 w-4 text-emerald-500" />, path: "/invoice-center/sales-invoices" },
   ];
 
   const collectionCards: SummaryCardItem[] = [
-    { title: "Total Invoice Amount", value: data?.total_invoice_amount || 0, format: "currency", icon: <Coins className="h-4 w-4" /> },
-    { title: "Total Paid Amount", value: data?.total_paid_amount || 0, format: "currency", icon: <Wallet className="h-4 w-4 text-emerald-500" /> },
-    { title: "Total Balance Amount", value: data?.total_balance_amount || 0, format: "currency", icon: <Banknote className="h-4 w-4 text-amber-500" /> },
-    { title: "Allocated Receipts", value: data?.total_allocated_receipt_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-indigo-500" /> },
+    { title: "Total Invoice Amount", value: data?.total_invoice_amount || 0, format: "currency", icon: <Coins className="h-4 w-4" />, path: "/invoice-center/reports/collection-summary" },
+    { title: "Total Paid Amount", value: data?.total_paid_amount || 0, format: "currency", icon: <Wallet className="h-4 w-4 text-emerald-500" />, path: "/invoice-center/customer-receipts" },
+    { title: "Total Balance Amount", value: data?.total_balance_amount || 0, format: "currency", icon: <Banknote className="h-4 w-4 text-amber-500" />, path: "/invoice-center/reports/customer-aging" },
+    { title: "Allocated Receipts", value: data?.total_allocated_receipt_amount || 0, format: "currency", icon: <CreditCard className="h-4 w-4 text-indigo-500" />, path: "/invoice-center/customer-receipts" },
   ];
 
   const financeCards: SummaryCardItem[] = [
-    { title: "Finance Posted", value: data?.finance_posted_documents || 0, format: "number", icon: <UploadCloud className="h-4 w-4 text-emerald-500" /> },
-    { title: "Finance Unposted", value: data?.finance_unposted_documents || 0, format: "number", icon: <DownloadCloud className="h-4 w-4 text-amber-500" /> },
+    { title: "Finance Posted", value: data?.finance_posted_documents || 0, format: "number", icon: <UploadCloud className="h-4 w-4 text-emerald-500" />, path: "/invoice-center/finance-posting" },
+    { title: "Finance Unposted", value: data?.finance_unposted_documents || 0, format: "number", icon: <DownloadCloud className="h-4 w-4 text-amber-500" />, path: "/invoice-center/finance-posting" },
   ];
 
   return (

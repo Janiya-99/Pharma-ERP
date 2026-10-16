@@ -24,7 +24,7 @@ import { AlertCircle } from "lucide-react";
 // Components
 import { FinanceDashboardFilters } from "./components/FinanceDashboardFilters";
 import { FinanceKpiCard } from "./components/FinanceKpiCard";
-import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
+import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import { FinanceSummaryCard } from "./components/FinanceSummaryCard";
 import { RevenueProfitTrendChart } from "./components/RevenueProfitTrendChart";
 import { ExpenseDistributionChart } from "./components/ExpenseDistributionChart";
@@ -60,11 +60,11 @@ const FinanceDashboardPage = () => {
 
   return (
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
-      {/* ── TOP PAGE HEADER ── */}
-      <DashboardHeroCard
-        title="Finance Dashboard"
-        subtitle={`Audited fiscal analytics, liquidity positions, and statutory ledger governance for ${user?.company_name || "Ceylon Med Global"}.`}
-        moduleTag="Finance"
+      {/* ── TOP PAGE TITLE CARD ── */}
+      <PageTitleCard
+        title="Financial Operations & Treasury"
+        description={`Audited fiscal analytics, liquidity positions, and statutory ledger governance for ${user?.company_name || "Ceylon MedEx Pharmaceuticals"}.`}
+        moduleTag="Financials"
         icon={Landmark}
         accent="emerald"
         actions={
@@ -86,22 +86,22 @@ const FinanceDashboardPage = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl border-slate-200/80 bg-white/95 backdrop-blur-md z-50">
-                <DropdownMenuItem onClick={() => navigate("/finance/journal-entries/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/finance/general-ledger/journal-entry/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <FileText className="mr-2.5 h-4 w-4 text-emerald-500" />
                   <span className="font-semibold">New Journal Entry</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/invoice-center/invoices/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/invoice-center/invoices/new")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Receipt className="mr-2.5 h-4 w-4 text-blue-500" />
                   <span className="font-semibold">Create Invoice</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/finance/payment-vouchers/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/finance/banking/payment-vouchers")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Wallet className="mr-2.5 h-4 w-4 text-amber-500" />
                   <span className="font-semibold">Record Payment</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                <DropdownMenuItem onClick={() => navigate("/finance/bank-transactions/create")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                <DropdownMenuItem onClick={() => navigate("/finance/banking/bank-accounts")} className="rounded-lg cursor-pointer flex items-center p-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                   <Landmark className="mr-2.5 h-4 w-4 text-indigo-500" />
-                  <span className="font-semibold">Bank Transfer</span>
+                  <span className="font-semibold">Bank Accounts</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

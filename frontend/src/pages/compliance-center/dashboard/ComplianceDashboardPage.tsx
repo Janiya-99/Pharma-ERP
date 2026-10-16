@@ -387,10 +387,15 @@ export const ComplianceDashboardPage = () => {
         {/* Left: Quality Assurance Pass Rate & NMRA Compliance Index */}
         <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-md p-6 shadow-xs lg:col-span-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                Quality Assurance Pass Rate & NMRA Compliance Index
+            <div 
+              onClick={() => navigate("/compliance-center/records")}
+              className="cursor-pointer group"
+            >
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+                <span>Quality Assurance Pass Rate & NMRA Compliance Index</span>
+                <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600" />
               </h3>
+              <p className="text-xs text-slate-400 mt-0.5">Click to view regulatory audit registry</p>
             </div>
             <div className="flex items-center gap-4">
               {/* Legend */}
@@ -432,8 +437,12 @@ export const ComplianceDashboardPage = () => {
         <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-md p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                Quarantine Root Causes
+              <h3 
+                onClick={() => navigate("/compliance-center/batch-holds")}
+                className="text-base sm:text-lg font-bold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer flex items-center gap-1.5 group"
+              >
+                <span>Quarantine Root Causes</span>
+                <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600" />
               </h3>
               <button
                 onClick={() => navigate("/compliance-center/batch-holds")}
@@ -483,8 +492,12 @@ export const ComplianceDashboardPage = () => {
         {/* Card 1: Write-off & Risk Value by Category */}
         <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-md p-6 shadow-xs">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-slate-900">
-              Write-off & Risk Value by Category
+            <h3 
+              onClick={() => navigate("/compliance-center/disposals")}
+              className="text-base font-bold text-slate-900 hover:text-purple-600 transition-colors cursor-pointer flex items-center gap-1.5 group"
+            >
+              <span>Write-off & Risk Value by Category</span>
+              <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-purple-600" />
             </h3>
             <select
               value={writeOffRange}
@@ -518,8 +531,12 @@ export const ComplianceDashboardPage = () => {
         <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-md p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-slate-900">
-                Product Compliance Status
+              <h3 
+                onClick={() => navigate("/inventory/products")}
+                className="text-base font-bold text-slate-900 hover:text-emerald-600 transition-colors cursor-pointer flex items-center gap-1.5 group"
+              >
+                <span>Product Compliance Status</span>
+                <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-600" />
               </h3>
               <select
                 value={productCategoryFilter}
@@ -578,8 +595,12 @@ export const ComplianceDashboardPage = () => {
         {/* Card 3: Regulatory Filings Status */}
         <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-md p-6 shadow-xs">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-slate-900">
-              Regulatory Filings Status
+            <h3 
+              onClick={() => navigate("/compliance-center/records")}
+              className="text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors cursor-pointer flex items-center gap-1.5 group"
+            >
+              <span>Regulatory Filings Status</span>
+              <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-600" />
             </h3>
             <select
               value={filingRange}
@@ -607,9 +628,13 @@ export const ComplianceDashboardPage = () => {
       {/* ── Row 4: Live Regulatory Audit Trail Table ── */}
       <div className="rounded-2xl border border-slate-200/80 bg-white/90 backdrop-blur-md p-6 shadow-xs">
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base sm:text-lg font-bold text-slate-900">
-              Live Regulatory Audit Trail
+          <div 
+            onClick={() => navigate("/compliance-center/records")}
+            className="cursor-pointer group"
+          >
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <span>Live Regulatory Audit Trail</span>
+              <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600" />
             </h3>
             <p className="text-xs text-slate-500">
               Real-time cryptographic audit log of batch certifications, NMRA filings, and QA deviations.
@@ -641,7 +666,8 @@ export const ComplianceDashboardPage = () => {
               {auditTrailRecords.map((row, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-slate-50/80 transition-colors group"
+                  onClick={() => navigate("/compliance-center/records")}
+                  className="hover:bg-blue-50/40 transition-colors group cursor-pointer"
                 >
                   <td className="px-4 py-3.5 text-slate-600 font-medium whitespace-nowrap">
                     {row.timestamp}

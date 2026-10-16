@@ -63,18 +63,41 @@ export const GlobalAiCopilot: React.FC = () => {
 
   const [copied, setCopied] = useState<string | null>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+  const prevRouteRef = useRef(pageContext.route);
+
+  // Dynamic contextual title for the assistant
+  const copilotTitle = React.useMemo(() => {
+    const route = pageContext.route || "";
+    if (route.includes("finance")) return "Treasury & Fiscal AI Copilot";
+    if (route.includes("inventory")) return "Supply Chain & Batch AI Copilot";
+    if (route.includes("invoice-center")) return "Revenue & Receivables AI Copilot";
+    if (route.includes("compliance")) return "NMRA Regulatory & QA Copilot";
+    if (route.includes("control-center")) return "Governance & Security AI Copilot";
+    if (pageContext.moduleName) return `${pageContext.moduleName} AI Copilot`;
+    return "Pharma Enterprise AI Copilot";
+  }, [pageContext.route, pageContext.moduleName]);
 
   // Synchronize active tab from context
   useEffect(() => {
     setCurrentTab(activeTab);
   }, [activeTab]);
 
-  // Handle initial prompt from deep-links
+  // Handle route / module change: automatically reset stale summaries and docs
   useEffect(() => {
-    if (isOpen && initialPrompt) {
-      handleSendPrompt(initialPrompt);
+    if (prevRouteRef.current && prevRouteRef.current !== pageContext.route) {
+      setSummary(null);
+      setDocs(null);
     }
-  }, [isOpen, initialPrompt]);
+    prevRouteRef.current = pageContext.route;
+  }, [pageContext.route]);
+
+  // Clear conversation history
+  const handleClearChat = () => {
+    setMessages([]);
+    setSummary(null);
+    setDocs(null);
+    toast.success("Conversation cleared. Ready for fresh queries.");
+  };
 
   // Keyboard shortcut Ctrl+J to toggle
   useEffect(() => {
@@ -208,7 +231,7 @@ export const GlobalAiCopilot: React.FC = () => {
             </div>
             <div className="flex flex-col text-left">
               <span className="text-xs font-bold tracking-tight text-white flex items-center gap-1.5">
-                AI Copilot
+                {pageContext.moduleName || "Enterprise"} Copilot
                 <span className="rounded-md bg-white/20 px-1 py-0.2 text-[9px] font-semibold text-white/90">
                   Gemini
                 </span>
@@ -233,7 +256,7 @@ export const GlobalAiCopilot: React.FC = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-sm font-bold text-slate-900">Pharma AI Copilot</h2>
+                        <h2 className="text-sm font-bold text-slate-900">{copilotTitle}</h2>
                         <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                           Gemini 3.6 Flash
@@ -244,7 +267,15 @@ export const GlobalAiCopilot: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={handleClearChat}
+                      className="flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer border border-slate-200/80 bg-white shadow-2xs"
+                      title="Clear conversation history and reset context"
+                    >
+                      <RefreshCw className="h-3 w-3" />
+                      <span>Clear</span>
+                    </button>
                     <button
                       onClick={closeCopilot}
                       className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
@@ -266,7 +297,7 @@ export const GlobalAiCopilot: React.FC = () => {
                     }`}
                   >
                     <Bot className="h-3.5 w-3.5" />
-                    <span>AI Chatbot</span>
+                    <span>Live Chat</span>
                   </button>
                   <button
                     onClick={() => setCurrentTab("summary")}
@@ -305,23 +336,52 @@ export const GlobalAiCopilot: React.FC = () => {
                           <Bot className="h-6 w-6" />
                         </div>
                         <h3 className="text-sm font-bold text-slate-900">
-                          How can I assist you on this page?
+                          {copilotTitle}
                         </h3>
                         <p className="mt-1 text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
-                          Ask me anything about <span className="font-semibold text-slate-700">{pageContext.pageTitle}</span>, financial calculations, batch expiry, NMRA regulations, or operational tasks.
+                          Ask me anything about <span className="font-semibold text-slate-700">{pageContext.pageTitle}</span>, financial calculations, batch inventory, NMRA compliance, or operational workflows.
                         </p>
 
                         {/* Quick Prompts */}
                         <div className="mt-4 flex flex-col gap-1.5 text-left">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Suggested Prompts
+                            Suggested Inquiries
                           </span>
-                          {[
-                            `Summarize current data on ${pageContext.pageTitle}`,
-                            "Explain NMRA batch recall and quarantine procedures",
-                            "What are the mandatory field validations on this form?",
-                            "Analyze credit risks and overdue collections for this month",
-                          ].map((prompt, i) => (
+                          {(pageContext.route?.includes("finance")
+                            ? [
+                                `Analyze fiscal health and cash positions on ${pageContext.pageTitle}`,
+                                "Calculate gross profit vs net profit margin performance",
+                                "Summarize overdue receivables and pending payment obligations",
+                                "Audit trial balance and general ledger reconciliation",
+                              ]
+                            : pageContext.route?.includes("inventory")
+                            ? [
+                                `Check stock levels and batch movements on ${pageContext.pageTitle}`,
+                                "Which product batches expire within the next 30 days?",
+                                "Identify warehouse locations below safety reorder levels",
+                                "Verify Goods Receipt Notes (GRN) posting status",
+                              ]
+                            : pageContext.route?.includes("invoice-center")
+                            ? [
+                                `Review customer collections and aging on ${pageContext.pageTitle}`,
+                                "Which accounts are currently exceeding approved credit limits?",
+                                "What is our current receipt collection efficiency?",
+                                "Explain billing approval and credit note procedures",
+                              ]
+                            : pageContext.route?.includes("compliance")
+                            ? [
+                                `Audit NMRA regulatory status on ${pageContext.pageTitle}`,
+                                "Check batches currently under quality quarantine hold",
+                                "Review active product registration license expiries",
+                                "Generate CAPA guidelines for batch inspection failure",
+                              ]
+                            : [
+                                `Summarize active configuration on ${pageContext.pageTitle}`,
+                                "Review user branch access and role permission matrix",
+                                "Explain system security policies and audit trails",
+                                "What are the mandatory compliance settings for this module?",
+                              ]
+                          ).map((prompt, i) => (
                             <button
                               key={i}
                               onClick={() => handleSendPrompt(prompt)}

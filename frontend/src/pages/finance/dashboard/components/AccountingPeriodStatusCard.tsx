@@ -1,23 +1,31 @@
+import { useNavigate } from "react-router-dom";
 import { PeriodStatus } from "../types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../components/ui/card";
-import { Calendar, AlertCircle, CheckCircle2, LockKeyhole, LockOpen } from "lucide-react";
+import { Calendar, AlertCircle, CheckCircle2, LockKeyhole, LockOpen, ChevronRight } from "lucide-react";
 
 interface AccountingPeriodStatusCardProps {
   data: PeriodStatus;
 }
 
 export function AccountingPeriodStatusCard({ data }: AccountingPeriodStatusCardProps) {
+  const navigate = useNavigate();
   const isClosingSoon = data.status === "Closing Soon";
   const isClosed = data.status === "Closed";
   
   return (
-    <Card className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60">
+    <Card 
+      onClick={() => navigate("/finance/setup/financial-year")}
+      className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60 cursor-pointer hover:ring-indigo-200"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 to-indigo-50/20 opacity-50 pointer-events-none" />
       
       <CardHeader className="pb-4 relative z-10 border-b border-slate-100/50 flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-lg font-semibold tracking-tight text-slate-800">Period Status</CardTitle>
-          <CardDescription className="text-sm font-medium text-slate-500">{data.financial_year}</CardDescription>
+        <div className="flex items-center gap-2">
+          <div>
+            <CardTitle className="text-lg font-semibold tracking-tight text-slate-800 group-hover:text-indigo-600 transition-colors">Period Status</CardTitle>
+            <CardDescription className="text-sm font-medium text-slate-500">{data.financial_year}</CardDescription>
+          </div>
+          <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors ml-1" />
         </div>
         <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${
           isClosed 

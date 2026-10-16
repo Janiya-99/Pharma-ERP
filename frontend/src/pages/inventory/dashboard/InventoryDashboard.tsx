@@ -54,6 +54,7 @@ interface TileMetric {
   iconColor: string;
   sparklineType: "bar" | "line";
   sparklineColor: string;
+  path?: string;
 }
 
 interface StockOverviewItem {
@@ -332,6 +333,7 @@ export default function InventoryDashboard() {
       iconColor: "text-blue-600",
       sparklineType: "bar",
       sparklineColor: "#3B82F6",
+      path: "/inventory/products",
     },
     {
       title: "Total Stock Value",
@@ -342,6 +344,7 @@ export default function InventoryDashboard() {
       iconColor: "text-emerald-600",
       sparklineType: "line",
       sparklineColor: "#10B981",
+      path: "/inventory/reports/stock-balance",
     },
     {
       title: "Low Stock Items",
@@ -354,6 +357,7 @@ export default function InventoryDashboard() {
       iconColor: "text-amber-500",
       sparklineType: "bar",
       sparklineColor: "#F59E0B",
+      path: "/inventory/reports/stock-balance",
     },
     {
       title: "Out of Stock Items",
@@ -366,6 +370,7 @@ export default function InventoryDashboard() {
       iconColor: "text-rose-500",
       sparklineType: "bar",
       sparklineColor: "#EF4444",
+      path: "/inventory/reports/stock-balance",
     },
     {
       title: "Expiring Soon",
@@ -378,6 +383,7 @@ export default function InventoryDashboard() {
       iconColor: "text-orange-500",
       sparklineType: "bar",
       sparklineColor: "#F97316",
+      path: "/inventory/reports/expiry",
     },
     {
       title: "Active Batches",
@@ -390,6 +396,7 @@ export default function InventoryDashboard() {
       iconColor: "text-purple-600",
       sparklineType: "bar",
       sparklineColor: "#8B5CF6",
+      path: "/inventory/batches",
     },
   ];
 
@@ -463,17 +470,21 @@ export default function InventoryDashboard() {
           return (
             <div
               key={i}
-              className="relative flex flex-col justify-between rounded-3xl border border-slate-100 bg-white p-4 sm:p-5 shadow-xs hover:shadow-md transition-all duration-300"
+              onClick={() => tile.path && navigate(tile.path)}
+              className="group relative flex flex-col justify-between rounded-3xl border border-slate-100 bg-white p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
             >
               <div>
                 {/* Top: Icon + Title */}
-                <div className="flex items-center gap-2.5 mb-3">
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${tile.iconBg} ${tile.iconColor}`}>
-                    <Icon className="h-4 w-4 stroke-[2.2]" />
+                <div className="flex items-center justify-between gap-1 mb-3">
+                  <div className="flex items-center gap-2 truncate">
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tile.iconBg} ${tile.iconColor} group-hover:scale-105 transition-transform`}>
+                      <Icon className="h-4 w-4 stroke-[2.2]" />
+                    </div>
+                    <span className="text-xs font-semibold text-slate-500 truncate group-hover:text-slate-900 transition-colors">
+                      {tile.title}
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-slate-500 truncate">
-                    {tile.title}
-                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-indigo-600 transition-colors shrink-0" />
                 </div>
 
                 {/* Value + Sparkline Row */}
@@ -538,10 +549,14 @@ export default function InventoryDashboard() {
       {/* Row 2: Middle Visual Intelligence (Donut + Category Bar Chart + Expiry Risk Table) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
         {/* Card 1: Stock Status Overview (Donut Chart) */}
-        <div className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+        <div 
+          onClick={() => navigate("/inventory/products")}
+          className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-slate-900">
-              Stock Status Overview
+            <h2 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <span>Stock Status Overview</span>
+              <span className="text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
             </h2>
             <button className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-100">
               <span>By Product Count</span>
@@ -597,10 +612,14 @@ export default function InventoryDashboard() {
         </div>
 
         {/* Card 2: Stock Value by Category (Vertical Bar Chart) */}
-        <div className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+        <div 
+          onClick={() => navigate("/inventory/reports/stock-balance")}
+          className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-purple-300 hover:shadow-md transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-slate-900">
-              Stock Value by Category
+            <h2 className="text-base font-bold text-slate-900 group-hover:text-purple-600 transition-colors flex items-center gap-1.5">
+              <span>Stock Value by Category</span>
+              <span className="text-xs text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
             </h2>
             <button className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-100">
               <span>By Category</span>
@@ -652,12 +671,16 @@ export default function InventoryDashboard() {
         {/* Card 3: Expiry Risk Items Table */}
         <div className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-slate-900">
-              Expiry Risk Items
+            <h2 
+              onClick={() => navigate("/inventory/product-batches")}
+              className="text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors cursor-pointer flex items-center gap-1.5 group"
+            >
+              <span>Expiry Risk Items</span>
+              <span className="text-xs text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
             </h2>
             <button
-              onClick={() => navigate("/inventory/batches")}
-              className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors"
+              onClick={() => navigate("/inventory/product-batches")}
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors cursor-pointer"
             >
               <span>View All</span>
               <span>&rarr;</span>
@@ -685,8 +708,12 @@ export default function InventoryDashboard() {
                       : "bg-amber-50 text-amber-600 border border-amber-200/50";
 
                   return (
-                    <tr key={i} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="py-2.5 font-bold text-slate-800 truncate max-w-[130px]" title={row.product}>
+                    <tr 
+                      key={i} 
+                      onClick={() => navigate("/inventory/product-batches")}
+                      className="hover:bg-indigo-50/40 transition-colors cursor-pointer"
+                    >
+                      <td className="py-2.5 font-bold text-slate-800 hover:text-indigo-600 truncate max-w-[130px]" title={row.product}>
                         {row.product}
                       </td>
                       <td className="py-2.5 text-slate-500 font-mono text-[11px]">{row.batch}</td>
