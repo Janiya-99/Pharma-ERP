@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import routes from "routes";
 import type { ERPRoute } from "routes";
+import LoadingScreen from "components/common/LoadingScreen";
 
 export default function Auth() {
   const getRoutes = (routes: ERPRoute[]): any => {
@@ -19,9 +20,9 @@ export default function Auth() {
   document.documentElement.dir = "ltr";
 
   return (
-    <div className="relative flex min-h-screen w-full font-dm">
+    <div className="relative flex min-h-screen w-full font-fira font-sans">
       {/* Full-screen split layout */}
-      <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading...</div>}>
+      <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" />}>
         <Routes>
           {getRoutes(routes)}
           <Route path="/" element={<Navigate to="/auth/sign-in" replace />} />

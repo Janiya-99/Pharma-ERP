@@ -1,45 +1,81 @@
-import { Building2, ShieldCheck, Sparkles } from "lucide-react";
+import React from "react";
 
-const LoadingScreen = ({ text = "Preparing workspace" }: { text?: string }) => {
-  return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[#F8FAFC] px-6 text-slate-900">
-      <div className="w-full max-w-[460px]">
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all">
-          
-          {/* Modern Circular Loop Spinner */}
-          <div className="my-6 flex flex-col items-center justify-center">
-            <div className="relative flex h-28 w-28 items-center justify-center">
-              {/* Outer Glowing Loop Ring */}
-              <div className="absolute inset-0 rounded-full border-[5px] border-slate-100 border-t-blue-600 border-r-indigo-600 animate-spin shadow-[0_0_20px_rgba(37,99,235,0.25)]" />
-              {/* Counter-rotating Inner Loop Ring */}
-              <div className="absolute inset-2.5 rounded-full border-[4px] border-slate-50 border-b-blue-500 border-l-indigo-500 animate-[spin_2.5s_linear_infinite_reverse]" />
-              {/* Center Icon */}
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30">
-                <Building2 className="h-7 w-7 animate-pulse" />
-              </div>
-            </div>
-          </div>
+interface LoadingScreenProps {
+  text?: string;
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  mode?: "fullscreen" | "page" | "minimal";
+  theme?: "light" | "dark" | "auto";
+}
 
-          <div className="text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-indigo-600">Pharma ERP</p>
-            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-slate-950">{text}</h1>
-            <p className="mt-1 text-sm text-slate-500">Loading your secure business environment...</p>
-          </div>
+/**
+ * LoadingScreen - PIXANDCO Modern Luxury Editorial Loader
+ * Designed to mirror high-fashion minimalist typography with zero latency.
+ */
+export const LoadingScreen: React.FC<LoadingScreenProps> = ({
+  text,
+  badge = "PIXANDCO ENTERPRISE",
+  title = "Pixandco",
+  subtitle = "Intelligent healthcare & enterprise operations",
+  mode = "fullscreen",
+  theme = "auto",
+}) => {
+  const isPage = mode === "page";
+  const displaySubtitle = text || subtitle;
 
-          <div className="mt-8 grid grid-cols-3 gap-2 border-t border-slate-100 pt-6">
-            {[
-              { label: "Company", icon: Building2 },
-              { label: "Access", icon: ShieldCheck },
-              { label: "Modules", icon: Sparkles },
-            ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50/80 py-2.5 px-2 text-center transition-all hover:bg-slate-100/80">
-                <item.icon className="h-4 w-4 text-indigo-600" />
-                <span className="text-[11px] font-semibold text-slate-600">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+  const content = (
+    <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 animate-editorial-pulse">
+      {/* Top Tracked Subtitle with Dot */}
+      <div className="flex items-center justify-center gap-2 mb-4">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#A39688] dark:bg-[#9B8F82]" />
+        <span className="text-[10px] sm:text-[11px] font-medium tracking-[0.32em] text-[#8F8377] dark:text-[#9F9387] uppercase select-none">
+          {badge}
+        </span>
       </div>
+
+      {/* Main Luxury Wordmark */}
+      <h1 className="font-serif-luxury text-5xl sm:text-7xl md:text-8xl font-normal tracking-tight text-[#1C1A17] dark:text-[#EDE8E1] select-none leading-none">
+        {title}
+      </h1>
+
+      {/* Hairline Separator with Light Sweep */}
+      <div className="my-5 sm:my-6 w-24 sm:w-32 md:w-40 h-[1px] bg-[#D7CDC4] dark:bg-[#3D3833] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#8F8377] dark:via-[#D7CDC4] to-transparent animate-sweep-line" />
+      </div>
+
+      {/* Italicized Aesthetic Subtitle */}
+      <p className="font-serif-luxury italic text-sm sm:text-base text-[#6E645B] dark:text-[#A89E94] tracking-wide max-w-md select-none">
+        {displaySubtitle}
+      </p>
+
+      {/* Micro Subtle Loading Indicator Bar */}
+      <div className="mt-8 flex flex-col items-center gap-2">
+        <div className="w-16 h-[1.5px] bg-[#E5DDD5] dark:bg-[#2A2622] rounded-full overflow-hidden relative">
+          <div className="absolute inset-0 bg-[#8F8377] dark:bg-[#C9BFB5] rounded-full animate-sweep-line" />
+        </div>
+        <span className="text-[9.5px] font-sans uppercase tracking-[0.2em] text-[#A89C90] dark:text-[#6E645B]">
+          Loading workspace
+        </span>
+      </div>
+    </div>
+  );
+
+  if (isPage) {
+    return (
+      <div className="w-full min-h-[50vh] py-16 flex items-center justify-center bg-[#FAF8F5]/80 dark:bg-[#0E121A]/80 backdrop-blur-md rounded-2xl border border-[#EBE4DC]/60 dark:border-slate-800/60 transition-all duration-300">
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex min-h-screen w-full items-center justify-center bg-[#FAF8F5] dark:bg-[#0D111A] text-slate-900 transition-colors duration-300">
+      {/* Subtle Warm Linen Texture Background */}
+      <div className="absolute inset-0 bg-noise opacity-30 pointer-events-none" />
+      {/* Soft Ambient Radial Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/70 via-transparent to-transparent dark:from-indigo-950/20 dark:via-transparent dark:to-transparent pointer-events-none" />
+      {content}
     </div>
   );
 };

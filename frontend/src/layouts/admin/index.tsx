@@ -5,21 +5,11 @@ import Sidebar from "components/sidebar";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import routes from "routes";
 import type { ERPRoute } from "routes";
+import LoadingScreen from "components/common/LoadingScreen";
+import RouteProgressBar from "components/common/RouteProgressBar";
 
 function PageLoader() {
-  return (
-    <div className="flex h-full w-full items-center justify-center py-24">
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative flex h-16 w-16 items-center justify-center">
-          <div className="border-slate-100 absolute inset-0 animate-spin rounded-full border-[3.5px] border-r-indigo-600 border-t-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.2)]" />
-          <div className="border-slate-50 absolute inset-2 animate-[spin_2s_linear_infinite_reverse] rounded-full border-[2.5px] border-b-blue-500 border-l-indigo-500" />
-        </div>
-        <p className="text-slate-500 animate-pulse text-sm font-semibold tracking-wide">
-          Loading workspace...
-        </p>
-      </div>
-    </div>
-  );
+  return <LoadingScreen mode="page" title="Pixandco" />;
 }
 
 export default function AdminLayout(props: { [x: string]: any }) {
@@ -97,6 +87,7 @@ export default function AdminLayout(props: { [x: string]: any }) {
   // Standard admin layout with sidebar + topbar
   return (
     <div className="relative flex h-screen w-full overflow-hidden bg-gray-50 ">
+      <RouteProgressBar />
       <Sidebar open={open} onClose={() => setOpen(false)} />
 
       {/* Floating Sidebar Toggle Button (Desktop only) */}
