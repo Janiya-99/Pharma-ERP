@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
+import LoadingScreen from "../components/common/LoadingScreen";
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
 
 // Platform Admin imports
@@ -188,12 +189,12 @@ const PlatformProtectedRoute = ({
   const { isAuthenticated, loading } = usePlatformAuth();
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 bg-slate-900 text-white">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
-        <span className="text-slate-550 text-sm font-semibold uppercase tracking-wider">
-          Verifying Authority...
-        </span>
-      </div>
+      <LoadingScreen
+        mode="fullscreen"
+        title="Pixandco"
+        badge="PLATFORM OWNER"
+        text="Verifying platform authority..."
+      />
     );
   }
   if (!isAuthenticated) {
@@ -206,7 +207,7 @@ const ModuleSelectionPage = lazy(() => import("../pages/landing/ModuleSelectionP
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" badge="PIXANDCO ENTERPRISE" />}>
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<Navigate to="/modules" replace />} />
@@ -1106,7 +1107,7 @@ const AppRoutes = () => {
         path="/platform-admin/*"
         element={
           <PlatformAuthProvider>
-            <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading...</div>}>
+            <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" badge="PLATFORM OWNER" />}>
     <Routes>
               <Route path="login" element={<PlatformAdminLoginPage />} />
               <Route

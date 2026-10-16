@@ -19,7 +19,10 @@ const config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter Variable", "Inter", "system-ui", ...fontFamily.sans],
+        sans: ["Fira Sans", "Inter Variable", "Inter", "system-ui", ...fontFamily.sans],
+        fira: ["Fira Sans", "sans-serif"],
+        serif: ["Playfair Display", "Georgia", "serif"],
+        display: ["Playfair Display", "Fira Sans", "serif"],
       },
       colors: {
         /* ── Ocean-Blue ERP Palette ── */

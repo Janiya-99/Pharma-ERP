@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { NavLink, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { usePlatformAuth } from "../../auth/PlatformAuthContext";
+import LoadingScreen from "../common/LoadingScreen";
+import RouteProgressBar from "../common/RouteProgressBar";
 import {
   LayoutDashboard,
   Building2,
@@ -237,9 +239,12 @@ const PlatformAdminLayout = () => {
         </header>
 
         {/* Outlet Main Pane */}
+        <RouteProgressBar />
         <main className="flex-grow overflow-y-auto bg-slate-900 p-6 flex flex-col justify-between">
           <div className="flex-grow">
-            <Outlet />
+            <Suspense fallback={<LoadingScreen mode="page" badge="PLATFORM OWNER" />}>
+              <Outlet />
+            </Suspense>
           </div>
           <footer className="mt-8 pt-4 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center bg-slate-900">
             <span>© {new Date().getFullYear()} Pharma ERP. Platform Owner Portal.</span>
