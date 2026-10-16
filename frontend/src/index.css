@@ -953,3 +953,44 @@ select.select-premium:focus {
   animation: editorialPulse 3.5s ease-in-out infinite;
 }
 
+/* ── PIXANDCO Text Shine Animation ── */
+@keyframes textShine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-text-shine {
+  background: linear-gradient(
+    90deg,
+    #0f172a 0%,
+    #0f172a 30%,
+    #4f46e5 48%,
+    #0ea5e9 52%,
+    #0f172a 70%,
+    #0f172a 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes letterPulse {
+  0%, 100% {
+    letter-spacing: 0.24em;
+    opacity: 0.95;
+  }
+  50% {
+    letter-spacing: 0.28em;
+    opacity: 1;
+  }
+}
+
+.animate-letter-pulse {
+  animation: letterPulse 3s ease-in-out infinite;
+}
+
