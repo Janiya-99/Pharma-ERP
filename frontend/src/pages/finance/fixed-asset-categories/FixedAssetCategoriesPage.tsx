@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import DataTable from "../../../components/common/DataTable";
@@ -21,7 +21,7 @@ const FixedAssetCategoriesPage = () => {
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
   useEffect(() => {
@@ -118,7 +118,7 @@ const FixedAssetCategoriesPage = () => {
         <div className="flex items-center justify-end gap-2">
           {hasPermission("finance.fixed_asset_category.view") && (
             <button
-              onClick={() => history.push(`/admin/finance/fixed-asset-categories/${row.id}`)}
+              onClick={() => navigate(`/admin/finance/fixed-asset-categories/${row.id}`)}
               className="p-1.5 text-gray-500 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-navy-700   "
               title="View Details"
             >
@@ -127,7 +127,7 @@ const FixedAssetCategoriesPage = () => {
           )}
           {hasPermission("finance.fixed_asset_category.update") && (
             <button
-              onClick={() => history.push(`/admin/finance/fixed-asset-categories/${row.id}/edit`)}
+              onClick={() => navigate(`/admin/finance/fixed-asset-categories/${row.id}/edit`)}
               className="p-1.5 text-brand-600 transition-colors bg-brand-50 rounded-lg hover:bg-brand-100   "
               title="Edit"
             >
@@ -156,7 +156,7 @@ const FixedAssetCategoriesPage = () => {
         action={
           hasPermission("finance.fixed_asset_category.create") && (
             <button
-              onClick={() => history.push("/admin/finance/fixed-asset-categories/create")}
+              onClick={() => navigate("/admin/finance/fixed-asset-categories/create")}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 shadow-sm shadow-brand-500/20"
             >
               <Plus className="w-4 h-4" /> Create Category

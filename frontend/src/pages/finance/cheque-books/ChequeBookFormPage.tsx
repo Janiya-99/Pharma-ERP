@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import BankAccountSelect from "../../../components/finance/BankAccountSelect";
 import { toast } from "react-hot-toast";
@@ -9,7 +9,7 @@ import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 
 export default function ChequeBookFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isEdit = !!id;
 
   const [loading, setLoading] = useState(false);
@@ -89,7 +89,7 @@ export default function ChequeBookFormPage() {
         await financeApi.createChequeBook(payload);
         toast.success("Cheque book created successfully");
       }
-      history.push("/admin/finance/cheque-books");
+      navigate("/admin/finance/cheque-books");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to save cheque book");
     } finally {
@@ -142,7 +142,7 @@ export default function ChequeBookFormPage() {
       <PageTitleCard
         title={isEdit ? "Edit Cheque Book" : "Create Cheque Book"}
         description={isEdit ? "Update cheque book registry parameters" : "Register a new commercial cheque book series with auto-generated leaves"}
-        backAction={() => history.push("/admin/finance/cheque-books")}
+        backAction={() => navigate("/admin/finance/cheque-books")}
         actions={
           <div className="flex items-center gap-2.5">
             <button
@@ -155,7 +155,7 @@ export default function ChequeBookFormPage() {
             </button>
             <button
               type="button"
-              onClick={() => history.push("/admin/finance/cheque-books")}
+              onClick={() => navigate("/admin/finance/cheque-books")}
               className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
             >
               Cancel

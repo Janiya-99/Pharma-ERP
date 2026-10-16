@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import ReconciliationStatusBadge from "../../../components/finance/ReconciliationStatusBadge";
@@ -13,7 +13,7 @@ import { toast } from "react-hot-toast";
 
 export default function BankReconciliationDetailsPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   
   const [rec, setRec] = useState(null);
@@ -49,7 +49,7 @@ export default function BankReconciliationDetailsPage() {
       try {
         await financeApi.deleteBankReconciliation(id);
         toast.success("Reconciliation draft deleted");
-        history.push("/admin/finance/bank-reconciliations");
+        navigate("/admin/finance/bank-reconciliations");
       } catch (err) {
         alert("Failed to delete: " + (err.response?.data?.message || err.message));
       }
@@ -96,7 +96,7 @@ export default function BankReconciliationDetailsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <button
-            onClick={() => history.push("/admin/finance/bank-reconciliations")}
+            onClick={() => navigate("/admin/finance/bank-reconciliations")}
             className="flex items-center text-sm text-gray-500 hover:text-brand-500 mb-2"
           >
             <MdArrowBack className="mr-1" /> Back to Reconciliations
@@ -117,7 +117,7 @@ export default function BankReconciliationDetailsPage() {
             <>
               {hasPermission("finance.bank_reconciliation.update") && (
                 <button
-                  onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}/edit`)}
+                  onClick={() => navigate(`/admin/finance/bank-reconciliations/${rec.id}/edit`)}
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-md hover:bg-gray-50 shadow-sm"
                 >
                   <MdEdit /> Edit Draft
@@ -220,7 +220,7 @@ export default function BankReconciliationDetailsPage() {
                           <td className="px-4 py-3">{new Date(tx.transaction_date).toLocaleDateString()}</td>
                           <td className="px-4 py-3 font-medium text-navy-700 ">
                             <button 
-                              onClick={() => history.push(`/admin/finance/bank-transactions/${tx.id}`)}
+                              onClick={() => navigate(`/admin/finance/bank-transactions/${tx.id}`)}
                               className="text-brand-500 hover:underline"
                             >
                               {tx.transaction_reference}

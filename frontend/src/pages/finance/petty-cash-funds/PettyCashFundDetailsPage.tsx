@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -8,7 +8,7 @@ import { MdEdit, MdDelete, MdArrowBack } from "react-icons/md";
 
 export default function PettyCashFundDetailsPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [fund, setFund] = useState(null);
@@ -39,7 +39,7 @@ export default function PettyCashFundDetailsPage() {
     if (window.confirm("Are you sure you want to delete this petty cash fund?")) {
       try {
         await financeApi.deletePettyCashFund(id);
-        history.push("/admin/finance/petty-cash-funds");
+        navigate("/admin/finance/petty-cash-funds");
       } catch (err) {
         alert("Failed to delete: " + (err.response?.data?.message || err.message));
       }
@@ -57,7 +57,7 @@ export default function PettyCashFundDetailsPage() {
     <div className="flex flex-col gap-4 py-4 h-full max-w-6xl mx-auto">
       <div className="flex items-center gap-4 mb-2">
         <button
-          onClick={() => history.push("/admin/finance/petty-cash-funds")}
+          onClick={() => navigate("/admin/finance/petty-cash-funds")}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-white  border border-gray-200  text-gray-500 hover:text-brand-500 hover:border-brand-500 transition-colors shadow-sm"
           title="Back to List"
         >
@@ -72,7 +72,7 @@ export default function PettyCashFundDetailsPage() {
       <div className="flex justify-end gap-2 mb-2">
         {hasPermission("finance.petty_cash_fund.update") && (
           <button
-            onClick={() => history.push(`/admin/finance/petty-cash-funds/${fund.id}/edit`)}
+            onClick={() => navigate(`/admin/finance/petty-cash-funds/${fund.id}/edit`)}
             className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-brand-600 shadow-sm ring-1 ring-inset ring-brand-200 hover:bg-brand-50    "
           >
             <MdEdit className="h-4 w-4" />

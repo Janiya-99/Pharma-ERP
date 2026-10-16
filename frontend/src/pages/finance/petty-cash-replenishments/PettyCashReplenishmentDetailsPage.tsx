@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -17,7 +17,7 @@ import PostPettyCashConfirmModal from "../petty-cash/shared/PostPettyCashConfirm
 
 export default function PettyCashReplenishmentDetailsPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   
   const [replenishment, setReplenishment] = useState(null);
@@ -54,7 +54,7 @@ export default function PettyCashReplenishmentDetailsPage() {
       try {
         await financeApi.deletePettyCashReplenishment(id);
         toast.success("Replenishment deleted successfully");
-        history.push("/admin/finance/petty-cash-replenishments");
+        navigate("/admin/finance/petty-cash-replenishments");
       } catch (err) {
         toast.error("Failed to delete: " + (err.response?.data?.message || err.message));
       }
@@ -87,7 +87,7 @@ export default function PettyCashReplenishmentDetailsPage() {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => history.push("/admin/finance/petty-cash-replenishments")}
+            onClick={() => navigate("/admin/finance/petty-cash-replenishments")}
             className="flex items-center justify-center w-10 h-10 rounded-full bg-white  border border-gray-200  text-gray-500 hover:text-brand-500 hover:border-brand-500 transition-colors shadow-sm"
           >
             <MdArrowBack className="w-5 h-5" />
@@ -109,7 +109,7 @@ export default function PettyCashReplenishmentDetailsPage() {
             reject: "finance.petty_cash_replenishment.reject",
             post: "finance.petty_cash_replenishment.post"
           }}
-          onEdit={() => history.push(`/admin/finance/petty-cash-replenishments/${replenishment.id}/edit`)}
+          onEdit={() => navigate(`/admin/finance/petty-cash-replenishments/${replenishment.id}/edit`)}
           onDelete={handleDelete}
           onSubmit={() => setModals((m: unknown) => ({ ...m, submit: true }))}
           onApprove={() => setModals((m: unknown) => ({ ...m, approve: true }))}

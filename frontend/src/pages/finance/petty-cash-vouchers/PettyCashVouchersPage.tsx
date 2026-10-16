@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -18,7 +18,7 @@ import { MdVisibility } from "react-icons/md";
 import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 export default function PettyCashVouchersPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [vouchers, setVouchers] = useState([]);
@@ -130,7 +130,7 @@ export default function PettyCashVouchersPage() {
       <FinancePageHeader
         title="Petty Cash Vouchers"
         subtitle="Manage and track petty cash expenses, advances, and refunds"
-        onAdd={hasPermission("finance.petty_cash_voucher.create") ? () => history.push("/admin/finance/petty-cash-vouchers/create") : undefined}
+        onAdd={hasPermission("finance.petty_cash_voucher.create") ? () => navigate("/admin/finance/petty-cash-vouchers/create") : undefined}
         addLabel="Create Petty Cash Voucher"
       />
 
@@ -220,7 +220,7 @@ export default function PettyCashVouchersPage() {
                       <div className="flex flex-col gap-2 justify-center items-center">
                         <div className="flex items-center gap-2">
                           {hasPermission("finance.petty_cash_voucher.view") && (
-                            <button onClick={() => history.push(`/admin/finance/petty-cash-vouchers/${v.id}`)} className="text-gray-500 hover:text-navy-700 " title="View Details">
+                            <button onClick={() => navigate(`/admin/finance/petty-cash-vouchers/${v.id}`)} className="text-gray-500 hover:text-navy-700 " title="View Details">
                               <MdVisibility className="h-5 w-5" />
                             </button>
                           )}
@@ -236,7 +236,7 @@ export default function PettyCashVouchersPage() {
                             reject: "finance.petty_cash_voucher.reject",
                             post: "finance.petty_cash_voucher.post"
                           }}
-                          onEdit={() => history.push(`/admin/finance/petty-cash-vouchers/${v.id}/edit`)}
+                          onEdit={() => navigate(`/admin/finance/petty-cash-vouchers/${v.id}/edit`)}
                           onDelete={() => handleDelete(v.id)}
                           onSubmit={() => { setActionVoucherId(v.id); setModals((m: unknown) => ({ ...m, submit: true })); }}
                           onApprove={() => { setActionVoucherId(v.id); setModals((m: unknown) => ({ ...m, approve: true })); }}

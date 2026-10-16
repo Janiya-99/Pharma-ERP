@@ -214,7 +214,7 @@ export default function PaymentVoucherFormPage() {
       } else {
         await financeApi.createPaymentVoucher(payload);
       }
-      history.push("/admin/finance/payment-vouchers");
+      navigate("/admin/finance/payment-vouchers");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to save payment voucher");
       console.error(err);

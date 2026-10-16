@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { controlApi } from "../../../api/controlApi";
 import PageHeader from "../../../components/common/PageHeader";
@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import DepreciationPreviewTable from "./DepreciationPreviewTable";
 
 const FixedAssetDepreciationRunFormPage = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [saving, setSaving] = useState(false);
   const [previewing, setPreviewing] = useState(false);
@@ -139,7 +139,7 @@ const FixedAssetDepreciationRunFormPage = () => {
 
       await financeApi.createFixedAssetDepreciationRun(payload);
       toast.success("Depreciation run created successfully");
-      history.push("/admin/finance/fixed-asset-depreciation-runs");
+      navigate("/admin/finance/fixed-asset-depreciation-runs");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to create depreciation run");
     } finally {
@@ -161,7 +161,7 @@ const FixedAssetDepreciationRunFormPage = () => {
       <div className="px-6 max-w-6xl mx-auto w-full">
         <div className="flex items-center justify-between mb-4">
           <button
-            onClick={() => history.push("/admin/finance/fixed-asset-depreciation-runs")}
+            onClick={() => navigate("/admin/finance/fixed-asset-depreciation-runs")}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import DataTable from "../../../components/common/DataTable";
@@ -20,7 +20,7 @@ const FixedAssetDepreciationRunsPage = () => {
   const [runToDelete, setRunToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
   useEffect(() => {
@@ -120,7 +120,7 @@ const FixedAssetDepreciationRunsPage = () => {
         <div className="flex items-center justify-end gap-2">
           {hasPermission("finance.fixed_asset_depreciation.view") && (
             <button
-              onClick={() => history.push(`/admin/finance/fixed-asset-depreciation-runs/${row.id}`)}
+              onClick={() => navigate(`/admin/finance/fixed-asset-depreciation-runs/${row.id}`)}
               className="p-1.5 text-gray-500 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-navy-700   "
               title="View Details"
             >
@@ -149,7 +149,7 @@ const FixedAssetDepreciationRunsPage = () => {
         action={
           hasPermission("finance.fixed_asset_depreciation.create") && (
             <button
-              onClick={() => history.push("/admin/finance/fixed-asset-depreciation-runs/create")}
+              onClick={() => navigate("/admin/finance/fixed-asset-depreciation-runs/create")}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all bg-brand-500 rounded-xl hover:bg-brand-600 shadow-sm shadow-brand-500/20"
             >
               <Plus className="w-4 h-4" /> Create Run

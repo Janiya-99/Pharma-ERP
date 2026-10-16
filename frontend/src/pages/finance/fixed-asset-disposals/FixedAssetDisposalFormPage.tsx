@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import PageHeader from "../../../components/common/PageHeader";
 import { ArrowLeft, Save } from "lucide-react";
@@ -10,7 +10,7 @@ import { GainLossBadge } from "../../../components/finance/FixedAssetBadges";
 const FixedAssetDisposalFormPage = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -51,7 +51,7 @@ const FixedAssetDisposalFormPage = () => {
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load disposal details");
-      history.push("/admin/finance/fixed-asset-disposals");
+      navigate("/admin/finance/fixed-asset-disposals");
     } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ const FixedAssetDisposalFormPage = () => {
         await financeApi.createFixedAssetDisposal(payload);
         toast.success("Asset disposal recorded successfully");
       }
-      history.push("/admin/finance/fixed-asset-disposals");
+      navigate("/admin/finance/fixed-asset-disposals");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save asset disposal");
     } finally {
@@ -130,7 +130,7 @@ const FixedAssetDisposalFormPage = () => {
       <div className="px-6 max-w-6xl mx-auto w-full">
         <div className="flex items-center justify-between mb-4">
           <button
-            onClick={() => history.push("/admin/finance/fixed-asset-disposals")}
+            onClick={() => navigate("/admin/finance/fixed-asset-disposals")}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List

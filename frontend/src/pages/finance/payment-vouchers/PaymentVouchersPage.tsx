@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -16,7 +16,7 @@ import RejectVoucherModal from "../shared/RejectVoucherModal";
 import PostVoucherConfirmModal from "../shared/PostVoucherConfirmModal";
 
 export default function PaymentVouchersPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [vouchers, setVouchers] = useState([]);
@@ -67,7 +67,7 @@ export default function PaymentVouchersPage() {
 
   const handleAction = async (action: unknown, voucher: unknown) => {
     if (action === "edit") {
-      history.push(`/admin/finance/payment-vouchers/${voucher.id}/edit`);
+      navigate(`/admin/finance/payment-vouchers/${voucher.id}/edit`);
     } else if (action === "delete") {
       if (window.confirm("Are you sure you want to delete this payment voucher?")) {
         try {
@@ -91,7 +91,7 @@ export default function PaymentVouchersPage() {
       <FinancePageHeader
         title="Payment Vouchers"
         subtitle="Manage outgoing payments and approvals"
-        onAdd={hasPermission("finance.payment.create") ? () => history.push("/admin/finance/payment-vouchers/create") : undefined}
+        onAdd={hasPermission("finance.payment.create") ? () => navigate("/admin/finance/payment-vouchers/create") : undefined}
         addLabel="Create Payment Voucher"
       />
 
@@ -208,7 +208,7 @@ export default function PaymentVouchersPage() {
                   <tr key={voucher.id} className="hover:bg-gray-50 ">
                     <td className="px-4 py-3 font-medium text-navy-700">
                       <button 
-                        onClick={() => history.push(`/admin/finance/payment-vouchers/${voucher.id}`)}
+                        onClick={() => navigate(`/admin/finance/payment-vouchers/${voucher.id}`)}
                         className="text-brand-500 hover:underline"
                       >
                         {voucher.payment_voucher_number}

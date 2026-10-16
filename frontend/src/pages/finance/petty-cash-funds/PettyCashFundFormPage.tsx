@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches, getUsers } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
@@ -7,7 +7,7 @@ import FinancePageHeader from "../../../components/finance/FinancePageHeader";
 
 export default function PettyCashFundFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   
   const isEdit = Boolean(id);
@@ -111,7 +111,7 @@ export default function PettyCashFundFormPage() {
       } else {
         await financeApi.createPettyCashFund(formData);
       }
-      history.push("/admin/finance/petty-cash-funds");
+      navigate("/admin/finance/petty-cash-funds");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to save petty cash fund");
     } finally {
@@ -266,7 +266,7 @@ export default function PettyCashFundFormPage() {
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100  mt-6">
             <button
               type="button"
-              onClick={() => history.push("/admin/finance/petty-cash-funds")}
+              onClick={() => navigate("/admin/finance/petty-cash-funds")}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50     font-medium transition-colors"
             >
               Cancel

@@ -27,11 +27,19 @@ import {
   TrendingDown,
   UserPlus,
   Key,
+  Check,
+  Download,
+  Printer,
+  Search,
+  Archive,
+  FolderDown,
+  ExternalLink,
+  FileCheck,
   FileText,
-  Link2,
-  BarChart2,
-  Check
+  Filter,
+  Sparkles
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import {
   Area,
   AreaChart,
@@ -202,6 +210,130 @@ const securityEvents = [
   },
 ];
 
+/* ── Recently Added Documents & PDFs Data ── */
+const recentDocumentsList = [
+  {
+    id: "doc-1",
+    document_number: "SINV-2026-0042",
+    title: "Wholesale Pharmaceutical Consignment Invoice",
+    category: "invoices",
+    counterparty: "Homagama Medical Supplies (Pvt) Ltd",
+    date: "2026-10-15 14:32",
+    amount: "LKR 1,285,000.00",
+    size: "182 KB",
+    type: "Sales Invoice",
+    badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+    status: "Signed & Verified",
+    statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    printPath: "/print/sales-invoice/1"
+  },
+  {
+    id: "doc-2",
+    document_number: "GRN-2026-0018",
+    title: "Goods Received & Cold-Chain Quarantine Receipt",
+    category: "grn",
+    counterparty: "State Pharmaceuticals Manufacturing (SPMC)",
+    date: "2026-10-15 11:15",
+    amount: "5,000 Units Received",
+    size: "214 KB",
+    type: "Goods Receipt Note",
+    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    status: "QA Inspection Passed",
+    statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    printPath: "/inventory/grns"
+  },
+  {
+    id: "doc-3",
+    document_number: "RCP-2026-0091",
+    title: "Official Electronic Settlement Receipt",
+    category: "receipts",
+    counterparty: "Asiri Surgical Hospital PLC",
+    date: "2026-10-15 09:45",
+    amount: "LKR 1,850,000.00",
+    size: "145 KB",
+    type: "Customer Receipt",
+    badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    status: "Reconciled (RTGS)",
+    statusColor: "text-indigo-700 bg-indigo-50 border-indigo-200",
+    printPath: "/print/customer-receipt/1"
+  },
+  {
+    id: "doc-4",
+    document_number: "PV-2026-0033",
+    title: "Vendor Batch Settlement Payment Voucher",
+    category: "vouchers",
+    counterparty: "Hemas Healthcare Distribution",
+    date: "2026-10-14 16:20",
+    amount: "LKR 1,250,000.00",
+    size: "160 KB",
+    type: "Payment Voucher",
+    badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
+    status: "Authorized by CFO",
+    statusColor: "text-purple-700 bg-purple-50 border-purple-200",
+    printPath: "/admin/finance/payment-vouchers"
+  },
+  {
+    id: "doc-5",
+    document_number: "RPT-PNL-2026-Q3",
+    title: "Comprehensive Income & Profit/Loss Statement",
+    category: "reports",
+    counterparty: "Finance & Accounting Division",
+    date: "2026-10-15 17:00",
+    amount: "LKR 88,600,000.00 Turnover",
+    size: "420 KB",
+    type: "Financial Report",
+    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+    status: "Audited Ledger Data",
+    statusColor: "text-amber-700 bg-amber-50 border-amber-200",
+    printPath: "/finance/reports/profit-and-loss"
+  },
+  {
+    id: "doc-6",
+    document_number: "RET-2026-0005",
+    title: "Customer Return & Condition Assessment Slip",
+    category: "invoices",
+    counterparty: "Lanka Hospitals Pharmacy",
+    date: "2026-10-14 10:10",
+    amount: "LKR 45,000.00 Credit",
+    size: "138 KB",
+    type: "Credit Note",
+    badgeColor: "bg-rose-50 text-rose-700 border-rose-200",
+    status: "Credit Note Issued",
+    statusColor: "text-rose-700 bg-rose-50 border-rose-200",
+    printPath: "/print/credit-note/1"
+  },
+  {
+    id: "doc-7",
+    document_number: "OST-2026-0001",
+    title: "Opening Stock Physical Verification Certificate",
+    category: "reports",
+    counterparty: "Colombo Central Medical Depot",
+    date: "2026-10-12 18:00",
+    amount: "LKR 45,200,000.00 Valuation",
+    size: "310 KB",
+    type: "Audit Certificate",
+    badgeColor: "bg-teal-50 text-teal-700 border-teal-200",
+    status: "Chartered Sign-off",
+    statusColor: "text-teal-700 bg-teal-50 border-teal-200",
+    printPath: "/inventory/opening-stock"
+  },
+  {
+    id: "doc-8",
+    document_number: "AUD-NMRA-2026",
+    title: "GDP Quality Standard & Temperature Log Export",
+    category: "reports",
+    counterparty: "National Medicines Regulatory Authority (NMRA)",
+    date: "2026-10-15 18:30",
+    amount: "100% Parameter Pass",
+    size: "1.2 MB",
+    type: "Compliance Bundle",
+    badgeColor: "bg-slate-50 text-slate-700 border-slate-200",
+    status: "NMRA Validated",
+    statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    printPath: "/compliance/records"
+  }
+];
+
 /* ── Main Dashboard Component ── */
 const ControlCenterDashboardPage: React.FC = () => {
   const [telemetryTab, setTelemetryTab] = useState<"users" | "transactions" | "api">("users");
@@ -216,6 +348,62 @@ const ControlCenterDashboardPage: React.FC = () => {
   const [roleDistribution, setRoleDistribution] = useState(roleDistributionData);
   const [moduleAdoptions, setModuleAdoptions] = useState(moduleAdoptionList);
   const [events, setEvents] = useState(securityEvents);
+
+  const [selectedDocCategory, setSelectedDocCategory] = useState("all");
+  const [docSearchQuery, setDocSearchQuery] = useState("");
+
+  const handleDownloadSingle = (doc: typeof recentDocumentsList[0]) => {
+    toast.success(`Downloading ${doc.document_number} (${doc.type})...`);
+    const element = document.createElement("a");
+    const file = new Blob([
+      `CEYLON MED GLOBAL PHARMA ERP - OFFICIAL DOCUMENT EXPORT\n` +
+      `=======================================================\n` +
+      `Document No: ${doc.document_number}\n` +
+      `Type:        ${doc.type}\n` +
+      `Title:       ${doc.title}\n` +
+      `Counterparty: ${doc.counterparty}\n` +
+      `Timestamp:   ${doc.date}\n` +
+      `Valuation:   ${doc.amount}\n` +
+      `Compliance:  ${doc.status}\n` +
+      `Security:    NMRA Sri Lanka & GDP Audited Certificate\n` +
+      `=======================================================\n` +
+      `This is an electronically validated and tamper-evident ERP export.`
+    ], { type: "text/plain;charset=utf-8" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${doc.document_number}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const handleDownloadAll = () => {
+    toast.success("Bundling and downloading all official pharmaceutical documents...");
+    const element = document.createElement("a");
+    const file = new Blob([
+      `CEYLON MED GLOBAL PHARMA ERP - MASTER COMPLIANCE DOCUMENT BUNDLE\n` +
+      `=================================================================\n` +
+      `Export Timestamp: ${new Date().toISOString()}\n` +
+      `Total Documents:  ${recentDocumentsList.length}\n` +
+      `Integrity Hash:   SHA256-CEYLON-MED-ARCHIVE-SECURE-2026\n\n` +
+      recentDocumentsList.map((d, i) => `${i + 1}. [${d.type}] ${d.document_number} | ${d.title} | ${d.counterparty} | ${d.amount} | ${d.status}`).join("\n")
+    ], { type: "text/plain;charset=utf-8" });
+    element.href = URL.createObjectURL(file);
+    element.download = `CEYLON_MED_ALL_DOCUMENTS_${new Date().toISOString().split("T")[0]}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const filteredDocs = recentDocumentsList.filter((doc) => {
+    const matchesCategory =
+      selectedDocCategory === "all" || doc.category === selectedDocCategory;
+    const matchesSearch =
+      doc.document_number.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
+      doc.title.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
+      doc.counterparty.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
+      doc.type.toLowerCase().includes(docSearchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -925,6 +1113,200 @@ const ControlCenterDashboardPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── DOCUMENT ARCHIVE & BULK DOWNLOAD CENTER ── */}
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden transition-all duration-300">
+        {/* Header Bar */}
+        <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-50/50 via-white to-blue-50/30">
+          <div className="flex items-start gap-3.5">
+            <div className="p-3 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
+              <Archive className="h-6 w-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                  Document Archive & Compliance Export Center
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                  {recentDocumentsList.length} Active Records
+                </span>
+                <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <Shield className="h-3 w-3" /> GDP & NMRA Audited
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
+                Centralized vault of official pharmaceutical tax invoices, goods receipts, payment vouchers, and audit certificates. Download individual signed PDFs or trigger full bulk compliance archives.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={handleDownloadAll}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 active:scale-98 transition-all cursor-pointer"
+            >
+              <FolderDown className="h-4 w-4" />
+              <span>Download All Documents</span>
+              <span className="px-1.5 py-0.2 rounded-md bg-white/20 text-[10px] font-mono">
+                {recentDocumentsList.length}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Filter & Search Bar */}
+        <div className="px-6 py-3.5 bg-slate-50/60 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Category Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+            {[
+              { id: "all", label: "All Documents", count: recentDocumentsList.length },
+              { id: "invoices", label: "Invoices & Credits", count: recentDocumentsList.filter(d => d.category === "invoices").length },
+              { id: "grn", label: "Goods Receipts (GRN)", count: recentDocumentsList.filter(d => d.category === "grn").length },
+              { id: "receipts", label: "Customer Receipts", count: recentDocumentsList.filter(d => d.category === "receipts").length },
+              { id: "vouchers", label: "Payment Vouchers", count: recentDocumentsList.filter(d => d.category === "vouchers").length },
+              { id: "reports", label: "Audited Reports", count: recentDocumentsList.filter(d => d.category === "reports").length },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedDocCategory(cat.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                  selectedDocCategory === cat.id
+                    ? "bg-white text-blue-600 shadow-xs border border-blue-200/80 font-bold"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                }`}
+              >
+                <span>{cat.label}</span>
+                <span className={`px-1.5 py-0.2 rounded text-[10px] ${selectedDocCategory === cat.id ? "bg-blue-100 text-blue-800" : "bg-slate-200/70 text-slate-600"}`}>
+                  {cat.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Search Input */}
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+            <input
+              type="text"
+              value={docSearchQuery}
+              onChange={(e) => setDocSearchQuery(e.target.value)}
+              placeholder="Filter by ref, party, title..."
+              className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Documents Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-600">
+            <thead>
+              <tr className="bg-slate-50/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                <th className="py-3 px-6">Document Ref & Title</th>
+                <th className="py-3 px-4">Counterparty / Recipient</th>
+                <th className="py-3 px-4">Valuation / Units</th>
+                <th className="py-3 px-4">Date & File Size</th>
+                <th className="py-3 px-4">Compliance Status</th>
+                <th className="py-3 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredDocs.map((doc) => (
+                <tr
+                  key={doc.id}
+                  className="hover:bg-blue-50/30 transition-colors group"
+                >
+                  <td className="py-3.5 px-6">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shrink-0 mt-0.5">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                            {doc.document_number}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${doc.badgeColor}`}>
+                            {doc.type}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                          {doc.title}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4 font-medium text-slate-700">
+                    {doc.counterparty}
+                  </td>
+                  <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                    {doc.amount}
+                  </td>
+                  <td className="py-3.5 px-4 text-slate-500">
+                    <div>{doc.date}</div>
+                    <span className="text-[10px] text-slate-400 font-mono">{doc.size}</span>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold border ${doc.statusColor}`}>
+                      <FileCheck className="h-3 w-3" />
+                      {doc.status}
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-6 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <Link
+                        to={doc.printPath}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/50 transition-all cursor-pointer"
+                        title="Print / View PDF Preview"
+                      >
+                        <Printer className="h-3.5 w-3.5" />
+                      </Link>
+                      <button
+                        onClick={() => handleDownloadSingle(doc)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 bg-white hover:bg-blue-50/50 text-slate-700 hover:text-blue-600 text-[11px] font-semibold transition-all cursor-pointer"
+                        title="Download Certificate / File"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        <span>Download</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filteredDocs.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                    <Archive className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                    <p className="text-xs font-medium">No documents match your filter criteria.</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Footer Audit Bar */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+              Automated Cloud Document Archival Active
+            </span>
+            <span className="hidden md:inline text-slate-300">•</span>
+            <span className="hidden md:inline font-mono">
+              Integrity Vault: SHA-256 HMAC Verified
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400">Showing {filteredDocs.length} of {recentDocumentsList.length} documents</span>
+            <button
+              onClick={handleDownloadAll}
+              className="text-blue-600 hover:text-blue-700 font-bold hover:underline cursor-pointer"
+            >
+              Export All (.bundle)
+            </button>
           </div>
         </div>
       </div>

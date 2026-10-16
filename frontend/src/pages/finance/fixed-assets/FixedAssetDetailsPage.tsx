@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import PageHeader from "../../../components/common/PageHeader";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
@@ -11,7 +11,7 @@ import { FixedAssetStatusBadge, DepreciationMethodBadge } from "../../../compone
 
 const FixedAssetDetailsPage = () => {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
   const [asset, setAsset] = useState(null);
@@ -30,7 +30,7 @@ const FixedAssetDetailsPage = () => {
       setAsset(res.data?.data);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load asset details");
-      history.push("/admin/finance/fixed-assets");
+      navigate("/admin/finance/fixed-assets");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ const FixedAssetDetailsPage = () => {
       setDeleting(true);
       await financeApi.deleteFixedAsset(id);
       toast.success("Fixed asset deleted successfully");
-      history.push("/admin/finance/fixed-assets");
+      navigate("/admin/finance/fixed-assets");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete fixed asset");
       setDeleteModalOpen(false);
@@ -77,7 +77,7 @@ const FixedAssetDetailsPage = () => {
       <div className="px-6 max-w-6xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => history.push("/admin/finance/fixed-assets")}
+            onClick={() => navigate("/admin/finance/fixed-assets")}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
@@ -86,7 +86,7 @@ const FixedAssetDetailsPage = () => {
           <div className="flex items-center gap-3">
             {hasPermission("finance.fixed_asset.update") && asset.asset_status === "active" && (
               <button
-                onClick={() => history.push(`/admin/finance/fixed-assets/${id}/edit`)}
+                onClick={() => navigate(`/admin/finance/fixed-assets/${id}/edit`)}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-xl hover:bg-brand-100    transition-all"
               >
                 <Edit className="w-4 h-4" /> Edit

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
@@ -8,7 +8,7 @@ import { DatePicker } from "../../../components/ui/date-picker";
 
 export default function PettyCashReplenishmentFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   
   const isEdit = Boolean(id);
@@ -120,7 +120,7 @@ export default function PettyCashReplenishmentFormPage() {
       } else {
         await financeApi.createPettyCashReplenishment(formData);
       }
-      history.push("/admin/finance/petty-cash-replenishments");
+      navigate("/admin/finance/petty-cash-replenishments");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to save petty cash replenishment");
     } finally {
@@ -226,7 +226,7 @@ export default function PettyCashReplenishmentFormPage() {
         <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"
-            onClick={() => history.push("/admin/finance/petty-cash-replenishments")}
+            onClick={() => navigate("/admin/finance/petty-cash-replenishments")}
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50     font-medium transition-colors"
           >
             Cancel

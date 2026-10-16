@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import VoucherStatusBadge from "../../../components/finance/VoucherStatusBadge";
@@ -16,7 +16,7 @@ import PostVoucherConfirmModal from "../shared/PostVoucherConfirmModal";
 
 export default function ReceiptVoucherDetailsPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   const [voucher, setVoucher] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,12 +50,12 @@ export default function ReceiptVoucherDetailsPage() {
 
   const handleAction = async (action: unknown, vch: unknown) => {
     if (action === "edit") {
-      history.push(`/admin/finance/receipt-vouchers/${vch.id}/edit`);
+      navigate(`/admin/finance/receipt-vouchers/${vch.id}/edit`);
     } else if (action === "delete") {
       if (window.confirm("Are you sure you want to delete this receipt voucher?")) {
         try {
           await financeApi.deleteReceiptVoucher(vch.id);
-          history.push("/admin/finance/receipt-vouchers");
+          navigate("/admin/finance/receipt-vouchers");
         } catch (err) {
           alert("Failed to delete: " + (err.response?.data?.message || err.message));
         }
@@ -79,7 +79,7 @@ export default function ReceiptVoucherDetailsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => history.push("/admin/finance/receipt-vouchers")}
+            onClick={() => navigate("/admin/finance/receipt-vouchers")}
             className="p-2 rounded-full hover:bg-gray-100  transition-colors"
           >
             <MdArrowBack className="h-6 w-6 text-gray-500 " />
