@@ -47,6 +47,47 @@ type TopMovingProductItem struct {
 	Stock     string  `json:"stock"`
 }
 
+type CategoryDistItem struct {
+	Category string  `json:"category"`
+	Value    float64 `json:"value"`
+	Count    int64   `json:"count"`
+}
+
+type ExpiryRiskItem struct {
+	Product    string `json:"product"`
+	Batch      string `json:"batch"`
+	ExpiryDate string `json:"expiry_date"`
+	DaysLeft   int64  `json:"days_left"`
+	Qty        int64  `json:"qty"`
+}
+
+type StockTableItem struct {
+	ID           uint64  `json:"id"`
+	Product      string  `json:"product"`
+	Batch        string  `json:"batch"`
+	Category     string  `json:"category"`
+	Warehouse    string  `json:"warehouse"`
+	CurrentStock float64 `json:"current_stock"`
+	ReorderLevel float64 `json:"reorder_level"`
+	Status       string  `json:"status"`
+	LastMovement string  `json:"last_movement"`
+}
+
+type StockStatusOverview struct {
+	InStock         int64   `json:"in_stock"`
+	InStockPct      float64 `json:"in_stock_pct"`
+	LowStock        int64   `json:"low_stock"`
+	LowStockPct     float64 `json:"low_stock_pct"`
+	OutOfStock      int64   `json:"out_of_stock"`
+	OutOfStockPct   float64 `json:"out_of_stock_pct"`
+	ExpiringSoon    int64   `json:"expiring_soon"`
+	ExpiringSoonPct float64 `json:"expiring_soon_pct"`
+	BlockedHold     int64   `json:"blocked_hold"`
+	BlockedHoldPct  float64 `json:"blocked_hold_pct"`
+	Inactive        int64   `json:"inactive"`
+	InactivePct     float64 `json:"inactive_pct"`
+}
+
 func (h *DashboardHandler) Summary(c *gin.Context) {
 	companyID, _ := c.Get("company_id")
 	companyDB, _ := c.Get("companyDB")
@@ -175,6 +216,86 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 		LIMIT 5
 	`, companyID).Scan(&topProducts)
 
+	// Category Stock Valuation Distribution
+	var categoryDist []CategoryDistItem
+	db.Raw(`
+		SELECT COALESCE(pc.category_name, 'Other') as category,
+		       ROUND(COALESCE(SUM(sb.quantity_available * sb.average_cost), 0), 2) as value,
+		       COUNT(DISTINCT p.id) as count
+		FROM product_categories pc
+		RIGHT JOIN products p ON p.product_category_id = pc.id
+		LEFT JOIN stock_balances sb ON sb.product_id = p.id AND sb.company_id = p.company_id
+		WHERE p.company_id = ?
+		GROUP BY pc.id, pc.category_name
+		ORDER BY value DESC
+		LIMIT 6
+	`, companyID).Scan(&categoryDist)
+
+	// Expiry Risk Items
+	var expiryRiskItems []ExpiryRiskItem
+	db.Raw(`
+		SELECT p.product_name as product, pb.batch_number as batch, DATE_FORMAT(pb.expiry_date, '%d %b %Y') as expiry_date,
+		       DATEDIFF(pb.expiry_date, NOW()) as days_left,
+		       ROUND(COALESCE(SUM(sb.quantity_available), 0), 0) as qty
+		FROM product_batches pb
+		JOIN products p ON pb.product_id = p.id
+		LEFT JOIN stock_balances sb ON sb.product_batch_id = pb.id
+		WHERE pb.company_id = ? AND pb.expiry_date >= NOW()
+		GROUP BY pb.id, p.product_name, pb.batch_number, pb.expiry_date
+		ORDER BY pb.expiry_date ASC
+		LIMIT 10
+	`, companyID).Scan(&expiryRiskItems)
+
+	// Low Stock / Table Items
+	var stockTableItems []StockTableItem
+	db.Raw(`
+		SELECT p.id, p.product_name as product, COALESCE(pb.batch_number, '—') as batch,
+		       COALESCE(pc.category_name, 'General') as category,
+		       COALESCE(w.warehouse_name, 'Main Warehouse') as warehouse,
+		       COALESCE(sb.quantity_available, 0) as current_stock,
+		       COALESCE(p.reorder_level, 0) as reorder_level,
+		       CASE 
+		         WHEN COALESCE(sb.quantity_available, 0) = 0 THEN 'Out of Stock'
+		         WHEN COALESCE(sb.quantity_available, 0) <= p.reorder_level THEN 'Low Stock'
+		         ELSE 'In Stock'
+		       END as status,
+		       DATE_FORMAT(COALESCE(sb.updated_at, p.updated_at), '%b %d, %Y') as last_movement
+		FROM products p
+		LEFT JOIN stock_balances sb ON sb.product_id = p.id AND sb.company_id = p.company_id
+		LEFT JOIN product_batches pb ON sb.product_batch_id = pb.id
+		LEFT JOIN product_categories pc ON p.product_category_id = pc.id
+		LEFT JOIN warehouses w ON sb.warehouse_id = w.id
+		WHERE p.company_id = ? AND p.status = 'active'
+		ORDER BY current_stock ASC
+		LIMIT 50
+	`, companyID).Scan(&stockTableItems)
+
+	// Stock Status Overview
+	var inactiveCount int64
+	db.Model(&models.Product{}).Where("company_id = ? AND status != 'active'", companyID).Count(&inactiveCount)
+	inStockCount := totalProducts - lowStockProducts - outOfStockItems - inactiveCount
+	if inStockCount < 0 {
+		inStockCount = 0
+	}
+	totProd := float64(totalProducts)
+	if totProd == 0 {
+		totProd = 1
+	}
+	statusOverview := StockStatusOverview{
+		InStock:         inStockCount,
+		InStockPct:      float64(int((float64(inStockCount)/totProd)*1000)) / 10.0,
+		LowStock:        lowStockProducts,
+		LowStockPct:     float64(int((float64(lowStockProducts)/totProd)*1000)) / 10.0,
+		OutOfStock:      outOfStockItems,
+		OutOfStockPct:   float64(int((float64(outOfStockItems)/totProd)*1000)) / 10.0,
+		ExpiringSoon:    nearExpiryBatches,
+		ExpiringSoonPct: float64(int((float64(nearExpiryBatches)/totProd)*1000)) / 10.0,
+		BlockedHold:     blockedBatches,
+		BlockedHoldPct:  float64(int((float64(blockedBatches)/totProd)*1000)) / 10.0,
+		Inactive:        inactiveCount,
+		InactivePct:     float64(int((float64(inactiveCount)/totProd)*1000)) / 10.0,
+	}
+
 	// Ensure empty slices instead of null in JSON
 	if warehouseDist == nil {
 		warehouseDist = []WarehouseDistItem{}
@@ -187,6 +308,15 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 	}
 	if topProducts == nil {
 		topProducts = []TopMovingProductItem{}
+	}
+	if categoryDist == nil {
+		categoryDist = []CategoryDistItem{}
+	}
+	if expiryRiskItems == nil {
+		expiryRiskItems = []ExpiryRiskItem{}
+	}
+	if stockTableItems == nil {
+		stockTableItems = []StockTableItem{}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -204,6 +334,10 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 			"out_of_stock_items":     outOfStockItems,
 			"total_stock_value":      totalStockValue,
 			"warehouse_distribution": warehouseDist,
+			"category_distribution":  categoryDist,
+			"expiry_risk_items":      expiryRiskItems,
+			"stock_table_items":      stockTableItems,
+			"stock_status_overview":  statusOverview,
 			"batch_alerts":           batchAlerts,
 			"stock_trends":           stockTrends,
 			"top_moving_products":    topProducts,

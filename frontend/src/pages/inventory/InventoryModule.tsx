@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import InventoryDashboard from "./dashboard/InventoryDashboard";
 import {
   Select,
   SelectContent,
@@ -808,143 +809,7 @@ function KpiCard({
 }
 
 export function InventoryDashboardPage() {
-  const context = useInventoryContext();
-  const dashboard = useBackendRecord(inventoryApi.getInventoryDashboard, {
-    company_id: context.companyId,
-    branch_id: context.branchId,
-  }, !!context.companyId);
-  const lowStock = useBackendList(inventoryApi.getStockBalances, {
-    company_id: context.companyId,
-    branch_id: context.branchId,
-    low_stock_only: true,
-    limit: 5,
-  }, !!context.companyId);
-  const expiring = useBackendList(inventoryApi.getExpiryReport, {
-    company_id: context.companyId,
-    branch_id: context.branchId,
-    days: 90,
-    limit: 5,
-  }, !!context.companyId);
-  const movements = useBackendList(inventoryApi.getStockLedgerEntries, {
-    company_id: context.companyId,
-    branch_id: context.branchId,
-    limit: 5,
-  }, !!context.companyId);
-  const grns = useBackendList(inventoryApi.getGRNs, {
-    company_id: context.companyId,
-    branch_id: context.branchId,
-    limit: 5,
-  }, !!context.companyId);
-
-  const data = dashboard.record || {};
-
-  return (
-    <InventoryPage
-      title="Inventory Dashboard"
-      description="Monitor stock levels, batches, expiry risks, warehouse activity, and inventory movements."
-      icon={BarChart3}
-      actions={
-        <Button variant="outline" onClick={() => Promise.all([dashboard.refresh(), lowStock.refresh(), expiring.refresh(), movements.refresh(), grns.refresh()])}>
-          Refresh
-        </Button>
-      }
-    >
-      {!context.companyId ? (
-        <Alert className="border-amber-100 bg-amber-50">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Company required</AlertTitle>
-          <AlertDescription>Please select a company first.</AlertDescription>
-        </Alert>
-      ) : null}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        {dashboard.loading ? (
-          Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="h-32 rounded-xl" />)
-        ) : (
-          <>
-            <KpiCard title="Total Products" value={data.total_products ?? 0} subtext={`${data.active_products ?? 0} active products`} icon={Package} tone="info" />
-            <KpiCard title="Total Stock Value" value={`Rs. ${Number(data.total_stock_value || 0).toLocaleString()}`} subtext="Backend stock valuation" icon={BarChart3} tone="success" />
-            <KpiCard title="Low Stock Items" value={data.low_stock_products ?? lowStock.rows.length} subtext="Below reorder level" icon={AlertTriangle} tone="warning" />
-            <KpiCard title="Out of Stock Items" value={data.out_of_stock_items ?? 0} subtext="Requires replenishment" icon={Boxes} tone="danger" />
-            <KpiCard title="Expiring Soon" value={data.near_expiry_batches ?? expiring.rows.length} subtext="Near expiry batches" icon={CalendarClock} tone="warning" />
-            <KpiCard title="Active Batches" value={data.total_batches ?? 0} subtext={`${data.blocked_batches ?? 0} blocked`} icon={ClipboardList} tone="neutral" />
-          </>
-        )}
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-4">
-        <KpiCard title="Expired Batches" value={data.expired_batches ?? 0} subtext="Past expiry" icon={AlertTriangle} tone="danger" />
-        <KpiCard title="Recent GRNs" value={grns.rows.length} subtext="Latest receipts" icon={Truck} tone="info" />
-        <KpiCard title="Recent Movements" value={movements.rows.length} subtext="Ledger entries" icon={Repeat} tone="neutral" />
-        <KpiCard title="Warehouses" value={data.total_warehouses ?? 0} subtext="Inventory locations" icon={Warehouse} tone="success" />
-      </div>
-
-      <Tabs defaultValue="low-stock" className="gap-4">
-        <TabsList className="inline-flex h-10 w-fit max-w-full flex-wrap items-center justify-start gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="low-stock">Low Stock</TabsTrigger>
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="expiry">Expiring Batches</TabsTrigger>
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="movements">Recent Movements</TabsTrigger>
-          <TabsTrigger className="h-8 flex-none rounded-lg px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none data-active:bg-indigo-50 data-active:text-indigo-700 data-active:shadow-none" value="grns">Recent GRNs</TabsTrigger>
-        </TabsList>
-        <TabsContent value="low-stock">
-          <DataGrid
-            loading={lowStock.loading}
-            error={lowStock.error}
-            data={lowStock.rows}
-            columns={[
-              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-              { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
-              { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
-              { header: "Available", render: (row) => valueOf(row, ["quantity_available"]) },
-              { header: "Status", render: (row) => <StatusBadge status={valueOf(row, ["status"], "low stock")} /> },
-            ]}
-          />
-        </TabsContent>
-        <TabsContent value="expiry">
-          <DataGrid
-            loading={expiring.loading}
-            error={expiring.error}
-            data={expiring.rows}
-            columns={[
-              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-              { header: "Batch", render: (row) => valueOf(row, ["batch_number", "product_batch.batch_number"]) },
-              { header: "Expiry", render: (row) => normalizeDate(valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")) || "—" },
-              { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"], "—") },
-              { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
-            ]}
-          />
-        </TabsContent>
-        <TabsContent value="movements">
-          <DataGrid
-            loading={movements.loading}
-            error={movements.error}
-            data={movements.rows}
-            columns={[
-              { header: "Date", render: (row) => normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")) },
-              { header: "Movement Type", render: (row) => valueOf(row, ["movement_type", "source_type"]) },
-              { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-              { header: "In", render: (row) => valueOf(row, ["quantity_in"], "0") },
-              { header: "Out", render: (row) => valueOf(row, ["quantity_out"], "0") },
-              { header: "Balance", render: (row) => valueOf(row, ["balance_quantity", "running_balance"], "—") },
-            ]}
-          />
-        </TabsContent>
-        <TabsContent value="grns">
-          <DataGrid
-            loading={grns.loading}
-            error={grns.error}
-            data={grns.rows}
-            columns={[
-              { header: "GRN No", render: (row) => valueOf(row, ["grn_number"]) },
-              { header: "Date", render: (row) => normalizeDate(valueOf(row, ["grn_date"], "")) },
-              { header: "Supplier", render: (row) => valueOf(row, ["supplier.supplier_name", "supplier_name", "supplier_id"]) },
-              { header: "Quantity", render: (row) => valueOf(row, ["total_quantity", "total_stock_quantity"]) },
-              { header: "Posted", render: (row) => <StatusBadge status={valueOf(row, ["posted_status"], "draft")} /> },
-            ]}
-          />
-        </TabsContent>
-      </Tabs>
-    </InventoryPage>
-  );
+  return <InventoryDashboard />;
 }
 
 function setupConfigs(context: InventoryContextValue): SetupConfig[] {
