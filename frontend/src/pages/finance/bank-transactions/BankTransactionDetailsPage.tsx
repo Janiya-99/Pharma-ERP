@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import BankTransactionTypeBadge from "../../../components/finance/BankTransactionTypeBadge";
@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 
 export default function BankTransactionDetailsPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   
   const [transaction, setTransaction] = useState(null);
@@ -46,7 +46,7 @@ export default function BankTransactionDetailsPage() {
       try {
         await financeApi.deleteBankTransaction(id);
         toast.success("Transaction deleted successfully");
-        history.push("/admin/finance/bank-transactions");
+        navigate("/admin/finance/bank-transactions");
       } catch (err) {
         alert("Failed to delete: " + (err.response?.data?.message || err.message));
       }
@@ -64,7 +64,7 @@ export default function BankTransactionDetailsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <button
-            onClick={() => history.push("/admin/finance/bank-transactions")}
+            onClick={() => navigate("/admin/finance/bank-transactions")}
             className="flex items-center text-sm text-gray-500 hover:text-brand-500 mb-2"
           >
             <MdArrowBack className="mr-1" /> Back to Transactions
@@ -79,7 +79,7 @@ export default function BankTransactionDetailsPage() {
         <div className="flex items-center gap-3">
           {hasPermission("finance.bank_transaction.update") && isManual && !transaction.is_reconciled && (
             <button
-              onClick={() => history.push(`/admin/finance/bank-transactions/${transaction.id}/edit`)}
+              onClick={() => navigate(`/admin/finance/bank-transactions/${transaction.id}/edit`)}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-md hover:bg-gray-50 shadow-sm"
             >
               <MdEdit /> Edit

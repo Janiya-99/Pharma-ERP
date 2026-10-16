@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import PageHeader from "../../../components/common/PageHeader";
 import { ArrowLeft, Save } from "lucide-react";
@@ -9,7 +9,7 @@ import ChartOfAccountSelect from "../../../components/finance/ChartOfAccountSele
 const FixedAssetCategoryFormPage = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -58,7 +58,7 @@ const FixedAssetCategoryFormPage = () => {
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load category details");
-      history.push("/admin/finance/fixed-asset-categories");
+      navigate("/admin/finance/fixed-asset-categories");
     } finally {
       setLoading(false);
     }
@@ -99,7 +99,7 @@ const FixedAssetCategoryFormPage = () => {
         await financeApi.createFixedAssetCategory(payload);
         toast.success("Fixed asset category created successfully");
       }
-      history.push("/admin/finance/fixed-asset-categories");
+      navigate("/admin/finance/fixed-asset-categories");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save category");
     } finally {
@@ -129,7 +129,7 @@ const FixedAssetCategoryFormPage = () => {
       <div className="px-6 max-w-5xl mx-auto w-full">
         <div className="flex items-center justify-between mb-4">
           <button
-            onClick={() => history.push("/admin/finance/fixed-asset-categories")}
+            onClick={() => navigate("/admin/finance/fixed-asset-categories")}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import PageHeader from "../../../components/common/PageHeader";
 import { ArrowLeft, Trash2, CheckCircle } from "lucide-react";
@@ -12,7 +12,7 @@ import { PostDepreciationConfirmModal } from "../fixed-assets/shared/FixedAssetA
 
 const FixedAssetDepreciationRunDetailsPage = () => {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
   const [run, setRun] = useState(null);
@@ -32,7 +32,7 @@ const FixedAssetDepreciationRunDetailsPage = () => {
       setRun(res.data?.data);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load depreciation run details");
-      history.push("/admin/finance/fixed-asset-depreciation-runs");
+      navigate("/admin/finance/fixed-asset-depreciation-runs");
     } finally {
       setLoading(false);
     }
@@ -43,7 +43,7 @@ const FixedAssetDepreciationRunDetailsPage = () => {
       setActionLoading(true);
       await financeApi.deleteFixedAssetDepreciationRun(id);
       toast.success("Depreciation run deleted successfully");
-      history.push("/admin/finance/fixed-asset-depreciation-runs");
+      navigate("/admin/finance/fixed-asset-depreciation-runs");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete depreciation run");
       setDeleteModalOpen(false);
@@ -90,7 +90,7 @@ const FixedAssetDepreciationRunDetailsPage = () => {
       <div className="px-6 max-w-6xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => history.push("/admin/finance/fixed-asset-depreciation-runs")}
+            onClick={() => navigate("/admin/finance/fixed-asset-depreciation-runs")}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List

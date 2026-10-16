@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
@@ -12,7 +12,7 @@ import { DatePicker } from "../../../components/ui/date-picker";
 
 export default function PettyCashVoucherFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   
   const isEdit = Boolean(id);
@@ -204,7 +204,7 @@ export default function PettyCashVoucherFormPage() {
       } else {
         await financeApi.createPettyCashVoucher(formData);
       }
-      history.push("/admin/finance/petty-cash-vouchers");
+      navigate("/admin/finance/petty-cash-vouchers");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to save petty cash voucher");
     } finally {
@@ -225,7 +225,7 @@ export default function PettyCashVoucherFormPage() {
       <PageTitleCard
         title={isEdit ? "Edit Petty Cash Voucher" : "Create Petty Cash Voucher"}
         description={isEdit ? "Editing petty cash voucher" : "Record petty cash expenses, cash advances, or refund transactions"}
-        backAction={() => history.push("/admin/finance/petty-cash-vouchers")}
+        backAction={() => navigate("/admin/finance/petty-cash-vouchers")}
         actions={
           <div className="flex items-center gap-2.5">
             <button
@@ -238,7 +238,7 @@ export default function PettyCashVoucherFormPage() {
             </button>
             <button
               type="button"
-              onClick={() => history.push("/admin/finance/petty-cash-vouchers")}
+              onClick={() => navigate("/admin/finance/petty-cash-vouchers")}
               className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
             >
               Cancel
@@ -341,7 +341,7 @@ export default function PettyCashVoucherFormPage() {
         <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"
-            onClick={() => history.push("/admin/finance/petty-cash-vouchers")}
+            onClick={() => navigate("/admin/finance/petty-cash-vouchers")}
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50     font-medium transition-colors"
           >
             Cancel

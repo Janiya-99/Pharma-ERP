@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
 import { toast } from "react-hot-toast";
@@ -9,7 +9,7 @@ import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
 
 export default function BankAccountFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isEdit = !!id;
 
   const [branches, setBranches] = useState([]);
@@ -111,7 +111,7 @@ export default function BankAccountFormPage() {
         await financeApi.createBankAccount(payload);
         toast.success("Bank account created successfully");
       }
-      history.push("/admin/finance/bank-accounts");
+      navigate("/admin/finance/bank-accounts");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to save bank account");
     } finally {
@@ -158,7 +158,7 @@ export default function BankAccountFormPage() {
       <PageTitleCard
         title={isEdit ? "Edit Bank Account" : "Create Bank Account"}
         description={isEdit ? "Update banking credentials and chart of account mappings" : "Register corporate commercial bank accounts and ledger integrations"}
-        backAction={() => history.push("/admin/finance/bank-accounts")}
+        backAction={() => navigate("/admin/finance/bank-accounts")}
         actions={
           <div className="flex items-center gap-2.5">
             <button
@@ -171,7 +171,7 @@ export default function BankAccountFormPage() {
             </button>
             <button
               type="button"
-              onClick={() => history.push("/admin/finance/bank-accounts")}
+              onClick={() => navigate("/admin/finance/bank-accounts")}
               className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
             >
               Cancel

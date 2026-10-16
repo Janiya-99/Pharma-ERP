@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -16,7 +16,7 @@ import { toast } from "react-hot-toast";
 import { MdVisibility } from "react-icons/md";
 
 export default function PettyCashReplenishmentsPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [replenishments, setReplenishments] = useState([]);
@@ -121,7 +121,7 @@ export default function PettyCashReplenishmentsPage() {
       <FinancePageHeader
         title="Petty Cash Replenishments"
         subtitle="Manage and track petty cash fund replenishments"
-        onAdd={hasPermission("finance.petty_cash_replenishment.create") ? () => history.push("/admin/finance/petty-cash-replenishments/create") : undefined}
+        onAdd={hasPermission("finance.petty_cash_replenishment.create") ? () => navigate("/admin/finance/petty-cash-replenishments/create") : undefined}
         addLabel="Create Replenishment"
       />
 
@@ -190,7 +190,7 @@ export default function PettyCashReplenishmentsPage() {
                       <div className="flex flex-col gap-2 justify-center items-center">
                         <div className="flex items-center gap-2">
                           {hasPermission("finance.petty_cash_replenishment.view") && (
-                            <button onClick={() => history.push(`/admin/finance/petty-cash-replenishments/${r.id}`)} className="text-gray-500 hover:text-navy-700 " title="View Details">
+                            <button onClick={() => navigate(`/admin/finance/petty-cash-replenishments/${r.id}`)} className="text-gray-500 hover:text-navy-700 " title="View Details">
                               <MdVisibility className="h-5 w-5" />
                             </button>
                           )}
@@ -206,7 +206,7 @@ export default function PettyCashReplenishmentsPage() {
                             reject: "finance.petty_cash_replenishment.reject",
                             post: "finance.petty_cash_replenishment.post"
                           }}
-                          onEdit={() => history.push(`/admin/finance/petty-cash-replenishments/${r.id}/edit`)}
+                          onEdit={() => navigate(`/admin/finance/petty-cash-replenishments/${r.id}/edit`)}
                           onDelete={() => handleDelete(r.id)}
                           onSubmit={() => { setActionReplenishmentId(r.id); setModals((m: unknown) => ({ ...m, submit: true })); }}
                           onApprove={() => { setActionReplenishmentId(r.id); setModals((m: unknown) => ({ ...m, approve: true })); }}

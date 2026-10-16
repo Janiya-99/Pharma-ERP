@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -16,7 +16,7 @@ import RejectVoucherModal from "../shared/RejectVoucherModal";
 import PostVoucherConfirmModal from "../shared/PostVoucherConfirmModal";
 
 export default function ReceiptVouchersPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [vouchers, setVouchers] = useState([]);
@@ -67,7 +67,7 @@ export default function ReceiptVouchersPage() {
 
   const handleAction = async (action: unknown, voucher: unknown) => {
     if (action === "edit") {
-      history.push(`/admin/finance/receipt-vouchers/${voucher.id}/edit`);
+      navigate(`/admin/finance/receipt-vouchers/${voucher.id}/edit`);
     } else if (action === "delete") {
       if (window.confirm("Are you sure you want to delete this receipt voucher?")) {
         try {
@@ -91,7 +91,7 @@ export default function ReceiptVouchersPage() {
       <FinancePageHeader
         title="Receipt Vouchers"
         subtitle="Manage incoming receipts and approvals"
-        onAdd={hasPermission("finance.receipt.create") ? () => history.push("/admin/finance/receipt-vouchers/create") : undefined}
+        onAdd={hasPermission("finance.receipt.create") ? () => navigate("/admin/finance/receipt-vouchers/create") : undefined}
         addLabel="Create Receipt Voucher"
       />
 
@@ -207,7 +207,7 @@ export default function ReceiptVouchersPage() {
                   <tr key={voucher.id} className="hover:bg-gray-50 ">
                     <td className="px-4 py-3 font-medium text-navy-700">
                       <button 
-                        onClick={() => history.push(`/admin/finance/receipt-vouchers/${voucher.id}`)}
+                        onClick={() => navigate(`/admin/finance/receipt-vouchers/${voucher.id}`)}
                         className="text-brand-500 hover:underline"
                       >
                         {voucher.receipt_voucher_number}

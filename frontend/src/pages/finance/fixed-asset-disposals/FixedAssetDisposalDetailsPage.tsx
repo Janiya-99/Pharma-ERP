@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import PageHeader from "../../../components/common/PageHeader";
 import { ArrowLeft, Trash2, Edit, CheckCircle, XCircle, Send } from "lucide-react";
@@ -11,7 +11,7 @@ import { ActionDisposalModal, PostDisposalConfirmModal } from "../fixed-assets/s
 
 const FixedAssetDisposalDetailsPage = () => {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
   const [disposal, setDisposal] = useState(null);
@@ -36,7 +36,7 @@ const FixedAssetDisposalDetailsPage = () => {
       setDisposal(res.data?.data);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load disposal details");
-      history.push("/admin/finance/fixed-asset-disposals");
+      navigate("/admin/finance/fixed-asset-disposals");
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ const FixedAssetDisposalDetailsPage = () => {
       setActionLoading(true);
       await financeApi.deleteFixedAssetDisposal(id);
       toast.success("Asset disposal deleted successfully");
-      history.push("/admin/finance/fixed-asset-disposals");
+      navigate("/admin/finance/fixed-asset-disposals");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete disposal");
       setDeleteModalOpen(false);
@@ -95,7 +95,7 @@ const FixedAssetDisposalDetailsPage = () => {
       <div className="px-6 max-w-6xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => history.push("/admin/finance/fixed-asset-disposals")}
+            onClick={() => navigate("/admin/finance/fixed-asset-disposals")}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
@@ -107,7 +107,7 @@ const FixedAssetDisposalDetailsPage = () => {
               <>
                 {hasPermission("finance.fixed_asset_disposal.update") && (
                   <button
-                    onClick={() => history.push(`/admin/finance/fixed-asset-disposals/${id}/edit`)}
+                    onClick={() => navigate(`/admin/finance/fixed-asset-disposals/${id}/edit`)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-xl hover:bg-brand-100    transition-all"
                   >
                     <Edit className="w-4 h-4" /> Edit

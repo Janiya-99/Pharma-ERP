@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import PageHeader from "../../../components/common/PageHeader";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
@@ -10,7 +10,7 @@ import Modal from "../../../components/common/Modal";
 
 const FixedAssetCategoryDetailsPage = () => {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
   const [category, setCategory] = useState(null);
@@ -29,7 +29,7 @@ const FixedAssetCategoryDetailsPage = () => {
       setCategory(res.data?.data);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load category details");
-      history.push("/admin/finance/fixed-asset-categories");
+      navigate("/admin/finance/fixed-asset-categories");
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ const FixedAssetCategoryDetailsPage = () => {
       setDeleting(true);
       await financeApi.deleteFixedAssetCategory(id);
       toast.success("Category deleted successfully");
-      history.push("/admin/finance/fixed-asset-categories");
+      navigate("/admin/finance/fixed-asset-categories");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete category");
       setDeleteModalOpen(false);
@@ -73,7 +73,7 @@ const FixedAssetCategoryDetailsPage = () => {
       <div className="px-6 max-w-5xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => history.push("/admin/finance/fixed-asset-categories")}
+            onClick={() => navigate("/admin/finance/fixed-asset-categories")}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-navy-700   transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to List
@@ -82,7 +82,7 @@ const FixedAssetCategoryDetailsPage = () => {
           <div className="flex items-center gap-3">
             {hasPermission("finance.fixed_asset_category.update") && (
               <button
-                onClick={() => history.push(`/admin/finance/fixed-asset-categories/${id}/edit`)}
+                onClick={() => navigate(`/admin/finance/fixed-asset-categories/${id}/edit`)}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-xl hover:bg-brand-100    transition-all"
               >
                 <Edit className="w-4 h-4" /> Edit

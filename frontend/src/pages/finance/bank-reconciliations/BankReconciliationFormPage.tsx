@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import BankAccountSelect from "../../../components/finance/BankAccountSelect";
 import UnreconciledTransactionsTable from "./UnreconciledTransactionsTable";
@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 
 export default function BankReconciliationFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isEdit = !!id;
 
   const [loading, setLoading] = useState(false);
@@ -153,7 +153,7 @@ export default function BankReconciliationFormPage() {
         await financeApi.createBankReconciliation(payload);
         toast.success("Reconciliation draft created");
       }
-      history.push("/admin/finance/bank-reconciliations");
+      navigate("/admin/finance/bank-reconciliations");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to save reconciliation");
     } finally {
@@ -174,7 +174,7 @@ export default function BankReconciliationFormPage() {
         </div>
         <button
           type="button"
-          onClick={() => history.push("/admin/finance/bank-reconciliations")}
+          onClick={() => navigate("/admin/finance/bank-reconciliations")}
           className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50 bg-white"
         >
           Cancel

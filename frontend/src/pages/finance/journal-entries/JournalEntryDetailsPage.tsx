@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import JournalStatusBadge from "../../../components/finance/JournalStatusBadge";
 import PostedStatusBadge from "../../../components/finance/PostedStatusBadge";
@@ -15,7 +15,7 @@ import ReverseJournalModal from "./ReverseJournalModal";
 
 export default function JournalEntryDetailsPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { activeSoftware } = useAuth();
   const [journal, setJournal] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,12 +49,12 @@ export default function JournalEntryDetailsPage() {
 
   const handleAction = async (action: unknown, jnl: unknown) => {
     if (action === "edit") {
-      history.push(`/admin/finance/journal-entries/${jnl.id}/edit`);
+      navigate(`/admin/finance/journal-entries/${jnl.id}/edit`);
     } else if (action === "delete") {
       if (window.confirm("Are you sure you want to delete this journal entry?")) {
         try {
           await financeApi.deleteJournalEntry(jnl.id);
-          history.push("/admin/finance/journal-entries");
+          navigate("/admin/finance/journal-entries");
         } catch (err) {
           alert("Failed to delete: " + (err.response?.data?.message || err.message));
         }
@@ -78,7 +78,7 @@ export default function JournalEntryDetailsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => history.push("/admin/finance/journal-entries")}
+            onClick={() => navigate("/admin/finance/journal-entries")}
             className="p-2 rounded-full hover:bg-gray-100  transition-colors"
           >
             <MdArrowBack className="h-6 w-6 text-gray-500 " />

@@ -214,7 +214,7 @@ export default function ReceiptVoucherFormPage() {
       } else {
         await financeApi.createReceiptVoucher(payload);
       }
-      history.push("/admin/finance/receipt-vouchers");
+      navigate("/admin/finance/receipt-vouchers");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to save receipt voucher");
       console.error(err);

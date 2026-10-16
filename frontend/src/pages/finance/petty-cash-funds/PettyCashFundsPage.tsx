@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches, getUsers } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
@@ -9,7 +9,7 @@ import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
 import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 export default function PettyCashFundsPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [funds, setFunds] = useState([]);
@@ -89,7 +89,7 @@ export default function PettyCashFundsPage() {
       <FinancePageHeader
         title="Petty Cash Funds"
         subtitle="Manage petty cash funds and custodians"
-        onAdd={hasPermission("finance.petty_cash_fund.create") ? () => history.push("/admin/finance/petty-cash-funds/create") : undefined}
+        onAdd={hasPermission("finance.petty_cash_fund.create") ? () => navigate("/admin/finance/petty-cash-funds/create") : undefined}
         addLabel="Create Petty Cash Fund"
       />
 
@@ -184,12 +184,12 @@ export default function PettyCashFundsPage() {
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-2">
                           {hasPermission("finance.petty_cash_fund.view") && (
-                            <button onClick={() => history.push(`/admin/finance/petty-cash-funds/${fund.id}`)} className="text-gray-500 hover:text-navy-700 ">
+                            <button onClick={() => navigate(`/admin/finance/petty-cash-funds/${fund.id}`)} className="text-gray-500 hover:text-navy-700 ">
                               <MdVisibility className="h-5 w-5" />
                             </button>
                           )}
                           {hasPermission("finance.petty_cash_fund.update") && (
-                            <button onClick={() => history.push(`/admin/finance/petty-cash-funds/${fund.id}/edit`)} className="text-brand-500 hover:text-brand-700 ">
+                            <button onClick={() => navigate(`/admin/finance/petty-cash-funds/${fund.id}/edit`)} className="text-brand-500 hover:text-brand-700 ">
                               <MdEdit className="h-5 w-5" />
                             </button>
                           )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
 import BankAccountSelect, {
@@ -51,7 +51,7 @@ const formatMoney = (amount?: number) =>
 
 export default function BankTransactionFormPage() {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isEdit = !!id;
 
   const [branches, setBranches] = useState<BranchOption[]>([]);
@@ -161,7 +161,7 @@ export default function BankTransactionFormPage() {
         await financeApi.createBankTransaction(payload);
         toast.success("Transaction created successfully");
       }
-      history.push("/admin/finance/bank-transactions");
+      navigate("/admin/finance/bank-transactions");
     } catch (error) {
       toast.error(
         error?.response?.data?.message || "Failed to save transaction"
@@ -191,7 +191,7 @@ export default function BankTransactionFormPage() {
             </div>
             <Button
               type="button"
-              onClick={() => history.push("/admin/finance/bank-transactions")}
+              onClick={() => navigate("/admin/finance/bank-transactions")}
               variant="outline"
             >
               Cancel

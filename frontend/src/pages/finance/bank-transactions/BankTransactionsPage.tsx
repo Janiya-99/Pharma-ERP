@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -9,7 +9,7 @@ import BankTransactionAmountDisplay from "../../../components/finance/BankTransa
 import { MdVisibility } from "react-icons/md";
 
 export default function BankTransactionsPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [transactions, setTransactions] = useState([]);
@@ -58,7 +58,7 @@ export default function BankTransactionsPage() {
       <FinancePageHeader
         title="Bank Transactions"
         subtitle="View and manage bank transactions"
-        onAdd={hasPermission("finance.bank_transaction.create") ? () => history.push("/admin/finance/bank-transactions/create") : undefined}
+        onAdd={hasPermission("finance.bank_transaction.create") ? () => navigate("/admin/finance/bank-transactions/create") : undefined}
         addLabel="Manual Transaction"
       />
 
@@ -138,7 +138,7 @@ export default function BankTransactionsPage() {
                     <td className="px-4 py-3 whitespace-nowrap">{new Date(tx.transaction_date).toLocaleDateString()}</td>
                     <td className="px-4 py-3 font-medium text-navy-700">
                       <button 
-                        onClick={() => history.push(`/admin/finance/bank-transactions/${tx.id}`)}
+                        onClick={() => navigate(`/admin/finance/bank-transactions/${tx.id}`)}
                         className="text-brand-500 hover:underline"
                       >
                         {tx.transaction_reference}
@@ -157,7 +157,7 @@ export default function BankTransactionsPage() {
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {hasPermission("finance.bank_transaction.view") && (
-                          <button onClick={() => history.push(`/admin/finance/bank-transactions/${tx.id}`)} className="text-gray-500 hover:text-navy-700">
+                          <button onClick={() => navigate(`/admin/finance/bank-transactions/${tx.id}`)} className="text-gray-500 hover:text-navy-700">
                             <MdVisibility className="h-5 w-5" />
                           </button>
                         )}

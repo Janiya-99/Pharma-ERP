@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
@@ -9,7 +9,7 @@ import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
 
 export default function BankAccountsPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [accounts, setAccounts] = useState([]);
@@ -84,7 +84,7 @@ export default function BankAccountsPage() {
       <FinancePageHeader
         title="Bank Accounts"
         subtitle="Manage company bank accounts and chart mapping"
-        onAdd={hasPermission("finance.bank_account.create") ? () => history.push("/admin/finance/bank-accounts/create") : undefined}
+        onAdd={hasPermission("finance.bank_account.create") ? () => navigate("/admin/finance/bank-accounts/create") : undefined}
         addLabel="Create Bank Account"
       />
 
@@ -170,12 +170,12 @@ export default function BankAccountsPage() {
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {hasPermission("finance.bank_account.view") && (
-                          <button onClick={() => history.push(`/admin/finance/bank-accounts/${account.id}`)} className="text-gray-500 hover:text-navy-700">
+                          <button onClick={() => navigate(`/admin/finance/bank-accounts/${account.id}`)} className="text-gray-500 hover:text-navy-700">
                             <MdVisibility className="h-5 w-5" />
                           </button>
                         )}
                         {hasPermission("finance.bank_account.update") && (
-                          <button onClick={() => history.push(`/admin/finance/bank-accounts/${account.id}/edit`)} className="text-brand-500 hover:text-brand-700">
+                          <button onClick={() => navigate(`/admin/finance/bank-accounts/${account.id}/edit`)} className="text-brand-500 hover:text-brand-700">
                             <MdEdit className="h-5 w-5" />
                           </button>
                         )}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import FinancePageHeader from "../../../components/finance/FinancePageHeader";
@@ -10,7 +10,7 @@ import { MdEdit, MdDelete, MdVisibility } from "react-icons/md";
 import { DataTableToolbar } from "../shared/DataTableToolbar";
 
 export default function BankReconciliationsPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { hasPermission, activeSoftware } = useAuth();
   
   const [reconciliations, setReconciliations] = useState([]);
@@ -72,7 +72,7 @@ export default function BankReconciliationsPage() {
       <FinancePageHeader
         title="Bank Reconciliations"
         subtitle="Match system transactions with bank statements"
-        onAdd={hasPermission("finance.bank_reconciliation.create") ? () => history.push("/admin/finance/bank-reconciliations/create") : undefined}
+        onAdd={hasPermission("finance.bank_reconciliation.create") ? () => navigate("/admin/finance/bank-reconciliations/create") : undefined}
         addLabel="New Reconciliation"
       />
 
@@ -130,7 +130,7 @@ export default function BankReconciliationsPage() {
                     <tr key={rec.id} className="hover:bg-gray-50 ">
                       <td className="px-4 py-3 font-medium text-navy-700">
                         <button 
-                          onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}`)}
+                          onClick={() => navigate(`/admin/finance/bank-reconciliations/${rec.id}`)}
                           className="text-brand-500 hover:underline"
                         >
                           {rec.reference_number || `REC-${rec.id}`}
@@ -149,12 +149,12 @@ export default function BankReconciliationsPage() {
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-2">
                           {hasPermission("finance.bank_reconciliation.view") && (
-                            <button onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}`)} className="text-gray-500 hover:text-navy-700">
+                            <button onClick={() => navigate(`/admin/finance/bank-reconciliations/${rec.id}`)} className="text-gray-500 hover:text-navy-700">
                               <MdVisibility className="h-5 w-5" />
                             </button>
                           )}
                           {hasPermission("finance.bank_reconciliation.update") && rec.status === "draft" && (
-                            <button onClick={() => history.push(`/admin/finance/bank-reconciliations/${rec.id}/edit`)} className="text-brand-500 hover:text-brand-700">
+                            <button onClick={() => navigate(`/admin/finance/bank-reconciliations/${rec.id}/edit`)} className="text-brand-500 hover:text-brand-700">
                               <MdEdit className="h-5 w-5" />
                             </button>
                           )}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { financeApi } from "../../../api/financeApi";
 import { controlApi } from "../../../api/controlApi";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
@@ -12,7 +12,7 @@ import FixedAssetCategorySelect from "../../../components/finance/FixedAssetCate
 const FixedAssetFormPage = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -143,7 +143,7 @@ const FixedAssetFormPage = () => {
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load asset details");
-      history.push("/admin/finance/fixed-assets");
+      navigate("/admin/finance/fixed-assets");
     } finally {
       setLoading(false);
     }
@@ -230,7 +230,7 @@ const FixedAssetFormPage = () => {
         await financeApi.createFixedAsset(payload);
         toast.success("Fixed asset created successfully");
       }
-      history.push("/admin/finance/fixed-assets");
+      navigate("/admin/finance/fixed-assets");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save asset");
     } finally {
@@ -255,7 +255,7 @@ const FixedAssetFormPage = () => {
         <PageTitleCard
           title={isEdit ? "Edit Fixed Asset" : "Create Fixed Asset"}
           description={isEdit ? "Update fixed asset registry parameters and valuation" : "Register capital asset, acquisition valuation, and depreciation schedule"}
-          backAction={() => history.push("/admin/finance/fixed-assets")}
+          backAction={() => navigate("/admin/finance/fixed-assets")}
           actions={
             <div className="flex items-center gap-2.5">
               <button
