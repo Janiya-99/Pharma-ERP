@@ -238,311 +238,329 @@ const Topbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full px-3 md:px-5 pt-3 pb-2 bg-slate-50/80 backdrop-blur-md">
-        <div className="flex h-14 w-full items-center justify-between rounded-2xl border border-slate-200/90 bg-white/95 px-3 md:px-4 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.05)] backdrop-blur-md transition-all gap-2 md:gap-4">
-          
-          {/* 1. LEFT GROUP: App Launcher & Breadcrumbs */}
-          <div className="flex min-w-0 items-center gap-3">
-            {/* App Launcher Button */}
-            <button
-              onClick={handleToggleSidebar}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-500 text-white shadow-sm shadow-indigo-500/25 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              title="Toggle Navigation Menu"
-              aria-label="Toggle Navigation"
+      <header className="sticky top-0 z-40 w-full h-16 border-b border-slate-200/80 bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-2 md:gap-4 transition-all">
+        {/* 1. LEFT GROUP: App Launcher & Breadcrumbs */}
+        <div className="flex min-w-0 items-center gap-3">
+          {/* App Launcher Button */}
+          <button
+            onClick={handleToggleSidebar}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-500 text-white shadow-xs hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+            title="Toggle Navigation Menu"
+            aria-label="Toggle Navigation"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+
+          {/* Breadcrumb Links */}
+          <div className="hidden min-w-0 items-center gap-1.5 text-xs sm:flex">
+            <NavLink
+              to="/"
+              className="text-slate-400 hover:text-blue-600 transition-colors flex items-center"
+              title="Home"
             >
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-
-            {/* Breadcrumb Links */}
-            <div className="hidden min-w-0 items-center gap-1.5 text-xs sm:flex">
-              <NavLink
-                to="/"
-                className="text-slate-400 hover:text-blue-600 transition-colors flex items-center"
-                title="Home"
-              >
-                <Home className="h-3.5 w-3.5" />
-              </NavLink>
-              {breadcrumbs.map((crumb, i) => (
-                <React.Fragment key={i}>
-                  <span className="text-slate-300 font-semibold select-none">&gt;</span>
-                  {crumb.isLast ? (
-                    <span className="font-semibold text-slate-800 truncate max-w-[150px]">
-                      {crumb.label}
-                    </span>
-                  ) : (
-                    <NavLink
-                      to={crumb.path}
-                      className="font-medium text-slate-400 hover:text-slate-600 truncate max-w-[140px] transition-colors"
-                    >
-                      {crumb.label}
-                    </NavLink>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
+              <Home className="h-3.5 w-3.5" />
+            </NavLink>
+            {breadcrumbs.map((crumb, i) => (
+              <React.Fragment key={i}>
+                <span className="text-slate-300 font-semibold select-none">&gt;</span>
+                {crumb.isLast ? (
+                  <span className="font-semibold text-slate-800 truncate max-w-[150px]">
+                    {crumb.label}
+                  </span>
+                ) : (
+                  <NavLink
+                    to={crumb.path}
+                    className="font-medium text-slate-400 hover:text-slate-600 truncate max-w-[140px] transition-colors"
+                  >
+                    {crumb.label}
+                  </NavLink>
+                )}
+              </React.Fragment>
+            ))}
           </div>
+        </div>
 
-          {/* 2. CENTER-LEFT: Active Module Pill & Quick Switcher Icons */}
-          <div className="hidden lg:flex items-center gap-1.5 shrink-0">
-            {/* Active Module Dropdown Pill */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:brightness-110 active:scale-95 transition-all cursor-pointer shrink-0">
-                  <ActiveIcon className="h-3.5 w-3.5 text-white" />
-                  <span>{activeModule.name}</span>
-                  <ChevronDown className="h-3 w-3 text-white/80" />
+        {/* 2. CENTER: Hover-Expanding Module Switcher Rail */}
+        <div className="hidden lg:flex items-center p-1 rounded-lg bg-slate-100/80 border border-slate-200/70 gap-0.5 shrink-0">
+          {ALL_MODULES.map((m) => {
+            const Icon = m.icon;
+            const isCurrent = m.code === activeModule.code;
+            return (
+              <div key={m.code} className="relative group">
+                <button
+                  onClick={() => handleSwitchModule(m.code, m.route)}
+                  className={`flex items-center h-8 px-2.5 rounded-md text-xs font-medium transition-all duration-300 cursor-pointer ${
+                    isCurrent
+                      ? "bg-white text-indigo-700 shadow-xs border border-slate-200/90 font-semibold"
+                      : "text-slate-600 hover:text-indigo-600 hover:bg-white/80"
+                  }`}
+                  aria-label={m.name}
+                >
+                  <Icon className={`h-4 w-4 shrink-0 transition-transform duration-200 ${isCurrent ? "text-indigo-600" : "text-slate-500 group-hover:text-indigo-600 group-hover:scale-110"}`} />
+                  <span
+                    className={`whitespace-nowrap transition-all duration-300 ease-out overflow-hidden ${
+                      isCurrent
+                        ? "max-w-[130px] ml-1.5 opacity-100"
+                        : "max-w-0 opacity-0 group-hover:max-w-[130px] group-hover:ml-1.5 group-hover:opacity-100"
+                    }`}
+                  >
+                    {m.name}
+                  </span>
                 </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
-                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Switch Enterprise Module
-                </div>
-                {ALL_MODULES.map((m) => {
-                  const Icon = m.icon;
-                  const isCurrent = m.code === activeModule.code;
-                  return (
-                    <DropdownMenuItem
-                      key={m.code}
-                      onClick={() => handleSwitchModule(m.code, m.route)}
-                      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium cursor-pointer transition-colors ${
-                        isCurrent ? "bg-indigo-50 text-indigo-700 font-semibold" : "text-slate-600 hover:bg-slate-100"
-                      }`}
-                    >
-                      <Icon className={`h-4 w-4 shrink-0 ${isCurrent ? "text-indigo-600" : "text-slate-400"}`} />
-                      <div className="flex flex-col min-w-0 flex-1">
-                        <span className="truncate">{m.name}</span>
-                        <span className="text-[10px] text-slate-400 truncate">{m.desc}</span>
-                      </div>
-                      {isCurrent && <Check className="h-3.5 w-3.5 text-indigo-600 shrink-0" />}
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
 
-            {/* Quick Switcher Round Icons for the other modules */}
-            <div className="flex items-center gap-1">
-              {ALL_MODULES.filter((m) => m.code !== activeModule.code).map((m) => {
+                {/* Hover Descriptive Badge / Tooltip explaining what the module is */}
+                <div className="pointer-events-none absolute left-1/2 -bottom-9 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 px-2.5 py-1 text-[11px] font-medium text-white shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-50 flex items-center gap-1.5">
+                  <span className="font-semibold text-white">{m.name}</span>
+                  <span className="text-slate-400">•</span>
+                  <span className="text-slate-300 text-[10px]">{m.desc}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile / Tablet Compact Module Dropdown */}
+        <div className="flex lg:hidden items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-100 active:scale-95 transition-all cursor-pointer">
+                <ActiveIcon className="h-3.5 w-3.5 text-indigo-600" />
+                <span className="max-w-[100px] truncate">{activeModule.name}</span>
+                <ChevronDown className="h-3 w-3 text-slate-400" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
+              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Switch Module
+              </div>
+              {ALL_MODULES.map((m) => {
                 const Icon = m.icon;
+                const isCurrent = m.code === activeModule.code;
                 return (
-                  <button
+                  <DropdownMenuItem
                     key={m.code}
                     onClick={() => handleSwitchModule(m.code, m.route)}
-                    className="group relative flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-blue-600 transition-all cursor-pointer"
-                    title={m.name}
+                    className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium cursor-pointer transition-colors ${
+                      isCurrent ? "bg-indigo-50 text-indigo-700 font-semibold" : "text-slate-600 hover:bg-slate-100"
+                    }`}
                   >
-                    <Icon className="h-4 w-4 transition-transform group-hover:scale-110" />
-                  </button>
+                    <Icon className={`h-4 w-4 shrink-0 ${isCurrent ? "text-indigo-600" : "text-slate-400"}`} />
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="truncate">{m.name}</span>
+                      <span className="text-[10px] text-slate-400 truncate">{m.desc}</span>
+                    </div>
+                    {isCurrent && <Check className="h-3.5 w-3.5 text-indigo-600 shrink-0" />}
+                  </DropdownMenuItem>
                 );
               })}
-            </div>
-          </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-          {/* 3. CENTER-RIGHT: Branch / Logistics Hub Pill */}
-          <div className="flex items-center gap-2 shrink-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="hidden sm:flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white/95 px-3 py-1 shadow-2xs hover:border-blue-400 hover:bg-slate-50/80 active:scale-95 transition-all cursor-pointer shrink-0">
-                  {isAllBranches ? (
-                    <Globe className="h-3 w-3 text-indigo-600 shrink-0" />
-                  ) : (
-                    <Building2 className="h-3 w-3 text-blue-600 shrink-0" />
-                  )}
-                  <span className="text-[11px] font-semibold text-slate-700 max-w-[150px] sm:max-w-[170px] truncate">
-                    {branchLoading ? "Switching..." : currentBranchName}
-                  </span>
-                  {branchLoading ? (
-                    <Loader2 className="h-3 w-3 animate-spin text-slate-400 shrink-0" />
-                  ) : (
-                    <ChevronDown className="h-3 w-3 text-slate-400 shrink-0" />
-                  )}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
-                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Active Logistics Branch
-                </div>
-                {branches && branches.length > 1 && (
-                  <>
+        {/* 3. CENTER-RIGHT: Branch / Logistics Hub Pill */}
+        <div className="flex items-center gap-2 shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="hidden sm:flex items-center gap-1.5 rounded-lg border border-slate-200/90 bg-slate-50/70 hover:bg-slate-100/80 hover:border-slate-300 px-2.5 py-1.5 text-xs shadow-2xs active:scale-95 transition-all cursor-pointer shrink-0">
+                {isAllBranches ? (
+                  <Globe className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                ) : (
+                  <Building2 className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                )}
+                <span className="text-xs font-semibold text-slate-700 max-w-[140px] sm:max-w-[160px] truncate">
+                  {branchLoading ? "Switching..." : currentBranchName}
+                </span>
+                {branchLoading ? (
+                  <Loader2 className="h-3 w-3 animate-spin text-slate-400 shrink-0" />
+                ) : (
+                  <ChevronDown className="h-3 w-3 text-slate-400 shrink-0" />
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
+              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Active Logistics Branch
+              </div>
+              {branches && branches.length > 1 && (
+                <>
+                  <DropdownMenuItem
+                    onClick={() => handleSwitchBranch("all")}
+                    className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium cursor-pointer transition-colors ${
+                      isAllBranches ? "bg-indigo-50 text-indigo-700 font-semibold" : "text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Globe className={`h-4 w-4 shrink-0 ${isAllBranches ? "text-indigo-600" : "text-slate-400"}`} />
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="truncate">All Branches (Consolidated)</span>
+                      <span className="text-[10px] text-slate-400">View consolidated enterprise data</span>
+                    </div>
+                    {isAllBranches && <Check className="h-3.5 w-3.5 text-indigo-600 shrink-0" />}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-slate-100 my-1" />
+                </>
+              )}
+              {branches && branches.length > 0 ? (
+                branches.map((b: any) => {
+                  const id = b.id || b.branch_id;
+                  const name = b.branch_name || b.branch?.branch_name || "";
+                  const code = b.branch_code || "";
+                  const isCurrent = !isAllBranches && String(id) === String(activeBranchId);
+                  return (
                     <DropdownMenuItem
-                      onClick={() => handleSwitchBranch("all")}
+                      key={id}
+                      onClick={() => handleSwitchBranch(id)}
                       className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium cursor-pointer transition-colors ${
-                        isAllBranches ? "bg-indigo-50 text-indigo-700 font-semibold" : "text-slate-600 hover:bg-slate-100"
+                        isCurrent ? "bg-blue-50 text-blue-700 font-semibold" : "text-slate-600 hover:bg-slate-100"
                       }`}
                     >
-                      <Globe className={`h-4 w-4 shrink-0 ${isAllBranches ? "text-indigo-600" : "text-slate-400"}`} />
+                      <Building2 className={`h-4 w-4 shrink-0 ${isCurrent ? "text-blue-600" : "text-slate-400"}`} />
                       <div className="flex flex-col min-w-0 flex-1">
-                        <span className="truncate">All Branches (Consolidated)</span>
-                        <span className="text-[10px] text-slate-400">View consolidated enterprise data</span>
+                        <span className="truncate">{name}</span>
+                        {code && <span className="text-[10px] text-slate-400">{code}</span>}
                       </div>
-                      {isAllBranches && <Check className="h-3.5 w-3.5 text-indigo-600 shrink-0" />}
+                      {isCurrent && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />}
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                  </>
-                )}
-                {branches && branches.length > 0 ? (
-                  branches.map((b: any) => {
-                    const id = b.id || b.branch_id;
-                    const name = b.branch_name || b.branch?.branch_name || "";
-                    const code = b.branch_code || "";
-                    const isCurrent = !isAllBranches && String(id) === String(activeBranchId);
-                    return (
-                      <DropdownMenuItem
-                        key={id}
-                        onClick={() => handleSwitchBranch(id)}
-                        className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium cursor-pointer transition-colors ${
-                          isCurrent ? "bg-blue-50 text-blue-700 font-semibold" : "text-slate-600 hover:bg-slate-100"
-                        }`}
-                      >
-                        <Building2 className={`h-4 w-4 shrink-0 ${isCurrent ? "text-blue-600" : "text-slate-400"}`} />
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <span className="truncate">{name}</span>
-                          {code && <span className="text-[10px] text-slate-400">{code}</span>}
-                        </div>
-                        {isCurrent && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />}
-                      </DropdownMenuItem>
-                    );
-                  })
-                ) : (
-                  <div className="px-3 py-2 text-xs text-slate-400">
-                    {currentBranchName} (Active)
-                  </div>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {/* 4. RIGHT GROUP: Divider, Actions, User Profile & Logout */}
-          <div className="flex items-center gap-2 md:gap-3 shrink-0">
-            <div className="h-5 w-px bg-slate-200/80 mx-0.5 hidden lg:block" />
-
-            {/* Quick Search */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-              title="Quick Search (Ctrl + K)"
-            >
-              <Search className="h-4 w-4" />
-            </button>
-
-            {/* Notifications Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-                  title="Notifications"
-                >
-                  <Bell className="h-4 w-4" />
-                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white animate-pulse" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80 rounded-xl border border-slate-200 bg-white p-2 shadow-xl z-50">
-                <div className="flex items-center justify-between border-b border-slate-100 px-2 py-1.5">
-                  <span className="text-xs font-bold text-slate-800">Notifications & Alerts</span>
-                  <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">3 New</span>
+                  );
+                })
+              ) : (
+                <div className="px-3 py-2 text-xs text-slate-400">
+                  {currentBranchName} (Active)
                 </div>
-                <div className="space-y-1 py-1 max-h-64 overflow-y-auto">
-                  <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-amber-700">Batch Expiry Warning</span>
-                      <span className="text-[9px] text-slate-400">10m ago</span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 mt-0.5">Paracetamol 500mg Batch #BAT-202609-001 expires in 45 days.</p>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* 4. RIGHT GROUP: Divider, Actions, User Profile & Logout */}
+        <div className="flex items-center gap-2 md:gap-2.5 shrink-0">
+          <div className="h-5 w-px bg-slate-200/80 mx-0.5 hidden lg:block" />
+
+          {/* Quick Search */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+            title="Quick Search (Ctrl + K)"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+
+          {/* Notifications Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="relative flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+                title="Notifications"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white animate-pulse" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 rounded-xl border border-slate-200 bg-white p-2 shadow-xl z-50">
+              <div className="flex items-center justify-between border-b border-slate-100 px-2 py-1.5">
+                <span className="text-xs font-bold text-slate-800">Notifications & Alerts</span>
+                <span className="rounded-md bg-rose-100 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">3 New</span>
+              </div>
+              <div className="space-y-1 py-1 max-h-64 overflow-y-auto">
+                <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-amber-700">Batch Expiry Warning</span>
+                    <span className="text-[9px] text-slate-400">10m ago</span>
                   </div>
-                  <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-blue-700">GRN Approval Needed</span>
-                      <span className="text-[9px] text-slate-400">1h ago</span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 mt-0.5">GRN-000042 submitted for Biyagama Cold Chain Logistics Hub.</p>
-                  </div>
-                  <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-emerald-700">NMRA Compliance Pass</span>
-                      <span className="text-[9px] text-slate-400">3h ago</span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 mt-0.5">Annual inspection verification passed with 98.4% QA score.</p>
-                  </div>
+                  <p className="text-[11px] text-slate-600 mt-0.5">Paracetamol 500mg Batch #BAT-202609-001 expires in 45 days.</p>
                 </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* AI Copilot & Help */}
-            <button
-              onClick={() => toggleCopilot()}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-              title="AI Copilot & Help"
-            >
-              <HelpCircle className="h-4 w-4" />
-            </button>
-
-            {/* User Profile Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-2 cursor-pointer group select-none">
-                  {/* User Avatar with Green Online Status */}
-                  <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full overflow-hidden border border-slate-200 ring-1 ring-slate-100 group-hover:ring-blue-400 transition-all bg-indigo-600 text-white font-bold text-xs">
-                    {(user?.profile_image_url || user?.avatar_url || user?.image) && !imgError ? (
-                      <img
-                        src={user?.profile_image_url || user?.avatar_url || user?.image}
-                        alt={user?.name || "User"}
-                        className="h-full w-full object-cover"
-                        onError={() => setImgError(true)}
-                      />
-                    ) : (
-                      <span>{initials}</span>
-                    )}
-                    <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+                <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-blue-700">GRN Approval Needed</span>
+                    <span className="text-[9px] text-slate-400">1h ago</span>
                   </div>
+                  <p className="text-[11px] text-slate-600 mt-0.5">GRN-000042 submitted for Biyagama Cold Chain Logistics Hub.</p>
+                </div>
+                <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-emerald-700">NMRA Compliance Pass</span>
+                    <span className="text-[9px] text-slate-400">3h ago</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-0.5">Annual inspection verification passed with 98.4% QA score.</p>
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-                  {/* User Name & Company */}
-                  <div className="hidden sm:flex flex-col text-left">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-bold text-slate-800 truncate max-w-[120px] group-hover:text-blue-600 transition-colors">
-                        {user?.name || user?.full_name || "Dr. Kalinga Silva"}
-                      </span>
-                      <ChevronDown className="h-3 w-3 text-blue-500 shrink-0" />
-                    </div>
-                    <span className="text-[10px] text-slate-400 truncate max-w-[130px] leading-tight block">
-                      {company?.company_name || user?.company_name || "Ceylon MedEx Pharmaceuticals"}
+          {/* AI Copilot & Help */}
+          <button
+            onClick={() => toggleCopilot()}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+            title="AI Copilot & Help"
+          >
+            <HelpCircle className="h-4 w-4" />
+          </button>
+
+          {/* User Profile Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-2 cursor-pointer group select-none">
+                {/* User Avatar with Green Online Status */}
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg overflow-hidden border border-slate-200 ring-1 ring-slate-100 group-hover:ring-blue-400 transition-all bg-indigo-600 text-white font-bold text-xs">
+                  {(user?.profile_image_url || user?.avatar_url || user?.image) && !imgError ? (
+                    <img
+                      src={user?.profile_image_url || user?.avatar_url || user?.image}
+                      alt={user?.name || "User"}
+                      className="h-full w-full object-cover"
+                      onError={() => setImgError(true)}
+                    />
+                  ) : (
+                    <span>{initials}</span>
+                  )}
+                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+                </div>
+
+                {/* User Name & Company */}
+                <div className="hidden sm:flex flex-col text-left">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-bold text-slate-800 truncate max-w-[120px] group-hover:text-blue-600 transition-colors">
+                      {user?.name || user?.full_name || "Dr. Kalinga Silva"}
                     </span>
+                    <ChevronDown className="h-3 w-3 text-slate-400 group-hover:text-blue-600 shrink-0" />
                   </div>
+                  <span className="text-[10px] text-slate-400 truncate max-w-[130px] leading-tight block">
+                    {company?.company_name || user?.company_name || "Ceylon MedEx Pharmaceuticals"}
+                  </span>
                 </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
-                <div className="px-3 py-2 border-b border-slate-100">
-                  <p className="text-xs font-bold text-slate-800">{user?.name || user?.full_name || "Dr. Kalinga Silva"}</p>
-                  <p className="text-[10px] text-slate-400 truncate">{user?.email || "user@pharma.lk"}</p>
-                  <div className="mt-1 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 border border-emerald-100">
-                    Active • {user?.role || "Administrator"}
-                  </div>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
+              <div className="px-3 py-2 border-b border-slate-100">
+                <p className="text-xs font-bold text-slate-800">{user?.name || user?.full_name || "Dr. Kalinga Silva"}</p>
+                <p className="text-[10px] text-slate-400 truncate">{user?.email || "user@pharma.lk"}</p>
+                <div className="mt-1 inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 border border-emerald-100">
+                  Active • {user?.role || "Administrator"}
                 </div>
-                <DropdownMenuItem onClick={() => navigate("/control-center/profile")} className="cursor-pointer">
-                  <User className="mr-2 h-3.5 w-3.5 text-slate-400" />
-                  <span>My Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/control-center/security-settings")} className="cursor-pointer">
-                  <Shield className="mr-2 h-3.5 w-3.5 text-slate-400" />
-                  <span>Security Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logoutUser} className="text-rose-600 cursor-pointer">
-                  <LogOut className="mr-2 h-3.5 w-3.5" />
-                  <span>Log Out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </div>
+              <DropdownMenuItem onClick={() => navigate("/control-center/profile")} className="cursor-pointer">
+                <User className="mr-2 h-3.5 w-3.5 text-slate-400" />
+                <span>My Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/control-center/security-settings")} className="cursor-pointer">
+                <Shield className="mr-2 h-3.5 w-3.5 text-slate-400" />
+                <span>Security Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logoutUser} className="text-rose-600 cursor-pointer">
+                <LogOut className="mr-2 h-3.5 w-3.5" />
+                <span>Log Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            {/* Logout Pill Button */}
-            <button
-              onClick={logoutUser}
-              className="flex items-center gap-1.5 rounded-full bg-rose-50/90 text-rose-600 hover:bg-rose-100/90 border border-rose-200/80 px-3 py-1.5 text-xs font-semibold shadow-xs hover:shadow-sm active:scale-95 transition-all cursor-pointer"
-              title="Sign out of Pharma ERP"
-            >
-              <LogOut className="h-3.5 w-3.5 text-rose-500" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
-          </div>
+          {/* Logout Button */}
+          <button
+            onClick={logoutUser}
+            className="flex items-center gap-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200/80 px-2.5 py-1.5 text-xs font-semibold shadow-xs hover:shadow-sm active:scale-95 transition-all cursor-pointer"
+            title="Sign out of Pharma ERP"
+          >
+            <LogOut className="h-3.5 w-3.5 text-rose-500" />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
         </div>
       </header>
 
