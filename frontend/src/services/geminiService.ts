@@ -4,8 +4,12 @@
  */
 
 const GEMINI_API_KEY =
-  import.meta.env.VITE_GEMINI_API_KEY ||
-  "AIzaSyA5VhtysziTbVcXgfSLm-epvVwCOk90VaU";
+  import.meta.env.VITE_GEMINI_API_KEY || "";
+
+// Only attempt remote Google endpoint if a non-revoked custom API key is supplied
+const IS_EXTERNAL_GEMINI_ENABLED = Boolean(
+  GEMINI_API_KEY && !GEMINI_API_KEY.startsWith("AIzaSyA5Vht")
+);
 
 const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.0-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
@@ -905,9 +909,10 @@ export async function generateAiDashboardAnalysis(
   kpis: any,
   customPrompt?: string
 ): Promise<AiDashboardAnalysisResult> {
-  // 1. Attempt live Google Gemini API call if online & key valid
-  try {
-    const prompt = `Perform an executive pharmaceutical enterprise analysis for the "${dashboardType}" dashboard.
+  // 1. Attempt live Google Gemini API call only if configured with a valid key
+  if (IS_EXTERNAL_GEMINI_ENABLED) {
+    try {
+      const prompt = `Perform an executive pharmaceutical enterprise analysis for the "${dashboardType}" dashboard.
 Live Metrics: ${JSON.stringify(kpis || {}).slice(0, 1500)}
 ${customPrompt ? `Specific Inquiry: "${customPrompt}"` : 'General health and risk audit.'}
 
@@ -959,6 +964,7 @@ Return strictly valid JSON:
   } catch (err) {
     console.warn("Gemini cloud API unreachable, engaging high-precision local analytical engine:", err);
   }
+}
 
   // 2. High-Precision Contextual & Heuristic AI Synthesis Engine
   return generateDynamicDashboardAnalysis(dashboardType, kpis, customPrompt);
