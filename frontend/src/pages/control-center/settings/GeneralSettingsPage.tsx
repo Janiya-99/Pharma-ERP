@@ -15,7 +15,6 @@ import {
   MapPin,
   Clock,
   DollarSign,
-  FileSpreadsheet,
 } from "lucide-react";
 import { getSettings, publishSetting, triggerManualBackup } from "../../../api/controlApi";
 import SettingsImpactPreview from "../../../components/common/SettingsImpactPreview";

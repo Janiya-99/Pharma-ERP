@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getSoftwareModules } from "../../../api/controlApi";
-import PageHeader from "../../../components/common/PageHeader";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Badge from "../../../components/common/Badge";

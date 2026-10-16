@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getPermissionsGrouped, getRolePermissionMatrix, assignRolePermissions } from "../../../api/controlApi";
 import { useAuth } from "../../../auth/AuthContext";
-import PageHeader from "../../../components/common/PageHeader";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import Button from "../../../components/common/Button";
 import FormError from "../../../components/common/FormError";

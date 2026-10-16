@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getBranches, deleteBranch } from "../../../api/controlApi";
-import PageHeader from "../../../components/common/PageHeader";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
 import DataTable from "../../../components/common/DataTable";
 import Pagination from "../../../components/common/Pagination";

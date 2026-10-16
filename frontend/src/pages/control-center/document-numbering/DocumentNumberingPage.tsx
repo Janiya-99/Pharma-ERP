@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
-  FileText,
   Hash,
   Save,
   CheckCircle2,
   RefreshCw,
   Search,
-  Filter,
-  Layers,
-  HelpCircle,
   Sparkles,
   RotateCcw,
 } from "lucide-react";
