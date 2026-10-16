@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { getControlDashboardSummary } from "../../../api/controlApi";
 import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
@@ -407,30 +407,31 @@ const ControlCenterDashboardPage: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const res = await getControlDashboardSummary();
-        if (res?.data) {
-          const d = res.data;
-          setStats({
-            total_branches: d.total_branches ?? 5,
-            total_users: d.total_users ?? 1,
-            activated_modules: d.activated_modules ?? 4,
-            total_modules: d.total_modules ?? 6,
-            security_alerts: d.security_alerts ?? 0,
-          });
-          if (d.telemetry && d.telemetry.length > 0) setTelemetry(d.telemetry);
-          if (d.role_distribution && d.role_distribution.length > 0) setRoleDistribution(d.role_distribution);
-          if (d.module_adoption && d.module_adoption.length > 0) setModuleAdoptions(d.module_adoption);
-          if (d.security_events && d.security_events.length > 0) setEvents(d.security_events);
-        }
-      } catch (err) {
-        console.error("Failed to load control center dashboard summary", err);
+  const fetchSummary = useCallback(async () => {
+    try {
+      const res = await getControlDashboardSummary();
+      if (res?.data) {
+        const d = res.data;
+        setStats({
+          total_branches: d.total_branches ?? 5,
+          total_users: d.total_users ?? 1,
+          activated_modules: d.activated_modules ?? 4,
+          total_modules: d.total_modules ?? 6,
+          security_alerts: d.security_alerts ?? 0,
+        });
+        if (d.telemetry && d.telemetry.length > 0) setTelemetry(d.telemetry);
+        if (d.role_distribution && d.role_distribution.length > 0) setRoleDistribution(d.role_distribution);
+        if (d.module_adoption && d.module_adoption.length > 0) setModuleAdoptions(d.module_adoption);
+        if (d.security_events && d.security_events.length > 0) setEvents(d.security_events);
       }
-    };
-    fetchSummary();
+    } catch (err) {
+      console.error("Failed to load control center dashboard summary", err);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
 
   return (
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
