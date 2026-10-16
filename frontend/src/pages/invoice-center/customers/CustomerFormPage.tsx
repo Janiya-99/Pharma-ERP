@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
+import { getDocumentNumberingRules } from "../../../api/controlApi";
 
 const CustomerFormPage: React.FC = () => {
   const { activeSoftware } = useAuth();
@@ -90,6 +91,37 @@ const CustomerFormPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!isEdit && activeSoftware?.software_code === "INVOICE_CENTER") {
+      const fetchNextCode = async () => {
+        try {
+          const rulesRes = await getDocumentNumberingRules();
+          const items = rulesRes?.data || [];
+          const custRule = items.find((r: any) => 
+            (r.document_type || "").toLowerCase() === "customer" || 
+            (r.module || "").toLowerCase() === "customer"
+          );
+          if (custRule) {
+            const prefix = custRule.prefix || "CUST-";
+            const pad = custRule.padding || 6;
+            const nextNum = custRule.next_number || 36;
+            const suffix = custRule.suffix || "";
+            const autoCode = `${prefix}${String(nextNum).padStart(pad, "0")}${suffix}`;
+            setFormData(prev => prev.customer_code ? prev : { ...prev, customer_code: autoCode });
+          } else {
+            const custRes = await invoiceCenterApi.getCustomers({ limit: 1 });
+            const total = custRes.data?.data?.total || 35;
+            const autoCode = `CUST-${String(total + 1).padStart(6, "0")}`;
+            setFormData(prev => prev.customer_code ? prev : { ...prev, customer_code: autoCode });
+          }
+        } catch {
+          setFormData(prev => prev.customer_code ? prev : { ...prev, customer_code: "CUST-000036" });
+        }
+      };
+      fetchNextCode();
+    }
+  }, [isEdit, activeSoftware]);
+
+  useEffect(() => {
     if (isEdit && id && activeSoftware?.software_code === "INVOICE_CENTER") {
       const loadCustomer = async () => {
         setFetching(true);
@@ -102,12 +134,12 @@ const CustomerFormPage: React.FC = () => {
               customer_name: c.customer_name || "",
               trade_name: c.trade_name || "",
               customer_type: c.customer_type || "pharmacy",
-              category_id: c.category_id ? String(c.category_id) : "",
+              category_id: c.category_id ? String(c.category_id) : (c.customer_category_id ? String(c.customer_category_id) : ""),
               currency: c.currency || "LKR",
               tax_id: c.tax_id || "",
               registration_no: c.registration_no || "",
-              email: c.email || "",
-              phone: c.phone || "",
+              email: c.email || c.primary_email || "",
+              phone: c.phone || c.primary_contact_number || "",
               mobile: c.mobile || "",
               website: c.website || "",
               credit_limit:
@@ -191,9 +223,16 @@ const CustomerFormPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
+    const catNum = Number(formData.category_id) || undefined;
+    const phoneVal = formData.phone || formData.mobile || "";
     const payload = {
       ...formData,
-      category_id: Number(formData.category_id),
+      customer_category_id: catNum,
+      category_id: catNum,
+      primary_contact_number: phoneVal,
+      phone: phoneVal,
+      primary_email: formData.email,
+      primary_contact_person: formData.customer_name,
       credit_limit: Number(formData.credit_limit) || 0,
       credit_days: Number(formData.credit_days) || 0,
       price_list_id: formData.price_list_id

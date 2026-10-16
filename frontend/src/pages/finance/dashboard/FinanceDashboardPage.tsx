@@ -34,6 +34,7 @@ import { FinanceQuickActions } from "./components/FinanceQuickActions";
 import { CashFlowLiquidityCard } from "./components/CashFlowLiquidityCard";
 import { AccountingPeriodStatusCard } from "./components/AccountingPeriodStatusCard";
 import { FinanceReportShortcuts } from "./components/FinanceReportShortcuts";
+import { DashboardAiAnalysisSection } from "../../../components/common/DashboardAiAnalysisSection";
 
 const FinanceDashboardPage = () => {
   const { user } = useAuth();
@@ -215,6 +216,13 @@ const FinanceDashboardPage = () => {
                 to="/finance/banking/receipt-vouchers"
               />
             </div>
+
+            {/* AI Executive Copilot & Cash Flow Intelligence */}
+            <DashboardAiAnalysisSection
+              dashboardType="finance"
+              kpiData={dashboardData}
+              title="Treasury AI Copilot & Working Capital Analytics"
+            />
 
             {/* Main Analytics Section (8/4 split) */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">

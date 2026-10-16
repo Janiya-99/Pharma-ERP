@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAiCopilot } from "../../context/AiCopilotContext";
 
 export interface DashboardHeroCardProps {
   title: string | React.ReactNode;
@@ -148,6 +149,7 @@ export const DashboardHeroCard: React.FC<DashboardHeroCardProps> = ({
   children,
   className = "",
 }) => {
+  const { openCopilot } = useAiCopilot();
   const [internalDate, setInternalDate] = useState("Today");
   const [internalBranch, setInternalBranch] = useState("All Branches (Global)");
 
@@ -392,6 +394,17 @@ export const DashboardHeroCard: React.FC<DashboardHeroCardProps> = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+
+            {/* AI Copilot Button */}
+            <button
+              type="button"
+              onClick={() => openCopilot("chat")}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:via-indigo-700 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              title="Open Pharma AI Copilot for this Dashboard"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-pulse" />
+              <span>AI Copilot</span>
+            </button>
 
             {/* Module-specific action buttons or default Refresh */}
             {actions ? (

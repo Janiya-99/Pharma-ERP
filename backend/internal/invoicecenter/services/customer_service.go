@@ -40,8 +40,16 @@ func NewCustomerService(
 
 func (s *CustomerService) mapToListDTO(model *models.Customer) *dto.CustomerListItemResponse {
 	catName := ""
+	var catRes *dto.CustomerCategoryResponse
 	if model.Category != nil {
 		catName = model.Category.CategoryName
+		catRes = &dto.CustomerCategoryResponse{
+			ID:           model.Category.ID,
+			CategoryCode: model.Category.CategoryCode,
+			CategoryName: model.Category.CategoryName,
+			Description:  model.Category.Description,
+			Status:       model.Category.Status,
+		}
 	}
 	exceeded := model.CreditLimit > 0 && model.CurrentBalance > model.CreditLimit
 	return &dto.CustomerListItemResponse{
@@ -51,9 +59,12 @@ func (s *CustomerService) mapToListDTO(model *models.Customer) *dto.CustomerList
 		CustomerName:         model.CustomerName,
 		CustomerCategoryID:   model.CustomerCategoryID,
 		CustomerCategoryName: catName,
+		CategoryName:         catName,
+		Category:             catRes,
 		CustomerType:         model.CustomerType,
 		PrimaryContactPerson: model.PrimaryContactPerson,
 		PrimaryContactNumber: model.PrimaryContactNumber,
+		Phone:                model.PrimaryContactNumber,
 		PrimaryEmail:         model.PrimaryEmail,
 		CreditLimit:          model.CreditLimit,
 		CreditDays:           model.CreditDays,
@@ -198,23 +209,32 @@ func (s *CustomerService) Create(db *gorm.DB, companyID, userID uint64, req *dto
 		}
 	}
 
-	if req.CustomerCategoryID != nil {
-		_, _, err := s.catRepo.GetByID(db, companyID, *req.CustomerCategoryID)
+	targetCatID := req.CustomerCategoryID
+	if targetCatID == nil {
+		targetCatID = req.CategoryID
+	}
+	if targetCatID != nil {
+		_, _, err := s.catRepo.GetByID(db, companyID, *targetCatID)
 		if err != nil {
 			return nil, errors.New("customer category not found")
 		}
 	}
 
+	phone := strings.TrimSpace(req.PrimaryContactNumber)
+	if phone == "" {
+		phone = strings.TrimSpace(req.Phone)
+	}
+
 	cust := &models.Customer{
 		CompanyID:                  companyID,
-		CustomerCategoryID:         req.CustomerCategoryID,
+		CustomerCategoryID:         targetCatID,
 		CustomerCode:               code,
 		CustomerName:               strings.TrimSpace(req.CustomerName),
 		CustomerType:               req.CustomerType,
 		BusinessRegistrationNumber: req.BusinessRegistrationNumber,
 		TaxRegistrationNumber:      req.TaxRegistrationNumber,
 		PrimaryContactPerson:       req.PrimaryContactPerson,
-		PrimaryContactNumber:       req.PrimaryContactNumber,
+		PrimaryContactNumber:       phone,
 		PrimaryEmail:               req.PrimaryEmail,
 		BillingAddress:             req.BillingAddress,
 		ShippingAddress:            req.ShippingAddress,
@@ -281,21 +301,30 @@ func (s *CustomerService) Update(db *gorm.DB, companyID, userID, id uint64, req 
 		}
 	}
 
-	if req.CustomerCategoryID != nil {
-		_, _, err := s.catRepo.GetByID(db, companyID, *req.CustomerCategoryID)
+	targetCatID := req.CustomerCategoryID
+	if targetCatID == nil {
+		targetCatID = req.CategoryID
+	}
+	if targetCatID != nil {
+		_, _, err := s.catRepo.GetByID(db, companyID, *targetCatID)
 		if err != nil {
 			return nil, errors.New("customer category not found")
 		}
 	}
 
-	cust.CustomerCategoryID = req.CustomerCategoryID
+	phone := strings.TrimSpace(req.PrimaryContactNumber)
+	if phone == "" {
+		phone = strings.TrimSpace(req.Phone)
+	}
+
+	cust.CustomerCategoryID = targetCatID
 	cust.CustomerCode = newCode
 	cust.CustomerName = strings.TrimSpace(req.CustomerName)
 	cust.CustomerType = req.CustomerType
 	cust.BusinessRegistrationNumber = req.BusinessRegistrationNumber
 	cust.TaxRegistrationNumber = req.TaxRegistrationNumber
 	cust.PrimaryContactPerson = req.PrimaryContactPerson
-	cust.PrimaryContactNumber = req.PrimaryContactNumber
+	cust.PrimaryContactNumber = phone
 	cust.PrimaryEmail = req.PrimaryEmail
 	cust.BillingAddress = req.BillingAddress
 	cust.ShippingAddress = req.ShippingAddress

@@ -37,6 +37,7 @@ import { inventoryApi } from "../../../api/inventoryApi";
 import { useAuth } from "../../../auth/AuthContext";
 import { Button } from "../../../components/ui/button";
 import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
+import { DashboardAiAnalysisSection } from "../../../components/common/DashboardAiAnalysisSection";
 
 /* ─────────────────────────────────────────────────────────────
    Types & Interfaces
@@ -495,6 +496,14 @@ export default function InventoryDashboard() {
           );
         })}
       </div>
+
+      {/* AI Copilot & Real-Time Stock Analytics */}
+      <DashboardAiAnalysisSection
+        dashboardType="inventory"
+        kpiData={data}
+        title="Inventory AI Copilot & Reorder Telemetry"
+        className="mb-6"
+      />
 
       {/* Row 2: Middle Visual Intelligence (Donut + Category Bar Chart + Expiry Risk Table) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">

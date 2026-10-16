@@ -4,6 +4,7 @@ import "time"
 
 type CreateCustomerRequest struct {
 	CustomerCategoryID         *uint64                        `json:"customer_category_id"`
+	CategoryID                 *uint64                        `json:"category_id"`
 	CustomerCode               string                         `json:"customer_code"`
 	CustomerName               string                         `json:"customer_name" binding:"required"`
 	CustomerType               string                         `json:"customer_type" binding:"required"`
@@ -11,6 +12,7 @@ type CreateCustomerRequest struct {
 	TaxRegistrationNumber      string                         `json:"tax_registration_number"`
 	PrimaryContactPerson       string                         `json:"primary_contact_person"`
 	PrimaryContactNumber       string                         `json:"primary_contact_number"`
+	Phone                      string                         `json:"phone"`
 	PrimaryEmail               string                         `json:"primary_email" binding:"omitempty,email"`
 	BillingAddress             string                         `json:"billing_address"`
 	ShippingAddress            string                         `json:"shipping_address"`
@@ -24,6 +26,7 @@ type CreateCustomerRequest struct {
 
 type UpdateCustomerRequest struct {
 	CustomerCategoryID         *uint64 `json:"customer_category_id"`
+	CategoryID                 *uint64 `json:"category_id"`
 	CustomerCode               string  `json:"customer_code" binding:"required"`
 	CustomerName               string  `json:"customer_name" binding:"required"`
 	CustomerType               string  `json:"customer_type" binding:"required"`
@@ -31,6 +34,7 @@ type UpdateCustomerRequest struct {
 	TaxRegistrationNumber      string  `json:"tax_registration_number"`
 	PrimaryContactPerson       string  `json:"primary_contact_person"`
 	PrimaryContactNumber       string  `json:"primary_contact_number"`
+	Phone                      string  `json:"phone"`
 	PrimaryEmail               string  `json:"primary_email" binding:"omitempty,email"`
 	BillingAddress             string  `json:"billing_address"`
 	ShippingAddress            string  `json:"shipping_address"`
@@ -46,23 +50,26 @@ type ChangeCustomerStatusRequest struct {
 }
 
 type CustomerListItemResponse struct {
-	ID                   uint64    `json:"id"`
-	CompanyID            uint64    `json:"company_id"`
-	CustomerCode         string    `json:"customer_code"`
-	CustomerName         string    `json:"customer_name"`
-	CustomerCategoryID   *uint64   `json:"customer_category_id"`
-	CustomerCategoryName string    `json:"customer_category_name"`
-	CustomerType         string    `json:"customer_type"`
-	PrimaryContactPerson string    `json:"primary_contact_person"`
-	PrimaryContactNumber string    `json:"primary_contact_number"`
-	PrimaryEmail         string    `json:"primary_email"`
-	CreditLimit          float64   `json:"credit_limit"`
-	CreditDays           int       `json:"credit_days"`
-	CurrentBalance       float64   `json:"current_balance"`
-	CreditLimitExceeded  bool      `json:"credit_limit_exceeded"`
-	Status               string    `json:"status"`
-	CreatedBy            *uint64   `json:"created_by"`
-	CreatedAt            time.Time `json:"created_at"`
+	ID                   uint64                    `json:"id"`
+	CompanyID            uint64                    `json:"company_id"`
+	CustomerCode         string                    `json:"customer_code"`
+	CustomerName         string                    `json:"customer_name"`
+	CustomerCategoryID   *uint64                   `json:"customer_category_id"`
+	CustomerCategoryName string                    `json:"customer_category_name"`
+	CategoryName         string                    `json:"category_name"`
+	Category             *CustomerCategoryResponse `json:"category,omitempty"`
+	CustomerType         string                    `json:"customer_type"`
+	PrimaryContactPerson string                    `json:"primary_contact_person"`
+	PrimaryContactNumber string                    `json:"primary_contact_number"`
+	Phone                string                    `json:"phone"`
+	PrimaryEmail         string                    `json:"primary_email"`
+	CreditLimit          float64                   `json:"credit_limit"`
+	CreditDays           int                       `json:"credit_days"`
+	CurrentBalance       float64                   `json:"current_balance"`
+	CreditLimitExceeded  bool                      `json:"credit_limit_exceeded"`
+	Status               string                    `json:"status"`
+	CreatedBy            *uint64                   `json:"created_by"`
+	CreatedAt            time.Time                 `json:"created_at"`
 }
 
 type CreditSummary struct {
