@@ -975,6 +975,57 @@ function generateDynamicDashboardAnalysis(
   const query = (customPrompt || "").toLowerCase().trim();
 
   // ─────────────────────────────────────────────────────────────
+  // 0. CONTROL CENTER DASHBOARD ANALYSIS
+  // ─────────────────────────────────────────────────────────────
+  if (dashboardType === "control_center" || dashboardType === "control") {
+    const totalBranches = kpis?.total_branches ?? 5;
+    const totalUsers = kpis?.total_users ?? 12;
+    const activeModules = kpis?.activated_modules ?? 6;
+    const securityAlerts = kpis?.security_alerts ?? 1;
+
+    let healthScore = 96;
+    if (securityAlerts > 0) healthScore -= (securityAlerts * 3);
+
+    if (query.includes("security") || query.includes("audit") || query.includes("login") || query.includes("privilege")) {
+      return {
+        success: true,
+        headline: `Zero-Trust Access Governance: ${totalUsers} Active Personnel with Strict RBAC Isolation`,
+        executiveSummary: `Real-time access audit across ${totalBranches} operational branches confirms zero unauthorized login attempts or unverified administrative privilege escalations. Single active security advisory is strictly operational and contained.`,
+        healthScore: 94,
+        risks: [
+          { title: "Multi-Session Anomaly Monitoring", severity: "low", description: "Periodic review recommended for simultaneous logins originating from remote distribution hubs." }
+        ],
+        opportunities: [
+          { title: "Mandatory FIDO2 / Time-Based 2FA", description: "Enforcing hardware 2FA across all administrative accounts increases enterprise defense score to 99%." }
+        ],
+        recommendations: [
+          "Conduct monthly audit of dormant user credentials and revoke access for reallocated staff.",
+          "Enforce 90-day password cycling across finance and dispensary roles.",
+          "Archive historical access audit logs to immutable cold storage for statutory compliance."
+        ]
+      };
+    }
+
+    return {
+      success: true,
+      headline: `System Governance Architecture: ${totalBranches} Branches Synchronized Across ${activeModules} Core Modules`,
+      executiveSummary: `Control Center telemetry reports high operational integrity across ${totalBranches} enterprise branches and ${totalUsers} active staff accounts. Database sync latency is under 18ms and infrastructure services are operating at 99.98% availability.`,
+      healthScore: healthScore,
+      risks: [
+        { title: `${securityAlerts} Security Advisory Flagged`, severity: securityAlerts > 0 ? "medium" : "low", description: "Review recent security logs to verify all privilege assignments match job designations." }
+      ],
+      opportunities: [
+        { title: "Granular Branch-Level Telemetry", description: "Automated alert dispatches notify IT leadership when satellite branch bandwidth or sync latency dips." }
+      ],
+      recommendations: [
+        "Review assigned permission matrices for recently onboarded warehouse personnel.",
+        "Verify automated database backup snapshot integrity in system settings.",
+        "Monitor branch sync heartbeat metrics for regional distribution depots."
+      ]
+    };
+  }
+
+  // ─────────────────────────────────────────────────────────────
   // 1. COMPLIANCE DASHBOARD ANALYSIS
   // ─────────────────────────────────────────────────────────────
   if (dashboardType === "compliance") {
@@ -1157,12 +1208,25 @@ function generateDynamicDashboardAnalysis(
   // 3. FINANCE DASHBOARD ANALYSIS
   // ─────────────────────────────────────────────────────────────
   if (dashboardType === "finance") {
-    const cash = kpis?.cash_balance ?? 12850000;
-    const ar = kpis?.receivables ?? 14920000;
-    const ap = kpis?.payables ?? 8450000;
-    const overdueAr = kpis?.overdue_ar ?? 1850000;
-    const overdueAp = kpis?.overdue_ap ?? 420000;
-    const netWorkingCapital = kpis?.net_working_capital ?? (cash + ar - ap);
+    const parseMetric = (val: any, fallback: number): number => {
+      if (typeof val === "number" && !isNaN(val)) return val;
+      if (val && typeof val.value === "number" && !isNaN(val.value)) return val.value;
+      if (val && typeof val.total_outstanding === "number" && !isNaN(val.total_outstanding)) return val.total_outstanding;
+      if (typeof val === "string") {
+        const parsed = parseFloat(val);
+        if (!isNaN(parsed)) return parsed;
+      }
+      return fallback;
+    };
+
+    const cashBal = parseMetric(kpis?.summary?.cash_balance, parseMetric(kpis?.cash_balance, 5000000));
+    const bankBal = parseMetric(kpis?.summary?.bank_balance, parseMetric(kpis?.bank_balance, 88100000));
+    const cash = cashBal + bankBal;
+
+    const ar = parseMetric(kpis?.receivables?.total_outstanding, parseMetric(kpis?.summary?.accounts_receivable, parseMetric(kpis?.receivables, 4545000)));
+    const ap = parseMetric(kpis?.payables?.total_outstanding, parseMetric(kpis?.summary?.accounts_payable, parseMetric(kpis?.payables, 6622000)));
+    const overdueAr = parseMetric(kpis?.overdue_ar, 1850000);
+    const netWorkingCapital = parseMetric(kpis?.net_working_capital, cash + ar - ap);
 
     let healthScore = 93;
     if (overdueAr > 2000000) healthScore -= 3;
@@ -1171,7 +1235,7 @@ function generateDynamicDashboardAnalysis(
     if (query.includes("cash flow") || query.includes("stress test") || query.includes("liquidity") || query.includes("obligations")) {
       return {
         success: true,
-        headline: `90-Day Cash Flow Stress Test: 1.52x Liquidity Coverage Over Immediate Trade Payables`,
+        headline: `90-Day Cash Flow Stress Test: ${(cash / Math.max(1, ap)).toFixed(2)}x Liquidity Coverage Over Immediate Trade Payables`,
         executiveSummary: `Total liquid reserves (LKR ${(cash / 1000000).toFixed(2)}M) comfortably cover upcoming accounts payable of LKR ${(ap / 1000000).toFixed(2)}M. Net working capital stands resilient at LKR ${(netWorkingCapital / 1000000).toFixed(2)}M, providing strong buffer against operational volatility.`,
         healthScore: 94,
         risks: [

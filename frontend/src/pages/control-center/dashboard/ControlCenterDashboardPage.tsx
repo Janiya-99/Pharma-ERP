@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { getControlDashboardSummary } from "../../../api/controlApi";
 import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
+import { DashboardAiAnalysisSection } from "../../../components/common/DashboardAiAnalysisSection";
 import {
   Building2,
   Users,
@@ -574,6 +575,18 @@ const ControlCenterDashboardPage: React.FC = () => {
           </div>
         </Link>
       </div>
+
+      {/* ── AI Executive Governance & Security Telemetry ── */}
+      <DashboardAiAnalysisSection
+        dashboardType="control_center"
+        kpiData={{
+          total_branches: stats.total_branches,
+          total_users: stats.total_users,
+          activated_modules: stats.activated_modules,
+          security_alerts: stats.security_alerts,
+        }}
+        title="Control Center AI Governance & Security Telemetry"
+      />
 
       {/* ── MIDDLE ROW: Telemetry Area Chart + Module Adoption + Role Donut ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
