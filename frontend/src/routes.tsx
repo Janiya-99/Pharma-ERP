@@ -20,6 +20,7 @@ const UsersPage = lazy(() => import("pages/control-center/users/UsersPage"));
 const UserCreatePage = lazy(() => import("pages/control-center/users/UserCreatePage"));
 const UserDetailsPage = lazy(() => import("pages/control-center/users/UserDetailsPage"));
 const RolesPermissionsPage = lazy(() => import("pages/control-center/roles-permissions/RolesPermissionsPage"));
+const PermissionsPage = lazy(() => import("pages/control-center/permissions/PermissionsPage"));
 const AccessMatrixPage = lazy(() => import("pages/control-center/access-matrix/AccessMatrixPage"));
 const AuditLogsPage = lazy(() => import("pages/control-center/logs/AuditLogsPage"));
 const LoginLogsPage = lazy(() => import("pages/control-center/logs/LoginLogsPage"));
@@ -167,6 +168,7 @@ const routes: ERPRoute[] = [
     children: [
       { name: "Users", path: "control-center/users", component: <UsersPage /> },
       { name: "Roles & Permissions", path: "control-center/roles-permissions", component: <RolesPermissionsPage /> },
+      { name: "Permissions Registry", path: "control-center/permissions", component: <PermissionsPage /> },
       { name: "User Access", path: "control-center/user-access", component: <AccessMatrixPage /> },
       // Hidden user routes
       { name: "Create User", path: "control-center/users/create", component: <UserCreatePage />, hide: true },

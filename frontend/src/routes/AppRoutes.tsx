@@ -56,6 +56,7 @@ const UserBranchAccessPage = lazy(() => import("../pages/control-center/user-acc
 const UserSoftwareAccessPage = lazy(() => import("../pages/control-center/user-access/UserSoftwareAccessPage"));
 
 const RolesPermissionsPage = lazy(() => import("../pages/control-center/roles-permissions/RolesPermissionsPage"));
+const PermissionsPage = lazy(() => import("../pages/control-center/permissions/PermissionsPage"));
 
 const AuditLogsPage = lazy(() => import("../pages/control-center/logs/AuditLogsPage"));
 const LoginLogsPage = lazy(() => import("../pages/control-center/logs/LoginLogsPage"));
@@ -270,6 +271,10 @@ const AppRoutes = () => {
           <Route
             path="/control-center/roles"
             element={<RolesPermissionsPage />}
+          />
+          <Route
+            path="/control-center/permissions"
+            element={<PermissionsPage />}
           />
           <Route
             path="/control-center/effective-access"
