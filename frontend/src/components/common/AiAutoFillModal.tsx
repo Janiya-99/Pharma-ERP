@@ -187,7 +187,7 @@ export const AiAutoFillModal: React.FC<AiAutoFillModalProps> = ({
                 </h3>
                 <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 px-2.5 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200/60">
                   <Zap className="h-3 w-3 text-purple-600" />
-                  Gemini 3.6 Flash
+                  Gemini 2.5 Flash
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium">
