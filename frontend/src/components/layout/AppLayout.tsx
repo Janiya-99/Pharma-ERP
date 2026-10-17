@@ -28,7 +28,13 @@ export const useSidebarState = () => useContext(SidebarContext);
 
 const AppLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [desktopExpanded, setDesktopExpanded] = useState(false);
+  const [desktopExpanded, setDesktopExpanded] = useState(() => {
+    try {
+      return localStorage.getItem("erp_sidebar_pinned") !== "false";
+    } catch {
+      return true;
+    }
+  });
   const location = useLocation();
   const { activeSoftware, switchActiveSoftware } = useAuth();
 
@@ -66,7 +72,7 @@ const AppLayout = () => {
             <Topbar />
             <main className="flex-1 overflow-x-hidden overflow-y-auto scroll-smooth bg-slate-50">
               <div className="flex flex-col min-h-full w-full">
-                <div className="page-content flex-grow space-y-8 pb-20 font-sans">
+                <div className="page-content flex-grow space-y-8 pb-6 font-sans">
                   <Suspense fallback={<LoadingScreen mode="page" title="Pixandco" />}>
                     <Outlet />
                   </Suspense>

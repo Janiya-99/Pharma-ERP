@@ -48,7 +48,7 @@ export function ERPDetailPanel({
 }: ERPDetailPanelProps) {
   return (
     <Sheet open={open} onOpenChange={(val: unknown) => !val && onClose()}>
-      <SheetContent side="right" className="w-[400px] sm:w-[500px] sm:max-w-none p-0 flex flex-col bg-white border-none shadow-2xl">
+      <SheetContent side="right" className="w-full sm:w-[min(94vw,860px)] sm:max-w-[860px] lg:w-[60vw] lg:max-w-[920px] p-0 flex flex-col bg-white border-none shadow-2xl">
         {/* Header */}
         <SheetHeader className="px-6 py-4 border-b border-gray-100 text-left">
           <div className="flex items-center gap-2">

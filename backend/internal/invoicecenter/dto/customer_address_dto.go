@@ -12,7 +12,7 @@ type CreateCustomerAddressRequest struct {
 	PostalCode   string `json:"postal_code"`
 	Country      string `json:"country"`
 	IsDefault    bool   `json:"is_default"`
-	Status       string `json:"status" binding:"required"`
+	Status       string `json:"status"`
 }
 
 type UpdateCustomerAddressRequest struct {
@@ -25,7 +25,7 @@ type UpdateCustomerAddressRequest struct {
 	PostalCode   string `json:"postal_code"`
 	Country      string `json:"country"`
 	IsDefault    bool   `json:"is_default"`
-	Status       string `json:"status" binding:"required"`
+	Status       string `json:"status"`
 }
 
 type CustomerAddressResponse struct {

@@ -64,7 +64,7 @@ export const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
       isCredit: true,
       status: "Sent",
       category: "invoice",
-      route: "/invoice-center/invoices",
+      route: "/invoice-center/sales-invoices",
     },
     {
       id: "tx-4",

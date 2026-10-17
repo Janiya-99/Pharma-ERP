@@ -15,11 +15,11 @@ const Modal = ({
   size?: "sm" | "md" | "lg" | "xl" | "half" | "full";
 }) => {
   const sizes: Record<string, string> = {
-    sm: "!max-w-md !w-full sm:!max-w-md",
-    md: "!max-w-lg !w-full sm:!max-w-lg",
-    lg: "!max-w-2xl !w-full sm:!max-w-2xl",
-    xl: "!max-w-4xl !w-full sm:!max-w-4xl",
-    half: "!max-w-[50vw] !w-[50vw] sm:!max-w-[50vw] sm:!w-[50vw]",
+    sm: "!max-w-lg !w-full sm:!max-w-lg",
+    md: "!max-w-2xl !w-full sm:!max-w-2xl",
+    lg: "!max-w-4xl !w-full sm:!max-w-4xl lg:!max-w-[1020px] lg:!w-[65vw]",
+    xl: "!max-w-5xl !w-full sm:!max-w-5xl lg:!max-w-[1140px] lg:!w-[70vw]",
+    half: "!max-w-[66vw] !w-[66vw] sm:!max-w-[66vw] sm:!w-[66vw]",
     full: "!max-w-full !w-full sm:!max-w-full sm:!w-full",
   };
 

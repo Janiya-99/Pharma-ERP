@@ -10,15 +10,21 @@ import { Plus, Edit, Trash2, MapPin } from "lucide-react";
 
 interface Address {
   id: number;
-  address_title: string;
+  address_title?: string;
   address_type: string;
-  street_address: string;
+  street_address?: string;
+  address_line_1?: string;
+  address_line_2?: string;
   city: string;
   state_province?: string;
+  district?: string;
+  province?: string;
   postal_code?: string;
   country: string;
-  is_default_billing: boolean;
-  is_default_shipping: boolean;
+  is_default?: boolean;
+  is_default_billing?: boolean;
+  is_default_shipping?: boolean;
+  status?: string;
 }
 
 interface CustomerAddressInlineTableProps {
@@ -100,22 +106,22 @@ const CustomerAddressInlineTable: React.FC<CustomerAddressInlineTableProps> = ({
                   className="transition-colors hover:bg-gray-50/80 "
                 >
                   <td className="px-4 py-3 font-bold text-navy-900 ">
-                    {addr.address_title}
+                    {addr.address_title || `${addr.address_type ? addr.address_type.charAt(0).toUpperCase() + addr.address_type.slice(1) : "Site"} Address`}
                   </td>
                   <td className="px-4 py-3">
                     <AddressTypeBadge type={addr.address_type} />
                   </td>
                   <td className="max-w-xs truncate px-4 py-3 text-gray-600 ">
-                    {addr.street_address}
+                    {addr.address_line_1 || addr.street_address || "-"}
                   </td>
                   <td className="px-4 py-3 text-gray-600 ">
-                    {addr.city}{" "}
-                    {addr.state_province ? `(${addr.state_province})` : ""}
+                    {addr.city || "-"}{" "}
+                    {addr.province || addr.state_province ? `(${addr.province || addr.state_province})` : ""}
                   </td>
                   <td className="px-4 py-3">
                     <DefaultAddressBadge
-                      isDefaultBilling={addr.is_default_billing}
-                      isDefaultShipping={addr.is_default_shipping}
+                      isDefaultBilling={Boolean(addr.is_default_billing || (addr.is_default && addr.address_type === "billing"))}
+                      isDefaultShipping={Boolean(addr.is_default_shipping || (addr.is_default && addr.address_type !== "billing"))}
                     />
                   </td>
                   <td className="px-4 py-3 text-right">

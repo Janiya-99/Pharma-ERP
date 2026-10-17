@@ -62,8 +62,81 @@ export const GlobalAiCopilot: React.FC = () => {
   const [docsLoading, setDocsLoading] = useState(false);
 
   const [copied, setCopied] = useState<string | null>(null);
+  const [harvestStats, setHarvestStats] = useState({ rows: 0, kpis: 0 });
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const prevRouteRef = useRef(pageContext.route);
+
+  // Function to harvest visible live screen records and metric cards
+  const harvestScreenData = () => {
+    try {
+      const kpis: Array<{ label: string; value: string }> = [];
+      const tableRows: Array<Record<string, string>> = [];
+
+      // 1. Scrape metric / KPI cards
+      document.querySelectorAll(".glass-card, [data-testid='kpi-card'], .rounded-2xl, .rounded-xl").forEach((card) => {
+        const textEls = card.querySelectorAll("p, span, h2, h3, h4, div");
+        let foundLabel = "";
+        let foundValue = "";
+
+        textEls.forEach((el) => {
+          const txt = el.textContent?.trim() || "";
+          if (!foundLabel && txt.length > 2 && txt.length < 35 && !txt.match(/^(LKR|\$|\d|Total)/i) && !el.children.length) {
+            foundLabel = txt;
+          } else if (!foundValue && (txt.includes("LKR") || txt.match(/^\d+([\.,]\d+)?(\s*[KMkBb%])?$/) || txt.match(/^(Active|Blocked|Expired|Pending|Approved)$/i))) {
+            foundValue = txt;
+          }
+        });
+
+        if (foundLabel && foundValue && !kpis.some(k => k.label === foundLabel)) {
+          kpis.push({ label: foundLabel, value: foundValue });
+        }
+      });
+
+      // 2. Scrape main visible data table
+      const table = document.querySelector("table");
+      if (table) {
+        const headers: string[] = [];
+        table.querySelectorAll("thead th").forEach((th) => {
+          const hText = th.textContent?.trim() || "";
+          if (hText && !hText.toLowerCase().includes("action")) {
+            headers.push(hText);
+          }
+        });
+
+        table.querySelectorAll("tbody tr").forEach((tr, rIdx) => {
+          if (rIdx >= 25) return;
+          const tds = tr.querySelectorAll("td");
+          if (tds.length > 0) {
+            const row: Record<string, string> = {};
+            let hasData = false;
+            tds.forEach((td, cIdx) => {
+              const h = headers[cIdx] || `col_${cIdx}`;
+              const val = td.textContent?.trim() || "";
+              if (val && !val.toLowerCase().includes("action")) {
+                row[h] = val;
+                hasData = true;
+              }
+            });
+            if (hasData) tableRows.push(row);
+          }
+        });
+      }
+
+      return {
+        kpis: kpis.slice(0, 8),
+        tableRows,
+      };
+    } catch {
+      return { kpis: [], tableRows: [] };
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      const h = harvestScreenData();
+      setHarvestStats({ rows: h.tableRows.length, kpis: h.kpis.length });
+    }
+  }, [isOpen, pageContext.route]);
 
   // Dynamic contextual title for the assistant
   const copilotTitle = React.useMemo(() => {
@@ -148,7 +221,15 @@ export const GlobalAiCopilot: React.FC = () => {
         text: m.text,
       }));
 
-      const res = await sendAiChatbotMessage(historyPayload, pageContext);
+      const screenData = harvestScreenData();
+      const enrichedContext = {
+        ...pageContext,
+        activeData: pageContext.activeData || screenData.tableRows,
+        kpis: screenData.kpis,
+        count: pageContext.count || screenData.tableRows.length,
+      };
+
+      const res = await sendAiChatbotMessage(historyPayload, enrichedContext);
       if (res.success && res.reply) {
         const botMsg: ChatMessage = {
           id: `m-${Date.now()}`,
@@ -172,11 +253,13 @@ export const GlobalAiCopilot: React.FC = () => {
   const handleGenerateSummary = async () => {
     setSummaryLoading(true);
     try {
+      const screenData = harvestScreenData();
       const res = await generateAiPageSummary({
         pageTitle: pageContext.pageTitle,
         route: pageContext.route || "/",
-        activeData: pageContext.activeData,
-        count: pageContext.count,
+        activeData: pageContext.activeData || screenData.tableRows,
+        kpis: screenData.kpis,
+        count: pageContext.count || screenData.tableRows.length,
       });
       setSummary(res);
     } catch (err) {
@@ -262,9 +345,17 @@ export const GlobalAiCopilot: React.FC = () => {
                           Gemini 3.6 Flash
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 truncate max-w-xs font-medium">
-                        Active: <span className="font-semibold text-slate-700">{pageContext.pageTitle}</span>
-                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-[11px] text-slate-500 truncate max-w-xs font-medium">
+                          Active: <span className="font-semibold text-slate-700">{pageContext.pageTitle}</span>
+                        </p>
+                        {harvestStats.rows > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.2 text-[10px] font-semibold text-blue-700 border border-blue-200">
+                            <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                            {harvestStats.rows} Live Records
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">

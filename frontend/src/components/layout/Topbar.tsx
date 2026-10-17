@@ -3,6 +3,7 @@ import { useAuth } from "../../auth/AuthContext";
 import {
   LayoutGrid,
   Home,
+  Menu,
   ChevronRight,
   ChevronDown,
   Landmark,
@@ -239,16 +240,16 @@ const Topbar = () => {
   return (
     <>
       <header className="sticky top-0 z-40 w-full h-16 border-b border-slate-200/80 bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-2 md:gap-4 transition-all">
-        {/* 1. LEFT GROUP: App Launcher & Breadcrumbs */}
+        {/* 1. LEFT GROUP: Navigation & Breadcrumbs */}
         <div className="flex min-w-0 items-center gap-3">
-          {/* App Launcher Button */}
+          {/* Mobile Navigation Toggle (hidden on desktop) */}
           <button
             onClick={handleToggleSidebar}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-500 text-white shadow-xs hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors lg:hidden cursor-pointer"
             title="Toggle Navigation Menu"
             aria-label="Toggle Navigation"
           >
-            <LayoutGrid className="h-4 w-4" />
+            <Menu className="h-5 w-5" />
           </button>
 
           {/* Breadcrumb Links */}

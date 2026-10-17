@@ -46,14 +46,56 @@ function DataTable<TData = any>({
   onDelete,
   onRowClick,
 }: DataTableProps<TData>) {
-  if (loading) {
+  const hasActions = Boolean(onEdit || onDelete);
+
+  if (loading && (!data || data.length === 0)) {
     return (
-      <div className="glass-card flex flex-col items-center justify-center gap-3 py-20">
-        <div className="relative">
-          <div className="h-10 w-10 rounded-full border-2" style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
-          <Loader2 className="text-slate-900 absolute inset-0 h-10 w-10 animate-spin" />
-        </div>
-        <p className="text-slate-500 text-sm font-semibold">Loading data...</p>
+      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-sm rounded-xl">
+        <Table>
+          <TableHeader className="border-b border-slate-100 bg-slate-50/50">
+            <TableRow className="hover:bg-transparent">
+              {columns.map((col, index) => (
+                <TableHead
+                  key={col.id || col.accessorKey || col.accessor || index}
+                  className={`text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${
+                    col.className || ""
+                  }`}
+                >
+                  {col.header}
+                </TableHead>
+              ))}
+              {hasActions && (
+                <TableHead className="text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">
+                  Actions
+                </TableHead>
+              )}
+            </TableRow>
+          </TableHeader>
+          <TableBody className="divide-slate-100 divide-y">
+            {Array.from({ length: 6 }).map((_, rIdx) => (
+              <TableRow key={rIdx} className="border-none animate-pulse">
+                {columns.map((col, cIdx) => (
+                  <TableCell
+                    key={col.id || col.accessorKey || col.accessor || cIdx}
+                    className="border-none px-6 py-4"
+                  >
+                    <div
+                      className="h-4 rounded-md bg-slate-200/80"
+                      style={{
+                        width: `${Math.max(45, ((rIdx + cIdx) * 23 + 45) % 85)}%`,
+                      }}
+                    />
+                  </TableCell>
+                ))}
+                {hasActions && (
+                  <TableCell className="border-none px-6 py-4 text-right">
+                    <div className="inline-block h-6 w-16 rounded-md bg-slate-200/80" />
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     );
   }
@@ -78,9 +120,6 @@ function DataTable<TData = any>({
   const resolveAccessor = (row: any, key: string) => {
     return key.split(".").reduce((obj: any, k: string) => obj?.[k], row);
   };
-
-  // Determine whether we need an actions column
-  const hasActions = onEdit || onDelete;
 
   return (
     <div>
