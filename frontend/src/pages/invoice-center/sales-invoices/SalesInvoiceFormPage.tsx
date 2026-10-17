@@ -20,6 +20,7 @@ import * as z from "zod";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { getBranches } from "../../../api/controlApi";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { financeApi } from "../../../api/financeApi";
 import { useAuth } from "../../../auth/AuthContext";
 import PermissionGuard from "../../../auth/PermissionGuard";
 import { Button } from "../../../components/ui/button";
@@ -98,7 +99,7 @@ type FormValues = z.infer<typeof formSchema>;
 const SalesInvoiceFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
-  const { user, activeSoftware, activeBranch } = useAuth();
+  const { user, activeSoftware, activeBranch, branches: authBranches } = useAuth();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -106,10 +107,13 @@ const SalesInvoiceFormPage: React.FC = () => {
 
   // Lookup states
   const [customer, setCustomer] = useState<Customer | null>(null);
-  const [branches, setBranches] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>(authBranches || []);
   const [warehouses, setWarehouses] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [salesOrders, setSalesOrders] = useState<any[]>([]);
+  const [financialYears, setFinancialYears] = useState<any[]>([]);
+  const [accountingPeriods, setAccountingPeriods] = useState<any[]>([]);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [lookupsLoading, setLookupsLoading] = useState(false);
   const [salesOrderInfo, setSalesOrderInfo] = useState<any | null>(null);
@@ -249,20 +253,71 @@ const SalesInvoiceFormPage: React.FC = () => {
   const loadLookups = async () => {
     setLookupsLoading(true);
     try {
-      const [branchRes, warehouseRes, customerRes, productRes] = await Promise.all([
+      const results = await Promise.allSettled([
         getBranches({ limit: 500, status: "active" }),
         inventoryApi.getWarehouses({ limit: 1000, status: "active" }),
         invoiceCenterApi.getCustomers({ limit: 1000, status: "active" }),
         inventoryApi.getProducts({ limit: 1000, status: "active" }),
+        invoiceCenterApi.getSalesOrders({ limit: 100 }),
+        financeApi.getFinancialYears({ limit: 50 }),
+        financeApi.getAccountingPeriods({ limit: 50 }),
       ]);
 
-      setBranches(listFromResponse(branchRes));
-      setWarehouses(listFromResponse(warehouseRes));
-      setCustomers(listFromResponse(customerRes));
-      setProducts(listFromResponse(productRes));
+      const [branchRes, warehouseRes, customerRes, productRes, soRes, fyRes, apRes] = results;
+
+      let availableBranches: any[] = [];
+      if (branchRes.status === "fulfilled") {
+        availableBranches = listFromResponse(branchRes.value);
+      }
+      if (!availableBranches.length && authBranches && authBranches.length) {
+        availableBranches = authBranches;
+      }
+      setBranches(availableBranches);
+
+      if (warehouseRes.status === "fulfilled") {
+        setWarehouses(listFromResponse(warehouseRes.value));
+      }
+      if (customerRes.status === "fulfilled") {
+        setCustomers(listFromResponse(customerRes.value));
+      }
+      if (productRes.status === "fulfilled") {
+        setProducts(listFromResponse(productRes.value));
+      }
+      if (soRes.status === "fulfilled") {
+        setSalesOrders(listFromResponse(soRes.value));
+      }
+      if (fyRes.status === "fulfilled") {
+        const fyData = listFromResponse(fyRes.value);
+        setFinancialYears(fyData);
+        if (!watch("financial_year_id") && fyData.length > 0) {
+          const currentFy = fyData.find((f: any) => f.is_current || f.is_active || f.status === "active") || fyData[0];
+          if (currentFy?.id) setValue("financial_year_id", String(currentFy.id));
+        }
+      }
+      if (apRes.status === "fulfilled") {
+        const apData = listFromResponse(apRes.value);
+        setAccountingPeriods(apData);
+        if (!watch("accounting_period_id") && apData.length > 0) {
+          const currentAp = apData.find((p: any) => p.is_active || p.status === "open") || apData[0];
+          if (currentAp?.id) setValue("accounting_period_id", String(currentAp.id));
+        }
+      }
+
+      // Auto-populate branch if not already chosen
+      if (!watch("branch_id")) {
+        const defaultBranchId = activeBranch?.id || availableBranches[0]?.id;
+        if (defaultBranchId) {
+          setValue("branch_id", String(defaultBranchId), { shouldValidate: true });
+        }
+      }
     } catch (err) {
-      console.error("Failed to load invoice form dropdowns", err);
-      toast.error("Failed to load form dropdowns.");
+      console.warn("Failed to load invoice form dropdowns", err);
+      if (authBranches && authBranches.length) {
+        setBranches(authBranches);
+        if (!watch("branch_id") && activeBranch?.id) {
+          setValue("branch_id", String(activeBranch.id));
+        }
+      }
     } finally {
       setLookupsLoading(false);
     }
@@ -350,58 +405,58 @@ const SalesInvoiceFormPage: React.FC = () => {
     }
   };
 
-  const loadSalesOrder = async () => {
-    if (!watchedSalesOrderId) return;
+  const loadSalesOrderById = async (soId: string) => {
+    if (!soId || soId === "direct_standalone") {
+      setSalesOrderInfo(null);
+      return;
+    }
     try {
-      const res = await invoiceCenterApi.getSalesOrderById(watchedSalesOrderId);
+      const res = await invoiceCenterApi.getSalesOrderById(soId);
       const so = res.data.data;
 
       if (so.approval_status !== "approved") {
-        toast.error("Selected Sales Order is not approved.");
-        return;
-      }
-
-      if (["cancelled", "closed", "fully_invoiced"].includes(so.order_status)) {
-        toast.error(
-          `Cannot invoice a ${so.order_status.replace("_", " ")} sales order.`
-        );
-        return;
+        toast.warning("Selected Sales Order is not yet marked approved.");
       }
 
       setSalesOrderInfo(so);
 
       if (so.customer_id) {
-        setValue("customer_id", String(so.customer_id));
+        setValue("customer_id", String(so.customer_id), { shouldValidate: true });
+      }
+      if (so.branch_id) {
+        setValue("branch_id", String(so.branch_id), { shouldValidate: true });
+      }
+      if (so.warehouse_id) {
+        setValue("warehouse_id", String(so.warehouse_id), { shouldValidate: true });
       }
 
       if (so.lines && so.lines.length > 0) {
         const linesToLoad = so.lines
-          .filter((l: any) => l.pending_quantity > 0)
+          .filter((l: any) => (l.pending_quantity ?? l.quantity) > 0)
           .map((l: any) => ({
             sales_order_line_id: String(l.id),
             product_id: String(l.product_id),
-            product_batch_id: l.product_batch_id
-              ? String(l.product_batch_id)
-              : "",
-            quantity: l.pending_quantity,
+            product_batch_id: l.product_batch_id ? String(l.product_batch_id) : "",
+            quantity: l.pending_quantity ?? l.quantity,
             unit_price: l.unit_price,
-            discount_amount: l.discount_amount,
-            tax_amount: l.tax_amount,
-            line_remarks: l.line_remarks || "",
+            discount_amount: l.discount_amount || 0,
+            tax_amount: l.tax_amount || 0,
+            line_remarks: l.line_remarks || l.remarks || "",
           }));
 
         if (linesToLoad.length > 0) {
-          setValue("lines", linesToLoad);
-          toast.success(`Loaded ${linesToLoad.length} lines from Sales Order.`);
-        } else {
-          toast.warning("Sales order has no pending lines to invoice.");
+          setValue("lines", linesToLoad, { shouldValidate: true });
+          toast.success(`Loaded ${linesToLoad.length} lines from Sales Order ${so.order_number || soId}`);
         }
       }
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || "Failed to load Sales Order."
-      );
+      toast.error(err?.response?.data?.message || "Failed to load Sales Order.");
     }
+  };
+
+  const loadSalesOrder = async () => {
+    if (!watchedSalesOrderId) return;
+    await loadSalesOrderById(watchedSalesOrderId);
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -822,33 +877,57 @@ const SalesInvoiceFormPage: React.FC = () => {
             </Card>
 
             <Card className="rounded-xl border-slate-200 bg-white shadow-sm">
-              <CardHeader className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
+              <CardHeader className="flex flex-col gap-1 border-b border-slate-100 pb-4">
                 <CardTitle className="text-lg font-semibold text-[#111827]">
                   Sales Order Link
                 </CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={loadSalesOrder}
-                    disabled={!watchedSalesOrderId}
-                  >
-                    <Check className="mr-2 h-4 w-4" /> Verify Order
-                  </Button>
-                </div>
+                <p className="text-xs text-gray-500">
+                  Select an approved sales order to auto-load customer and items, or create a direct invoice.
+                </p>
               </CardHeader>
-              <CardContent className="pt-5">
+              <CardContent className="pt-5 space-y-3">
                 <div className="space-y-2">
-                  <Label htmlFor="sales_order_id">Sales Order ID</Label>
-                  <Input
-                    id="sales_order_id"
-                    {...register("sales_order_id")}
-                    placeholder="Link to existing Sales Order..."
-                  />
-                  <p className="text-xs text-gray-500">
-                    If this invoice fulfills an existing sales order, enter the
-                    ID and click Verify to load lines automatically.
+                  <Label htmlFor="sales_order_id" className="flex items-center justify-between text-xs font-semibold text-slate-700">
+                    <span>Sales Order (Optional)</span>
+                    {watchedSalesOrderId && (
+                      <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                        ✓ Order Linked
+                      </span>
+                    )}
+                  </Label>
+                  <Select
+                    value={watch("sales_order_id") || "direct_standalone"}
+                    onValueChange={(val) => {
+                      if (val === "direct_standalone") {
+                        setValue("sales_order_id", "", { shouldDirty: true, shouldValidate: true });
+                        setSalesOrderInfo(null);
+                      } else {
+                        setValue("sales_order_id", val, { shouldDirty: true, shouldValidate: true });
+                        loadSalesOrderById(val);
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="sales_order_id" className="h-9">
+                      <SelectValue placeholder="Standalone Direct Invoice (No Sales Order)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="direct_standalone">
+                        Standalone Direct Invoice (No Sales Order)
+                      </SelectItem>
+                      {salesOrders.map((so) => {
+                        const soId = String(so.id || so.sales_order_id);
+                        return (
+                          <SelectItem key={soId} value={soId}>
+                            {so.order_number || `SO-${soId}`} — {so.customer?.customer_name || so.customer_name || "Customer"} ({so.approval_status || "approved"})
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[11px] text-gray-500">
+                    {watch("sales_order_id")
+                      ? "Order lines have been retrieved. You can adjust line items below if needed."
+                      : "Direct Sale: You can freely add items and batches directly below without linking an order."}
                   </p>
                 </div>
               </CardContent>
@@ -882,27 +961,67 @@ const SalesInvoiceFormPage: React.FC = () => {
             <Card className="rounded-xl border-slate-200 bg-white shadow-sm">
               <CardHeader className="border-b border-slate-100 pb-4">
                 <CardTitle className="text-lg font-semibold text-[#111827]">
-                  Accounting
+                  Accounting Period
                 </CardTitle>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  General ledger allocation & fiscal period
+                </p>
               </CardHeader>
               <CardContent className="space-y-4 pt-5">
                 <div className="space-y-2">
-                  <Label htmlFor="financial_year_id">Financial Year</Label>
-                  <Input
-                    id="financial_year_id"
-                    {...register("financial_year_id")}
-                    placeholder="Optional ID"
-                  />
+                  <Label htmlFor="financial_year_id" className="text-xs font-semibold text-slate-700">
+                    Financial Year
+                  </Label>
+                  {financialYears.length > 0 ? (
+                    <Select
+                      value={watch("financial_year_id") || (financialYears[0]?.id ? String(financialYears[0].id) : "")}
+                      onValueChange={(val) => setValue("financial_year_id", val, { shouldDirty: true })}
+                    >
+                      <SelectTrigger id="financial_year_id" className="h-9">
+                        <SelectValue placeholder="Select Financial Year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {financialYears.map((fy) => (
+                          <SelectItem key={fy.id} value={String(fy.id)}>
+                            {fy.year_name || `FY ${new Date(fy.start_date || "").getFullYear()}`} {fy.is_current ? "(Current)" : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 font-medium flex items-center justify-between">
+                      <span>FY {new Date(watch("invoice_date") || new Date()).getFullYear()}/{new Date(watch("invoice_date") || new Date()).getFullYear() + 1}</span>
+                      <span className="text-[10px] text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Auto Active</span>
+                    </div>
+                  )}
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="accounting_period_id">
+                  <Label htmlFor="accounting_period_id" className="text-xs font-semibold text-slate-700">
                     Accounting Period
                   </Label>
-                  <Input
-                    id="accounting_period_id"
-                    {...register("accounting_period_id")}
-                    placeholder="Optional ID"
-                  />
+                  {accountingPeriods.length > 0 ? (
+                    <Select
+                      value={watch("accounting_period_id") || (accountingPeriods[0]?.id ? String(accountingPeriods[0].id) : "")}
+                      onValueChange={(val) => setValue("accounting_period_id", val, { shouldDirty: true })}
+                    >
+                      <SelectTrigger id="accounting_period_id" className="h-9">
+                        <SelectValue placeholder="Select Accounting Period" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accountingPeriods.map((ap) => (
+                          <SelectItem key={ap.id} value={String(ap.id)}>
+                            {ap.period_name || `Period ${ap.period_number || ap.id}`} ({ap.status || "open"})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 font-medium flex items-center justify-between">
+                      <span>Period {new Date(watch("invoice_date") || new Date()).getMonth() + 1} ({new Date(watch("invoice_date") || new Date()).toLocaleString('default', { month: 'short' })})</span>
+                      <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Open</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

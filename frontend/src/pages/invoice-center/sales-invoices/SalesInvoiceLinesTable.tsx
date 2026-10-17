@@ -118,7 +118,7 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
               <TableHead className="w-[100px] text-right">Discount</TableHead>
               <TableHead className="w-[100px] text-right">Tax</TableHead>
               <TableHead className="w-[120px] text-right">Total</TableHead>
-              <TableHead className="w-[150px]">Remarks</TableHead>
+              <TableHead className="min-w-[240px]">Item Description & Remarks</TableHead>
               <TableHead className="w-16"></TableHead>
             </TableRow>
           </TableHeader>
@@ -221,9 +221,9 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
                   </TableCell>
                   <TableCell>
                     <Textarea
-                      rows={1}
-                      className="min-h-0 resize-none py-2"
-                      placeholder="Remarks..."
+                      rows={2}
+                      className="min-h-[48px] w-full resize-y rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs leading-relaxed focus:border-indigo-500"
+                      placeholder="Enter item description or remarks..."
                       {...register(`lines.${index}.line_remarks`)}
                     />
                   </TableCell>
@@ -376,10 +376,11 @@ export const SalesInvoiceLinesTable: React.FC<Props> = ({
                    placeholder="0.00" />
                 </div>
                 <div className="space-y-1 sm:col-span-2">
-                  <Label>Remarks</Label>
+                  <Label>Item Description & Remarks</Label>
                   <Textarea
                     rows={2}
-                    placeholder="Remarks..."
+                    className="min-h-[50px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs leading-relaxed focus:border-indigo-500"
+                    placeholder="Enter item description or remarks..."
                     {...register(`lines.${index}.line_remarks`)}
                   />
                 </div>
