@@ -59,11 +59,14 @@ func (r *CompanyResolver) ResolveCompanyDB(companyCode string) (*gorm.DB, *model
 	}
 
 	// 2. Validate company status to show explicit messages
-	if company.Status == "suspended" {
-		return nil, nil, errors.New("Company account is suspended. Please contact support.")
+	if company.Status == "suspended" || company.SubscriptionStatus == "suspended" {
+		return nil, nil, errors.New("Company account has been locked by Platform Administration. Please contact support.")
+	}
+	if company.LicenseEndDate != nil && time.Now().After(*company.LicenseEndDate) {
+		return nil, nil, fmt.Errorf("Company subscription license expired on %s. Please contact Platform Administration to renew.", company.LicenseEndDate.Format("2006-01-02"))
 	}
 	if company.Status == "expired" || company.SubscriptionStatus == "expired" {
-		return nil, nil, errors.New("Company license has expired. Please contact billing.")
+		return nil, nil, errors.New("Company subscription license has expired. Please contact billing.")
 	}
 	if company.Status == "cancelled" || company.SubscriptionStatus == "cancelled" {
 		return nil, nil, errors.New("Company account is inactive. Please contact support.")

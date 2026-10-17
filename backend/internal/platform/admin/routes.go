@@ -32,6 +32,7 @@ func SetupRoutes(router *gin.RouterGroup, platformDB *gorm.DB, logger *zap.Logge
 		adminGroup.PUT("/companies/:id", updateCompany(platformDB))
 		adminGroup.POST("/companies/:id/suspend", suspendCompany(platformDB))
 		adminGroup.POST("/companies/:id/activate", activateCompany(platformDB))
+		adminGroup.POST("/companies/:id/extend-license", extendCompanyLicense(platformDB))
 
 		// Company Databases catalog overview
 		adminGroup.GET("/company-databases", listCompanyDatabases(platformDB))
@@ -73,6 +74,8 @@ func SetupRoutes(router *gin.RouterGroup, platformDB *gorm.DB, logger *zap.Logge
 		// Support tickets
 		adminGroup.GET("/support/tickets", listSupportTickets(platformDB))
 		adminGroup.POST("/support/tickets", createSupportTicket(platformDB))
+		adminGroup.PUT("/support/tickets/:id/status", updateTicketStatus(platformDB))
+		adminGroup.PUT("/support/tickets/:id", updateTicketStatus(platformDB))
 		adminGroup.GET("/support/tickets/:id/messages", listSupportMessages(platformDB))
 		adminGroup.POST("/support/tickets/:id/messages", sendSupportMessage(platformDB))
 
@@ -335,6 +338,58 @@ func activateCompany(db *gorm.DB) gin.HandlerFunc {
 		})
 
 		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Company activated successfully", "status": "active"})
+	}
+}
+
+func extendCompanyLicense(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var company models.TenantCompany
+		if err := db.First(&company, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Company not found"})
+			return
+		}
+
+		var req struct {
+			Days int `json:"days"`
+		}
+		if err := c.ShouldBindJSON(&req); err != nil || req.Days <= 0 {
+			req.Days = 30
+		}
+
+		baseTime := time.Now()
+		if company.LicenseEndDate != nil && company.LicenseEndDate.After(baseTime) {
+			baseTime = *company.LicenseEndDate
+		}
+		newExpiry := baseTime.AddDate(0, 0, req.Days)
+
+		db.Model(&company).Updates(map[string]interface{}{
+			"license_end_date":    newExpiry,
+			"status":              "active",
+			"subscription_status": "active",
+		})
+		db.Model(&models.TenantCompanySubscription{}).Where("tenant_company_id = ?", company.ID).Updates(map[string]interface{}{
+			"end_date": newExpiry,
+			"status":   "active",
+		})
+
+		adminIDVal, _ := c.Get("platformAdminID")
+		adminID, _ := adminIDVal.(uint)
+
+		db.Create(&models.PlatformAuditLog{
+			UserID:     adminID,
+			Action:     "company.license_extend",
+			TargetType: "tenant_companies",
+			TargetID:   fmt.Sprintf("%d", company.ID),
+			Details:    fmt.Sprintf("Extended license for %s by %d days to %s", company.CompanyName, req.Days, newExpiry.Format("2006-01-02")),
+			CreatedAt:  time.Now(),
+		})
+
+		c.JSON(http.StatusOK, gin.H{
+			"success":          true,
+			"message":          fmt.Sprintf("License extended by %d days until %s", req.Days, newExpiry.Format("2006-01-02")),
+			"license_end_date": newExpiry,
+			"status":           "active",
+		})
 	}
 }
 
@@ -663,31 +718,122 @@ func updateBackupSettings(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+type SupportTicketDetail struct {
+	models.SupportTicket
+	CompanyName string `json:"company_name"`
+	CompanyCode string `json:"company_code"`
+}
+
 func listSupportTickets(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var list []models.SupportTicket
-		db.Order("id DESC").Find(&list)
+		var list []SupportTicketDetail
+		db.Table("support_tickets").
+			Select("support_tickets.*, tenant_companies.company_name, tenant_companies.company_code").
+			Joins("LEFT JOIN tenant_companies ON support_tickets.tenant_company_id = tenant_companies.id").
+			Order("support_tickets.id DESC").
+			Scan(&list)
 		c.JSON(http.StatusOK, gin.H{"success": true, "data": list})
 	}
 }
 
 func createSupportTicket(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var req models.SupportTicket
+		var req struct {
+			TenantCompanyID uint   `json:"tenant_company_id"`
+			Subject         string `json:"subject"`
+			Description     string `json:"description"`
+			Priority        string `json:"priority"`
+		}
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
 
-		req.TicketNumber = "TKT-" + strconv.FormatInt(time.Now().Unix(), 10)
-		req.Status = "open"
+		if req.Priority == "" {
+			req.Priority = "medium"
+		}
 
-		if err := db.Create(&req).Error; err != nil {
+		ticket := models.SupportTicket{
+			TenantCompanyID: req.TenantCompanyID,
+			TicketNumber:    "TKT-" + strconv.FormatInt(time.Now().Unix(), 10),
+			Subject:         req.Subject,
+			Description:     req.Description,
+			Priority:        req.Priority,
+			Status:          "open",
+			CreatedAt:       time.Now(),
+			UpdatedAt:       time.Now(),
+		}
+
+		if err := db.Create(&ticket).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"success": true, "data": req})
+		if req.Description != "" {
+			adminIDVal, _ := c.Get("platformAdminID")
+			adminID, _ := adminIDVal.(uint)
+			db.Create(&models.SupportTicketMessage{
+				SupportTicketID: ticket.ID,
+				SenderType:      "platform_admin",
+				SenderID:        adminID,
+				MessageText:     req.Description,
+				CreatedAt:       time.Now(),
+				UpdatedAt:       time.Now(),
+			})
+		}
+
+		c.JSON(http.StatusCreated, gin.H{"success": true, "data": ticket})
+	}
+}
+
+func updateTicketStatus(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ticketID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ticket ID"})
+			return
+		}
+
+		var req struct {
+			Status   string `json:"status"`
+			Priority string `json:"priority"`
+		}
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+
+		updates := map[string]interface{}{
+			"updated_at": time.Now(),
+		}
+		if req.Status != "" {
+			updates["status"] = req.Status
+		}
+		if req.Priority != "" {
+			updates["priority"] = req.Priority
+		}
+
+		if err := db.Model(&models.SupportTicket{}).Where("id = ?", ticketID).Updates(updates).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
+
+		var updated models.SupportTicket
+		db.First(&updated, ticketID)
+
+		adminIDVal, _ := c.Get("platformAdminID")
+		adminID, _ := adminIDVal.(uint)
+
+		db.Create(&models.PlatformAuditLog{
+			UserID:     adminID,
+			Action:     "ticket.status_update",
+			TargetType: "support_tickets",
+			TargetID:   fmt.Sprintf("%d", ticketID),
+			Details:    fmt.Sprintf("Updated ticket %s status to %s", updated.TicketNumber, updated.Status),
+			CreatedAt:  time.Now(),
+		})
+
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": updated})
 	}
 }
 

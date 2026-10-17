@@ -222,63 +222,212 @@ export const SubscriptionPlanFormPage = () => {
 // 3. CompanyLicensesPage
 export const CompanyLicensesPage = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [subRes, compRes] = await Promise.all([
+        getPlatformSubscriptions(),
+        getPlatformCompanies(),
+      ]);
+      setSubscriptions(subRes.data || []);
+      setCompanies(compRes.data || []);
+    } catch (err) {
+      toast.error("Failed to load active licenses");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadSubs = async () => {
-      try {
-        setLoading(true);
-        const res = await getPlatformSubscriptions();
-        if (res.success) {
-          setSubscriptions(res.data || []);
-        }
-      } catch (err) {
-        toast.error("Failed to load active licenses");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadSubs();
+    loadData();
   }, []);
+
+  const companyMap = new Map(companies.map((c) => [c.id, c]));
+
+  const handleToggleLock = async (companyId: number, currentStatus: string) => {
+    try {
+      if (currentStatus === "suspended") {
+        await activatePlatformCompany(companyId);
+        toast.success("License activated & tenant access unlocked");
+      } else {
+        await suspendPlatformCompany(companyId);
+        toast.warning("License suspended & tenant access clocked/locked");
+      }
+      loadData();
+    } catch (err) {
+      toast.error("Failed to toggle license status");
+    }
+  };
+
+  const handleExtend = async (companyId: number, days: number) => {
+    try {
+      const res = await extendPlatformCompanyLicense(companyId, days);
+      if (res.success) {
+        toast.success(res.message || `License extended by ${days} days`);
+        loadData();
+      }
+    } catch (err) {
+      toast.error("Failed to extend license");
+    }
+  };
+
+  const enrichedSubs = subscriptions.map((sub) => {
+    const comp = companyMap.get(sub.tenant_company_id);
+    const endDate = sub.end_date || comp?.license_end_date;
+    let daysRemaining = 365;
+    if (endDate) {
+      daysRemaining = Math.ceil(
+        (new Date(endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      );
+    }
+    const isLocked = sub.status === "suspended" || comp?.status === "suspended";
+    return {
+      ...sub,
+      company: comp,
+      endDate,
+      daysRemaining,
+      isLocked,
+    };
+  });
+
+  const filteredSubs = enrichedSubs.filter((sub) => {
+    if (filter === "active") return !sub.isLocked && sub.daysRemaining > 30;
+    if (filter === "expiring") return !sub.isLocked && sub.daysRemaining <= 30 && sub.daysRemaining > 0;
+    if (filter === "expired") return sub.daysRemaining <= 0 || sub.isLocked;
+    return true;
+  });
 
   return (
     <div className="space-y-6 font-sans">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-white">Active License Agreements</h2>
-        <p className="text-sm text-slate-400">Validate subscription status logs, start times, and upcoming expiry terms.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            <span>Active License Agreements</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              {subscriptions.length} Licenses
+            </span>
+          </h2>
+          <p className="text-sm text-slate-400 mt-1">
+            Subscription terms, expiration clocks, grace period monitoring, and one-click tenant clocking.
+          </p>
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex gap-2 border-b border-slate-800 pb-2">
+        {[
+          { id: "all", label: "All Agreements" },
+          { id: "active", label: "Active (>30d)" },
+          { id: "expiring", label: "Expiring Soon (≤30d)" },
+          { id: "expired", label: "Expired / Clocked" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setFilter(tab.id)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
+              filter === tab.id
+                ? "bg-slate-800 text-white shadow-sm"
+                : "text-slate-500 hover:text-slate-300 hover:bg-slate-900/50"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {loading ? (
         <div className="text-slate-500 text-center py-8">Fetching active contracts...</div>
-      ) : subscriptions.length === 0 ? (
-        <div className="text-slate-500 text-center py-8">No licenses active currently.</div>
+      ) : filteredSubs.length === 0 ? (
+        <div className="text-slate-500 text-center py-8">No licenses match current filter.</div>
       ) : (
-        <div className="overflow-x-auto bg-slate-950/20 rounded-xl border border-slate-800">
+        <div className="overflow-x-auto bg-slate-950/20 rounded-2xl border border-slate-800 shadow-md">
           <table className="w-full text-left text-sm text-slate-400">
             <thead>
               <tr className="border-b border-slate-800 text-slate-500 font-semibold text-xs uppercase tracking-wider bg-slate-950/40 p-4">
-                <th className="p-4">Subscription Number</th>
-                <th className="p-4">Tenant Company ID</th>
+                <th className="p-4">Subscription #</th>
+                <th className="p-4">Tenant Company</th>
                 <th className="p-4">Billing Cycle</th>
                 <th className="p-4">SaaS Price (LKR)</th>
-                <th className="p-4">Expiry Date</th>
-                <th className="p-4">Renewal Status</th>
+                <th className="p-4">Expiration Clock</th>
+                <th className="p-4">Status</th>
+                <th className="p-4 text-right">Clocking & Extension</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-850">
-              {subscriptions.map((sub) => (
-                <tr key={sub.id} className="hover:bg-slate-900/10">
-                  <td className="p-4 font-mono font-bold text-white text-xs">{sub.subscription_number}</td>
-                  <td className="p-4 text-slate-200">Company ID: {sub.tenant_company_id}</td>
+              {filteredSubs.map((sub) => (
+                <tr key={sub.id} className="hover:bg-slate-900/20 transition-colors">
+                  <td className="p-4 font-mono font-bold text-white text-xs">
+                    {sub.subscription_number}
+                  </td>
+                  <td className="p-4 text-slate-200">
+                    <span className="font-bold text-white block">
+                      {sub.company?.company_name || `Company ID: ${sub.tenant_company_id}`}
+                    </span>
+                    {sub.company?.company_code && (
+                      <span className="text-[10px] text-indigo-400 font-mono">
+                        Code: {sub.company.company_code}
+                      </span>
+                    )}
+                  </td>
                   <td className="p-4 uppercase text-xs">{sub.billing_cycle}</td>
-                  <td className="p-4">{sub.price.toLocaleString()} LKR</td>
-                  <td className="p-4 text-xs font-semibold text-indigo-400">
-                    {sub.end_date ? new Date(sub.end_date).toLocaleDateString() : "N/A"}
+                  <td className="p-4 font-semibold text-slate-200">
+                    {sub.price ? Number(sub.price).toLocaleString() : "0"} LKR
                   </td>
                   <td className="p-4">
-                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      {sub.status}
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        sub.isLocked
+                          ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                          : sub.daysRemaining <= 0
+                          ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                          : sub.daysRemaining <= 30
+                          ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                          : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      }`}
+                    >
+                      {sub.isLocked
+                        ? "Clocked / Locked"
+                        : sub.daysRemaining <= 0
+                        ? "Expired"
+                        : `${sub.daysRemaining}d left`}
                     </span>
+                    <span className="block text-[10px] text-slate-500 font-mono mt-0.5">
+                      {sub.endDate ? new Date(sub.endDate).toLocaleDateString() : "N/A"}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <span
+                      className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                        sub.isLocked
+                          ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                          : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      }`}
+                    >
+                      {sub.isLocked ? "Suspended" : sub.status}
+                    </span>
+                  </td>
+                  <td className="p-4 text-right space-x-2">
+                    <button
+                      onClick={() => handleExtend(sub.tenant_company_id, 30)}
+                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                      title="Extend 30 Days"
+                    >
+                      +30d
+                    </button>
+                    <button
+                      onClick={() => handleToggleLock(sub.tenant_company_id, sub.status)}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${
+                        sub.isLocked
+                          ? "bg-emerald-950/40 text-emerald-400 border-emerald-500/30 hover:bg-emerald-900/50"
+                          : "bg-rose-950/40 text-rose-400 border-rose-500/30 hover:bg-rose-900/50"
+                      }`}
+                    >
+                      {sub.isLocked ? "Unlock" : "Clock/Lock"}
+                    </button>
                   </td>
                 </tr>
               ))}

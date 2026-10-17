@@ -1166,10 +1166,18 @@ const AppRoutes = () => {
                   path="subscriptions/licenses"
                   element={<CompanyLicensesPage />}
                 />
+                <Route
+                  path="subscriptions/company-licenses"
+                  element={<Navigate to="/platform-admin/subscriptions/licenses" replace />}
+                />
 
                 <Route
                   path="billing/invoices"
                   element={<SubscriptionInvoicesPage />}
+                />
+                <Route
+                  path="subscriptions/invoices"
+                  element={<Navigate to="/platform-admin/billing/invoices" replace />}
                 />
                 <Route
                   path="billing/payments"
@@ -1212,6 +1220,18 @@ const AppRoutes = () => {
                 <Route
                   path="support/tickets"
                   element={<SupportTicketsPage />}
+                />
+                <Route
+                  path="support-tickets"
+                  element={<Navigate to="/platform-admin/support/tickets" replace />}
+                />
+                <Route
+                  path="support"
+                  element={<Navigate to="/platform-admin/support/tickets" replace />}
+                />
+                <Route
+                  path="tickets"
+                  element={<Navigate to="/platform-admin/support/tickets" replace />}
                 />
                 <Route
                   path="documentation"
