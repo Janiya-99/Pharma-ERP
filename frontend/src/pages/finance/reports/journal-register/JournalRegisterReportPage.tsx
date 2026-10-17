@@ -13,6 +13,7 @@ import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import StatusBadge from '../../../../components/common/StatusBadge';
+import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 
 const JournalRegisterReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
@@ -41,7 +42,14 @@ const JournalRegisterReportPage = () => {
         financeApi.getFinancialYears({ limit: 100 }),
         financeApi.getAccountingPeriods({ limit: 100 })
       ]);
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
+      if (fyRes.data?.success) {
+        const years = fyRes.data.data || [];
+        setFinancialYears(years);
+        const activeYr = years.find((y: any) => y.is_active) || years[0];
+        if (activeYr && !filters.financial_year_id) {
+          setFilters((prev: any) => ({ ...prev, financial_year_id: activeYr.id.toString() }));
+        }
+      }
       if (apRes.data?.success) setAccountingPeriods(apRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -107,7 +115,12 @@ const JournalRegisterReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!hasPermission("finance.report.journal_register.view")) {
+  if (
+    !hasPermission("finance.report.journal_register.view") &&
+    !hasPermission("finance.report.view") &&
+    !hasPermission("finance.reports.view") &&
+    !hasPermission("admin")
+  ) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -170,6 +183,13 @@ const JournalRegisterReportPage = () => {
         description="Log of all manual journal entries with their approval and posting status." 
       />
 
+      <FinanceAiPromptBar
+        contextType="journal_register"
+        pageTitle="Journal Register"
+        dataSnapshot={data}
+        className="mb-6"
+      />
+
       <ReportFilterCard 
         onApply={handleApplyFilters} 
         onClear={handleClearFilters}
@@ -178,14 +198,14 @@ const JournalRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Financial Year</Label>
           <Select 
-            value={filters.financial_year_id} 
-            onValueChange={(val: any) => handleFilterChange('financial_year_id', val)}
+            value={filters.financial_year_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('financial_year_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Years" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Years</SelectItem>
+              <SelectItem value="all">All Years</SelectItem>
               {(financialYears || []).map((fy: any) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
@@ -196,14 +216,14 @@ const JournalRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Accounting Period</Label>
           <Select 
-            value={filters.accounting_period_id} 
-            onValueChange={(val: any) => handleFilterChange('accounting_period_id', val)}
+            value={filters.accounting_period_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('accounting_period_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Periods" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Periods</SelectItem>
+              <SelectItem value="all">All Periods</SelectItem>
               {(accountingPeriods || []).map((ap: any) => (
                 <SelectItem key={ap.id} value={ap.id.toString()}>{ap.period_name}</SelectItem>
               ))}
@@ -214,14 +234,14 @@ const JournalRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Approval Status</Label>
           <Select 
-            value={filters.approval_status} 
-            onValueChange={(val: any) => handleFilterChange('approval_status', val)}
+            value={filters.approval_status || "all"} 
+            onValueChange={(val: any) => handleFilterChange('approval_status', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
@@ -232,14 +252,14 @@ const JournalRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Posted Status</Label>
           <Select 
-            value={filters.posted_status} 
-            onValueChange={(val: any) => handleFilterChange('posted_status', val)}
+            value={filters.posted_status || "all"} 
+            onValueChange={(val: any) => handleFilterChange('posted_status', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="unposted">Unposted</SelectItem>
               <SelectItem value="posted">Posted</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>

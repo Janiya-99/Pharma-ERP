@@ -14,6 +14,7 @@ import { Button } from '../../../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import RebuildLedgerModal from './RebuildLedgerModal';
+import { FinanceAiPromptBar } from '../shared/FinanceAiPromptBar';
 
 const SOURCE_TYPES = [
   'opening_balance',
@@ -59,9 +60,16 @@ const GeneralLedgerPage = () => {
         financeApi.getAccountingPeriods({ limit: 100 }),
         financeApi.getChartOfAccounts({ limit: 500, status: 'active' })
       ]);
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data);
-      if (apRes.data?.success) setAccountingPeriods(apRes.data.data);
-      if (accRes.data?.success) setAccounts(accRes.data.data);
+      if (fyRes.data?.success) {
+        const years = fyRes.data.data || [];
+        setFinancialYears(years);
+        const activeYr = years.find((y: any) => y.is_active) || years[0];
+        if (activeYr && !filters.financial_year_id) {
+          setFilters((prev: any) => ({ ...prev, financial_year_id: activeYr.id.toString() }));
+        }
+      }
+      if (apRes.data?.success) setAccountingPeriods(apRes.data.data || []);
+      if (accRes.data?.success) setAccounts(accRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -177,7 +185,13 @@ const GeneralLedgerPage = () => {
     }
   ];
 
-  if (!hasPermission("finance.general_ledger.view")) {
+  if (
+    !hasPermission("finance.general_ledger.view") &&
+    !hasPermission("finance.ledger.view") &&
+    !hasPermission("finance.report.view") &&
+    !hasPermission("finance.reports.view") &&
+    !hasPermission("admin")
+  ) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -208,6 +222,13 @@ const GeneralLedgerPage = () => {
         )}
       </div>
 
+      <FinanceAiPromptBar
+        contextType="general_ledger"
+        pageTitle="General Ledger"
+        dataSnapshot={data}
+        className="mb-6"
+      />
+
       <ReportFilterCard 
         onApply={handleApplyFilters} 
         onClear={handleClearFilters}
@@ -216,15 +237,15 @@ const GeneralLedgerPage = () => {
         <div className="space-y-2">
           <Label>Financial Year</Label>
           <Select 
-            value={filters.financial_year_id} 
-            onValueChange={(val: unknown) => handleFilterChange('financial_year_id', val)}
+            value={filters.financial_year_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('financial_year_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Years" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Years</SelectItem>
-              {financialYears.map((fy: unknown) => (
+              <SelectItem value="all">All Years</SelectItem>
+              {financialYears.map((fy: any) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -234,15 +255,15 @@ const GeneralLedgerPage = () => {
         <div className="space-y-2">
           <Label>Accounting Period</Label>
           <Select 
-            value={filters.accounting_period_id} 
-            onValueChange={(val: unknown) => handleFilterChange('accounting_period_id', val)}
+            value={filters.accounting_period_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('accounting_period_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Periods" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Periods</SelectItem>
-              {accountingPeriods.map((ap: unknown) => (
+              <SelectItem value="all">All Periods</SelectItem>
+              {accountingPeriods.map((ap: any) => (
                 <SelectItem key={ap.id} value={ap.id.toString()}>{ap.period_name}</SelectItem>
               ))}
             </SelectContent>
@@ -252,15 +273,15 @@ const GeneralLedgerPage = () => {
         <div className="space-y-2">
           <Label>Account</Label>
           <Select 
-            value={filters.account_id} 
-            onValueChange={(val: unknown) => handleFilterChange('account_id', val)}
+            value={filters.account_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('account_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Accounts" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Accounts</SelectItem>
-              {accounts.map((acc: unknown) => (
+              <SelectItem value="all">All Accounts</SelectItem>
+              {accounts.map((acc: any) => (
                 <SelectItem key={acc.id} value={acc.id.toString()}>{acc.account_code} - {acc.account_name}</SelectItem>
               ))}
             </SelectContent>
@@ -270,16 +291,16 @@ const GeneralLedgerPage = () => {
         <div className="space-y-2">
           <Label>Source Type</Label>
           <Select 
-            value={filters.source_type} 
-            onValueChange={(val: unknown) => handleFilterChange('source_type', val)}
+            value={filters.source_type || "all"} 
+            onValueChange={(val: any) => handleFilterChange('source_type', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
-              {SOURCE_TYPES.map((type: unknown) => (
-                <SelectItem key={type} value={type}>{type.split('_').map((w: unknown) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
+              {SOURCE_TYPES.map((type: any) => (
+                <SelectItem key={type} value={type}>{type.split('_').map((w: any) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</SelectItem>
               ))}
             </SelectContent>
           </Select>

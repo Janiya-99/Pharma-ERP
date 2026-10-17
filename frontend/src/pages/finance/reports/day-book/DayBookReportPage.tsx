@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../../../../auth/AuthContext';
 import { financeApi } from '../../../../api/financeApi';
 import { toast } from 'react-hot-toast';
@@ -12,6 +12,7 @@ import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
+import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 
 const SOURCE_TYPES = [
   'opening_balance',
@@ -29,7 +30,7 @@ const SOURCE_TYPES = [
 const DayBookReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
   
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -48,7 +49,7 @@ const DayBookReportPage = () => {
     setLoading(true);
     try {
       const params = { ...filters };
-      Object.keys(params).forEach((key: unknown) => {
+      Object.keys(params).forEach((key: any) => {
         if (params[key] === "") delete params[key];
       });
 
@@ -56,7 +57,7 @@ const DayBookReportPage = () => {
       if (response.data?.success) {
         setData(response.data.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to fetch day book report");
       setData(null);
     } finally {
@@ -64,8 +65,12 @@ const DayBookReportPage = () => {
     }
   }, [filters]);
 
-  const handleFilterChange = (key: unknown, value: unknown) => {
-    setFilters((prev: unknown) => ({ ...prev, [key]: value }));
+  useEffect(() => {
+    fetchReport();
+  }, [activeBranch]);
+
+  const handleFilterChange = (key: any, value: any) => {
+    setFilters((prev: any) => ({ ...prev, [key]: value }));
   };
 
   const handleApplyFilters = () => {
@@ -93,7 +98,12 @@ const DayBookReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!hasPermission("finance.report.day_book.view")) {
+  if (
+    !hasPermission("finance.report.day_book.view") &&
+    !hasPermission("finance.report.view") &&
+    !hasPermission("finance.reports.view") &&
+    !hasPermission("admin")
+  ) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -108,6 +118,13 @@ const DayBookReportPage = () => {
       <ReportPageHeader 
         title="Day Book" 
         description="Chronological daily summary of all accounting transactions." 
+      />
+
+      <FinanceAiPromptBar
+        contextType="day_book"
+        pageTitle="Day Book Report"
+        dataSnapshot={data}
+        className="mb-6"
       />
 
       <ReportFilterCard 
@@ -136,16 +153,16 @@ const DayBookReportPage = () => {
         <div className="space-y-2">
           <Label>Source Type</Label>
           <Select 
-            value={filters.source_type} 
-            onValueChange={(val: unknown) => handleFilterChange('source_type', val)}
+            value={filters.source_type || "all"} 
+            onValueChange={(val: any) => handleFilterChange('source_type', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
-              {SOURCE_TYPES.map((type: unknown) => (
-                <SelectItem key={type} value={type}>{type.split('_').map((w: unknown) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
+              {SOURCE_TYPES.map((type: any) => (
+                <SelectItem key={type} value={type}>{type.split('_').map((w: any) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</SelectItem>
               ))}
             </SelectContent>
           </Select>

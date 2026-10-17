@@ -41,6 +41,7 @@ import {
 } from "../../../components/ui/table";
 import ERPConfirmDialog from "../../../components/erp/ERPConfirmDialog";
 import { DataTableToolbar } from "../shared/DataTableToolbar";
+import { FinanceAiPromptBar } from "../shared/FinanceAiPromptBar";
 
 type ApiRecord = Record<string, any>;
 
@@ -339,6 +340,13 @@ const ChartOfAccountsPage = () => {
           Create Account
         </Button>
       </div>
+      
+      <FinanceAiPromptBar
+        contextType="chart_of_accounts"
+        pageTitle="Chart of Accounts"
+        dataSnapshot={accounts}
+        className="mb-6"
+      />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
         <Card className="border border-slate-200 bg-white shadow-sm">

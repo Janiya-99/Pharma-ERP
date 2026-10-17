@@ -13,6 +13,7 @@ import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import StatusBadge from '../../../../components/common/StatusBadge';
+import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 
 const ReceiptRegisterReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
@@ -43,7 +44,14 @@ const ReceiptRegisterReportPage = () => {
         financeApi.getFinancialYears({ limit: 100 }),
         financeApi.getAccountingPeriods({ limit: 100 })
       ]);
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
+      if (fyRes.data?.success) {
+        const years = fyRes.data.data || [];
+        setFinancialYears(years);
+        const activeYr = years.find((y: any) => y.is_active) || years[0];
+        if (activeYr && !filters.financial_year_id) {
+          setFilters((prev: any) => ({ ...prev, financial_year_id: activeYr.id.toString() }));
+        }
+      }
       if (apRes.data?.success) setAccountingPeriods(apRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -111,7 +119,12 @@ const ReceiptRegisterReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!hasPermission("finance.report.receipt_register.view")) {
+  if (
+    !hasPermission("finance.report.receipt_register.view") &&
+    !hasPermission("finance.report.view") &&
+    !hasPermission("finance.reports.view") &&
+    !hasPermission("admin")
+  ) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -125,12 +138,12 @@ const ReceiptRegisterReportPage = () => {
     {
       header: "Receipt No",
       accessor: "receipt_number",
-      cell: (row: unknown) => <div className="font-medium text-navy-800 ">{row.receipt_number}</div>
+      cell: (row: any) => <div className="font-medium text-navy-800 ">{row.receipt_number}</div>
     },
     {
       header: "Date",
       accessor: "receipt_date",
-      cell: (row: unknown) => format(new Date(row.receipt_date), 'yyyy-MM-dd')
+      cell: (row: any) => format(new Date(row.receipt_date), 'yyyy-MM-dd')
     },
     {
       header: "Ref No",
@@ -139,27 +152,27 @@ const ReceiptRegisterReportPage = () => {
     {
       header: "Type",
       accessor: "receipt_type",
-      cell: (row: unknown) => (row.receipt_type || '').split('_').map((w: unknown) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      cell: (row: any) => (row.receipt_type || '').split('_').map((w: any) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
     },
     {
       header: "Received From",
       accessor: "received_from",
-      cell: (row: unknown) => <div className="max-w-[150px] truncate" title={row.received_from}>{row.received_from || '-'}</div>
+      cell: (row: any) => <div className="max-w-[150px] truncate" title={row.received_from}>{row.received_from || '-'}</div>
     },
     {
       header: <div className="text-right">Total Amount</div>,
       accessor: "total_amount",
-      cell: (row: unknown) => <ReportAmountCell amount={row.total_amount} />
+      cell: (row: any) => <ReportAmountCell amount={row.total_amount} />
     },
     {
       header: "Approval Status",
       accessor: "approval_status",
-      cell: (row: unknown) => <StatusBadge status={row.approval_status} />
+      cell: (row: any) => <StatusBadge status={row.approval_status} />
     },
     {
       header: "Posted Status",
       accessor: "posted_status",
-      cell: (row: unknown) => <StatusBadge status={row.posted_status} />
+      cell: (row: any) => <StatusBadge status={row.posted_status} />
     },
     {
       header: "Created By",
@@ -174,6 +187,13 @@ const ReceiptRegisterReportPage = () => {
         description="Log of all receipt vouchers with their approval and posting status." 
       />
 
+      <FinanceAiPromptBar
+        contextType="receipt_register"
+        pageTitle="Receipt Register"
+        dataSnapshot={data}
+        className="mb-6"
+      />
+
       <ReportFilterCard 
         onApply={handleApplyFilters} 
         onClear={handleClearFilters}
@@ -182,15 +202,15 @@ const ReceiptRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Financial Year</Label>
           <Select 
-            value={filters.financial_year_id} 
-            onValueChange={(val: unknown) => handleFilterChange('financial_year_id', val)}
+            value={filters.financial_year_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('financial_year_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Years" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Years</SelectItem>
-              {(financialYears || []).map((fy: unknown) => (
+              <SelectItem value="all">All Years</SelectItem>
+              {(financialYears || []).map((fy: any) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -200,15 +220,15 @@ const ReceiptRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Accounting Period</Label>
           <Select 
-            value={filters.accounting_period_id} 
-            onValueChange={(val: unknown) => handleFilterChange('accounting_period_id', val)}
+            value={filters.accounting_period_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('accounting_period_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Periods" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Periods</SelectItem>
-              {(accountingPeriods || []).map((ap: unknown) => (
+              <SelectItem value="all">All Periods</SelectItem>
+              {(accountingPeriods || []).map((ap: any) => (
                 <SelectItem key={ap.id} value={ap.id.toString()}>{ap.period_name}</SelectItem>
               ))}
             </SelectContent>
@@ -218,14 +238,14 @@ const ReceiptRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Receipt Method</Label>
           <Select 
-            value={filters.receipt_method} 
-            onValueChange={(val: unknown) => handleFilterChange('receipt_method', val)}
+            value={filters.receipt_method || "all"} 
+            onValueChange={(val: any) => handleFilterChange('receipt_method', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Methods" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Methods</SelectItem>
+              <SelectItem value="all">All Methods</SelectItem>
               <SelectItem value="cash">Cash</SelectItem>
               <SelectItem value="bank">Bank Transfer</SelectItem>
               <SelectItem value="cheque">Cheque</SelectItem>
@@ -237,14 +257,14 @@ const ReceiptRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Receipt Type</Label>
           <Select 
-            value={filters.receipt_type} 
-            onValueChange={(val: unknown) => handleFilterChange('receipt_type', val)}
+            value={filters.receipt_type || "all"} 
+            onValueChange={(val: any) => handleFilterChange('receipt_type', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="customer_receipt">Customer Receipt</SelectItem>
               <SelectItem value="other_income">Other Income</SelectItem>
               <SelectItem value="loan_receipt">Loan Receipt</SelectItem>
@@ -256,14 +276,14 @@ const ReceiptRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Approval Status</Label>
           <Select 
-            value={filters.approval_status} 
-            onValueChange={(val: unknown) => handleFilterChange('approval_status', val)}
+            value={filters.approval_status || "all"} 
+            onValueChange={(val: any) => handleFilterChange('approval_status', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
@@ -274,14 +294,14 @@ const ReceiptRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Posted Status</Label>
           <Select 
-            value={filters.posted_status} 
-            onValueChange={(val: unknown) => handleFilterChange('posted_status', val)}
+            value={filters.posted_status || "all"} 
+            onValueChange={(val: any) => handleFilterChange('posted_status', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="unposted">Unposted</SelectItem>
               <SelectItem value="posted">Posted</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>

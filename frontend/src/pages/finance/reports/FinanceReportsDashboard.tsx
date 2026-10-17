@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../../../c
 import { Button } from '../../../components/ui/button';
 import { BookOpen, PieChart, FileText, ArrowRight, Activity, TrendingUp, TrendingDown, Clock, Archive, DollarSign, Wallet } from 'lucide-react';
 import ReportPageHeader from '../../../components/finance/reports/ReportPageHeader';
+import { FinanceAiPromptBar } from '../shared/FinanceAiPromptBar';
 
 const FinanceReportsDashboard = () => {
   const navigate = useNavigate();
@@ -83,7 +84,13 @@ const FinanceReportsDashboard = () => {
   ];
 
   // Filter cards based on user permissions
-  const visibleCards = reportCards.filter((card: unknown) => hasPermission(card.permission));
+  const visibleCards = reportCards.filter(
+    (card: any) =>
+      hasPermission(card.permission) ||
+      hasPermission("finance.report.view") ||
+      hasPermission("finance.reports.view") ||
+      hasPermission("admin")
+  );
 
   return (
     <div className="p-6">
@@ -91,6 +98,12 @@ const FinanceReportsDashboard = () => {
         title="Finance Reports" 
         description="Access and analyze all financial reporting and accounting registers." 
         backTo={null}
+      />
+
+      <FinanceAiPromptBar
+        contextType="reports_dashboard"
+        pageTitle="Finance Reports Dashboard"
+        className="mb-6"
       />
 
       {visibleCards.length === 0 ? (

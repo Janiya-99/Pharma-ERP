@@ -13,18 +13,19 @@ import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
+import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 
 const ProfitLossReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
   
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   // Filter State
-  const [financialYears, setFinancialYears] = useState([]);
-  const [branches, setBranches] = useState([]);
+  const [financialYears, setFinancialYears] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<any>({
     financial_year_id: "",
     date_from: "",
     date_to: "",
@@ -32,19 +33,25 @@ const ProfitLossReportPage = () => {
   });
 
   const fetchReport = useCallback(async (customFilters?: Record<string, unknown>) => {
+    const activeFilters: any = customFilters || filters;
+    const params: Record<string, unknown> = { ...activeFilters };
+    Object.keys(params).forEach((key: string) => {
+      if (params[key] === "" || params[key] === undefined || params[key] === null) {
+        delete params[key];
+      }
+    });
+
+    if (!params.financial_year_id && financialYears.length > 0) {
+      const activeFy: any = financialYears.find((f: any) => f.is_active || f.is_current || f.status === 'active') || financialYears[0];
+      if (activeFy) params.financial_year_id = String(activeFy.id);
+    }
+
+    if (!params.financial_year_id) {
+      return;
+    }
+
     setLoading(true);
     try {
-      const activeFilters = customFilters || filters;
-      const params: Record<string, unknown> = { ...activeFilters };
-      Object.keys(params).forEach((key: string) => {
-        if (params[key] === "") delete params[key];
-      });
-
-      if (!params.financial_year_id && financialYears.length > 0) {
-        const activeFy: any = financialYears.find((f: any) => f.is_active || f.is_current) || financialYears[0];
-        if (activeFy) params.financial_year_id = String(activeFy.id);
-      }
-
       const response = await financeApi.getProfitLossReport(params);
       if (response.data?.success) {
         setData(response.data.data);
@@ -63,12 +70,12 @@ const ProfitLossReportPage = () => {
         financeApi.getFinancialYears({ limit: 100 }),
         getBranches({ limit: 100, status: "active" })
       ]);
-      const fyList = fyRes.data?.success ? (fyRes.data.data || []) : [];
+      const fyList = Array.isArray(fyRes.data?.data) ? fyRes.data.data : Array.isArray(fyRes.data) ? fyRes.data : [];
       setFinancialYears(fyList);
       const bList = branchRes.data?.data?.items || branchRes.data?.data || branchRes.data || [];
       if (Array.isArray(bList)) setBranches(bList);
 
-      const activeFy: any = fyList.find((f: any) => f.is_active || f.is_current) || fyList[0];
+      const activeFy: any = fyList.find((f: any) => f.is_active || f.is_current || f.status === 'active') || fyList[0];
       if (activeFy) {
         const initial = {
           financial_year_id: String(activeFy.id),
@@ -90,7 +97,7 @@ const ProfitLossReportPage = () => {
   }, [activeBranch]);
 
   const handleFilterChange = (key: unknown, value: unknown) => {
-    setFilters((prev: unknown) => ({ ...prev, [key]: value }));
+    setFilters((prev: any) => ({ ...prev, [key as string]: value }));
   };
 
   const handleApplyFilters = () => {
@@ -98,13 +105,19 @@ const ProfitLossReportPage = () => {
   };
 
   const handleClearFilters = () => {
-    setFilters({
-      financial_year_id: "",
+    const activeFy: any = financialYears.find((f: any) => f.is_active || f.is_current || f.status === 'active') || financialYears[0];
+    const initial = {
+      financial_year_id: activeFy ? String(activeFy.id) : "",
       date_from: "",
       date_to: "",
-      branch_id: activeBranch?.id || ""
-    });
-    setData(null);
+      branch_id: activeBranch?.id ? String(activeBranch.id) : ""
+    };
+    setFilters(initial);
+    if (initial.financial_year_id) {
+      fetchReport(initial);
+    } else {
+      setData(null);
+    }
   };
 
   const handleExportJson = () => {
@@ -118,32 +131,37 @@ const ProfitLossReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!hasPermission("finance.report.profit_loss.view")) {
+  const canView =
+    hasPermission("finance.report.profit_loss.view") ||
+    hasPermission("finance.report.view") ||
+    hasPermission("finance.reports.view");
+
+  if (!canView) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
-        <p className="text-gray-500 ">You do not have permission to view the Profit and Loss report.</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h2>
+        <p className="text-gray-500">You do not have permission to view the Profit and Loss report.</p>
       </div>
     );
   }
 
-  const renderSectionLines = (lines: unknown) => {
+  const renderSectionLines = (lines: any) => {
     if (!lines || lines.length === 0) {
-      return <div className="px-4 py-3 text-sm text-gray-500  italic text-center">No accounts found in this section.</div>;
+      return <div className="px-4 py-3 text-xs text-slate-500 italic text-center">No accounts found in this section.</div>;
     }
 
     return (
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-slate-100">
         {lines.map((line: any, idx: number) => {
           const lineBal = line.balance !== undefined ? line.balance : (line.closing_credit || line.closing_debit || 0);
           return (
-            <div key={line.account_id || line.account_code || idx} className="flex justify-between items-center px-4 py-2 hover:bg-gray-50 transition-colors">
+            <div key={line.account_id || line.account_code || idx} className="flex justify-between items-center px-4 py-2 hover:bg-slate-50 transition-colors">
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-slate-800">{line.account_code}</span>
-                <span className="text-xs text-slate-500">{line.account_name}</span>
+                <span className="text-xs font-semibold text-slate-800">{line.account_code}</span>
+                <span className="text-[11px] text-slate-500">{line.account_name}</span>
               </div>
-              <div className="text-sm font-medium">
+              <div className="text-xs font-medium">
                 <ReportAmountCell amount={lineBal} />
               </div>
             </div>
@@ -154,10 +172,17 @@ const ProfitLossReportPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 max-w-5xl mx-auto space-y-6">
       <ReportPageHeader 
         title="Profit and Loss" 
-        description="Financial performance summary showing revenues, costs, and expenses over a period." 
+        description="Multi-step income statement showing operating revenues, cost of sales, overheads, and net profit." 
+      />
+
+      {/* AI Copilot Prompting Bar */}
+      <FinanceAiPromptBar
+        contextType="profit_loss"
+        pageTitle="Profit and Loss"
+        dataSnapshot={data}
       />
 
       <ReportFilterCard 
@@ -184,17 +209,16 @@ const ProfitLossReportPage = () => {
         </div>
 
         <div className="space-y-2">
-          <Label>Financial Year</Label>
+          <Label>Financial Year <span className="text-red-500">*</span></Label>
           <Select 
             value={filters.financial_year_id} 
-            onValueChange={(val: unknown) => handleFilterChange('financial_year_id', val)}
+            onValueChange={(val: string) => handleFilterChange('financial_year_id', val)}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="All Years" />
+            <SelectTrigger className={!filters.financial_year_id ? "border-red-300" : ""}>
+              <SelectValue placeholder="Select Financial Year" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Years</SelectItem>
-              {(financialYears || []).map((fy: unknown) => (
+              {(financialYears || []).map((fy: any) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -245,7 +269,8 @@ const ProfitLossReportPage = () => {
             type="date" 
             value={filters.date_from}
             onChange={(e: any) => handleFilterChange('date_from', e.target.value)}
-            placeholder="Enter value" />
+            placeholder="Enter value" 
+          />
         </div>
 
         <div className="space-y-2">
@@ -254,7 +279,8 @@ const ProfitLossReportPage = () => {
             type="date" 
             value={filters.date_to}
             onChange={(e: any) => handleFilterChange('date_to', e.target.value)}
-            placeholder="Enter value" />
+            placeholder="Enter value" 
+          />
         </div>
       </ReportFilterCard>
 
@@ -264,16 +290,16 @@ const ProfitLossReportPage = () => {
         const netProfit = data.net_profit !== undefined ? data.net_profit : (data.net_profit_loss !== undefined ? data.net_profit_loss : (totalIncome - totalExpense));
 
         return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="flex justify-between items-end mb-6">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+          <div className="flex justify-between items-end">
             <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
-            <div className="mb-4">
+            <div>
                <ProfitLossBadge amount={netProfit} />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 mb-8">
-            <h2 className="text-2xl font-bold text-center text-slate-800 mb-6">Income Statement</h2>
+          <div className="bg-white rounded-2xl shadow-xs border border-slate-200/90 p-6">
+            <h2 className="text-xl font-bold text-center text-slate-800 mb-6">Income Statement</h2>
             
             {/* Income Sections */}
             <ReportSection title="Revenue" totalLabel="Total Revenue" totalAmount={data.revenue?.total}>
@@ -284,15 +310,15 @@ const ProfitLossReportPage = () => {
               {renderSectionLines(data.other_income?.lines)}
             </ReportSection>
 
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex justify-between items-center mb-8 shadow-xs">
-              <span className="font-bold text-emerald-800">Total Income</span>
-              <span className="font-bold text-emerald-800">
+            <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl px-4 py-3 flex justify-between items-center mb-6 shadow-2xs">
+              <span className="font-bold text-emerald-900 text-sm">Total Income</span>
+              <span className="font-bold text-emerald-900 text-sm">
                 <ReportAmountCell amount={totalIncome} />
               </span>
             </div>
 
             {/* Expense Sections */}
-            <ReportSection title="Direct Expenses" totalLabel="Total Direct Expenses" totalAmount={data.direct_expenses?.total}>
+            <ReportSection title="Direct Expenses (COGS)" totalLabel="Total Direct Expenses" totalAmount={data.direct_expenses?.total}>
               {renderSectionLines(data.direct_expenses?.lines)}
             </ReportSection>
 
@@ -300,36 +326,36 @@ const ProfitLossReportPage = () => {
               {renderSectionLines(data.administrative_expenses?.lines)}
             </ReportSection>
 
-            <ReportSection title="Selling Expenses" totalLabel="Total Selling Expenses" totalAmount={data.selling_expenses?.total}>
+            <ReportSection title="Selling & Distribution Expenses" totalLabel="Total Selling Expenses" totalAmount={data.selling_expenses?.total}>
               {renderSectionLines(data.selling_expenses?.lines)}
             </ReportSection>
 
-            <ReportSection title="Finance Expenses" totalLabel="Total Finance Expenses" totalAmount={data.finance_expenses?.total}>
+            <ReportSection title="Finance Charges" totalLabel="Total Finance Expenses" totalAmount={data.finance_expenses?.total}>
               {renderSectionLines(data.finance_expenses?.lines)}
             </ReportSection>
 
-            <div className="bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 flex justify-between items-center mb-8 shadow-xs">
-              <span className="font-bold text-rose-800">Total Expenses</span>
-              <span className="font-bold text-rose-800">
+            <div className="bg-rose-50/80 border border-rose-200 rounded-xl px-4 py-3 flex justify-between items-center mb-6 shadow-2xs">
+              <span className="font-bold text-rose-900 text-sm">Total Expenses</span>
+              <span className="font-bold text-rose-900 text-sm">
                 <ReportAmountCell amount={totalExpense} />
               </span>
             </div>
 
-            {/* Net Profit */}
-            <div className={`rounded-xl px-6 py-4 flex justify-between items-center border-2 shadow-xs ${
+            {/* Net Profit Summary */}
+            <div className={`rounded-xl px-6 py-4 flex justify-between items-center border shadow-xs ${
               netProfit > 0 
                 ? "bg-emerald-50 border-emerald-300" 
                 : netProfit < 0 
                   ? "bg-rose-50 border-rose-300"
                   : "bg-slate-50 border-slate-300"
             }`}>
-              <span className={`text-xl font-bold ${
-                netProfit > 0 ? "text-emerald-800" : netProfit < 0 ? "text-rose-800" : "text-slate-800"
+              <span className={`text-base font-bold ${
+                netProfit > 0 ? "text-emerald-900" : netProfit < 0 ? "text-rose-900" : "text-slate-800"
               }`}>
                 Net {netProfit > 0 ? "Profit" : netProfit < 0 ? "Loss" : "Profit/Loss"}
               </span>
-              <span className={`text-2xl font-bold ${
-                netProfit > 0 ? "text-emerald-800" : netProfit < 0 ? "text-rose-800" : "text-slate-800"
+              <span className={`text-xl font-bold ${
+                netProfit > 0 ? "text-emerald-900" : netProfit < 0 ? "text-rose-900" : "text-slate-800"
               }`}>
                 <ReportAmountCell amount={netProfit} />
               </span>
@@ -341,11 +367,11 @@ const ProfitLossReportPage = () => {
       })()}
       
       {!data && !loading && (
-        <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
-          <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 ">Run Report</h3>
-          <p className="mt-2 text-sm text-gray-500 ">
-            Click Apply Filters to view the profit and loss statement.
+        <div className="bg-white rounded-xl shadow-xs p-8 text-center border border-slate-200">
+          <AlertCircle className="mx-auto h-12 w-12 text-slate-400" />
+          <h3 className="mt-4 text-lg font-medium text-slate-900">Run Report</h3>
+          <p className="mt-2 text-sm text-slate-500">
+            Select a financial year and click Apply Filters to generate the profit and loss statement.
           </p>
         </div>
       )}

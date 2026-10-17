@@ -10,6 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { DataTableToolbar } from "../shared/DataTableToolbar";
+import { FinanceAiPromptBar } from "../shared/FinanceAiPromptBar";
 import { useAuth } from "../../../auth/AuthContext";
 import { financeApi } from "../../../api/financeApi";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
@@ -302,6 +303,14 @@ const AccountGroupsPage = () => {
           </p>
         </div>
       </div>
+
+      <FinanceAiPromptBar
+        contextType="account_groups"
+        pageTitle="Account Groups"
+        dataSnapshot={groups}
+        className="mb-6"
+      />
+
       <Card className="border-slate-200 border bg-white shadow-sm overflow-hidden">
         <DataTableToolbar
           searchQuery={filters.search}
