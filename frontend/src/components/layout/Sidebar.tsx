@@ -62,15 +62,34 @@ type MenuItem = {
 const Sidebar = () => {
   const { activeSoftware, user, company, activeBranch, hasPermission } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isPinned, setIsPinned] = useState(false);
+  const [isPinned, setIsPinned] = useState(() => {
+    try {
+      return localStorage.getItem("erp_sidebar_pinned") !== "false";
+    } catch {
+      return true;
+    }
+  });
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const effectiveExpanded = isExpanded || isPinned;
   const location = useLocation();
   const { mobileOpen, setMobileOpen, setDesktopExpanded } = useSidebarState();
 
   React.useEffect(() => {
-    setDesktopExpanded(effectiveExpanded);
-  }, [effectiveExpanded, setDesktopExpanded]);
+    // Only update main grid layout when user explicitly pins/unpins!
+    // This completely eliminates hover lag and page stutter.
+    setDesktopExpanded(isPinned);
+  }, [isPinned, setDesktopExpanded]);
+
+  const handleTogglePin = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsPinned((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("erp_sidebar_pinned", String(next));
+      } catch {}
+      return next;
+    });
+  };
 
 
   const financeMenus: MenuItem[] = [
@@ -850,9 +869,13 @@ const Sidebar = () => {
               </button>
             ) : (
               <button
-                onClick={() => setIsPinned(!isPinned)}
-                className="rounded-lg p-1.5 text-[#6B7280] transition-colors hover:bg-slate-100/80 hover:text-[#002137]"
-                title={isPinned ? "Unpin sidebar" : "Pin sidebar"}
+                onClick={handleTogglePin}
+                className={`rounded-lg p-1.5 transition-colors cursor-pointer ${
+                  isPinned
+                    ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                    : "text-[#6B7280] hover:bg-slate-100 hover:text-[#002137]"
+                }`}
+                title={isPinned ? "Unpin sidebar (auto-collapse)" : "Pin sidebar open"}
               >
                 {isPinned ? (
                   <PinOff className="h-4 w-4" />
@@ -953,17 +976,21 @@ const Sidebar = () => {
     <>
       {/* ── Desktop Sidebar (hidden on mobile) ── */}
       <div
-        className={`ease-[cubic-bezier(0.4,0,0.2,1)] relative z-30 hidden h-full shrink-0 transition-all duration-300 lg:block ${
-          effectiveExpanded ? "w-[260px]" : "w-[72px]"
+        className={`relative z-30 hidden h-full shrink-0 transition-[width] duration-200 ease-out lg:block ${
+          isPinned ? "w-[260px]" : "w-[72px]"
         }`}
-        onMouseEnter={() => setIsExpanded(true)}
+        onMouseEnter={() => {
+          if (!isPinned) setIsExpanded(true);
+        }}
         onMouseLeave={() => {
           if (!isPinned) setIsExpanded(false);
         }}
       >
         <div
-          className={`ease-[cubic-bezier(0.4,0,0.2,1)] fixed bottom-0 left-0 top-0 z-30 flex flex-col overflow-hidden border-r border-slate-200 bg-white shadow-xl shadow-slate-200/40 transition-all duration-300 ${
-            effectiveExpanded ? "w-[260px]" : "w-[72px]"
+          className={`fixed bottom-0 left-0 top-0 z-30 flex flex-col overflow-hidden border-r border-slate-200/80 bg-white transition-[width] duration-200 ease-out will-change-[width] ${
+            effectiveExpanded
+              ? "w-[260px] shadow-xl shadow-slate-900/10"
+              : "w-[72px] shadow-xs"
           }`}
         >
           {sidebarContent(false)}

@@ -13,18 +13,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
+import InlineAiFormPrompt from "../../../components/common/InlineAiFormPrompt";
+import { Sparkles } from "lucide-react";
 
 interface Address {
   id: number;
-  address_title: string;
+  address_title?: string;
   address_type: string;
-  street_address: string;
+  street_address?: string;
+  address_line_1?: string;
+  address_line_2?: string;
   city: string;
   state_province?: string;
+  district?: string;
+  province?: string;
   postal_code?: string;
   country: string;
-  is_default_billing: boolean;
-  is_default_shipping: boolean;
+  is_default?: boolean;
+  is_default_billing?: boolean;
+  is_default_shipping?: boolean;
+  status?: string;
 }
 
 interface CustomerAddressModalProps {
@@ -53,21 +61,22 @@ const CustomerAddressModal: React.FC<CustomerAddressModalProps> = ({
     is_default_billing: false,
     is_default_shipping: false,
   });
+  const [showAiPrompt, setShowAiPrompt] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (address) {
       setFormData({
-        address_title: address.address_title || "",
+        address_title: address.address_title || address.address_type || "",
         address_type: address.address_type || "shipping",
-        street_address: address.street_address || "",
+        street_address: address.street_address || address.address_line_1 || "",
         city: address.city || "",
-        state_province: address.state_province || "",
+        state_province: address.state_province || address.province || address.district || "",
         postal_code: address.postal_code || "",
         country: address.country || "Sri Lanka",
-        is_default_billing: Boolean(address.is_default_billing),
-        is_default_shipping: Boolean(address.is_default_shipping),
+        is_default_billing: Boolean(address.is_default_billing || address.is_default),
+        is_default_shipping: Boolean(address.is_default_shipping || address.is_default),
       });
     } else {
       setFormData({
@@ -90,26 +99,43 @@ const CustomerAddressModal: React.FC<CustomerAddressModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
-      !formData.address_title.trim() ||
       !formData.street_address.trim() ||
       !formData.city.trim()
     ) {
-      setError("Title, Street Address, and City are required.");
+      setError("Street Address and City are required.");
       return;
     }
 
     setLoading(true);
     setError(null);
 
+    const payload = {
+      address_title: formData.address_title || `${formData.city} ${formData.address_type}`,
+      address_type: formData.address_type,
+      address_line_1: formData.street_address,
+      address_line_2: "",
+      street_address: formData.street_address,
+      city: formData.city,
+      state_province: formData.state_province,
+      district: formData.state_province,
+      province: formData.state_province,
+      postal_code: formData.postal_code,
+      country: formData.country || "Sri Lanka",
+      is_default: formData.is_default_billing || formData.is_default_shipping,
+      is_default_billing: formData.is_default_billing,
+      is_default_shipping: formData.is_default_shipping,
+      status: address?.status || "active",
+    };
+
     try {
       if (address?.id) {
         await invoiceCenterApi.updateCustomerAddress(
           customerId,
           address.id,
-          formData
+          payload
         );
       } else {
-        await invoiceCenterApi.createCustomerAddress(customerId, formData);
+        await invoiceCenterApi.createCustomerAddress(customerId, payload);
       }
       onSuccess();
       onClose();
@@ -125,15 +151,61 @@ const CustomerAddressModal: React.FC<CustomerAddressModalProps> = ({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
-        className="w-[calc(100vw-1rem)] overflow-y-auto rounded-l-xl border-slate-200 bg-white p-0 shadow-2xl sm:max-w-xl"
+        className="w-full sm:w-[min(96vw,840px)] lg:w-[56vw] max-w-[880px] overflow-y-auto rounded-l-2xl border-slate-200 bg-white p-0 shadow-2xl"
       >
-        <SheetHeader className="border-b border-gray-100 bg-gray-50 px-6 py-5  ">
-          <SheetTitle className="text-lg font-bold text-navy-900 ">
-            {address ? "Edit Address" : "Add New Address"}
-          </SheetTitle>
+        <SheetHeader className="border-b border-gray-100 bg-gray-50/80 px-6 py-5">
+          <div className="flex items-center justify-between">
+            <SheetTitle className="text-lg font-bold text-navy-900">
+              {address ? "Edit Customer Address" : "Add Customer Address"}
+            </SheetTitle>
+            <button
+              type="button"
+              onClick={() => setShowAiPrompt((prev) => !prev)}
+              className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all ${
+                showAiPrompt
+                  ? "border-purple-300 bg-purple-50 text-purple-700 shadow-xs"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-purple-200 hover:bg-purple-50/50"
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5 text-purple-600" />
+              <span>AI Auto-Fill</span>
+            </button>
+          </div>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 p-6">
+        <form onSubmit={handleSubmit} className="space-y-5 p-6">
+          <InlineAiFormPrompt
+            formContext="Customer Shipping / Billing Address"
+            isOpen={showAiPrompt}
+            onClose={() => setShowAiPrompt(false)}
+            onApplyFields={(parsed) => {
+              setFormData((prev) => ({
+                ...prev,
+                address_title: (parsed.address_title as string) || prev.address_title,
+                address_type: (parsed.address_type as string) || prev.address_type,
+                street_address: (parsed.street_address as string) || (parsed.address_line_1 as string) || prev.street_address,
+                city: (parsed.city as string) || prev.city,
+                state_province: (parsed.state_province as string) || (parsed.province as string) || prev.state_province,
+                postal_code: (parsed.postal_code as string) || prev.postal_code,
+                country: (parsed.country as string) || prev.country,
+              }));
+            }}
+            fieldHints={[
+              { name: "address_title", label: "Address Title", type: "string" },
+              { name: "address_type", label: "Address Type (shipping, billing, office, warehouse)", type: "string" },
+              { name: "street_address", label: "Street Address", type: "string" },
+              { name: "city", label: "City", type: "string" },
+              { name: "state_province", label: "Province / District", type: "string" },
+              { name: "postal_code", label: "Postal Code", type: "string" },
+              { name: "country", label: "Country", type: "string" },
+            ]}
+            presetPrompts={[
+              "Paste full delivery address: No 45/A, Galle Road, Colombo 03, Western Province, 00300",
+              "Main Central Warehouse, Kandy Road, Kadawatha, Gampaha District",
+              "Head Office Billing Address, Level 14, World Trade Center, Echelon Square, Colombo 01",
+            ]}
+          />
+
           {error && (
             <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-600">
               {error}

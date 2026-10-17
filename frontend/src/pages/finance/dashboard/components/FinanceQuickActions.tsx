@@ -32,7 +32,7 @@ export const FinanceQuickActions: React.FC = () => {
     {
       label: "Create Invoice",
       icon: FilePlus,
-      path: "/invoice-center/invoices/new",
+      path: "/invoice-center/sales-invoices/create",
       iconColor: "text-blue-600 bg-blue-50 border-blue-100",
     },
     {

@@ -892,6 +892,26 @@ const AppRoutes = () => {
             element={<SalesInvoiceFormPage />}
           />
           <Route
+            path="/invoice-center/invoices/new"
+            element={<Navigate to="/invoice-center/sales-invoices/create" replace />}
+          />
+          <Route
+            path="/invoice-center/invoices/create"
+            element={<Navigate to="/invoice-center/sales-invoices/create" replace />}
+          />
+          <Route
+            path="/invoice-center/sales-invoices/new"
+            element={<Navigate to="/invoice-center/sales-invoices/create" replace />}
+          />
+          <Route
+            path="/invoice-center/invoices"
+            element={<Navigate to="/invoice-center/sales-invoices" replace />}
+          />
+          <Route
+            path="/invoice-center/invoices/:id"
+            element={<Navigate to="/invoice-center/sales-invoices" replace />}
+          />
+          <Route
             path="/invoice-center/proforma-invoices"
             element={<ProformaInvoicesPage />}
           />

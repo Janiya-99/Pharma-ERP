@@ -7,7 +7,7 @@ import {
 } from "../../../components/invoice-center";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save, AlertCircle, Sparkles } from "lucide-react";
-import { AiAutoFillModal } from "../../../components/common/AiAutoFillModal";
+import { InlineAiFormPrompt } from "../../../components/common/InlineAiFormPrompt";
 import {
   Select,
   SelectContent,
@@ -52,7 +52,7 @@ const CustomerFormPage: React.FC = () => {
   const [fetching, setFetching] = useState(isEdit);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [showAiPrompt, setShowAiPrompt] = useState(false);
 
   const handleAiApply = (aiData: any) => {
     setFormData((prev) => ({
@@ -268,13 +268,13 @@ const CustomerFormPage: React.FC = () => {
   }
 
   return (
-    <div className="page-content mx-auto flex w-full max-w-6xl flex-col gap-4 pb-12">
+    <div className="page-content mx-auto flex w-full max-w-6xl flex-col gap-4 pb-6">
       {/* Header */}
       <div className="sticky top-14 z-30 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="rounded-lg border border-slate-200 bg-white p-2 text-[#334155] transition-colors hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 bg-white p-2 text-[#334155] transition-colors hover:bg-slate-50 cursor-pointer"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -294,11 +294,15 @@ const CustomerFormPage: React.FC = () => {
           {!isEdit && (
             <button
               type="button"
-              onClick={() => setIsAiModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:from-purple-700 hover:to-indigo-700 transition-all shadow-indigo-100"
+              onClick={() => setShowAiPrompt((prev) => !prev)}
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                showAiPrompt
+                  ? "bg-purple-700 text-white shadow-purple-500/30 ring-2 ring-purple-400/50"
+                  : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm hover:from-purple-700 hover:to-indigo-700"
+              }`}
             >
               <Sparkles className="h-4 w-4 text-amber-300 animate-pulse" />
-              <span>✨ AI Auto-Fill</span>
+              <span>{showAiPrompt ? "AI Prompt Open" : "✨ AI Auto-Fill"}</span>
             </button>
           )}
           {isEdit && (
@@ -314,6 +318,15 @@ const CustomerFormPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {showAiPrompt && !isEdit && (
+        <InlineAiFormPrompt
+          formType="customer"
+          title="Customer Registration"
+          onApply={handleAiApply}
+          onClose={() => setShowAiPrompt(false)}
+        />
+      )}
 
       {error && (
         <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
@@ -695,14 +708,6 @@ const CustomerFormPage: React.FC = () => {
           </button>
         </div>
       </form>
-
-      <AiAutoFillModal
-        isOpen={isAiModalOpen}
-        onClose={() => setIsAiModalOpen(false)}
-        formType="customer"
-        title="Gemini AI Customer Registration"
-        onApply={handleAiApply}
-      />
     </div>
   );
 };

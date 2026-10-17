@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Banknote, Download, Edit, Loader2, MoreHorizontal, Plus, Search } from "lucide-react";
+import { Banknote, Download, Edit, Loader2, MoreHorizontal, Plus, Search, Sparkles } from "lucide-react";
+import { InlineAiFormPrompt } from "../../../components/common/InlineAiFormPrompt";
 import { useAuth } from "../../../auth/AuthContext";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches, getUsers } from "../../../api/controlApi";
@@ -116,6 +117,7 @@ const CashAccountsPage = () => {
   const [form, setForm] = useState<CashAccountForm>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState({ search: "", status: "all", branch_id: "all" });
+  const [showDrawerAiPrompt, setShowDrawerAiPrompt] = useState(false);
 
   const fetchAccounts = async () => {
     if (!companyId) {
@@ -421,10 +423,27 @@ const CashAccountsPage = () => {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:max-w-2xl border-l border-slate-200 shadow-2xl">
+        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:w-[min(96vw,1080px)] sm:max-w-[1080px] lg:w-[68vw] lg:max-w-[1120px] xl:w-[64vw] border-l border-slate-200 shadow-2xl">
           <SheetHeader className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 shrink-0">
-            <SheetTitle className="text-xl font-bold text-slate-800">{editingAccount ? "Edit Cash Account" : "Add Cash Account"}</SheetTitle>
-            <SheetDescription>Cash accounts must link to a cash ledger account or request backend auto-create.</SheetDescription>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <SheetTitle className="text-xl font-bold text-slate-800">{editingAccount ? "Edit Cash Account" : "Add Cash Account"}</SheetTitle>
+                <SheetDescription>Cash accounts must link to a cash ledger account or request backend auto-create.</SheetDescription>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDrawerAiPrompt((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold text-xs shadow-md transition-all cursor-pointer shrink-0 ${
+                  showDrawerAiPrompt
+                    ? "bg-purple-700 text-white shadow-purple-500/30 ring-2 ring-purple-400/50"
+                    : "bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]"
+                }`}
+                title="Toggle AI Copilot prompt to auto-fill form"
+              >
+                <Sparkles className="h-3.5 w-3.5 animate-pulse text-amber-300" />
+                <span>{showDrawerAiPrompt ? "AI Prompt Open" : "AI Auto-Fill"}</span>
+              </button>
+            </div>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-6">
             {errors.company_id && (
@@ -434,6 +453,21 @@ const CashAccountsPage = () => {
               </Alert>
             )}
             <form id="cash-account-form" onSubmit={submitForm} className="space-y-6">
+              {showDrawerAiPrompt && (
+                <InlineAiFormPrompt
+                  formType="bank_account"
+                  title="Cash Account"
+                  onApply={(aiData) => {
+                    if (aiData.account_name || aiData.name || aiData.cash_account_name) {
+                      setField("cash_account_name", aiData.cash_account_name || aiData.account_name || aiData.name);
+                    }
+                    if (aiData.branch_id) setField("branch_id", String(aiData.branch_id));
+                    if (aiData.currency_code) setField("currency_code", aiData.currency_code);
+                    if (aiData.opening_balance) setField("opening_balance", String(aiData.opening_balance));
+                  }}
+                  onClose={() => setShowDrawerAiPrompt(false)}
+                />
+              )}
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Field label="Cash Account Name" error={errors.cash_account_name} required>
                 <Input value={form.cash_account_name} onChange={(event) => setField("cash_account_name", event.target.value)}  placeholder="Enter value" />

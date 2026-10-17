@@ -235,7 +235,7 @@ export default function InvoiceCenterDashboard() {
               <span>Refresh</span>
             </button>
             <button 
-              onClick={() => navigate("/invoice-center/invoices/new")}
+              onClick={() => navigate("/invoice-center/sales-invoices/create")}
               className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs px-3.5 py-2.5 shadow-2xs transition-all cursor-pointer"
             >
               <Plus className="h-4 w-4 text-slate-500" />

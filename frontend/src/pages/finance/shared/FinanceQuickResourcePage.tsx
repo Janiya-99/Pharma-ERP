@@ -7,8 +7,10 @@ import {
   MoreHorizontal,
   Plus,
   Search,
+  Sparkles,
   Trash2,
 } from "lucide-react";
+import { InlineAiFormPrompt } from "../../../components/common/InlineAiFormPrompt";
 import { useAuth } from "../../../auth/AuthContext";
 import { financeApi } from "../../../api/financeApi";
 import { getBranches } from "../../../api/controlApi";
@@ -221,6 +223,7 @@ export function FinanceQuickResourcePage({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState({ search: "", status: "all" });
+  const [showDrawerAiPrompt, setShowDrawerAiPrompt] = useState(false);
 
   const tableFields = useMemo(
     () => config.fields.filter((field) => field.table),
@@ -625,18 +628,50 @@ export function FinanceQuickResourcePage({
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:max-w-3xl border-l border-slate-200 shadow-2xl">
+        <SheetContent className="flex w-full flex-col overflow-hidden bg-white p-0 sm:w-[min(96vw,1080px)] sm:max-w-[1080px] lg:w-[68vw] lg:max-w-[1120px] xl:w-[64vw] border-l border-slate-200 shadow-2xl">
           <SheetHeader className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 shrink-0">
-            <SheetTitle className="text-xl font-bold text-slate-800">
-              {editingRow ? `Update ${config.title}` : config.createLabel}
-            </SheetTitle>
-            <SheetDescription>
-              Required fields are marked with an asterisk. JSON fields are
-              sent as structured arrays.
-            </SheetDescription>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <SheetTitle className="text-xl font-bold text-slate-800">
+                  {editingRow ? `Update ${config.title}` : config.createLabel}
+                </SheetTitle>
+                <SheetDescription>
+                  Required fields are marked with an asterisk. JSON fields are
+                  sent as structured arrays.
+                </SheetDescription>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDrawerAiPrompt((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold text-xs shadow-md transition-all cursor-pointer shrink-0 ${
+                  showDrawerAiPrompt
+                    ? "bg-purple-700 text-white shadow-purple-500/30 ring-2 ring-purple-400/50"
+                    : "bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]"
+                }`}
+                title="Toggle AI Copilot prompt to auto-fill form"
+              >
+                <Sparkles className="h-3.5 w-3.5 animate-pulse text-amber-300" />
+                <span>{showDrawerAiPrompt ? "AI Prompt Open" : "AI Auto-Fill"}</span>
+              </button>
+            </div>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <form id="quick-resource-form" onSubmit={handleSubmit} className="space-y-6">
+              {showDrawerAiPrompt && (
+                <InlineAiFormPrompt
+                  formType={config.resourceKey || "account"}
+                  title={config.title}
+                  fields={config.fields.map((f) => ({ key: f.name, name: f.name, label: f.label }))}
+                  onApply={(aiData) => {
+                    Object.keys(aiData).forEach((k) => {
+                      if (config.fields.some((f) => f.name === k) || k in form) {
+                        setField(k, aiData[k]);
+                      }
+                    });
+                  }}
+                  onClose={() => setShowDrawerAiPrompt(false)}
+                />
+              )}
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {config.fields.map((field) => (
                 <div

@@ -14,20 +14,20 @@ func NewProductBatchRepository() *ProductBatchRepository {
 }
 
 func (r *ProductBatchRepository) List(db *gorm.DB, companyID uint64, filters map[string]interface{}, search string, page, limit int) ([]models.ProductBatch, int64, error) {
-	query := db.Where("company_id = ?", companyID)
+	query := db.Model(&models.ProductBatch{}).Where("product_batches.company_id = ?", companyID)
 
 	for k, v := range filters {
 		if v != "" {
 			if k == "is_blocked" {
-				query = query.Where("is_blocked = ?", v)
+				query = query.Where("product_batches.is_blocked = ?", v)
 			} else if k == "expiry_date_from" {
-				query = query.Where("expiry_date >= ?", v)
+				query = query.Where("product_batches.expiry_date >= ?", v)
 			} else if k == "expiry_date_to" {
-				query = query.Where("expiry_date <= ?", v)
+				query = query.Where("product_batches.expiry_date <= ?", v)
 			} else if k == "near_expiry_days" {
-				query = query.Where("expiry_date <= DATE_ADD(NOW(), INTERVAL ? DAY)", v)
+				query = query.Where("product_batches.expiry_date <= DATE_ADD(NOW(), INTERVAL ? DAY)", v)
 			} else {
-				query = query.Where(k+" = ?", v)
+				query = query.Where("product_batches."+k+" = ?", v)
 			}
 		}
 	}
@@ -41,11 +41,21 @@ func (r *ProductBatchRepository) List(db *gorm.DB, companyID uint64, filters map
 	}
 
 	var total int64
-	db.Model(&models.ProductBatch{}).Where("company_id = ?", companyID).Count(&total)
+	// Fast count clone before offset/limit
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
 
 	var batches []models.ProductBatch
 	offset := (page - 1) * limit
-	err := query.Preload("Product.BaseUnit").Preload("Product").Preload("Supplier").Preload("Manufacturer").Offset(offset).Limit(limit).Find(&batches).Error
+	err := query.Order("product_batches.id DESC").
+		Preload("Product.BaseUnit").
+		Preload("Product").
+		Preload("Supplier").
+		Preload("Manufacturer").
+		Offset(offset).
+		Limit(limit).
+		Find(&batches).Error
 	return batches, total, err
 }
 

@@ -56,6 +56,10 @@ func (s *CustomerAddressService) Create(db *gorm.DB, companyID, userID, customer
 	if country == "" {
 		country = "Sri Lanka"
 	}
+	status := req.Status
+	if status == "" {
+		status = "active"
+	}
 	addr := &models.CustomerAddress{
 		CustomerID:   customerID,
 		AddressType:  req.AddressType,
@@ -67,7 +71,7 @@ func (s *CustomerAddressService) Create(db *gorm.DB, companyID, userID, customer
 		PostalCode:   req.PostalCode,
 		Country:      country,
 		IsDefault:    req.IsDefault,
-		Status:       req.Status,
+		Status:       status,
 	}
 
 	if err := s.repo.Create(db, addr); err != nil {
@@ -102,7 +106,11 @@ func (s *CustomerAddressService) Update(db *gorm.DB, companyID, userID, customer
 	addr.PostalCode = req.PostalCode
 	addr.Country = country
 	addr.IsDefault = req.IsDefault
-	addr.Status = req.Status
+	if req.Status != "" {
+		addr.Status = req.Status
+	} else if addr.Status == "" {
+		addr.Status = "active"
+	}
 
 	if err := s.repo.Update(db, addr); err != nil {
 		return nil, err

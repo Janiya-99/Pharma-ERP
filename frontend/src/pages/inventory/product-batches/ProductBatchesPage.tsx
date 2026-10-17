@@ -15,6 +15,7 @@ const ProductBatchesPage = () => {
   const { hasPermission } = useAuth();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [totalRecords, setTotalRecords] = useState(0);
@@ -22,6 +23,16 @@ const ProductBatchesPage = () => {
   const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [unblockModalOpen, setUnblockModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput !== search) {
+        setSearch(searchInput);
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => {
     fetchData();
@@ -36,8 +47,8 @@ const ProductBatchesPage = () => {
         search,
       });
       if (response.data?.success) {
-        setData(response.data.data);
-        setTotalRecords(response.data.pagination.total);
+        setData(response.data.data || []);
+        setTotalRecords(response.data.pagination?.total || 0);
       }
     } catch (error) {
       toast.error("Failed to load batches");
@@ -123,7 +134,7 @@ const ProductBatchesPage = () => {
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input type="text" placeholder="Search..." value={search} onChange={(e: any) => setSearch(e.target.value)} className="pl-9 pr-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 " />
+            <input type="text" placeholder="Search batches, products..." value={searchInput} onChange={(e: any) => setSearchInput(e.target.value)} className="pl-9 pr-4 py-2 border border-gray-200  rounded-xl text-sm focus:ring-2 focus:ring-brand-500 bg-white  text-gray-700 " />
           </div>
           <PermissionGuard permission="inventory.product_batch.create">
             <button onClick={() => navigate("/inventory/product-batches/create")} className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors shadow-sm text-sm font-medium">
