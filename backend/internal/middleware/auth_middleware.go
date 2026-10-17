@@ -37,7 +37,7 @@ func CompanyAuthMiddleware(resolver *database.CompanyResolver) gin.HandlerFunc {
 		// Resolve the company database
 		db, _, err := resolver.ResolveCompanyDB(claims.CompanyCode)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized - Invalid company"})
+			c.JSON(http.StatusForbidden, gin.H{"message": err.Error(), "code": "SUBSCRIPTION_LOCKED"})
 			c.Abort()
 			return
 		}

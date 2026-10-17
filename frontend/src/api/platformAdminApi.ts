@@ -215,6 +215,24 @@ export const getPlatformSupportTickets = async () => {
   return res.data;
 };
 
+export const createPlatformSupportTicket = async (data: {
+  tenant_company_id: number;
+  subject: string;
+  description: string;
+  priority?: string;
+}) => {
+  const res = await platformAdminClient.post("/support/tickets", data);
+  return res.data;
+};
+
+export const updatePlatformSupportTicketStatus = async (
+  id: any,
+  data: { status?: string; priority?: string }
+) => {
+  const res = await platformAdminClient.put(`/support/tickets/${id}/status`, data);
+  return res.data;
+};
+
 export const getPlatformTicketMessages = async (id: any) => {
   const res = await platformAdminClient.get(`/support/tickets/${id}/messages`);
   return res.data;
@@ -222,6 +240,11 @@ export const getPlatformTicketMessages = async (id: any) => {
 
 export const sendPlatformTicketMessage = async (id: any, data: any) => {
   const res = await platformAdminClient.post(`/support/tickets/${id}/messages`, data);
+  return res.data;
+};
+
+export const extendPlatformCompanyLicense = async (id: any, days: number = 30) => {
+  const res = await platformAdminClient.post(`/companies/${id}/extend-license`, { days });
   return res.data;
 };
 
