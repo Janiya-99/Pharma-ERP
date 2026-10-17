@@ -9,7 +9,7 @@ import LoadingScreen from "components/common/LoadingScreen";
 import RouteProgressBar from "components/common/RouteProgressBar";
 
 function PageLoader() {
-  return <LoadingScreen mode="page" title="Pixandco" />;
+  return <LoadingScreen mode="page" />;
 }
 
 export default function AdminLayout(props: { [x: string]: any }) {

@@ -22,7 +22,7 @@ export default function Auth() {
   return (
     <div className="relative flex min-h-screen w-full font-fira font-sans">
       {/* Full-screen split layout */}
-      <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" />}>
+      <Suspense fallback={<LoadingScreen mode="page" />}>
         <Routes>
           {getRoutes(routes)}
           <Route path="/" element={<Navigate to="/auth/sign-in" replace />} />
