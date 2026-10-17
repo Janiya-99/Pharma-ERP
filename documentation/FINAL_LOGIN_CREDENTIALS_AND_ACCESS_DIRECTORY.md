@@ -29,7 +29,7 @@ The Platform Admin Portal provides multi-tenant administration, tenant onboardin
 - **Tenant Code:** `CEYLONMED`  
 - **Tenant Database:** `erp_ceylonmed`  
 - **Enterprise Dataset Scope:** **1,124+ role-permission mappings**, 383 unique permission keys, 394 general ledger lines, 369 sales invoice lines, 275 product batches, 195 GRN receiving lines, 110 customer receipts.  
-- **ERP Web Application Portal:** [https://erp.pixandco.lk/auth/login](https://erp.pixandco.lk/auth/login)  
+- **ERP Web Application Portal:** [https://erp.pixandco.lk/login](https://erp.pixandco.lk/login)  
 - **Shared Standard Initial Password:** `CeylonAdmin@2026`  
 
 ---
@@ -92,7 +92,7 @@ For parallel isolated testing or sandbox validation:
 | **Company Name** | QA20261015 Pharma Distribution (Test) |
 | **Tenant Code** | `QA20261015` |
 | **Tenant Database** | `erp_qa20261015` |
-| **Portal Web URL** | [https://erp.pixandco.lk/auth/login](https://erp.pixandco.lk/auth/login) |
+| **Portal Web URL** | [https://erp.pixandco.lk/login](https://erp.pixandco.lk/login) |
 | **Administrator Name** | Dr. Janith Samarasinghe |
 | **Admin Email** | `admin@qa20261015.lk` |
 | **Password** | `CeylonAdmin@2026` *(or `Admin@123`)* |
