@@ -150,7 +150,7 @@ export const InlineAiFormPrompt: React.FC<InlineAiFormPromptProps> = ({
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-bold text-slate-900 tracking-tight">
-                Gemini 3.6 Flash Form Copilot
+                Gemini 2.5 Flash Form Copilot
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200">
                 <Zap className="h-2.5 w-2.5 text-purple-600" />

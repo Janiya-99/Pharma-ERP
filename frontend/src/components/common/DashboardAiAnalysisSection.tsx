@@ -105,7 +105,7 @@ export const DashboardAiAnalysisSection: React.FC<DashboardAiAnalysisSectionProp
               </h2>
               <span className="inline-flex items-center gap-1 rounded-md bg-indigo-100/80 px-2 py-0.5 text-[10px] font-bold text-indigo-700 border border-indigo-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-indigo-600 animate-ping"></span>
-                Gemini 3.6 Flash
+                Gemini 2.5 Flash
               </span>
             </div>
             <p className="text-xs text-slate-500 font-medium mt-0.5">

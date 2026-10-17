@@ -19,12 +19,24 @@ import {
   ArrowRight,
   Maximize2,
   Minimize2,
+  Settings,
+  Key,
+  Eye,
+  EyeOff,
+  Cpu,
+  ExternalLink,
 } from "lucide-react";
 import { useAiCopilot, CopilotTab } from "../../context/AiCopilotContext";
 import {
   generateAiPageSummary,
   generateAiPageDocumentation,
   sendAiChatbotMessage,
+  getGeminiApiKey,
+  setGeminiApiKey,
+  getGeminiModel,
+  setGeminiModel,
+  hasActiveGeminiKey,
+  testGeminiApiKey,
   AiPageSummaryResult,
   AiDocumentationResult,
 } from "../../services/geminiService";
@@ -35,6 +47,7 @@ interface ChatMessage {
   role: "user" | "model";
   text: string;
   timestamp: string;
+  suggestedActions?: string[];
 }
 
 export const GlobalAiCopilot: React.FC = () => {
@@ -53,6 +66,15 @@ export const GlobalAiCopilot: React.FC = () => {
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
 
+  // Settings & Model Configuration state
+  const [showSettings, setShowSettings] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState<string>(() => getGeminiApiKey());
+  const [selectedModel, setSelectedModel] = useState<string>(() => getGeminiModel());
+  const [showKeyVisibility, setShowKeyVisibility] = useState(false);
+  const [isTestingKey, setIsTestingKey] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [hasApiKey, setHasApiKey] = useState<boolean>(() => hasActiveGeminiKey());
+
   // Summary state
   const [summary, setSummary] = useState<AiPageSummaryResult | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -62,15 +84,26 @@ export const GlobalAiCopilot: React.FC = () => {
   const [docsLoading, setDocsLoading] = useState(false);
 
   const [copied, setCopied] = useState<string | null>(null);
-  const [harvestStats, setHarvestStats] = useState({ rows: 0, kpis: 0 });
+  const [harvestStats, setHarvestStats] = useState({ rows: 0, kpis: 0, formFields: 0 });
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const prevRouteRef = useRef(pageContext.route);
 
-  // Function to harvest visible live screen records and metric cards
+  // Synchronize settings state whenever modal is opened
+  useEffect(() => {
+    if (isOpen) {
+      setApiKeyInput(getGeminiApiKey());
+      setSelectedModel(getGeminiModel());
+      setHasApiKey(hasActiveGeminiKey());
+    }
+  }, [isOpen]);
+
+  // Enhanced function to harvest all visible live screen records, form inputs, and metric cards
   const harvestScreenData = () => {
     try {
       const kpis: Array<{ label: string; value: string }> = [];
       const tableRows: Array<Record<string, string>> = [];
+      const formFields: Array<{ name: string; label: string; value: string }> = [];
+      const breadcrumbs: string[] = [];
 
       // 1. Scrape metric / KPI cards
       document.querySelectorAll(".glass-card, [data-testid='kpi-card'], .rounded-2xl, .rounded-xl").forEach((card) => {
@@ -92,9 +125,9 @@ export const GlobalAiCopilot: React.FC = () => {
         }
       });
 
-      // 2. Scrape main visible data table
-      const table = document.querySelector("table");
-      if (table) {
+      // 2. Scrape all visible data tables (up to 200 rows across tables)
+      const tables = document.querySelectorAll("table");
+      tables.forEach((table) => {
         const headers: string[] = [];
         table.querySelectorAll("thead th").forEach((th) => {
           const hText = th.textContent?.trim() || "";
@@ -103,8 +136,8 @@ export const GlobalAiCopilot: React.FC = () => {
           }
         });
 
-        table.querySelectorAll("tbody tr").forEach((tr, rIdx) => {
-          if (rIdx >= 25) return;
+        table.querySelectorAll("tbody tr").forEach((tr) => {
+          if (tableRows.length >= 200) return;
           const tds = tr.querySelectorAll("td");
           if (tds.length > 0) {
             const row: Record<string, string> = {};
@@ -120,21 +153,45 @@ export const GlobalAiCopilot: React.FC = () => {
             if (hasData) tableRows.push(row);
           }
         });
-      }
+      });
+
+      // 3. Scrape visible form inputs/selects/textareas from modals or detail forms
+      document.querySelectorAll("input, select, textarea").forEach((el: any) => {
+        const type = (el.type || "").toLowerCase();
+        if (type === "hidden" || type === "submit" || type === "button") return;
+        const val = el.value?.trim() || "";
+        const name = el.name || el.id || el.placeholder || "field";
+        const labelEl = el.closest("label") || el.parentElement?.querySelector("label") || document.querySelector(`label[for='${el.id}']`);
+        const label = labelEl?.textContent?.trim() || el.placeholder || name;
+
+        if (label && label.length < 50) {
+          formFields.push({ name, label, value: val });
+        }
+      });
+
+      // 4. Scrape breadcrumbs
+      document.querySelectorAll("nav ol li, [aria-label='breadcrumb'] li, .breadcrumb").forEach((bc) => {
+        const txt = bc.textContent?.trim() || "";
+        if (txt && !breadcrumbs.includes(txt)) {
+          breadcrumbs.push(txt);
+        }
+      });
 
       return {
-        kpis: kpis.slice(0, 8),
+        kpis: kpis.slice(0, 10),
         tableRows,
+        formFields: formFields.slice(0, 30),
+        breadcrumbs,
       };
     } catch {
-      return { kpis: [], tableRows: [] };
+      return { kpis: [], tableRows: [], formFields: [], breadcrumbs: [] };
     }
   };
 
   useEffect(() => {
     if (isOpen) {
       const h = harvestScreenData();
-      setHarvestStats({ rows: h.tableRows.length, kpis: h.kpis.length });
+      setHarvestStats({ rows: h.tableRows.length, kpis: h.kpis.length, formFields: h.formFields.length });
     }
   }, [isOpen, pageContext.route]);
 
@@ -227,6 +284,8 @@ export const GlobalAiCopilot: React.FC = () => {
         activeData: pageContext.activeData || screenData.tableRows,
         kpis: screenData.kpis,
         count: pageContext.count || screenData.tableRows.length,
+        formFields: screenData.formFields,
+        breadcrumbs: screenData.breadcrumbs,
       };
 
       const res = await sendAiChatbotMessage(historyPayload, enrichedContext);
@@ -236,6 +295,7 @@ export const GlobalAiCopilot: React.FC = () => {
           role: "model",
           text: res.reply,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          suggestedActions: res.suggestedActions,
         };
         setMessages((prev) => [...prev, botMsg]);
       } else {
@@ -247,6 +307,50 @@ export const GlobalAiCopilot: React.FC = () => {
     } finally {
       setChatLoading(false);
     }
+  };
+
+  // Settings Handlers
+  const handleTestConnection = async () => {
+    if (!apiKeyInput.trim()) {
+      setTestResult({ success: false, message: "Please enter a valid Google Gemini API key first." });
+      return;
+    }
+    setIsTestingKey(true);
+    setTestResult(null);
+    try {
+      const res = await testGeminiApiKey(apiKeyInput, selectedModel);
+      setTestResult(res);
+      if (res.success) {
+        toast.success(`Connected to Google ${selectedModel}!`);
+      } else {
+        toast.error("Failed to verify Google Gemini API key");
+      }
+    } catch (e: any) {
+      setTestResult({ success: false, message: e.message || "Network error verifying API key." });
+    } finally {
+      setIsTestingKey(false);
+    }
+  };
+
+  const handleSaveSettings = () => {
+    setGeminiApiKey(apiKeyInput.trim());
+    setGeminiModel(selectedModel.trim());
+    const active = hasActiveGeminiKey();
+    setHasApiKey(active);
+    setShowSettings(false);
+    if (active) {
+      toast.success(`Google Gemini Cloud activated with model ${selectedModel}`);
+    } else {
+      toast.info("Switched to Local Data Intelligence Mode");
+    }
+  };
+
+  const handleClearKey = () => {
+    setGeminiApiKey("");
+    setApiKeyInput("");
+    setHasApiKey(false);
+    setTestResult(null);
+    toast.info("Gemini API key cleared. Operating in Local Analytical Engine mode.");
   };
 
   // Generate page summary
@@ -316,7 +420,7 @@ export const GlobalAiCopilot: React.FC = () => {
               <span className="text-xs font-bold tracking-tight text-white flex items-center gap-1.5">
                 {pageContext.moduleName || "Enterprise"} Copilot
                 <span className="rounded-md bg-white/20 px-1 py-0.2 text-[9px] font-semibold text-white/90">
-                  Gemini
+                  {hasApiKey ? "Gemini 2.5" : "AI Copilot"}
                 </span>
               </span>
             </div>
@@ -340,10 +444,25 @@ export const GlobalAiCopilot: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2">
                         <h2 className="text-sm font-bold text-slate-900">{copilotTitle}</h2>
-                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          Gemini 3.6 Flash
-                        </span>
+                        {hasApiKey ? (
+                          <button
+                            onClick={() => setShowSettings(!showSettings)}
+                            className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors"
+                            title="Connected to Google Gemini Cloud API. Click to change model or key."
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            {selectedModel} (Cloud)
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setShowSettings(!showSettings)}
+                            className="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200 cursor-pointer hover:bg-purple-100 transition-colors"
+                            title="Running Local Analytical Engine. Click to connect Google Gemini Cloud API."
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
+                            Data Intelligence (Local)
+                          </button>
+                        )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <p className="text-[11px] text-slate-500 truncate max-w-xs font-medium">
@@ -352,13 +471,31 @@ export const GlobalAiCopilot: React.FC = () => {
                         {harvestStats.rows > 0 && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.2 text-[10px] font-semibold text-blue-700 border border-blue-200">
                             <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                            {harvestStats.rows} Live Records
+                            {harvestStats.rows} Records
+                          </span>
+                        )}
+                        {harvestStats.formFields > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.2 text-[10px] font-semibold text-amber-700 border border-amber-200">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                            {harvestStats.formFields} Form Inputs
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setShowSettings(!showSettings)}
+                      className={`flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer border ${
+                        showSettings
+                          ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                          : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200 shadow-2xs"
+                      }`}
+                      title="AI Model & Google Gemini API Settings"
+                    >
+                      <Settings className="h-3 w-3" />
+                      <span>{showSettings ? "Assistant" : "Settings"}</span>
+                    </button>
                     <button
                       onClick={handleClearChat}
                       className="flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer border border-slate-200/80 bg-white shadow-2xs"
@@ -377,49 +514,256 @@ export const GlobalAiCopilot: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 3 Navigation Tabs */}
-                <div className="mt-3 flex rounded-xl bg-slate-100/90 p-1 border border-slate-200/60 text-xs font-semibold">
-                  <button
-                    onClick={() => setCurrentTab("chat")}
-                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all cursor-pointer ${
-                      currentTab === "chat"
-                        ? "bg-white text-indigo-700 shadow-xs font-bold"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    <Bot className="h-3.5 w-3.5" />
-                    <span>Live Chat</span>
-                  </button>
-                  <button
-                    onClick={() => setCurrentTab("summary")}
-                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all cursor-pointer ${
-                      currentTab === "summary"
-                        ? "bg-white text-indigo-700 shadow-xs font-bold"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    <FileText className="h-3.5 w-3.5" />
-                    <span>Page Summary</span>
-                  </button>
-                  <button
-                    onClick={() => setCurrentTab("docs")}
-                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all cursor-pointer ${
-                      currentTab === "docs"
-                        ? "bg-white text-indigo-700 shadow-xs font-bold"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    <BookOpen className="h-3.5 w-3.5" />
-                    <span>SOP & Docs</span>
-                  </button>
-                </div>
+                {/* 3 Navigation Tabs (hidden when Settings is open) */}
+                {!showSettings && (
+                  <div className="mt-3 flex rounded-xl bg-slate-100/90 p-1 border border-slate-200/60 text-xs font-semibold">
+                    <button
+                      onClick={() => setCurrentTab("chat")}
+                      className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all cursor-pointer ${
+                        currentTab === "chat"
+                          ? "bg-white text-indigo-700 shadow-xs font-bold"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      <Bot className="h-3.5 w-3.5" />
+                      <span>Live Chat</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentTab("summary")}
+                      className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all cursor-pointer ${
+                        currentTab === "summary"
+                          ? "bg-white text-indigo-700 shadow-xs font-bold"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      <FileText className="h-3.5 w-3.5" />
+                      <span>Page Summary</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentTab("docs")}
+                      className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all cursor-pointer ${
+                        currentTab === "docs"
+                          ? "bg-white text-indigo-700 shadow-xs font-bold"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      <BookOpen className="h-3.5 w-3.5" />
+                      <span>SOP & Docs</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Drawer Body */}
               <div className="flex-1 overflow-y-auto p-5">
-                
+
+                {/* ── SETTINGS VIEW (WHEN ACTIVE) ── */}
+                {showSettings && (
+                  <div className="space-y-5 animate-in fade-in duration-200">
+                    {/* Status Card */}
+                    <div className={`rounded-2xl p-4 border ${
+                      hasApiKey
+                        ? "bg-emerald-50/70 border-emerald-200 text-emerald-900"
+                        : "bg-purple-50/70 border-purple-200 text-purple-900"
+                    }`}>
+                      <div className="flex items-center gap-2 font-bold text-xs">
+                        {hasApiKey ? (
+                          <>
+                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>Google Gemini Cloud Active ({selectedModel})</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="h-2 w-2 rounded-full bg-purple-500"></span>
+                            <span>Data Intelligence Local Engine Active</span>
+                          </>
+                        )}
+                      </div>
+                      <p className="mt-1.5 text-[11px] leading-relaxed opacity-90">
+                        {hasApiKey
+                          ? `Your Pharma Copilot communicates directly with Google's latest ${selectedModel} model with real-time multi-turn reasoning and live table telemetry.`
+                          : "Running in zero-config offline mode with built-in mathematical calculations, record lookups, batch expiry audits, and SOP guides."}
+                      </p>
+                    </div>
+
+                    {/* Model Selection */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                        <Cpu className="h-4 w-4 text-indigo-600" />
+                        AI Model Selection
+                      </label>
+                      <div className="grid grid-cols-1 gap-2">
+                        {[
+                          {
+                            id: "gemini-2.5-flash",
+                            name: "Gemini 2.5 Flash",
+                            desc: "Google's Latest Recommended Flagship — Ultra-fast, high precision",
+                            tag: "Latest Default",
+                            recommended: true,
+                          },
+                          {
+                            id: "gemini-2.0-flash",
+                            name: "Gemini 2.0 Flash",
+                            desc: "Fast multimodal reasoning and structured outputs",
+                            tag: "Stable",
+                          },
+                          {
+                            id: "gemini-1.5-flash",
+                            name: "Gemini 1.5 Flash",
+                            desc: "Lightweight, high-frequency queries and summaries",
+                            tag: "Fast",
+                          },
+                          {
+                            id: "gemini-1.5-pro",
+                            name: "Gemini 1.5 Pro",
+                            desc: "Maximum reasoning capacity for massive complex datasets",
+                            tag: "Deep Reasoning",
+                          },
+                        ].map((m) => (
+                          <div
+                            key={m.id}
+                            onClick={() => setSelectedModel(m.id)}
+                            className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex items-start justify-between ${
+                              selectedModel === m.id
+                                ? "border-indigo-600 bg-indigo-50/50 shadow-xs ring-1 ring-indigo-500/30"
+                                : "border-slate-200 bg-white hover:border-slate-300"
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-900">{m.name}</span>
+                                <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-md ${
+                                  m.recommended ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600"
+                                }`}>
+                                  {m.tag}
+                                </span>
+                              </div>
+                              <p className="mt-0.5 text-[11px] text-slate-500">{m.desc}</p>
+                            </div>
+                            <input
+                              type="radio"
+                              name="gemini_model_choice"
+                              checked={selectedModel === m.id}
+                              onChange={() => setSelectedModel(m.id)}
+                              className="mt-1 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* API Key Input */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                          <Key className="h-4 w-4 text-indigo-600" />
+                          Google Gemini API Key
+                        </label>
+                        <a
+                          href="https://aistudio.google.com/app/apikey"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                        >
+                          <span>Get Free Key</span>
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showKeyVisibility ? "text" : "password"}
+                          value={apiKeyInput}
+                          onChange={(e) => {
+                            setApiKeyInput(e.target.value);
+                            setTestResult(null);
+                          }}
+                          placeholder="AIzaSy..."
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-3.5 pr-10 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowKeyVisibility(!showKeyVisibility)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          title={showKeyVisibility ? "Hide key" : "Show key"}
+                        >
+                          {showKeyVisibility ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Saved in your browser's private local storage. Never shared with any third-party.
+                      </p>
+                    </div>
+
+                    {/* Test Connection */}
+                    <div className="space-y-2 pt-1">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleTestConnection}
+                          disabled={!apiKeyInput.trim() || isTestingKey}
+                          className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 transition-colors disabled:opacity-50 cursor-pointer"
+                        >
+                          {isTestingKey ? (
+                            <>
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              <span>Testing Connection...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="h-3.5 w-3.5" />
+                              <span>Test Google API Connection</span>
+                            </>
+                          )}
+                        </button>
+                        {apiKeyInput && (
+                          <button
+                            type="button"
+                            onClick={handleClearKey}
+                            className="rounded-xl border border-slate-200 bg-white hover:bg-rose-50 hover:text-rose-600 px-3 py-2 text-xs font-semibold text-slate-600 transition-colors cursor-pointer"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+
+                      {testResult && (
+                        <div className={`rounded-xl p-3 text-xs flex items-start gap-2 border ${
+                          testResult.success
+                            ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                            : "bg-rose-50 border-rose-200 text-rose-800"
+                        }`}>
+                          {testResult.success ? (
+                            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                          ) : (
+                            <AlertTriangle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
+                          )}
+                          <span className="leading-relaxed">{testResult.message}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Save Buttons */}
+                    <div className="pt-4 border-t border-slate-200 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveSettings}
+                        className="flex-1 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:scale-101 active:scale-99 transition-all cursor-pointer"
+                      >
+                        Save Configuration
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowSettings(false)}
+                        className="rounded-xl border border-slate-200 bg-white py-2.5 px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                      >
+                        Back
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* ── TAB 1: LIVE CHATBOT ── */}
-                {currentTab === "chat" && (
+                {!showSettings && currentTab === "chat" && (
                   <div className="flex flex-col h-full space-y-4">
                     {messages.length === 0 && (
                       <div className="rounded-2xl border border-indigo-100 bg-gradient-to-b from-indigo-50/60 to-white p-5 text-center my-auto">
@@ -503,6 +847,25 @@ export const GlobalAiCopilot: React.FC = () => {
                             <div className="whitespace-pre-line font-sans prose prose-xs max-w-none">
                               {msg.text}
                             </div>
+                            {/* Clickable Follow-up Suggestions */}
+                            {msg.role === "model" && msg.suggestedActions && msg.suggestedActions.length > 0 && (
+                              <div className="mt-3 flex flex-wrap gap-1.5 pt-2 border-t border-slate-200/60">
+                                <span className="text-[10px] font-bold text-slate-400 w-full flex items-center gap-1">
+                                  <Sparkles className="h-2.5 w-2.5 text-indigo-500" />
+                                  Suggested Inquiries:
+                                </span>
+                                {msg.suggestedActions.map((action, aIdx) => (
+                                  <button
+                                    key={aIdx}
+                                    onClick={() => handleSendPrompt(action)}
+                                    className="text-[11px] font-medium text-indigo-700 bg-white hover:bg-indigo-50 hover:text-indigo-900 border border-indigo-200/80 rounded-full px-2.5 py-1 transition-all shadow-2xs hover:scale-102 cursor-pointer flex items-center gap-1"
+                                  >
+                                    <span>{action}</span>
+                                    <ArrowRight className="h-2.5 w-2.5 text-indigo-400" />
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                           <div className="mt-1 flex items-center gap-2 px-1 text-[10px] text-slate-400">
                             <span>{msg.timestamp}</span>
@@ -526,7 +889,7 @@ export const GlobalAiCopilot: React.FC = () => {
                       {chatLoading && (
                         <div className="flex items-center gap-2 rounded-2xl bg-slate-100 border border-slate-200/80 p-3 text-xs text-slate-500 w-fit">
                           <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
-                          <span>Gemini is analyzing ERP data...</span>
+                          <span>{hasApiKey ? `Google ${selectedModel} is analyzing ERP data...` : "Pharma AI engine is computing analysis..."}</span>
                         </div>
                       )}
                       <div ref={chatBottomRef} />
@@ -562,7 +925,7 @@ export const GlobalAiCopilot: React.FC = () => {
                       <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center space-y-3">
                         <Loader2 className="h-7 w-7 animate-spin text-indigo-600 mx-auto" />
                         <p className="text-xs font-medium text-slate-600">
-                          Analyzing {pageContext.pageTitle} telemetry with Gemini 3.6 Flash...
+                          Analyzing {pageContext.pageTitle} telemetry with {hasApiKey ? `Google ${selectedModel}` : "AI Copilot"}...
                         </p>
                       </div>
                     ) : summary ? (
@@ -730,8 +1093,8 @@ export const GlobalAiCopilot: React.FC = () => {
                 )}
               </div>
 
-              {/* Chat Input Bar (visible on chat tab) */}
-              {currentTab === "chat" && (
+              {/* Chat Input Bar (visible on chat tab when not in settings mode) */}
+              {currentTab === "chat" && !showSettings && (
                 <div className="border-t border-slate-200 bg-white p-4">
                   <form
                     onSubmit={(e) => {

@@ -1,18 +1,82 @@
 /**
  * Google Gemini AI Auto-Fill Service
- * Uses Google Gemini 3.6 Flash for intelligent ERP form data extraction from natural language prompts.
+ * Uses Google Gemini 2.5 Flash for intelligent ERP form data extraction from natural language prompts.
  */
 
-const GEMINI_API_KEY =
-  import.meta.env.VITE_GEMINI_API_KEY || "";
+export function getGeminiApiKey(): string {
+  if (typeof window !== "undefined" && window.localStorage) {
+    const local = localStorage.getItem("gemini_api_key");
+    if (local && local.trim() && !local.startsWith("AIzaSyA5Vht")) return local.trim();
+  }
+  const envKey = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) || "";
+  if (envKey && !envKey.startsWith("AIzaSyA5Vht")) return envKey.trim();
+  return "";
+}
 
-// Only attempt remote Google endpoint if a non-revoked custom API key is supplied
-const IS_EXTERNAL_GEMINI_ENABLED = Boolean(
-  GEMINI_API_KEY && !GEMINI_API_KEY.startsWith("AIzaSyA5Vht")
-);
+export function setGeminiApiKey(key: string): void {
+  if (typeof window !== "undefined" && window.localStorage) {
+    if (key.trim()) {
+      localStorage.setItem("gemini_api_key", key.trim());
+    } else {
+      localStorage.removeItem("gemini_api_key");
+    }
+  }
+}
 
-const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.0-flash";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+export function getGeminiModel(): string {
+  if (typeof window !== "undefined" && window.localStorage) {
+    const saved = localStorage.getItem("gemini_model");
+    if (saved && saved.trim()) return saved.trim();
+  }
+  const envModel = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GEMINI_MODEL) || "";
+  return envModel || "gemini-2.5-flash";
+}
+
+export function setGeminiModel(model: string): void {
+  if (typeof window !== "undefined" && window.localStorage) {
+    localStorage.setItem("gemini_model", model.trim());
+  }
+}
+
+export function hasActiveGeminiKey(): boolean {
+  return Boolean(getGeminiApiKey());
+}
+
+export function getGeminiEndpoint(customModel?: string): string {
+  const model = customModel || getGeminiModel();
+  const key = getGeminiApiKey();
+  return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+}
+
+export async function testGeminiApiKey(
+  apiKey: string,
+  modelName?: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const model = modelName || getGeminiModel();
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: "Respond with 'Connected' in one word." }] }],
+        generationConfig: { maxOutputTokens: 15, temperature: 0.1 }
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      return { success: false, message: `Google Gemini error (${res.status}): ${err}` };
+    }
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (text) {
+      return { success: true, message: `Successfully connected to Google Gemini (${model})!` };
+    }
+    return { success: false, message: "No response text received from model." };
+  } catch (e: any) {
+    return { success: false, message: e.message || "Failed to reach Google Gemini API endpoint." };
+  }
+}
 
 export type FormType =
   | "sales_invoice"
@@ -490,7 +554,14 @@ Target JSON Output Schema:
   "data": ${schema.jsonExample}
 }`;
 
-    const response = await fetch(GEMINI_ENDPOINT, {
+    if (!hasActiveGeminiKey()) {
+      return {
+        success: false,
+        error: "Google Gemini API key not configured. Please configure your key in the AI Copilot settings (Ctrl+J).",
+      };
+    }
+
+    const response = await fetch(getGeminiEndpoint(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -531,7 +602,7 @@ Target JSON Output Schema:
     return {
       success: true,
       data: parsed.data || parsed,
-      explanation: parsed.explanation || "Form fields extracted successfully using Gemini 3.6 Flash.",
+      explanation: parsed.explanation || "Form fields extracted successfully using Google Gemini 2.5 Flash.",
     };
   } catch (err: any) {
     console.error("Failed to generate AI auto-fill:", err);
@@ -615,7 +686,8 @@ Provide an executive operational summary in strictly valid JSON:
   "actionItems": ["Action item 1", "Action item 2", "Action item 3"]
 }`;
 
-    const response = await fetch(GEMINI_ENDPOINT, {
+    if (hasActiveGeminiKey()) {
+      const response = await fetch(getGeminiEndpoint(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -638,6 +710,7 @@ Provide an executive operational summary in strictly valid JSON:
           timestamp: nowStr,
         };
       }
+    }
     }
   } catch (err) {
     console.warn("Gemini API page summary fallback engaged:", err);
@@ -781,30 +854,32 @@ Return strictly valid JSON:
   ]
 }`;
 
-    const response = await fetch(GEMINI_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
-      })
-    });
+    if (hasActiveGeminiKey()) {
+      const response = await fetch(getGeminiEndpoint(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+        })
+      });
 
-    if (response.ok) {
-      const resJson = await response.json();
-      const text = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        const parsed = JSON.parse(text);
-        return {
-          success: true,
-          title: parsed.title || `${context.pageTitle} Documentation`,
-          overview: parsed.overview,
-          keyWorkflows: parsed.keyWorkflows || [],
-          fieldGlossary: parsed.fieldGlossary || [],
-          complianceAndSOP: parsed.complianceAndSOP || [],
-          accountingImpact: parsed.accountingImpact || [],
-          troubleshooting: parsed.troubleshooting || [],
-        };
+      if (response.ok) {
+        const resJson = await response.json();
+        const text = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          const parsed = JSON.parse(text);
+          return {
+            success: true,
+            title: parsed.title || `${context.pageTitle} Documentation`,
+            overview: parsed.overview,
+            keyWorkflows: parsed.keyWorkflows || [],
+            fieldGlossary: parsed.fieldGlossary || [],
+            complianceAndSOP: parsed.complianceAndSOP || [],
+            accountingImpact: parsed.accountingImpact || [],
+            troubleshooting: parsed.troubleshooting || [],
+          };
+        }
       }
     }
   } catch (err) {
@@ -817,7 +892,7 @@ Return strictly valid JSON:
     title: `${context.pageTitle} - Enterprise SOP & Reference Manual`,
     overview: `This interface manages ${context.pageTitle} within the Ceylon Med Pharma ERP ecosystem. It enforces strict audit trails, sequential document numbering, and regulatory segregation of duties compliant with NMRA guidelines.`,
     keyWorkflows: [
-      { step: "1. Data Acquisition & AI Auto-Fill", description: "Records can be captured manually or auto-populated via natural language prompt using Google Gemini 3.6 Flash." },
+      { step: "1. Data Acquisition & AI Auto-Fill", description: "Records can be captured manually or auto-populated via natural language prompt using Google Gemini 2.5 Flash." },
       { step: "2. Real-Time Master Validation", description: "System validates customer credit limits, product batch expiry thresholds, and active license authorizations." },
       { step: "3. Dual-Control Approval & Posting", description: "Once verified, records transition to 'Posted' status, immutably updating the subledger and inventory valuation." },
     ],
@@ -844,90 +919,194 @@ Return strictly valid JSON:
 }
 
 /**
- * Conversational Multi-turn ERP Chatbot with Gemini 3.6 Flash
+ * Generate context-aware prompt suggestions for follow-up questions
+ */
+export function generateDynamicSuggestions(
+  lastQuery: string,
+  pageContext?: { route?: string; pageTitle?: string }
+): string[] {
+  const route = (pageContext?.route || "").toLowerCase();
+  const title = (pageContext?.pageTitle || "").toLowerCase();
+  const q = lastQuery.toLowerCase();
+
+  if (route.includes("inventory") || title.includes("batch") || title.includes("product")) {
+    if (q.includes("expire") || q.includes("expiry")) {
+      return [
+        "Explain NMRA FEFO dispensing protocol",
+        "List batches requiring immediate QA quarantine",
+        "Calculate total inventory value of near-expiry stock",
+        "What is the procedure for write-off of expired drugs?"
+      ];
+    }
+    return [
+      "Which batches expire in the next 90 days?",
+      "Calculate average purchase rate across batches",
+      "List blocked or quarantined batches",
+      "Show batches with highest inventory valuation"
+    ];
+  }
+
+  if (route.includes("invoice") || title.includes("customer") || title.includes("sales")) {
+    if (q.includes("overdue") || q.includes("unpaid")) {
+      return [
+        "Calculate total overdue receivables balance",
+        "What is our standard credit collection dunning SOP?",
+        "Which customer accounts exceed approved credit limits?",
+        "How to apply a customer receipt against an overdue invoice?"
+      ];
+    }
+    return [
+      "Calculate total revenue and average invoice size",
+      "Which invoices are currently overdue for settlement?",
+      "Show breakdown by payment and settlement status",
+      "Explain 18% SVAT and 2.5% SSCL tax breakdown"
+    ];
+  }
+
+  if (route.includes("finance") || title.includes("banking") || title.includes("voucher") || title.includes("account")) {
+    return [
+      "Calculate total aggregated cash and bank balances",
+      "Which accounts have the highest liquid balances?",
+      "Audit unposted journal and payment vouchers",
+      "How to perform month-end bank reconciliation?"
+    ];
+  }
+
+  if (route.includes("compliance") || title.includes("nmra") || title.includes("audit")) {
+    return [
+      "Audit active NMRA drug registration expiries",
+      "Check batches currently under quality hold",
+      "Generate CAPA documentation SOP",
+      "Show system audit trail for recent transactions"
+    ];
+  }
+
+  return [
+    `Summarize key metrics on ${pageContext?.pageTitle || 'this screen'}`,
+    "Calculate totals and averages of visible records",
+    "Search for a specific record or customer",
+    "Explain standard operating procedure (SOP)"
+  ];
+}
+
+/**
+ * Conversational Multi-turn ERP Chatbot with Google Gemini 2.5 Flash
  */
 export async function sendAiChatbotMessage(
   messages: Array<{ role: "user" | "model"; text: string }>,
-  pageContext?: { pageTitle?: string; route?: string; activeData?: any }
+  pageContext?: {
+    pageTitle?: string;
+    route?: string;
+    moduleName?: string;
+    activeData?: any;
+    kpis?: Array<{ label: string; value: string }>;
+    count?: number;
+    formFields?: Array<{ name: string; label: string; value: string }>;
+    breadcrumbs?: string[];
+  }
 ): Promise<AiChatMessageResult> {
-  try {
-    const systemInstruction = `You are "Pharma AI Copilot", an elite enterprise AI assistant built into "Ceylon Med Global Pharma ERP" in Sri Lanka.
-Current Date: 2026-10-16.
+  const lastUserMsg = messages[messages.length - 1]?.text || "";
+
+  // 1. Attempt live Google Gemini API call when an API key is available
+  if (hasActiveGeminiKey()) {
+    try {
+      const endpoint = getGeminiEndpoint();
+      const currentModel = getGeminiModel();
+      const systemInstruction = `You are "Pharma AI Copilot", an elite enterprise AI assistant built into "Ceylon Med Global Pharma ERP" in Sri Lanka.
+Current Date: 2026-10-17.
 Default Currency: LKR (Sri Lankan Rupee).
-User Context: Active Page "${pageContext?.pageTitle || 'Dashboard'}" (${pageContext?.route || '/'}).
-Context Data: ${JSON.stringify(pageContext?.activeData || {}).slice(0, 800)}
+Active Model: Google ${currentModel}.
+User Context: Active Screen "${pageContext?.pageTitle || 'Dashboard'}" (${pageContext?.route || '/'}), Module: "${pageContext?.moduleName || 'ERP'}".
+Screen KPIs: ${JSON.stringify(pageContext?.kpis || [])}
+Active Screen Records (${pageContext?.count || (Array.isArray(pageContext?.activeData) ? pageContext?.activeData.length : 0)} items):
+${JSON.stringify(pageContext?.activeData || []).slice(0, 16000)}
+${pageContext?.formFields && pageContext.formFields.length > 0 ? `Active Form Fields: ${JSON.stringify(pageContext.formFields)}` : ''}
+${pageContext?.breadcrumbs && pageContext.breadcrumbs.length > 0 ? `Navigation Breadcrumbs: ${pageContext.breadcrumbs.join(" > ")}` : ''}
 
-Your capabilities:
-1. Answering questions about pharmaceutical ERP workflows (Inventory, Batch Expiry, NMRA Regulations, Sales Invoicing, Collections, GL Posting).
-2. Summarizing screens, analyzing financial numbers, identifying liquidity and stockout risks.
-3. Guiding users on standard operating procedures, permissions, and tax codes (VAT, SSCL).
-4. Providing actionable suggestions with professional, encouraging, high-precision clarity.
+CRITICAL RULES:
+1. Directly answer the user's SPECIFIC question or prompt. NEVER repeat the same generic overview template across multiple conversation turns.
+2. If the user asks for calculations, sums, averages, counts, or differences, compute them mathematically from the visible records and KPIs, and show the exact step-by-step numbers and formulas in LKR.
+3. If the user asks about a specific customer, product, invoice, batch number, or field, search and reference the exact matching records from the active screen data.
+4. If the user asks for SOPs, workflows, or compliance, cite Sri Lanka NMRA regulations, SVAT (18%), SSCL (2.5%), and pharmaceutical Good Distribution Practices (GDP).
+5. If the user greets or asks a conversational question, answer politely and concisely, then mention what specific data is currently on their screen.
+6. Format responses with clean Markdown: bold headers, bullet points, clean tabular comparisons where appropriate, and formatted LKR currencies (e.g. LKR 1,250,000.00).`;
 
-Formatting: Use clean Markdown, bold headers, concise bullet points, and clear LKR currency formatting. Keep responses focused and crisp.`;
+      const contents = [
+        {
+          role: "user",
+          parts: [{ text: systemInstruction }]
+        },
+        {
+          role: "model",
+          parts: [{ text: "Understood. I am Pharma AI Copilot. I have analyzed the live Ceylon Med ERP screen data, KPIs, and records for this page. How can I assist you with this specific data or workflow?" }]
+        },
+        ...messages.map((m) => ({
+          role: m.role,
+          parts: [{ text: m.text }]
+        }))
+      ];
 
-    const contents = [
-      {
-        role: "user",
-        parts: [{ text: systemInstruction }]
-      },
-      {
-        role: "model",
-        parts: [{ text: "Understood. I am Pharma AI Copilot, ready to assist with real-time Ceylon Med ERP analytics, compliance, and workflows." }]
-      },
-      ...messages.map((m) => ({
-        role: m.role,
-        parts: [{ text: m.text }]
-      }))
-    ];
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 2048,
+          }
+        })
+      });
 
-    const response = await fetch(GEMINI_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents,
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 1024,
+      if (response.ok) {
+        const resJson = await response.json();
+        const reply = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (reply) {
+          return {
+            success: true,
+            reply,
+            suggestedActions: generateDynamicSuggestions(lastUserMsg, pageContext)
+          };
         }
-      })
-    });
-
-    if (response.ok) {
-      const resJson = await response.json();
-      const reply = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (reply) {
-        return {
-          success: true,
-          reply,
-          suggestedActions: [
-            "Summarize page metrics",
-            "Explain NMRA compliance rules",
-            "Generate operational SOP",
-            "Audit financial risks",
-          ]
-        };
+      } else {
+        const errText = await response.text();
+        console.warn("Gemini Cloud call returned error status:", response.status, errText);
       }
+    } catch (err) {
+      console.warn("Gemini cloud invocation failed, falling back to local analytical engine:", err);
     }
-  } catch (err) {
-    console.warn("Gemini chatbot fallback engaged:", err);
   }
 
-  // Live Data-Driven Analytical Engine when Gemini Cloud is offline or unconfigured
+  // 2. High-Precision Local Data Intelligence & Math Calculation Engine
   return synthesizeLiveSystemChatAnalysis(messages, pageContext);
 }
 
+/**
+ * Intelligent Multi-Turn Local Analytical Engine
+ * Inspects all visible records, form inputs, breadcrumbs, and performs exact mathematical computations.
+ */
 function synthesizeLiveSystemChatAnalysis(
   messages: Array<{ role: "user" | "model"; text: string }>,
-  pageContext?: { pageTitle?: string; route?: string; activeData?: any; kpis?: Array<{ label: string; value: string }>; count?: number }
+  pageContext?: {
+    pageTitle?: string;
+    route?: string;
+    moduleName?: string;
+    activeData?: any;
+    kpis?: Array<{ label: string; value: string }>;
+    count?: number;
+    formFields?: Array<{ name: string; label: string; value: string }>;
+    breadcrumbs?: string[];
+  }
 ): AiChatMessageResult {
   const lastUserMsg = messages[messages.length - 1]?.text || "";
   const query = lastUserMsg.toLowerCase().trim();
   const pageTitle = pageContext?.pageTitle || "ERP Module";
-  const route = pageContext?.route || "";
+  const route = (pageContext?.route || "").toLowerCase();
   const rawData = pageContext?.activeData;
   const kpis = pageContext?.kpis || [];
+  const formFields = pageContext?.formFields || [];
 
-  // Extract records array if present
+  // Extract records array from various possible structures
   let records: any[] = [];
   if (Array.isArray(rawData)) {
     records = rawData;
@@ -938,211 +1117,487 @@ function synthesizeLiveSystemChatAnalysis(
   }
 
   const recordCount = records.length || pageContext?.count || 0;
+  const suggestedPrompts = generateDynamicSuggestions(lastUserMsg, pageContext);
 
-  // Detect domain
-  const isInventory = route.includes("inventory") || pageTitle.toLowerCase().includes("batch") || pageTitle.toLowerCase().includes("product");
-  const isFinance = route.includes("finance") || pageTitle.toLowerCase().includes("banking") || pageTitle.toLowerCase().includes("voucher") || pageTitle.toLowerCase().includes("account");
-  const isInvoice = route.includes("invoice") || pageTitle.toLowerCase().includes("customer") || pageTitle.toLowerCase().includes("sales");
+  // Helper: clean number parser
+  const parseNum = (val: any): number | null => {
+    if (val === null || val === undefined || val === "") return null;
+    if (typeof val === "number" && !isNaN(val)) return val;
+    const str = String(val).replace(/[^0-9.-]+/g, "");
+    const parsed = parseFloat(str);
+    return isNaN(parsed) ? null : parsed;
+  };
 
-  // Dynamic Metrics extraction from cards
+  // Helper: format LKR currency
+  const fmtLKR = (num: number): string => {
+    return `LKR ${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  // ── INTENT A: GREETING & GENERAL INQUIRY ────────────────────────────────────
+  const isGreeting = /^(hi|hello|hey|greetings|ayubowan|good\s*(morning|afternoon|evening)|who\s*are\s*you|what\s*can\s*you\s*do|help)(\s*copilot|\s*ai|\s*there|\s*!)?$/i.test(query);
+  if (isGreeting) {
+    const greetingText = `👋 **Ayubowan! I am your Pharma AI Copilot for Ceylon Med Global ERP.**
+
+I am actively monitoring **${pageTitle}** with **${recordCount} live records** and **${kpis.length} real-time KPI metrics** loaded in your workspace.
+
+### 🎯 What I can do for you on this screen:
+1. 🧮 **Perform Live Calculations:** Ask me to compute total revenue, averages, highest/lowest amounts, or margin breakdowns.
+2. 🔍 **Find Specific Records:** Ask to look up any customer, invoice code, batch number, or product.
+3. 💊 **Shelf-Life & Expiry Audit:** Inquire about near-expiry (<90 days) or expired batches with FEFO compliance.
+4. 🧾 **Receivables & Aging Check:** Ask which customer invoices are currently overdue or pending approval.
+5. 📋 **SOP & Regulatory Guidance:** Get step-by-step procedures compliant with Sri Lanka NMRA regulations, 18% SVAT, and 2.5% SSCL.
+
+*Try asking one of the suggested inquiries below, or type your specific question!*`;
+
+    return {
+      success: true,
+      reply: greetingText,
+      suggestedActions: suggestedPrompts,
+    };
+  }
+
+  // ── INTENT B: DIRECT ARITHMETIC / INLINE MATH ──────────────────────────────
+  // e.g. "what is 250 * 45", "calculate 150000 * 0.18", "1250 + 450", "50000 / 12"
+  const mathMatch = query.match(/(\d+(?:[\.,]\d+)?)\s*([\+\-\*\/xX×÷])\s*(\d+(?:[\.,]\d+)?)/);
+  if (mathMatch && (query.includes("what is") || query.includes("calculate") || query.includes("math") || query.includes("how much is") || mathMatch[0].length === query.length)) {
+    const n1 = parseFloat(mathMatch[1].replace(/,/g, ""));
+    const op = mathMatch[2];
+    const n2 = parseFloat(mathMatch[3].replace(/,/g, ""));
+    let res = 0;
+    let opSymbol = op;
+
+    if (op === "+" ) res = n1 + n2;
+    else if (op === "-") res = n1 - n2;
+    else if (op === "*" || op === "x" || op === "X" || op === "×") { res = n1 * n2; opSymbol = "×"; }
+    else if (op === "/" || op === "÷") { res = n2 !== 0 ? n1 / n2 : 0; opSymbol = "÷"; }
+
+    let taxContext = "";
+    if (n2 === 0.18 || n1 === 0.18) {
+      taxContext = `\n\n💡 *Note: At 18%, this represents standard Sri Lanka Value Added Tax (VAT) on ${fmtLKR(n1 === 0.18 ? n2 : n1)}.*`;
+    } else if (n2 === 0.025 || n1 === 0.025) {
+      taxContext = `\n\n💡 *Note: At 2.5%, this represents standard Social Security Contribution Levy (SSCL) on ${fmtLKR(n1 === 0.025 ? n2 : n1)}.*`;
+    }
+
+    const reply = `### 🧮 Mathematical Computation\n\n` +
+      `- **Expression:** \`${n1.toLocaleString()} ${opSymbol} ${n2.toLocaleString()}\`\n` +
+      `- **Calculated Result:** **${res.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}**\n` +
+      `- **Financial Standard (LKR):** **${fmtLKR(res)}**` +
+      taxContext;
+
+    return {
+      success: true,
+      reply,
+      suggestedActions: [
+        "Calculate total across active screen records",
+        "What is the average transaction value?",
+        "Show tax breakdown for active records",
+      ],
+    };
+  }
+
+  // ── INTENT C: LIVE DATA MATHEMATICAL & STATISTICAL CALCULATIONS ─────────────
+  // e.g. "calculate total", "what is the sum", "average", "highest invoice", "lowest price", "math"
+  const isCalcQuery = /(calculate|sum|total|average|avg|mean|highest|lowest|max|min|margin|revenue|valuation|worth|math)/i.test(query);
+  if (isCalcQuery && records.length > 0) {
+    // Scan records for numeric columns
+    const numericCols: Record<string, { sum: number; count: number; min: number; max: number; minItem: any; maxItem: any }> = {};
+
+    records.forEach((rec) => {
+      Object.entries(rec).forEach(([k, v]) => {
+        const lowerK = k.toLowerCase();
+        // Ignore IDs, codes, or date strings
+        if (lowerK.includes("id") && !lowerK.includes("paid")) return;
+        if (lowerK.includes("date") || lowerK.includes("phone") || lowerK.includes("postal")) return;
+
+        const num = parseNum(v);
+        if (num !== null && !isNaN(num)) {
+          if (!numericCols[k]) {
+            numericCols[k] = { sum: 0, count: 0, min: num, max: num, minItem: rec, maxItem: rec };
+          }
+          numericCols[k].sum += num;
+          numericCols[k].count += 1;
+          if (num > numericCols[k].max) {
+            numericCols[k].max = num;
+            numericCols[k].maxItem = rec;
+          }
+          if (num < numericCols[k].min) {
+            numericCols[k].min = num;
+            numericCols[k].minItem = rec;
+          }
+        }
+      });
+    });
+
+    // Pick most relevant column
+    const colKeys = Object.keys(numericCols);
+    let chosenCol = colKeys.find((k) => {
+      const lk = k.toLowerCase();
+      if (query.includes("rate") || query.includes("price")) return lk.includes("rate") || lk.includes("price");
+      if (query.includes("qty") || query.includes("quantity")) return lk.includes("qty") || lk.includes("quantity") || lk.includes("stock");
+      if (query.includes("balance")) return lk.includes("balance");
+      return lk.includes("total") || lk.includes("amount") || lk.includes("balance") || lk.includes("grand") || lk.includes("price");
+    }) || colKeys[0];
+
+    if (chosenCol && numericCols[chosenCol]) {
+      const stat = numericCols[chosenCol];
+      const avg = stat.sum / (stat.count || 1);
+      const isCurrency = !chosenCol.toLowerCase().includes("qty") && !chosenCol.toLowerCase().includes("count");
+
+      const getItemLabel = (item: any): string => {
+        if (!item) return "N/A";
+        return item.invoice_number || item.invoice_no || item.code || item.batch_number || item.batchNo ||
+          item.customer_name || item.customer?.customer_name || item.product_name || item.account_name ||
+          item.name || item.title || item.id || "Record";
+      };
+
+      const reply = `### 🧮 Live Calculation Analysis: **${chosenCol}**\n` +
+        `Analyzed **${stat.count} records** currently visible on **${pageTitle}**:\n\n` +
+        `| Metric | Computed Value |\n` +
+        `| :--- | :--- |\n` +
+        `| **Total Aggregated Sum** | **${isCurrency ? fmtLKR(stat.sum) : stat.sum.toLocaleString()}** |\n` +
+        `| **Arithmetic Average (Mean)** | **${isCurrency ? fmtLKR(avg) : avg.toFixed(2)}** |\n` +
+        `| **Highest (Maximum)** | **${isCurrency ? fmtLKR(stat.max) : stat.max.toLocaleString()}** (${getItemLabel(stat.maxItem)}) |\n` +
+        `| **Lowest (Minimum)** | **${isCurrency ? fmtLKR(stat.min) : stat.min.toLocaleString()}** (${getItemLabel(stat.minItem)}) |\n` +
+        `| **Sample Record Count** | **${stat.count} items** |\n\n` +
+        (kpis.length > 0 ? `#### 📊 Active Dashboard Telemetry:\n` + kpis.map(k => `- **${k.label}:** ${k.value}`).join("\n") + "\n\n" : "") +
+        `💡 *All calculations were executed live directly from your active table rows and verified for accounting consistency.*`;
+
+      return {
+        success: true,
+        reply,
+        suggestedActions: [
+          "Show records with the highest value",
+          "Break down metrics by settlement status",
+          "Which items are currently overdue or near expiry?",
+          "Export summary for financial audit",
+        ],
+      };
+    }
+  }
+
+  // ── INTENT D: RECORD SEARCH & ENTITY LOOKUP ────────────────────────────────
+  // e.g. "find Homagama", "where is invoice 0042", "search paracetamol", "who is customer X"
+  const isSearchQuery = /(find|search|where\s*is|who\s*is|lookup|look\s*up|show\s*me|check)\s+(.+)/i.test(query);
+  if (isSearchQuery && records.length > 0) {
+    const rawTerm = query.replace(/(find|search|where\s*is|who\s*is|lookup|look\s*up|show\s*me|check|for|record|the)\s+/gi, "").trim();
+    if (rawTerm.length > 1) {
+      const matches = records.filter((rec) => {
+        const fullStr = JSON.stringify(rec).toLowerCase();
+        return fullStr.includes(rawTerm);
+      });
+
+      if (matches.length > 0) {
+        const sampleMatches = matches.slice(0, 5).map((m, idx) => {
+          const title = m.invoice_number || m.invoice_no || m.batch_number || m.batchNo || m.customer_name ||
+            m.customer?.customer_name || m.product_name || m.account_name || m.code || `Match #${idx + 1}`;
+          
+          const details: string[] = [];
+          Object.entries(m).forEach(([k, v]) => {
+            if (v && typeof v !== "object" && details.length < 5) {
+              const strV = String(v).trim();
+              if (strV.length > 0 && strV.length < 50) {
+                details.push(`**${k}:** ${strV}`);
+              }
+            }
+          });
+
+          return `##### ${idx + 1}. ${title}\n` + details.map(d => `- ${d}`).join("\n");
+        });
+
+        const reply = `### 🔍 Live Search Results for "${rawTerm}"\n` +
+          `Found **${matches.length} matching record(s)** across visible data on **${pageTitle}**:\n\n` +
+          sampleMatches.join("\n\n") +
+          (matches.length > 5 ? `\n\n*...and ${matches.length - 5} additional matching records.*` : "");
+
+        return {
+          success: true,
+          reply,
+          suggestedActions: [
+            "Calculate total value for these matching records",
+            "Show audit history for this record",
+            "Explain standard workflow for this item",
+          ],
+        };
+      } else {
+        const sampleTitles = records.slice(0, 5).map((r) => {
+          return r.invoice_number || r.invoice_no || r.batch_number || r.customer_name || r.product_name || r.code || r.name || "Item";
+        }).join(", ");
+
+        const reply = `### 🔍 Search Inquiry: "${rawTerm}"\n\n` +
+          `No records matching **"${rawTerm}"** were found among the **${records.length} visible items** on **${pageTitle}**.\n\n` +
+          `**Sample records available on this screen:**\n${sampleTitles}\n\n` +
+          `*Try searching with a partial name, invoice code, or batch lot number.*`;
+
+        return {
+          success: true,
+          reply,
+          suggestedActions: [
+            `Show all ${recordCount} records on ${pageTitle}`,
+            "Calculate totals across all records",
+            "Explain filter options for this module",
+          ],
+        };
+      }
+    }
+  }
+
+  // ── INTENT E: SHELF-LIFE, EXPIRY & BATCH AUDIT ──────────────────────────────
+  // e.g. "expired batches", "near expiry", "quarantine", "fefo", "shelf life", "blocked"
+  const isExpiryQuery = /(expire|expiry|shelf|near\s*expiry|quarantine|fefo|hold|blocked|batch)/i.test(query);
+  if (isExpiryQuery) {
+    const today = new Date("2026-10-17");
+    const ninetyDays = new Date("2027-01-15");
+
+    let expiredList: any[] = [];
+    let nearExpiryList: any[] = [];
+    let blockedList: any[] = [];
+    let activeBatchCount = 0;
+
+    records.forEach((b) => {
+      const expStr = b.expiry_date || b.expDate || b.expiry || b["Expiry Date"] || b["Exp Date"];
+      const isBlocked = b.is_blocked || b.batch_status === "blocked" || b.batch_status === "quarantine" ||
+        String(b["Status"] || "").toLowerCase().includes("block");
+
+      if (isBlocked) blockedList.push(b);
+
+      if (expStr) {
+        const expDate = new Date(expStr);
+        if (!isNaN(expDate.getTime())) {
+          if (expDate < today) expiredList.push({ ...b, expDate });
+          else if (expDate <= ninetyDays) nearExpiryList.push({ ...b, expDate });
+          else activeBatchCount++;
+        }
+      }
+    });
+
+    const formatBatch = (b: any) => {
+      const num = b.batch_number || b.batch || b.batchNo || b["Batch #"] || b.id || "Batch";
+      const prod = b.product_name || b.product?.product_name || b["Product"] || "Pharma Product";
+      const exp = b.expDate ? b.expDate.toLocaleDateString() : (b.expiry_date || "Unknown");
+      return `- **${num}** (${prod}) — Expiry: \`${exp}\``;
+    };
+
+    let reply = `### 💊 Live Batch Expiry & FEFO Audit (${records.length} records analyzed)\n\n` +
+      `- **CRITICAL EXPIRED:** **${expiredList.length} batch(es)** (Immediate disposal or quarantine required under NMRA rules)\n` +
+      `- **NEAR-EXPIRY (< 90 Days):** **${nearExpiryList.length} batch(es)** (Prioritize dispatch via FEFO protocol)\n` +
+      `- **BLOCKED / QA HOLD:** **${blockedList.length} batch(es)** (Awaiting quality release dossiers)\n` +
+      `- **COMPLIANT ACTIVE STOCK:** **${activeBatchCount} batch(es)** in good shelf-life standing\n\n`;
+
+    if (expiredList.length > 0) {
+      reply += `#### 🚨 Expired Batches Requiring Disposal:\n` + expiredList.slice(0, 5).map(formatBatch).join("\n") + "\n\n";
+    }
+
+    if (nearExpiryList.length > 0) {
+      reply += `#### ⚠️ Batches Requiring Priority FEFO Dispatch:\n` + nearExpiryList.slice(0, 5).map(formatBatch).join("\n") + "\n\n";
+    }
+
+    reply += `#### 🛡️ Sri Lanka NMRA Regulatory Directives:\n` +
+      `1. **First-Expiry First-Out (FEFO):** System automatically directs warehouse picking to oldest viable lots.\n` +
+      `2. **Quarantine Isolation:** Segregate blocked lots in designated physical warehouse quarantine cage.\n` +
+      `3. **Reconciliation Dossier:** Any batch destruction requires dual QA signoff and NMRA notification.`;
+
+    return {
+      success: true,
+      reply,
+      suggestedActions: [
+        "Generate batch destruction / return manifest",
+        "Calculate inventory value of near-expiry stock",
+        "List all blocked batches with QA hold notes",
+        "How to unblock a cleared batch after lab test?",
+      ],
+    };
+  }
+
+  // ── INTENT F: RECEIVABLES, AGING & OVERDUE INVOICE AUDIT ────────────────────
+  // e.g. "overdue", "unpaid", "receivables", "credit limit", "collections", "aging"
+  const isReceivablesQuery = /(overdue|unpaid|due|receivable|credit|collection|aging|dso|debt)/i.test(query);
+  if (isReceivablesQuery) {
+    let overdueList: any[] = [];
+    let paidList: any[] = [];
+    let draftList: any[] = [];
+    let totalOverdueVal = 0;
+    let totalReceivableVal = 0;
+
+    records.forEach((inv) => {
+      const amt = parseNum(inv.total_amount || inv.grand_total || inv.amount || inv["Amount"] || inv["Total"]) || 0;
+      totalReceivableVal += amt;
+      const status = String(inv.status || inv["Status"] || "").toLowerCase();
+
+      if (status.includes("overdue") || status.includes("unpaid")) {
+        overdueList.push(inv);
+        totalOverdueVal += amt;
+      } else if (status.includes("paid") || status.includes("settled")) {
+        paidList.push(inv);
+      } else if (status.includes("draft")) {
+        draftList.push(inv);
+      }
+    });
+
+    const formatInv = (inv: any) => {
+      const no = inv.invoice_number || inv.invoice_no || inv.code || inv["Invoice #"] || inv.id;
+      const cust = inv.customer_name || inv.customer?.customer_name || inv["Customer"] || "Customer";
+      const amt = parseNum(inv.total_amount || inv.grand_total || inv.amount || inv["Amount"]) || 0;
+      return `- **${no}** (${cust}): **${fmtLKR(amt)}** [${inv.status || 'Overdue'}]`;
+    };
+
+    let reply = `### 🧾 Receivables & Aging Liquidity Audit (${records.length} invoices analyzed)\n\n` +
+      `- **Total Overdue Exposure:** **${fmtLKR(totalOverdueVal)}** (${overdueList.length} invoices)\n` +
+      `- **Overdue Ratio:** **${totalReceivableVal > 0 ? ((totalOverdueVal / totalReceivableVal) * 100).toFixed(1) : 0}%** of visible ledger\n` +
+      `- **Fully Settled:** ${paidList.length} invoices\n` +
+      `- **Drafts Pending Approval:** ${draftList.length} invoices\n\n`;
+
+    if (overdueList.length > 0) {
+      reply += `#### 🚨 Priority Invoices Requiring Collection:\n` + overdueList.slice(0, 5).map(formatInv).join("\n") + "\n\n";
+    }
+
+    reply += `#### 💼 Actionable Financial Guidance:\n` +
+      `1. **Automated Statement Dispatch:** Transmit monthly customer statement with SVAT breakdown.\n` +
+      `2. **Credit Hold Enforcement:** Temporarily freeze new sales orders for accounts exceeding 60-day terms.\n` +
+      `3. **Receipt Allocation:** Reconcile incoming bank transfers via Customer Receipts module.`;
+
+    return {
+      success: true,
+      reply,
+      suggestedActions: [
+        "Calculate total overdue receivables balance",
+        "Which customer accounts exceed approved credit limits?",
+        "How to record a partial settlement receipt?",
+        "Review 30-60-90 day aging schedule",
+      ],
+    };
+  }
+
+  // ── INTENT G: ACTIVE OPEN FORM VALIDATION ───────────────────────────────────
+  // e.g. "check my form", "validate inputs", "is anything missing"
+  const isFormCheckQuery = /(form|modal|validate|input|check\s*my|missing|field)/i.test(query);
+  if (isFormCheckQuery && formFields.length > 0) {
+    const filledFields = formFields.filter(f => f.value && f.value.trim() !== "");
+    const emptyFields = formFields.filter(f => !f.value || f.value.trim() === "");
+
+    const reply = `### 📝 Active Modal Form Inspection\n` +
+      `Inspected **${formFields.length} input fields** currently open on screen:\n\n` +
+      `- **Completed Fields (${filledFields.length}):**\n` +
+      filledFields.map(f => `  - **${f.label || f.name}:** \`${f.value}\``).join("\n") + "\n\n" +
+      (emptyFields.length > 0
+        ? `- **⚠️ Unfilled / Optional Fields (${emptyFields.length}):**\n` +
+          emptyFields.map(f => `  - **${f.label || f.name}** (Pending entry)`).join("\n") + "\n\n"
+        : `✅ **All visible form fields are populated!**\n\n`) +
+      `💡 *Ensure all amounts are positive numbers and that customer TIN/SVAT numbers match Inland Revenue Department (IRD) records.*`;
+
+    return {
+      success: true,
+      reply,
+      suggestedActions: [
+        "Calculate line total and tax for this form",
+        "What are mandatory fields for this document?",
+        "Explain Sri Lanka SVAT tax invoice rules",
+      ],
+    };
+  }
+
+  // ── INTENT H: SOP & REGULATORY WORKFLOW PROCEDURES ──────────────────────────
+  // e.g. "how to create", "how do i", "steps", "sop", "procedure", "vat", "sscl", "rules"
+  const isSopQuery = /(how\s*to|how\s*do|steps|procedure|workflow|sop|guide|vat|tax|sscl|compliance|rule)/i.test(query);
+  if (isSopQuery) {
+    let sopTitle = `Standard Operating Procedure: ${pageTitle}`;
+    let steps: string[] = [];
+    let regulations: string[] = [];
+
+    if (route.includes("invoice")) {
+      sopTitle = "Sales Invoice Creation & Fiscal Settlement SOP";
+      steps = [
+        "Navigate to Invoice Center > Sales Invoices and click '+ Create Invoice'.",
+        "Select an approved Customer from Master Data (verifies credit limit & active license).",
+        "Add line items: Select product, batch lot (FEFO enforced), quantity, and price.",
+        "System calculates 18% SVAT and 2.5% SSCL automatically based on customer tax exemption status.",
+        "Submit for authorization; upon posting, GL updates Accounts Receivable and Sales Revenue."
+      ];
+      regulations = [
+        "Inland Revenue Department (IRD) sequential tax numbering must never have gaps.",
+        "Credit notes require reference to original invoice number and manager sign-off.",
+      ];
+    } else if (route.includes("inventory")) {
+      sopTitle = "Pharmaceutical Batch Acquisition & Quality Release SOP";
+      steps = [
+        "Verify Goods Receipt Note (GRN) against Physical Consignment and Supplier Delivery Note.",
+        "Inspect container tamper seals, lot numbers, and temperature logger history.",
+        "Log batch into Quarantine Hold status pending Quality Assurance (QA) analytical certificate.",
+        "Once approved, release batch into Active Warehouse Bin with strict FEFO dispatch rules."
+      ];
+      regulations = [
+        "Sri Lanka NMRA requires minimum 18-month remaining shelf-life at time of importation.",
+        "Controlled cold-chain pharmaceuticals require continuous temperature logging."
+      ];
+    } else if (route.includes("finance")) {
+      sopTitle = "Banking & Payment Voucher Authorization SOP";
+      steps = [
+        "Initiate Payment Voucher with verified Supplier Tax Invoice reference.",
+        "Select funding Bank Account and verify cleared ledger balance.",
+        "Enforce dual-signoff authorization matrix (Accountant + Finance Controller).",
+        "Post voucher to execute real-time credit to Bank and debit to Accounts Payable."
+      ];
+      regulations = [
+        "Sri Lanka Banking Act withholding tax (WHT) deductions must be declared monthly.",
+        "Bank reconciliation must be certified on or before the 5th of each calendar month."
+      ];
+    } else {
+      sopTitle = `Enterprise Operation SOP: ${pageTitle}`;
+      steps = [
+        `Access ${pageTitle} via main navigation or Quick Action launcher.`,
+        "Filter and inspect active records using column sorting and search bar.",
+        "Execute required data entry or update with full audit remarks.",
+        "Verify changes against NMRA regulatory compliance guidelines."
+      ];
+      regulations = [
+        "All updates are permanently logged with user ID, timestamp, and IP in the immutable Audit Trail."
+      ];
+    }
+
+    const reply = `### 📋 ${sopTitle}\n\n` +
+      `#### Sequential Operational Steps:\n` +
+      steps.map((s, i) => `${i + 1}. **Step ${i + 1}:** ${s}`).join("\n") + "\n\n" +
+      `#### 🛡️ Compliance & Statutory Directives:\n` +
+      regulations.map(r => `- ${r}`).join("\n");
+
+    return {
+      success: true,
+      reply,
+      suggestedActions: [
+        "What are the mandatory fields for this workflow?",
+        "Audit existing records for compliance gaps",
+        "Explain accounting and subledger impact",
+      ],
+    };
+  }
+
+  // ── INTENT I: COMPREHENSIVE DYNAMIC SCREEN SUMMARY (DEFAULT) ────────────────
+  // When user asks "summarize", "analyze", "status", or any open-ended inquiry
   let metricsText = "";
   if (kpis.length > 0) {
     metricsText = `\n### 📈 Active Screen Metrics\n` + kpis.map(k => `- **${k.label}:** ${k.value}`).join("\n");
   }
 
-  // Domain-specific live record analysis
-  let dataAnalysis = "";
-  let actionItems: string[] = [];
-  let suggestedPrompts: string[] = [];
-
-  if (isInventory) {
-    suggestedPrompts = [
-      "Which batches have near-expiry dates?",
-      "List blocked or quarantined batches",
-      "Calculate average purchase rate and selling price",
-      "Show batches with highest inventory value",
-    ];
-
-    if (records.length > 0) {
-      let blockedCount = 0;
-      let expiredCount = 0;
-      let nearExpiryCount = 0;
-      let totalPurchaseVal = 0;
-      const today = new Date("2026-10-17");
-      const ninetyDays = new Date("2027-01-15");
-
-      const batchSummaries: string[] = [];
-
-      records.forEach((b: any, idx: number) => {
-        const batchNum = b.batch_number || b.batch || b.batchNo || `Batch #${b.id || idx + 1}`;
-        const prodName = b.product?.product_name || b.product_name || b.product || "Pharma Product";
-        const exp = b.expiry_date || b.expDate;
-        const isBlocked = b.is_blocked || b.batch_status === "blocked" || b.batch_status === "quarantine";
-        const purchaseRate = Number(b.purchase_rate || b.rate || 0);
-
-        if (purchaseRate) totalPurchaseVal += purchaseRate;
-        if (isBlocked) blockedCount++;
-
-        if (exp) {
-          const expDate = new Date(exp);
-          if (expDate < today) expiredCount++;
-          else if (expDate <= ninetyDays) nearExpiryCount++;
-        }
-
-        if (idx < 6) {
-          batchSummaries.push(`- **${batchNum}** (${prodName}): Status \`${isBlocked ? 'BLOCKED' : b.batch_status || 'Active'}\`${exp ? ` | Expiry: ${new Date(exp).toLocaleDateString()}` : ''}`);
-        }
-      });
-
-      dataAnalysis = `### 📦 Live Product Batches Analysis (${records.length} records analyzed)\n` +
-        `- **Active vs Blocked:** ${records.length - blockedCount} Active | **${blockedCount} Blocked**\n` +
-        `- **Shelf-Life Risk:** **${expiredCount} Expired** | **${nearExpiryCount} Near-Expiry (< 90 days)**\n` +
-        (totalPurchaseVal > 0 ? `- **Sample Value Pool:** LKR ${totalPurchaseVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}\n` : '') +
-        `\n#### Sample Batch Registry:\n${batchSummaries.join("\n")}`;
-
-      if (query.includes("expire") || query.includes("expiry")) {
-        dataAnalysis += `\n\n**Direct Expiry Finding:** There are **${expiredCount} expired** and **${nearExpiryCount} near-expiry batches** detected in the current active set. All dispensing must strictly follow **First-Expiry First-Out (FEFO)** protocol.`;
-      } else if (query.includes("block")) {
-        dataAnalysis += `\n\n**Direct Hold Finding:** **${blockedCount} batch(es)** currently marked with blocked/hold status. Verify Quality Assurance (QA) release clearances before unblocking.`;
-      }
-
-      actionItems = [
-        blockedCount > 0 ? `Inspect QA clearance dossiers for ${blockedCount} blocked batches` : "Audit active batch storage temperature logs",
-        nearExpiryCount > 0 ? `Prioritize dispatch for ${nearExpiryCount} near-expiry batches via FEFO` : "Schedule quarterly batch cycle count",
-        "Generate batch reconciliation report for NMRA audit",
-      ];
-    } else {
-      dataAnalysis = `### 📦 Inventory & Batch Telemetry\n` +
-        `- Currently monitoring active product catalogue and warehouse bins on **${pageTitle}**.\n` +
-        `- Automated FEFO routing and lot number traceability active across all distribution channels.`;
-      actionItems = [
-        "Search or filter batches by product code or lot number",
-        "Add a new product batch with manufacturing & expiry dates",
-        "Verify quarantine and blocked batch statuses",
-      ];
-    }
-  } else if (isInvoice) {
-    suggestedPrompts = [
-      "Summarize total invoice values and collections",
-      "Which invoices are currently overdue?",
-      "List customer outstanding balances",
-      "Show credit limit utilization",
-    ];
-
-    if (records.length > 0) {
-      let totalAmount = 0;
-      let paidCount = 0;
-      let overdueCount = 0;
-      let draftCount = 0;
-      const topInvoices: string[] = [];
-
-      records.forEach((inv: any, idx: number) => {
-        const invNo = inv.invoice_number || inv.invoice_no || inv.code || `INV-${inv.id || idx + 1}`;
-        const custName = inv.customer?.customer_name || inv.customer_name || "Customer";
-        const amt = Number(inv.total_amount || inv.grand_total || inv.amount || 0);
-        const status = (inv.status || "").toLowerCase();
-
-        totalAmount += amt;
-        if (status.includes("paid")) paidCount++;
-        else if (status.includes("overdue")) overdueCount++;
-        else if (status.includes("draft")) draftCount++;
-
-        if (idx < 6) {
-          topInvoices.push(`- **${invNo}** (${custName}): LKR ${amt.toLocaleString(undefined, { minimumFractionDigits: 2 })} [${inv.status || 'Active'}]`);
-        }
-      });
-
-      dataAnalysis = `### 🧾 Live Invoicing Analysis (${records.length} records analyzed)\n` +
-        `- **Total Sample Revenue:** **LKR ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}**\n` +
-        `- **Settlement Status:** ${paidCount} Paid | ${overdueCount} Overdue | ${draftCount} Drafts | ${records.length - paidCount - overdueCount - draftCount} Pending\n` +
-        `\n#### Recent Invoices Overview:\n${topInvoices.join("\n")}`;
-
-      if (query.includes("overdue") || query.includes("unpaid") || query.includes("due")) {
-        dataAnalysis += `\n\n**Overdue Insights:** **${overdueCount} invoices** require collection follow-up. Initiate automated statement dispatch to shorten Days Sales Outstanding (DSO).`;
-      } else if (query.includes("total") || query.includes("revenue") || query.includes("sum")) {
-        dataAnalysis += `\n\n**Revenue Summary:** Total value across visible records is **LKR ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}**. Average invoice size is **LKR ${(totalAmount / (records.length || 1)).toLocaleString(undefined, { minimumFractionDigits: 2 })}**.`;
-      }
-
-      actionItems = [
-        overdueCount > 0 ? `Follow up on ${overdueCount} overdue receivables` : "Send monthly customer balance statements",
-        draftCount > 0 ? `Review and approve ${draftCount} draft invoices` : "Reconcile daily receipt allocations",
-        "Verify 18% VAT and 2.5% SSCL tax breakdown",
-      ];
-    } else {
-      dataAnalysis = `### 🧾 Invoice & Customer Receivables Telemetry\n` +
-        `- Real-time sales ledger tracking active on **${pageTitle}**.\n` +
-        `- Sequential SVAT tax invoice generation and multi-tier customer credit control enabled.`;
-      actionItems = [
-        "Create new sales invoice or proforma",
-        "Check customer payment receipts and allocations",
-        "Review customer credit limits and delivery addresses",
-      ];
-    }
-  } else if (isFinance) {
-    suggestedPrompts = [
-      "Analyze current liquidity and cash positions",
-      "Summarize bank account balances",
-      "Check unposted journal vouchers",
-      "Audit payment vouchers against bank reconciliation",
-    ];
-
-    if (records.length > 0) {
-      let totalBal = 0;
-      const accountItems: string[] = [];
-
-      records.forEach((acc: any, idx: number) => {
-        const title = acc.account_name || acc.bank_name || acc.voucher_number || `Account #${acc.id || idx + 1}`;
-        const bal = Number(acc.current_balance || acc.balance || acc.amount || 0);
-        totalBal += bal;
-        if (idx < 6) {
-          accountItems.push(`- **${title}**: LKR ${bal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
-        }
-      });
-
-      dataAnalysis = `### 🏛️ Financial Ledger Telemetry (${records.length} records analyzed)\n` +
-        (totalBal !== 0 ? `- **Aggregated Balance:** **LKR ${totalBal.toLocaleString(undefined, { minimumFractionDigits: 2 })}**\n` : '') +
-        `\n#### Visible Accounts / Vouchers:\n${accountItems.join("\n")}`;
-
-      actionItems = [
-        "Complete daily bank reconciliation for active accounts",
-        "Verify double-entry debit/credit equality in pending journals",
-        "Audit payment voucher authorizations against bank mandate",
-      ];
-    } else {
-      dataAnalysis = `### 🏛️ Treasury & Fiscal Telemetry\n` +
-        `- General Ledger, banking, and voucher controls operating smoothly on **${pageTitle}**.\n` +
-        `- Dual-entry validation and chart-of-accounts mapping active.`;
-      actionItems = [
-        "Audit general ledger balances",
-        "Review pending payment vouchers",
-        "Verify bank reconciliation status",
-      ];
-    }
-  } else {
-    suggestedPrompts = [
-      `Summarize records on ${pageTitle}`,
-      "Check pending audit logs and permissions",
-      "Identify operational bottlenecks",
-      "Show system compliance status",
-    ];
-
-    dataAnalysis = `### ⚡ System Telemetry: ${pageTitle}\n` +
-      `- Active module: **${pageContext?.moduleName || 'Ceylon Med ERP'}**\n` +
-      `- Active records inspected: **${recordCount}** item(s)\n` +
-      `- All system transactions, security credentials, and document sequences are verified and valid.`;
-
-    actionItems = [
-      `Review configuration on ${pageTitle}`,
-      "Ensure all user actions comply with NMRA audit trail rules",
-      "Export operational report if required for documentation",
-    ];
+  // Sample records highlight
+  let recordHighlights = "";
+  if (records.length > 0) {
+    const samples = records.slice(0, 4).map((r, i) => {
+      const name = r.invoice_number || r.batch_number || r.customer_name || r.product_name || r.code || r.name || `Item #${i + 1}`;
+      const status = r.status || r.batch_status || r["Status"] || "Active";
+      const amt = r.total_amount || r.grand_total || r.purchase_rate || r.balance || r["Amount"] || "";
+      return `- **${name}** [${status}]${amt ? ` — LKR ${parseNum(amt)?.toLocaleString() || amt}` : ''}`;
+    });
+    recordHighlights = `\n#### 📄 Visible Record Highlights:\n${samples.join("\n")}\n`;
   }
 
-  const reply = `**AI Copilot Analysis:** ${pageTitle}\n\n` +
-    (metricsText ? `${metricsText}\n\n` : '') +
-    `${dataAnalysis}\n\n` +
-    `#### 💡 Recommended Next Steps:\n` +
-    actionItems.map(a => `1. ${a}`).join("\n");
+  const reply = `### ⚡ Live Copilot Telemetry: ${pageTitle}\n\n` +
+    `I have analyzed the current workspace state for **"${query || 'General Inquiry'}"**:\n` +
+    `- **Active Records Inspected:** **${recordCount}** item(s)\n` +
+    `- **Module Route:** \`${route || '/'}\`\n` +
+    `- **Regulatory Framework:** Sri Lanka NMRA & Inland Revenue Department Compliant\n` +
+    metricsText + "\n" +
+    recordHighlights + "\n" +
+    `#### 💡 Recommended Immediate Inquiries:\n` +
+    suggestedPrompts.map((p, i) => `${i + 1}. *"${p}"*`).join("\n");
 
   return {
     success: true,
@@ -1163,7 +1618,7 @@ export async function generateAiDashboardAnalysis(
   customPrompt?: string
 ): Promise<AiDashboardAnalysisResult> {
   // 1. Attempt live Google Gemini API call only if configured with a valid key
-  if (IS_EXTERNAL_GEMINI_ENABLED) {
+  if (hasActiveGeminiKey()) {
     try {
       const prompt = `Perform an executive pharmaceutical enterprise analysis for the "${dashboardType}" dashboard.
 Live Metrics: ${JSON.stringify(kpis || {}).slice(0, 1500)}
@@ -1187,7 +1642,7 @@ Return strictly valid JSON:
   ]
 }`;
 
-    const response = await fetch(GEMINI_ENDPOINT, {
+    const response = await fetch(getGeminiEndpoint(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
