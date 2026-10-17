@@ -13,7 +13,9 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config: any) => {
-    const token = Cookies.get("erp_token");
+    const token =
+      Cookies.get("erp_token") ||
+      (typeof localStorage !== "undefined" ? localStorage.getItem("erp_token") : null);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,9 +32,14 @@ apiClient.interceptors.response.use(
   },
   (error: any) => {
     if (error.response && error.response.status === 401) {
-      const token = Cookies.get("erp_token");
+      const token =
+        Cookies.get("erp_token") ||
+        (typeof localStorage !== "undefined" ? localStorage.getItem("erp_token") : null);
       if (token) {
         Cookies.remove("erp_token");
+        if (typeof localStorage !== "undefined") {
+          localStorage.removeItem("erp_token");
+        }
         window.location.href = "/login";
       }
     }
