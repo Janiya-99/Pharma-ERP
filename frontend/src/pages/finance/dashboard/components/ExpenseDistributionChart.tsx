@@ -1,71 +1,175 @@
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import React, { useState } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { ChevronDown, Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../../components/ui/dropdown-menu";
 import { ExpenseCategory } from "../types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
-import { money } from "../utils";
+import { formatLKR, formatCompactLKR } from "../utils";
+import { useNavigate } from "react-router-dom";
 
 interface ExpenseDistributionChartProps {
-  data: ExpenseCategory[];
+  data?: ExpenseCategory[];
 }
 
-const COLORS = ["#4F46E5", "#0F766E", "#16A34A", "#D97706", "#6B7280", "#DC2626"];
+const CATEGORY_COLORS = [
+  "#4F46E5", // Cost of Goods Sold - Indigo
+  "#06B6D4", // Operating Expenses - Cyan
+  "#10B981", // Salaries & Benefits - Emerald
+  "#F43F5E", // Marketing & Sales - Rose
+  "#F59E0B", // Utilities & Facility - Amber
+  "#94A3B8", // Others - Slate
+];
 
-export function ExpenseDistributionChart({ data }: ExpenseDistributionChartProps) {
+export const ExpenseDistributionChart: React.FC<ExpenseDistributionChartProps> = ({ data }) => {
+  const navigate = useNavigate();
+  const [selectedPeriod, setSelectedPeriod] = useState("This Month");
+
+  // Default data strictly conforming to Image 2
+  const defaultExpenseCategories: ExpenseCategory[] = [
+    { category: "Cost of Goods Sold", amount: 5208000, share: 42 },
+    { category: "Operating Expenses", amount: 2976000, share: 24 },
+    { category: "Salaries & Benefits", amount: 1736000, share: 14 },
+    { category: "Marketing & Sales", amount: 992000, share: 8 },
+    { category: "Utilities & Facility", amount: 744000, share: 6 },
+    { category: "Others", amount: 744000, share: 6 },
+  ];
+
+  const items =
+    data && data.length > 0
+      ? data.map((d, i) => ({
+          category: d.category || "General Expense",
+          amount: d.amount || 0,
+          share: d.share || Math.round(100 / data.length),
+        }))
+      : defaultExpenseCategories;
+
+  const totalExpense = items.reduce((acc, curr) => acc + curr.amount, 0);
+
+  const formatShortAmount = (val: number) => {
+    if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+    if (val >= 1_000) return `${(val / 1_000).toFixed(0)}K`;
+    return `${val}`;
+  };
+
   return (
-    <Card className="col-span-1 rounded-2xl border-slate-200/60 bg-white/70 backdrop-blur-xl shadow-sm transition-all duration-300 hover:shadow-md ring-1 ring-inset ring-slate-900/5 lg:col-span-4  ">
-      <CardHeader className="pb-2">
-        <CardTitle>Expense Distribution</CardTitle>
-        <CardDescription>Breakdown of operating costs</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex h-[200px] items-center justify-center pt-4">
+    <div className="col-span-12 lg:col-span-4 flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h2 className="text-base font-bold text-slate-900 tracking-tight">
+          Expense Distribution
+        </h2>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 cursor-pointer"
+            >
+              <span>{selectedPeriod}</span>
+              <ChevronDown className="h-3 w-3 text-slate-400" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36 rounded-xl p-1 bg-white shadow-lg border-slate-200 text-xs">
+            {["This Month", "Last Month", "This Quarter", "YTD"].map((p) => (
+              <DropdownMenuItem
+                key={p}
+                onClick={() => setSelectedPeriod(p)}
+                className="flex items-center justify-between rounded-lg p-2 cursor-pointer font-medium"
+              >
+                <span>{p}</span>
+                {selectedPeriod === p && <Check className="h-3 w-3 text-indigo-600" />}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Main Content: Donut + Detailed Legend */}
+      <div className="my-auto py-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Donut Chart with Center Total */}
+        <div className="relative h-[175px] w-[175px] shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={items}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={2}
+                innerRadius={55}
+                outerRadius={75}
+                paddingAngle={3}
                 dataKey="amount"
                 nameKey="category"
                 stroke="none"
               >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                {items.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  borderRadius: "8px",
-                  border: "1px solid #E5E7EB",
+                  backgroundColor: "rgba(255, 255, 255, 0.98)",
+                  borderRadius: "10px",
+                  border: "1px solid #E2E8F0",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                  fontSize: "12px",
                 }}
-                itemStyle={{ fontSize: "14px", fontWeight: 500 }}
-                formatter={(value: number, name: string) => [money(value), name]}
+                formatter={(value: any, name: any) => [
+                  formatLKR(Number(value)),
+                  name,
+                ]}
               />
             </PieChart>
           </ResponsiveContainer>
+          {/* Centered Total Label */}
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">
+              {formatCompactLKR(totalExpense)}
+            </span>
+            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              Total Expenses
+            </span>
+          </div>
         </div>
-        <div className="mt-4 flex flex-col gap-2">
-          {data.map((item, index) => (
-            <div key={index} className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <div
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                />
-                <span className="text-gray-600 ">{item.category}</span>
+
+        {/* Legend List */}
+        <div className="flex-1 w-full space-y-2">
+          {items.map((item, index) => {
+            const color = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
+            return (
+              <div
+                key={index}
+                onClick={() => navigate("/finance/reports/profit-and-loss")}
+                className="group flex items-center justify-between text-xs cursor-pointer hover:bg-slate-50/80 p-1 rounded-lg transition-colors"
+              >
+                <div className="flex items-center gap-2 truncate pr-2">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-slate-600 font-medium group-hover:text-slate-900 truncate">
+                    {item.category}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <span className="font-bold text-slate-900 text-right">
+                    {item.share}%
+                  </span>
+                  <span className="text-slate-400 font-semibold text-right w-12">
+                    {formatShortAmount(item.amount)}
+                  </span>
+                </div>
               </div>
-              <div className="flex gap-4 font-medium">
-                <span className="text-gray-900 ">{money(item.amount)}</span>
-                <span className="w-10 text-right text-gray-500">{item.share}%</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
-}
+};

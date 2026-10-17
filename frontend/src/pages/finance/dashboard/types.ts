@@ -91,6 +91,21 @@ export interface PeriodStatus {
   posting_allowed: boolean;
 }
 
+export interface TopEntityItem {
+  name: string;
+  amount: number;
+  percentage?: number;
+  code?: string;
+}
+
+export interface FinancialAlertItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  severity: "High" | "Medium" | "Low";
+  link: string;
+}
+
 export interface FinanceDashboardResponse {
   summary: DashboardSummary;
   trend: TrendPoint[];

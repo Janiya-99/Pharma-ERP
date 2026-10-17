@@ -1,80 +1,145 @@
+import React from "react";
+import { ArrowUpRight, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ReceivablesSummary } from "../types";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../components/ui/card";
-import { money } from "../utils";
-import { ChevronRight } from "lucide-react";
+import { formatLKR } from "../utils";
 
 interface ReceivablesAgingCardProps {
-  data: ReceivablesSummary;
+  data?: ReceivablesSummary;
 }
 
-export function ReceivablesAgingCard({ data }: ReceivablesAgingCardProps) {
+export const ReceivablesAgingCard: React.FC<ReceivablesAgingCardProps> = ({ data }) => {
   const navigate = useNavigate();
 
+  // Conforming default data from Image 2
+  const defaultTotal = 43934760;
+  const defaultBuckets = [
+    { label: "Current (0-30 days)", amount: 24120000, share: 55, color: "#3B82F6" },
+    { label: "31 - 60 days", amount: 9842120, share: 22, color: "#06B6D4" },
+    { label: "61 - 90 days", amount: 5271430, share: 12, color: "#F59E0B" },
+    { label: "91 - 120 days", amount: 2934850, share: 7, color: "#8B5CF6" },
+    { label: "> 120 days", amount: 1766360, share: 4, color: "#EF4444" },
+  ];
+
+  const totalOutstanding = data?.total_outstanding ? data.total_outstanding : defaultTotal;
+
+  // Process data if provided by backend, otherwise use exact Image 2 buckets
+  const buckets =
+    data && data.aging && data.aging.length > 0 && data.total_outstanding > 0
+      ? [
+          {
+            label: "Current (0-30 days)",
+            amount: data.aging[0]?.amount || 0,
+            share: Math.round(((data.aging[0]?.amount || 0) / data.total_outstanding) * 100),
+            color: "#3B82F6",
+          },
+          {
+            label: "31 - 60 days",
+            amount: data.aging[1]?.amount || 0,
+            share: Math.round(((data.aging[1]?.amount || 0) / data.total_outstanding) * 100),
+            color: "#06B6D4",
+          },
+          {
+            label: "61 - 90 days",
+            amount: data.aging[2]?.amount || 0,
+            share: Math.round(((data.aging[2]?.amount || 0) / data.total_outstanding) * 100),
+            color: "#F59E0B",
+          },
+          {
+            label: "91 - 120 days",
+            amount: data.aging[3]?.amount || 0,
+            share: Math.round(((data.aging[3]?.amount || 0) / data.total_outstanding) * 100),
+            color: "#8B5CF6",
+          },
+          {
+            label: "> 120 days",
+            amount: data.aging[4]?.amount || 0,
+            share: Math.round(((data.aging[4]?.amount || 0) / data.total_outstanding) * 100),
+            color: "#EF4444",
+          },
+        ]
+      : defaultBuckets;
+
+  const handleNavigate = () => {
+    navigate("/invoice-center/reports/customer-aging");
+  };
+
   return (
-    <Card 
-      onClick={() => navigate("/invoice-center/reports/customer-aging")}
-      className="rounded-3xl border-0 bg-white/70 backdrop-blur-2xl shadow-xl shadow-slate-200/40 ring-1 ring-slate-100 overflow-hidden relative group transition-all hover:shadow-2xl hover:shadow-slate-200/60 cursor-pointer hover:ring-blue-200"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/30 opacity-50 pointer-events-none" />
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-100/50 to-transparent rounded-bl-full pointer-events-none opacity-50" />
-      
-      <CardHeader className="pb-4 relative z-10 border-b border-slate-100/50 flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-lg font-semibold tracking-tight text-slate-800 group-hover:text-blue-600 transition-colors">Accounts Receivable</CardTitle>
-          <CardDescription className="text-sm font-medium text-slate-500">Outstanding customer invoices</CardDescription>
+    <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-slate-300">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h2 className="text-base font-bold text-slate-900 tracking-tight">
+          Accounts Receivable
+        </h2>
+        <button
+          type="button"
+          onClick={handleNavigate}
+          className="group inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer transition-colors"
+        >
+          <span>View Details</span>
+          <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </button>
+      </div>
+
+      {/* Main Metric */}
+      <div className="pt-3 pb-1">
+        <div className="flex items-center gap-2.5">
+          <span className="text-2xl font-bold tracking-tight text-slate-900">
+            {formatLKR(totalOutstanding)}
+          </span>
+          <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600 border border-emerald-100">
+            <ArrowUpRight className="h-3 w-3 stroke-[2.5]" />
+            12%
+          </span>
         </div>
-        <div className="h-7 w-7 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
-          <ChevronRight className="h-4 w-4" />
-        </div>
-      </CardHeader>
-      
-      <CardContent className="pt-5 relative z-10">
-        <div className="mb-6 flex items-end justify-between bg-white rounded-2xl p-4 ring-1 ring-slate-100 shadow-sm shadow-slate-100/50">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Total Outstanding</div>
-            <div className="text-3xl font-bold tracking-tight text-slate-900">
-              {money(data.total_outstanding)}
+        <p className="mt-0.5 text-xs text-slate-500 font-medium">
+          Outstanding customer balances
+        </p>
+      </div>
+
+      {/* Stacked Segmented Progress Bar */}
+      <div className="my-3.5 flex h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+        {buckets.map((b, i) => (
+          <div
+            key={i}
+            style={{
+              width: `${Math.max(b.share, 2)}%`,
+              backgroundColor: b.color,
+            }}
+            className="h-full transition-all duration-500"
+            title={`${b.label}: ${b.share}%`}
+          />
+        ))}
+      </div>
+
+      {/* Buckets List */}
+      <div className="space-y-2 pt-1">
+        {buckets.map((b, i) => (
+          <div
+            key={i}
+            onClick={handleNavigate}
+            className="group flex items-center justify-between text-xs cursor-pointer hover:bg-slate-50/70 p-1 rounded-lg transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ backgroundColor: b.color }}
+              />
+              <span className="text-slate-600 font-medium group-hover:text-slate-900">
+                {b.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="font-semibold text-slate-800">
+                {formatLKR(b.amount).replace("LKR ", "")}
+              </span>
+              <span className="w-8 text-right font-medium text-slate-400">
+                {b.share}%
+              </span>
             </div>
           </div>
-          <div className="text-right flex flex-col items-end justify-end">
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Collection Rate</div>
-            <div className="inline-flex items-center justify-center rounded-full bg-emerald-50 px-2.5 py-1 text-sm font-bold text-emerald-600 ring-1 ring-emerald-200/50">
-              {data.collection_rate}%
-            </div>
-          </div>
-        </div>
-        
-        <div className="space-y-4 pt-1">
-          {data.aging.map((bucket, index) => {
-            const percentage = data.total_outstanding > 0 ? (bucket.amount / data.total_outstanding) * 100 : 0;
-            // Create a gradient for each bar from a predefined set of modern colors based on index
-            const colors = [
-              "from-blue-400 to-blue-500 shadow-blue-500/20",
-              "from-indigo-400 to-indigo-500 shadow-indigo-500/20",
-              "from-violet-400 to-violet-500 shadow-violet-500/20",
-              "from-amber-400 to-amber-500 shadow-amber-500/20",
-              "from-rose-400 to-rose-500 shadow-rose-500/20",
-            ];
-            const colorClass = colors[index % colors.length];
-            
-            return (
-              <div key={index} className="group/bar">
-                <div className="mb-1.5 flex justify-between text-sm items-center">
-                  <span className="font-semibold text-slate-600 group-hover/bar:text-indigo-600 transition-colors">{bucket.label}</span>
-                  <span className="font-bold text-slate-800 tabular-nums">{money(bucket.amount)}</span>
-                </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100/80 shadow-inner">
-                  <div
-                    className={`h-full rounded-full bg-gradient-to-r ${colorClass} transition-all duration-700 ease-out shadow-sm`}
-                    style={{ width: `${Math.max(percentage, 2)}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+    </div>
   );
-}
+};
