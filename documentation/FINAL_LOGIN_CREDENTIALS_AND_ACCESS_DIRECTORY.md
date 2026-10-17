@@ -13,8 +13,7 @@ The Platform Admin Portal provides multi-tenant administration, tenant onboardin
 
 | Attribute | Platform Admin Details |
 |---|---|
-| **Portal Web URL** | [https://erp.pixandco.lk/platform/login](https://erp.pixandco.lk/platform/login) |
-| **Alternative URL** | [https://erp.pixandco.lk/admin/login](https://erp.pixandco.lk/admin/login) |
+| **Portal Web URL** | [https://erp.pixandco.lk/platform-admin/login](https://erp.pixandco.lk/platform-admin/login) |
 | **Username** | `admin` |
 | **Email Address** | `admin@platform.com` |
 | **Password** | `Admin@12345` |
