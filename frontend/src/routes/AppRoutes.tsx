@@ -5,7 +5,7 @@ import AppLayout from "../components/layout/AppLayout";
 import LoadingScreen from "../components/common/LoadingScreen";
 import ErrorBoundary from "../components/common/ErrorBoundary";
 import ModernErrorPage from "../pages/error/ModernErrorPage";
-const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
+import LoginPage from "../pages/auth/LoginPage";
 
 // Platform Admin imports
 import {
@@ -194,10 +194,7 @@ const PlatformProtectedRoute = ({
   if (loading) {
     return (
       <LoadingScreen
-        mode="fullscreen"
-        title="Pixandco"
-        badge="PLATFORM OWNER"
-        text="Verifying platform authority..."
+        mode="page"
       />
     );
   }
@@ -212,7 +209,7 @@ const ModuleSelectionPage = lazy(() => import("../pages/landing/ModuleSelectionP
 const AppRoutes = () => {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" badge="PIXANDCO ENTERPRISE" />}>
+      <Suspense fallback={<LoadingScreen mode="page" />}>
         <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<Navigate to="/modules" replace />} />
@@ -1164,7 +1161,7 @@ const AppRoutes = () => {
         path="/platform-admin/*"
         element={
           <PlatformAuthProvider>
-            <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" badge="PLATFORM OWNER" />}>
+            <Suspense fallback={<LoadingScreen mode="page" />}>
     <Routes>
               <Route path="login" element={<PlatformAdminLoginPage />} />
               <Route
