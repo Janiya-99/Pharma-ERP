@@ -3,7 +3,7 @@
 **Organization:** Ceylon MedEx Pharmaceuticals & Healthcare Lanka PLC  
 **Tenant Code:** `CEYLONMED`  
 **Tenant Database:** `erp_ceylonmed`  
-**Web Application Portal:** [https://erp.pixandco.lk/auth/login](https://erp.pixandco.lk/auth/login)  
+**Web Application Portal:** [https://erp.pixandco.lk/login](https://erp.pixandco.lk/login)  
 **Shared Initial Password:** `CeylonAdmin@2026`  
 **Date of Audit & Certification:** October 15, 2026  
 **Security Model:** Role-Based Access Control (RBAC) with Multi-Branch Isolation & Maker-Checker Approval Guardrails  

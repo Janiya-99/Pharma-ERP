@@ -273,7 +273,7 @@ def build_pdf():
             Paragraph("<b>Tenant Database:</b> <code>erp_ceylonmed</code>", td_style),
         ],
         [
-            Paragraph("<b>Web Portal:</b> <code>https://erp.pixandco.lk/auth/login</code>", td_style),
+            Paragraph("<b>Web Portal:</b> <code>https://erp.pixandco.lk/login</code>", td_style),
             Paragraph("<b>Shared Password:</b> <code>CeylonAdmin@2026</code>", td_style),
             Paragraph("<b>Total Role Permissions:</b> <b>1,124+ Active Mappings</b>", td_style),
         ]
@@ -468,7 +468,7 @@ def build_pdf():
         [Paragraph("Attribute", th_style), Paragraph("Sandbox Specification", th_style)],
         [Paragraph("<b>Company Name</b>", td_style), Paragraph("QA20261015 Pharma Distribution (Test)", td_style)],
         [Paragraph("<b>Tenant Code / Database</b>", td_style), Paragraph("Code: <code>QA20261015</code> &bull; Database: <code>erp_qa20261015</code>", code_bold)],
-        [Paragraph("<b>Login Portal URL</b>", td_style), Paragraph("<code>https://erp.pixandco.lk/auth/login</code>", code_bold)],
+        [Paragraph("<b>Login Portal URL</b>", td_style), Paragraph("<code>https://erp.pixandco.lk/login</code>", code_bold)],
         [Paragraph("<b>First Admin User</b>", td_style), Paragraph("Dr. Janith Samarasinghe (<code>admin@qa20261015.lk</code>)", td_style)],
         [Paragraph("<b>Default Password</b>", td_style), Paragraph("<code>CeylonAdmin@2026</code> (or <code>Admin@123</code>)", code_bold)],
     ]
