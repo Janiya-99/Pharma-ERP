@@ -59,6 +59,9 @@ services:
       # Migrations
       SKIP_MIGRATIONS: "true"
 
+      # CORS
+      CORS_ALLOWED_ORIGINS: "https://erp.pixandco.lk,http://erp.pixandco.lk,http://50.6.230.198:8081,http://50.6.230.198:8080"
+
     depends_on:
       - redis
 

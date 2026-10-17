@@ -49,12 +49,19 @@ func Setup(
 	// Configure CORS for frontend
 	r.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
-			// Always allow localhost and 127.0.0.1 dev origins
-			if strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "http://127.0.0.1:") {
+			if origin == "" {
+				return true
+			}
+			// Allow localhost, local loopback, VPS IP, and pixandco domains
+			if strings.HasPrefix(origin, "http://localhost") ||
+				strings.HasPrefix(origin, "http://127.0.0.1") ||
+				strings.HasPrefix(origin, "http://50.6.230.198") ||
+				strings.HasPrefix(origin, "https://50.6.230.198") ||
+				strings.Contains(origin, "pixandco.lk") {
 				return true
 			}
 			for _, o := range cfg.CORS.AllowedOrigins {
-				if o == origin {
+				if o == "*" || o == origin || strings.TrimSpace(o) == origin {
 					return true
 				}
 			}
