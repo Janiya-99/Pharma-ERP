@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import LoadingScreen from "../components/common/LoadingScreen";
+import ErrorBoundary from "../components/common/ErrorBoundary";
+import ModernErrorPage from "../pages/error/ModernErrorPage";
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
 
 // Platform Admin imports
@@ -208,8 +210,9 @@ const ModuleSelectionPage = lazy(() => import("../pages/landing/ModuleSelectionP
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" badge="PIXANDCO ENTERPRISE" />}>
-    <Routes>
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingScreen mode="fullscreen" title="Pixandco" badge="PIXANDCO ENTERPRISE" />}>
+        <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<Navigate to="/modules" replace />} />
 
@@ -1211,14 +1214,22 @@ const AppRoutes = () => {
                 />
                 <Route path="login-logs" element={<PlatformLoginLogsPage />} />
                 <Route path="audit-logs" element={<PlatformAuditLogsPage />} />
+                <Route path="*" element={<ModernErrorPage code={404} />} />
               </Route>
             </Routes>
     </Suspense>
           </PlatformAuthProvider>
         }
       />
+
+      {/* Modern Error Pages with multi-code support (404, 500, 422, 403, 401, 503) */}
+      <Route path="/error/:code?" element={<ModernErrorPage />} />
+
+      {/* Global Wildcard Catch-all Route: displays modern 404 error page */}
+      <Route path="*" element={<ModernErrorPage code={404} />} />
     </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 };
 
