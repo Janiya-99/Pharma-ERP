@@ -18,6 +18,8 @@ import {
   Receipt,
   Mail,
   ShieldAlert,
+  FileDown,
+  LifeBuoy,
 } from "lucide-react";
 
 type MenuItem = {
@@ -84,9 +86,18 @@ const PlatformAdminLayout = () => {
     },
     {
       name: "Support Desk",
-      icon: BookOpen,
+      icon: LifeBuoy,
       children: [
         { name: "Tickets", path: "/platform-admin/support/tickets" },
+      ],
+    },
+    {
+      name: "Documentation",
+      icon: FileDown,
+      children: [
+        { name: "All Manuals & Downloads", path: "/platform-admin/documentation" },
+        { name: "Login Credentials PDF", path: "/platform-admin/documentation?category=credentials" },
+        { name: "Complete Master Volume", path: "/platform-admin/documentation?category=manuals" },
       ],
     },
     {
@@ -231,6 +242,14 @@ const PlatformAdminLayout = () => {
             </h1>
           </div>
           <div className="flex items-center gap-4">
+            <NavLink
+              to="/platform-admin/documentation"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 hover:text-white border border-indigo-500/30 rounded-lg text-xs font-semibold transition-all shadow-xs"
+              title="Download Platform Documentation & Manuals"
+            >
+              <FileDown className="h-3.5 w-3.5" />
+              <span>Download Docs</span>
+            </NavLink>
             <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 rounded-full border border-slate-800 text-xs text-indigo-400 font-semibold uppercase tracking-wider">
               <Shield className="h-3 w-3" />
               <span>Owner Mode</span>
