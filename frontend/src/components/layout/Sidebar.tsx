@@ -32,6 +32,7 @@ import {
   ChevronDown,
   ShieldCheck,
   AlertTriangle,
+  LifeBuoy,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -44,6 +45,7 @@ import {
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useSidebarState } from "./AppLayout";
 import { controlCenterNavigation } from "../../config/controlCenterNavigation";
+import SubmitSupportTicketModal from "../common/SubmitSupportTicketModal";
 
 type MenuItem = {
   name: string;
@@ -62,6 +64,7 @@ type MenuItem = {
 const Sidebar = () => {
   const { activeSoftware, user, company, activeBranch, hasPermission } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [isPinned, setIsPinned] = useState(() => {
     try {
       return localStorage.getItem("erp_sidebar_pinned") !== "false";
@@ -913,6 +916,28 @@ const Sidebar = () => {
         </div>
       )}
 
+      {/* Global Support Ticket Action (Available across all modules) */}
+      <div className={`mb-2 ${isMobile || effectiveExpanded ? "px-3" : "px-2"}`}>
+        <button
+          type="button"
+          onClick={() => {
+            setIsTicketModalOpen(true);
+            if (isMobile) setMobileOpen(false);
+          }}
+          className={`w-full flex items-center gap-2.5 py-2 rounded-xl text-xs font-semibold transition-all group ${
+            isMobile || effectiveExpanded
+              ? "px-3 bg-indigo-50/70 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200/70 shadow-2xs"
+              : "justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/70"
+          }`}
+          title="Submit Support Ticket"
+        >
+          <LifeBuoy className="h-4 w-4 shrink-0 text-indigo-600 group-hover:rotate-45 transition-transform duration-300" />
+          {(isMobile || effectiveExpanded) && (
+            <span className="truncate">Submit Support Ticket</span>
+          )}
+        </button>
+      </div>
+
       {/* User info at bottom */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -1001,11 +1026,16 @@ const Sidebar = () => {
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent
           side="left"
-          className="flex w-72 flex-col border-r border-slate-200/70 bg-white/70 p-0 backdrop-blur-xl"
+          className="flex w-72 flex-col border-r border-slate-200 bg-white p-0 shadow-2xl"
         >
           {sidebarContent(true)}
         </SheetContent>
       </Sheet>
+
+      <SubmitSupportTicketModal
+        isOpen={isTicketModalOpen}
+        onClose={() => setIsTicketModalOpen(false)}
+      />
     </>
   );
 };

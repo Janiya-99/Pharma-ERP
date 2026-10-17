@@ -1,4 +1,5 @@
 import React from "react";
+import { Printer } from "lucide-react";
 import { Button } from "../ui/button";
 import { SalesInvoice } from "../../types/invoice-center";
 import PermissionGuard from "../../auth/PermissionGuard";
@@ -12,6 +13,7 @@ interface Props {
   onReject?: () => void;
   onPost?: () => void;
   onCancel?: () => void;
+  onPrint?: () => void;
   layout?: "horizontal" | "vertical";
   className?: string;
 }
@@ -25,6 +27,7 @@ export const SalesInvoiceActionButtons: React.FC<Props> = ({
   onReject,
   onPost,
   onCancel,
+  onPrint,
   layout = "horizontal",
   className = "",
 }) => {
@@ -33,10 +36,23 @@ export const SalesInvoiceActionButtons: React.FC<Props> = ({
 
   return (
     <div
-      className={`flex gap-2 ${
+      className={`flex items-center gap-2 ${
         layout === "vertical" ? "flex-col" : "flex-row"
       } ${className}`}
     >
+      <Button
+        variant="outline"
+        size="sm"
+        className="flex items-center gap-1.5 text-slate-700 hover:text-indigo-600 hover:border-indigo-300 cursor-pointer"
+        onClick={() => {
+          if (onPrint) onPrint();
+          else window.open(`/invoice-center/sales-invoices/${invoice.id}/print`, "_blank");
+        }}
+        title="Print Invoice"
+      >
+        <Printer className="h-4 w-4 text-slate-600" />
+        <span>Print</span>
+      </Button>
       {!isPosted &&
         (approval_status === "draft" || approval_status === "rejected") &&
         onEdit && (

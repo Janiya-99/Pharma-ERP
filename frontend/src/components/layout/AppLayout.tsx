@@ -51,6 +51,8 @@ const AppLayout = () => {
     if (targetCode && activeSoftware?.software_code !== targetCode && switchActiveSoftware) {
       switchActiveSoftware(targetCode);
     }
+    // Auto-dismiss mobile sidebar when navigating to new page for instant smooth mobile experience
+    setMobileOpen(false);
   }, [location.pathname, activeSoftware?.software_code, switchActiveSoftware]);
 
   return (
@@ -73,7 +75,7 @@ const AppLayout = () => {
             <main className="flex-1 overflow-x-hidden overflow-y-auto scroll-smooth bg-slate-50">
               <div className="flex flex-col min-h-full w-full">
                 <div className="page-content flex-grow space-y-8 pb-6 font-sans">
-                  <Suspense fallback={<LoadingScreen mode="page" title="Pixandco" />}>
+                  <Suspense fallback={<LoadingScreen mode="page" />}>
                     <Outlet />
                   </Suspense>
                 </div>
