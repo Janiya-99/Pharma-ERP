@@ -9,6 +9,7 @@ import JournalActionButtons from "../../../components/finance/JournalActionButto
 import MoneyDisplay from "../../../components/finance/MoneyDisplay";
 import FinancialYearSelect from "../../../components/finance/FinancialYearSelect";
 import AccountingPeriodSelect from "../../../components/finance/AccountingPeriodSelect";
+import { FinanceAiPromptBar } from "../shared/FinanceAiPromptBar";
 
 // Note: Modals will be implemented next.
 // import SubmitJournalModal from "./SubmitJournalModal";
@@ -60,20 +61,18 @@ export default function JournalEntriesPage() {
   };
 
   useEffect(() => {
-    if (activeSoftware?.software_code === "FINANCE") {
-      fetchJournals();
-    }
-  }, [filters, pagination.page, activeSoftware]);
+    fetchJournals();
+  }, [filters, pagination.page]);
 
   const handleAction = async (action: unknown, journal: unknown) => {
     if (action === "edit") {
-      navigate(`/finance/general-ledger/journal-entry/${journal.id}/edit`);
+      navigate(`/finance/general-ledger/journal-entry/${(journal as any).id}/edit`);
     } else if (action === "delete") {
       if (window.confirm("Are you sure you want to delete this journal entry?")) {
         try {
-          await financeApi.deleteJournalEntry(journal.id);
+          await financeApi.deleteJournalEntry((journal as any).id);
           fetchJournals();
-        } catch (err) {
+        } catch (err: any) {
           alert("Failed to delete: " + (err.response?.data?.message || err.message));
         }
       }
@@ -82,17 +81,19 @@ export default function JournalEntriesPage() {
     }
   };
 
-  if (activeSoftware?.software_code !== "FINANCE") {
-    return <div className="p-8 text-center text-red-500 font-medium">Please switch to Finance module to access this page.</div>;
-  }
-
   return (
-    <div className="flex flex-col gap-4 py-4 h-full">
+    <div className="flex flex-col gap-5 py-4 h-full">
       <FinancePageHeader
         title="Journal Entries"
-        subtitle="Manage financial journal entries and approvals"
+        subtitle="Manage financial journal entries, dual-currency balancing, and multi-step approvals"
         onAdd={hasPermission("finance.journal.create") ? () => navigate("/finance/general-ledger/journal-entry/create") : undefined}
         addLabel="Create Journal Entry"
+      />
+
+      <FinanceAiPromptBar
+        contextType="journal_entries"
+        pageTitle="Journal Entries"
+        dataSnapshot={journals}
       />
 
       {/* Filters Section */}

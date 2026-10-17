@@ -57,6 +57,7 @@ import {
 } from "../../../components/ui/table";
 import ERPConfirmDialog from "../../../components/erp/ERPConfirmDialog";
 import { DataTableToolbar } from "./DataTableToolbar";
+import { FinanceAiPromptBar, FinanceAiContextType } from "./FinanceAiPromptBar";
 
 import { DynamicLinesEditor } from "./DynamicLinesEditor";
 
@@ -502,6 +503,23 @@ export function FinanceQuickResourcePage({
           </p>
         </div>
       </div>
+
+      <FinanceAiPromptBar
+        contextType={(() => {
+          const t = config.title.toLowerCase();
+          if (t.includes("opening balance")) return "opening_balances";
+          if (t.includes("financial year")) return "financial_year";
+          if (t.includes("tax setting")) return "tax_settings";
+          if (t.includes("journal entry")) return "journal_entries";
+          if (t.includes("journal register")) return "journal_register";
+          if (t.includes("voucher") || t.includes("reconciliation") || t.includes("bank")) return "banking";
+          if (t.includes("asset")) return "fixed_assets";
+          return "chart_of_accounts";
+        })()}
+        pageTitle={config.title}
+        dataSnapshot={rows}
+        className="mb-6"
+      />
 
       <Card className="border-slate-200 border bg-white shadow-sm overflow-hidden">
         <DataTableToolbar

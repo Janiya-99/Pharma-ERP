@@ -14,56 +14,75 @@ import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
+import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 
 const CashBookReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
   
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   // Filter State
-  const [cashAccounts, setCashAccounts] = useState([]);
+  const [cashAccounts, setCashAccounts] = useState<any[]>([]);
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<any>({
     account_id: "",
     date_from: "",
     date_to: "",
-    branch_id: activeBranch?.id || ""
+    branch_id: activeBranch?.id ? String(activeBranch.id) : ""
   });
 
-  const fetchFiltersData = async () => {
-    try {
-      const accRes = await financeApi.getChartOfAccounts({ limit: 500, status: 'active', is_cash_account: true });
-      if (accRes.data?.success) setCashAccounts(accRes.data.data || []);
-    } catch (error) {
-      console.error("Failed to load filters data", error);
-    }
-  };
-
-  const fetchReport = useCallback(async () => {
-    if (!filters.account_id) {
-      toast.error("Cash Account is required");
+  const fetchReportWithFilters = useCallback(async (activeFilters: any) => {
+    if (!activeFilters?.account_id) {
       return;
     }
 
     setLoading(true);
     try {
-      const params = { ...filters };
-      Object.keys(params).forEach((key: unknown) => {
-        if (params[key] === "") delete params[key];
+      const params = { ...activeFilters };
+      Object.keys(params).forEach((key) => {
+        if (params[key] === "" || params[key] === undefined || params[key] === null) {
+          delete params[key];
+        }
       });
 
       const response = await financeApi.getCashBookReport(params);
       if (response.data?.success) {
         setData(response.data.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to fetch cash book report");
       setData(null);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, []);
+
+  const fetchFiltersData = async () => {
+    try {
+      const accRes = await financeApi.getChartOfAccounts({ limit: 500, status: 'active', is_cash_account: true });
+      const cList = Array.isArray(accRes.data?.data) ? accRes.data.data : Array.isArray(accRes.data) ? accRes.data : [];
+      setCashAccounts(cList);
+
+      const defaultCashAcc = cList[0]?.id ? String(cList[0].id) : "";
+      if (defaultCashAcc) {
+        const initial = {
+          account_id: defaultCashAcc,
+          date_from: "",
+          date_to: "",
+          branch_id: activeBranch?.id ? String(activeBranch.id) : ""
+        };
+        setFilters(initial);
+        fetchReportWithFilters(initial);
+      }
+    } catch (error) {
+      console.error("Failed to load filters data", error);
+    }
+  };
+
+  const fetchReport = useCallback(async () => {
+    fetchReportWithFilters(filters);
+  }, [filters, fetchReportWithFilters]);
 
   useEffect(() => {
     fetchFiltersData();
@@ -71,7 +90,7 @@ const CashBookReportPage = () => {
   }, [activeBranch]);
 
   const handleFilterChange = (key: unknown, value: unknown) => {
-    setFilters((prev: unknown) => ({ ...prev, [key]: value }));
+    setFilters((prev: any) => ({ ...prev, [key as string]: value }));
   };
 
   const handleApplyFilters = () => {
@@ -79,13 +98,19 @@ const CashBookReportPage = () => {
   };
 
   const handleClearFilters = () => {
-    setFilters({
-      account_id: "",
+    const defaultCashAcc = cashAccounts[0]?.id ? String(cashAccounts[0].id) : "";
+    const cleared = {
+      account_id: defaultCashAcc,
       date_from: "",
       date_to: "",
-      branch_id: activeBranch?.id || ""
-    });
-    setData(null);
+      branch_id: activeBranch?.id ? String(activeBranch.id) : ""
+    };
+    setFilters(cleared);
+    if (cleared.account_id) {
+      fetchReportWithFilters(cleared);
+    } else {
+      setData(null);
+    }
   };
 
   const handleExportJson = () => {
@@ -99,12 +124,17 @@ const CashBookReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!hasPermission("finance.report.cash_book.view")) {
+  const canView =
+    hasPermission("finance.report.cash_book.view") ||
+    hasPermission("finance.report.view") ||
+    hasPermission("finance.reports.view");
+
+  if (!canView) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
-        <p className="text-gray-500 ">You do not have permission to view the Cash Book report.</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h2>
+        <p className="text-gray-500">You do not have permission to view the Cash Book report.</p>
       </div>
     );
   }
@@ -113,44 +143,55 @@ const CashBookReportPage = () => {
     {
       header: "Date",
       accessor: "transaction_date",
-      cell: (row: unknown) => format(new Date(row.transaction_date), 'yyyy-MM-dd')
+      cell: (row: any) => format(new Date(row.transaction_date), 'yyyy-MM-dd')
     },
     {
       header: "Source Type",
       accessor: "source_type",
-      cell: (row: unknown) => <SourceTypeBadge type={row.source_type} />
+      cell: (row: any) => <SourceTypeBadge type={row.source_type} />
     },
     {
       header: "Source No",
       accessor: "source_number"
     },
     {
+      header: "Ref No",
+      accessor: "reference_number"
+    },
+    {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => <div className="max-w-[250px] truncate" title={row.description}>{row.description || '-'}</div>
+      cell: (row: any) => <div className="max-w-[200px] truncate" title={row.description}>{row.description || '-'}</div>
     },
     {
-      header: <div className="text-right">Receipt</div>,
+      header: <div className="text-right">Receipts (Dr)</div>,
       accessor: "debit",
-      cell: (row: unknown) => <ReportAmountCell amount={row.debit} />
+      cell: (row: any) => <ReportAmountCell amount={row.debit} />
     },
     {
-      header: <div className="text-right">Payment</div>,
+      header: <div className="text-right">Payments (Cr)</div>,
       accessor: "credit",
-      cell: (row: unknown) => <ReportAmountCell amount={row.credit} />
+      cell: (row: any) => <ReportAmountCell amount={row.credit} />
     },
     {
       header: <div className="text-right">Balance</div>,
       accessor: "running_balance",
-      cell: (row: unknown) => <ReportAmountCell amount={row.running_balance} />
+      cell: (row: any) => <ReportAmountCell amount={row.running_balance} />
     }
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 space-y-6">
       <ReportPageHeader 
         title="Cash Book" 
-        description="Daily record of all cash receipts and cash payments." 
+        description="Daily record of all physical cash receipts, cash deposits, and petty cash disbursements." 
+      />
+
+      {/* AI Copilot Prompting Bar */}
+      <FinanceAiPromptBar
+        contextType="banking"
+        pageTitle="Cash Book"
+        dataSnapshot={data}
       />
 
       <ReportFilterCard 
@@ -162,13 +203,13 @@ const CashBookReportPage = () => {
           <Label>Cash Account <span className="text-red-500">*</span></Label>
           <Select 
             value={filters.account_id} 
-            onValueChange={(val: unknown) => handleFilterChange('account_id', val)}
+            onValueChange={(val: string) => handleFilterChange('account_id', val)}
           >
             <SelectTrigger className={!filters.account_id ? "border-red-300" : ""}>
               <SelectValue placeholder="Select Cash Account" />
             </SelectTrigger>
             <SelectContent>
-              {(cashAccounts || []).map((acc: unknown) => (
+              {(cashAccounts || []).map((acc: any) => (
                 <SelectItem key={acc.id} value={acc.id.toString()}>{acc.account_code} - {acc.account_name}</SelectItem>
               ))}
             </SelectContent>
@@ -181,7 +222,8 @@ const CashBookReportPage = () => {
             type="date" 
             value={filters.date_from}
             onChange={(e: any) => handleFilterChange('date_from', e.target.value)}
-           placeholder="Enter value" />
+            placeholder="Enter value" 
+          />
         </div>
 
         <div className="space-y-2">
@@ -190,30 +232,31 @@ const CashBookReportPage = () => {
             type="date" 
             value={filters.date_to}
             onChange={(e: any) => handleFilterChange('date_to', e.target.value)}
-           placeholder="Enter value" />
+            placeholder="Enter value" 
+          />
         </div>
       </ReportFilterCard>
 
       {data && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="mb-6 bg-white  rounded-lg p-6 shadow-sm border border-gray-200 ">
-            <h2 className="text-xl font-bold text-navy-800 ">{data.account_code} - {data.account_name}</h2>
-            {data.branch_name && <p className="text-gray-500  mt-1">Branch: {data.branch_name}</p>}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+          <div className="bg-white rounded-xl p-5 shadow-xs border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-800">{data.account_code || (data.account_details?.account_code)} - {data.account_name || (data.account_details?.account_name)}</h2>
+            {data.branch_name && <p className="text-slate-500 text-xs mt-1">Branch: {data.branch_name}</p>}
           </div>
 
           <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />
-            <ReportSummaryCard title="Total Receipts" amount={data.total_receipts} className="bg-green-50  border-green-200 " />
-            <ReportSummaryCard title="Total Payments" amount={data.total_payments} className="bg-red-50  border-red-200 " />
-            <ReportSummaryCard title="Closing Balance" amount={data.closing_balance} className="bg-brand-50  border-brand-200 " />
+            <ReportSummaryCard title="Total Receipts" amount={data.total_receipts || data.total_debit} />
+            <ReportSummaryCard title="Total Payments" amount={data.total_payments || data.total_credit} />
+            <ReportSummaryCard title="Closing Balance" amount={data.closing_balance} className="bg-emerald-50/60 border-emerald-200" />
           </div>
 
-          <div className="bg-white  rounded-lg shadow border border-gray-200 ">
+          <div className="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
             <DataTable
               columns={columns}
-              data={(data?.lines) || []}
+              data={data.transactions || data.ledger_lines || []}
               loading={loading}
               emptyMessage="No cash transactions found for the selected period."
             />
@@ -222,11 +265,11 @@ const CashBookReportPage = () => {
       )}
       
       {!data && !loading && (
-        <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
-          <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 ">Select Filters</h3>
-          <p className="mt-2 text-sm text-gray-500 ">
-            Select a cash account and click Apply Filters to view the cash book.
+        <div className="bg-white rounded-xl shadow-xs p-8 text-center border border-slate-200">
+          <AlertCircle className="mx-auto h-12 w-12 text-slate-400" />
+          <h3 className="mt-4 text-lg font-medium text-slate-900">Select Cash Account</h3>
+          <p className="mt-2 text-sm text-slate-500">
+            Select a cash account from the filters above to inspect transactions.
           </p>
         </div>
       )}

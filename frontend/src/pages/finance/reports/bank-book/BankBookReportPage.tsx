@@ -14,24 +14,51 @@ import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
+import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 
 const BankBookReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
   
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   // Filter State
-  const [bankAccounts, setBankAccounts] = useState([]);
-  const [chartAccounts, setChartAccounts] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [chartAccounts, setChartAccounts] = useState<any[]>([]);
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<any>({
     bank_account_id: "",
     account_id: "",
     date_from: "",
     date_to: "",
-    branch_id: activeBranch?.id || ""
+    branch_id: activeBranch?.id ? String(activeBranch.id) : ""
   });
+
+  const fetchReportWithParams = useCallback(async (activeFilters: any) => {
+    if (!activeFilters?.bank_account_id && !activeFilters?.account_id) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const params = { ...activeFilters };
+      Object.keys(params).forEach((key) => {
+        if (params[key] === "" || params[key] === undefined || params[key] === null) {
+          delete params[key];
+        }
+      });
+
+      const response = await financeApi.getBankBookReport(params);
+      if (response.data?.success) {
+        setData(response.data.data);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to fetch bank book report");
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const fetchFiltersData = async () => {
     try {
@@ -39,37 +66,34 @@ const BankBookReportPage = () => {
         financeApi.getBankAccounts({ limit: 100 }),
         financeApi.getChartOfAccounts({ limit: 500, status: 'active', is_bank_account: true })
       ]);
-      if (bankRes.data?.success) setBankAccounts(bankRes.data.data || []);
-      if (chartRes.data?.success) setChartAccounts(chartRes.data.data || []);
+      const bList = Array.isArray(bankRes.data?.data) ? bankRes.data.data : Array.isArray(bankRes.data) ? bankRes.data : [];
+      const cList = Array.isArray(chartRes.data?.data) ? chartRes.data.data : Array.isArray(chartRes.data) ? chartRes.data : [];
+
+      setBankAccounts(bList);
+      setChartAccounts(cList);
+
+      const initialAccId = cList[0]?.id ? String(cList[0].id) : "";
+      const initialBankId = bList[0]?.id ? String(bList[0].id) : "";
+
+      if (initialBankId || initialAccId) {
+        const initial = {
+          bank_account_id: initialBankId,
+          account_id: initialAccId,
+          date_from: "",
+          date_to: "",
+          branch_id: activeBranch?.id ? String(activeBranch.id) : ""
+        };
+        setFilters(initial);
+        fetchReportWithParams(initial);
+      }
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
   };
 
   const fetchReport = useCallback(async () => {
-    if (!filters.bank_account_id && !filters.account_id) {
-      toast.error("Please select a Bank Account or a Chart Account");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const params = { ...filters };
-      Object.keys(params).forEach((key: unknown) => {
-        if (params[key] === "") delete params[key];
-      });
-
-      const response = await financeApi.getBankBookReport(params);
-      if (response.data?.success) {
-        setData(response.data.data);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to fetch bank book report");
-      setData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+    fetchReportWithParams(filters);
+  }, [filters, fetchReportWithParams]);
 
   useEffect(() => {
     fetchFiltersData();
@@ -77,7 +101,7 @@ const BankBookReportPage = () => {
   }, [activeBranch]);
 
   const handleFilterChange = (key: unknown, value: unknown) => {
-    setFilters((prev: unknown) => ({ ...prev, [key]: value }));
+    setFilters((prev: any) => ({ ...prev, [key as string]: value }));
   };
 
   const handleApplyFilters = () => {
@@ -85,14 +109,21 @@ const BankBookReportPage = () => {
   };
 
   const handleClearFilters = () => {
-    setFilters({
-      bank_account_id: "",
-      account_id: "",
+    const initialAccId = chartAccounts[0]?.id ? String(chartAccounts[0].id) : "";
+    const initialBankId = bankAccounts[0]?.id ? String(bankAccounts[0].id) : "";
+    const cleared = {
+      bank_account_id: initialBankId,
+      account_id: initialAccId,
       date_from: "",
       date_to: "",
-      branch_id: activeBranch?.id || ""
-    });
-    setData(null);
+      branch_id: activeBranch?.id ? String(activeBranch.id) : ""
+    };
+    setFilters(cleared);
+    if (cleared.bank_account_id || cleared.account_id) {
+      fetchReportWithParams(cleared);
+    } else {
+      setData(null);
+    }
   };
 
   const handleExportJson = () => {
@@ -106,12 +137,17 @@ const BankBookReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!hasPermission("finance.report.bank_book.view")) {
+  const canView =
+    hasPermission("finance.report.bank_book.view") ||
+    hasPermission("finance.report.view") ||
+    hasPermission("finance.reports.view");
+
+  if (!canView) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800  mb-2">Access Denied</h2>
-        <p className="text-gray-500 ">You do not have permission to view the Bank Book report.</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h2>
+        <p className="text-gray-500">You do not have permission to view the Bank Book report.</p>
       </div>
     );
   }
@@ -120,12 +156,12 @@ const BankBookReportPage = () => {
     {
       header: "Date",
       accessor: "transaction_date",
-      cell: (row: unknown) => format(new Date(row.transaction_date), 'yyyy-MM-dd')
+      cell: (row: any) => format(new Date(row.transaction_date), 'yyyy-MM-dd')
     },
     {
       header: "Source Type",
       accessor: "source_type",
-      cell: (row: unknown) => <SourceTypeBadge type={row.source_type} />
+      cell: (row: any) => <SourceTypeBadge type={row.source_type} />
     },
     {
       header: "Source No",
@@ -138,30 +174,37 @@ const BankBookReportPage = () => {
     {
       header: "Description",
       accessor: "description",
-      cell: (row: unknown) => <div className="max-w-[200px] truncate" title={row.description}>{row.description || '-'}</div>
+      cell: (row: any) => <div className="max-w-[200px] truncate" title={row.description}>{row.description || '-'}</div>
     },
     {
-      header: <div className="text-right">Deposit</div>,
+      header: <div className="text-right">Receipts (Dr)</div>,
       accessor: "debit",
-      cell: (row: unknown) => <ReportAmountCell amount={row.debit} />
+      cell: (row: any) => <ReportAmountCell amount={row.debit} />
     },
     {
-      header: <div className="text-right">Withdrawal</div>,
+      header: <div className="text-right">Payments (Cr)</div>,
       accessor: "credit",
-      cell: (row: unknown) => <ReportAmountCell amount={row.credit} />
+      cell: (row: any) => <ReportAmountCell amount={row.credit} />
     },
     {
       header: <div className="text-right">Balance</div>,
       accessor: "running_balance",
-      cell: (row: unknown) => <ReportAmountCell amount={row.running_balance} />
+      cell: (row: any) => <ReportAmountCell amount={row.running_balance} />
     }
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 space-y-6">
       <ReportPageHeader 
         title="Bank Book" 
-        description="Record of all transactions for specific bank accounts." 
+        description="Comprehensive chronological record of all commercial bank receipts, deposits, and payments." 
+      />
+
+      {/* AI Copilot Prompting Bar */}
+      <FinanceAiPromptBar
+        contextType="banking"
+        pageTitle="Bank Book"
+        dataSnapshot={data}
       />
 
       <ReportFilterCard 
@@ -170,41 +213,33 @@ const BankBookReportPage = () => {
         isLoading={loading}
       >
         <div className="space-y-2">
-          <Label>System Bank Account</Label>
+          <Label>Bank Account</Label>
           <Select 
             value={filters.bank_account_id} 
-            onValueChange={(val: unknown) => {
-              handleFilterChange('bank_account_id', val);
-              handleFilterChange('account_id', ""); // Clear chart account if bank account is selected
-            }}
+            onValueChange={(val: string) => handleFilterChange('bank_account_id', val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select Bank Account" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select Bank Account</SelectItem>
-              {(bankAccounts || []).map((acc: unknown) => (
-                <SelectItem key={acc.id} value={acc.id.toString()}>{acc.bank_name} - {acc.account_number}</SelectItem>
+              {(bankAccounts || []).map((ba: any) => (
+                <SelectItem key={ba.id} value={ba.id.toString()}>{ba.bank_name} - {ba.account_number}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label>Chart Account</Label>
+          <Label>Chart Bank Ledger</Label>
           <Select 
             value={filters.account_id} 
-            onValueChange={(val: unknown) => {
-              handleFilterChange('account_id', val);
-              handleFilterChange('bank_account_id', ""); // Clear bank account if chart account is selected
-            }}
+            onValueChange={(val: string) => handleFilterChange('account_id', val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Chart Account" />
+              <SelectValue placeholder="Select GL Account" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select Chart Account</SelectItem>
-              {(chartAccounts || []).map((acc: unknown) => (
+              {(chartAccounts || []).map((acc: any) => (
                 <SelectItem key={acc.id} value={acc.id.toString()}>{acc.account_code} - {acc.account_name}</SelectItem>
               ))}
             </SelectContent>
@@ -217,7 +252,8 @@ const BankBookReportPage = () => {
             type="date" 
             value={filters.date_from}
             onChange={(e: any) => handleFilterChange('date_from', e.target.value)}
-           placeholder="Enter value" />
+            placeholder="Enter value" 
+          />
         </div>
 
         <div className="space-y-2">
@@ -226,43 +262,44 @@ const BankBookReportPage = () => {
             type="date" 
             value={filters.date_to}
             onChange={(e: any) => handleFilterChange('date_to', e.target.value)}
-           placeholder="Enter value" />
+            placeholder="Enter value" 
+          />
         </div>
       </ReportFilterCard>
 
       {data && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="mb-6 bg-white  rounded-lg p-6 shadow-sm border border-gray-200 ">
-            <h2 className="text-xl font-bold text-navy-800 ">{data.account_code} - {data.account_name}</h2>
-            {data.bank_details && <p className="text-gray-500  mt-1">{data.bank_details}</p>}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+          <div className="bg-white rounded-xl p-5 shadow-xs border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-800">{data.account_name || (data.account_details?.account_name) || "Commercial Bank Account"}</h2>
+            {data.bank_name && <p className="text-slate-500 text-xs mt-1">Bank: {data.bank_name} | Acc: {data.account_number}</p>}
           </div>
 
           <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />
-            <ReportSummaryCard title="Total Deposits" amount={data.total_deposits} className="bg-green-50  border-green-200 " />
-            <ReportSummaryCard title="Total Withdrawals" amount={data.total_withdrawals} className="bg-red-50  border-red-200 " />
-            <ReportSummaryCard title="Closing Balance" amount={data.closing_balance} className="bg-brand-50  border-brand-200 " />
+            <ReportSummaryCard title="Total Receipts" amount={data.total_receipts || data.total_debit} />
+            <ReportSummaryCard title="Total Payments" amount={data.total_payments || data.total_credit} />
+            <ReportSummaryCard title="Closing Balance" amount={data.closing_balance} className="bg-indigo-50/60 border-indigo-200" />
           </div>
 
-          <div className="bg-white  rounded-lg shadow border border-gray-200 ">
+          <div className="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
             <DataTable
               columns={columns}
-              data={data.lines || []}
+              data={data.transactions || data.ledger_lines || []}
               loading={loading}
-              emptyMessage="No bank transactions found for the selected period."
+              emptyMessage="No bank transactions found for the selected filters."
             />
           </div>
         </div>
       )}
       
       {!data && !loading && (
-        <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
-          <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 ">Select Filters</h3>
-          <p className="mt-2 text-sm text-gray-500 ">
-            Select a bank account and click Apply Filters to view the bank book.
+        <div className="bg-white rounded-xl shadow-xs p-8 text-center border border-slate-200">
+          <AlertCircle className="mx-auto h-12 w-12 text-slate-400" />
+          <h3 className="mt-4 text-lg font-medium text-slate-900">Select Bank Account</h3>
+          <p className="mt-2 text-sm text-slate-500">
+            Select a bank account or ledger from the filters above to inspect transactions.
           </p>
         </div>
       )}

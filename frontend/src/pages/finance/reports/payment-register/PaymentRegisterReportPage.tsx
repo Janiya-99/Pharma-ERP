@@ -13,6 +13,7 @@ import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import StatusBadge from '../../../../components/common/StatusBadge';
+import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 
 const PaymentRegisterReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
@@ -43,7 +44,14 @@ const PaymentRegisterReportPage = () => {
         financeApi.getFinancialYears({ limit: 100 }),
         financeApi.getAccountingPeriods({ limit: 100 })
       ]);
-      if (fyRes.data?.success) setFinancialYears(fyRes.data.data || []);
+      if (fyRes.data?.success) {
+        const years = fyRes.data.data || [];
+        setFinancialYears(years);
+        const activeYr = years.find((y: any) => y.is_active) || years[0];
+        if (activeYr && !filters.financial_year_id) {
+          setFilters((prev: any) => ({ ...prev, financial_year_id: activeYr.id.toString() }));
+        }
+      }
       if (apRes.data?.success) setAccountingPeriods(apRes.data.data || []);
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -111,7 +119,12 @@ const PaymentRegisterReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!hasPermission("finance.report.payment_register.view")) {
+  if (
+    !hasPermission("finance.report.payment_register.view") &&
+    !hasPermission("finance.report.view") &&
+    !hasPermission("finance.reports.view") &&
+    !hasPermission("admin")
+  ) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -125,27 +138,27 @@ const PaymentRegisterReportPage = () => {
     {
       header: "Voucher No",
       accessor: "voucher_number",
-      cell: (row: unknown) => <div className="font-medium text-navy-800 ">{row.voucher_number}</div>
+      cell: (row: any) => <div className="font-medium text-navy-800 ">{row.voucher_number}</div>
     },
     {
       header: "Date",
       accessor: "payment_date",
-      cell: (row: unknown) => format(new Date(row.payment_date), 'yyyy-MM-dd')
+      cell: (row: any) => format(new Date(row.payment_date), 'yyyy-MM-dd')
     },
     {
       header: "Type",
       accessor: "payment_type",
-      cell: (row: unknown) => (row.payment_type || '').split('_').map((w: unknown) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      cell: (row: any) => (row.payment_type || '').split('_').map((w: any) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
     },
     {
       header: "Method",
       accessor: "payment_method",
-      cell: (row: unknown) => (row.payment_method || '').charAt(0).toUpperCase() + (row.payment_method || '').slice(1)
+      cell: (row: any) => (row.payment_method || '').charAt(0).toUpperCase() + (row.payment_method || '').slice(1)
     },
     {
       header: "Paid From",
       accessor: "paid_from_account_name",
-      cell: (row: unknown) => <div className="max-w-[150px] truncate" title={row.paid_from_account_name}>{row.paid_from_account_name || '-'}</div>
+      cell: (row: any) => <div className="max-w-[150px] truncate" title={row.paid_from_account_name}>{row.paid_from_account_name || '-'}</div>
     },
     {
       header: "Ref No",
@@ -154,17 +167,17 @@ const PaymentRegisterReportPage = () => {
     {
       header: <div className="text-right">Total Amount</div>,
       accessor: "total_amount",
-      cell: (row: unknown) => <ReportAmountCell amount={row.total_amount} />
+      cell: (row: any) => <ReportAmountCell amount={row.total_amount} />
     },
     {
       header: "Approval",
       accessor: "approval_status",
-      cell: (row: unknown) => <StatusBadge status={row.approval_status} />
+      cell: (row: any) => <StatusBadge status={row.approval_status} />
     },
     {
       header: "Posted",
       accessor: "posted_status",
-      cell: (row: unknown) => <StatusBadge status={row.posted_status} />
+      cell: (row: any) => <StatusBadge status={row.posted_status} />
     },
     {
       header: "Created By",
@@ -179,6 +192,13 @@ const PaymentRegisterReportPage = () => {
         description="Log of all payment vouchers with their approval and posting status." 
       />
 
+      <FinanceAiPromptBar
+        contextType="payment_register"
+        pageTitle="Payment Register"
+        dataSnapshot={data}
+        className="mb-6"
+      />
+
       <ReportFilterCard 
         onApply={handleApplyFilters} 
         onClear={handleClearFilters}
@@ -187,15 +207,15 @@ const PaymentRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Financial Year</Label>
           <Select 
-            value={filters.financial_year_id} 
-            onValueChange={(val: unknown) => handleFilterChange('financial_year_id', val)}
+            value={filters.financial_year_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('financial_year_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Years" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Years</SelectItem>
-              {(financialYears || []).map((fy: unknown) => (
+              <SelectItem value="all">All Years</SelectItem>
+              {(financialYears || []).map((fy: any) => (
                 <SelectItem key={fy.id} value={fy.id.toString()}>{fy.year_name}</SelectItem>
               ))}
             </SelectContent>
@@ -205,15 +225,15 @@ const PaymentRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Accounting Period</Label>
           <Select 
-            value={filters.accounting_period_id} 
-            onValueChange={(val: unknown) => handleFilterChange('accounting_period_id', val)}
+            value={filters.accounting_period_id || "all"} 
+            onValueChange={(val: any) => handleFilterChange('accounting_period_id', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Periods" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Periods</SelectItem>
-              {(accountingPeriods || []).map((ap: unknown) => (
+              <SelectItem value="all">All Periods</SelectItem>
+              {(accountingPeriods || []).map((ap: any) => (
                 <SelectItem key={ap.id} value={ap.id.toString()}>{ap.period_name}</SelectItem>
               ))}
             </SelectContent>
@@ -223,14 +243,14 @@ const PaymentRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Payment Method</Label>
           <Select 
-            value={filters.payment_method} 
-            onValueChange={(val: unknown) => handleFilterChange('payment_method', val)}
+            value={filters.payment_method || "all"} 
+            onValueChange={(val: any) => handleFilterChange('payment_method', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Methods" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Methods</SelectItem>
+              <SelectItem value="all">All Methods</SelectItem>
               <SelectItem value="cash">Cash</SelectItem>
               <SelectItem value="bank">Bank Transfer</SelectItem>
               <SelectItem value="cheque">Cheque</SelectItem>
@@ -242,14 +262,14 @@ const PaymentRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Payment Type</Label>
           <Select 
-            value={filters.payment_type} 
-            onValueChange={(val: unknown) => handleFilterChange('payment_type', val)}
+            value={filters.payment_type || "all"} 
+            onValueChange={(val: any) => handleFilterChange('payment_type', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="supplier_payment">Supplier Payment</SelectItem>
               <SelectItem value="expense_payment">Expense Payment</SelectItem>
               <SelectItem value="payroll_payment">Payroll Payment</SelectItem>
@@ -280,14 +300,14 @@ const PaymentRegisterReportPage = () => {
         <div className="space-y-2">
           <Label>Status</Label>
           <Select 
-            value={filters.posted_status} 
-            onValueChange={(val: unknown) => handleFilterChange('posted_status', val)}
+            value={filters.posted_status || "all"} 
+            onValueChange={(val: any) => handleFilterChange('posted_status', val === "all" ? "" : val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="unposted">Unposted</SelectItem>
               <SelectItem value="posted">Posted</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>

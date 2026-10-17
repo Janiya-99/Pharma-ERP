@@ -412,6 +412,26 @@ const AppRoutes = () => {
             element={<TrialBalanceReportPage />}
           />
           <Route
+            path="/finance/reports/account-ledger"
+            element={<AccountLedgerReportPage />}
+          />
+          <Route
+            path="/finance/reports/journal-register"
+            element={<JournalRegisterReportPage />}
+          />
+          <Route
+            path="/finance/reports/general-ledger"
+            element={<GeneralLedgerPage />}
+          />
+          <Route
+            path="/finance/reports/bank-book"
+            element={<BankBookReportPage />}
+          />
+          <Route
+            path="/finance/reports/cash-book"
+            element={<CashBookReportPage />}
+          />
+          <Route
             path="/finance/reports/day-book"
             element={<DayBookReportPage />}
           />

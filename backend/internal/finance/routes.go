@@ -315,14 +315,14 @@ func SetupRoutes(r *gin.RouterGroup, logger *zap.Logger) {
 	frHandler := handlers.NewFinanceReportHandler(logger)
 	reports := finance.Group("/reports")
 	{
-		reports.GET("/account-ledger", middleware.RequirePermission("finance.reports.view"), frHandler.AccountLedger)
-		reports.GET("/trial-balance", middleware.RequirePermission("finance.reports.view"), frHandler.TrialBalance)
-		reports.GET("/profit-loss", middleware.RequirePermission("finance.reports.view"), frHandler.ProfitLoss)
-		reports.GET("/balance-sheet", middleware.RequirePermission("finance.reports.view"), frHandler.BalanceSheet)
-		reports.GET("/cash-bank-book", middleware.RequirePermission("finance.reports.view"), frHandler.CashBankBook)
-		reports.GET("/day-book", middleware.RequirePermission("finance.reports.view"), frHandler.DayBook)
-		reports.GET("/journal-register", middleware.RequirePermission("finance.reports.view"), frHandler.JournalRegister)
-		reports.GET("/payment-register", middleware.RequirePermission("finance.reports.view"), frHandler.PaymentRegister)
-		reports.GET("/receipt-register", middleware.RequirePermission("finance.reports.view"), frHandler.ReceiptRegister)
+		reports.GET("/account-ledger", middleware.RequirePermission("finance.report.view"), frHandler.AccountLedger)
+		reports.GET("/trial-balance", middleware.RequirePermission("finance.report.view"), frHandler.TrialBalance)
+		reports.GET("/profit-loss", middleware.RequirePermission("finance.report.view"), frHandler.ProfitLoss)
+		reports.GET("/balance-sheet", middleware.RequirePermission("finance.report.view"), frHandler.BalanceSheet)
+		reports.GET("/cash-bank-book", middleware.RequirePermission("finance.report.view"), frHandler.CashBankBook)
+		reports.GET("/day-book", middleware.RequirePermission("finance.report.view"), frHandler.DayBook)
+		reports.GET("/journal-register", middleware.RequirePermission("finance.report.view"), frHandler.JournalRegister)
+		reports.GET("/payment-register", middleware.RequirePermission("finance.report.view"), frHandler.PaymentRegister)
+		reports.GET("/receipt-register", middleware.RequirePermission("finance.report.view"), frHandler.ReceiptRegister)
 	}
 }
