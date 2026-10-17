@@ -37,8 +37,30 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const useAuth = () => useContext(AuthContext);
 
+const getStoredToken = () => {
+  return (
+    Cookies.get("erp_token") ||
+    (typeof localStorage !== "undefined" ? localStorage.getItem("erp_token") : null)
+  );
+};
+
+const storeToken = (tokenStr: string) => {
+  const isHttps = typeof window !== "undefined" && window.location.protocol === "https:";
+  Cookies.set("erp_token", tokenStr, { expires: 7, secure: isHttps, sameSite: isHttps ? "strict" : "lax" });
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem("erp_token", tokenStr);
+  }
+};
+
+const clearStoredToken = () => {
+  Cookies.remove("erp_token");
+  if (typeof localStorage !== "undefined") {
+    localStorage.removeItem("erp_token");
+  }
+};
+
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
-  const [token, setToken] = useState(Cookies.get("erp_token") || null);
+  const [token, setToken] = useState(getStoredToken() || null);
   const [user, setUser] = useState(null);
   const [company, setCompany] = useState(null);
   const [activeBranch, setActiveBranch] = useState(null);
@@ -97,7 +119,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
       const isSuccess = res.success !== false;
 
       if (isSuccess && tokenStr) {
-        Cookies.set("erp_token", tokenStr, { expires: 7, secure: true, sameSite: "strict" });
+        storeToken(tokenStr);
         setToken(tokenStr);
 
         // If login returns the context, set it immediately to prevent redirect loops
@@ -118,14 +140,14 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
       return {
         success: false,
         message:
-          error.response?.data?.message || "An error occurred during login",
+          (error as any).response?.data?.message || "An error occurred during login",
       };
     }
   };
 
   const logoutUser = () => {
-    const hadToken = !!Cookies.get("erp_token");
-    Cookies.remove("erp_token");
+    const hadToken = !!getStoredToken();
+    clearStoredToken();
     setToken(null);
     setUser(null);
     setCompany(null);
@@ -147,7 +169,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         res.data?.tokens?.access_token || res.token || res.data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
-        Cookies.set("erp_token", token, { expires: 7, secure: true, sameSite: "strict" });
+        storeToken(token);
         setToken(token);
         await refreshContext();
         return true;
@@ -169,7 +191,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         res.data?.tokens?.access_token || res.token || res.data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
-        Cookies.set("erp_token", token, { expires: 7, secure: true, sameSite: "strict" });
+        storeToken(token);
         setToken(token);
         await refreshContext();
         return true;

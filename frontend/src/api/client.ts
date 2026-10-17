@@ -18,7 +18,10 @@ const apiClient = axios.create({
 // Request interceptor — attach auth token if available
 apiClient.interceptors.request.use(
   (config: any) => {
-    const token = Cookies.get("erp_token") || Cookies.get("access_token");
+    const token =
+      Cookies.get("erp_token") ||
+      Cookies.get("access_token") ||
+      (typeof localStorage !== "undefined" ? localStorage.getItem("erp_token") : null);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
