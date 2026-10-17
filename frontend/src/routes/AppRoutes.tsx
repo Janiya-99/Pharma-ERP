@@ -39,6 +39,7 @@ const EmailSettingsPage = lazy(() => import("../pages/platform-admin/GlobalSetti
 const PaymentGatewaySettingsPage = lazy(() => import("../pages/platform-admin/GlobalSettingsPages").then(m => ({ default: m.PaymentGatewaySettingsPage })));
 const BackupSettingsPage = lazy(() => import("../pages/platform-admin/GlobalSettingsPages").then(m => ({ default: m.BackupSettingsPage })));
 const SupportTicketsPage = lazy(() => import("../pages/platform-admin/SupportTicketsPage"));
+const PlatformDocumentationPage = lazy(() => import("../pages/platform-admin/PlatformDocumentationPage"));
 const PlatformLoginLogsPage = lazy(() => import("../pages/platform-admin/PlatformLogsPages").then(m => ({ default: m.PlatformLoginLogsPage })));
 const PlatformAuditLogsPage = lazy(() => import("../pages/platform-admin/PlatformLogsPages").then(m => ({ default: m.PlatformAuditLogsPage })));
 const ControlCenterDashboardPage = lazy(() => import("../pages/control-center/dashboard/ControlCenterDashboardPage"));
@@ -1212,6 +1213,10 @@ const AppRoutes = () => {
                   path="support/tickets"
                   element={<SupportTicketsPage />}
                 />
+                <Route
+                  path="documentation"
+                  element={<PlatformDocumentationPage />}
+                />
                 <Route path="login-logs" element={<PlatformLoginLogsPage />} />
                 <Route path="audit-logs" element={<PlatformAuditLogsPage />} />
                 <Route path="*" element={<ModernErrorPage code={404} />} />
@@ -1224,6 +1229,9 @@ const AppRoutes = () => {
 
       {/* Modern Error Pages with multi-code support (404, 500, 422, 403, 401, 503) */}
       <Route path="/error/:code?" element={<ModernErrorPage />} />
+
+      {/* Direct Documentation & Manuals Route */}
+      <Route path="/documentation" element={<PlatformDocumentationPage />} />
 
       {/* Global Wildcard Catch-all Route: displays modern 404 error page */}
       <Route path="*" element={<ModernErrorPage code={404} />} />
