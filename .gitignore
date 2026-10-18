@@ -24,3 +24,5 @@ Test/1*
 Test/evidence/
 Test/run_e2e_qa.py
 Test/.~lock.*
+test_screenshots/
+*.png
