@@ -1,6 +1,8 @@
 package router
 
 import (
+	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,6 +19,7 @@ import (
 	invoiceCenterRoutes "github.com/pixandco/erp-phrma/internal/invoicecenter/routes"
 	"github.com/pixandco/erp-phrma/internal/middleware"
 	platformAdmin "github.com/pixandco/erp-phrma/internal/platform/admin"
+	platformModels "github.com/pixandco/erp-phrma/internal/platform/models"
 	"github.com/pixandco/erp-phrma/internal/service"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -220,6 +223,140 @@ func Setup(
 		complianceGrp.Use(middleware.SoftwareAccessMiddleware())
 		complianceModule.SetupRoutes(complianceGrp, logger)
 		complianceGrp.GET("/countries", commonCtrl.GetCountries)
+
+		// Support Ticket & Helpdesk routes (accessible by authenticated tenant users)
+		supportGrp := v1.Group("/support")
+		supportGrp.Use(middleware.CompanyAuthMiddleware(resolver))
+		{
+			// List support tickets for the current company
+			supportGrp.GET("/tickets", func(c *gin.Context) {
+				companyID, _ := c.Get("company_id")
+				var list []platformAdmin.SupportTicketDetail
+				platformDB.Table("support_tickets").
+					Select("support_tickets.*, tenant_companies.company_name, tenant_companies.company_code").
+					Joins("LEFT JOIN tenant_companies ON support_tickets.tenant_company_id = tenant_companies.id").
+					Where("support_tickets.tenant_company_id = ?", companyID).
+					Order("support_tickets.id DESC").
+					Scan(&list)
+				c.JSON(http.StatusOK, gin.H{"success": true, "data": list})
+			})
+
+			// Create ticket from tenant client
+			supportGrp.POST("/tickets", func(c *gin.Context) {
+				companyIDVal, _ := c.Get("company_id")
+				companyID, _ := companyIDVal.(uint)
+				userIDVal, _ := c.Get("user_id")
+				userID, _ := userIDVal.(uint)
+
+				var req struct {
+					Subject     string `json:"subject"`
+					Description string `json:"description"`
+					Priority    string `json:"priority"`
+				}
+				if err := c.ShouldBindJSON(&req); err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+					return
+				}
+				if req.Priority == "" {
+					req.Priority = "medium"
+				}
+
+				ticket := platformModels.SupportTicket{
+					TenantCompanyID: companyID,
+					TicketNumber:    "TKT-" + strconv.FormatInt(time.Now().Unix(), 10),
+					Subject:         req.Subject,
+					Description:     req.Description,
+					Priority:        req.Priority,
+					Status:          "open",
+					CreatedAt:       time.Now(),
+					UpdatedAt:       time.Now(),
+				}
+				if err := platformDB.Create(&ticket).Error; err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+					return
+				}
+
+				if req.Description != "" {
+					platformDB.Create(&platformModels.SupportTicketMessage{
+						SupportTicketID: ticket.ID,
+						SenderType:      "client",
+						SenderID:        userID,
+						MessageText:     req.Description,
+						CreatedAt:       time.Now(),
+						UpdatedAt:       time.Now(),
+					})
+				}
+
+				c.JSON(http.StatusCreated, gin.H{"success": true, "data": ticket})
+			})
+
+			// Get messages for a ticket (verifying company ownership)
+			supportGrp.GET("/tickets/:id/messages", func(c *gin.Context) {
+				companyIDVal, _ := c.Get("company_id")
+				ticketID, err := strconv.Atoi(c.Param("id"))
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ticket ID"})
+					return
+				}
+
+				var ticket platformModels.SupportTicket
+				if err := platformDB.Where("id = ? AND tenant_company_id = ?", ticketID, companyIDVal).First(&ticket).Error; err != nil {
+					c.JSON(http.StatusNotFound, gin.H{"message": "Ticket not found"})
+					return
+				}
+
+				var list []platformModels.SupportTicketMessage
+				platformDB.Where("support_ticket_id = ?", ticketID).Order("id ASC").Find(&list)
+				c.JSON(http.StatusOK, gin.H{"success": true, "data": list})
+			})
+
+			// Client send message reply to ticket
+			supportGrp.POST("/tickets/:id/messages", func(c *gin.Context) {
+				companyIDVal, _ := c.Get("company_id")
+				userIDVal, _ := c.Get("user_id")
+				userID, _ := userIDVal.(uint)
+
+				ticketID, err := strconv.Atoi(c.Param("id"))
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ticket ID"})
+					return
+				}
+
+				var ticket platformModels.SupportTicket
+				if err := platformDB.Where("id = ? AND tenant_company_id = ?", ticketID, companyIDVal).First(&ticket).Error; err != nil {
+					c.JSON(http.StatusNotFound, gin.H{"message": "Ticket not found"})
+					return
+				}
+
+				var req struct {
+					MessageText string `json:"message_text"`
+				}
+				if err := c.ShouldBindJSON(&req); err != nil || req.MessageText == "" {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "Message text is required"})
+					return
+				}
+
+				msg := platformModels.SupportTicketMessage{
+					SupportTicketID: uint(ticketID),
+					SenderType:      "client",
+					SenderID:        userID,
+					MessageText:     req.MessageText,
+					CreatedAt:       time.Now(),
+					UpdatedAt:       time.Now(),
+				}
+				if err := platformDB.Create(&msg).Error; err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+					return
+				}
+
+				// Touch ticket updated_at
+				platformDB.Model(&platformModels.SupportTicket{}).Where("id = ?", ticketID).Updates(map[string]interface{}{
+					"updated_at": time.Now(),
+				})
+
+				c.JSON(http.StatusCreated, gin.H{"success": true, "data": msg})
+			})
+		}
 	}
 
 	return r
