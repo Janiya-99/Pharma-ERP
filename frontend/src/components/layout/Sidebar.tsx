@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import PermissionGuard from "../../auth/PermissionGuard";
@@ -99,11 +99,22 @@ const Sidebar = () => {
     }, 120);
   };
 
+  useEffect(() => {
+    return () => {
+      if (hoverLeaveTimerRef.current) {
+        clearTimeout(hoverLeaveTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleTogglePin = (e: React.MouseEvent) => {
     e.stopPropagation();
     const next = !desktopExpanded;
     setDesktopExpanded(next);
-    if (next) {
+    if (!next) {
+      // User just unpinned while mouse is inside sidebar; keep it hovered until mouse leaves
+      setDesktopHovered(true);
+    } else {
       setDesktopHovered(false);
     }
     try {
@@ -1017,23 +1028,15 @@ const Sidebar = () => {
   return (
     <>
       {/* ── Desktop Sidebar (hidden on mobile) ── */}
-      <div
-        className={`relative z-30 hidden h-full shrink-0 transition-[width] duration-200 ease-out lg:block ${
-          effectiveExpanded ? "w-[260px]" : "w-[72px]"
+      <aside
+        className={`relative z-30 hidden h-full shrink-0 flex-col overflow-hidden border-r border-slate-200/80 bg-white transition-[width] duration-200 ease-out will-change-[width] lg:flex ${
+          effectiveExpanded ? "w-[260px] shadow-sm" : "w-[72px] shadow-xs"
         }`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <div
-          className={`fixed bottom-0 left-0 top-0 z-30 flex flex-col overflow-hidden border-r border-slate-200/80 bg-white transition-[width] duration-200 ease-out will-change-[width] ${
-            effectiveExpanded
-              ? "w-[260px] shadow-sm"
-              : "w-[72px] shadow-xs"
-          }`}
-        >
-          {sidebarContent(false)}
-        </div>
-      </div>
+        {sidebarContent(false)}
+      </aside>
 
       {/* ── Mobile Sidebar Drawer (hidden on desktop) ── */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
