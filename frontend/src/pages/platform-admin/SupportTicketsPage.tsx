@@ -19,6 +19,7 @@ import {
   AlertCircle,
   XCircle,
   RotateCcw,
+  RotateCw,
   ShieldAlert,
   X,
   Filter,
@@ -31,6 +32,7 @@ export const SupportTicketsPage = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [sending, setSending] = useState(false);
 
   // Filters & Search
@@ -69,6 +71,37 @@ export const SupportTicketsPage = () => {
   useEffect(() => {
     loadTickets();
   }, []);
+
+  // Auto-refresh chat messages every 8 seconds when a ticket is actively selected
+  useEffect(() => {
+    if (!selectedTicket) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await getPlatformTicketMessages(selectedTicket.id);
+        if (res.success && res.data) {
+          setMessages(res.data);
+        }
+      } catch {}
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [selectedTicket]);
+
+  const refreshSelectedMessages = async () => {
+    if (!selectedTicket) return;
+    try {
+      setRefreshing(true);
+      const res = await getPlatformTicketMessages(selectedTicket.id);
+      if (res.success) {
+        setMessages(res.data || []);
+      }
+    } catch {
+      toast.error("Failed to refresh messages");
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleSelectTicket = async (ticket: any) => {
     try {
@@ -198,13 +231,23 @@ export const SupportTicketsPage = () => {
             Resolve technical issues, billing inquiries, capacity extension requests, and dispatch notices.
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Create Ticket / Notice</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => loadTickets()}
+            disabled={loading}
+            className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer"
+            title="Refresh tickets list"
+          >
+            <RotateCw className={`h-4 w-4 ${loading ? "animate-spin text-indigo-400" : ""}`} />
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Create Ticket / Notice</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs & Search Bar */}
@@ -407,6 +450,18 @@ export const SupportTicketsPage = () => {
                     >
                       {selectedTicket.status.replace("_", " ")}
                     </span>
+
+                    {/* Refresh Chat Messages */}
+                    <button
+                      onClick={refreshSelectedMessages}
+                      disabled={refreshing}
+                      className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all cursor-pointer"
+                      title="Refresh conversation"
+                    >
+                      <RotateCw
+                        className={`h-3.5 w-3.5 ${refreshing ? "animate-spin text-indigo-400" : ""}`}
+                      />
+                    </button>
                   </div>
                 </div>
 
