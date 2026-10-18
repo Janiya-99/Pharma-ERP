@@ -105,22 +105,24 @@ export const GlobalAiCopilot: React.FC = () => {
       const formFields: Array<{ name: string; label: string; value: string }> = [];
       const breadcrumbs: string[] = [];
 
-      // 1. Scrape metric / KPI cards
-      document.querySelectorAll(".glass-card, [data-testid='kpi-card'], .rounded-2xl, .rounded-xl").forEach((card) => {
+      // 1. Scrape metric / KPI cards (ignoring table wrappers)
+      document.querySelectorAll(".glass-card, [data-testid='kpi-card'], .kpi-card").forEach((card) => {
+        if (card.querySelector("table") || card.closest("table")) return;
         const textEls = card.querySelectorAll("p, span, h2, h3, h4, div");
         let foundLabel = "";
         let foundValue = "";
 
         textEls.forEach((el) => {
+          if (el.children.length > 0) return;
           const txt = el.textContent?.trim() || "";
-          if (!foundLabel && txt.length > 2 && txt.length < 35 && !txt.match(/^(LKR|\$|\d|Total)/i) && !el.children.length) {
+          if (!foundLabel && txt.length > 2 && txt.length < 35 && !txt.match(/^(LKR|\$|\d|Total)/i)) {
             foundLabel = txt;
-          } else if (!foundValue && (txt.includes("LKR") || txt.match(/^\d+([\.,]\d+)?(\s*[KMkBb%])?$/) || txt.match(/^(Active|Blocked|Expired|Pending|Approved)$/i))) {
+          } else if (!foundValue && txt.length < 30 && (txt.includes("LKR") || txt.match(/^\d+([\.,]\d+)?(\s*[KMkBb%])?$/) || txt.match(/^(Active|Blocked|Expired|Pending|Approved)$/i))) {
             foundValue = txt;
           }
         });
 
-        if (foundLabel && foundValue && !kpis.some(k => k.label === foundLabel)) {
+        if (foundLabel && foundValue && foundValue.length < 35 && !kpis.some(k => k.label === foundLabel)) {
           kpis.push({ label: foundLabel, value: foundValue });
         }
       });
@@ -133,6 +135,8 @@ export const GlobalAiCopilot: React.FC = () => {
           const hText = th.textContent?.trim() || "";
           if (hText && !hText.toLowerCase().includes("action")) {
             headers.push(hText);
+          } else {
+            headers.push("__ACTION__");
           }
         });
 
@@ -144,8 +148,9 @@ export const GlobalAiCopilot: React.FC = () => {
             let hasData = false;
             tds.forEach((td, cIdx) => {
               const h = headers[cIdx] || `col_${cIdx}`;
+              if (h === "__ACTION__") return;
               const val = td.textContent?.trim() || "";
-              if (val && !val.toLowerCase().includes("action")) {
+              if (val) {
                 row[h] = val;
                 hasData = true;
               }
@@ -227,6 +232,53 @@ export const GlobalAiCopilot: React.FC = () => {
     setSummary(null);
     setDocs(null);
     toast.success("Conversation cleared. Ready for fresh queries.");
+  };
+
+  const renderFormattedMessage = (text: string) => {
+    if (!text) return null;
+    const lines = text.split("\n");
+    return lines.map((line, idx) => {
+      const trimmed = line.trim();
+      if (!trimmed) return <div key={idx} className="h-1.5" />;
+
+      if (trimmed.startsWith("### ")) {
+        return (
+          <h4 key={idx} className="font-bold text-sm text-slate-900 mt-2 mb-1 flex items-center gap-1.5">
+            {trimmed.replace("### ", "")}
+          </h4>
+        );
+      }
+      if (trimmed.startsWith("#### ")) {
+        return (
+          <h5 key={idx} className="font-bold text-xs text-indigo-700 uppercase tracking-wider mt-2 mb-1">
+            {trimmed.replace("#### ", "")}
+          </h5>
+        );
+      }
+
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      return (
+        <div key={idx} className={trimmed.startsWith("• ") || trimmed.startsWith("- ") ? "pl-2 py-0.5" : "py-0.5"}>
+          {parts.map((p, pIdx) => {
+            if (p.startsWith("**") && p.endsWith("**")) {
+              return (
+                <strong key={pIdx} className="font-bold text-slate-900">
+                  {p.slice(2, -2)}
+                </strong>
+              );
+            }
+            if (p.startsWith("*") && p.endsWith("*") && p.length > 2) {
+              return (
+                <em key={pIdx} className="text-slate-500 text-[11px]">
+                  {p.slice(1, -1)}
+                </em>
+              );
+            }
+            return <span key={pIdx}>{p}</span>;
+          })}
+        </div>
+      );
+    });
   };
 
   // Keyboard shortcut Ctrl+J to toggle
@@ -844,8 +896,8 @@ export const GlobalAiCopilot: React.FC = () => {
                                 : "bg-slate-100 text-slate-800 border border-slate-200/80 rounded-bl-xs shadow-2xs"
                             }`}
                           >
-                            <div className="whitespace-pre-line font-sans prose prose-xs max-w-none">
-                              {msg.text}
+                            <div className="font-sans leading-relaxed">
+                              {msg.role === "user" ? msg.text : renderFormattedMessage(msg.text)}
                             </div>
                             {/* Clickable Follow-up Suggestions */}
                             {msg.role === "model" && msg.suggestedActions && msg.suggestedActions.length > 0 && (

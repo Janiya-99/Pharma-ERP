@@ -1245,21 +1245,21 @@ I am actively monitoring **${pageTitle}** with **${recordCount} live records** a
 
       const getItemLabel = (item: any): string => {
         if (!item) return "N/A";
-        return item.invoice_number || item.invoice_no || item.code || item.batch_number || item.batchNo ||
-          item.customer_name || item.customer?.customer_name || item.product_name || item.account_name ||
-          item.name || item.title || item.id || "Record";
+        return item["Invoice Number"] || item.invoice_number || item["Customer Name"] || item.customer_name ||
+          item["Product Name"] || item.product_name || item["Batch Number"] || item.batch_number ||
+          item.code || item.name || item.id || "Record";
       };
+
+      const cleanKpis = kpis.filter(k => k.label && k.value && k.value.length < 40 && !k.value.includes("\n"));
 
       const reply = `### 🧮 Live Calculation Analysis: **${chosenCol}**\n` +
         `Analyzed **${stat.count} records** currently visible on **${pageTitle}**:\n\n` +
-        `| Metric | Computed Value |\n` +
-        `| :--- | :--- |\n` +
-        `| **Total Aggregated Sum** | **${isCurrency ? fmtLKR(stat.sum) : stat.sum.toLocaleString()}** |\n` +
-        `| **Arithmetic Average (Mean)** | **${isCurrency ? fmtLKR(avg) : avg.toFixed(2)}** |\n` +
-        `| **Highest (Maximum)** | **${isCurrency ? fmtLKR(stat.max) : stat.max.toLocaleString()}** (${getItemLabel(stat.maxItem)}) |\n` +
-        `| **Lowest (Minimum)** | **${isCurrency ? fmtLKR(stat.min) : stat.min.toLocaleString()}** (${getItemLabel(stat.minItem)}) |\n` +
-        `| **Sample Record Count** | **${stat.count} items** |\n\n` +
-        (kpis.length > 0 ? `#### 📊 Active Dashboard Telemetry:\n` + kpis.map(k => `- **${k.label}:** ${k.value}`).join("\n") + "\n\n" : "") +
+        `• **Total Aggregated Sum:** **${isCurrency ? fmtLKR(stat.sum) : stat.sum.toLocaleString()}**\n` +
+        `• **Arithmetic Average (Mean):** **${isCurrency ? fmtLKR(avg) : avg.toFixed(2)}**\n` +
+        `• **Highest (Maximum):** **${isCurrency ? fmtLKR(stat.max) : stat.max.toLocaleString()}** (${getItemLabel(stat.maxItem)})\n` +
+        `• **Lowest (Minimum):** **${isCurrency ? fmtLKR(stat.min) : stat.min.toLocaleString()}** (${getItemLabel(stat.minItem)})\n` +
+        `• **Sample Record Count:** **${stat.count} items**\n\n` +
+        (cleanKpis.length > 0 ? `#### 📊 Active Dashboard Telemetry:\n` + cleanKpis.map(k => `• **${k.label}:** ${k.value}`).join("\n") + "\n\n" : "") +
         `💡 *All calculations were executed live directly from your active table rows and verified for accounting consistency.*`;
 
       return {
