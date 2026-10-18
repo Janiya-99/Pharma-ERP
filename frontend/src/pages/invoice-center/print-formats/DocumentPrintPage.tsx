@@ -214,10 +214,11 @@ export default function DocumentPrintPage({ documentType }: Props) {
 
           <Button
             onClick={() => window.print()}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer"
+            title="Print invoice or Save as PDF"
           >
             <Printer className="mr-2 h-4 w-4" />
-            Print Now
+            Print / Save as PDF
           </Button>
         </div>
       </div>
@@ -226,7 +227,11 @@ export default function DocumentPrintPage({ documentType }: Props) {
       <div className="p-4 sm:p-8 print:p-0">
         <main
           className="mx-auto max-w-4xl rounded-xl border border-slate-200 bg-white p-8 shadow-sm print:m-0 print:max-w-none print:rounded-none print:border-0 print:p-6 print:shadow-none"
-          style={{ fontFamily: format.font_family || "Inter" }}
+          style={{
+            fontFamily: format.font_family || "Inter",
+            WebkitPrintColorAdjust: "exact",
+            printColorAdjust: "exact" as any,
+          }}
         >
           {/* Header */}
           <header
