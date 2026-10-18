@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import PermissionGuard from "../../auth/PermissionGuard";
@@ -66,13 +66,46 @@ const Sidebar = () => {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const location = useLocation();
-  const { mobileOpen, setMobileOpen, desktopExpanded, setDesktopExpanded } = useSidebarState();
-  const effectiveExpanded = desktopExpanded;
+  const {
+    mobileOpen,
+    setMobileOpen,
+    desktopExpanded,
+    setDesktopExpanded,
+    desktopHovered,
+    setDesktopHovered,
+  } = useSidebarState();
+
+  const effectiveExpanded = desktopExpanded || desktopHovered;
+  const hoverLeaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (hoverLeaveTimerRef.current) {
+      clearTimeout(hoverLeaveTimerRef.current);
+      hoverLeaveTimerRef.current = null;
+    }
+    if (!desktopExpanded) {
+      setDesktopHovered(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverLeaveTimerRef.current) {
+      clearTimeout(hoverLeaveTimerRef.current);
+    }
+    hoverLeaveTimerRef.current = setTimeout(() => {
+      if (!desktopExpanded) {
+        setDesktopHovered(false);
+      }
+    }, 120);
+  };
 
   const handleTogglePin = (e: React.MouseEvent) => {
     e.stopPropagation();
     const next = !desktopExpanded;
     setDesktopExpanded(next);
+    if (next) {
+      setDesktopHovered(false);
+    }
     try {
       localStorage.setItem("erp_sidebar_pinned", String(next));
     } catch {}
@@ -986,12 +1019,14 @@ const Sidebar = () => {
       {/* ── Desktop Sidebar (hidden on mobile) ── */}
       <div
         className={`relative z-30 hidden h-full shrink-0 transition-[width] duration-200 ease-out lg:block ${
-          desktopExpanded ? "w-[260px]" : "w-[72px]"
+          effectiveExpanded ? "w-[260px]" : "w-[72px]"
         }`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <div
           className={`fixed bottom-0 left-0 top-0 z-30 flex flex-col overflow-hidden border-r border-slate-200/80 bg-white transition-[width] duration-200 ease-out will-change-[width] ${
-            desktopExpanded
+            effectiveExpanded
               ? "w-[260px] shadow-sm"
               : "w-[72px] shadow-xs"
           }`}
