@@ -83,9 +83,7 @@ const Sidebar = () => {
       clearTimeout(hoverLeaveTimerRef.current);
       hoverLeaveTimerRef.current = null;
     }
-    if (!desktopExpanded) {
-      setDesktopHovered(true);
-    }
+    setDesktopHovered(true);
   };
 
   const handleMouseLeave = () => {
@@ -93,9 +91,7 @@ const Sidebar = () => {
       clearTimeout(hoverLeaveTimerRef.current);
     }
     hoverLeaveTimerRef.current = setTimeout(() => {
-      if (!desktopExpanded) {
-        setDesktopHovered(false);
-      }
+      setDesktopHovered(false);
     }, 120);
   };
 
@@ -111,12 +107,6 @@ const Sidebar = () => {
     e.stopPropagation();
     const next = !desktopExpanded;
     setDesktopExpanded(next);
-    if (!next) {
-      // User just unpinned while mouse is inside sidebar; keep it hovered until mouse leaves
-      setDesktopHovered(true);
-    } else {
-      setDesktopHovered(false);
-    }
     try {
       localStorage.setItem("erp_sidebar_pinned", String(next));
     } catch {}
