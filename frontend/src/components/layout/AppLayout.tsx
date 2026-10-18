@@ -15,6 +15,8 @@ interface SidebarContextValue {
   setMobileOpen: (open: boolean) => void;
   desktopExpanded: boolean;
   setDesktopExpanded: (expanded: boolean) => void;
+  desktopHovered: boolean;
+  setDesktopHovered: (hovered: boolean) => void;
 }
 
 const SidebarContext = createContext<SidebarContextValue>({
@@ -22,6 +24,8 @@ const SidebarContext = createContext<SidebarContextValue>({
   setMobileOpen: () => {},
   desktopExpanded: false,
   setDesktopExpanded: () => {},
+  desktopHovered: false,
+  setDesktopHovered: () => {},
 });
 
 export const useSidebarState = () => useContext(SidebarContext);
@@ -35,8 +39,11 @@ const AppLayout = () => {
       return true;
     }
   });
+  const [desktopHovered, setDesktopHovered] = useState(false);
   const location = useLocation();
   const { activeSoftware, switchActiveSoftware } = useAuth();
+
+  const isEffectiveExpanded = desktopExpanded || desktopHovered;
 
   // Automatically keep activeSoftware in sync with the current URL workspace route
   useEffect(() => {
@@ -57,15 +64,22 @@ const AppLayout = () => {
 
   return (
     <SidebarContext.Provider
-      value={{ mobileOpen, setMobileOpen, desktopExpanded, setDesktopExpanded }}
+      value={{
+        mobileOpen,
+        setMobileOpen,
+        desktopExpanded,
+        setDesktopExpanded,
+        desktopHovered,
+        setDesktopHovered,
+      }}
     >
       <AiCopilotProvider>
         <RouteProgressBar />
         <div
-          className="grid h-screen grid-cols-[0_1fr] gap-0 overflow-hidden font-sans text-[#1F2937] transition-[grid-template-columns] duration-300 lg:grid-cols-[var(--sidebar-width)_1fr]"
+          className="grid h-screen grid-cols-[0_1fr] gap-0 overflow-hidden font-sans text-[#1F2937] transition-[grid-template-columns] duration-200 ease-out lg:grid-cols-[var(--sidebar-width)_1fr]"
           style={
             {
-              "--sidebar-width": desktopExpanded ? "260px" : "72px",
+              "--sidebar-width": isEffectiveExpanded ? "260px" : "72px",
             } as CSSProperties
           }
         >
