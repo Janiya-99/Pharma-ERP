@@ -440,11 +440,10 @@ export default function DocumentPrintPage({ documentType }: Props) {
           )}
 
           {/* Footer Note */}
-          {format.footer_note && (
-            <footer className="mt-8 border-t border-slate-100 pt-3 text-center text-[10px] text-slate-400">
-              {format.footer_note}
-            </footer>
-          )}
+          <footer className="mt-8 border-t border-slate-200/80 pt-3 text-center text-[10px] text-slate-500 print:mt-6 print:border-slate-300 print:break-inside-avoid">
+            {format.footer_note ||
+              "This is a computer-generated tax document. Regulated by National Medicines Regulatory Authority (NMRA), Sri Lanka • Ceylon Med Global ERP"}
+          </footer>
         </main>
       </div>
     </div>

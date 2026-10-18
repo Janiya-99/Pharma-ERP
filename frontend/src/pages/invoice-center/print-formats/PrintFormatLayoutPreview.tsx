@@ -271,11 +271,10 @@ export function PrintFormatLayoutPreview({
               <div className="border-t pt-2">Authorized Signature</div>
             </div>
           )}
-          {format.footer_note && (
-            <footer className="mt-6 border-t pt-3 text-center text-xs text-slate-500">
-              {format.footer_note}
-            </footer>
-          )}
+          <footer className="mt-6 border-t border-slate-200/80 pt-3 text-center text-xs text-slate-500">
+            {format.footer_note ||
+              "This is a computer-generated tax document. Regulated by National Medicines Regulatory Authority (NMRA), Sri Lanka • Ceylon Med Global ERP"}
+          </footer>
         </div>
       </div>
     </div>
