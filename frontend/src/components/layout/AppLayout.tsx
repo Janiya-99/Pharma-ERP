@@ -72,19 +72,21 @@ const AppLayout = () => {
           <Sidebar />
           <div className="flex min-w-0 flex-col overflow-hidden">
             <Topbar />
-            <main className="flex-1 overflow-x-hidden overflow-y-auto scroll-smooth bg-slate-50">
-              <div className="flex flex-col min-h-full w-full">
-                <div className="page-content flex-grow space-y-8 pb-6 font-sans">
+            <main className="flex-1 overflow-x-hidden overflow-y-auto scroll-smooth bg-slate-50 flex flex-col">
+              <div className="flex flex-col min-h-full flex-1 w-full">
+                <div className="page-content flex-1 space-y-8 pb-8 font-sans">
                   <Suspense fallback={<LoadingScreen mode="page" />}>
                     <Outlet />
                   </Suspense>
                 </div>
-                <footer className="mt-auto h-14 shrink-0 border-t px-6 md:px-8 flex items-center shadow-[0_-1px_3px_rgba(0,0,0,0.02)] relative z-10" style={{ borderColor: 'rgba(148, 163, 184, 0.15)', background: '#ffffff' }}>
-                  <div className="w-full flex flex-col items-center justify-between gap-2 text-xs text-slate-500 sm:flex-row">
-                    <span>© {new Date().getFullYear()} Pharma ERP. All rights reserved.</span>
-                    <span>
-                      Developed by{" "}
-                      <span className="font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-default">PIXANDCO</span>
+                <footer className="mt-auto h-14 shrink-0 border-t px-6 md:px-8 flex items-center shadow-[0_-1px_3px_rgba(0,0,0,0.02)] relative z-10 bg-white" style={{ borderColor: 'rgba(148, 163, 184, 0.15)' }}>
+                  <div className="w-full flex flex-col items-center justify-between gap-2 text-xs text-slate-500 sm:flex-row pr-4 sm:pr-24 lg:pr-28">
+                    <span>© {new Date().getFullYear()} Ceylon Med Global ERP. All rights reserved.</span>
+                    <span className="flex items-center gap-2">
+                      <span>
+                        Developed by{" "}
+                        <span className="font-bold text-slate-800 hover:text-indigo-600 transition-colors cursor-default">PIXANDCO</span>
+                      </span>
                     </span>
                   </div>
                 </footer>

@@ -278,12 +278,18 @@ const RolePermissionMatrixPage = () => {
           })}
 
           {canAssign && hasUnsavedChanges && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg flex justify-end px-8 z-50">
-              <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-                <span className="text-orange-600 font-medium flex items-center">
-                  <AlertTriangle className="w-5 h-5 mr-2" /> You have unsaved changes
-                </span>
-                <Button onClick={handleSave} isLoading={saving}>
+            <div className="sticky bottom-4 z-40 mt-6 rounded-2xl border border-amber-200/80 bg-white/95 backdrop-blur-md p-4 shadow-xl flex items-center justify-between gap-4 animate-in slide-in-from-bottom duration-300">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-sm font-bold text-slate-800 block">You have unsaved changes</span>
+                  <span className="text-xs text-slate-500">Remember to save before leaving this page</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button onClick={handleSave} isLoading={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm">
                   <Save className="w-4 h-4 mr-2" /> Save Permissions
                 </Button>
               </div>

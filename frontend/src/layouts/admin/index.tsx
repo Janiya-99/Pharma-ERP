@@ -8,6 +8,8 @@ import type { ERPRoute } from "routes";
 import LoadingScreen from "components/common/LoadingScreen";
 import RouteProgressBar from "components/common/RouteProgressBar";
 
+import Footer from "components/footer/Footer";
+
 function PageLoader() {
   return <LoadingScreen mode="page" />;
 }
@@ -113,13 +115,16 @@ export default function AdminLayout(props: { [x: string]: any }) {
           {...rest}
         />
 
-        <main className="flex h-full flex-1 flex-col overflow-hidden px-4 pb-6 pt-2 md:px-6">
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {renderRoutes(routes)}
-              <Route path="/" element={<Navigate to="/admin/home" replace />} />
-            </Routes>
-          </Suspense>
+        <main className="flex h-full flex-1 flex-col overflow-y-auto px-4 pb-0 pt-2 md:px-6">
+          <div className="flex-1 pb-6">
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {renderRoutes(routes)}
+                <Route path="/" element={<Navigate to="/admin/home" replace />} />
+              </Routes>
+            </Suspense>
+          </div>
+          <Footer />
         </main>
       </div>
     </div>

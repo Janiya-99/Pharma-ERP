@@ -501,10 +501,18 @@ export const ModuleSelectionPage = () => {
         </div>
 
         {/* Footer */}
-        <footer className="text-center py-4 border-t border-slate-100/80">
-          <p className="text-xs font-medium text-slate-400">
-            Engineered by <span className="font-bold text-slate-700">PIXANDCO</span>
-          </p>
+        <footer className="w-full mt-auto py-5 border-t border-slate-200/70 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+          <span>© {new Date().getFullYear()} Ceylon Med Global ERP. All rights reserved.</span>
+          <span className="flex items-center gap-2">
+            <span>
+              Engineered by <span className="font-bold text-slate-800 hover:text-indigo-600 transition-colors">PIXANDCO</span>
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Secure
+            </span>
+          </span>
         </footer>
       </main>
     </div>
