@@ -58,8 +58,9 @@ const AppLayout = () => {
     if (targetCode && activeSoftware?.software_code !== targetCode && switchActiveSoftware) {
       switchActiveSoftware(targetCode);
     }
-    // Auto-dismiss mobile sidebar when navigating to new page for instant smooth mobile experience
+    // Auto-dismiss mobile sidebar and desktop hover when navigating to new page
     setMobileOpen(false);
+    setDesktopHovered(false);
   }, [location.pathname, activeSoftware?.software_code, switchActiveSoftware]);
 
   return (
