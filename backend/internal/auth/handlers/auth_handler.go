@@ -144,6 +144,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
+	req.Password = strings.TrimSpace(req.Password)
+
 	ip := getClientIP(c)
 	userAgent := c.Request.UserAgent()
 

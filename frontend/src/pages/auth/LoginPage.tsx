@@ -36,6 +36,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [capsLockOn, setCapsLockOn] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -44,12 +45,26 @@ const LoginPage = () => {
     });
   };
 
+  const handlePasswordKeyEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.getModifierState) {
+      setCapsLockOn(e.getModifierState("CapsLock"));
+    }
+  };
+
+  const handleQuickFill = (email: string, pass: string) => {
+    setFormData({ email, password: pass });
+    setError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const res = await loginUser(formData.email, formData.password);
+    const cleanEmail = formData.email.trim().toLowerCase();
+    const cleanPassword = formData.password.trim();
+
+    const res = await loginUser(cleanEmail, cleanPassword);
 
     if (res.success) {
       if (res.softwareModules && res.softwareModules.length === 1) {
@@ -59,7 +74,7 @@ const LoginPage = () => {
         navigate("/modules");
       }
     } else {
-      setError(res.message);
+      setError(res.message || "Invalid email or password. Please verify your credentials and ensure Caps Lock is off.");
       setLoading(false);
     }
   };
@@ -186,9 +201,16 @@ const LoginPage = () => {
 
             {/* Password Field */}
             <div className="flex flex-col gap-1.5 group">
-              <Label htmlFor="password" className="text-slate-500 font-bold text-[11px] tracking-wider uppercase">
-                Password
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-slate-500 font-bold text-[11px] tracking-wider uppercase">
+                  Password
+                </Label>
+                {capsLockOn && (
+                  <span className="text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 animate-pulse">
+                    Caps Lock is ON
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <MdLockOutline className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors duration-200" size={19} />
                 <Input
@@ -198,6 +220,8 @@ const LoginPage = () => {
                   placeholder="••••••••••••"
                   value={formData.password}
                   onChange={handleChange}
+                  onKeyDown={handlePasswordKeyEvent}
+                  onKeyUp={handlePasswordKeyEvent}
                   required
                   className="pl-11 pr-11 h-[48px] rounded-xl bg-slate-50/80 border-slate-200 text-slate-900 text-sm font-medium transition-all duration-200 focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 placeholder:text-slate-400 shadow-2xs"
                 />
@@ -208,6 +232,36 @@ const LoginPage = () => {
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <MdVisibilityOff size={18} /> : <MdVisibility size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Demo Profiles Helper */}
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex flex-col gap-1.5">
+              <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+                Quick Select Account
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill("cfo@ceylonmed.lk", "CeylonAdmin@2026")}
+                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-emerald-700 hover:bg-emerald-50 rounded-lg border border-emerald-200/80 shadow-2xs transition-colors"
+                >
+                  CFO (Ruwani)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill("admin@ceylonmed.lk", "CeylonAdmin@2026")}
+                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-indigo-700 hover:bg-indigo-50 rounded-lg border border-indigo-200/80 shadow-2xs transition-colors"
+                >
+                  Admin (Kavinda)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill("accountant@ceylonmed.lk", "CeylonAdmin@2026")}
+                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-blue-700 hover:bg-blue-50 rounded-lg border border-blue-200/80 shadow-2xs transition-colors"
+                >
+                  Accountant (Nuwan)
                 </button>
               </div>
             </div>

@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/pixandco/erp-phrma/internal/auth/dto"
@@ -20,6 +21,8 @@ func NewAuthService(db *gorm.DB) *AuthService {
 }
 
 func (s *AuthService) Login(req dto.LoginRequest, platformCompany *platformModels.PlatformCompany, ipAddress string, userAgent string) (*dto.LoginResponse, error) {
+	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
+	req.Password = strings.TrimSpace(req.Password)
 	var user models.User
 
 	// 1. Find user by email
