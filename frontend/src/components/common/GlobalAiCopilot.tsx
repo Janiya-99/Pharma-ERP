@@ -86,6 +86,7 @@ export const GlobalAiCopilot: React.FC = () => {
   const [copied, setCopied] = useState<string | null>(null);
   const [harvestStats, setHarvestStats] = useState({ rows: 0, kpis: 0, formFields: 0 });
   const chatBottomRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
   const prevRouteRef = useRef(pageContext.route);
 
   // Synchronize settings state whenever modal is opened
@@ -292,17 +293,36 @@ export const GlobalAiCopilot: React.FC = () => {
     });
   };
 
-  // Keyboard shortcut Ctrl+J to toggle
+  // Keyboard shortcut Ctrl+J to toggle, Escape to close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "j") {
         e.preventDefault();
         toggleCopilot();
+      } else if (e.key === "Escape" && isOpen) {
+        e.preventDefault();
+        closeCopilot();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleCopilot]);
+  }, [toggleCopilot, closeCopilot, isOpen]);
+
+  // Handle click outside drawer to close
+  useEffect(() => {
+    if (!isOpen) return;
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      if (drawerRef.current && !drawerRef.current.contains(e.target as Node)) {
+        closeCopilot();
+      }
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [isOpen, closeCopilot]);
 
   // Auto-scroll chat
   useEffect(() => {
@@ -493,9 +513,20 @@ export const GlobalAiCopilot: React.FC = () => {
 
       {/* ── Slide-Over Copilot Drawer ── */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/30 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in">
-          <div className="absolute inset-y-0 right-0 flex max-w-full pl-10">
-            <div className="w-screen max-w-xl bg-white shadow-2xl flex flex-col border-l border-slate-200">
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Backdrop overlay - clicking anywhere outside the drawer immediately closes it */}
+          <div
+            onClick={closeCopilot}
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in cursor-pointer"
+            aria-label="Close AI Copilot backdrop"
+          />
+
+          {/* Slide-over panel container: pointer-events-none ensures clicks outside pass to the backdrop */}
+          <div className="fixed inset-y-0 right-0 flex max-w-full pl-10 pointer-events-none">
+            <div
+              ref={drawerRef}
+              className="pointer-events-auto w-screen max-w-xl bg-white shadow-2xl flex flex-col border-l border-slate-200"
+            >
               
               {/* Drawer Header */}
               <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 via-white to-indigo-50/40 px-4 sm:px-5 py-3.5 sm:py-4">
