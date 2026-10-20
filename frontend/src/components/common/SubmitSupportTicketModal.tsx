@@ -332,10 +332,10 @@ export const SubmitSupportTicketModal: React.FC<Props> = ({ isOpen, onClose }) =
               onClose();
               navigate("/support/chat");
             }}
-            className="ml-auto mb-2 text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="ml-auto mb-2 text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
-            <span>Open WhatsApp Chat View →</span>
+            <MessageSquare className="h-3.5 w-3.5 text-indigo-600" />
+            <span>Open Support Ticket Desk →</span>
           </button>
         </div>
 

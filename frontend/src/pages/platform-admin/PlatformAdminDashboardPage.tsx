@@ -7,6 +7,8 @@ import {
   suspendPlatformCompany,
   activatePlatformCompany,
   extendPlatformCompanyLicense,
+  getPlatformBlockedIPs,
+  unblockPlatformIP,
 } from "../../api/platformAdminApi";
 import {
   Building2,
@@ -40,6 +42,9 @@ const PlatformAdminDashboardPage = () => {
   const [tickets, setTickets] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [blockedIPs, setBlockedIPs] = useState<any[]>([]);
+  const [unblockingIP, setUnblockingIP] = useState<string | null>(null);
+  const [quickUnblockInput, setQuickUnblockInput] = useState("");
 
   // AI Evaluation Modal State
   const [selectedAICompany, setSelectedAICompany] = useState<any | null>(null);
@@ -48,16 +53,18 @@ const PlatformAdminDashboardPage = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [compRes, subRes, invRes, ticketRes] = await Promise.all([
+      const [compRes, subRes, invRes, ticketRes, blockedRes] = await Promise.all([
         getPlatformCompanies(),
         getPlatformSubscriptions(),
         getPlatformInvoices(),
         getPlatformSupportTickets(),
+        getPlatformBlockedIPs().catch(() => ({ data: [] })),
       ]);
 
       const companyList = compRes.data || [];
       const invoiceList = invRes.data || [];
       const ticketList = ticketRes.data || [];
+      const blockedList = blockedRes.data || [];
 
       const activeCount = companyList.filter((c: any) => c.status === "active").length;
 
@@ -82,11 +89,32 @@ const PlatformAdminDashboardPage = () => {
       setCompanies(companyList);
       setInvoices(invoiceList);
       setTickets(ticketList);
+      setBlockedIPs(blockedList);
     } catch (err) {
       console.error("Failed to load dashboard metrics", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUnblockIP = async (ipToUnblock: string) => {
+    try {
+      setUnblockingIP(ipToUnblock);
+      const res = await unblockPlatformIP(ipToUnblock);
+      toast.success(res.message || `IP ${ipToUnblock} successfully unblocked`);
+      await loadData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to unblock IP address");
+    } finally {
+      setUnblockingIP(null);
+    }
+  };
+
+  const handleManualQuickUnblock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickUnblockInput.trim()) return;
+    await handleUnblockIP(quickUnblockInput.trim());
+    setQuickUnblockInput("");
   };
 
   useEffect(() => {
@@ -502,6 +530,113 @@ const PlatformAdminDashboardPage = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ── Blocked IP Security & Resolution Manager ── */}
+      <div className="rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-xl space-y-4 ring-1 ring-inset ring-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <span className="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                <Lock className="h-4 w-4" />
+              </span>
+              <h3 className="text-base font-bold text-white">Firewall & Blocked IP Management</h3>
+              <span className="rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/20">
+                {blockedIPs.length} Blocked / Restricted
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Real-time security shield protecting tenant and platform endpoints against brute-force attacks and rate limits. Release access in one click.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              to="/platform-admin/blocked-ips"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-850 text-indigo-400 border border-slate-800 text-xs font-semibold transition-colors"
+            >
+              <span>Security Center</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Quick Unblock Input */}
+        <form onSubmit={handleManualQuickUnblock} className="flex flex-col sm:flex-row gap-3 max-w-xl">
+          <input
+            type="text"
+            placeholder="Quick Unblock IP (e.g. 192.168.1.100 or 123.45.67.89)"
+            value={quickUnblockInput}
+            onChange={(e) => setQuickUnblockInput(e.target.value)}
+            className="flex-1 rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono"
+          />
+          <button
+            type="submit"
+            disabled={!quickUnblockInput.trim() || unblockingIP === quickUnblockInput.trim()}
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/20 cursor-pointer whitespace-nowrap"
+          >
+            {unblockingIP === quickUnblockInput.trim() ? "Unblocking..." : "Release & Unblock IP"}
+          </button>
+        </form>
+
+        {blockedIPs.length === 0 ? (
+          <div className="py-8 text-center text-slate-400 border border-slate-900 rounded-2xl bg-slate-900/20">
+            <ShieldCheck className="h-8 w-8 text-emerald-400 mx-auto mb-2 opacity-80" />
+            <p className="text-sm font-semibold text-slate-200">Zero Active IP Blocks</p>
+            <p className="text-xs text-slate-500 mt-0.5">All incoming client requests are healthy and operating normally.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl border border-slate-800">
+            <table className="w-full text-left text-sm text-slate-400">
+              <thead>
+                <tr className="border-b border-slate-800 text-slate-500 font-semibold text-xs uppercase tracking-wider bg-slate-900/40">
+                  <th className="p-3.5">IP Address</th>
+                  <th className="p-3.5">Failure Count</th>
+                  <th className="p-3.5">Last Attempt</th>
+                  <th className="p-3.5">Reason</th>
+                  <th className="p-3.5">Status</th>
+                  <th className="p-3.5 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-850 text-xs">
+                {blockedIPs.map((it) => (
+                  <tr key={it.ip} className="hover:bg-slate-900/30 transition-colors">
+                    <td className="p-3.5 font-mono font-bold text-white">{it.ip}</td>
+                    <td className="p-3.5">
+                      <span className="inline-flex px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 font-bold border border-rose-500/20">
+                        {it.failed_count} attempts
+                      </span>
+                    </td>
+                    <td className="p-3.5 font-mono text-slate-400">{it.last_attempt}</td>
+                    <td className="p-3.5 max-w-xs text-slate-300 truncate" title={it.reason}>
+                      {it.reason}
+                    </td>
+                    <td className="p-3.5">
+                      <span
+                        className={`inline-flex px-2 py-0.5 rounded-full font-bold uppercase ${
+                          it.status === "BLOCKED"
+                            ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                        }`}
+                      >
+                        {it.status}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-right">
+                      <button
+                        onClick={() => handleUnblockIP(it.ip)}
+                        disabled={unblockingIP === it.ip}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs transition-all shadow-xs shadow-emerald-600/20 cursor-pointer"
+                      >
+                        {unblockingIP === it.ip ? "Unblocking..." : "Unblock IP"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* AI Company Evaluation Modal */}

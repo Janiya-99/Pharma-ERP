@@ -211,11 +211,12 @@ const Topbar = () => {
     }
   };
 
-  const handleSwitchModule = async (code: string, route: string) => {
-    if (code !== "LOGISTICS" && switchActiveSoftware) {
-      await switchActiveSoftware(code);
-    }
+  const handleSwitchModule = (code: string, route: string) => {
+    // Navigate immediately to the target module route with zero lag
     navigate(route);
+    if (code !== "LOGISTICS" && switchActiveSoftware) {
+      switchActiveSoftware(code).catch((err) => console.error("Error switching active software:", err));
+    }
   };
 
   const [isAllBranches, setIsAllBranches] = useState<boolean>(() => {
@@ -569,10 +570,10 @@ const Topbar = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/support/chat")}
-                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shadow-emerald-600/20"
+                  className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shadow-indigo-600/20"
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>Open WhatsApp Support Chat</span>
+                  <span>Open Support Ticket Desk</span>
                 </button>
               </div>
             </DropdownMenuContent>

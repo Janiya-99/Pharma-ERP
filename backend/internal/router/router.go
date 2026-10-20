@@ -301,9 +301,13 @@ func Setup(
 				userID := parseCtxID(userIDVal)
 
 				var req struct {
-					Subject     string `json:"subject"`
-					Description string `json:"description"`
-					Priority    string `json:"priority"`
+					Subject        string `json:"subject"`
+					Description    string `json:"description"`
+					Priority       string `json:"priority"`
+					AttachmentURL  string `json:"attachment_url"`
+					AttachmentName string `json:"attachment_name"`
+					AttachmentType string `json:"attachment_type"`
+					AttachmentSize int64  `json:"attachment_size"`
 				}
 				if err := c.ShouldBindJSON(&req); err != nil {
 					c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -320,6 +324,10 @@ func Setup(
 					Description:     req.Description,
 					Priority:        req.Priority,
 					Status:          "open",
+					AttachmentURL:   req.AttachmentURL,
+					AttachmentName:  req.AttachmentName,
+					AttachmentType:  req.AttachmentType,
+					AttachmentSize:  req.AttachmentSize,
 					CreatedAt:       time.Now(),
 					UpdatedAt:       time.Now(),
 				}
@@ -328,12 +336,16 @@ func Setup(
 					return
 				}
 
-				if req.Description != "" {
+				if req.Description != "" || req.AttachmentURL != "" {
 					platformDB.Create(&platformModels.SupportTicketMessage{
 						SupportTicketID: ticket.ID,
 						SenderType:      "client",
 						SenderID:        userID,
 						MessageText:     req.Description,
+						AttachmentURL:   req.AttachmentURL,
+						AttachmentName:  req.AttachmentName,
+						AttachmentType:  req.AttachmentType,
+						AttachmentSize:  req.AttachmentSize,
 						CreatedAt:       time.Now(),
 						UpdatedAt:       time.Now(),
 					})
@@ -391,18 +403,32 @@ func Setup(
 				}
 
 				var req struct {
-					MessageText string `json:"message_text"`
+					MessageText    string `json:"message_text"`
+					AttachmentURL  string `json:"attachment_url"`
+					AttachmentName string `json:"attachment_name"`
+					AttachmentType string `json:"attachment_type"`
+					AttachmentSize int64  `json:"attachment_size"`
+					SenderType     string `json:"sender_type"`
 				}
-				if err := c.ShouldBindJSON(&req); err != nil || req.MessageText == "" {
-					c.JSON(http.StatusBadRequest, gin.H{"message": "Message text is required"})
+				if err := c.ShouldBindJSON(&req); err != nil || (req.MessageText == "" && req.AttachmentURL == "") {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "Message text or attachment is required"})
 					return
+				}
+
+				senderType := "client"
+				if req.SenderType == "platform_admin" || req.SenderType == "support" {
+					senderType = "platform_admin"
 				}
 
 				msg := platformModels.SupportTicketMessage{
 					SupportTicketID: uint(ticketID),
-					SenderType:      "client",
+					SenderType:      senderType,
 					SenderID:        userID,
 					MessageText:     req.MessageText,
+					AttachmentURL:   req.AttachmentURL,
+					AttachmentName:  req.AttachmentName,
+					AttachmentType:  req.AttachmentType,
+					AttachmentSize:  req.AttachmentSize,
 					CreatedAt:       time.Now(),
 					UpdatedAt:       time.Now(),
 				}

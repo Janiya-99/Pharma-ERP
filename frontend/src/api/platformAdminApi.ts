@@ -264,3 +264,15 @@ export const getCountries = async () => {
   return res.data;
 };
 
+// Security & Blocked IPs
+export const getPlatformBlockedIPs = async () => {
+  const res = await platformAdminClient.get("/blocked-ips");
+  return res.data;
+};
+
+export const unblockPlatformIP = async (ip: string) => {
+  const res = await platformAdminClient.post("/blocked-ips/unblock", { ip });
+  return res.data;
+};
+
+
