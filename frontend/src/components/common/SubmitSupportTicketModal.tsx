@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../../auth/AuthContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -45,6 +45,7 @@ interface Props {
 export const SubmitSupportTicketModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const { user, company, activeBranch, activeSoftware } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Active view tab: 'new' | 'list'
   const [activeTab, setActiveTab] = useState<"new" | "list">("new");
@@ -323,6 +324,18 @@ export const SubmitSupportTicketModal: React.FC<Props> = ({ isOpen, onClose }) =
                 {tickets.length}
               </span>
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              navigate("/support/chat");
+            }}
+            className="ml-auto mb-2 text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
+            <span>Open WhatsApp Chat View →</span>
           </button>
         </div>
 

@@ -221,6 +221,8 @@ func (h *ControlDashboardHandler) GetSummary(c *gin.Context) {
 		roleDist = []RoleDistItem{}
 	}
 
+	blockedIPs := fetchBlockedIPs(db)
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Control Center dashboard loaded successfully",
@@ -234,6 +236,132 @@ func (h *ControlDashboardHandler) GetSummary(c *gin.Context) {
 			"role_distribution": roleDist,
 			"module_adoption":   moduleAdoption,
 			"security_events":   secEvents,
+			"blocked_ips":       blockedIPs,
 		},
 	})
+}
+
+type BlockedIPItem struct {
+	IP          string `json:"ip"`
+	FailedCount int64  `json:"failed_count"`
+	LastAttempt string `json:"last_attempt"`
+	Reason      string `json:"reason"`
+	Status      string `json:"status"` // "BLOCKED" or "FLAGGED"
+	IsRule      bool   `json:"is_rule"`
+}
+
+func fetchBlockedIPs(db *gorm.DB) []BlockedIPItem {
+	var items []BlockedIPItem
+
+	type FailedIPRow struct {
+		IP          string
+		Count       int64
+		LastAttempt time.Time
+		Reason      string
+	}
+	var failedRows []FailedIPRow
+	db.Raw(`
+		SELECT ip_address as ip, COUNT(*) as count, MAX(logged_at) as last_attempt, MAX(failure_reason) as reason
+		FROM login_logs
+		WHERE login_status = 'failed' AND ip_address != '' AND ip_address != '127.0.0.1' AND ip_address != '::1'
+		GROUP BY ip_address
+		HAVING count >= 2
+		ORDER BY last_attempt DESC
+		LIMIT 10
+	`).Scan(&failedRows)
+
+	for _, row := range failedRows {
+		status := "FLAGGED"
+		if row.Count >= 4 {
+			status = "BLOCKED"
+		}
+		timeStr := row.LastAttempt.Format("Jan 02, 15:04")
+		reason := row.Reason
+		if reason == "" {
+			reason = "Multiple failed login attempts"
+		}
+		items = append(items, BlockedIPItem{
+			IP:          row.IP,
+			FailedCount: row.Count,
+			LastAttempt: timeStr,
+			Reason:      reason,
+			Status:      status,
+			IsRule:      false,
+		})
+	}
+
+	// Also inspect trusted_ip_rules for explicit deny rules
+	type DenyRuleRow struct {
+		IPRange   string
+		CreatedAt time.Time
+		RuleName  string
+	}
+	var denyRules []DenyRuleRow
+	db.Raw(`
+		SELECT ip_range, created_at, rule_name
+		FROM trusted_ip_rules
+		WHERE access_type = 'deny' AND is_active = true
+	`).Scan(&denyRules)
+
+	for _, rule := range denyRules {
+		found := false
+		for _, it := range items {
+			if it.IP == rule.IPRange {
+				found = true
+				break
+			}
+		}
+		if !found {
+			items = append(items, BlockedIPItem{
+				IP:          rule.IPRange,
+				FailedCount: 0,
+				LastAttempt: rule.CreatedAt.Format("Jan 02, 15:04"),
+				Reason:      "Firewall deny rule: " + rule.RuleName,
+				Status:      "BLOCKED",
+				IsRule:      true,
+			})
+		}
+	}
+
+	if items == nil {
+		items = []BlockedIPItem{}
+	}
+	return items
+}
+
+func (h *ControlDashboardHandler) GetBlockedIPs(c *gin.Context) {
+	companyDB, exists := c.Get("companyDB")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Tenant database context missing"})
+		return
+	}
+	db := companyDB.(*gorm.DB)
+
+	blocked := fetchBlockedIPs(db)
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": blocked})
+}
+
+func (h *ControlDashboardHandler) UnblockIP(c *gin.Context) {
+	companyDB, exists := c.Get("companyDB")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Tenant database context missing"})
+		return
+	}
+	db := companyDB.(*gorm.DB)
+
+	var req struct {
+		IP string `json:"ip"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil || req.IP == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Valid IP address is required"})
+		return
+	}
+
+	// 1. Reset failed login attempts in login_logs for this IP
+	db.Exec("UPDATE login_logs SET login_status = 'unblocked' WHERE ip_address = ? AND login_status = 'failed'", req.IP)
+
+	// 2. If there is a deny rule in trusted_ip_rules, disable it
+	db.Exec("UPDATE trusted_ip_rules SET is_active = false WHERE ip_range = ? AND access_type = 'deny'", req.IP)
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "IP " + req.IP + " unblocked successfully. Authentication restrictions cleared."})
 }

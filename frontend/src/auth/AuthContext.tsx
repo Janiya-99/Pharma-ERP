@@ -79,7 +79,10 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     }
 
     try {
-      setLoading(true);
+      // Only show full-screen blocking loader if we don't already have user context
+      if (!user) {
+        setLoading(true);
+      }
       const res = await getAuthContext();
 
       // Handle both {success: true, data: {...}} and direct object {...}
@@ -103,11 +106,11 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, user]);
 
   useEffect(() => {
     refreshContext();
-  }, [refreshContext]);
+  }, [token]);
 
   const loginUser = async (email: unknown, password: unknown) => {
     try {
@@ -163,45 +166,51 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 
   const switchActiveBranch = async (branchId: string | number) => {
     try {
-      setLoading(true);
       const res = await switchBranch(branchId);
+      const data = res.data || res;
       const token =
-        res.data?.tokens?.access_token || res.token || res.data?.token;
+        data?.tokens?.access_token || res.token || data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
         storeToken(token);
         setToken(token);
-        await refreshContext();
+        if (data.active_branch) {
+          setActiveBranch(data.active_branch);
+        }
+        if (data.permissions) {
+          setPermissions(data.permissions);
+        }
         return true;
       }
       return false;
     } catch (error) {
       console.error("Failed to switch branch", error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const switchActiveSoftware = async (softwareCode: unknown) => {
     try {
-      setLoading(true);
       const res = await switchSoftware(softwareCode);
+      const data = res.data || res;
       const token =
-        res.data?.tokens?.access_token || res.token || res.data?.token;
+        data?.tokens?.access_token || res.token || data?.token;
       const isSuccess = res.success !== false;
       if (isSuccess && token) {
         storeToken(token);
         setToken(token);
-        await refreshContext();
+        if (data.active_software) {
+          setActiveSoftware(data.active_software);
+        }
+        if (data.permissions) {
+          setPermissions(data.permissions);
+        }
         return true;
       }
       return false;
     } catch (error) {
       console.error("Failed to switch software", error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 

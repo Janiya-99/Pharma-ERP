@@ -559,5 +559,13 @@ export const getCountries = async () => {
   return res.data;
 };
 
+// --- Blocked IPs & Security Controls ---
+export const getBlockedIPs = async () => {
+  const res = await apiClient.get("/control/dashboard/blocked-ips");
+  return res.data;
+};
 
-
+export const unblockIP = async (ip: string) => {
+  const res = await apiClient.post("/control/dashboard/unblock-ip", { ip });
+  return res.data;
+};

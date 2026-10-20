@@ -225,28 +225,80 @@ func Setup(
 		complianceGrp.GET("/countries", commonCtrl.GetCountries)
 
 		// Support Ticket & Helpdesk routes (accessible by authenticated tenant users)
+		parseCtxID := func(val interface{}) uint {
+			if val == nil {
+				return 0
+			}
+			switch v := val.(type) {
+			case uint:
+				return v
+			case uint64:
+				return uint(v)
+			case int:
+				return uint(v)
+			case int64:
+				return uint(v)
+			default:
+				return 0
+			}
+		}
+
 		supportGrp := v1.Group("/support")
 		supportGrp.Use(middleware.CompanyAuthMiddleware(resolver))
 		{
 			// List support tickets for the current company
 			supportGrp.GET("/tickets", func(c *gin.Context) {
-				companyID, _ := c.Get("company_id")
+				companyIDVal, _ := c.Get("company_id")
+				companyID := parseCtxID(companyIDVal)
+
 				var list []platformAdmin.SupportTicketDetail
-				platformDB.Table("support_tickets").
+				q := platformDB.Table("support_tickets").
 					Select("support_tickets.*, tenant_companies.company_name, tenant_companies.company_code").
-					Joins("LEFT JOIN tenant_companies ON support_tickets.tenant_company_id = tenant_companies.id").
-					Where("support_tickets.tenant_company_id = ?", companyID).
-					Order("support_tickets.id DESC").
-					Scan(&list)
+					Joins("LEFT JOIN tenant_companies ON support_tickets.tenant_company_id = tenant_companies.id")
+				
+				if companyID > 0 {
+					q = q.Where("support_tickets.tenant_company_id = ? OR support_tickets.tenant_company_id = 0", companyID)
+				}
+				q.Order("support_tickets.id DESC").Scan(&list)
 				c.JSON(http.StatusOK, gin.H{"success": true, "data": list})
+			})
+
+			// Unread replies and notifications
+			supportGrp.GET("/notifications", func(c *gin.Context) {
+				companyIDVal, _ := c.Get("company_id")
+				companyID := parseCtxID(companyIDVal)
+
+				type NotificationItem struct {
+					TicketID     uint      `json:"ticket_id"`
+					TicketNumber string    `json:"ticket_number"`
+					Subject      string    `json:"subject"`
+					SenderType   string    `json:"sender_type"`
+					MessageText  string    `json:"message_text"`
+					CreatedAt    time.Time `json:"created_at"`
+				}
+
+				var notifications []NotificationItem
+				platformDB.Table("support_ticket_messages").
+					Select("support_ticket_messages.support_ticket_id as ticket_id, support_tickets.ticket_number, support_tickets.subject, support_ticket_messages.sender_type, support_ticket_messages.message_text, support_ticket_messages.created_at").
+					Joins("JOIN support_tickets ON support_tickets.id = support_ticket_messages.support_ticket_id").
+					Where("(support_tickets.tenant_company_id = ? OR support_tickets.tenant_company_id = 0) AND support_ticket_messages.sender_type = 'platform_admin'", companyID).
+					Order("support_ticket_messages.id DESC").
+					Limit(10).
+					Scan(&notifications)
+
+				c.JSON(http.StatusOK, gin.H{
+					"success": true,
+					"unread_count": len(notifications),
+					"notifications": notifications,
+				})
 			})
 
 			// Create ticket from tenant client
 			supportGrp.POST("/tickets", func(c *gin.Context) {
 				companyIDVal, _ := c.Get("company_id")
-				companyID, _ := companyIDVal.(uint)
+				companyID := parseCtxID(companyIDVal)
 				userIDVal, _ := c.Get("user_id")
-				userID, _ := userIDVal.(uint)
+				userID := parseCtxID(userIDVal)
 
 				var req struct {
 					Subject     string `json:"subject"`
@@ -293,6 +345,7 @@ func Setup(
 			// Get messages for a ticket (verifying company ownership)
 			supportGrp.GET("/tickets/:id/messages", func(c *gin.Context) {
 				companyIDVal, _ := c.Get("company_id")
+				companyID := parseCtxID(companyIDVal)
 				ticketID, err := strconv.Atoi(c.Param("id"))
 				if err != nil {
 					c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ticket ID"})
@@ -300,7 +353,11 @@ func Setup(
 				}
 
 				var ticket platformModels.SupportTicket
-				if err := platformDB.Where("id = ? AND tenant_company_id = ?", ticketID, companyIDVal).First(&ticket).Error; err != nil {
+				q := platformDB.Where("id = ?", ticketID)
+				if companyID > 0 {
+					q = q.Where("tenant_company_id = ? OR tenant_company_id = 0", companyID)
+				}
+				if err := q.First(&ticket).Error; err != nil {
 					c.JSON(http.StatusNotFound, gin.H{"message": "Ticket not found"})
 					return
 				}
@@ -313,8 +370,9 @@ func Setup(
 			// Client send message reply to ticket
 			supportGrp.POST("/tickets/:id/messages", func(c *gin.Context) {
 				companyIDVal, _ := c.Get("company_id")
+				companyID := parseCtxID(companyIDVal)
 				userIDVal, _ := c.Get("user_id")
-				userID, _ := userIDVal.(uint)
+				userID := parseCtxID(userIDVal)
 
 				ticketID, err := strconv.Atoi(c.Param("id"))
 				if err != nil {
@@ -323,7 +381,11 @@ func Setup(
 				}
 
 				var ticket platformModels.SupportTicket
-				if err := platformDB.Where("id = ? AND tenant_company_id = ?", ticketID, companyIDVal).First(&ticket).Error; err != nil {
+				q := platformDB.Where("id = ?", ticketID)
+				if companyID > 0 {
+					q = q.Where("tenant_company_id = ? OR tenant_company_id = 0", companyID)
+				}
+				if err := q.First(&ticket).Error; err != nil {
 					c.JSON(http.StatusNotFound, gin.H{"message": "Ticket not found"})
 					return
 				}
@@ -349,12 +411,41 @@ func Setup(
 					return
 				}
 
-				// Touch ticket updated_at
+				// Touch ticket updated_at and move to open if was resolved
 				platformDB.Model(&platformModels.SupportTicket{}).Where("id = ?", ticketID).Updates(map[string]interface{}{
 					"updated_at": time.Now(),
 				})
 
 				c.JSON(http.StatusCreated, gin.H{"success": true, "data": msg})
+			})
+
+			// Client update ticket status (e.g. resolve/close or reopen)
+			supportGrp.PUT("/tickets/:id/status", func(c *gin.Context) {
+				companyIDVal, _ := c.Get("company_id")
+				companyID := parseCtxID(companyIDVal)
+				ticketID, err := strconv.Atoi(c.Param("id"))
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ticket ID"})
+					return
+				}
+
+				var req struct {
+					Status string `json:"status"`
+				}
+				if err := c.ShouldBindJSON(&req); err != nil || req.Status == "" {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "Status is required"})
+					return
+				}
+
+				q := platformDB.Model(&platformModels.SupportTicket{}).Where("id = ?", ticketID)
+				if companyID > 0 {
+					q = q.Where("tenant_company_id = ? OR tenant_company_id = 0", companyID)
+				}
+				if err := q.Update("status", req.Status).Error; err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+					return
+				}
+				c.JSON(http.StatusOK, gin.H{"success": true, "message": "Ticket status updated"})
 			})
 		}
 	}

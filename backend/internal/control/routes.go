@@ -23,8 +23,10 @@ func SetupRoutes(router *gin.RouterGroup, logger *zap.Logger) {
 	secSettingsHandler := handlers.NewSecuritySettingsHandler(logger)
 	dashboardHandler := handlers.NewControlDashboardHandler(logger)
 
-	// --- Dashboard Summary ---
+	// --- Dashboard Summary & IP Security ---
 	router.GET("/dashboard/summary", dashboardHandler.GetSummary)
+	router.GET("/dashboard/blocked-ips", dashboardHandler.GetBlockedIPs)
+	router.POST("/dashboard/unblock-ip", dashboardHandler.UnblockIP)
 
 	// --- Company Profile ---
 	router.GET("/company", middleware.RequirePermission("control.company.view"), companyHandler.GetCompanyProfile)

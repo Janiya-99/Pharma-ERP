@@ -63,3 +63,31 @@ export const sendClientTicketMessage = async (
   });
   return res.data?.data;
 };
+
+export const updateClientTicketStatus = async (
+  ticketId: number,
+  status: string
+): Promise<SupportTicketItem> => {
+  const res = await apiClient.put(`/support/tickets/${ticketId}/status`, { status });
+  return res.data?.data;
+};
+
+export interface SupportNotificationsData {
+  unread_replies: number;
+  latest_replies: Array<{
+    ticket_id: number;
+    subject: string;
+    reply_message: string;
+    sender: string;
+    created_at: string;
+  }>;
+}
+
+export const getSupportNotifications = async (): Promise<SupportNotificationsData> => {
+  try {
+    const res = await apiClient.get("/support/notifications");
+    return res.data?.data || { unread_replies: 0, latest_replies: [] };
+  } catch (err) {
+    return { unread_replies: 0, latest_replies: [] };
+  }
+};

@@ -83,6 +83,11 @@ export const AiCopilotProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return deriveContextFromPath(location.pathname);
   }, [location.pathname]);
 
+  // Automatically reset any page-specific custom context when navigating between routes
+  React.useEffect(() => {
+    setCustomPageContext({});
+  }, [location.pathname]);
+
   const pageContext: PageContextState = useMemo(() => {
     return {
       ...derivedContext,
