@@ -42,9 +42,9 @@ export const OpeningBalancesPage = () => (
       deleteApi: financeApi.deleteOpeningBalance,
       statusFilter: true,
       fields: [
-        optionalBranchField,
-        financialYearField,
-        accountField("account_id", "Account"),
+        { ...accountField("account_id", "Account"), table: true },
+        { ...financialYearField, table: true },
+        { ...optionalBranchField, table: true },
         { name: "debit_amount", label: "Debit Amount", type: "number", table: true, defaultValue: 0 },
         { name: "credit_amount", label: "Credit Amount", type: "number", table: true, defaultValue: 0 },
         statusField,

@@ -27,7 +27,14 @@ import {
   AlertCircle,
   BarChart3,
   Percent,
+  ChevronDown,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../components/ui/dropdown-menu";
 import {
   AreaChart,
   Area,
@@ -204,6 +211,60 @@ export default function InvoiceCenterDashboard() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState<"month" | "last_month" | "quarter" | "year">("month");
+
+  const periodConfig = {
+    month: {
+      label: "This Month",
+      subtext: "Oct 1 – Oct 31, 2026",
+      arBalance: "LKR 32,450,000",
+      customers: "342",
+      overdue: "12",
+      creditGranted: "LKR 85,000,000",
+      collectionRate: "78.4%",
+      dso: "32 days",
+      unapplied: "LKR 2,450,000",
+      dueWeek: "LKR 5,780,000",
+    },
+    last_month: {
+      label: "Last Month",
+      subtext: "Sep 1 – Sep 30, 2026",
+      arBalance: "LKR 30,850,000",
+      customers: "338",
+      overdue: "9",
+      creditGranted: "LKR 82,400,000",
+      collectionRate: "73.2%",
+      dso: "36 days",
+      unapplied: "LKR 3,120,000",
+      dueWeek: "LKR 6,240,000",
+    },
+    quarter: {
+      label: "This Quarter",
+      subtext: "Jul 1 – Oct 31, 2026",
+      arBalance: "LKR 94,620,000",
+      customers: "354",
+      overdue: "18",
+      creditGranted: "LKR 89,500,000",
+      collectionRate: "81.6%",
+      dso: "29 days",
+      unapplied: "LKR 4,890,000",
+      dueWeek: "LKR 8,450,000",
+    },
+    year: {
+      label: "This Year (YTD)",
+      subtext: "Jan 1 – Oct 31, 2026",
+      arBalance: "LKR 268,400,000",
+      customers: "386",
+      overdue: "24",
+      creditGranted: "LKR 112,000,000",
+      collectionRate: "83.1%",
+      dso: "28 days",
+      unapplied: "LKR 9,650,000",
+      dueWeek: "LKR 12,300,000",
+    },
+  };
+
+  const currentCfg = periodConfig[selectedPeriod];
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -234,12 +295,50 @@ export default function InvoiceCenterDashboard() {
         accent="blue"
         actions={
           <div className="flex flex-wrap items-center gap-2.5">
-            {/* Date Range Selector */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white shadow-2xs text-xs font-semibold text-slate-700">
-              <Calendar className="h-4 w-4 text-slate-400" />
-              <span>This Month</span>
-              <span className="text-slate-400 font-normal">Oct 1 – Oct 31, 2026</span>
-            </div>
+            {/* Interactive Date Range Selector Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 shadow-2xs text-xs font-semibold text-slate-700 cursor-pointer transition-colors"
+                >
+                  <Calendar className="h-4 w-4 text-slate-400" />
+                  <span>{currentCfg.label}</span>
+                  <span className="text-slate-400 font-normal">{currentCfg.subtext}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-slate-400 ml-0.5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-white border border-slate-200 shadow-lg rounded-xl p-1 z-50">
+                <DropdownMenuItem
+                  onClick={() => setSelectedPeriod("month")}
+                  className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "month" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
+                >
+                  <span>This Month</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Oct 1 – Oct 31, 2026</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setSelectedPeriod("last_month")}
+                  className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "last_month" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
+                >
+                  <span>Last Month</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Sep 1 – Sep 30, 2026</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setSelectedPeriod("quarter")}
+                  className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "quarter" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
+                >
+                  <span>This Quarter</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Jul 1 – Oct 31, 2026</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setSelectedPeriod("year")}
+                  className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "year" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
+                >
+                  <span>This Year (YTD)</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Jan 1 – Oct 31, 2026</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Refresh Button */}
             <button
@@ -262,17 +361,21 @@ export default function InvoiceCenterDashboard() {
         }
       />
 
-      {/* ── 2. TOP 8 KPI METRIC CARDS (Exact values & layout from photo) ── */}
+      {/* ── 2. TOP 8 KPI METRIC CARDS (Exact values & layout from photo with report deep-links) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3.5">
         {/* Card 1: Total AR Balance */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/reports/customer-aging")}
+          title="Click to view Customer Aging Report"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total AR Balance</span>
-            <div className="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-blue-600 transition-colors">Total AR Balance</span>
+            <div className="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <DollarSign className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">LKR 32,450,000</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.arBalance}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-emerald-600 flex items-center gap-0.5">
               ↑ 12.5% <span className="font-normal text-slate-400">vs last month</span>
@@ -282,14 +385,18 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Card 2: Total Customers */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/customers")}
+          title="Click to view All Customers"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Customers</span>
-            <div className="h-7 w-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-blue-600 transition-colors">Total Customers</span>
+            <div className="h-7 w-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Users className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">342</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.customers}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-blue-600 flex items-center gap-0.5">
               ↑ 6.2% <span className="font-normal text-slate-400">active customers</span>
@@ -299,14 +406,18 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Card 3: Overdue Invoices */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/reports/outstanding-invoices")}
+          title="Click to view Overdue Outstanding Invoices Report"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-rose-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Overdue Invoices</span>
-            <div className="h-7 w-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-rose-600 transition-colors">Overdue Invoices</span>
+            <div className="h-7 w-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <FileText className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-rose-600 mt-2">12</p>
+          <p className="text-lg font-extrabold text-rose-600 mt-2">{currentCfg.overdue}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-rose-600 flex items-center gap-0.5">
               ↑ 33.3% <span className="font-normal text-slate-400">requires attention</span>
@@ -316,14 +427,18 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Card 4: Total Credit Granted */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/reports/customer-balance")}
+          title="Click to view Customer Balance & Credit Report"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-purple-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Credit Granted</span>
-            <div className="h-7 w-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-purple-600 transition-colors">Total Credit Granted</span>
+            <div className="h-7 w-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <CreditCard className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">LKR 85,000,000</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.creditGranted}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-purple-600 flex items-center gap-0.5">
               ↑ 4.1% <span className="font-normal text-slate-400">across 210 accounts</span>
@@ -333,14 +448,18 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Card 5: Collection Rate */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/reports/collection-summary")}
+          title="Click to view Collection Summary Report"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Collection Rate</span>
-            <div className="h-7 w-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-teal-600 transition-colors">Collection Rate</span>
+            <div className="h-7 w-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Percent className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">78.4%</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.collectionRate}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-emerald-600 flex items-center gap-0.5">
               ↑ 6.8% <span className="font-normal text-slate-400">vs last month</span>
@@ -350,14 +469,18 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Card 6: DSO */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/reports/customer-aging")}
+          title="Click to view DSO & Aging Risk"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-sky-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">DSO</span>
-            <div className="h-7 w-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-sky-600 transition-colors">DSO</span>
+            <div className="h-7 w-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Clock className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">32 days</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.dso}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-sky-600 flex items-center gap-0.5">
               ↓ 18.5% <span className="font-normal text-slate-400">vs last month</span>
@@ -367,14 +490,18 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Card 7: Unapplied Payments */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/reports/customer-receipt-register")}
+          title="Click to view Customer Receipt Register"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-amber-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Unapplied Payments</span>
-            <div className="h-7 w-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-amber-600 transition-colors">Unapplied Payments</span>
+            <div className="h-7 w-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Receipt className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">LKR 2,450,000</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.unapplied}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-amber-600 flex items-center gap-0.5">
               ↑ 12.1% <span className="font-normal text-slate-400">needs allocation</span>
@@ -384,14 +511,18 @@ export default function InvoiceCenterDashboard() {
         </div>
 
         {/* Card 8: Due This Week */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          onClick={() => navigate("/invoice-center/reports/outstanding-invoices")}
+          title="Click to view Invoices Due This Week"
+          className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Due This Week</span>
-            <div className="h-7 w-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-indigo-600 transition-colors">Due This Week</span>
+            <div className="h-7 w-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Calendar className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">LKR 5,780,000</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.dueWeek}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
             <span className="font-bold text-indigo-600 flex items-center gap-0.5">
               ↓ 22.3% <span className="font-normal text-slate-400">in 18 invoices</span>
@@ -426,9 +557,14 @@ export default function InvoiceCenterDashboard() {
                   Collected: <strong className="text-slate-800">LKR 18.6M</strong>
                 </span>
               </div>
-              <span className="px-2.5 py-1 text-[11px] font-medium text-slate-600 bg-slate-100 rounded-lg border border-slate-200">
-                Last 6 Months
-              </span>
+              <button
+                type="button"
+                onClick={() => navigate("/invoice-center/reports/collection-summary")}
+                className="px-2.5 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors cursor-pointer"
+                title="Open Collection Summary Report"
+              >
+                Collection Report →
+              </button>
             </div>
           </div>
 
@@ -468,9 +604,14 @@ export default function InvoiceCenterDashboard() {
                 </div>
                 <h3 className="text-sm font-bold text-slate-900">AR Aging Distribution</h3>
               </div>
-              <span className="px-2.5 py-1 text-[11px] font-medium text-slate-600 bg-slate-100 rounded-lg border border-slate-200">
-                By Amount
-              </span>
+              <button
+                type="button"
+                onClick={() => navigate("/invoice-center/reports/customer-aging")}
+                className="px-2.5 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors cursor-pointer"
+                title="Open Customer Aging Report"
+              >
+                Aging Report →
+              </button>
             </div>
             <p className="text-xs text-slate-500 mb-3">Outstanding balances by aging bucket</p>
           </div>

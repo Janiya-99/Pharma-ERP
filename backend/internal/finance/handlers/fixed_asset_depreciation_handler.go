@@ -31,8 +31,12 @@ func (h *FixedAssetDepreciationHandler) getService(c *gin.Context) (*financeServ
 	}
 	ctx := authCtx.(*middleware.AuthContext)
 
-	branchAccess, _ := c.Get("branch_access")
-	bAccess := branchAccess.([]uint64)
+	var bAccess []uint64
+	if branchAccess, exists := c.Get("branch_access"); exists && branchAccess != nil {
+		if list, ok := branchAccess.([]uint64); ok {
+			bAccess = list
+		}
+	}
 
 	repo := repositories.NewFixedAssetDepreciationRepository(db)
 	assetRepo := repositories.NewFixedAssetRepository(db)

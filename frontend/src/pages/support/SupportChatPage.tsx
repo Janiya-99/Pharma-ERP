@@ -852,38 +852,12 @@ export const SupportChatPage: React.FC = () => {
               </div>
             )}
 
-            {/* Role Switcher & Message Input Bar */}
+            {/* Message Input Bar */}
             <div className="border-t border-slate-200 bg-white p-3 sm:p-4 space-y-2.5">
-              {/* Role Toggle: Send as Client vs Reply as Engineering Support */}
               <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sending mode:</span>
-                  <div className="inline-flex rounded-xl p-0.5 bg-slate-100 border border-slate-200">
-                    <button
-                      type="button"
-                      onClick={() => setSenderRole("client")}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        senderRole === "client"
-                          ? "bg-indigo-600 text-white shadow-2xs"
-                          : "text-slate-600 hover:text-slate-900"
-                      }`}
-                    >
-                      Send as: Client (Right)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSenderRole("support")}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        senderRole === "support"
-                          ? "bg-slate-900 text-white shadow-2xs"
-                          : "text-slate-600 hover:text-slate-900"
-                      }`}
-                    >
-                      Reply as: Support Desk (Left)
-                    </button>
-                  </div>
-                </div>
-
+                <span className="text-[11px] font-semibold text-slate-500">
+                  Direct Line with Ceylon Med Engineering & Support Desk
+                </span>
                 <span className="text-[10px] text-slate-400 hidden sm:inline">
                   Tip: Paste (<kbd className="font-mono bg-slate-100 px-1 py-0.5 rounded border">Ctrl+V</kbd>) screenshots directly
                 </span>

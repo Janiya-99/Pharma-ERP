@@ -33,9 +33,22 @@ export const CustomerBalanceReportPage: React.FC = () => {
   });
 
   const [data, setData] = useState<CustomerBalanceReportRow[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [customerTypeFilter, setCustomerTypeFilter] = useState<string>("all");
   const [creditStatusFilter, setCreditStatusFilter] = useState<string>("all");
   const [minBalanceFilter, setMinBalanceFilter] = useState<string>("all");
+
+  useEffect(() => {
+    const loadCustomers = async () => {
+      try {
+        const res = await invoiceCenterApi.getCustomers({ limit: 1000 });
+        setCustomers(res.data?.data || []);
+      } catch (err) {
+        console.error("Failed to load customers for balance report", err);
+      }
+    };
+    loadCustomers();
+  }, []);
 
   const filteredData = useMemo(() => {
     return data.filter((row) => {
@@ -203,6 +216,28 @@ export const CustomerBalanceReportPage: React.FC = () => {
           onReset={handleResetFilters}
           isLoading={isLoading}
         >
+          <div className="space-y-1">
+            <Label htmlFor="customer_select">Select Customer</Label>
+            <Select
+              value={filters.search ? filters.search : "all"}
+              onValueChange={(val) => {
+                const searchVal = val === "all" ? "" : val;
+                setFilters((prev) => ({ ...prev, search: searchVal }));
+              }}
+            >
+              <SelectTrigger id="customer_select" className="w-[190px]">
+                <SelectValue placeholder="All Customers" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Customers</SelectItem>
+                {customers.map((c) => (
+                  <SelectItem key={c.id} value={c.customer_code || c.company_name}>
+                    {c.customer_code} - {c.company_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1">
             <Label htmlFor="search">Search Customer</Label>
             <Input

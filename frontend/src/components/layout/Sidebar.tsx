@@ -532,13 +532,13 @@ const Sidebar = () => {
     },
     {
       name: "Quality Assurance",
-      path: "/compliance-center/records",
+      path: "/compliance-center/records?tab=qa",
       icon: ShieldCheck,
       permission: "compliance.record.view",
     },
     {
       name: "Audits",
-      path: "/compliance-center/records",
+      path: "/compliance-center/records?tab=audits",
       icon: FileCheck,
       permission: "compliance.record.view",
     },
@@ -568,7 +568,7 @@ const Sidebar = () => {
     },
     {
       name: "Documentation",
-      path: "/compliance-center/records",
+      path: "/compliance-center/records?tab=docs",
       icon: ClipboardList,
       permission: "compliance.record.view",
     },
@@ -582,6 +582,8 @@ const Sidebar = () => {
   else if (currentPath.startsWith("/invoice-center")) currentModuleCode = "INVOICE_CENTER";
   else if (currentPath.startsWith("/compliance")) currentModuleCode = "COMPLIANCE_CENTER";
   else if (currentPath.startsWith("/control-center")) currentModuleCode = "CONTROL_CENTER";
+
+  if (currentModuleCode === "COMPLIANCE") currentModuleCode = "COMPLIANCE_CENTER";
 
   const moduleNameMap: Record<string, string> = {
     CONTROL_CENTER: "Control Center",
@@ -678,6 +680,10 @@ const Sidebar = () => {
   };
 
   React.useEffect(() => {
+    setOpenAccordion(null);
+  }, [currentModuleCode]);
+
+  React.useEffect(() => {
     const match = menus.find(
       (m) =>
         m.children && m.children.some((c) => isPathActive(c.path))
@@ -710,7 +716,7 @@ const Sidebar = () => {
     if (!hasChildren) {
       const isActive = isPathActive(menu.path);
       return (
-        <PermissionGuard key={menu.path} permission={menu.permission}>
+        <PermissionGuard key={`${currentModuleCode}-${menu.name}-${menu.path || ""}`} permission={menu.permission}>
           <NavLink
             to={menu.path || "#"}
             title={!showExpanded ? menu.name : undefined}
@@ -756,7 +762,7 @@ const Sidebar = () => {
 
     // Accordion group
     return (
-      <div key={menu.name} className="flex flex-col gap-0.5">
+      <div key={`${currentModuleCode}-${menu.name}`} className="flex flex-col gap-0.5">
         <button
           onClick={() => {
             if (!showExpanded && !isMobile) setDesktopExpanded(true);
@@ -811,7 +817,7 @@ const Sidebar = () => {
                 if (child.disabled) {
                   return (
                     <PermissionGuard
-                      key={child.path}
+                      key={`${currentModuleCode}-${menu.name}-${child.name}-${child.path}`}
                       permission={child.permission}
                     >
                       <div className="flex cursor-not-allowed items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium text-[#9CA3AF] opacity-60">
@@ -828,7 +834,7 @@ const Sidebar = () => {
                 }
                 const isActive = isPathActive(child.path);
                 return (
-                  <PermissionGuard key={child.path} permission={child.permission}>
+                  <PermissionGuard key={`${currentModuleCode}-${menu.name}-${child.name}-${child.path}`} permission={child.permission}>
                     <NavLink
                       to={child.path}
                       className={() =>
@@ -929,11 +935,16 @@ const Sidebar = () => {
 
       {/* Navigation */}
       <nav
+        key={currentModuleCode}
         className={`scrollbar-none flex-1 space-y-1 overflow-y-auto py-3 transition-all duration-300 ${
           isMobile || effectiveExpanded ? "px-3" : "px-2"
         }`}
       >
-        {menus.map((m) => renderMenu(m, isMobile))}
+        {menus.map((m, idx) => (
+          <React.Fragment key={`${currentModuleCode}-${m.name}-${m.path || idx}`}>
+            {renderMenu(m, isMobile)}
+          </React.Fragment>
+        ))}
       </nav>
 
       {/* Regulatory Scope Selector (as featured in Compliance reference screenshot) */}

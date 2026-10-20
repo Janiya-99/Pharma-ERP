@@ -7,6 +7,13 @@ import { ReportPermissionState } from "@/components/invoice-center/reports/Repor
 import { ReportExportActions } from "@/components/invoice-center/reports/ReportExportActions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/auth/AuthContext";
 import { DashboardSummaryReport } from "@/types/invoice-center-reports";
 import { toast } from "sonner";
@@ -118,6 +125,56 @@ export const InvoiceCenterReportsDashboardPage: React.FC = () => {
           onReset={handleResetFilters}
           isLoading={isLoading}
         >
+          <div className="space-y-1">
+            <Label htmlFor="date_preset">Quick Presets</Label>
+            <Select
+              value="custom"
+              onValueChange={(val) => {
+                const today = new Date();
+                const pad = (n: number) => String(n).padStart(2, "0");
+                const formatDate = (d: Date) =>
+                  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+                if (val === "this_month") {
+                  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                  setFilters({
+                    date_from: formatDate(startOfMonth),
+                    date_to: formatDate(today),
+                  });
+                } else if (val === "last_month") {
+                  const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                  const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                  setFilters({
+                    date_from: formatDate(startOfLastMonth),
+                    date_to: formatDate(endOfLastMonth),
+                  });
+                } else if (val === "this_quarter") {
+                  const startOfQuarter = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
+                  setFilters({
+                    date_from: formatDate(startOfQuarter),
+                    date_to: formatDate(today),
+                  });
+                } else if (val === "ytd") {
+                  const startOfYear = new Date(today.getFullYear(), 0, 1);
+                  setFilters({
+                    date_from: formatDate(startOfYear),
+                    date_to: formatDate(today),
+                  });
+                }
+              }}
+            >
+              <SelectTrigger id="date_preset" className="w-[160px]">
+                <SelectValue placeholder="Quick Presets" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Quick Presets...</SelectItem>
+                <SelectItem value="this_month">This Month</SelectItem>
+                <SelectItem value="last_month">Last Month</SelectItem>
+                <SelectItem value="this_quarter">This Quarter</SelectItem>
+                <SelectItem value="ytd">Year to Date (YTD)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1">
             <Label htmlFor="date_from">Date From</Label>
             <Input 

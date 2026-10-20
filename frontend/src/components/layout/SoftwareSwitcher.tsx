@@ -30,7 +30,7 @@ const SoftwareSwitcher = () => {
         if (value === "FINANCE") navigate("/finance/dashboard");
         else if (value === "INVENTORY") navigate("/inventory/dashboard");
         else if (value === "INVOICE_CENTER") navigate("/invoice-center/dashboard");
-        else if (value === "COMPLIANCE_CENTER") navigate("/compliance-center/dashboard");
+        else if (value === "COMPLIANCE_CENTER" || value === "COMPLIANCE") navigate("/compliance-center/dashboard");
         else if (value === "CONTROL_CENTER") navigate("/control-center/dashboard");
       }
     }

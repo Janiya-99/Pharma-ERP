@@ -570,23 +570,99 @@ export function FinanceQuickResourcePage({
               ) : (
                 rows.map((row) => (
                   <TableRow key={row.id}>
-                    {tableFields.map((field) => (
-                      <TableCell key={field.name}>
-                        {field.name === "status" ||
-                        field.name.endsWith("_status") ? (
-                          <Badge
-                            variant="outline"
-                            className="border-slate-200 bg-slate-50 text-slate-700"
-                          >
-                            {labelize(row[field.name])}
-                          </Badge>
-                        ) : (
-                          <span className="line-clamp-1">
+                    {tableFields.map((field) => {
+                      // 1. Account fields
+                      if (field.source === "accounts" || field.name.includes("account")) {
+                        const acc = row.chart_of_account || row.account || (refs.accounts && refs.accounts.find((a: any) => String(a.id) === String(row[field.name])));
+                        return (
+                          <TableCell key={field.name} className="py-2.5">
+                            <div className="flex flex-col min-w-[190px]">
+                              <span className="font-bold text-slate-900 text-xs tracking-tight">
+                                {acc ? `${acc.account_code || ""} - ${acc.account_name || ""}` : (row[field.name] || "-")}
+                              </span>
+                              {(acc?.account_type || acc?.classification || acc?.type) && (
+                                <span className="text-[10px] font-semibold text-slate-400 capitalize">
+                                  {(acc.account_type || acc.classification || acc.type).replace(/_/g, " ")}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                        );
+                      }
+
+                      // 2. Financial Year
+                      if (field.source === "financialYears" || field.name === "financial_year_id") {
+                        const fy = row.financial_year || (refs.financialYears && refs.financialYears.find((f: any) => String(f.id) === String(row[field.name])));
+                        return (
+                          <TableCell key={field.name} className="py-2.5">
+                            <span className="text-xs font-semibold text-slate-700 whitespace-nowrap">
+                              {fy?.year_name || fy?.name || (row[field.name] ? `FY #${row[field.name]}` : "-")}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+
+                      // 3. Branch
+                      if (field.source === "branches" || field.name === "branch_id") {
+                        const br = row.branch || (refs.branches && refs.branches.find((b: any) => String(b.id) === String(row[field.name])));
+                        return (
+                          <TableCell key={field.name} className="py-2.5">
+                            <span className="text-xs font-medium text-slate-600 whitespace-nowrap">
+                              {br?.branch_name || br?.name || (row[field.name] ? `Branch #${row[field.name]}` : "All Branches")}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+
+                      // 4. Currency amounts
+                      if (field.type === "number" && (field.name.includes("amount") || field.name.includes("cost") || field.name.includes("balance") || field.name.includes("rate"))) {
+                        const numVal = Number(row[field.name]) || 0;
+                        const isDebit = field.name.includes("debit");
+                        const isCredit = field.name.includes("credit");
+                        return (
+                          <TableCell key={field.name} className="py-2.5">
+                            <span className={`font-mono text-xs font-semibold ${
+                              numVal > 0 
+                                ? isDebit 
+                                  ? "text-indigo-600 font-bold" 
+                                  : isCredit 
+                                  ? "text-emerald-600 font-bold" 
+                                  : "text-slate-800" 
+                                : "text-slate-300"
+                            }`}>
+                              {numVal !== 0 ? `LKR ${numVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "-"}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+
+                      // 5. Status fields
+                      if (field.name === "status" || field.name.endsWith("_status")) {
+                        const isOk = String(row[field.name]).toLowerCase() === "active" || String(row[field.name]).toLowerCase() === "posted";
+                        return (
+                          <TableCell key={field.name} className="py-2.5">
+                            <Badge
+                              variant="outline"
+                              className={isOk 
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700 font-bold text-[10px]" 
+                                : "border-slate-200 bg-slate-50 text-slate-700 font-medium text-[10px]"
+                              }
+                            >
+                              {labelize(row[field.name])}
+                            </Badge>
+                          </TableCell>
+                        );
+                      }
+
+                      // 6. Default text
+                      return (
+                        <TableCell key={field.name} className="py-2.5">
+                          <span className="line-clamp-1 text-xs text-slate-700 font-medium">
                             {labelize(row[field.name] ?? "")}
                           </span>
-                        )}
-                      </TableCell>
-                    ))}
+                        </TableCell>
+                      );
+                    })}
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
