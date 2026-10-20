@@ -7,6 +7,7 @@ import {
   getClientTicketMessages,
   sendClientTicketMessage,
   updateClientTicketStatus,
+  deleteClientSupportTicket,
   SupportTicketItem,
   SupportTicketMessageItem,
 } from "../../api/clientSupportApi";
@@ -36,6 +37,9 @@ import {
   Eye,
   Image as ImageIcon,
   User,
+  Trash2,
+  XCircle,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -56,7 +60,7 @@ export const SupportChatPage: React.FC = () => {
   const [loadingTickets, setLoadingTickets] = useState(true);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "in_progress" | "resolved">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "in_progress" | "resolved" | "closed">("all");
 
   // Chat messages state
   const [messages, setMessages] = useState<SupportTicketMessageItem[]>([]);
@@ -316,10 +320,24 @@ export const SupportChatPage: React.FC = () => {
     if (!selectedTicketId) return;
     try {
       await updateClientTicketStatus(selectedTicketId, newStatus);
-      toast.success(`Ticket status updated to ${newStatus.replace("_", " ")}`);
+      toast.success(`Ticket marked as ${newStatus.replace("_", " ")}`);
       fetchTickets(true);
     } catch (err) {
       toast.error("Failed to update ticket status");
+    }
+  };
+
+  // Handle Delete Ticket
+  const handleDeleteTicket = async (id: number) => {
+    if (!window.confirm("Are you sure you want to permanently delete this support ticket?")) return;
+    try {
+      await deleteClientSupportTicket(id);
+      toast.success("Support ticket deleted successfully");
+      setSelectedTicketId(null);
+      setMessages([]);
+      await fetchTickets(true);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to delete support ticket");
     }
   };
 
@@ -421,18 +439,24 @@ export const SupportChatPage: React.FC = () => {
 
           {/* Status Tabs */}
           <div className="flex items-center gap-1 overflow-x-auto pb-0.5 text-xs">
-            {(["all", "open", "in_progress", "resolved"] as const).map((st) => (
+            {([
+              { id: "all", label: `All (${tickets.length})` },
+              { id: "open", label: "Open" },
+              { id: "in_progress", label: "In Progress" },
+              { id: "resolved", label: "Completed" },
+              { id: "closed", label: "Closed" },
+            ] as const).map((tab) => (
               <button
-                key={st}
+                key={tab.id}
                 type="button"
-                onClick={() => setStatusFilter(st)}
-                className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] capitalize transition-all cursor-pointer whitespace-nowrap ${
-                  statusFilter === st
+                onClick={() => setStatusFilter(tab.id as any)}
+                className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] transition-all cursor-pointer whitespace-nowrap ${
+                  statusFilter === tab.id
                     ? "bg-indigo-600 text-white shadow-2xs font-bold"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200/80"
                 }`}
               >
-                {st === "all" ? `All (${tickets.length})` : st.replace("_", " ")}
+                {tab.label}
               </button>
             ))}
           </div>
@@ -568,23 +592,57 @@ export const SupportChatPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Status Action Buttons */}
-              <div className="flex items-center gap-2 shrink-0">
-                <select
-                  value={selectedTicket.status}
-                  onChange={(e) => handleStatusChange(e.target.value)}
-                  className="text-xs bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-bold text-slate-700 outline-none cursor-pointer shadow-2xs hover:border-indigo-500 transition-colors"
-                >
-                  <option value="open">Open</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="resolved">Mark Resolved</option>
-                  <option value="closed">Closed</option>
-                </select>
+              {/* Quick Status & Management Action Buttons */}
+              <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                {selectedTicket.status !== "resolved" && (
+                  <button
+                    type="button"
+                    onClick={() => handleStatusChange("resolved")}
+                    className="px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                    title="Mark ticket as Completed / Resolved"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="hidden sm:inline">Completed</span>
+                  </button>
+                )}
 
+                {selectedTicket.status !== "closed" ? (
+                  <button
+                    type="button"
+                    onClick={() => handleStatusChange("closed")}
+                    className="px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                    title="Close this ticket"
+                  >
+                    <XCircle className="h-3.5 w-3.5 text-rose-600" />
+                    <span>Close</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleStatusChange("open")}
+                    className="px-2.5 py-1.5 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                    title="Reopen this ticket"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 text-amber-600" />
+                    <span>Reopen</span>
+                  </button>
+                )}
+
+                {/* Delete Ticket Button */}
+                <button
+                  type="button"
+                  onClick={() => handleDeleteTicket(selectedTicket.id)}
+                  className="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all cursor-pointer shadow-2xs"
+                  title="Permanently delete ticket"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+
+                {/* Refresh Chat */}
                 <button
                   type="button"
                   onClick={() => fetchMessages(selectedTicket.id)}
-                  className="rounded-xl p-2 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-2xs transition-colors cursor-pointer"
+                  className="rounded-xl p-1.5 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-2xs transition-colors cursor-pointer"
                   title="Refresh conversation"
                 >
                   <RefreshCw className="h-4 w-4" />

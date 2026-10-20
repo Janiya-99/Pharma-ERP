@@ -5,6 +5,7 @@ import {
   sendPlatformTicketMessage,
   createPlatformSupportTicket,
   updatePlatformSupportTicketStatus,
+  deletePlatformSupportTicket,
   getPlatformCompanies,
 } from "../../api/platformAdminApi";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ import {
   ShieldAlert,
   X,
   Filter,
+  Trash2,
 } from "lucide-react";
 
 export const SupportTicketsPage = () => {
@@ -167,6 +169,27 @@ export const SupportTicketsPage = () => {
       toast.success(`Priority updated to ${newPriority}`);
     } catch (err) {
       toast.error("Failed to update ticket priority");
+    }
+  };
+
+  const handleDeleteTicket = async (ticketId: number) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to permanently delete this support ticket and all messages?"
+      )
+    ) {
+      return;
+    }
+    try {
+      await deletePlatformSupportTicket(ticketId);
+      toast.success("Support ticket deleted successfully");
+      if (selectedTicket?.id === ticketId) {
+        setSelectedTicket(null);
+        setMessages([]);
+      }
+      loadTickets();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to delete ticket");
     }
   };
 
@@ -465,43 +488,57 @@ export const SupportTicketsPage = () => {
                   </div>
                 </div>
 
-                {/* Status Transitions Bar */}
-                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-850">
-                  <span className="text-[11px] text-slate-500 font-semibold uppercase">
-                    Transition:
-                  </span>
-                  {selectedTicket.status !== "in_progress" && (
-                    <button
-                      onClick={() => handleStatusChange("in_progress")}
-                      className="px-2.5 py-1 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/50 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition-colors"
-                    >
-                      Mark In Progress
-                    </button>
-                  )}
-                  {selectedTicket.status !== "resolved" && (
-                    <button
-                      onClick={() => handleStatusChange("resolved")}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-colors"
-                    >
-                      Resolve Ticket
-                    </button>
-                  )}
-                  {selectedTicket.status !== "closed" && (
-                    <button
-                      onClick={() => handleStatusChange("closed")}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold transition-colors"
-                    >
-                      Close Ticket
-                    </button>
-                  )}
-                  {selectedTicket.status === "closed" && (
-                    <button
-                      onClick={() => handleStatusChange("open")}
-                      className="px-2.5 py-1 rounded-lg bg-amber-950/40 hover:bg-amber-900/50 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-colors"
-                    >
-                      Reopen Ticket
-                    </button>
-                  )}
+                {/* Status Transitions & Action Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-850">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] text-slate-500 font-semibold uppercase">
+                      Actions:
+                    </span>
+                    {selectedTicket.status !== "in_progress" && (
+                      <button
+                        onClick={() => handleStatusChange("in_progress")}
+                        className="px-2.5 py-1 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/50 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition-colors cursor-pointer"
+                      >
+                        In Progress
+                      </button>
+                    )}
+                    {selectedTicket.status !== "resolved" && (
+                      <button
+                        onClick={() => handleStatusChange("resolved")}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                        <span>Mark Completed / Resolved</span>
+                      </button>
+                    )}
+                    {selectedTicket.status !== "closed" ? (
+                      <button
+                        onClick={() => handleStatusChange("closed")}
+                        className="px-2.5 py-1 rounded-lg bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                      >
+                        <XCircle className="h-3.5 w-3.5 text-rose-400" />
+                        <span>Close Ticket</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleStatusChange("open")}
+                        className="px-2.5 py-1 rounded-lg bg-amber-950/40 hover:bg-amber-900/50 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5 text-amber-400" />
+                        <span>Reopen Ticket</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Delete Option */}
+                  <button
+                    onClick={() => handleDeleteTicket(selectedTicket.id)}
+                    className="px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-900/50 text-red-400 border border-red-500/30 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ml-auto"
+                    title="Permanently delete ticket and all messages"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                    <span>Delete Ticket</span>
+                  </button>
                 </div>
               </div>
 
