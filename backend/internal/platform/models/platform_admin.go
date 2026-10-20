@@ -429,6 +429,10 @@ type SupportTicket struct {
 	Description     string    `gorm:"type:text" json:"description"`
 	Priority        string    `gorm:"type:varchar(50);default:'medium'" json:"priority"` // low, medium, high, urgent
 	Status          string    `gorm:"type:varchar(50);default:'open'" json:"status"`     // open, in_progress, resolved, closed
+	AttachmentURL   string    `gorm:"type:longtext" json:"attachment_url,omitempty"`
+	AttachmentName  string    `gorm:"type:varchar(255)" json:"attachment_name,omitempty"`
+	AttachmentType  string    `gorm:"type:varchar(100)" json:"attachment_type,omitempty"`
+	AttachmentSize  int64     `gorm:"type:bigint;default:0" json:"attachment_size,omitempty"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }
@@ -441,9 +445,13 @@ func (SupportTicket) TableName() string {
 type SupportTicketMessage struct {
 	ID              uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	SupportTicketID uint      `gorm:"not null" json:"support_ticket_id"`
-	SenderType      string    `gorm:"type:varchar(50);not null" json:"sender_type"` // platform_admin, client_company
+	SenderType      string    `gorm:"type:varchar(50);not null" json:"sender_type"` // platform_admin, client
 	SenderID        uint      `gorm:"not null" json:"sender_id"`                    // user ID
 	MessageText     string    `gorm:"type:text;not null" json:"message_text"`
+	AttachmentURL   string    `gorm:"type:longtext" json:"attachment_url,omitempty"`
+	AttachmentName  string    `gorm:"type:varchar(255)" json:"attachment_name,omitempty"`
+	AttachmentType  string    `gorm:"type:varchar(100)" json:"attachment_type,omitempty"`
+	AttachmentSize  int64     `gorm:"type:bigint;default:0" json:"attachment_size,omitempty"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }

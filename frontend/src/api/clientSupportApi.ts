@@ -10,6 +10,10 @@ export interface SupportTicketItem {
   description: string;
   priority: "low" | "medium" | "high" | "urgent" | string;
   status: "open" | "in_progress" | "resolved" | "closed" | string;
+  attachment_url?: string;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_size?: number;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +24,10 @@ export interface SupportTicketMessageItem {
   sender_type: "platform_admin" | "client" | string;
   sender_id: number;
   message_text: string;
+  attachment_url?: string;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_size?: number;
   created_at: string;
   updated_at: string;
 }
@@ -42,6 +50,10 @@ export const createClientSupportTicket = async (data: {
   subject: string;
   description: string;
   priority: string;
+  attachment_url?: string;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_size?: number;
 }): Promise<SupportTicketItem> => {
   const res = await apiClient.post("/support/tickets", data);
   return res.data?.data;
@@ -54,13 +66,21 @@ export const getClientTicketMessages = async (
   return res.data?.data || [];
 };
 
+export interface SendMessagePayload {
+  message_text: string;
+  attachment_url?: string;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_size?: number;
+  sender_type?: "client" | "platform_admin" | string;
+}
+
 export const sendClientTicketMessage = async (
   ticketId: number,
-  messageText: string
+  payload: string | SendMessagePayload
 ): Promise<SupportTicketMessageItem> => {
-  const res = await apiClient.post(`/support/tickets/${ticketId}/messages`, {
-    message_text: messageText,
-  });
+  const body = typeof payload === "string" ? { message_text: payload } : payload;
+  const res = await apiClient.post(`/support/tickets/${ticketId}/messages`, body);
   return res.data?.data;
 };
 

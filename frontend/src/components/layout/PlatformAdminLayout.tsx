@@ -115,6 +115,7 @@ const PlatformAdminLayout = () => {
       name: "Logs & Audit",
       icon: Shield,
       children: [
+        { name: "Blocked IPs & Security", path: "/platform-admin/blocked-ips" },
         { name: "Login Logs", path: "/platform-admin/login-logs" },
         { name: "Audit Trails", path: "/platform-admin/audit-logs" },
       ],

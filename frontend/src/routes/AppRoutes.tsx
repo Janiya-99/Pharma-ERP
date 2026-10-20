@@ -43,6 +43,7 @@ const SupportChatPage = lazy(() => import("../pages/support/SupportChatPage"));
 const PlatformDocumentationPage = lazy(() => import("../pages/platform-admin/PlatformDocumentationPage"));
 const PlatformLoginLogsPage = lazy(() => import("../pages/platform-admin/PlatformLogsPages").then(m => ({ default: m.PlatformLoginLogsPage })));
 const PlatformAuditLogsPage = lazy(() => import("../pages/platform-admin/PlatformLogsPages").then(m => ({ default: m.PlatformAuditLogsPage })));
+const PlatformBlockedIPsPage = lazy(() => import("../pages/platform-admin/PlatformLogsPages").then(m => ({ default: m.PlatformBlockedIPsPage })));
 const ControlCenterDashboardPage = lazy(() => import("../pages/control-center/dashboard/ControlCenterDashboardPage"));
 const PlaceholderPage = lazy(() => import("../pages/control-center/PlaceholderPage"));
 
@@ -219,7 +220,7 @@ const AppRoutes = () => {
         <Route path="/modules" element={<ModuleSelectionPage />} />
 
         <Route element={<AppLayout />}>
-          {/* Engineering Support Live Chat (WhatsApp Style) */}
+          {/* Engineering Support Ticket Desk & Live Chat */}
           <Route path="/support" element={<SupportChatPage />} />
           <Route path="/support/chat" element={<SupportChatPage />} />
           <Route path="/control-center/support" element={<SupportChatPage />} />
@@ -1282,6 +1283,8 @@ const AppRoutes = () => {
                 />
                 <Route path="login-logs" element={<PlatformLoginLogsPage />} />
                 <Route path="audit-logs" element={<PlatformAuditLogsPage />} />
+                <Route path="blocked-ips" element={<PlatformBlockedIPsPage />} />
+                <Route path="security" element={<Navigate to="/platform-admin/blocked-ips" replace />} />
                 <Route path="*" element={<ModernErrorPage code={404} />} />
               </Route>
             </Routes>

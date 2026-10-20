@@ -191,6 +191,19 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 
   const switchActiveSoftware = async (softwareCode: unknown) => {
     try {
+      // Optimistically update activeSoftware immediately to eliminate lag and prevent double fetches
+      const found = softwareModules.find(
+        (m: any) => m.software_code === softwareCode || m.code === softwareCode
+      );
+      if (found) {
+        setActiveSoftware(found);
+      } else if (typeof softwareCode === "string") {
+        setActiveSoftware((prev: any) => ({
+          ...prev,
+          software_code: softwareCode,
+        }));
+      }
+
       const res = await switchSoftware(softwareCode);
       const data = res.data || res;
       const token =

@@ -79,9 +79,11 @@ func SetupRoutes(router *gin.RouterGroup, platformDB *gorm.DB, logger *zap.Logge
 		adminGroup.GET("/support/tickets/:id/messages", listSupportMessages(platformDB))
 		adminGroup.POST("/support/tickets/:id/messages", sendSupportMessage(platformDB))
 
-		// Security Logs
+		// Security Logs & IP Restrictions
 		adminGroup.GET("/audit-logs", listAuditLogs(platformDB))
 		adminGroup.GET("/login-logs", listLoginLogs(platformDB))
+		adminGroup.GET("/blocked-ips", listPlatformBlockedIPs(platformDB))
+		adminGroup.POST("/blocked-ips/unblock", unblockPlatformIP(platformDB))
 	}
 }
 
@@ -899,3 +901,69 @@ func listLoginLogs(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{"success": true, "data": list})
 	}
 }
+
+type PlatformBlockedIPItem struct {
+	IP          string `json:"ip"`
+	FailedCount int    `json:"failed_count"`
+	LastAttempt string `json:"last_attempt"`
+	Reason      string `json:"reason"`
+	Status      string `json:"status"`
+}
+
+func listPlatformBlockedIPs(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		type row struct {
+			IPAddress string
+			Cnt       int
+			LastAt    time.Time
+			LastErr   string
+		}
+		var rows []row
+		db.Raw(`
+			SELECT ip_address, COUNT(*) as cnt, MAX(created_at) as last_at, MAX(error_message) as last_err
+			FROM platform_login_logs
+			WHERE status = 'failed' AND created_at >= ?
+			GROUP BY ip_address
+			ORDER BY last_at DESC
+		`, time.Now().Add(-72*time.Hour)).Scan(&rows)
+
+		var items []PlatformBlockedIPItem
+		for _, r := range rows {
+			status := "SUSPICIOUS"
+			if r.Cnt >= 3 {
+				status = "BLOCKED"
+			}
+			reason := "Authentication threshold breach"
+			if r.LastErr != "" {
+				reason = r.LastErr
+			}
+			items = append(items, PlatformBlockedIPItem{
+				IP:          r.IPAddress,
+				FailedCount: r.Cnt,
+				LastAttempt: r.LastAt.Format("Jan 02, 15:04"),
+				Reason:      reason,
+				Status:      status,
+			})
+		}
+		if items == nil {
+			items = []PlatformBlockedIPItem{}
+		}
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": items})
+	}
+}
+
+func unblockPlatformIP(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req struct {
+			IP string `json:"ip"`
+		}
+		if err := c.ShouldBindJSON(&req); err != nil || req.IP == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Valid IP address is required"})
+			return
+		}
+
+		db.Exec("UPDATE platform_login_logs SET status = 'unblocked' WHERE ip_address = ? AND status = 'failed'", req.IP)
+		c.JSON(http.StatusOK, gin.H{"success": true, "message": "IP " + req.IP + " unblocked successfully. Access restrictions removed."})
+	}
+}
+

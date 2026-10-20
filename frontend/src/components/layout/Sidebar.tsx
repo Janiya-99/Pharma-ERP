@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import PermissionGuard from "../../auth/PermissionGuard";
 import {
@@ -45,7 +45,6 @@ import {
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useSidebarState } from "./AppLayout";
 import { controlCenterNavigation } from "../../config/controlCenterNavigation";
-import SubmitSupportTicketModal from "../common/SubmitSupportTicketModal";
 
 type MenuItem = {
   name: string;
@@ -63,7 +62,7 @@ type MenuItem = {
 
 const Sidebar = () => {
   const { activeSoftware, user, company, activeBranch, hasPermission } = useAuth();
-  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const location = useLocation();
   const {
@@ -575,8 +574,27 @@ const Sidebar = () => {
     },
   ];
 
+  // Derive active module dynamically from route with fallback to activeSoftware
+  const currentPath = location.pathname;
+  let currentModuleCode = activeSoftware?.software_code || "CONTROL_CENTER";
+  if (currentPath.startsWith("/finance")) currentModuleCode = "FINANCE";
+  else if (currentPath.startsWith("/inventory")) currentModuleCode = "INVENTORY";
+  else if (currentPath.startsWith("/invoice-center")) currentModuleCode = "INVOICE_CENTER";
+  else if (currentPath.startsWith("/compliance")) currentModuleCode = "COMPLIANCE_CENTER";
+  else if (currentPath.startsWith("/control-center")) currentModuleCode = "CONTROL_CENTER";
+
+  const moduleNameMap: Record<string, string> = {
+    CONTROL_CENTER: "Control Center",
+    FINANCE: "Financial Operations",
+    INVENTORY: "Inventory & Warehousing",
+    INVOICE_CENTER: "Invoice Center",
+    COMPLIANCE_CENTER: "Compliance Center",
+    COMPLIANCE: "Compliance Center",
+  };
+  const currentModuleName = moduleNameMap[currentModuleCode] || activeSoftware?.software_name || "Enterprise ERP";
+
   const getMenus = (): MenuItem[] => {
-    const code = activeSoftware?.software_code;
+    const code = currentModuleCode;
     
     if (code === "CONTROL_CENTER") {
       const filteredMenus = controlCenterNavigation
@@ -877,7 +895,7 @@ const Sidebar = () => {
                 {company?.company_name || "Pharma ERP"}
               </p>
               <p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6B7280]">
-                {activeSoftware?.software_name || "Platform"}
+                {currentModuleName || activeSoftware?.software_name || "Platform"}
               </p>
             </div>
             {isMobile ? (
@@ -934,24 +952,24 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Global Support Ticket Action (Available across all modules) */}
+      {/* Global Support Ticket Desk Navigation (Direct page, no modal) */}
       <div className={`mb-2 ${isMobile || effectiveExpanded ? "px-3" : "px-2"}`}>
         <button
           type="button"
           onClick={() => {
-            setIsTicketModalOpen(true);
             if (isMobile) setMobileOpen(false);
+            navigate("/support/chat");
           }}
           className={`w-full flex items-center gap-2.5 py-2 rounded-xl text-xs font-semibold transition-all group ${
             isMobile || effectiveExpanded
-              ? "px-3 bg-indigo-50/70 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200/70 shadow-2xs"
-              : "justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/70"
+              ? "px-3 bg-indigo-50/70 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200/70 shadow-2xs cursor-pointer"
+              : "justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/70 cursor-pointer"
           }`}
-          title="Submit Support Ticket"
+          title="Support Ticket Desk"
         >
           <LifeBuoy className="h-4 w-4 shrink-0 text-indigo-600 group-hover:rotate-45 transition-transform duration-300" />
           {(isMobile || effectiveExpanded) && (
-            <span className="truncate">Submit Support Ticket</span>
+            <span className="truncate">Support Ticket Desk</span>
           )}
         </button>
       </div>
@@ -1037,11 +1055,6 @@ const Sidebar = () => {
           {sidebarContent(true)}
         </SheetContent>
       </Sheet>
-
-      <SubmitSupportTicketModal
-        isOpen={isTicketModalOpen}
-        onClose={() => setIsTicketModalOpen(false)}
-      />
     </>
   );
 };
