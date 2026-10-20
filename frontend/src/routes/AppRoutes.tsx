@@ -614,6 +614,10 @@ const AppRoutes = () => {
             element={<CashBookReportPage />}
           />
           <Route
+            path="/finance/reports/cash-flow"
+            element={<Navigate to="/finance/reports/cash-book" replace />}
+          />
+          <Route
             path="/finance/reports/bank-book"
             element={<BankBookReportPage />}
           />

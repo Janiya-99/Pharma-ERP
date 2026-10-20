@@ -16,7 +16,8 @@ const getModuleIcon = (code: string) => {
     case "FINANCE": return Landmark;
     case "INVENTORY": return Package;
     case "INVOICE_CENTER": return FileText;
-    case "COMPLIANCE_CENTER": return ShieldCheck;
+    case "COMPLIANCE_CENTER":
+    case "COMPLIANCE": return ShieldCheck;
     case "CONTROL_CENTER": return Settings;
     default: return LayoutGrid;
   }
@@ -41,7 +42,7 @@ const ModuleIconSwitcher = () => {
         if (value === "FINANCE") navigate("/finance/dashboard");
         else if (value === "INVENTORY") navigate("/inventory/dashboard");
         else if (value === "INVOICE_CENTER") navigate("/invoice-center/dashboard");
-        else if (value === "COMPLIANCE_CENTER") navigate("/compliance-center/dashboard");
+        else if (value === "COMPLIANCE_CENTER" || value === "COMPLIANCE") navigate("/compliance-center/dashboard");
         else if (value === "CONTROL_CENTER") navigate("/control-center/dashboard");
       }
     }
@@ -53,7 +54,7 @@ const ModuleIconSwitcher = () => {
         .sort((a: any, b: any) => {
           const codeA = a.software_code || a.software?.software_code || "";
           const codeB = b.software_code || b.software?.software_code || "";
-          const order = ["CONTROL_CENTER", "FINANCE", "INVENTORY", "INVOICE_CENTER", "COMPLIANCE_CENTER"];
+          const order = ["CONTROL_CENTER", "FINANCE", "INVENTORY", "INVOICE_CENTER", "COMPLIANCE_CENTER", "COMPLIANCE"];
           const indexA = order.indexOf(codeA);
           const indexB = order.indexOf(codeB);
           if (indexA !== -1 && indexB !== -1) return indexA - indexB;

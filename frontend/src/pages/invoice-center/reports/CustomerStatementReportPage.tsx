@@ -45,21 +45,8 @@ export const CustomerStatementReportPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(true);
 
-  useEffect(() => {
-    // Load customers for dropdown
-    const loadCustomers = async () => {
-      try {
-        const res = await invoiceCenterApi.getCustomers({ limit: 1000 });
-        setCustomers(res.data?.data || []);
-      } catch (err) {
-        console.error("Failed to load customers", err);
-      }
-    };
-    loadCustomers();
-  }, []);
-
-  const fetchData = async () => {
-    if (!filters.customer_id) {
+  const fetchStatement = async (custId: string, customFilters?: typeof filters) => {
+    if (!custId) {
       toast.error("Customer is required");
       return;
     }
@@ -68,9 +55,10 @@ export const CustomerStatementReportPage: React.FC = () => {
       setIsLoading(true);
       setHasPermission(true);
 
+      const activeFilters = customFilters || filters;
       const payload = {
-        ...filters,
-        customer_id: parseInt(filters.customer_id, 10),
+        ...activeFilters,
+        customer_id: parseInt(custId, 10),
       };
 
       const res = await invoiceCenterApi.getCustomerStatementReport(
@@ -96,6 +84,29 @@ export const CustomerStatementReportPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    // Load customers for dropdown and auto-load the first customer's statement
+    const loadCustomers = async () => {
+      try {
+        const res = await invoiceCenterApi.getCustomers({ limit: 1000 });
+        const list = res.data?.data || [];
+        setCustomers(list);
+        if (list.length > 0 && !filters.customer_id) {
+          const firstId = String(list[0].id);
+          setFilters((prev) => ({ ...prev, customer_id: firstId }));
+          fetchStatement(firstId);
+        }
+      } catch (err) {
+        console.error("Failed to load customers", err);
+      }
+    };
+    loadCustomers();
+  }, []);
+
+  const fetchData = async () => {
+    fetchStatement(filters.customer_id);
   };
 
   const handleApplyFilters = () => {
@@ -190,9 +201,10 @@ export const CustomerStatementReportPage: React.FC = () => {
             </Label>
             <Select
               value={filters.customer_id}
-              onValueChange={(val) =>
-                setFilters((prev) => ({ ...prev, customer_id: val }))
-              }
+              onValueChange={(val) => {
+                setFilters((prev) => ({ ...prev, customer_id: val }));
+                fetchStatement(val);
+              }}
             >
               <SelectTrigger id="customer_id">
                 <SelectValue placeholder="Select a customer" />
