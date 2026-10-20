@@ -233,6 +233,11 @@ export const updatePlatformSupportTicketStatus = async (
   return res.data;
 };
 
+export const deletePlatformSupportTicket = async (id: any) => {
+  const res = await platformAdminClient.delete(`/support/tickets/${id}`);
+  return res.data;
+};
+
 export const getPlatformTicketMessages = async (id: any) => {
   const res = await platformAdminClient.get(`/support/tickets/${id}/messages`);
   return res.data;

@@ -78,6 +78,7 @@ func SetupRoutes(router *gin.RouterGroup, platformDB *gorm.DB, logger *zap.Logge
 		adminGroup.PUT("/support/tickets/:id", updateTicketStatus(platformDB))
 		adminGroup.GET("/support/tickets/:id/messages", listSupportMessages(platformDB))
 		adminGroup.POST("/support/tickets/:id/messages", sendSupportMessage(platformDB))
+		adminGroup.DELETE("/support/tickets/:id", deleteSupportTicket(platformDB))
 
 		// Security Logs & IP Restrictions
 		adminGroup.GET("/audit-logs", listAuditLogs(platformDB))
@@ -883,6 +884,42 @@ func sendSupportMessage(db *gorm.DB) gin.HandlerFunc {
 		db.Model(&models.SupportTicket{}).Where("id = ?", ticketID).Update("updated_at", time.Now())
 
 		c.JSON(http.StatusCreated, gin.H{"success": true, "data": msg})
+	}
+}
+
+func deleteSupportTicket(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ticketID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ticket ID"})
+			return
+		}
+
+		var ticket models.SupportTicket
+		if err := db.First(&ticket, ticketID).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Ticket not found"})
+			return
+		}
+
+		db.Where("support_ticket_id = ?", ticket.ID).Delete(&models.SupportTicketMessage{})
+		if err := db.Delete(&ticket).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete ticket"})
+			return
+		}
+
+		adminIDVal, _ := c.Get("platformAdminID")
+		adminID, _ := adminIDVal.(uint)
+
+		db.Create(&models.PlatformAuditLog{
+			UserID:     adminID,
+			Action:     "ticket.delete",
+			TargetType: "support_tickets",
+			TargetID:   fmt.Sprintf("%d", ticketID),
+			Details:    fmt.Sprintf("Deleted ticket %s", ticket.TicketNumber),
+			CreatedAt:  time.Now(),
+		})
+
+		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Ticket deleted successfully"})
 	}
 }
 

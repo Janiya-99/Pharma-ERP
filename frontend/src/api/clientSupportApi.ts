@@ -92,6 +92,11 @@ export const updateClientTicketStatus = async (
   return res.data?.data;
 };
 
+export const deleteClientSupportTicket = async (ticketId: number): Promise<any> => {
+  const res = await apiClient.delete(`/support/tickets/${ticketId}`);
+  return res.data;
+};
+
 export interface SupportNotificationsData {
   unread_replies: number;
   latest_replies: Array<{

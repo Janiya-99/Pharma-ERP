@@ -473,6 +473,32 @@ func Setup(
 				}
 				c.JSON(http.StatusOK, gin.H{"success": true, "message": "Ticket status updated"})
 			})
+
+			// Client delete support ticket
+			supportGrp.DELETE("/tickets/:id", func(c *gin.Context) {
+				companyIDVal, _ := c.Get("company_id")
+				companyID := parseCtxID(companyIDVal)
+				ticketID, err := strconv.Atoi(c.Param("id"))
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ticket ID"})
+					return
+				}
+
+				q := platformDB.Where("id = ?", ticketID)
+				if companyID > 0 {
+					q = q.Where("tenant_company_id = ? OR tenant_company_id = 0", companyID)
+				}
+				var ticket platformModels.SupportTicket
+				if err := q.First(&ticket).Error; err != nil {
+					c.JSON(http.StatusNotFound, gin.H{"message": "Ticket not found"})
+					return
+				}
+
+				platformDB.Where("support_ticket_id = ?", ticketID).Delete(&platformModels.SupportTicketMessage{})
+				platformDB.Delete(&ticket)
+
+				c.JSON(http.StatusOK, gin.H{"success": true, "message": "Ticket deleted successfully"})
+			})
 		}
 	}
 
