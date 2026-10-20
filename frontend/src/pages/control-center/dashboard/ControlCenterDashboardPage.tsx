@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { getControlDashboardSummary } from "../../../api/controlApi";
+import { getControlDashboardSummary, getBlockedIPs, unblockIP } from "../../../api/controlApi";
 import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 import { DashboardAiAnalysisSection } from "../../../components/common/DashboardAiAnalysisSection";
 import {
@@ -40,7 +40,11 @@ import {
   Filter,
   Sparkles,
   BarChart2,
-  Link2
+  Link2,
+  ShieldAlert,
+  Unlock,
+  Lock,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import {
@@ -351,6 +355,34 @@ const ControlCenterDashboardPage: React.FC = () => {
   const [roleDistribution, setRoleDistribution] = useState(roleDistributionData);
   const [moduleAdoptions, setModuleAdoptions] = useState(moduleAdoptionList);
   const [events, setEvents] = useState(securityEvents);
+  const [blockedIPs, setBlockedIPs] = useState<Array<{
+    ip: string;
+    reason: string;
+    blocked_at: string;
+    attempts: number;
+    last_attempt: string;
+  }>>([]);
+  const [manualIPToUnblock, setManualIPToUnblock] = useState("");
+  const [isUnblocking, setIsUnblocking] = useState(false);
+
+  const handleUnblock = async (ipToUnblock: string) => {
+    if (!ipToUnblock.trim()) {
+      toast.error("Please enter a valid IP address");
+      return;
+    }
+    setIsUnblocking(true);
+    try {
+      const res = await unblockIP(ipToUnblock.trim());
+      toast.success(res?.message || `Successfully unblocked IP ${ipToUnblock.trim()}`);
+      setBlockedIPs((prev) => prev.filter((item) => item.ip !== ipToUnblock.trim()));
+      setManualIPToUnblock("");
+      fetchSummary();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || `Failed to unblock IP ${ipToUnblock}`);
+    } finally {
+      setIsUnblocking(false);
+    }
+  };
 
   const [selectedDocCategory, setSelectedDocCategory] = useState("all");
   const [docSearchQuery, setDocSearchQuery] = useState("");
@@ -424,6 +456,7 @@ const ControlCenterDashboardPage: React.FC = () => {
         if (d.role_distribution && d.role_distribution.length > 0) setRoleDistribution(d.role_distribution);
         if (d.module_adoption && d.module_adoption.length > 0) setModuleAdoptions(d.module_adoption);
         if (d.security_events && d.security_events.length > 0) setEvents(d.security_events);
+        if (d.blocked_ips) setBlockedIPs(d.blocked_ips);
       }
     } catch (err) {
       console.error("Failed to load control center dashboard summary", err);
@@ -1137,6 +1170,141 @@ const ControlCenterDashboardPage: React.FC = () => {
             </div>
           </Link>
         </div>
+      </div>
+
+      {/* ── BLOCKED & RESTRICTED NETWORK ADDRESSES (LOGIN LOCKOUT MANAGEMENT) ── */}
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden transition-all duration-300">
+        {/* Header Bar */}
+        <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-rose-50/40 via-white to-amber-50/30">
+          <div className="flex items-start gap-3.5">
+            <div className={`p-3 rounded-xl shadow-md ${blockedIPs.length > 0 ? "bg-rose-600 text-white shadow-rose-500/20" : "bg-emerald-600 text-white shadow-emerald-500/20"}`}>
+              {blockedIPs.length > 0 ? <ShieldAlert className="h-6 w-6" /> : <Shield className="h-6 w-6" />}
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                  Blocked & Restricted IP Addresses (Login Lockout Manager)
+                </h3>
+                {blockedIPs.length > 0 ? (
+                  <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 text-xs font-bold flex items-center gap-1.5 animate-pulse">
+                    <span className="h-2 w-2 rounded-full bg-rose-500" />
+                    {blockedIPs.length} IP Address{blockedIPs.length > 1 ? "es" : ""} Blocked
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    All Clear (0 Blocked IPs)
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Monitor IP addresses restricted by automated brute-force protection or firewall rules. Unblock client IPs with 1 click to restore immediate login access.
+              </p>
+            </div>
+          </div>
+
+          {/* Right Side: Manual Unblock & Refresh */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-1.5 bg-white border border-slate-200/90 rounded-xl px-2.5 py-1.5 shadow-2xs">
+              <Lock className="h-3.5 w-3.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Unblock IP manually (e.g. 192.168.1.1)"
+                value={manualIPToUnblock}
+                onChange={(e) => setManualIPToUnblock(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleUnblock(manualIPToUnblock);
+                  }
+                }}
+                className="text-xs bg-transparent outline-none w-52 sm:w-64 placeholder:text-slate-400 font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => handleUnblock(manualIPToUnblock)}
+                disabled={isUnblocking || !manualIPToUnblock.trim()}
+                className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+              >
+                <Unlock className="h-3 w-3" />
+                <span>Unblock</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={fetchSummary}
+              className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+              title="Refresh Blocked IPs"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content Body */}
+        {blockedIPs.length === 0 ? (
+          <div className="p-8 text-center flex flex-col items-center justify-center">
+            <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+              <CheckCircle2 className="h-6 w-6" />
+            </div>
+            <h4 className="text-sm font-bold text-slate-800">No Blocked IP Addresses</h4>
+            <p className="text-xs text-slate-400 max-w-md mt-1">
+              Zero login lockouts are currently active. If a user encounters an "Invalid credentials / Account blocked" message due to repeated password attempts, enter their IP above to unlock them immediately.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/70 text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th className="py-3 px-5">IP Address</th>
+                  <th className="py-3 px-4">Restriction Reason</th>
+                  <th className="py-3 px-4">Failed Attempts</th>
+                  <th className="py-3 px-4">Blocked At</th>
+                  <th className="py-3 px-4">Last Activity</th>
+                  <th className="py-3 px-5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {blockedIPs.map((item) => (
+                  <tr key={item.ip} className="hover:bg-rose-50/30 transition-colors">
+                    <td className="py-3 px-5">
+                      <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                        {item.ip}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                        <AlertTriangle className="h-3 w-3 text-rose-600" />
+                        {item.reason}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 font-semibold text-slate-700">
+                      <span className="font-bold text-rose-600">{item.attempts}</span> attempts
+                    </td>
+                    <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">
+                      {item.blocked_at || "Recent lockout"}
+                    </td>
+                    <td className="py-3 px-4 text-slate-500 text-[11px]">
+                      {item.last_attempt || "Just now"}
+                    </td>
+                    <td className="py-3 px-5 text-right">
+                      <button
+                        type="button"
+                        onClick={() => handleUnblock(item.ip)}
+                        disabled={isUnblocking}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs hover:shadow transition-all cursor-pointer active:scale-95"
+                      >
+                        <Unlock className="h-3.5 w-3.5" />
+                        <span>Unblock IP</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* ── DOCUMENT ARCHIVE & BULK DOWNLOAD CENTER ── */}

@@ -27,11 +27,14 @@ import {
   Activity,
   Truck,
   Globe,
+  MessageSquare,
+  Headphones,
 } from "lucide-react";
 import { useLocation, useNavigate, NavLink } from "react-router-dom";
 import { toast } from "sonner";
 import { useSidebarState } from "./AppLayout";
 import { useAiCopilot } from "../../context/AiCopilotContext";
+import { getSupportNotifications, SupportNotificationsData } from "../../api/clientSupportApi";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -138,6 +141,31 @@ const Topbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [branchLoading, setBranchLoading] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [supportNotifs, setSupportNotifs] = useState<SupportNotificationsData>({
+    unread_replies: 0,
+    latest_replies: [],
+  });
+
+  // Poll for support ticket notifications every 10 seconds
+  useEffect(() => {
+    let isMounted = true;
+    const fetchNotifs = async () => {
+      try {
+        const data = await getSupportNotifications();
+        if (isMounted && data) {
+          setSupportNotifs(data);
+        }
+      } catch (e) {
+        // silent
+      }
+    };
+    fetchNotifs();
+    const interval = setInterval(fetchNotifs, 10000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   // Keyboard shortcut Ctrl+K / Cmd+K for search
   useEffect(() => {
@@ -450,39 +478,102 @@ const Topbar = () => {
             <DropdownMenuTrigger asChild>
               <button
                 className="relative flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-                title="Notifications"
+                title="Notifications & Support Messages"
               >
                 <Bell className="h-4 w-4" />
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white animate-pulse" />
+                {supportNotifs.unread_replies > 0 ? (
+                  <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-600 px-1 text-[9px] font-extrabold text-white ring-2 ring-white animate-pulse">
+                    {supportNotifs.unread_replies}
+                  </span>
+                ) : (
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+                )}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 rounded-xl border border-slate-200 bg-white p-2 shadow-xl z-50">
-              <div className="flex items-center justify-between border-b border-slate-100 px-2 py-1.5">
-                <span className="text-xs font-bold text-slate-800">Notifications & Alerts</span>
-                <span className="rounded-md bg-rose-100 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">3 New</span>
+            <DropdownMenuContent align="end" className="w-88 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl z-50">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                <span className="text-xs font-bold text-slate-800">Notifications & Support Center</span>
+                {supportNotifs.unread_replies > 0 ? (
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 animate-pulse">
+                    {supportNotifs.unread_replies} Support Reply{supportNotifs.unread_replies > 1 ? "ies" : "y"}
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                    Up to date
+                  </span>
+                )}
               </div>
-              <div className="space-y-1 py-1 max-h-64 overflow-y-auto">
-                <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
+
+              <div className="space-y-1.5 max-h-72 overflow-y-auto pr-0.5">
+                {/* 1. Support Replies from Engineering/Platform Admin */}
+                {supportNotifs.latest_replies && supportNotifs.latest_replies.length > 0 && (
+                  <div className="border border-emerald-200 bg-emerald-50/50 rounded-xl p-2 mb-2">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10.5px] font-extrabold text-emerald-800 flex items-center gap-1.5">
+                        <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
+                        <span>Support Ticket Replies</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => navigate("/support/chat")}
+                        className="text-[10px] font-bold text-emerald-700 hover:underline cursor-pointer"
+                      >
+                        Open Chat →
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      {supportNotifs.latest_replies.map((reply, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => navigate(`/support/chat?ticketId=${reply.ticket_id}`)}
+                          className="rounded-lg p-2 bg-white/90 hover:bg-white border border-emerald-100 shadow-2xs transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold text-slate-900 truncate max-w-[180px]">
+                              {reply.subject}
+                            </span>
+                            <span className="text-[9.5px] text-slate-400 font-mono">
+                              {reply.created_at ? new Date(reply.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "New"}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-600 line-clamp-2 mt-1">
+                            <span className="font-semibold text-emerald-700">{reply.sender || "Engineering Support"}: </span>
+                            {reply.reply_message}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. System Alerts */}
+                <div className="rounded-xl p-2.5 hover:bg-slate-50 transition-colors cursor-pointer border border-transparent hover:border-slate-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-amber-700">Batch Expiry Warning</span>
+                    <span className="text-[11px] font-bold text-amber-700">Batch Expiry Warning</span>
                     <span className="text-[9px] text-slate-400">10m ago</span>
                   </div>
                   <p className="text-[11px] text-slate-600 mt-0.5">Paracetamol 500mg Batch #BAT-202609-001 expires in 45 days.</p>
                 </div>
-                <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
+                <div className="rounded-xl p-2.5 hover:bg-slate-50 transition-colors cursor-pointer border border-transparent hover:border-slate-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-blue-700">GRN Approval Needed</span>
+                    <span className="text-[11px] font-bold text-blue-700">GRN Approval Needed</span>
                     <span className="text-[9px] text-slate-400">1h ago</span>
                   </div>
                   <p className="text-[11px] text-slate-600 mt-0.5">GRN-000042 submitted for Biyagama Cold Chain Logistics Hub.</p>
                 </div>
-                <div className="rounded-lg p-2 hover:bg-slate-50 transition-colors cursor-pointer">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-emerald-700">NMRA Compliance Pass</span>
-                    <span className="text-[9px] text-slate-400">3h ago</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-0.5">Annual inspection verification passed with 98.4% QA score.</p>
-                </div>
+              </div>
+
+              {/* Action: Open Modern Support Chat Tool */}
+              <div className="pt-2 border-t border-slate-100 mt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/support/chat")}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shadow-emerald-600/20"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Open WhatsApp Support Chat</span>
+                </button>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>

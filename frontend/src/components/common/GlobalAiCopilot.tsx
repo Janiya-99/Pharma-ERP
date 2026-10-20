@@ -217,14 +217,25 @@ export const GlobalAiCopilot: React.FC = () => {
     setCurrentTab(activeTab);
   }, [activeTab]);
 
-  // Handle route / module change: automatically reset stale summaries and docs
+  // Handle route / module change: automatically reset stale summaries and regenerate according to open page
   useEffect(() => {
     if (prevRouteRef.current && prevRouteRef.current !== pageContext.route) {
       setSummary(null);
       setDocs(null);
+      if (isOpen) {
+        if (currentTab === "summary") {
+          setTimeout(() => {
+            handleGenerateSummary();
+          }, 150);
+        } else if (currentTab === "docs") {
+          setTimeout(() => {
+            handleGenerateDocs();
+          }, 150);
+        }
+      }
     }
     prevRouteRef.current = pageContext.route;
-  }, [pageContext.route]);
+  }, [pageContext.route, isOpen, currentTab]);
 
   // Clear conversation history
   const handleClearChat = () => {
@@ -484,50 +495,50 @@ export const GlobalAiCopilot: React.FC = () => {
       {isOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/30 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in">
           <div className="absolute inset-y-0 right-0 flex max-w-full pl-10">
-            <div className="w-screen max-w-xl bg-white/95 backdrop-blur-2xl shadow-2xl flex flex-col border-l border-slate-200">
+            <div className="w-screen max-w-xl bg-white shadow-2xl flex flex-col border-l border-slate-200">
               
               {/* Drawer Header */}
-              <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 via-white to-indigo-50/40 px-5 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-500/30">
+              <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 via-white to-indigo-50/40 px-4 sm:px-5 py-3.5 sm:py-4">
+                <div className="flex items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-500/30">
                       <Sparkles className="h-4 w-4 text-amber-300" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-sm font-bold text-slate-900">{copilotTitle}</h2>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        <h2 className="text-xs sm:text-sm font-bold text-slate-900 truncate max-w-[170px] sm:max-w-[260px]">{copilotTitle}</h2>
                         {hasApiKey ? (
                           <button
                             onClick={() => setShowSettings(!showSettings)}
-                            className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors"
+                            className="inline-flex shrink-0 items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors whitespace-nowrap"
                             title="Connected to Google Gemini Cloud API. Click to change model or key."
                           >
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            {selectedModel} (Cloud)
+                            {selectedModel}
                           </button>
                         ) : (
                           <button
                             onClick={() => setShowSettings(!showSettings)}
-                            className="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200 cursor-pointer hover:bg-purple-100 transition-colors"
+                            className="inline-flex shrink-0 items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200 cursor-pointer hover:bg-purple-100 transition-colors whitespace-nowrap"
                             title="Running Local Analytical Engine. Click to connect Google Gemini Cloud API."
                           >
                             <span className="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
-                            Data Intelligence (Local)
+                            Data Intelligence
                           </button>
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[11px] text-slate-500 truncate max-w-xs font-medium">
+                        <p className="text-[11px] text-slate-500 truncate max-w-[160px] sm:max-w-xs font-medium">
                           Active: <span className="font-semibold text-slate-700">{pageContext.pageTitle}</span>
                         </p>
                         {harvestStats.rows > 0 && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.2 text-[10px] font-semibold text-blue-700 border border-blue-200">
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-50 px-1.5 py-0.2 text-[9.5px] font-semibold text-blue-700 border border-blue-200">
                             <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
                             {harvestStats.rows} Records
                           </span>
                         )}
                         {harvestStats.formFields > 0 && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.2 text-[10px] font-semibold text-amber-700 border border-amber-200">
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.2 text-[9.5px] font-semibold text-amber-700 border border-amber-200">
                             <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                             {harvestStats.formFields} Form Inputs
                           </span>
@@ -535,10 +546,10 @@ export const GlobalAiCopilot: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                     <button
                       onClick={() => setShowSettings(!showSettings)}
-                      className={`flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer border ${
+                      className={`flex items-center gap-1 rounded-xl px-2 sm:px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer border ${
                         showSettings
                           ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
                           : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200 shadow-2xs"
@@ -546,15 +557,15 @@ export const GlobalAiCopilot: React.FC = () => {
                       title="AI Model & Google Gemini API Settings"
                     >
                       <Settings className="h-3 w-3" />
-                      <span>{showSettings ? "Assistant" : "Settings"}</span>
+                      <span className="hidden sm:inline">{showSettings ? "Assistant" : "Settings"}</span>
                     </button>
                     <button
                       onClick={handleClearChat}
-                      className="flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer border border-slate-200/80 bg-white shadow-2xs"
+                      className="flex items-center gap-1 rounded-xl px-2 sm:px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer border border-slate-200/80 bg-white shadow-2xs"
                       title="Clear conversation history and reset context"
                     >
                       <RefreshCw className="h-3 w-3" />
-                      <span>Clear</span>
+                      <span className="hidden sm:inline">Clear</span>
                     </button>
                     <button
                       onClick={closeCopilot}

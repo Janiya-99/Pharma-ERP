@@ -39,6 +39,7 @@ const EmailSettingsPage = lazy(() => import("../pages/platform-admin/GlobalSetti
 const PaymentGatewaySettingsPage = lazy(() => import("../pages/platform-admin/GlobalSettingsPages").then(m => ({ default: m.PaymentGatewaySettingsPage })));
 const BackupSettingsPage = lazy(() => import("../pages/platform-admin/GlobalSettingsPages").then(m => ({ default: m.BackupSettingsPage })));
 const SupportTicketsPage = lazy(() => import("../pages/platform-admin/SupportTicketsPage"));
+const SupportChatPage = lazy(() => import("../pages/support/SupportChatPage"));
 const PlatformDocumentationPage = lazy(() => import("../pages/platform-admin/PlatformDocumentationPage"));
 const PlatformLoginLogsPage = lazy(() => import("../pages/platform-admin/PlatformLogsPages").then(m => ({ default: m.PlatformLoginLogsPage })));
 const PlatformAuditLogsPage = lazy(() => import("../pages/platform-admin/PlatformLogsPages").then(m => ({ default: m.PlatformAuditLogsPage })));
@@ -218,6 +219,11 @@ const AppRoutes = () => {
         <Route path="/modules" element={<ModuleSelectionPage />} />
 
         <Route element={<AppLayout />}>
+          {/* Engineering Support Live Chat (WhatsApp Style) */}
+          <Route path="/support" element={<SupportChatPage />} />
+          <Route path="/support/chat" element={<SupportChatPage />} />
+          <Route path="/control-center/support" element={<SupportChatPage />} />
+
           {/* Control Center Routes */}
           <Route
             path="/control-center/dashboard"
