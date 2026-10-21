@@ -1,6 +1,9 @@
 package repositories
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/dto"
 	"gorm.io/gorm"
 )
@@ -255,8 +258,6 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 	header.DateFrom = filters.DateFrom
 	header.DateTo = filters.DateTo
 
-	var rows []dto.CustomerStatementRowDTO
-
 	statusFilter := "posted_status = 'posted'"
 	if filters.IncludeUnposted != nil && *filters.IncludeUnposted {
 		statusFilter = "1=1" // All statuses except deleted
@@ -264,59 +265,180 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 
 	branchFilter := ""
 	if filters.BranchID != nil {
-		branchFilter = " AND branch_id = " + db.Dialector.Explain("?", *filters.BranchID)
+		branchFilter = fmt.Sprintf(" AND branch_id = %d", *filters.BranchID)
+	}
+
+	// Calculate opening balance before DateFrom if DateFrom is provided
+	if filters.DateFrom != nil {
+		df := filters.DateFrom.Format("2006-01-02")
+		var prevInvoices, prevDebit, prevCredit, prevReceipts float64
+
+		db.Raw(fmt.Sprintf(`SELECT COALESCE(SUM(total_amount), 0) FROM sales_invoices WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND invoice_date < '%s' AND %s%s`, df, statusFilter, branchFilter), *filters.CustomerID, companyID).Scan(&prevInvoices)
+		db.Raw(fmt.Sprintf(`SELECT COALESCE(SUM(total_amount), 0) FROM debit_notes WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND debit_note_date < '%s' AND %s%s`, df, statusFilter, branchFilter), *filters.CustomerID, companyID).Scan(&prevDebit)
+		db.Raw(fmt.Sprintf(`SELECT COALESCE(SUM(total_amount), 0) FROM credit_notes WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND credit_note_date < '%s' AND %s%s`, df, statusFilter, branchFilter), *filters.CustomerID, companyID).Scan(&prevCredit)
+		db.Raw(fmt.Sprintf(`SELECT COALESCE(SUM(allocated_amount), 0) FROM customer_receipts WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND receipt_date < '%s' AND %s%s`, df, statusFilter, branchFilter), *filters.CustomerID, companyID).Scan(&prevReceipts)
+
+		header.OpeningBalance = (prevInvoices + prevDebit) - (prevCredit + prevReceipts)
+	}
+
+	dateFilterSI := ""
+	dateFilterDN := ""
+	dateFilterCN := ""
+	dateFilterCR := ""
+
+	if filters.DateFrom != nil {
+		df := filters.DateFrom.Format("2006-01-02")
+		dateFilterSI += fmt.Sprintf(" AND si.invoice_date >= '%s'", df)
+		dateFilterDN += fmt.Sprintf(" AND debit_note_date >= '%s'", df)
+		dateFilterCN += fmt.Sprintf(" AND credit_note_date >= '%s'", df)
+		dateFilterCR += fmt.Sprintf(" AND receipt_date >= '%s'", df)
+	}
+	if filters.DateTo != nil {
+		dt := filters.DateTo.Format("2006-01-02")
+		dateFilterSI += fmt.Sprintf(" AND si.invoice_date <= '%s'", dt)
+		dateFilterDN += fmt.Sprintf(" AND debit_note_date <= '%s'", dt)
+		dateFilterCN += fmt.Sprintf(" AND credit_note_date <= '%s'", dt)
+		dateFilterCR += fmt.Sprintf(" AND receipt_date <= '%s'", dt)
+	}
+
+	branchFilterSI := ""
+	if filters.BranchID != nil {
+		branchFilterSI = fmt.Sprintf(" AND si.branch_id = %d", *filters.BranchID)
 	}
 
 	query := `
 		SELECT 
-			created_at, invoice_date as transaction_date, 'Sales Invoice' as document_type, invoice_number as document_number, 
-			sales_order_number as reference_number, 'Sales Invoice' as description, 
-			total_amount as debit_amount, 0 as credit_amount, 0 as running_balance, 
-			posted_status as operational_status, finance_post_status
-		FROM sales_invoices 
-		WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND ` + statusFilter + branchFilter + `
+			si.created_at, si.invoice_date as transaction_date, 'Sales Invoice' as document_type, si.invoice_number as document_number, 
+			COALESCE(so.sales_order_number, si.customer_reference_number, '') as reference_number, 'Sales Invoice' as description, 
+			si.total_amount as debit_amount, 0.0 as credit_amount, 0.0 as running_balance, 
+			si.posted_status as operational_status, si.finance_post_status
+		FROM sales_invoices si
+		LEFT JOIN sales_orders so ON so.id = si.sales_order_id
+		WHERE si.customer_id = ? AND si.company_id = ? AND si.deleted_at IS NULL AND si.` + statusFilter + branchFilterSI + dateFilterSI + `
 		
 		UNION ALL
 		
 		SELECT 
 			created_at, debit_note_date as transaction_date, 'Debit Note' as document_type, debit_note_number as document_number, 
-			reference_number, 'Debit Note' as description, 
-			total_amount as debit_amount, 0 as credit_amount, 0 as running_balance, 
+			COALESCE(reference_number, '') as reference_number, 'Debit Note' as description, 
+			total_amount as debit_amount, 0.0 as credit_amount, 0.0 as running_balance, 
 			posted_status as operational_status, finance_post_status
 		FROM debit_notes 
-		WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND ` + statusFilter + branchFilter + `
+		WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND ` + statusFilter + branchFilter + dateFilterDN + `
 		
 		UNION ALL
 		
 		SELECT 
 			created_at, credit_note_date as transaction_date, 'Credit Note' as document_type, credit_note_number as document_number, 
-			reference_number, 'Credit Note' as description, 
-			0 as debit_amount, total_amount as credit_amount, 0 as running_balance, 
+			COALESCE(reference_number, '') as reference_number, 'Credit Note' as description, 
+			0.0 as debit_amount, total_amount as credit_amount, 0.0 as running_balance, 
 			posted_status as operational_status, finance_post_status
 		FROM credit_notes 
-		WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND ` + statusFilter + branchFilter + `
+		WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND ` + statusFilter + branchFilter + dateFilterCN + `
 		
 		UNION ALL
 		
 		SELECT 
 			created_at, receipt_date as transaction_date, 'Customer Receipt' as document_type, receipt_number as document_number, 
-			reference_number, 'Customer Receipt (' || payment_method || ')' as description, 
-			0 as debit_amount, allocated_amount as credit_amount, 0 as running_balance, 
+			COALESCE(reference_number, '') as reference_number, CONCAT('Customer Receipt (', COALESCE(payment_method, ''), ')') as description, 
+			0.0 as debit_amount, allocated_amount as credit_amount, 0.0 as running_balance, 
 			posted_status as operational_status, finance_post_status
 		FROM customer_receipts 
-		WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND ` + statusFilter + branchFilter + `
+		WHERE customer_id = ? AND company_id = ? AND deleted_at IS NULL AND ` + statusFilter + branchFilter + dateFilterCR + `
 		
 		ORDER BY transaction_date ASC, created_at ASC
 	`
 
+	var rows []dto.CustomerStatementRowDTO
 	err = db.Raw(query, *filters.CustomerID, companyID, *filters.CustomerID, companyID, *filters.CustomerID, companyID, *filters.CustomerID, companyID).Scan(&rows).Error
 
 	return rows, header, err
 }
 
 func (r *invoiceCenterReportRepository) GetCustomerAging(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerAgingRowDTO, int64, error) {
-	// Implemented in service using raw invoices and processing.
-	return nil, 0, nil
+	asOf := time.Now().Format("2006-01-02")
+	if filters.AsOfDate != nil {
+		asOf = filters.AsOfDate.Format("2006-01-02")
+	}
+
+	whereClause := "c.company_id = ? AND c.deleted_at IS NULL"
+	args := []interface{}{companyID}
+
+	if filters.CustomerID != nil {
+		whereClause += " AND c.id = ?"
+		args = append(args, *filters.CustomerID)
+	}
+	if filters.CustomerCategoryID != nil {
+		whereClause += " AND c.customer_category_id = ?"
+		args = append(args, *filters.CustomerCategoryID)
+	}
+	if filters.CustomerType != nil && *filters.CustomerType != "" {
+		whereClause += " AND c.customer_type = ?"
+		args = append(args, *filters.CustomerType)
+	}
+	if filters.Search != "" {
+		search := "%" + filters.Search + "%"
+		whereClause += " AND (LOWER(c.customer_code) LIKE LOWER(?) OR LOWER(c.customer_name) LIKE LOWER(?))"
+		args = append(args, search, search)
+	}
+
+	// Count total matching customers
+	var total int64
+	countErr := db.Table("customers c").Where(whereClause, args...).Count(&total).Error
+	if countErr != nil {
+		return nil, 0, countErr
+	}
+
+	page := filters.Page
+	if page < 1 {
+		page = 1
+	}
+	limit := filters.Limit
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+
+	branchJoin := ""
+	if filters.BranchID != nil {
+		branchJoin = fmt.Sprintf(" AND si.branch_id = %d", *filters.BranchID)
+	}
+
+	agingQuery := fmt.Sprintf(`
+		SELECT 
+			c.id as customer_id,
+			c.customer_code,
+			c.customer_name,
+			c.credit_limit,
+			c.current_balance,
+			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) <= 0 THEN si.balance_amount ELSE 0 END), 0) as 'current',
+			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 1 AND 30 THEN si.balance_amount ELSE 0 END), 0) as 'days_1_30',
+			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 31 AND 60 THEN si.balance_amount ELSE 0 END), 0) as 'days_31_60',
+			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 61 AND 90 THEN si.balance_amount ELSE 0 END), 0) as 'days_61_90',
+			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 91 AND 120 THEN si.balance_amount ELSE 0 END), 0) as 'days_91_120',
+			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) > 120 THEN si.balance_amount ELSE 0 END), 0) as 'over_120',
+			COALESCE(SUM(si.balance_amount), 0) as 'total_outstanding'
+		FROM customers c
+		LEFT JOIN sales_invoices si ON si.customer_id = c.id 
+			AND si.company_id = c.company_id 
+			AND si.deleted_at IS NULL 
+			AND si.payment_status != 'paid' 
+			AND si.approval_status != 'cancelled'
+			AND si.balance_amount > 0%s
+		WHERE %s
+		GROUP BY c.id, c.customer_code, c.customer_name, c.credit_limit, c.current_balance
+		ORDER BY total_outstanding DESC, c.customer_name ASC
+		LIMIT ? OFFSET ?
+	`, asOf, asOf, asOf, asOf, asOf, asOf, branchJoin, whereClause)
+
+	queryArgs := append(args, limit, offset)
+	var rows []dto.CustomerAgingRowDTO
+	err := db.Raw(agingQuery, queryArgs...).Scan(&rows).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return rows, total, nil
 }
 
 func (r *invoiceCenterReportRepository) GetSalesOrderRegister(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.SalesOrderRegisterRowDTO, int64, dto.SalesOrderRegisterSummaryDTO, error) {

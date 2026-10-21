@@ -1,8 +1,6 @@
 package services
 
 import (
-	"errors"
-
 	controlDto "github.com/pixandco/erp-phrma/internal/control/dto"
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/dto"
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/repositories"
@@ -67,7 +65,12 @@ func (s *invoiceCenterReportService) GetCustomerBalanceReport(db *gorm.DB, compa
 
 func (s *invoiceCenterReportService) GetCustomerStatementReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerStatementRowDTO, dto.CustomerStatementHeaderDTO, error) {
 	if filters.CustomerID == nil {
-		return nil, dto.CustomerStatementHeaderDTO{}, errors.New("customer_id is required for statement report")
+		var firstCustID uint64
+		if err := db.Table("customers").Where("company_id = ? AND deleted_at IS NULL", companyID).Order("customer_name ASC").Select("id").Limit(1).Scan(&firstCustID).Error; err == nil && firstCustID > 0 {
+			filters.CustomerID = &firstCustID
+		} else {
+			return []dto.CustomerStatementRowDTO{}, dto.CustomerStatementHeaderDTO{}, nil
+		}
 	}
 
 	rows, header, err := s.repo.GetCustomerStatementTransactions(db, companyID, filters)
