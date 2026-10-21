@@ -1,6 +1,7 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useState, createContext, useContext, useEffect, Suspense } from "react";
 import type { CSSProperties } from "react";
+import { toast } from "react-hot-toast";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import LoadingScreen from "../common/LoadingScreen";
@@ -41,7 +42,8 @@ const AppLayout = () => {
   });
   const [desktopHovered, setDesktopHovered] = useState(false);
   const location = useLocation();
-  const { activeSoftware, switchActiveSoftware } = useAuth();
+  const navigate = useNavigate();
+  const { user, softwareModules, activeSoftware, switchActiveSoftware } = useAuth();
 
   const isEffectiveExpanded = desktopExpanded || desktopHovered;
 
@@ -53,7 +55,28 @@ const AppLayout = () => {
     else if (path.startsWith("/finance")) targetCode = "FINANCE";
     else if (path.startsWith("/inventory")) targetCode = "INVENTORY";
     else if (path.startsWith("/invoice-center")) targetCode = "INVOICE_CENTER";
-    else if (path.startsWith("/compliance-center")) targetCode = "COMPLIANCE_CENTER";
+    else if (path.startsWith("/compliance-center") || path.startsWith("/compliance")) targetCode = "COMPLIANCE_CENTER";
+
+    if (
+      targetCode &&
+      user &&
+      user.user_type !== "super_admin" &&
+      softwareModules &&
+      softwareModules.length > 0
+    ) {
+      const hasAccess = softwareModules.some((sm: any) => {
+        const c = sm.software_code || sm.code;
+        return (
+          c === targetCode ||
+          (targetCode === "COMPLIANCE_CENTER" && (c === "COMPLIANCE" || c === "COMPLIANCE_CENTER"))
+        );
+      });
+      if (!hasAccess) {
+        toast.error(`You do not have permission to access the ${targetCode.replace("_", " ")} module.`);
+        navigate("/modules", { replace: true });
+        return;
+      }
+    }
 
     if (targetCode && activeSoftware?.software_code !== targetCode && switchActiveSoftware) {
       switchActiveSoftware(targetCode);
@@ -61,7 +84,7 @@ const AppLayout = () => {
     // Auto-dismiss mobile sidebar and desktop hover when navigating to new page
     setMobileOpen(false);
     setDesktopHovered(false);
-  }, [location.pathname, activeSoftware?.software_code, switchActiveSoftware]);
+  }, [location.pathname, activeSoftware?.software_code, switchActiveSoftware, softwareModules, user, navigate]);
 
   return (
     <SidebarContext.Provider

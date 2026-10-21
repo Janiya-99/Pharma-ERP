@@ -227,12 +227,76 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     }
   };
 
-  const hasPermission = (permissionKey: any) => {
+  const checkSinglePermission = (permissionKey: any): boolean => {
     if (user?.user_type === "super_admin") {
       return true;
     }
     if (!permissionKey) return true;
-    return permissions.includes(permissionKey);
+    if (permissions.includes("*") || permissions.includes(permissionKey)) {
+      return true;
+    }
+
+    // 1. Module dashboard access fallback: if user has access to this software module, allow dashboard view
+    const isDashboard =
+      permissionKey === "control_center.dashboard.view" ||
+      permissionKey === "control.dashboard.view" ||
+      permissionKey === "finance.dashboard.view" ||
+      permissionKey === "inventory.dashboard.view" ||
+      permissionKey === "invoice_center.dashboard.view" ||
+      permissionKey === "invoice.dashboard.view" ||
+      permissionKey === "compliance.dashboard.view";
+
+    if (isDashboard) {
+      let modCode = "";
+      if (permissionKey.startsWith("control")) modCode = "CONTROL_CENTER";
+      else if (permissionKey.startsWith("finance")) modCode = "FINANCE";
+      else if (permissionKey.startsWith("inventory")) modCode = "INVENTORY";
+      else if (permissionKey.startsWith("invoice")) modCode = "INVOICE_CENTER";
+      else if (permissionKey.startsWith("compliance")) modCode = "COMPLIANCE_CENTER";
+
+      const hasMod = softwareModules.some((sm: any) => {
+        const c = sm.software_code || sm.code;
+        return c === modCode || (modCode === "COMPLIANCE_CENTER" && (c === "COMPLIANCE" || c === "COMPLIANCE_CENTER"));
+      });
+      if (hasMod) return true;
+    }
+
+    // 2. Control Center prefix mapping (control_center.* <-> control.*)
+    if (typeof permissionKey === "string") {
+      if (permissionKey.startsWith("control_center.")) {
+        const altKey = "control." + permissionKey.slice("control_center.".length);
+        if (permissions.includes(altKey)) return true;
+        if (altKey === "control.audit_log.view" && permissions.includes("control.audit.view")) return true;
+        if (altKey === "control.access_audit.view" && permissions.includes("control.audit.view")) return true;
+        if (altKey === "control.login_history.view" && permissions.includes("control.login_logs.view")) return true;
+        if (altKey === "control.software_module.view" && (permissions.includes("control.access.software.view") || permissions.includes("control.permission.view"))) return true;
+        if (altKey === "control.approval_setting.view" && (permissions.includes("control.approval_workflow.view") || permissions.includes("control_center.approval_workflow.view"))) return true;
+      } else if (permissionKey.startsWith("control.")) {
+        const altKey = "control_center." + permissionKey.slice("control.".length);
+        if (permissions.includes(altKey)) return true;
+      }
+
+      // 3. Invoice Center prefix mapping (invoice_center.* <-> invoice.*)
+      if (permissionKey.startsWith("invoice_center.")) {
+        const altKey = "invoice." + permissionKey.slice("invoice_center.".length);
+        if (permissions.includes(altKey)) return true;
+      } else if (permissionKey.startsWith("invoice.")) {
+        const altKey = "invoice_center." + permissionKey.slice("invoice.".length);
+        if (permissions.includes(altKey)) return true;
+      }
+
+      // 4. Compliance mapping aliases
+      if (permissionKey === "compliance.record.view" && permissions.includes("compliance.nmra.view")) return true;
+      if (permissionKey === "compliance.license.view" && permissions.includes("compliance.nmra.view")) return true;
+      if (permissionKey === "compliance.recall.view" && permissions.includes("compliance.batch_recall.view")) return true;
+      if (permissionKey === "compliance.disposal.view" && permissions.includes("compliance.expiry_disposal.view")) return true;
+    }
+
+    return false;
+  };
+
+  const hasPermission = (permissionKey: any) => {
+    return checkSinglePermission(permissionKey);
   };
 
   const hasAnyPermission = (permissionKeys: any[]) => {
@@ -240,7 +304,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
       return true;
     }
     if (!permissionKeys || permissionKeys.length === 0) return true;
-    return permissionKeys.some((key: any) => permissions.includes(key));
+    return permissionKeys.some((key: any) => checkSinglePermission(key));
   };
 
   const value = {

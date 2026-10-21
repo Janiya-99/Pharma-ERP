@@ -1035,6 +1035,9 @@ function BackendCrudPage({
   requireBranchForSubmit = false,
   addLabel = "Add New",
   uniqueField,
+  createPermission,
+  updatePermission,
+  deletePermission,
 }: {
   title: string;
   description: string;
@@ -1055,7 +1058,11 @@ function BackendCrudPage({
   requireBranchForSubmit?: boolean;
   addLabel?: string;
   uniqueField?: string;
+  createPermission?: string;
+  updatePermission?: string;
+  deletePermission?: string;
 }) {
+  const { hasPermission } = useAuth();
   const [search, setSearch] = useState("");
   const [drawer, setDrawer] = useState<{ open: boolean; mode: DrawerMode; id?: string | number }>({ open: false, mode: "create" });
   const [form, setForm] = useState<ApiRecord>(defaults);
@@ -1130,10 +1137,12 @@ function BackendCrudPage({
   return (
     <InventoryPage title={title} description={description} icon={icon}>
       <SearchToolbar search={search} setSearch={setSearch}>
-        <Button onClick={openCreate} className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
-          <Plus className="h-4 w-4" />
-          {addLabel}
-        </Button>
+        {(!createPermission || hasPermission(createPermission)) && (
+          <Button onClick={openCreate} className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
+            <Plus className="h-4 w-4" />
+            {addLabel}
+          </Button>
+        )}
       </SearchToolbar>
       <DataGrid
         loading={loading}
@@ -1146,8 +1155,8 @@ function BackendCrudPage({
             render: (row) => (
               <ActionMenu
                 onView={() => openRecord(row, "view")}
-                onEdit={() => openRecord(row, "edit")}
-                onDeactivate={() => deactivateRecord(row)}
+                onEdit={!updatePermission || hasPermission(updatePermission) ? () => openRecord(row, "edit") : undefined}
+                onDeactivate={!deletePermission || hasPermission(deletePermission) ? () => deactivateRecord(row) : undefined}
               />
             ),
           },
@@ -1172,6 +1181,7 @@ function BackendCrudPage({
 }
 
 export function ProductSetupPage() {
+  const { hasPermission } = useAuth();
   const context = useInventoryContext();
   const configs = useMemo(() => setupConfigs(context), [context.companyId, context.branchId]);
   const [activeTab, setActiveTab] = useState(configs[0].key);
@@ -1269,10 +1279,12 @@ export function ProductSetupPage() {
                   className="h-9 w-full rounded-lg border-slate-200 bg-white pl-9 tracking-normal"
                 />
               </div>
-              <Button onClick={() => openSetup("create")} className="h-9 rounded-lg bg-indigo-600 px-3 text-white hover:bg-indigo-700">
-                <Plus className="h-4 w-4" />
-                Add {activeConfig.singular}
-              </Button>
+              {hasPermission("inventory.product_category.create") && (
+                <Button onClick={() => openSetup("create")} className="h-9 rounded-lg bg-indigo-600 px-3 text-white hover:bg-indigo-700">
+                  <Plus className="h-4 w-4" />
+                  Add {activeConfig.singular}
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -1465,11 +1477,15 @@ export function ProductsPage() {
       permissionContext={context}
       addLabel="Add Product"
       uniqueField="product_code"
+      createPermission="inventory.product.create"
+      updatePermission="inventory.product.update"
+      deletePermission="inventory.product.delete"
     />
   );
 }
 
 export function ProductBatchesPage() {
+  const { hasPermission } = useAuth();
   const context = useInventoryContext();
   const { refs } = useReferenceData();
   const list = useBackendList(inventoryApi.getProductBatches, { company_id: context.companyId, limit: 1000 }, !!context.companyId);
@@ -1567,9 +1583,9 @@ export function ProductBatchesPage() {
             render: (row) => (
               <ActionMenu
                 onView={() => openBatch(row, "view")}
-                onEdit={() => openBatch(row, "edit")}
-                onHold={() => holdBatch(row)}
-                onRelease={() => releaseBatch(row)}
+                onEdit={hasPermission("inventory.product_batch.update") ? () => openBatch(row, "edit") : undefined}
+                onHold={hasPermission("inventory.product_batch.block") ? () => holdBatch(row) : undefined}
+                onRelease={hasPermission("inventory.product_batch.unblock") ? () => releaseBatch(row) : undefined}
               />
             ),
           },
@@ -1594,6 +1610,7 @@ export function ProductBatchesPage() {
 }
 
 export function WarehousesAndLocationsPage() {
+  const { hasPermission } = useAuth();
   const context = useInventoryContext();
   const warehouses = useBackendList(inventoryApi.getWarehouses, { company_id: context.companyId, branch_id: context.branchId, limit: 1000 }, !!context.companyId);
   const [selected, setSelected] = useState<ApiRecord | null>(null);
@@ -1663,16 +1680,18 @@ export function WarehousesAndLocationsPage() {
       description="Manage warehouses, branch stock locations, racks, shelves, and bins."
       icon={Warehouse}
       actions={
-        <Button
-          onClick={() => {
-            setWarehouseDrawerRequest(null);
-            setDrawerType("warehouse");
-          }}
-          className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-        >
-          <Plus className="h-4 w-4" />
-          Add Warehouse
-        </Button>
+        hasPermission("inventory.warehouse.create") ? (
+          <Button
+            onClick={() => {
+              setWarehouseDrawerRequest(null);
+              setDrawerType("warehouse");
+            }}
+            className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+          >
+            <Plus className="h-4 w-4" />
+            Add Warehouse
+          </Button>
+        ) : undefined
       }
     >
       <div className="grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
@@ -1703,8 +1722,8 @@ export function WarehousesAndLocationsPage() {
                     <div onClick={(event) => event.stopPropagation()}>
                       <ActionMenu
                         onView={() => openWarehouse(warehouse, "view")}
-                        onEdit={() => openWarehouse(warehouse, "edit")}
-                        onDeactivate={() => deleteWarehouse(warehouse)}
+                        onEdit={hasPermission("inventory.warehouse.update") ? () => openWarehouse(warehouse, "edit") : undefined}
+                        onDeactivate={hasPermission("inventory.warehouse.delete") ? () => deleteWarehouse(warehouse) : undefined}
                         deactivateLabel="Delete"
                       />
                     </div>
@@ -1724,14 +1743,18 @@ export function WarehousesAndLocationsPage() {
                     <Eye className="h-4 w-4" />
                     View
                   </Button>
-                  <Button variant="outline" className="h-8 rounded-lg border-slate-200 px-3" onClick={() => openWarehouse(selected, "edit")}>
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button variant="outline" className="h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => deleteWarehouse(selected)}>
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
+                  {hasPermission("inventory.warehouse.update") && (
+                    <Button variant="outline" className="h-8 rounded-lg border-slate-200 px-3" onClick={() => openWarehouse(selected, "edit")}>
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </Button>
+                  )}
+                  {hasPermission("inventory.warehouse.delete") && (
+                    <Button variant="outline" className="h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => deleteWarehouse(selected)}>
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  )}
                 </div>
               ) : null}
             </CardHeader>
@@ -1757,10 +1780,12 @@ export function WarehousesAndLocationsPage() {
           </Card>
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-base font-semibold tracking-normal text-slate-950">Internal Locations</h2>
-            <Button onClick={() => setDrawerType("location")} variant="outline" className="rounded-lg border-slate-200" disabled={!selected}>
-              <Plus className="h-4 w-4" />
-              Add Location
-            </Button>
+            {hasPermission("inventory.warehouse.create") && (
+              <Button onClick={() => setDrawerType("location")} variant="outline" className="rounded-lg border-slate-200" disabled={!selected}>
+                <Plus className="h-4 w-4" />
+                Add Location
+              </Button>
+            )}
           </div>
           <LocationManager
             context={context}
@@ -2265,16 +2290,29 @@ function WorkflowPage({ kind }: { kind: WorkflowKind }) {
     await runBackendAction(() => config.cancel(id, { remarks: "Cancelled from inventory module" }), `${config.title} deactivated`, list.refresh);
   };
 
+  const { hasPermission } = useAuth();
+  const createPermMap: Record<WorkflowKind, string> = {
+    grn: "inventory.grn.create",
+    opening_stock: "inventory.opening_stock.create",
+    transfer: "inventory.stock_transfer.create",
+    adjustment: "inventory.stock_adjustment.create",
+    purchase_return: "inventory.purchase_return.create",
+    sales_return: "inventory.sales_return.create",
+  };
+  const createPerm = createPermMap[kind];
+
   return (
     <InventoryPage
       title={config.title}
       description={config.description}
       icon={config.icon}
       actions={
-        <Button onClick={openCreate} className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
-          <Plus className="h-4 w-4" />
-          New
-        </Button>
+        (!createPerm || hasPermission(createPerm)) ? (
+          <Button onClick={openCreate} className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
+            <Plus className="h-4 w-4" />
+            New
+          </Button>
+        ) : undefined
       }
     >
       <DataGrid

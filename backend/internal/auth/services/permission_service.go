@@ -14,13 +14,7 @@ func NewPermissionService(db *gorm.DB) *PermissionService {
 }
 
 func (s *PermissionService) GetPermissionsForUserContext(userID, branchID uint64, softwareCode string) []string {
-	// 1. Find active software module by software_code
-	var software models.SoftwareModule
-	if err := s.db.Where("software_code = ? AND status = ?", softwareCode, "active").First(&software).Error; err != nil {
-		return []string{}
-	}
-
-	// 2. Find active roles from user_branch_software_roles
+	// 1. Find active roles from user_branch_roles
 	var matrix []models.UserBranchRole
 	s.db.Preload("Role").Where("user_id = ? AND branch_id = ? AND status = ?", userID, branchID, "active").Find(&matrix)
 
@@ -42,12 +36,10 @@ func (s *PermissionService) GetPermissionsForUserContext(userID, branchID uint64
 		return []string{}
 	}
 
-	// 3. Join roles -> role_permissions -> permissions -> software_modules
+	// 2. Fetch role permissions for all assigned active roles
 	var rolePermissions []models.RolePermission
-	s.db.Preload("Permission.Software").
-		Joins("JOIN permissions p ON p.id = role_permissions.permission_id").
-		Joins("JOIN software_modules sm ON sm.id = p.software_id").
-		Where("role_permissions.role_id IN ? AND sm.software_code = ?", roleIDs, softwareCode).
+	s.db.Preload("Permission").
+		Where("role_id IN ?", roleIDs).
 		Find(&rolePermissions)
 
 	permMap := make(map[string]bool)
@@ -61,6 +53,6 @@ func (s *PermissionService) GetPermissionsForUserContext(userID, branchID uint64
 		}
 	}
 
-	// 4. Return unique permission_key list
+	// 3. Return unique permission_key list
 	return permissions
 }

@@ -209,7 +209,6 @@ const Sidebar = () => {
       name: "Dashboard",
       path: "/inventory/dashboard",
       icon: LayoutDashboard,
-      permission: "inventory.dashboard.view",
     },
     {
       name: "Product Master",
@@ -335,7 +334,6 @@ const Sidebar = () => {
       name: "Invoice Center Dashboard",
       path: "/invoice-center/dashboard",
       icon: LayoutDashboard,
-      permission: "invoice_center.dashboard.view",
     },
     {
       name: "Customers",
@@ -528,19 +526,18 @@ const Sidebar = () => {
       name: "Dashboard",
       path: "/compliance-center/dashboard",
       icon: LayoutDashboard,
-      permission: "compliance.dashboard.view",
     },
     {
       name: "Quality Assurance",
       path: "/compliance-center/records?tab=qa",
       icon: ShieldCheck,
-      permission: "compliance.record.view",
+      permission: "compliance.nmra.view",
     },
     {
       name: "Audits",
       path: "/compliance-center/records?tab=audits",
       icon: FileCheck,
-      permission: "compliance.record.view",
+      permission: "compliance.nmra.view",
     },
     {
       name: "Batch Release",
@@ -552,25 +549,25 @@ const Sidebar = () => {
       name: "Regulatory Filings",
       path: "/compliance-center/licenses",
       icon: FileText,
-      permission: "compliance.license.view",
+      permission: "compliance.nmra.view",
     },
     {
       name: "Deviations",
       path: "/compliance-center/recalls",
       icon: AlertTriangle,
-      permission: "compliance.recall.view",
+      permission: "compliance.batch_recall.view",
     },
     {
       name: "CAPA",
       path: "/compliance-center/disposals",
       icon: BookOpen,
-      permission: "compliance.disposal.view",
+      permission: "compliance.expiry_disposal.view",
     },
     {
       name: "Documentation",
       path: "/compliance-center/records?tab=docs",
       icon: ClipboardList,
-      permission: "compliance.record.view",
+      permission: "compliance.nmra.view",
     },
   ];
 
@@ -940,11 +937,32 @@ const Sidebar = () => {
           isMobile || effectiveExpanded ? "px-3" : "px-2"
         }`}
       >
-        {menus.map((m, idx) => (
-          <React.Fragment key={`${currentModuleCode}-${m.name}-${m.path || idx}`}>
-            {renderMenu(m, isMobile)}
-          </React.Fragment>
-        ))}
+        {menus.length > 0 ? (
+          menus.map((m, idx) => (
+            <React.Fragment key={`${currentModuleCode}-${m.name}-${m.path || idx}`}>
+              {renderMenu(m, isMobile)}
+            </React.Fragment>
+          ))
+        ) : (
+          <div className="mx-2 my-6 rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 text-center">
+            <Shield className="mx-auto h-5 w-5 text-slate-400 mb-1.5" />
+            {(isMobile || effectiveExpanded) && (
+              <>
+                <p className="text-xs font-semibold text-slate-700">No Menus Available</p>
+                <p className="mt-1 text-[11px] text-slate-400">
+                  Your assigned role has no access to navigation items in this module.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate("/modules")}
+                  className="mt-2.5 w-full rounded-lg bg-white px-2 py-1.5 text-xs font-semibold text-indigo-600 border border-slate-200 shadow-2xs hover:bg-indigo-50 cursor-pointer"
+                >
+                  Switch Workspace
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* Regulatory Scope Selector (as featured in Compliance reference screenshot) */}
