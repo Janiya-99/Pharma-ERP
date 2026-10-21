@@ -129,6 +129,7 @@ const Topbar = () => {
     activeBranch,
     switchActiveBranch,
     activeSoftware,
+    softwareModules,
     switchActiveSoftware,
     logoutUser,
   } = useAuth();
@@ -136,6 +137,26 @@ const Topbar = () => {
   const navigate = useNavigate();
   const { mobileOpen, setMobileOpen, desktopExpanded, setDesktopExpanded } = useSidebarState();
   const { toggleCopilot } = useAiCopilot();
+
+  const permittedModules = useMemo(() => {
+    if (user?.user_type === "super_admin") return ALL_MODULES;
+    if (!softwareModules || softwareModules.length === 0) return ALL_MODULES;
+
+    return ALL_MODULES.filter((m) => {
+      if (m.code === "LOGISTICS") {
+        return softwareModules.some(
+          (sm: any) => (sm.software_code || sm.code) === "INVENTORY"
+        );
+      }
+      return softwareModules.some((sm: any) => {
+        const c = sm.software_code || sm.code;
+        return (
+          c === m.code ||
+          (m.code === "COMPLIANCE_CENTER" && (c === "COMPLIANCE" || c === "COMPLIANCE_CENTER"))
+        );
+      });
+    });
+  }, [softwareModules, user?.user_type]);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -312,7 +333,7 @@ const Topbar = () => {
 
         {/* 2. CENTER: Hover-Expanding Module Switcher Rail */}
         <div className="hidden lg:flex items-center p-1 rounded-lg bg-slate-100/80 border border-slate-200/70 gap-0.5 shrink-0">
-          {ALL_MODULES.map((m) => {
+          {permittedModules.map((m) => {
             const Icon = m.icon;
             const isCurrent = m.code === activeModule.code;
             return (
@@ -363,7 +384,7 @@ const Topbar = () => {
               <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Switch Module
               </div>
-              {ALL_MODULES.map((m) => {
+              {permittedModules.map((m) => {
                 const Icon = m.icon;
                 const isCurrent = m.code === activeModule.code;
                 return (

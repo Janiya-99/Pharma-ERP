@@ -28,7 +28,6 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
       {
         label: "Dashboard",
         route: "/control-center/dashboard",
-        permission: "control_center.dashboard.view",
       },
     ],
   },
@@ -39,22 +38,22 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
       {
         label: "Company Profile",
         route: "/control-center/company",
-        permission: "control_center.company.view",
+        permission: "control.company.view",
       },
       {
         label: "Branches",
         route: "/control-center/branches",
-        permission: "control_center.branch.view",
+        permission: "control.branch.view",
       },
       {
         label: "Departments",
         route: "/control-center/departments",
-        permission: "control_center.department.view",
+        permission: "control.department.view",
       },
       {
         label: "Designations",
         route: "/control-center/designations",
-        permission: "control_center.designation.view",
+        permission: "control.designation.view",
       },
     ],
   },
@@ -65,28 +64,18 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
       {
         label: "Users",
         route: "/control-center/users",
-        permission: "control_center.user.view",
+        permission: "control.user.view",
       },
       {
         label: "Roles",
         route: "/control-center/roles",
-        permission: "control_center.role.view",
+        permission: "control.role.view",
       },
       {
         label: "Permission Catalogue",
         route: "/control-center/permissions",
-        permission: "control_center.permission.view",
+        permission: "control.permission.view",
       },
-      // {
-      //   label: "User Assignments",
-      //   route: "/control-center/user-assignments",
-      //   permission: "control_center.user_assignment.view",
-      // },
-      // {
-      //   label: "Effective Access",
-      //   route: "/control-center/effective-access",
-      //   permission: "control_center.effective_access.view",
-      // },
     ],
   },
   {
@@ -96,22 +85,22 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
       {
         label: "Software Modules",
         route: "/control-center/software-modules",
-        permission: "control_center.software_module.view",
+        permission: "control.access.software.view",
       },
       {
         label: "Approval Settings",
         route: "/control-center/approval-settings",
-        permission: "control_center.approval_setting.view",
+        permission: "control.approval_workflow.view",
       },
       {
         label: "Document Numbering",
         route: "/control-center/document-numbering",
-        permission: "control_center.document_numbering.view",
+        permission: "control.document_numbering.view",
       },
       {
         label: "General Settings",
         route: "/control-center/settings",
-        permission: "control_center.settings.view",
+        permission: "control.settings.view",
       },
     ],
   },
@@ -122,22 +111,22 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
       {
         label: "Audit Logs",
         route: "/control-center/audit-logs",
-        permission: "control_center.audit_log.view",
+        permission: "control.audit.view",
       },
       {
         label: "Access Audit",
         route: "/control-center/access-audit",
-        permission: "control_center.access_audit.view",
+        permission: "control.audit.view",
       },
       {
         label: "Login History",
         route: "/control-center/login-history",
-        permission: "control_center.login_history.view",
+        permission: "control.login_logs.view",
       },
       {
         label: "Security Settings",
         route: "/control-center/security-settings",
-        permission: "control_center.security_settings.view",
+        permission: "control.security_settings.view",
       },
     ],
   },
