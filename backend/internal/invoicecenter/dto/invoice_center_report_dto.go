@@ -119,11 +119,11 @@ type CustomerAgingRowDTO struct {
 	CreditLimit      float64 `json:"credit_limit"`
 	CurrentBalance   float64 `json:"current_balance"`
 	Current          float64 `json:"current"`
-	Days1To30        float64 `json:"1_30_days"`
-	Days31To60       float64 `json:"31_60_days"`
-	Days61To90       float64 `json:"61_90_days"`
-	Days91To120      float64 `json:"91_120_days"`
-	Over120Days      float64 `json:"over_120_days"`
+	Days1To30        float64 `json:"days_1_30"`
+	Days31To60       float64 `json:"days_31_60"`
+	Days61To90       float64 `json:"days_61_90"`
+	Days91To120      float64 `json:"days_91_120"`
+	Over120Days      float64 `json:"over_120"`
 	TotalOutstanding float64 `json:"total_outstanding"`
 }
 
