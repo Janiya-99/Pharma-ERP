@@ -1290,6 +1290,10 @@ const AppRoutes = () => {
                   path="documentation"
                   element={<PlatformDocumentationPage />}
                 />
+                <Route
+                  path="system-fixes-audit"
+                  element={<SystemFixesAuditPage />}
+                />
                 <Route path="login-logs" element={<PlatformLoginLogsPage />} />
                 <Route path="audit-logs" element={<PlatformAuditLogsPage />} />
                 <Route path="blocked-ips" element={<PlatformBlockedIPsPage />} />

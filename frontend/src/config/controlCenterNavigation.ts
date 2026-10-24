@@ -131,7 +131,6 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
       {
         label: "System Fixes & Audit",
         route: "/control-center/system-fixes-audit",
-        permission: "control.audit.view",
       },
     ],
   },

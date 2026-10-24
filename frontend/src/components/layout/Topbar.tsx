@@ -29,6 +29,7 @@ import {
   Globe,
   MessageSquare,
   Headphones,
+  FileCheck2,
 } from "lucide-react";
 import { useLocation, useNavigate, NavLink } from "react-router-dom";
 import { toast } from "sonner";
@@ -119,6 +120,8 @@ const SEARCH_ITEMS = [
   { name: "Customers Directory", category: "Invoice Center", path: "/invoice-center/customers", icon: UsersIcon },
   { name: "System Settings", category: "Control Center", path: "/control-center/settings", icon: Settings },
   { name: "User Management", category: "Control Center", path: "/control-center/users", icon: UsersIcon },
+  { name: "System Fixes & Audit Report", category: "Control Center", path: "/control-center/system-fixes-audit", icon: FileCheck2 },
+  { name: "Balance Sheet & Ledger Audit", category: "Finance", path: "/control-center/system-fixes-audit", icon: Landmark },
 ];
 
 const Topbar = () => {
@@ -657,6 +660,10 @@ const Topbar = () => {
               <DropdownMenuItem onClick={() => navigate("/control-center/security-settings")} className="cursor-pointer">
                 <Shield className="mr-2 h-3.5 w-3.5 text-slate-400" />
                 <span>Security Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/control-center/system-fixes-audit")} className="cursor-pointer text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50">
+                <FileCheck2 className="mr-2 h-3.5 w-3.5 text-emerald-600" />
+                <span className="font-semibold">System Fixes & Audit</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logoutUser} className="text-rose-600 cursor-pointer">

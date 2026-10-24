@@ -324,6 +324,27 @@ const DOCUMENTS_CATALOG: DocItem[] = [
     icon: FileCheck,
     accentColor: "from-blue-600 to-cyan-600",
   },
+  {
+    id: "fin-03-04-dashboard-kpis-tax-formatting",
+    title: "FIN-03 & FIN-04: Finance Dashboard KPIs & Tax Settings Formatting",
+    category: "Audit & Reports",
+    description:
+      "Statutory audit and engineering resolutions for Cash/AR alert discrepancies, live general ledger metric lineage, and percentage formatting for tax rates and zero-rated settings.",
+    pdfFilename: "FIN_03_AND_04_AUDIT_REPORT.md",
+    mdFilename: "FIN_03_AND_04_AUDIT_REPORT.md",
+    sizeBytes: "7.2 KB",
+    pageCount: "4 Sections",
+    badge: "FIN-03 & FIN-04 AUDIT",
+    featured: true,
+    highlights: [
+      "Eliminated 32.4M & 11.95M hardcoded mock alerts with live GL balances",
+      "Reconciled Cash in Hand (5.0M) & Commercial Bank (88.1M) with ledgers",
+      "Standardized 18% / 2.5% percentages & Zero-Rated badges instead of dashes",
+    ],
+    lastUpdated: "October 2026",
+    icon: FileCheck,
+    accentColor: "from-purple-600 to-indigo-600",
+  },
 ];
 
 const CATEGORIES = [
@@ -435,6 +456,14 @@ export const PlatformDocumentationPage = () => {
               <ArrowDownToLine className="w-4 h-4" />
               <span>Master Volume (3.6MB)</span>
             </button>
+
+            <a
+              href="/control-center/system-fixes-audit"
+              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-600/25 active:scale-95 transition-all"
+            >
+              <FileCheck className="w-4 h-4" />
+              <span>Statutory Audit & Fixes</span>
+            </a>
           </div>
         </div>
       </div>
