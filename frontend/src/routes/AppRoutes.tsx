@@ -846,8 +846,28 @@ const AppRoutes = () => {
             element={<Navigate to="/inventory/reports/stock-balance" replace />}
           />
           <Route
+            path="/inventory/stock-balance"
+            element={<Navigate to="/inventory/reports/stock-balance" replace />}
+          />
+          <Route
             path="/inventory/stock-ledger"
             element={<Navigate to="/inventory/reports/stock-ledger" replace />}
+          />
+          <Route
+            path="/inventory/batches"
+            element={<Navigate to="/inventory/product-batches" replace />}
+          />
+          <Route
+            path="/inventory/reports/expiry"
+            element={<Navigate to="/inventory/reports/expiry-report" replace />}
+          />
+          <Route
+            path="/inventory/reports/batch"
+            element={<Navigate to="/inventory/reports/batch-report" replace />}
+          />
+          <Route
+            path="/inventory/reports/batches"
+            element={<Navigate to="/inventory/reports/batch-report" replace />}
           />
 
           {/* Invoice Center Routes */}

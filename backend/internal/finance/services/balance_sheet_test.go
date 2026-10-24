@@ -205,3 +205,131 @@ func TestCalculateBalanceSheet_ContraAssets(t *testing.T) {
 		t.Fatalf("Expected report to be Balanced with contra-asset, but got IsBalanced=false")
 	}
 }
+
+func TestCalculateBalanceSheet_LiveReconciledLedger(t *testing.T) {
+	svc := &FinanceReportService{}
+
+	// Live reconciled scenario for FY 2026/2027:
+	// Cash in Hand: 5,000,000.00
+	// Bank Account: 88,107,675.10
+	// Trade Debtors: 4,545,730.20
+	// Inventory Account: 34,934,760.00
+	// Total Assets: 132,588,165.30
+	// Trade Creditors: 6,622,131.66
+	// Share Capital: 100,000,000.00
+	// Retained Earnings: 19,541,056.38
+	// Net Profit: 6,424,977.26 (Sales 28,843,172 - COGS 17,882,766.64 - Salaries 3,380,428.10 - Rent 1,155,000.00)
+	// Total Liabilities + Equity: 132,588,165.30
+	rawLines := []repositories.TrialBalanceRawLine{
+		{
+			AccountID:     1,
+			AccountCode:   "100001",
+			AccountName:   "Cash in Hand",
+			NormalBalance: "Debit",
+			PeriodDebit:   5000000.00,
+		},
+		{
+			AccountID:     3,
+			AccountCode:   "100003",
+			AccountName:   "Bank Account",
+			NormalBalance: "Debit",
+			PeriodDebit:   92643103.20,
+			PeriodCredit:  4535428.10,
+		},
+		{
+			AccountID:     4,
+			AccountCode:   "110001",
+			AccountName:   "Trade Debtors",
+			NormalBalance: "Debit",
+			PeriodDebit:   28843172.00,
+			PeriodCredit:  24297441.80,
+		},
+		{
+			AccountID:     5,
+			AccountCode:   "120001",
+			AccountName:   "Inventory Account",
+			NormalBalance: "Debit",
+			PeriodDebit:   52817526.64,
+			PeriodCredit:  17882766.64,
+		},
+		{
+			AccountID:     9,
+			AccountCode:   "200001",
+			AccountName:   "Trade Creditors",
+			NormalBalance: "Credit",
+			PeriodCredit:  6622131.66,
+		},
+		{
+			AccountID:     12,
+			AccountCode:   "300001",
+			AccountName:   "Share Capital",
+			NormalBalance: "Credit",
+			PeriodCredit:  100000000.00,
+		},
+		{
+			AccountID:     13,
+			AccountCode:   "310001",
+			AccountName:   "Retained Earnings",
+			NormalBalance: "Credit",
+			PeriodCredit:  19541056.38,
+		},
+		{
+			AccountID:     14,
+			AccountCode:   "400001",
+			AccountName:   "Sales Revenue",
+			NormalBalance: "Credit",
+			PeriodCredit:  28843172.00,
+		},
+		{
+			AccountID:     16,
+			AccountCode:   "500001",
+			AccountName:   "Cost of Goods Sold",
+			NormalBalance: "Debit",
+			PeriodDebit:   17882766.64,
+		},
+		{
+			AccountID:     19,
+			AccountCode:   "600001",
+			AccountName:   "Salaries and Wages",
+			NormalBalance: "Debit",
+			PeriodDebit:   3380428.10,
+		},
+		{
+			AccountID:     20,
+			AccountCode:   "610001",
+			AccountName:   "Rent Expense",
+			NormalBalance: "Debit",
+			PeriodDebit:   1155000.00,
+		},
+	}
+
+	report := svc.CalculateBalanceSheet(rawLines)
+
+	expectedAssets := 132588165.30
+	if math.Abs(report.TotalAssets-expectedAssets) > 0.01 {
+		t.Fatalf("Expected TotalAssets %f, got %f", expectedAssets, report.TotalAssets)
+	}
+
+	expectedLiabilities := 6622131.66
+	if math.Abs(report.TotalLiabilities-expectedLiabilities) > 0.01 {
+		t.Fatalf("Expected TotalLiabilities %f, got %f", expectedLiabilities, report.TotalLiabilities)
+	}
+
+	expectedEquity := 125966033.64
+	if math.Abs(report.TotalEquity-expectedEquity) > 0.01 {
+		t.Fatalf("Expected TotalEquity %f, got %f", expectedEquity, report.TotalEquity)
+	}
+
+	expectedLE := 132588165.30
+	if math.Abs(report.TotalLiabilitiesAndEquity-expectedLE) > 0.01 {
+		t.Fatalf("Expected TotalLiabilitiesAndEquity %f, got %f", expectedLE, report.TotalLiabilitiesAndEquity)
+	}
+
+	if !report.IsBalanced {
+		t.Fatalf("Expected report to be Balanced, Difference: %f", report.Difference)
+	}
+	if math.Abs(report.Difference) > 0.01 {
+		t.Fatalf("Expected Difference 0.00, got %f", report.Difference)
+	}
+}
+

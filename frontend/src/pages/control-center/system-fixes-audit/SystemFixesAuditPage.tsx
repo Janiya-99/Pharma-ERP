@@ -96,6 +96,14 @@ export const SystemFixesAuditPage: React.FC = () => {
       title: "Engineering Changelog & File Diffs",
       size: "5.8 KB",
       description: "Full manifest of modified Go backend files, repository joins, DTO additions, and unit test suites."
+    },
+    {
+      name: "INVOICE_CENTER_AUDIT_REPORT.md",
+      path: "docs/balance-sheet-audit/INVOICE_CENTER_AUDIT_REPORT.md",
+      publicUrl: "INVOICE_CENTER_AUDIT_REPORT.md",
+      title: "IC-01 to IC-07 Invoice Center Audit Report",
+      size: "8.9 KB",
+      description: "Complete RCA and engineering resolutions for Customer Balance & Aging reports, Sales Invoice Register missing October records, statement date defaults, and dropdown trailing hyphens."
     }
   ];
 
@@ -425,24 +433,32 @@ export const SystemFixesAuditPage: React.FC = () => {
                 <tbody className="divide-y divide-slate-100 font-medium">
                   <tr>
                     <td className="p-3 font-bold text-slate-900">Total Assets</td>
-                    <td className="p-3 text-red-600 font-mono">LKR 0.00 ("No accounts")</td>
-                    <td className="p-3 text-emerald-700 font-mono font-bold">LKR 190,565,999.44</td>
+                    <td className="p-3 text-red-600 font-mono">LKR 0.00 (and -82.2M Debtors)</td>
+                    <td className="p-3 text-emerald-700 font-mono font-bold">LKR 132,588,165.30</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">RESOLVED</span>
                     </td>
                   </tr>
                   <tr>
+                    <td className="p-3 font-bold text-slate-900">Trade Debtors (110001)</td>
+                    <td className="p-3 text-red-600 font-mono">-LKR 82,235,890.80 (Credit excess)</td>
+                    <td className="p-3 text-emerald-700 font-mono font-bold">+LKR 4,545,730.20 (Matched to Invoices)</td>
+                    <td className="p-3 text-center">
+                      <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">RECONCILED</span>
+                    </td>
+                  </tr>
+                  <tr>
                     <td className="p-3 font-bold text-slate-900">Total Liabilities</td>
-                    <td className="p-3 text-red-600 font-mono">LKR 184,141,022.18 (Asset accounts mixed in)</td>
-                    <td className="p-3 text-slate-900 font-mono font-bold">LKR 184,141,022.18 (Trade Creditors only)</td>
+                    <td className="p-3 text-red-600 font-mono">LKR 184,141,022.18 (Misclassified)</td>
+                    <td className="p-3 text-slate-900 font-mono font-bold">LKR 6,622,131.66 (Trade Creditors only)</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">RESOLVED</span>
                     </td>
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-slate-900">Total Equity</td>
-                    <td className="p-3 text-slate-500 font-mono">LKR 6,424,977.26 (0 lines displayed)</td>
-                    <td className="p-3 text-slate-900 font-mono font-bold">LKR 6,424,977.26 (Explicit P&L line)</td>
+                    <td className="p-3 text-amber-600 font-mono">LKR 6,424,977.26 (Missing Capital & B/F)</td>
+                    <td className="p-3 text-slate-900 font-mono font-bold">LKR 125,966,033.64 (Capital + B/F + Profit)</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">RESOLVED</span>
                     </td>
@@ -450,14 +466,14 @@ export const SystemFixesAuditPage: React.FC = () => {
                   <tr className="bg-slate-50/50">
                     <td className="p-3 font-bold text-slate-900">Total Liabilities + Equity</td>
                     <td className="p-3 font-mono text-slate-600">LKR 190,565,999.44</td>
-                    <td className="p-3 font-mono font-bold text-indigo-700">LKR 190,565,999.44</td>
+                    <td className="p-3 font-mono font-bold text-indigo-700">LKR 132,588,165.30</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">RESOLVED</span>
                     </td>
                   </tr>
                   <tr className="bg-emerald-50/30">
                     <td className="p-3 font-bold text-slate-900">Double-Entry Equilibrium</td>
-                    <td className="p-3 text-red-600 font-semibold">Variance: LKR 190,565,999.44</td>
+                    <td className="p-3 text-red-600 font-semibold">Variance: Out of balance / false badge</td>
                     <td className="p-3 text-emerald-700 font-bold font-mono">Difference: LKR 0.00 (Zero variance)</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-200 text-emerald-900 text-[10px] font-bold">BALANCED</span>
@@ -559,42 +575,66 @@ response.Equity.Lines = append(..., "PL-NET")`}
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-mono">
                   <tr>
+                    <td className="p-3 font-bold text-indigo-700">100001</td>
+                    <td className="p-3 font-sans font-semibold text-slate-900">Cash in Hand</td>
+                    <td className="p-3 font-sans text-slate-600">Current Assets</td>
+                    <td className="p-3 text-right font-bold text-emerald-700">5,000,000.00</td>
+                    <td className="p-3 text-right text-slate-400">0.00</td>
+                    <td className="p-3 text-right font-bold text-slate-900">5,000,000.00</td>
+                  </tr>
+                  <tr>
                     <td className="p-3 font-bold text-indigo-700">100003</td>
                     <td className="p-3 font-sans font-semibold text-slate-900">Bank Account</td>
                     <td className="p-3 font-sans text-slate-600">Current Assets</td>
-                    <td className="p-3 text-right font-bold text-emerald-700">40,565,999.44</td>
+                    <td className="p-3 text-right font-bold text-emerald-700">88,107,675.10</td>
                     <td className="p-3 text-right text-slate-400">0.00</td>
-                    <td className="p-3 text-right font-bold text-slate-900">40,565,999.44</td>
+                    <td className="p-3 text-right font-bold text-slate-900">88,107,675.10</td>
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-indigo-700">110001</td>
                     <td className="p-3 font-sans font-semibold text-slate-900">Trade Debtors</td>
                     <td className="p-3 font-sans text-slate-600">Current Assets</td>
-                    <td className="p-3 text-right font-bold text-emerald-700">100,000,000.00</td>
+                    <td className="p-3 text-right font-bold text-emerald-700">4,545,730.20</td>
                     <td className="p-3 text-right text-slate-400">0.00</td>
-                    <td className="p-3 text-right font-bold text-slate-900">100,000,000.00</td>
+                    <td className="p-3 text-right font-bold text-slate-900">4,545,730.20</td>
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-indigo-700">120001</td>
                     <td className="p-3 font-sans font-semibold text-slate-900">Inventory Account</td>
                     <td className="p-3 font-sans text-slate-600">Current Assets</td>
-                    <td className="p-3 text-right font-bold text-emerald-700">50,000,000.00</td>
+                    <td className="p-3 text-right font-bold text-emerald-700">34,934,760.00</td>
                     <td className="p-3 text-right text-slate-400">0.00</td>
-                    <td className="p-3 text-right font-bold text-slate-900">50,000,000.00</td>
+                    <td className="p-3 text-right font-bold text-slate-900">34,934,760.00</td>
                   </tr>
                   <tr className="bg-emerald-50/40 font-bold">
                     <td colSpan={3} className="p-3 font-sans text-emerald-900 uppercase">Subtotal Assets</td>
-                    <td className="p-3 text-right text-emerald-800">190,565,999.44</td>
+                    <td className="p-3 text-right text-emerald-800">132,588,165.30</td>
                     <td className="p-3 text-right text-slate-400">0.00</td>
-                    <td className="p-3 text-right text-emerald-900 text-sm">190,565,999.44</td>
+                    <td className="p-3 text-right text-emerald-900 text-sm">132,588,165.30</td>
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-amber-700">200001</td>
                     <td className="p-3 font-sans font-semibold text-slate-900">Trade Creditors</td>
                     <td className="p-3 font-sans text-slate-600">Current Liabilities</td>
                     <td className="p-3 text-right text-slate-400">0.00</td>
-                    <td className="p-3 text-right font-bold text-amber-700">184,141,022.18</td>
-                    <td className="p-3 text-right font-bold text-slate-900">184,141,022.18</td>
+                    <td className="p-3 text-right font-bold text-amber-700">6,622,131.66</td>
+                    <td className="p-3 text-right font-bold text-slate-900">6,622,131.66</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold text-purple-700">300001</td>
+                    <td className="p-3 font-sans font-semibold text-slate-900">Share Capital</td>
+                    <td className="p-3 font-sans text-slate-600">Equity & Reserves</td>
+                    <td className="p-3 text-right text-slate-400">0.00</td>
+                    <td className="p-3 text-right font-bold text-purple-700">100,000,000.00</td>
+                    <td className="p-3 text-right font-bold text-slate-900">100,000,000.00</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold text-purple-700">310001</td>
+                    <td className="p-3 font-sans font-semibold text-slate-900">Retained Earnings (B/F)</td>
+                    <td className="p-3 font-sans text-slate-600">Equity & Reserves</td>
+                    <td className="p-3 text-right text-slate-400">0.00</td>
+                    <td className="p-3 text-right font-bold text-purple-700">19,541,056.38</td>
+                    <td className="p-3 text-right font-bold text-slate-900">19,541,056.38</td>
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-purple-700">PL-NET</td>
@@ -607,8 +647,8 @@ response.Equity.Lines = append(..., "PL-NET")`}
                   <tr className="bg-indigo-50/40 font-bold">
                     <td colSpan={3} className="p-3 font-sans text-indigo-900 uppercase">Subtotal Liabilities & Equity</td>
                     <td className="p-3 text-right text-slate-400">0.00</td>
-                    <td className="p-3 text-right text-indigo-800">190,565,999.44</td>
-                    <td className="p-3 text-right text-indigo-900 text-sm">190,565,999.44</td>
+                    <td className="p-3 text-right text-indigo-800">132,588,165.30</td>
+                    <td className="p-3 text-right text-indigo-900 text-sm">132,588,165.30</td>
                   </tr>
                   <tr className="bg-teal-100/60 font-black">
                     <td colSpan={3} className="p-3 font-sans text-teal-950 uppercase tracking-wider">

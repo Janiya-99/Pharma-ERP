@@ -8,6 +8,11 @@ import {
 } from "@/components/invoice-center/reports/ReportDataTable";
 import { ReportPermissionState } from "@/components/invoice-center/reports/ReportPermissionState";
 import { ReportExportActions } from "@/components/invoice-center/reports/ReportExportActions";
+import { ReportErrorState } from "@/components/invoice-center/reports/ReportErrorState";
+import {
+  ReportSummaryCards,
+  SummaryCardItem,
+} from "@/components/invoice-center/reports/ReportSummaryCards";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +30,7 @@ import {
 import { useRef } from 'react';
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
+import { Users, CreditCard, AlertTriangle, ShieldAlert, Banknote } from "lucide-react";
 
 export const CustomerAgingReportPage: React.FC = () => {
   const [filters, setFilters] = useState<CustomerAgingReportParams>({
@@ -85,11 +91,41 @@ export const CustomerAgingReportPage: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const summaryTotals = useMemo(() => {
+    let totalOutstanding = 0;
+    let currentTotal = 0;
+    let overdueTotal = 0;
+    let criticalTotal = 0;
+    data.forEach((row) => {
+      totalOutstanding += row.total_outstanding || 0;
+      currentTotal += (row.current || 0) + (row.days_1_30 || 0);
+      overdueTotal += (row.days_31_60 || 0) + (row.days_61_90 || 0) + (row.days_91_120 || 0);
+      criticalTotal += row.over_120 || 0;
+    });
+    return {
+      totalAccounts: pagination.total || data.length,
+      totalOutstanding,
+      currentTotal,
+      overdueTotal,
+      criticalTotal,
+    };
+  }, [data, pagination.total]);
+
+  const summaryCards: SummaryCardItem[] = [
+    { title: "Total Accounts", value: summaryTotals.totalAccounts, format: "number", icon: <Users className="h-4 w-4 text-blue-500" /> },
+    { title: "Current & < 30d", value: summaryTotals.currentTotal, format: "currency", icon: <CreditCard className="h-4 w-4 text-emerald-500" /> },
+    { title: "Overdue (31-120d)", value: summaryTotals.overdueTotal, format: "currency", icon: <AlertTriangle className="h-4 w-4 text-amber-500" /> },
+    { title: "Critical (> 120d)", value: summaryTotals.criticalTotal, format: "currency", icon: <ShieldAlert className="h-4 w-4 text-rose-500" /> },
+    { title: "Total Outstanding", value: summaryTotals.totalOutstanding, format: "currency", icon: <Banknote className="h-4 w-4 text-indigo-600" /> },
+  ];
 
   const fetchData = async (overrideFilters?: CustomerAgingReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
+      setErrorMessage(null);
 
       const activeFilters = overrideFilters || filters;
       const res = await invoiceCenterApi.getCustomerAgingReport(activeFilters);
@@ -106,9 +142,10 @@ export const CustomerAgingReportPage: React.FC = () => {
       if (err.response?.status === 403) {
         setHasPermission(false);
       } else {
-        toast.error(
-          err.response?.data?.message || "Failed to load report data"
-        );
+        const msg = err.response?.data?.message || err.response?.data?.errors || "Failed to load report data";
+        const cleanMsg = typeof msg === "string" ? msg : Array.isArray(msg) ? msg.join(", ") : "Failed to load report data";
+        setErrorMessage(cleanMsg);
+        toast.error(cleanMsg);
       }
     } finally {
       setIsLoading(false);
@@ -227,10 +264,14 @@ export const CustomerAgingReportPage: React.FC = () => {
       description="View outstanding balances bucketed by age to track overdue payments."
       actions={
         <ReportExportActions
-          data={data}
+          data={filteredData}
+          columns={columns}
           filename={`customer-aging-${new Date().toISOString().split("T")[0]}`}
-          disabled={isLoading || data.length === 0}
+          disabled={isLoading || filteredData.length === 0}
         />
+      }
+      summary={
+        <ReportSummaryCards items={summaryCards} isLoading={isLoading} />
       }
       filters={
         <ReportFilterBar
@@ -252,11 +293,17 @@ export const CustomerAgingReportPage: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Customers</SelectItem>
-                {customers.map((c) => (
-                  <SelectItem key={c.id} value={c.customer_code || c.company_name}>
-                    {c.customer_code} - {c.company_name}
-                  </SelectItem>
-                ))}
+                {customers.map((c) => {
+                  const customerName = c.customer_name || c.company_name;
+                  const label = customerName
+                    ? `${c.customer_code} - ${customerName}`
+                    : (c.customer_code || `Customer #${c.id}`);
+                  return (
+                    <SelectItem key={c.id} value={c.customer_code || String(c.id)}>
+                      {label}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
@@ -370,13 +417,25 @@ export const CustomerAgingReportPage: React.FC = () => {
         </ReportFilterBar>
       }
       table={
-        <ReportDataTable
-          columns={columns}
-          data={filteredData}
-          isLoading={isLoading}
-          pagination={pagination}
-          onPageChange={handlePageChange}
-        />
+        errorMessage ? (
+          <div className="p-6">
+            <ReportErrorState
+              title="Failed to Generate Customer Aging Report"
+              errorDetails={errorMessage}
+              onRetry={fetchData}
+              onResetFilters={handleResetFilters}
+            />
+          </div>
+        ) : (
+          <ReportDataTable
+            columns={columns}
+            data={filteredData}
+            isLoading={isLoading}
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            emptyMessage="No customer aging records match your filter criteria."
+          />
+        )
       }
     />
   );

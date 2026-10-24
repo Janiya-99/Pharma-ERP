@@ -56,24 +56,33 @@ export const SalesInvoiceLineTable: React.FC<Props> = ({ lines = [] }) => {
                   {index + 1}
                 </TableCell>
                 <TableCell>
-                  <div className="font-medium">
-                    {line.product_name || `Product ID: ${line.product_id}`}
+                  <div className="font-medium text-slate-900">
+                    {line.product_name || line.product?.product_name || (line.product_id ? `Product #${line.product_id}` : "Unspecified Product")}
                   </div>
-                  {line.product_code && (
+                  {(line.product_code || line.product?.product_code) && (
                     <div className="text-xs text-muted-foreground">
-                      {line.product_code}
+                      {line.product_code || line.product?.product_code}
                     </div>
                   )}
                 </TableCell>
                 <TableCell>
-                  <div className="font-medium">
-                    {line.batch_number || line.product_batch_id || "-"}
+                  <div className="font-medium text-slate-800">
+                    {line.batch_number || line.batch?.batch_number || (line.product_batch_id ? `Batch #${line.product_batch_id}` : "-")}
                   </div>
-                  {line.expiry_date && (
-                    <div className="text-xs text-muted-foreground">
-                      Exp: {new Date(line.expiry_date).toLocaleDateString()}
-                    </div>
-                  )}
+                  {(() => {
+                    const exp = line.expiry_date || line.batch?.expiry_date;
+                    if (exp && !exp.startsWith("0001-01-01")) {
+                      const d = new Date(exp);
+                      if (!isNaN(d.getTime())) {
+                        return (
+                          <div className="text-xs text-muted-foreground">
+                            Exp: {d.toLocaleDateString()}
+                          </div>
+                        );
+                      }
+                    }
+                    return null;
+                  })()}
                 </TableCell>
                 <TableCell className="text-right font-medium">
                   {formatQty(line.quantity)}

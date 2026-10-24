@@ -302,6 +302,8 @@ export interface SalesInvoiceLine {
   product_name?: string;
   batch_number?: string;
   expiry_date?: string;
+  product?: { id: number; product_code?: string; product_name?: string };
+  batch?: { id: number; batch_number?: string; expiry_date?: string };
 }
 
 export interface SalesInvoice {

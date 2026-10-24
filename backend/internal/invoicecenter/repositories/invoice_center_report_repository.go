@@ -193,32 +193,34 @@ func (r *invoiceCenterReportRepository) GetDashboardSummary(db *gorm.DB, company
 }
 
 func (r *invoiceCenterReportRepository) GetCustomerBalanceSummary(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, int64, dto.CustomerBalanceSummaryDTO, error) {
-	baseQuery := db.Table("customers").Where("company_id = ? AND deleted_at IS NULL", companyID)
-
-	// Customers are company-level in the current schema. Branch filtering applies
-	// to document reports, not to the customer master balance summary.
-	if filters.CustomerID != nil {
-		baseQuery = baseQuery.Where("id = ?", *filters.CustomerID)
-	}
-	if filters.CustomerCategoryID != nil {
-		baseQuery = baseQuery.Where("customer_category_id = ?", *filters.CustomerCategoryID)
-	}
-	if filters.CustomerType != nil && *filters.CustomerType != "" && *filters.CustomerType != "all" {
-		baseQuery = baseQuery.Where("customer_type = ?", *filters.CustomerType)
-	}
-	if filters.Status != nil && *filters.Status != "" && *filters.Status != "all" {
-		baseQuery = baseQuery.Where("status = ?", *filters.Status)
-	}
-	if filters.OverCreditLimit != nil && *filters.OverCreditLimit {
-		baseQuery = baseQuery.Where("current_balance > credit_limit AND credit_limit > 0")
-	}
-	if filters.Search != "" {
-		search := "%" + filters.Search + "%"
-		baseQuery = baseQuery.Where("(LOWER(customer_code) LIKE LOWER(?) OR LOWER(customer_name) LIKE LOWER(?) OR LOWER(primary_email) LIKE LOWER(?))", search, search, search)
+	applyFilters := func(q *gorm.DB) *gorm.DB {
+		q = q.Where("customers.company_id = ? AND customers.deleted_at IS NULL", companyID)
+		if filters.CustomerID != nil {
+			q = q.Where("customers.id = ?", *filters.CustomerID)
+		}
+		if filters.CustomerCategoryID != nil {
+			q = q.Where("customers.customer_category_id = ?", *filters.CustomerCategoryID)
+		}
+		if filters.CustomerType != nil && *filters.CustomerType != "" && *filters.CustomerType != "all" {
+			q = q.Where("customers.customer_type = ?", *filters.CustomerType)
+		}
+		if filters.Status != nil && *filters.Status != "" && *filters.Status != "all" {
+			q = q.Where("customers.status = ?", *filters.Status)
+		}
+		if filters.OverCreditLimit != nil && *filters.OverCreditLimit {
+			q = q.Where("COALESCE(customers.current_balance, 0) > COALESCE(customers.credit_limit, 0) AND COALESCE(customers.credit_limit, 0) > 0")
+		}
+		if filters.Search != "" {
+			search := "%" + filters.Search + "%"
+			q = q.Where("(LOWER(customers.customer_code) LIKE LOWER(?) OR LOWER(customers.customer_name) LIKE LOWER(?) OR LOWER(customers.primary_email) LIKE LOWER(?))", search, search, search)
+		}
+		return q
 	}
 
 	var total int64
-	baseQuery.Count(&total)
+	if err := applyFilters(db.Table("customers")).Count(&total).Error; err != nil {
+		return nil, 0, dto.CustomerBalanceSummaryDTO{}, err
+	}
 
 	type SummaryAgg struct {
 		TotalCreditLimit     float64
@@ -227,12 +229,14 @@ func (r *invoiceCenterReportRepository) GetCustomerBalanceSummary(db *gorm.DB, c
 		OverLimitCount       int64
 	}
 	var agg SummaryAgg
-	baseQuery.Select(`
-		COALESCE(SUM(credit_limit), 0) as total_credit_limit,
-		COALESCE(SUM(current_balance), 0) as total_current_balance,
-		COALESCE(SUM(CASE WHEN credit_limit > 0 THEN GREATEST(credit_limit - current_balance, 0) ELSE 0 END), 0) as total_available_credit,
-		COALESCE(SUM(CASE WHEN current_balance > credit_limit AND credit_limit > 0 THEN 1 ELSE 0 END), 0) as over_limit_count
-	`).Scan(&agg)
+	if err := applyFilters(db.Table("customers")).Select(`
+		COALESCE(SUM(customers.credit_limit), 0) as total_credit_limit,
+		COALESCE(SUM(customers.current_balance), 0) as total_current_balance,
+		COALESCE(SUM(CASE WHEN COALESCE(customers.credit_limit, 0) > 0 THEN GREATEST(COALESCE(customers.credit_limit, 0) - COALESCE(customers.current_balance, 0), 0) ELSE 0 END), 0) as total_available_credit,
+		COALESCE(SUM(CASE WHEN COALESCE(customers.current_balance, 0) > COALESCE(customers.credit_limit, 0) AND COALESCE(customers.credit_limit, 0) > 0 THEN 1 ELSE 0 END), 0) as over_limit_count
+	`).Scan(&agg).Error; err != nil {
+		return nil, 0, dto.CustomerBalanceSummaryDTO{}, err
+	}
 
 	summary := dto.CustomerBalanceSummaryDTO{
 		TotalCustomers:           total,
@@ -253,22 +257,28 @@ func (r *invoiceCenterReportRepository) GetCustomerBalanceSummary(db *gorm.DB, c
 	offset := (page - 1) * limit
 
 	var rows []dto.CustomerBalanceRowDTO
-	err := baseQuery.Limit(limit).Offset(offset).Order("customer_name ASC").Select(`
-		customer_code, 
-		customer_name, 
-		COALESCE((SELECT name FROM customer_categories WHERE id = customers.customer_category_id), '') as customer_category,
-		customer_type, 
-		primary_contact_number, 
-		primary_email, 
-		credit_limit, 
-		credit_days, 
-		current_balance,
-		CASE WHEN credit_limit > 0 THEN GREATEST(credit_limit - current_balance, 0) ELSE 0 END as available_credit,
-		CASE WHEN credit_limit = 0 THEN 'No Credit Limit' WHEN current_balance > credit_limit THEN 'Over Limit' ELSE 'Within Limit' END as credit_status,
-		COALESCE((SELECT account_code FROM chart_of_accounts WHERE id = customers.receivable_account_id), '') as receivable_account_code,
-		COALESCE((SELECT account_name FROM chart_of_accounts WHERE id = customers.receivable_account_id), '') as receivable_account_name,
-		status
-	`).Scan(&rows).Error
+	err := applyFilters(db.Table("customers")).
+		Joins("LEFT JOIN customer_categories cat ON cat.id = customers.customer_category_id AND cat.deleted_at IS NULL").
+		Joins("LEFT JOIN chart_of_accounts coa ON coa.id = customers.receivable_account_id AND coa.deleted_at IS NULL").
+		Limit(limit).
+		Offset(offset).
+		Order("customers.customer_name ASC").
+		Select(`
+			customers.customer_code, 
+			customers.customer_name, 
+			COALESCE(cat.category_name, '') as customer_category,
+			customers.customer_type, 
+			customers.primary_contact_number, 
+			customers.primary_email, 
+			customers.credit_limit, 
+			customers.credit_days, 
+			customers.current_balance,
+			CASE WHEN COALESCE(customers.credit_limit, 0) > 0 THEN GREATEST(COALESCE(customers.credit_limit, 0) - COALESCE(customers.current_balance, 0), 0) ELSE 0 END as available_credit,
+			CASE WHEN COALESCE(customers.credit_limit, 0) = 0 THEN 'No Credit Limit' WHEN COALESCE(customers.current_balance, 0) > COALESCE(customers.credit_limit, 0) THEN 'Over Limit' ELSE 'Within Limit' END as credit_status,
+			COALESCE(coa.account_code, '') as receivable_account_code,
+			COALESCE(coa.account_name, '') as receivable_account_name,
+			customers.status
+		`).Scan(&rows).Error
 
 	return rows, total, summary, err
 }
@@ -286,8 +296,14 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 		return nil, header, err
 	}
 
-	header.DateFrom = filters.DateFrom
-	header.DateTo = filters.DateTo
+	if filters.DateFrom != nil && !filters.DateFrom.IsZero() {
+		df := filters.DateFrom.Format("2006-01-02")
+		header.DateFrom = &df
+	}
+	if filters.DateTo != nil && !filters.DateTo.IsZero() {
+		dt := filters.DateTo.Format("2006-01-02")
+		header.DateTo = &dt
+	}
 
 	statusFilter := "posted_status = 'posted'"
 	statusFilterSI := "si.posted_status = 'posted'"
@@ -444,19 +460,19 @@ func (r *invoiceCenterReportRepository) GetCustomerAging(db *gorm.DB, companyID 
 			c.customer_name,
 			c.credit_limit,
 			c.current_balance,
-			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) <= 0 THEN si.balance_amount ELSE 0 END), 0) as 'current',
-			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 1 AND 30 THEN si.balance_amount ELSE 0 END), 0) as 'days_1_30',
-			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 31 AND 60 THEN si.balance_amount ELSE 0 END), 0) as 'days_31_60',
-			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 61 AND 90 THEN si.balance_amount ELSE 0 END), 0) as 'days_61_90',
-			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 91 AND 120 THEN si.balance_amount ELSE 0 END), 0) as 'days_91_120',
-			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) > 120 THEN si.balance_amount ELSE 0 END), 0) as 'over_120',
-			COALESCE(SUM(si.balance_amount), 0) as 'total_outstanding'
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) <= 0 THEN si.balance_amount ELSE 0 END), 0) as ` + "`current`" + `,
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 1 AND 30 THEN si.balance_amount ELSE 0 END), 0) as ` + "`days_1_30`" + `,
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 31 AND 60 THEN si.balance_amount ELSE 0 END), 0) as ` + "`days_31_60`" + `,
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 61 AND 90 THEN si.balance_amount ELSE 0 END), 0) as ` + "`days_61_90`" + `,
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 91 AND 120 THEN si.balance_amount ELSE 0 END), 0) as ` + "`days_91_120`" + `,
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) > 120 THEN si.balance_amount ELSE 0 END), 0) as ` + "`over_120`" + `,
+			COALESCE(SUM(si.balance_amount), 0) as ` + "`total_outstanding`" + `
 		FROM customers c
 		LEFT JOIN sales_invoices si ON si.customer_id = c.id 
 			AND si.company_id = c.company_id 
 			AND si.deleted_at IS NULL 
 			AND si.payment_status != 'paid' 
-			AND si.approval_status != 'cancelled'
+			AND si.approval_status NOT IN ('cancelled', 'rejected')
 			AND si.balance_amount > 0` + branchJoin + `
 		WHERE ` + whereClause + `
 		GROUP BY c.id, c.customer_code, c.customer_name, c.credit_limit, c.current_balance
@@ -481,7 +497,148 @@ func (r *invoiceCenterReportRepository) GetSalesOrderRegister(db *gorm.DB, compa
 }
 
 func (r *invoiceCenterReportRepository) GetSalesInvoiceRegister(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.SalesInvoiceRegisterRowDTO, int64, dto.SalesInvoiceRegisterSummaryDTO, error) {
-	return nil, 0, dto.SalesInvoiceRegisterSummaryDTO{}, nil
+	whereClause := "si.company_id = ? AND si.deleted_at IS NULL"
+	args := []interface{}{companyID}
+
+	if filters.BranchID != nil && *filters.BranchID > 0 {
+		whereClause += " AND si.branch_id = ?"
+		args = append(args, *filters.BranchID)
+	}
+
+	if filters.CustomerID != nil && *filters.CustomerID > 0 {
+		whereClause += " AND si.customer_id = ?"
+		args = append(args, *filters.CustomerID)
+	}
+
+	if filters.SalesOrderID != nil && *filters.SalesOrderID > 0 {
+		whereClause += " AND si.sales_order_id = ?"
+		args = append(args, *filters.SalesOrderID)
+	}
+
+	if filters.ApprovalStatus != nil && *filters.ApprovalStatus != "" && *filters.ApprovalStatus != "all" {
+		whereClause += " AND si.approval_status = ?"
+		args = append(args, *filters.ApprovalStatus)
+	}
+
+	if filters.PostedStatus != nil && *filters.PostedStatus != "" && *filters.PostedStatus != "all" {
+		whereClause += " AND si.posted_status = ?"
+		args = append(args, *filters.PostedStatus)
+	}
+
+	if filters.PaymentStatus != nil && *filters.PaymentStatus != "" && *filters.PaymentStatus != "all" {
+		whereClause += " AND si.payment_status = ?"
+		args = append(args, *filters.PaymentStatus)
+	}
+
+	if filters.FinancePostStatus != nil && *filters.FinancePostStatus != "" && *filters.FinancePostStatus != "all" {
+		whereClause += " AND si.finance_post_status = ?"
+		args = append(args, *filters.FinancePostStatus)
+	}
+
+	// Inclusive date range boundaries
+	if filters.DateFrom != nil && !filters.DateFrom.IsZero() {
+		whereClause += " AND DATE(si.invoice_date) >= ?"
+		args = append(args, filters.DateFrom.Format("2006-01-02"))
+	}
+
+	if filters.DateTo != nil && !filters.DateTo.IsZero() {
+		whereClause += " AND DATE(si.invoice_date) <= ?"
+		args = append(args, filters.DateTo.Format("2006-01-02"))
+	}
+
+	if filters.DueDateFrom != nil && !filters.DueDateFrom.IsZero() {
+		whereClause += " AND DATE(si.due_date) >= ?"
+		args = append(args, filters.DueDateFrom.Format("2006-01-02"))
+	}
+
+	if filters.DueDateTo != nil && !filters.DueDateTo.IsZero() {
+		whereClause += " AND DATE(si.due_date) <= ?"
+		args = append(args, filters.DueDateTo.Format("2006-01-02"))
+	}
+
+	if filters.Search != "" {
+		search := "%" + filters.Search + "%"
+		whereClause += " AND (si.invoice_number LIKE ? OR c.customer_name LIKE ? OR c.customer_code LIKE ? OR so.sales_order_number LIKE ? OR b.branch_name LIKE ?)"
+		args = append(args, search, search, search, search, search)
+	}
+
+	// 1. Calculate Summary across all matching records
+	var summary dto.SalesInvoiceRegisterSummaryDTO
+	summaryQuery := `
+		SELECT 
+			COUNT(si.id) as invoice_count,
+			COALESCE(SUM(si.subtotal_amount), 0) as subtotal_amount,
+			COALESCE(SUM(si.discount_amount), 0) as discount_amount,
+			COALESCE(SUM(si.tax_amount), 0) as tax_amount,
+			COALESCE(SUM(si.total_amount), 0) as total_amount,
+			COALESCE(SUM(si.paid_amount), 0) as paid_amount,
+			COALESCE(SUM(si.balance_amount), 0) as balance_amount,
+			COALESCE(SUM(CASE WHEN si.posted_status = 'posted' THEN 1 ELSE 0 END), 0) as posted_count,
+			COALESCE(SUM(CASE WHEN si.finance_post_status = 'posted' THEN 1 ELSE 0 END), 0) as finance_posted_count,
+			COALESCE(SUM(CASE WHEN si.finance_post_status != 'posted' OR si.finance_post_status IS NULL THEN 1 ELSE 0 END), 0) as finance_unposted_count
+		FROM sales_invoices si
+		LEFT JOIN customers c ON c.id = si.customer_id
+		LEFT JOIN sales_orders so ON so.id = si.sales_order_id
+		LEFT JOIN branches b ON b.id = si.branch_id
+		LEFT JOIN warehouses w ON w.id = si.warehouse_id
+		WHERE ` + whereClause
+
+	if err := db.Raw(summaryQuery, args...).Scan(&summary).Error; err != nil {
+		return nil, 0, summary, err
+	}
+
+	total := summary.InvoiceCount
+
+	page := filters.Page
+	if page < 1 {
+		page = 1
+	}
+	limit := filters.Limit
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+
+	// 2. Fetch paginated rows
+	dataQuery := `
+		SELECT 
+			si.invoice_number,
+			si.invoice_date,
+			si.due_date,
+			COALESCE(b.branch_name, '') as branch,
+			COALESCE(c.customer_code, '') as customer_code,
+			COALESCE(c.customer_name, '') as customer_name,
+			COALESCE(so.sales_order_number, '') as sales_order_number,
+			COALESCE(w.warehouse_name, '') as warehouse,
+			si.subtotal_amount,
+			si.discount_amount,
+			si.tax_amount,
+			si.total_amount,
+			si.paid_amount,
+			si.balance_amount,
+			si.approval_status,
+			si.posted_status,
+			si.payment_status,
+			si.finance_post_status,
+			COALESCE(u.name, '') as created_by,
+			si.created_at
+		FROM sales_invoices si
+		LEFT JOIN customers c ON c.id = si.customer_id
+		LEFT JOIN sales_orders so ON so.id = si.sales_order_id
+		LEFT JOIN branches b ON b.id = si.branch_id
+		LEFT JOIN warehouses w ON w.id = si.warehouse_id
+		LEFT JOIN users u ON u.id = si.created_by
+		WHERE ` + whereClause + `
+		ORDER BY si.invoice_date DESC, si.id DESC
+		LIMIT ? OFFSET ?
+	`
+	paginationArgs := append(args, limit, offset)
+	var rows []dto.SalesInvoiceRegisterRowDTO
+	if err := db.Raw(dataQuery, paginationArgs...).Scan(&rows).Error; err != nil {
+		return nil, 0, summary, err
+	}
+
+	return rows, total, summary, nil
 }
 
 func (r *invoiceCenterReportRepository) GetCreditNoteRegister(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CreditNoteRegisterRowDTO, int64, dto.CreditNoteRegisterSummaryDTO, error) {

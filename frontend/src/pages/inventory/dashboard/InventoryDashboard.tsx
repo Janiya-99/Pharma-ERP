@@ -21,6 +21,10 @@ import {
   TrendingUp,
   Building2,
   CheckCircle2,
+  Clock,
+  Filter,
+  AlertCircle,
+  ExternalLink,
 } from "lucide-react";
 import {
   PieChart,
@@ -44,6 +48,7 @@ import { DashboardAiAnalysisSection } from "../../../components/common/Dashboard
 ───────────────────────────────────────────────────────────── */
 
 interface TileMetric {
+  id: string;
   title: string;
   value: string | number;
   badge?: string;
@@ -54,7 +59,8 @@ interface TileMetric {
   iconColor: string;
   sparklineType: "bar" | "line";
   sparklineColor: string;
-  path?: string;
+  path: string;
+  filterTab: string;
 }
 
 interface StockOverviewItem {
@@ -113,8 +119,32 @@ const defaultExpiryRisk: ExpiryRiskRow[] = [
 ];
 
 const defaultTableData: TableRow[] = [
+  // Out of Stock (Requires Replenishment)
   {
     id: 1,
+    product: "Paracetamol 500mg IV Infusion",
+    batch: "BAT-OUT24-01",
+    category: "Pain Relief",
+    warehouse: "Colombo Central Warehouse",
+    currentStock: 0,
+    reorderLevel: 50,
+    status: "Out of Stock",
+    lastMovement: "Oct 15, 2026",
+  },
+  {
+    id: 2,
+    product: "Insulin Glargine 100IU/ml Cartridges",
+    batch: "BAT-OUT24-02",
+    category: "Endocrinology",
+    warehouse: "Cold Storage Unit 1",
+    currentStock: 0,
+    reorderLevel: 25,
+    status: "Out of Stock",
+    lastMovement: "Oct 14, 2026",
+  },
+  // Low Stock Items (Below Reorder Level)
+  {
+    id: 3,
     product: "Omeprazole 40mg IV Injection",
     batch: "BAT-EXP23-14",
     category: "Gastrointestinal",
@@ -125,7 +155,7 @@ const defaultTableData: TableRow[] = [
     lastMovement: "Oct 14, 2026",
   },
   {
-    id: 2,
+    id: 4,
     product: "Azithromycin 500mg Tablets",
     batch: "BAT-EXP24-20",
     category: "Antibiotics",
@@ -136,7 +166,7 @@ const defaultTableData: TableRow[] = [
     lastMovement: "Oct 13, 2026",
   },
   {
-    id: 3,
+    id: 5,
     product: "Losartan Potassium 50mg Tablets",
     batch: "BAT-EXP24-22",
     category: "Cardiovascular",
@@ -147,7 +177,7 @@ const defaultTableData: TableRow[] = [
     lastMovement: "Oct 12, 2026",
   },
   {
-    id: 4,
+    id: 6,
     product: "Diclofenac Sodium 50mg Tablets",
     batch: "BAT-EXP24-36",
     category: "Pain Relief",
@@ -157,16 +187,73 @@ const defaultTableData: TableRow[] = [
     status: "Low Stock",
     lastMovement: "Oct 14, 2026",
   },
+  // Expiring Soon (Within 90 Days)
   {
-    id: 5,
-    product: "Amlodipine Besylate 10mg Tablets",
-    batch: "BAT-EXP23-42",
-    category: "Cardiovascular",
+    id: 7,
+    product: "Amoxicillin 500mg Capsules",
+    batch: "BAT-EXP23-14",
+    category: "Antibiotics",
     warehouse: "Colombo Central Warehouse",
-    currentStock: 18,
-    reorderLevel: 50,
-    status: "Low Stock",
+    currentStock: 120,
+    reorderLevel: 40,
+    status: "Expiring Soon",
+    lastMovement: "Expires in 9 days (25 Oct 2026)",
+  },
+  {
+    id: 8,
+    product: "Omeprazole 40mg Powder for Injection",
+    batch: "BAT-EXP24-08",
+    category: "Gastrointestinal",
+    warehouse: "Colombo Central Warehouse",
+    currentStock: 85,
+    reorderLevel: 30,
+    status: "Expiring Soon",
+    lastMovement: "Expires in 16 days (02 Nov 2026)",
+  },
+  // In Stock
+  {
+    id: 9,
+    product: "Metformin Hydrochloride 500mg Tablets",
+    batch: "BAT-MET24-05",
+    category: "Endocrinology",
+    warehouse: "Colombo Central Warehouse",
+    currentStock: 450,
+    reorderLevel: 100,
+    status: "In Stock",
     lastMovement: "Oct 11, 2026",
+  },
+  {
+    id: 10,
+    product: "Amoxicillin + Clavulanic Acid 625mg",
+    batch: "BAT-AUG24-11",
+    category: "Antibiotics",
+    warehouse: "Colombo Central Warehouse",
+    currentStock: 320,
+    reorderLevel: 80,
+    status: "In Stock",
+    lastMovement: "Oct 10, 2026",
+  },
+  {
+    id: 11,
+    product: "Cetirizine 10mg Tablets",
+    batch: "BAT-CET24-18",
+    category: "Antihistamines",
+    warehouse: "Colombo Central Warehouse",
+    currentStock: 600,
+    reorderLevel: 150,
+    status: "In Stock",
+    lastMovement: "Oct 09, 2026",
+  },
+  {
+    id: 12,
+    product: "Pantoprazole 40mg Gastro-Resistant",
+    batch: "BAT-PAN24-03",
+    category: "Gastrointestinal",
+    warehouse: "Colombo Central Warehouse",
+    currentStock: 280,
+    reorderLevel: 75,
+    status: "In Stock",
+    lastMovement: "Oct 08, 2026",
   },
 ];
 
@@ -211,21 +298,21 @@ export default function InventoryDashboard() {
   const [selectedIds, setSelectedIds] = useState<Record<string | number, boolean>>({});
 
   // Dynamic Data from Backend API
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [totalStockValue, setTotalStockValue] = useState(0);
-  const [lowStockCount, setLowStockCount] = useState(0);
-  const [outOfStockCount, setOutOfStockCount] = useState(0);
-  const [expiringSoonCount, setExpiringSoonCount] = useState(0);
-  const [activeBatchesCount, setActiveBatchesCount] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(65);
+  const [totalStockValue, setTotalStockValue] = useState(34934760);
+  const [lowStockCount, setLowStockCount] = useState(4);
+  const [outOfStockCount, setOutOfStockCount] = useState(2);
+  const [expiringSoonCount, setExpiringSoonCount] = useState(60);
+  const [activeBatchesCount, setActiveBatchesCount] = useState(275);
 
   const [categoryData, setCategoryData] = useState<CategoryBarItem[]>(defaultCategoryData);
   const [expiryList, setExpiryList] = useState<ExpiryRiskRow[]>(defaultExpiryRisk);
   const [tableData, setTableData] = useState<TableRow[]>(defaultTableData);
   const [stockStatusOverview, setStockStatusOverview] = useState<StockOverviewItem[]>([
-    { name: "In Stock", count: 0, pct: 0, color: "#0EA5E9" },
-    { name: "Low Stock", count: 0, pct: 0, color: "#F59E0B" },
-    { name: "Out of Stock", count: 0, pct: 0, color: "#EF4444" },
-    { name: "Expiring Soon", count: 0, pct: 0, color: "#F97316" },
+    { name: "In Stock", count: 59, pct: 90.7, color: "#0EA5E9" },
+    { name: "Low Stock", count: 4, pct: 6.2, color: "#F59E0B" },
+    { name: "Out of Stock", count: 2, pct: 3.1, color: "#EF4444" },
+    { name: "Expiring Soon", count: 60, pct: 15.0, color: "#F97316" },
     { name: "Blocked / Hold", count: 0, pct: 0, color: "#8B5CF6" },
     { name: "Inactive", count: 0, pct: 0, color: "#94A3B8" },
   ]);
@@ -320,9 +407,10 @@ export default function InventoryDashboard() {
     fetchData();
   }, []);
 
-  // 6 KPI Tile Cards definition
+  // 6 KPI Tile Cards definition - accurate paths & direct filter connections
   const tiles: TileMetric[] = [
     {
+      id: "total-products",
       title: "Total Products",
       value: totalProducts.toLocaleString(),
       badge: "+3.2%",
@@ -334,8 +422,10 @@ export default function InventoryDashboard() {
       sparklineType: "bar",
       sparklineColor: "#3B82F6",
       path: "/inventory/products",
+      filterTab: "all",
     },
     {
+      id: "total-stock-value",
       title: "Total Stock Value",
       value: `Rs. ${totalStockValue.toLocaleString()}`,
       subtext: "Current inventory value",
@@ -345,8 +435,10 @@ export default function InventoryDashboard() {
       sparklineType: "line",
       sparklineColor: "#10B981",
       path: "/inventory/reports/stock-balance",
+      filterTab: "all",
     },
     {
+      id: "low-stock",
       title: "Low Stock Items",
       value: lowStockCount,
       badge: "+12%",
@@ -357,9 +449,11 @@ export default function InventoryDashboard() {
       iconColor: "text-amber-500",
       sparklineType: "bar",
       sparklineColor: "#F59E0B",
-      path: "/inventory/reports/stock-balance",
+      path: "/inventory/reports/stock-balance?filter=low_stock",
+      filterTab: "low-stock",
     },
     {
+      id: "out-of-stock",
       title: "Out of Stock Items",
       value: outOfStockCount,
       badge: "+4%",
@@ -370,9 +464,11 @@ export default function InventoryDashboard() {
       iconColor: "text-rose-500",
       sparklineType: "bar",
       sparklineColor: "#EF4444",
-      path: "/inventory/reports/stock-balance",
+      path: "/inventory/reports/stock-balance?filter=out_of_stock",
+      filterTab: "out-of-stock",
     },
     {
+      id: "expiring",
       title: "Expiring Soon",
       value: expiringSoonCount,
       badge: "+25%",
@@ -383,9 +479,11 @@ export default function InventoryDashboard() {
       iconColor: "text-orange-500",
       sparklineType: "bar",
       sparklineColor: "#F97316",
-      path: "/inventory/reports/expiry",
+      path: "/inventory/reports/expiry-report",
+      filterTab: "expiring",
     },
     {
+      id: "active-batches",
       title: "Active Batches",
       value: activeBatchesCount,
       badge: "+8%",
@@ -396,32 +494,66 @@ export default function InventoryDashboard() {
       iconColor: "text-purple-600",
       sparklineType: "bar",
       sparklineColor: "#8B5CF6",
-      path: "/inventory/batches",
+      path: "/inventory/product-batches",
+      filterTab: "all",
     },
   ];
+
+  // Tile click handler: sets active tab and smoothly scrolls down to the table
+  const handleTileClick = (tile: TileMetric) => {
+    if (tile.filterTab) {
+      setActiveTab(tile.filterTab);
+      const tableEl = document.getElementById("inventory-stock-table");
+      if (tableEl) {
+        tableEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
 
   // Donut chart breakdown
   const donutData: StockOverviewItem[] = stockStatusOverview;
 
-  // Table filtering
+  // Table filtering across all tabs
   const filteredRows = useMemo(() => {
     let rows = tableData;
     if (activeTab === "low-stock") {
-      rows = rows.filter((r) => r.status === "Low Stock" || r.currentStock <= r.reorderLevel);
+      rows = rows.filter((r) => r.status === "Low Stock" || (r.currentStock > 0 && r.currentStock <= r.reorderLevel));
     } else if (activeTab === "out-of-stock") {
       rows = rows.filter((r) => r.status === "Out of Stock" || r.currentStock === 0);
+    } else if (activeTab === "expiring") {
+      const expiringInTable = rows.filter((r) => r.status === "Expiring Soon");
+      if (expiringInTable.length > 0) {
+        rows = expiringInTable;
+      } else if (expiryList.length > 0) {
+        rows = expiryList.map((exp, idx) => ({
+          id: `exp-${idx}`,
+          product: exp.product,
+          batch: exp.batch,
+          category: "Pharma",
+          warehouse: "Colombo Central Warehouse",
+          currentStock: exp.qty,
+          reorderLevel: 20,
+          status: "Expiring Soon",
+          lastMovement: `${exp.daysLeft} days left (${exp.expiryDate})`,
+        }));
+      }
+    } else if (activeTab === "in-stock") {
+      rows = rows.filter((r) => r.status === "In Stock" || r.currentStock > r.reorderLevel);
     }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       rows = rows.filter(
         (r) =>
           r.product.toLowerCase().includes(q) ||
           r.batch.toLowerCase().includes(q) ||
-          r.warehouse.toLowerCase().includes(q)
+          r.category.toLowerCase().includes(q) ||
+          r.warehouse.toLowerCase().includes(q) ||
+          r.status.toLowerCase().includes(q)
       );
     }
     return rows;
-  }, [tableData, activeTab, searchQuery]);
+  }, [tableData, activeTab, searchQuery, expiryList]);
 
   const toggleSelect = (id: string | number) => {
     setSelectedIds((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -441,9 +573,24 @@ export default function InventoryDashboard() {
     }
   };
 
+  // Row styling helper for colors and badges
+  const getRowStyle = (status: string) => {
+    switch (status) {
+      case "Out of Stock":
+        return "bg-rose-50/40 hover:bg-rose-50/70 border-l-4 border-l-rose-500 transition-colors";
+      case "Low Stock":
+        return "bg-amber-50/35 hover:bg-amber-50/65 border-l-4 border-l-amber-500 transition-colors";
+      case "Expiring Soon":
+        return "bg-orange-50/35 hover:bg-orange-50/65 border-l-4 border-l-orange-500 transition-colors";
+      case "In Stock":
+        return "hover:bg-slate-50/70 border-l-4 border-l-transparent transition-colors";
+      default:
+        return "hover:bg-slate-50/70 border-l-4 border-l-transparent transition-colors";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-16 pt-3 px-4 sm:px-6 lg:px-8 font-sans selection:bg-indigo-500 selection:text-white">
-      {/* Breadcrumb Header */}
       {/* ── TOP PAGE HEADER ── */}
       <DashboardHeroCard
         title="Inventory Dashboard"
@@ -463,28 +610,56 @@ export default function InventoryDashboard() {
         }
       />
 
-      {/* Row 1: 6 Tile Cards */}
+      {/* Row 1: 6 Interactive KPI Tile Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {tiles.map((tile, i) => {
           const Icon = tile.icon;
+          const isFilterActive =
+            activeTab === tile.filterTab &&
+            (tile.filterTab !== "all" || tile.id === "total-products");
+
           return (
             <div
-              key={i}
-              onClick={() => tile.path && navigate(tile.path)}
-              className="group relative flex flex-col justify-between rounded-3xl border border-slate-100 bg-white p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+              key={tile.id || i}
+              onClick={() => handleTileClick(tile)}
+              className={`group relative flex flex-col justify-between rounded-3xl border p-4 sm:p-5 shadow-xs transition-all duration-300 cursor-pointer ${
+                isFilterActive
+                  ? "border-indigo-500 bg-indigo-50/25 shadow-md ring-2 ring-indigo-500/20 -translate-y-0.5"
+                  : "border-slate-100 bg-white hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5"
+              }`}
             >
+              {isFilterActive && (
+                <span className="absolute -top-2.5 right-4 rounded-full bg-indigo-600 px-2 py-0.5 text-[9.5px] font-bold text-white shadow-xs">
+                  Active Filter
+                </span>
+              )}
+
               <div>
-                {/* Top: Icon + Title */}
+                {/* Top: Icon + Title + Direct Link Button */}
                 <div className="flex items-center justify-between gap-1 mb-3">
                   <div className="flex items-center gap-2 truncate">
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tile.iconBg} ${tile.iconColor} group-hover:scale-105 transition-transform`}>
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tile.iconBg} ${tile.iconColor} group-hover:scale-105 transition-transform`}
+                    >
                       <Icon className="h-4 w-4 stroke-[2.2]" />
                     </div>
                     <span className="text-xs font-semibold text-slate-500 truncate group-hover:text-slate-900 transition-colors">
                       {tile.title}
                     </span>
                   </div>
-                  <ChevronRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-indigo-600 transition-colors shrink-0" />
+                  {tile.path && (
+                    <button
+                      type="button"
+                      title={`Open ${tile.title} page`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(tile.path);
+                      }}
+                      className="p-1 rounded-md text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all shrink-0 cursor-pointer"
+                    >
+                      <ChevronRight className="h-3.5 w-3.5 stroke-[2.5]" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Value + Sparkline Row */}
@@ -501,11 +676,7 @@ export default function InventoryDashboard() {
                             : "bg-rose-50 text-rose-600"
                         }`}
                       >
-                        {tile.badgeTone === "green" ? (
-                          <ArrowUp className="h-2.5 w-2.5 stroke-[2.5]" />
-                        ) : (
-                          <ArrowUp className="h-2.5 w-2.5 stroke-[2.5]" />
-                        )}
+                        <ArrowUp className="h-2.5 w-2.5 stroke-[2.5]" />
                         {tile.badge}
                       </span>
                     )}
@@ -522,9 +693,22 @@ export default function InventoryDashboard() {
                 </div>
               </div>
 
-              {/* Bottom Subtext */}
-              <div className="mt-2 text-[11.5px] font-medium text-slate-400">
-                {tile.subtext}
+              {/* Bottom Subtext & Open Page CTA */}
+              <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-slate-400">
+                <span className="truncate">{tile.subtext}</span>
+                {tile.path && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(tile.path);
+                    }}
+                    className="text-indigo-600 hover:text-indigo-800 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 shrink-0 ml-1 cursor-pointer"
+                  >
+                    <span>View</span>
+                    <span>&rarr;</span>
+                  </button>
+                )}
               </div>
             </div>
           );
@@ -549,7 +733,7 @@ export default function InventoryDashboard() {
       {/* Row 2: Middle Visual Intelligence (Donut + Category Bar Chart + Expiry Risk Table) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
         {/* Card 1: Stock Status Overview (Donut Chart) */}
-        <div 
+        <div
           onClick={() => navigate("/inventory/products")}
           className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
         >
@@ -612,7 +796,7 @@ export default function InventoryDashboard() {
         </div>
 
         {/* Card 2: Stock Value by Category (Vertical Bar Chart) */}
-        <div 
+        <div
           onClick={() => navigate("/inventory/reports/stock-balance")}
           className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between hover:border-purple-300 hover:shadow-md transition-all cursor-pointer group"
         >
@@ -671,15 +855,15 @@ export default function InventoryDashboard() {
         {/* Card 3: Expiry Risk Items Table */}
         <div className="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <h2 
-              onClick={() => navigate("/inventory/product-batches")}
+            <h2
+              onClick={() => navigate("/inventory/reports/expiry-report")}
               className="text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors cursor-pointer flex items-center gap-1.5 group"
             >
               <span>Expiry Risk Items</span>
               <span className="text-xs text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
             </h2>
             <button
-              onClick={() => navigate("/inventory/product-batches")}
+              onClick={() => navigate("/inventory/reports/expiry-report")}
               className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors cursor-pointer"
             >
               <span>View All</span>
@@ -708,9 +892,9 @@ export default function InventoryDashboard() {
                       : "bg-amber-50 text-amber-600 border border-amber-200/50";
 
                   return (
-                    <tr 
-                      key={i} 
-                      onClick={() => navigate("/inventory/product-batches")}
+                    <tr
+                      key={i}
+                      onClick={() => navigate("/inventory/reports/expiry-report")}
                       className="hover:bg-indigo-50/40 transition-colors cursor-pointer"
                     >
                       <td className="py-2.5 font-bold text-slate-800 hover:text-indigo-600 truncate max-w-[130px]" title={row.product}>
@@ -733,16 +917,18 @@ export default function InventoryDashboard() {
         </div>
       </div>
 
-      {/* Row 3: Tabbed Data Table with Search and Filters */}
-      <div className="rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs">
+      {/* Row 3: Tabbed Data Table with Search and Status Filters */}
+      <div id="inventory-stock-table" className="rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs scroll-mt-6">
         {/* Navigation Tabs Bar */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-          {/* Pills */}
+          {/* Pills with dynamic item count badges */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
             {[
-              { id: "low-stock", label: "Low Stock Items" },
-              { id: "expiring", label: "Expiring Batches" },
-              { id: "out-of-stock", label: "Out of Stock" },
+              { id: "all", label: "All Items", count: totalProducts || tableData.length },
+              { id: "low-stock", label: "Low Stock Items", count: lowStockCount || tableData.filter((r) => r.status === "Low Stock").length },
+              { id: "out-of-stock", label: "Out of Stock", count: outOfStockCount || tableData.filter((r) => r.status === "Out of Stock").length },
+              { id: "expiring", label: "Expiring Batches", count: expiringSoonCount || expiryList.length },
+              { id: "in-stock", label: "In Stock", count: tableData.filter((r) => r.status === "In Stock").length },
               { id: "movements", label: "Recent Movements" },
               { id: "grns", label: "Recent GRNs" },
               { id: "adjustments", label: "Stock Adjustments" },
@@ -752,13 +938,24 @@ export default function InventoryDashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`rounded-xl px-4 py-2 text-xs font-bold transition-all shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shrink-0 cursor-pointer ${
                     active
-                      ? "bg-blue-600 text-white shadow-xs"
+                      ? "bg-indigo-600 text-white shadow-xs"
                       : "bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
-                  {tab.label}
+                  <span>{tab.label}</span>
+                  {tab.count !== undefined && (
+                    <span
+                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                        active
+                          ? "bg-white/20 text-white"
+                          : "bg-slate-200/80 text-slate-600"
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -770,7 +967,7 @@ export default function InventoryDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search products, batch, or warehouse..."
+                placeholder="Search products, batch, or status..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-xl border border-slate-200/80 bg-white pl-9 pr-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-2xs"
@@ -779,33 +976,35 @@ export default function InventoryDashboard() {
 
             <button
               type="button"
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
+              onClick={() => setActiveTab(activeTab === "all" ? "low-stock" : "all")}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
             >
               <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400" />
-              <span>Filters</span>
+              <span>{activeTab === "all" ? "Filter: All" : "Reset Filter"}</span>
             </button>
 
             <button
               type="button"
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
+              onClick={() => navigate("/inventory/reports/stock-balance")}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
             >
               <Download className="h-3.5 w-3.5 text-slate-400" />
-              <span>Export</span>
+              <span>Full Report</span>
             </button>
           </div>
         </div>
 
-        {/* Data Table */}
+        {/* Data Table with Colored Statuses, Rows, Names, and Counts */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <th className="pb-3 w-8">
+                <th className="pb-3 w-8 pl-3">
                   <input
                     type="checkbox"
                     checked={isAllSelected}
                     onChange={toggleSelectAll}
-                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                   />
                 </th>
                 <th className="pb-3 font-bold">PRODUCT</th>
@@ -816,49 +1015,163 @@ export default function InventoryDashboard() {
                 <th className="pb-3 font-bold text-center">REORDER LEVEL</th>
                 <th className="pb-3 font-bold text-center">STATUS</th>
                 <th className="pb-3 font-bold">LAST MOVEMENT</th>
-                <th className="pb-3 font-bold text-right pr-2">ACTIONS</th>
+                <th className="pb-3 font-bold text-right pr-3">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
               {filteredRows.map((row) => {
                 const isSelected = !!selectedIds[row.id];
+                const rowStyle = getRowStyle(row.status);
+
                 return (
                   <tr
                     key={row.id}
-                    className={`hover:bg-slate-50/70 transition-colors ${isSelected ? "bg-indigo-50/30" : ""}`}
+                    className={`${rowStyle} ${isSelected ? "bg-indigo-50/40" : ""}`}
                   >
-                    <td className="py-3.5">
+                    <td className="py-3.5 pl-3">
                       <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleSelect(row.id)}
-                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                       />
                     </td>
-                    <td className="py-3.5 font-bold text-slate-900">{row.product}</td>
+
+                    {/* Product Name Column with Color Highlight & Sub-badge */}
+                    <td className="py-3.5 font-bold">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-1.5">
+                          {row.status === "Out of Stock" && (
+                            <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0 animate-pulse" />
+                          )}
+                          {row.status === "Low Stock" && (
+                            <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
+                          )}
+                          {row.status === "Expiring Soon" && (
+                            <span className="h-2 w-2 rounded-full bg-orange-500 shrink-0" />
+                          )}
+                          {row.status === "In Stock" && (
+                            <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                          )}
+                          <span
+                            className={
+                              row.status === "Out of Stock"
+                                ? "text-rose-950 font-bold"
+                                : row.status === "Low Stock"
+                                ? "text-amber-950 font-bold"
+                                : row.status === "Expiring Soon"
+                                ? "text-orange-950 font-bold"
+                                : "text-slate-900 font-bold"
+                            }
+                          >
+                            {row.product}
+                          </span>
+                        </div>
+
+                        {/* Subtle Contextual Sub-label */}
+                        <div className="flex items-center gap-1.5 pl-3.5 text-[10.5px]">
+                          {row.status === "Out of Stock" && (
+                            <span className="inline-block font-bold text-rose-600 bg-rose-100/70 px-1.5 py-0.2 rounded text-[10px]">
+                              Replenishment Needed
+                            </span>
+                          )}
+                          {row.status === "Low Stock" && (
+                            <span className="inline-block font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded text-[10px]">
+                              Below Reorder Level ({row.currentStock} / {row.reorderLevel})
+                            </span>
+                          )}
+                          {row.status === "Expiring Soon" && (
+                            <span className="inline-block font-bold text-orange-700 bg-orange-100/70 px-1.5 py-0.2 rounded text-[10px]">
+                              Near Expiry Risk
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+
                     <td className="py-3.5 font-mono text-[11px] text-slate-500">{row.batch}</td>
                     <td className="py-3.5 text-slate-600">{row.category}</td>
                     <td className="py-3.5 text-slate-500">{row.warehouse}</td>
-                    <td className="py-3.5 text-center font-bold text-slate-800">{row.currentStock}</td>
-                    <td className="py-3.5 text-center text-slate-500">{row.reorderLevel}</td>
+
+                    {/* Current Stock (Count) Column - Distinct Colors & Badges */}
                     <td className="py-3.5 text-center">
-                      <span className="inline-block rounded-full bg-amber-50 border border-amber-200/60 px-2.5 py-0.5 text-[10.5px] font-bold text-amber-600">
-                        {row.status}
-                      </span>
+                      {row.status === "Out of Stock" || row.currentStock === 0 ? (
+                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black bg-rose-100 text-rose-700 border border-rose-200/80 shadow-2xs">
+                          <CircleSlash className="h-3 w-3 stroke-[2.5]" />
+                          <span>0</span>
+                        </span>
+                      ) : row.status === "Low Stock" || row.currentStock <= row.reorderLevel ? (
+                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200/80 shadow-2xs">
+                          <AlertTriangle className="h-3 w-3 stroke-[2.5]" />
+                          <span>{row.currentStock}</span>
+                        </span>
+                      ) : row.status === "Expiring Soon" ? (
+                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200/80 shadow-2xs">
+                          <Clock className="h-3 w-3 stroke-[2.5]" />
+                          <span>{row.currentStock}</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                          <CheckCircle2 className="h-3 w-3 stroke-[2.5]" />
+                          <span>{row.currentStock}</span>
+                        </span>
+                      )}
                     </td>
+
+                    <td className="py-3.5 text-center font-mono font-medium text-slate-500">
+                      {row.reorderLevel}
+                    </td>
+
+                    {/* Status Column - Rich Badges with matching Icons */}
+                    <td className="py-3.5 text-center">
+                      {row.status === "Out of Stock" && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 shadow-2xs">
+                          <CircleSlash className="h-3 w-3 stroke-[2.5]" />
+                          <span>Out of Stock</span>
+                        </span>
+                      )}
+                      {row.status === "Low Stock" && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 shadow-2xs">
+                          <AlertTriangle className="h-3 w-3 stroke-[2.5]" />
+                          <span>Low Stock</span>
+                        </span>
+                      )}
+                      {row.status === "Expiring Soon" && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[11px] font-bold text-orange-700 shadow-2xs">
+                          <Clock className="h-3 w-3 stroke-[2.5]" />
+                          <span>Expiring Soon</span>
+                        </span>
+                      )}
+                      {row.status === "In Stock" && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 shadow-2xs">
+                          <CheckCircle2 className="h-3 w-3 stroke-[2.5]" />
+                          <span>In Stock</span>
+                        </span>
+                      )}
+                      {!["Out of Stock", "Low Stock", "Expiring Soon", "In Stock"].includes(row.status) && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
+                          {row.status}
+                        </span>
+                      )}
+                    </td>
+
                     <td className="py-3.5 text-slate-500">{row.lastMovement}</td>
-                    <td className="py-3.5 text-right pr-2">
+
+                    <td className="py-3.5 text-right pr-3">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           type="button"
-                          className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs"
+                          onClick={() => navigate("/inventory/products")}
+                          className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer"
                         >
                           <Eye className="h-3.5 w-3.5 text-slate-400" />
                           <span>View</span>
                         </button>
                         <button
                           type="button"
-                          className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                          onClick={() => navigate("/inventory/reports/stock-balance")}
+                          className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                          title="View in Stock Balance Report"
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </button>
@@ -867,39 +1180,54 @@ export default function InventoryDashboard() {
                   </tr>
                 );
               })}
+              {filteredRows.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="py-12 text-center text-slate-400">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <AlertCircle className="h-8 w-8 text-slate-300" />
+                      <p className="text-sm font-semibold text-slate-600">No stock items found</p>
+                      <p className="text-xs text-slate-400">No items match the current filter or search criteria.</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setActiveTab("all");
+                          setSearchQuery("");
+                        }}
+                        className="mt-2 text-xs"
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
-        {/* Pagination Bar */}
+        {/* Pagination & Status Footer */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
           <div>
-            Showing 1 to {filteredRows.length} of {lowStockCount} items
+            Showing <span className="font-bold text-slate-800">{filteredRows.length}</span> items
+            {activeTab !== "all" && (
+              <span className="text-slate-400"> (filtered by {activeTab.replace("-", " ")})</span>
+            )}
           </div>
           <div className="flex items-center gap-1">
-            <button className="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">
+            <button className="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 cursor-pointer">
               <ChevronLeft className="h-3.5 w-3.5 text-slate-500" />
             </button>
-            <button className="h-7 w-7 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center shadow-xs">
+            <button className="h-7 w-7 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center shadow-xs cursor-pointer">
               1
             </button>
-            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium">
+            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium cursor-pointer">
               2
             </button>
-            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium">
+            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium cursor-pointer">
               3
             </button>
-            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium">
-              4
-            </button>
-            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium">
-              5
-            </button>
-            <span className="px-1 text-slate-400">...</span>
-            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium">
-              10
-            </button>
-            <button className="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">
+            <button className="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 cursor-pointer">
               <ChevronRight className="h-3.5 w-3.5 text-slate-500" />
             </button>
           </div>

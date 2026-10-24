@@ -71,7 +71,9 @@ const CustomerSelect: React.FC<CustomerSelectProps> = ({
               value={cust.id}
               disabled={!isSelectable && filterActiveOnly}
             >
-              {cust.customer_code} - {cust.customer_name}
+              {cust.customer_name
+                ? `${cust.customer_code} - ${cust.customer_name}`
+                : cust.customer_code}
               {statusText}
             </option>
           );

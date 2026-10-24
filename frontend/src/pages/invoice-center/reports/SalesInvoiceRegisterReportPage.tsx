@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { invoiceCenterApi } from "@/api/invoiceCenterApi";
+import { getBranches } from "@/api/controlApi";
 import { ReportPageShell } from "@/components/invoice-center/reports/ReportPageShell";
 import { ReportFilterBar } from "@/components/invoice-center/reports/ReportFilterBar";
 import { ReportSummaryCards, SummaryCardItem } from "@/components/invoice-center/reports/ReportSummaryCards";
 import { ReportDataTable, ColumnDef } from "@/components/invoice-center/reports/ReportDataTable";
 import { ReportPermissionState } from "@/components/invoice-center/reports/ReportPermissionState";
 import { ReportExportActions } from "@/components/invoice-center/reports/ReportExportActions";
+import { ReportErrorState } from "@/components/invoice-center/reports/ReportErrorState";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SalesInvoiceRegisterReportParams, SalesInvoiceRegisterReportRow } from "@/types/invoice-center-reports";
 import { normalizeReportEnvelope } from "@/utils/reportResponse";
-import { useRef } from 'react';
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import { FileText, Coins, CreditCard, Banknote } from "lucide-react";
@@ -22,25 +23,53 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
     page: 1,
     limit: 10,
     search: "",
+    branch_id: undefined,
     approval_status: "all",
     posted_status: "all",
     payment_status: "all",
     finance_post_status: "all",
+    date_from: "",
+    date_to: "",
   });
   
   const debouncedFilters = useDebounce(filters, 300);
 
   const [data, setData] = useState<{ summary: any, rows: SalesInvoiceRegisterReportRow[] } | null>(null);
+  const [branches, setBranches] = useState<any[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10, totalPages: 1 });
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadBranches = async () => {
+      try {
+        const res = await getBranches({ limit: 500, status: "active" });
+        const list = res.data?.data || res.data || [];
+        setBranches(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error("Failed to load branches", err);
+      }
+    };
+    loadBranches();
+  }, []);
 
   const fetchData = async (overrideFilters?: SalesInvoiceRegisterReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
+      setErrorMessage(null);
       
-      const cleanFilters = { ...(overrideFilters || filters) };
+      const cleanFilters: any = { ...(overrideFilters || filters) };
+      if (!cleanFilters.date_from) delete cleanFilters.date_from;
+      if (!cleanFilters.date_to) delete cleanFilters.date_to;
+      if (cleanFilters.date_from && cleanFilters.date_to && cleanFilters.date_from > cleanFilters.date_to) {
+        toast.error("Date From cannot be after Date To.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (cleanFilters.branch_id === "all" || !cleanFilters.branch_id) delete cleanFilters.branch_id;
       if (cleanFilters.approval_status === "all") delete cleanFilters.approval_status;
       if (cleanFilters.posted_status === "all") delete cleanFilters.posted_status;
       if (cleanFilters.payment_status === "all") delete cleanFilters.payment_status;
@@ -60,7 +89,9 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
       if (err.response?.status === 403) {
         setHasPermission(false);
       } else {
-        toast.error(err.response?.data?.message || "Failed to load report data");
+        const msg = err.response?.data?.message || err.response?.data?.errors || "Failed to load report data";
+        setErrorMessage(msg);
+        toast.error(msg);
       }
     } finally {
       setIsLoading(false);
@@ -90,9 +121,12 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
   const handleResetFilters = () => {
     setFilters({ 
       page: 1, limit: 10, search: "", 
+      branch_id: undefined,
       approval_status: "all", posted_status: "all", 
-      payment_status: "all", finance_post_status: "all" 
+      payment_status: "all", finance_post_status: "all",
+      date_from: "", date_to: ""
     });
+    setErrorMessage(null);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -103,10 +137,32 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
     return new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR' }).format(val || 0);
   };
 
+  const formatReportDate = (val?: string) => {
+    if (!val || val.startsWith("0001-01-01") || val === "null" || val === "undefined") {
+      return "-";
+    }
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return "-";
+    return d.toLocaleDateString("en-LK", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
+  };
+
   const columns: ColumnDef<SalesInvoiceRegisterReportRow>[] = [
     { header: "Invoice Number", accessorKey: "invoice_number" },
-    { header: "Date", accessorKey: "invoice_date" },
-    { header: "Due Date", accessorKey: "due_date" },
+    { 
+      header: "Date", 
+      accessorKey: "invoice_date",
+      cell: (row) => formatReportDate(row.invoice_date)
+    },
+    { 
+      header: "Due Date", 
+      accessorKey: "due_date",
+      cell: (row) => formatReportDate(row.due_date)
+    },
+    { header: "Branch", accessorKey: "branch" },
     { header: "Customer Name", accessorKey: "customer_name" },
     { header: "Order No.", accessorKey: "sales_order_number" },
     { 
@@ -175,7 +231,8 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
       description="View all sales invoices, their statuses, and balances."
       actions={
         <ReportExportActions 
-          data={data} 
+          data={data?.rows || []} 
+          columns={columns}
           filename={`sales-invoice-register-${new Date().toISOString().split('T')[0]}`} 
           disabled={isLoading || !data || data.rows.length === 0}
         />
@@ -186,6 +243,25 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
           onReset={handleResetFilters}
           isLoading={isLoading}
         >
+          <div className="space-y-1">
+            <Label htmlFor="branch_select">Branch</Label>
+            <Select 
+              value={filters.branch_id ? String(filters.branch_id) : "all"} 
+              onValueChange={(val) => setFilters(prev => ({ ...prev, branch_id: val === "all" ? undefined : Number(val) }))}
+            >
+              <SelectTrigger id="branch_select" className="w-[180px]">
+                <SelectValue placeholder="All Branches" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Branches</SelectItem>
+                {branches.map(b => (
+                  <SelectItem key={b.id} value={String(b.id)}>
+                    {b.branch_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1">
             <Label htmlFor="search">Search</Label>
             <Input 
@@ -214,6 +290,53 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
              placeholder="Enter Date To" />
           </div>
           <div className="space-y-1">
+            <Label htmlFor="date_preset">Date Presets</Label>
+            <Select 
+              value="custom" 
+              onValueChange={(val) => {
+                if (val === "oct_2026") {
+                  setFilters(prev => ({ ...prev, date_from: "2026-10-01", date_to: "2026-10-31" }));
+                } else if (val === "this_month") {
+                  const now = new Date();
+                  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+                  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
+                  setFilters(prev => ({ ...prev, date_from: firstDay, date_to: lastDay }));
+                } else if (val === "clear") {
+                  setFilters(prev => ({ ...prev, date_from: "", date_to: "" }));
+                }
+              }}
+            >
+              <SelectTrigger id="date_preset">
+                <SelectValue placeholder="Quick Range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Quick Presets...</SelectItem>
+                <SelectItem value="oct_2026">October 2026</SelectItem>
+                <SelectItem value="this_month">This Month</SelectItem>
+                <SelectItem value="clear">Clear Dates (All Time)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="approval_status">Approval Status</Label>
+            <Select 
+              value={filters.approval_status || "all"} 
+              onValueChange={(val) => setFilters(prev => ({ ...prev, approval_status: val }))}
+            >
+              <SelectTrigger id="approval_status">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="submitted">Submitted</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
             <Label htmlFor="payment_status">Payment Status</Label>
             <Select 
               value={filters.payment_status || "all"} 
@@ -223,7 +346,7 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="unpaid">Unpaid</SelectItem>
                 <SelectItem value="partially_paid">Partially Paid</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
@@ -240,7 +363,7 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="unposted">Unposted</SelectItem>
                 <SelectItem value="posted">Posted</SelectItem>
               </SelectContent>
@@ -252,13 +375,25 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
         <ReportSummaryCards items={summaryCards} isLoading={isLoading} />
       }
       table={
-        <ReportDataTable 
-          columns={columns} 
-          data={data?.rows || []} 
-          isLoading={isLoading} 
-          pagination={pagination}
-          onPageChange={handlePageChange}
-        />
+        errorMessage ? (
+          <div className="p-6">
+            <ReportErrorState
+              title="Failed to Generate Sales Invoice Register"
+              errorDetails={errorMessage}
+              onRetry={fetchData}
+              onResetFilters={handleResetFilters}
+            />
+          </div>
+        ) : (
+          <ReportDataTable 
+            columns={columns} 
+            data={data?.rows || []} 
+            isLoading={isLoading} 
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            emptyMessage="No sales invoices match your filter criteria."
+          />
+        )
       }
     />
   );

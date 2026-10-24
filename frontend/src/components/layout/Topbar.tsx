@@ -114,7 +114,7 @@ const SEARCH_ITEMS = [
   { name: "Bank Accounts", category: "Finance", path: "/finance/banking/bank-accounts", icon: Landmark },
   { name: "Inventory Dashboard", category: "Inventory", path: "/inventory/dashboard", icon: Package },
   { name: "Goods Receipt Notes (GRN)", category: "Inventory", path: "/inventory/grn", icon: Truck },
-  { name: "Product Batches & Expiry", category: "Inventory", path: "/inventory/batches", icon: Activity },
+  { name: "Product Batches & Expiry", category: "Inventory", path: "/inventory/product-batches", icon: Activity },
   { name: "Sales Invoices", category: "Invoice Center", path: "/invoice-center/sales-invoices", icon: FileText },
   { name: "Sales Orders", category: "Invoice Center", path: "/invoice-center/sales-orders", icon: FileText },
   { name: "Customers Directory", category: "Invoice Center", path: "/invoice-center/customers", icon: UsersIcon },

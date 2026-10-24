@@ -70,20 +70,20 @@ type DashboardSummaryReportDTO struct {
 
 // 8. Customer Balance Summary Report
 type CustomerBalanceRowDTO struct {
-	CustomerCode          string  `json:"customer_code"`
-	CustomerName          string  `json:"customer_name"`
-	CustomerCategory      string  `json:"customer_category"`
-	CustomerType          string  `json:"customer_type"`
-	PrimaryContactNumber  string  `json:"primary_contact_number"`
-	PrimaryEmail          string  `json:"primary_email"`
-	CreditLimit           float64 `json:"credit_limit"`
-	CreditDays            int     `json:"credit_days"`
-	CurrentBalance        float64 `json:"current_balance"`
-	AvailableCredit       float64 `json:"available_credit"`
-	CreditStatus          string  `json:"credit_status"`
-	ReceivableAccountCode string  `json:"receivable_account_code"`
-	ReceivableAccountName string  `json:"receivable_account_name"`
-	Status                string  `json:"status"`
+	CustomerCode          string  `json:"customer_code" gorm:"column:customer_code"`
+	CustomerName          string  `json:"customer_name" gorm:"column:customer_name"`
+	CustomerCategory      string  `json:"customer_category" gorm:"column:customer_category"`
+	CustomerType          string  `json:"customer_type" gorm:"column:customer_type"`
+	PrimaryContactNumber  string  `json:"primary_contact_number" gorm:"column:primary_contact_number"`
+	PrimaryEmail          string  `json:"primary_email" gorm:"column:primary_email"`
+	CreditLimit           float64 `json:"credit_limit" gorm:"column:credit_limit"`
+	CreditDays            int     `json:"credit_days" gorm:"column:credit_days"`
+	CurrentBalance        float64 `json:"current_balance" gorm:"column:current_balance"`
+	AvailableCredit       float64 `json:"available_credit" gorm:"column:available_credit"`
+	CreditStatus          string  `json:"credit_status" gorm:"column:credit_status"`
+	ReceivableAccountCode string  `json:"receivable_account_code" gorm:"column:receivable_account_code"`
+	ReceivableAccountName string  `json:"receivable_account_name" gorm:"column:receivable_account_name"`
+	Status                string  `json:"status" gorm:"column:status"`
 }
 
 type CustomerBalanceSummaryDTO struct {
@@ -103,57 +103,57 @@ type CustomerStatementHeaderDTO struct {
 	CreditDays     int        `json:"credit_days"`
 	OpeningBalance float64    `json:"opening_balance"`
 	ClosingBalance float64    `json:"closing_balance"`
-	DateFrom       *time.Time `json:"date_from"`
-	DateTo         *time.Time `json:"date_to"`
+	DateFrom       *string `json:"date_from"`
+	DateTo         *string `json:"date_to"`
 }
 
 type CustomerStatementRowDTO struct {
 	CreatedAt         time.Time `json:"-"`
-	TransactionDate   time.Time `json:"transaction_date"`
-	DocumentType      string    `json:"document_type"`
-	DocumentNumber    string    `json:"document_number"`
-	ReferenceNumber   string    `json:"reference_number"`
-	Description       string    `json:"description"`
-	DebitAmount       float64   `json:"debit_amount"`
-	CreditAmount      float64   `json:"credit_amount"`
-	RunningBalance    float64   `json:"running_balance"`
-	OperationalStatus string    `json:"operational_status"`
-	FinancePostStatus string    `json:"finance_post_status"`
+	TransactionDate   time.Time `json:"transaction_date" gorm:"column:transaction_date"`
+	DocumentType      string    `json:"document_type" gorm:"column:document_type"`
+	DocumentNumber    string    `json:"document_number" gorm:"column:document_number"`
+	ReferenceNumber   string    `json:"reference_number" gorm:"column:reference_number"`
+	Description       string    `json:"description" gorm:"column:description"`
+	DebitAmount       float64   `json:"debit_amount" gorm:"column:debit_amount"`
+	CreditAmount      float64   `json:"credit_amount" gorm:"column:credit_amount"`
+	RunningBalance    float64   `json:"running_balance" gorm:"column:running_balance"`
+	OperationalStatus string    `json:"operational_status" gorm:"column:operational_status"`
+	FinancePostStatus string    `json:"finance_post_status" gorm:"column:finance_post_status"`
 }
 
 // 10. Customer Aging Report
 type CustomerAgingRowDTO struct {
-	CustomerID       uint64  `json:"customer_id"`
-	CustomerCode     string  `json:"customer_code"`
-	CustomerName     string  `json:"customer_name"`
-	CreditLimit      float64 `json:"credit_limit"`
-	CurrentBalance   float64 `json:"current_balance"`
-	Current          float64 `json:"current"`
-	Days1To30        float64 `json:"days_1_30"`
-	Days31To60       float64 `json:"days_31_60"`
-	Days61To90       float64 `json:"days_61_90"`
-	Days91To120      float64 `json:"days_91_120"`
-	Over120Days      float64 `json:"over_120"`
-	TotalOutstanding float64 `json:"total_outstanding"`
+	CustomerID       uint64  `json:"customer_id" gorm:"column:customer_id"`
+	CustomerCode     string  `json:"customer_code" gorm:"column:customer_code"`
+	CustomerName     string  `json:"customer_name" gorm:"column:customer_name"`
+	CreditLimit      float64 `json:"credit_limit" gorm:"column:credit_limit"`
+	CurrentBalance   float64 `json:"current_balance" gorm:"column:current_balance"`
+	Current          float64 `json:"current" gorm:"column:current"`
+	Days1To30        float64 `json:"days_1_30" gorm:"column:days_1_30"`
+	Days31To60       float64 `json:"days_31_60" gorm:"column:days_31_60"`
+	Days61To90       float64 `json:"days_61_90" gorm:"column:days_61_90"`
+	Days91To120      float64 `json:"days_91_120" gorm:"column:days_91_120"`
+	Over120Days      float64 `json:"over_120" gorm:"column:over_120"`
+	TotalOutstanding float64 `json:"total_outstanding" gorm:"column:total_outstanding"`
 }
 
 // 11. Sales Order Register
 type SalesOrderRegisterRowDTO struct {
-	SalesOrderNumber        string     `json:"sales_order_number"`
-	SalesOrderDate          time.Time  `json:"sales_order_date"`
-	ExpectedDeliveryDate    *time.Time `json:"expected_delivery_date"`
-	Branch                  string     `json:"branch"`
-	CustomerCode            string     `json:"customer_code"`
-	CustomerName            string     `json:"customer_name"`
-	CustomerReferenceNumber string     `json:"customer_reference_number"`
-	SubtotalAmount          float64    `json:"subtotal_amount"`
-	DiscountAmount          float64    `json:"discount_amount"`
-	TaxAmount               float64    `json:"tax_amount"`
-	TotalAmount             float64    `json:"total_amount"`
-	ApprovalStatus          string     `json:"approval_status"`
-	OrderStatus             string     `json:"order_status"`
-	CreatedBy               string     `json:"created_by"`
-	CreatedAt               time.Time  `json:"created_at"`
+	SalesOrderNumber        string     `json:"sales_order_number" gorm:"column:sales_order_number"`
+	SalesOrderDate          time.Time  `json:"sales_order_date" gorm:"column:sales_order_date"`
+	ExpectedDeliveryDate    *time.Time `json:"expected_delivery_date" gorm:"column:expected_delivery_date"`
+	Branch                  string     `json:"branch" gorm:"column:branch"`
+	CustomerCode            string     `json:"customer_code" gorm:"column:customer_code"`
+	CustomerName            string     `json:"customer_name" gorm:"column:customer_name"`
+	CustomerReferenceNumber string     `json:"customer_reference_number" gorm:"column:customer_reference_number"`
+	SubtotalAmount          float64    `json:"subtotal_amount" gorm:"column:subtotal_amount"`
+	DiscountAmount          float64    `json:"discount_amount" gorm:"column:discount_amount"`
+	TaxAmount               float64    `json:"tax_amount" gorm:"column:tax_amount"`
+	TotalAmount             float64    `json:"total_amount" gorm:"column:total_amount"`
+	ApprovalStatus          string     `json:"approval_status" gorm:"column:approval_status"`
+	OrderStatus             string     `json:"order_status" gorm:"column:order_status"`
+	CreatedBy               string     `json:"created_by" gorm:"column:created_by"`
+	CreatedAt               time.Time  `json:"created_at" gorm:"column:created_at"`
 }
 
 type SalesOrderRegisterSummaryDTO struct {
@@ -170,26 +170,26 @@ type SalesOrderRegisterSummaryDTO struct {
 
 // 12. Sales Invoice Register
 type SalesInvoiceRegisterRowDTO struct {
-	InvoiceNumber     string     `json:"invoice_number"`
-	InvoiceDate       time.Time  `json:"invoice_date"`
-	DueDate           *time.Time `json:"due_date"`
-	Branch            string     `json:"branch"`
-	CustomerCode      string     `json:"customer_code"`
-	CustomerName      string     `json:"customer_name"`
-	SalesOrderNumber  string     `json:"sales_order_number"`
-	Warehouse         string     `json:"warehouse"`
-	SubtotalAmount    float64    `json:"subtotal_amount"`
-	DiscountAmount    float64    `json:"discount_amount"`
-	TaxAmount         float64    `json:"tax_amount"`
-	TotalAmount       float64    `json:"total_amount"`
-	PaidAmount        float64    `json:"paid_amount"`
-	BalanceAmount     float64    `json:"balance_amount"`
-	ApprovalStatus    string     `json:"approval_status"`
-	PostedStatus      string     `json:"posted_status"`
-	PaymentStatus     string     `json:"payment_status"`
-	FinancePostStatus string     `json:"finance_post_status"`
-	CreatedBy         string     `json:"created_by"`
-	CreatedAt         time.Time  `json:"created_at"`
+	InvoiceNumber     string     `json:"invoice_number" gorm:"column:invoice_number"`
+	InvoiceDate       time.Time  `json:"invoice_date" gorm:"column:invoice_date"`
+	DueDate           *time.Time `json:"due_date" gorm:"column:due_date"`
+	Branch            string     `json:"branch" gorm:"column:branch"`
+	CustomerCode      string     `json:"customer_code" gorm:"column:customer_code"`
+	CustomerName      string     `json:"customer_name" gorm:"column:customer_name"`
+	SalesOrderNumber  string     `json:"sales_order_number" gorm:"column:sales_order_number"`
+	Warehouse         string     `json:"warehouse" gorm:"column:warehouse"`
+	SubtotalAmount    float64    `json:"subtotal_amount" gorm:"column:subtotal_amount"`
+	DiscountAmount    float64    `json:"discount_amount" gorm:"column:discount_amount"`
+	TaxAmount         float64    `json:"tax_amount" gorm:"column:tax_amount"`
+	TotalAmount       float64    `json:"total_amount" gorm:"column:total_amount"`
+	PaidAmount        float64    `json:"paid_amount" gorm:"column:paid_amount"`
+	BalanceAmount     float64    `json:"balance_amount" gorm:"column:balance_amount"`
+	ApprovalStatus    string     `json:"approval_status" gorm:"column:approval_status"`
+	PostedStatus      string     `json:"posted_status" gorm:"column:posted_status"`
+	PaymentStatus     string     `json:"payment_status" gorm:"column:payment_status"`
+	FinancePostStatus string     `json:"finance_post_status" gorm:"column:finance_post_status"`
+	CreatedBy         string     `json:"created_by" gorm:"column:created_by"`
+	CreatedAt         time.Time  `json:"created_at" gorm:"column:created_at"`
 }
 
 type SalesInvoiceRegisterSummaryDTO struct {

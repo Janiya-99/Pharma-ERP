@@ -290,6 +290,21 @@ func SeedPermissions(db *gorm.DB, logger *zap.Logger) error {
 		{"INVOICE_CENTER", "Report", "invoice_center.reports.sales_by_product.view", "View Sales By Product Report"},
 		{"INVOICE_CENTER", "Report", "invoice_center.reports.collection_summary.view", "View Collection Summary Report"},
 
+		// Route permission aliases (singular format)
+		{"INVOICE_CENTER", "Report", "invoice_center.report.customer_balance", "View Customer Balance Report"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.customer_statement", "View Customer Statement Report"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.customer_aging", "View Customer Aging Report"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.sales_order_register", "View Sales Order Register"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.sales_invoice_register", "View Sales Invoice Register"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.credit_note_register", "View Credit Note Register"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.debit_note_register", "View Debit Note Register"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.customer_receipt_register", "View Customer Receipt Register"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.outstanding_invoices", "View Outstanding Invoices"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.sales_by_customer", "View Sales by Customer"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.sales_by_product", "View Sales by Product"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.collection_summary", "View Collection Summary"},
+		{"INVOICE_CENTER", "Report", "invoice_center.report.finance_posting_status", "View Finance Posting Status"},
+
 		// COMPLIANCE CENTER
 		{"COMPLIANCE_CENTER", "Dashboard", "compliance.dashboard.view", "View Compliance Dashboard"},
 		{"COMPLIANCE_CENTER", "NMRA", "compliance.nmra.view", "View NMRA"},

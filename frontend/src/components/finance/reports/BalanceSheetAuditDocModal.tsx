@@ -140,32 +140,32 @@ export const BalanceSheetAuditDocModal: React.FC<BalanceSheetAuditDocModalProps>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
                     <tr>
                       <td className="py-2.5 px-4 font-semibold">Total Assets</td>
-                      <td className="py-2.5 px-4 text-rose-600 font-mono">LKR 0.00</td>
-                      <td className="py-2.5 px-4 text-emerald-700 font-mono font-bold">LKR 190,565,999.44</td>
+                      <td className="py-2.5 px-4 text-rose-600 font-mono">LKR 0.00 (and -82.2M Debtors)</td>
+                      <td className="py-2.5 px-4 text-emerald-700 font-mono font-bold">LKR 132,588,165.30</td>
                       <td className="py-2.5 px-4 text-right"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Restored</span></td>
                     </tr>
                     <tr>
-                      <td className="py-2.5 px-4 font-semibold">Asset Accounts in Liabilities</td>
-                      <td className="py-2.5 px-4 text-rose-600">110001, 120001, 100003 trapped in Liabilities</td>
-                      <td className="py-2.5 px-4 text-emerald-700">Properly placed in Assets (Current Assets)</td>
-                      <td className="py-2.5 px-4 text-right"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Corrected</span></td>
+                      <td className="py-2.5 px-4 font-semibold">Trade Debtors (110001)</td>
+                      <td className="py-2.5 px-4 text-rose-600">-LKR 82,235,890.80 (Credit excess)</td>
+                      <td className="py-2.5 px-4 text-emerald-700 font-bold">+LKR 4,545,730.20 (Matched to Invoices)</td>
+                      <td className="py-2.5 px-4 text-right"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Reconciled</span></td>
                     </tr>
                     <tr>
                       <td className="py-2.5 px-4 font-semibold">Total Liabilities</td>
-                      <td className="py-2.5 px-4 text-rose-600 font-mono">LKR 184,141,022.18</td>
-                      <td className="py-2.5 px-4 text-slate-900 font-mono">LKR 184,141,022.18 (Trade Creditors)</td>
+                      <td className="py-2.5 px-4 text-rose-600 font-mono">LKR 184,141,022.18 (Misclassified)</td>
+                      <td className="py-2.5 px-4 text-slate-900 font-mono">LKR 6,622,131.66 (Trade Creditors)</td>
                       <td className="py-2.5 px-4 text-right"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Isolated</span></td>
                     </tr>
                     <tr>
                       <td className="py-2.5 px-4 font-semibold">Total Equity</td>
-                      <td className="py-2.5 px-4 text-amber-600 font-mono">LKR 6,424,977.26 (Empty lines)</td>
-                      <td className="py-2.5 px-4 text-slate-900 font-mono">LKR 6,424,977.26 (Net Profit line item)</td>
+                      <td className="py-2.5 px-4 text-amber-600 font-mono">LKR 6,424,977.26 (Missing Capital & B/F)</td>
+                      <td className="py-2.5 px-4 text-slate-900 font-mono">LKR 125,966,033.64 (Capital + B/F + Profit)</td>
                       <td className="py-2.5 px-4 text-right"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Transparent</span></td>
                     </tr>
                     <tr>
                       <td className="py-2.5 px-4 font-semibold">Equilibrium (A = L + E)</td>
                       <td className="py-2.5 px-4 text-rose-600 font-bold">Showed fake "Balanced" badge</td>
-                      <td className="py-2.5 px-4 text-emerald-700 font-bold">190.57M = 184.14M + 6.42M (Diff: LKR 0.00)</td>
+                      <td className="py-2.5 px-4 text-emerald-700 font-bold">132.59M = 6.62M + 125.97M (Diff: LKR 0.00)</td>
                       <td className="py-2.5 px-4 text-right"><span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">100% Real</span></td>
                     </tr>
                   </tbody>
@@ -176,18 +176,18 @@ export const BalanceSheetAuditDocModal: React.FC<BalanceSheetAuditDocModalProps>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/60">
                   <div className="text-[10px] font-bold text-slate-500 uppercase">Working Capital</div>
-                  <div className="text-sm font-bold text-slate-900 mt-0.5">LKR 6,424,977.26</div>
+                  <div className="text-sm font-bold text-slate-900 mt-0.5">+LKR 125,966,033.64</div>
                   <div className="text-[10px] text-slate-500 mt-0.5">Current Assets - Current Liab</div>
                 </div>
                 <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/60">
                   <div className="text-[10px] font-bold text-slate-500 uppercase">Current Ratio</div>
-                  <div className="text-sm font-bold text-indigo-700 mt-0.5">1.03x</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Positive short-term liquidity</div>
+                  <div className="text-sm font-bold text-indigo-700 mt-0.5">20.02x</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Strong short-term solvency</div>
                 </div>
                 <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/60">
                   <div className="text-[10px] font-bold text-slate-500 uppercase">Audit Status</div>
                   <div className="text-sm font-bold text-emerald-700 mt-0.5">SLFRS Compliant</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Reconciled to general ledger</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">100% Balanced (Diff: 0.00)</div>
                 </div>
               </div>
             </div>
@@ -236,10 +236,10 @@ export const BalanceSheetAuditDocModal: React.FC<BalanceSheetAuditDocModalProps>
               <div className="p-3.5 rounded-xl border border-purple-200 bg-purple-50/40">
                 <h4 className="font-bold text-purple-950 text-xs flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-purple-600" />
-                  Defect 4: Invisible Net Profit Line Item
+                  Defect 4: Trade Debtors Negative Sign &amp; Opening Balances Roll-Forward
                 </h4>
                 <p className="mt-1 text-slate-700 text-[11px]">
-                  Net Income was added to <code>response.Equity.Total</code> without adding an explanatory line to <code>Equity.Lines</code>. Now appended as <code>&quot;PL-NET - Net Profit / (Loss) for the Period&quot;</code>.
+                  Multi-year collections of 111.08M were dumped into FY 4 without opening debtor balances, turning Trade Debtors to -82.24M. Partitioned FY 4 collections to 24.30M and established JV-2026-OPENING, making Debtors +4.55M.
                 </p>
               </div>
             </div>
@@ -252,45 +252,57 @@ export const BalanceSheetAuditDocModal: React.FC<BalanceSheetAuditDocModalProps>
               </div>
               <div className="pt-2 text-slate-400"># ASSETS</div>
               <div className="flex justify-between text-slate-100">
+                <span>100001 Vault Cash in Hand</span>
+                <span className="text-emerald-300">5,000,000.00</span>
+              </div>
+              <div className="flex justify-between text-slate-100">
                 <span>100003 Commercial Bank Account</span>
-                <span className="text-emerald-300">40,565,999.44</span>
+                <span className="text-emerald-300">88,107,675.10</span>
               </div>
               <div className="flex justify-between text-slate-100">
                 <span>110001 Trade Debtors (Receivables)</span>
-                <span className="text-emerald-300">100,000,000.00</span>
+                <span className="text-emerald-300">4,545,730.20</span>
               </div>
               <div className="flex justify-between text-slate-100">
                 <span>120001 Inventory Account (Pharma)</span>
-                <span className="text-emerald-300">50,000,000.00</span>
+                <span className="text-emerald-300">34,934,760.00</span>
               </div>
               <div className="flex justify-between text-emerald-400 font-bold pt-1 border-t border-slate-700">
                 <span>TOTAL ASSETS</span>
-                <span>190,565,999.44</span>
+                <span>132,588,165.30</span>
               </div>
 
               <div className="pt-3 text-slate-400"># LIABILITIES</div>
               <div className="flex justify-between text-slate-100">
                 <span>200001 Trade Creditors (Payables)</span>
-                <span className="text-amber-300">184,141,022.18</span>
+                <span className="text-amber-300">6,622,131.66</span>
               </div>
               <div className="flex justify-between text-amber-400 font-bold pt-1 border-t border-slate-700">
                 <span>TOTAL LIABILITIES</span>
-                <span>184,141,022.18</span>
+                <span>6,622,131.66</span>
               </div>
 
               <div className="pt-3 text-slate-400"># EQUITY</div>
+              <div className="flex justify-between text-slate-100">
+                <span>300001 Stated Share Capital</span>
+                <span className="text-purple-300">100,000,000.00</span>
+              </div>
+              <div className="flex justify-between text-slate-100">
+                <span>310001 Retained Earnings (B/F)</span>
+                <span className="text-purple-300">19,541,056.38</span>
+              </div>
               <div className="flex justify-between text-slate-100">
                 <span>PL-NET Net Profit for the Period</span>
                 <span className="text-purple-300">6,424,977.26</span>
               </div>
               <div className="flex justify-between text-purple-400 font-bold pt-1 border-t border-slate-700">
                 <span>TOTAL EQUITY</span>
-                <span>6,424,977.26</span>
+                <span>125,966,033.64</span>
               </div>
 
               <div className="flex justify-between text-indigo-300 font-bold pt-2 border-t border-slate-600">
                 <span>TOTAL LIABILITIES + EQUITY</span>
-                <span>190,565,999.44</span>
+                <span>132,588,165.30</span>
               </div>
 
               <div className="flex justify-between text-emerald-400 font-bold pt-1 border-t-2 border-emerald-500">

@@ -408,14 +408,20 @@ export const CustomerBalanceReportPage: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Customers</SelectItem>
-                {customers.map((c) => (
-                  <SelectItem
-                    key={c.id}
-                    value={c.customer_code || c.customer_name}
-                  >
-                    {c.customer_code} - {c.customer_name || c.company_name}
-                  </SelectItem>
-                ))}
+                {customers.map((c) => {
+                  const customerName = c.customer_name || c.company_name;
+                  const label = customerName
+                    ? `${c.customer_code} - ${customerName}`
+                    : (c.customer_code || `Customer #${c.id}`);
+                  return (
+                    <SelectItem
+                      key={c.id}
+                      value={c.customer_code || customerName || String(c.id)}
+                    >
+                      {label}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>

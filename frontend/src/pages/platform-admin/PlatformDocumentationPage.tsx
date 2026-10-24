@@ -345,6 +345,27 @@ const DOCUMENTS_CATALOG: DocItem[] = [
     icon: FileCheck,
     accentColor: "from-purple-600 to-indigo-600",
   },
+  {
+    id: "invoice-center-audit-report",
+    title: "IC-01 to IC-07: Invoice Center & Receivables Audit Report",
+    category: "Audit & Reports",
+    description:
+      "Statutory and commercial receivables audit resolving Customer Balance & Aging report permissions, missing October 2026 sales invoices (INV-2026-0114), statement date defaults, numeric alignments, and customer dropdown trailing hyphens.",
+    pdfFilename: "INVOICE_CENTER_AUDIT_REPORT.md",
+    mdFilename: "INVOICE_CENTER_AUDIT_REPORT.md",
+    sizeBytes: "8.9 KB",
+    pageCount: "7 Sections",
+    badge: "IC-01 - IC-07 AUDIT SIGN-OFF",
+    featured: true,
+    highlights: [
+      "Customer Balance & Aging generation permissions and Executive Summary KPIs",
+      "Sales Invoice Register missing October 2026 records resolved (INV-2026-0114)",
+      "Month-to-date defaults, numeric column alignments, and trailing hyphen fixes",
+    ],
+    lastUpdated: "October 2026",
+    icon: FileCheck,
+    accentColor: "from-emerald-600 to-teal-600",
+  },
 ];
 
 const CATEGORIES = [
