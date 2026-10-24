@@ -23,6 +23,7 @@ docs/balance-sheet-audit/
 ├── BALANCE_SHEET_FIX_AUDIT_REPORT.md        # Balance Sheet statutory audit & engineering report
 ├── RECONCILIATION_PROOF.md                  # Account-by-account double-entry ledger reconciliation
 ├── SYSTEM_CHANGELOG.md                      # Balance Sheet engineering changelog & test suites
+├── INVOICE_CENTER_AUDIT_REPORT.md           # Invoice Center & receivables statutory audit (IC-01 to IC-07)
 ├── FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md# FIN-02 Bank & Cash Book reconciliation audit
 └── FIN_03_AND_04_AUDIT_REPORT.md            # FIN-03 Dashboard KPIs & FIN-04 Tax Settings report
 ```
@@ -62,6 +63,18 @@ docs/balance-sheet-audit/
 | **4.3** | **Tax Rates formatted as Currency (`LKR 18.00`)**. | `field.name.includes("rate")` was included in currency formatter. | Extracted percentage formatter rendering `18%`, `2.5%`, etc. | Displays proper percentages across all tax rates. |
 | **4.4** | **Zero-Rated Taxes displayed as dash (`-`)**. | Zero numeric rate defaulted to empty placeholder. | Formatted with explicit badge `0% (Zero-Rated / Exempt)`. | Legitimate zero-rated/exempt settings clearly visible. |
 
+### 5. IC-01 to IC-07: Invoice Center & Commercial Receivables Intelligence
+| # | Issue Identified | Root Cause | Engineering Resolution | Statutory Verification |
+|---|---|---|---|---|
+| **5.1** | **Customer Balance Report generation failed (HTTP 500)**. | SQL query in `GetCustomerBalanceSummary` referenced non-existent column `name` instead of `category_name` in `customer_categories`. | Refactored query to use clean `LEFT JOIN customer_categories cat` selecting `COALESCE(cat.category_name, '')` and wrapped arithmetic in `COALESCE`. | Instant report generation with active balances, credit limits, and zero-record fallback. |
+| **5.2** | **Customer Aging Report permission & KPI visibility**. | Permission `invoice_center.report.customer_aging` missing from Admin role, and table lacked executive concentration indicators. | Added permission to seed matrix, and added 5-card Executive Summary Ribbon (Total Accounts, Current, Overdue 31-120d, Critical >120d, Total Outstanding). | Granular aging audit with immediate concentration insights matching GL AR. |
+| **5.3** | **Sales Invoice Register Missing October 2026 Records**. | Unrestricted or improper date bounds caused zero records to display, obscuring `INV-2026-0114` (dated 20 Oct 2026). | Applied month-to-date default date range, resilient multi-status filtering, and debounced auto-loading. | All October invoices including `INV-2026-0114` immediately visible upon page load. |
+| **5.4** | **Customer Statement Date Defaults & Running Balance**. | Uninitialized date range caused queries to fail or return unbound history with unformatted dates. | Standardized month-to-date defaults (`date_from <= date_to` validation) and ascending balance roll-forward. | Accurate statement generation with verified closing debtor balance. |
+| **5.5** | **Sales Invoice Details Financial Alignment & SO Navigation**. | Financial numeric columns were left-aligned, and clicking linked Sales Order did not navigate. | Right-aligned all numeric amounts in line items, formatted unit prices to 2 decimals, and linked Sales Order cards to `/sales/orders/:id`. | Clean financial typography and 1-click cross-module navigation. |
+| **5.6** | **Debit Note Header Typo**. | Column header displayed typographical error `"Original Invioce No."`. | Corrected header orthography to `"Original Invoice No."`. | Verified spelling across table headers and export definitions. |
+| **5.7** | **Customer Selector Trailing Hyphen**. | Customer dropdown labels displayed trailing hyphen (`CUST_MAHARAGAMA_PHARM - `) when `company_name` was undefined. | Updated selector formatting to prioritize `c.customer_name || c.name` with clean `${c.customer_code} - ${c.customer_name}` output. | Clean customer selection across all report filter bars. |
+| **5.8** | **Automatic Report Reloading on Filter Change**. | Reports required manual button clicks, causing desynchronized report states when dropdowns changed. | Implemented debounced (300ms) automatic fetching across all 14 commercial and financial report pages. | Effortless, live data exploration upon changing branch, date, or customer filters. |
+
 ---
 
 ## Detailed Documents in this Folder
@@ -70,11 +83,13 @@ docs/balance-sheet-audit/
    Mathematical theorem, double-entry ledger extract, and account-by-account equilibrium proof for FY 2026/2027.
 2. **[BALANCE_SHEET_FIX_AUDIT_REPORT.md](./BALANCE_SHEET_FIX_AUDIT_REPORT.md)**  
    Full statutory audit report for Balance Sheet equilibrium, Trade Debtors settlement reconciliation, LKAS 1 structure, and financial intelligence indicators.
-3. **[FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md](./FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md)**  
+3. **[INVOICE_CENTER_AUDIT_REPORT.md](./INVOICE_CENTER_AUDIT_REPORT.md)**  
+   Comprehensive statutory audit for Invoice Center reports (Customer Balance & Aging), missing invoice resolution, month-to-date defaults, and auto-loading filters.
+4. **[FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md](./FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md)**  
    Full statutory audit for Bank Book and Cash Book reconciliation, column dash fixes, sign conventions, and chronological running-balance calculations.
-4. **[FIN_03_AND_04_AUDIT_REPORT.md](./FIN_03_AND_04_AUDIT_REPORT.md)**  
+5. **[FIN_03_AND_04_AUDIT_REPORT.md](./FIN_03_AND_04_AUDIT_REPORT.md)**  
    Statutory audit report for Finance Dashboard KPIs, metric lineage, and tax percentage formatting.
-5. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
+6. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
    Engineering changelog detailing all modified files, schema queries, and automated unit test suites.
 
 ---
@@ -85,3 +100,4 @@ This documentation is also directly accessible within the ERP interface:
 * **Platform Admin Documentation:** Navigate to `Platform Admin -> Documentation -> Audit & Reports` or `/platform-admin/documentation`
 * **Tenant Control Center:** Navigate to `Control Center -> Audit & Security -> System Fixes & Audit` or `/control-center/system-fixes-audit`
 * **In-App Balance Sheet Modal:** Click the **"Audit Fix Documentation"** button on the Balance Sheet page (`/finance/reports/balance-sheet`)
+

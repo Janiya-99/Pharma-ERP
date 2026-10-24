@@ -295,7 +295,7 @@ const DOCUMENTS_CATALOG: DocItem[] = [
     badge: "CRITICAL AUDIT & FIX",
     featured: true,
     highlights: [
-      "Total Assets LKR 190,565,999.44 Ledger Equilibrium Restored",
+      "Total Assets LKR 132,588,165.30 Ledger Equilibrium Restored",
       "Corrected Trade Debtors, Inventory & Bank Misclassification",
       "Dynamic LKAS/SLFRS KPI Ribbon & Financial Liquidity Ratios",
     ],
@@ -777,6 +777,9 @@ export const PlatformDocumentationPage = () => {
           {[
             { name: "BALANCE_SHEET_FIX_AUDIT_REPORT.md", title: "Balance Sheet Audit & Fix Report", size: "12.4 KB" },
             { name: "RECONCILIATION_PROOF.md", title: "Double-Entry Reconciliation Proof", size: "4.6 KB" },
+            { name: "INVOICE_CENTER_AUDIT_REPORT.md", title: "Invoice Center & Receivables Audit", size: "14.8 KB" },
+            { name: "FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md", title: "Bank & Cash Book Audit Report", size: "11.1 KB" },
+            { name: "FIN_03_AND_04_AUDIT_REPORT.md", title: "Dashboard KPIs & Tax Settings Audit", size: "6.1 KB" },
             { name: "SYSTEM_CHANGELOG.md", title: "Engineering System Changelog", size: "5.8 KB" },
             { name: "ARCHITECTURE_GUIDE.md", title: "Complete Architecture Guide", size: "14 KB" },
             { name: "DATABASE_SCHEMA.md", title: "Database Schema Reference", size: "12 KB" },
