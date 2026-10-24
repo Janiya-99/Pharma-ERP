@@ -370,10 +370,17 @@ func (s *SalesInvoiceService) GetSalesInvoiceByID(db *gorm.DB, companyID, id uin
 
 	var salesOrder map[string]interface{}
 	if invoice.SalesOrder != nil {
+		orderDate := ""
+		if !invoice.SalesOrder.SalesOrderDate.IsZero() {
+			orderDate = invoice.SalesOrder.SalesOrderDate.Format("2006-01-02")
+		}
 		salesOrder = map[string]interface{}{
 			"id":                 invoice.SalesOrder.ID,
 			"sales_order_number": invoice.SalesOrder.SalesOrderNumber,
+			"sales_order_date":   orderDate,
 			"order_status":       invoice.SalesOrder.OrderStatus,
+			"approval_status":    invoice.SalesOrder.ApprovalStatus,
+			"total_amount":       invoice.SalesOrder.TotalAmount,
 		}
 	}
 
@@ -850,19 +857,25 @@ func (s *SalesInvoiceService) customerMap(customer models.Customer) map[string]i
 }
 
 func (s *SalesInvoiceService) lineResponse(line models.SalesInvoiceLine, productMap map[uint64]invmodels.Product, batchMap map[uint64]invmodels.ProductBatch, locationMap map[uint64]invmodels.WarehouseLocation) dto.SalesInvoiceLineResponse {
+	productCode := ""
+	productName := ""
 	product := map[string]interface{}{"id": line.ProductID, "product_code": "", "product_name": ""}
 	if p, ok := productMap[line.ProductID]; ok {
+		productCode = p.ProductCode
+		productName = p.ProductName
 		product["product_code"] = p.ProductCode
 		product["product_name"] = p.ProductName
 	}
+	batchNumber := ""
+	expiryDate := ""
 	var batch map[string]interface{}
 	if line.ProductBatchID != nil {
 		if b, ok := batchMap[*line.ProductBatchID]; ok {
-			expiry := ""
+			batchNumber = b.BatchNumber
 			if b.ExpiryDate != nil {
-				expiry = b.ExpiryDate.Format("2006-01-02")
+				expiryDate = b.ExpiryDate.Format("2006-01-02")
 			}
-			batch = map[string]interface{}{"id": b.ID, "batch_number": b.BatchNumber, "expiry_date": expiry}
+			batch = map[string]interface{}{"id": b.ID, "batch_number": b.BatchNumber, "expiry_date": expiryDate}
 		}
 	}
 	var location map[string]interface{}
@@ -877,8 +890,12 @@ func (s *SalesInvoiceService) lineResponse(line models.SalesInvoiceLine, product
 		WarehouseLocationID: line.WarehouseLocationID,
 		WarehouseLocation:   location,
 		ProductID:           line.ProductID,
+		ProductCode:         productCode,
+		ProductName:         productName,
 		Product:             product,
 		ProductBatchID:      line.ProductBatchID,
+		BatchNumber:         batchNumber,
+		ExpiryDate:          expiryDate,
 		Batch:               batch,
 		Quantity:            line.Quantity,
 		UnitPrice:           line.UnitPrice,

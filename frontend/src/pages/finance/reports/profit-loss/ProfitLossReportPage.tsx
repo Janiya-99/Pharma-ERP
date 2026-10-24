@@ -14,6 +14,7 @@ import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
+import { useDebounce } from '../../../../hooks/useDebounce';
 
 const ProfitLossReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
@@ -31,6 +32,8 @@ const ProfitLossReportPage = () => {
     date_to: "",
     branch_id: activeBranch?.id ? String(activeBranch.id) : ""
   });
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const fetchReport = useCallback(async (customFilters?: Record<string, unknown>) => {
     const activeFilters: any = customFilters || filters;
@@ -62,7 +65,7 @@ const ProfitLossReportPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, financialYears]);
+  }, [financialYears]);
 
   const fetchFiltersData = async () => {
     try {
@@ -76,15 +79,12 @@ const ProfitLossReportPage = () => {
       if (Array.isArray(bList)) setBranches(bList);
 
       const activeFy: any = fyList.find((f: any) => f.is_active || f.is_current || f.status === 'active') || fyList[0];
-      if (activeFy) {
-        const initial = {
+      if (activeFy && !filters.financial_year_id) {
+        setFilters((prev: any) => ({
+          ...prev,
           financial_year_id: String(activeFy.id),
-          date_from: "",
-          date_to: "",
-          branch_id: activeBranch?.id ? String(activeBranch.id) : ""
-        };
-        setFilters(initial);
-        fetchReport(initial);
+          branch_id: activeBranch?.id ? String(activeBranch.id) : prev.branch_id
+        }));
       }
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -93,15 +93,20 @@ const ProfitLossReportPage = () => {
 
   useEffect(() => {
     fetchFiltersData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
+
+  useEffect(() => {
+    if (debouncedFilters.financial_year_id) {
+      fetchReport(debouncedFilters);
+    }
+  }, [debouncedFilters, fetchReport]);
 
   const handleFilterChange = (key: unknown, value: unknown) => {
     setFilters((prev: any) => ({ ...prev, [key as string]: value }));
   };
 
   const handleApplyFilters = () => {
-    fetchReport();
+    fetchReport(filters);
   };
 
   const handleClearFilters = () => {
@@ -369,9 +374,9 @@ const ProfitLossReportPage = () => {
       {!data && !loading && (
         <div className="bg-white rounded-xl shadow-xs p-8 text-center border border-slate-200">
           <AlertCircle className="mx-auto h-12 w-12 text-slate-400" />
-          <h3 className="mt-4 text-lg font-medium text-slate-900">Run Report</h3>
+          <h3 className="mt-4 text-lg font-medium text-slate-900">No Data</h3>
           <p className="mt-2 text-sm text-slate-500">
-            Select a financial year and click Apply Filters to generate the profit and loss statement.
+            Select a financial year to generate the profit and loss statement.
           </p>
         </div>
       )}

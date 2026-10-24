@@ -9,7 +9,7 @@ import (
 
 type InvoiceCenterReportService interface {
 	GetDashboardSummaryReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) (dto.DashboardSummaryReportDTO, error)
-	GetCustomerBalanceReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, *controlDto.Pagination, error)
+	GetCustomerBalanceReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, dto.CustomerBalanceSummaryDTO, *controlDto.Pagination, error)
 	GetCustomerStatementReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerStatementRowDTO, dto.CustomerStatementHeaderDTO, error)
 	GetCustomerAgingReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerAgingRowDTO, *controlDto.Pagination, error)
 	GetSalesOrderRegisterReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.SalesOrderRegisterRowDTO, dto.SalesOrderRegisterSummaryDTO, *controlDto.Pagination, error)
@@ -55,12 +55,12 @@ func (s *invoiceCenterReportService) GetDashboardSummaryReport(db *gorm.DB, comp
 	return s.repo.GetDashboardSummary(db, companyID, filters)
 }
 
-func (s *invoiceCenterReportService) GetCustomerBalanceReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, *controlDto.Pagination, error) {
-	rows, total, err := s.repo.GetCustomerBalanceSummary(db, companyID, filters)
+func (s *invoiceCenterReportService) GetCustomerBalanceReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, dto.CustomerBalanceSummaryDTO, *controlDto.Pagination, error) {
+	rows, total, summary, err := s.repo.GetCustomerBalanceSummary(db, companyID, filters)
 	if err != nil {
-		return nil, nil, err
+		return nil, dto.CustomerBalanceSummaryDTO{}, nil, err
 	}
-	return rows, s.calculatePagination(filters.Page, filters.Limit, total), nil
+	return rows, summary, s.calculatePagination(filters.Page, filters.Limit, total), nil
 }
 
 func (s *invoiceCenterReportService) GetCustomerStatementReport(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerStatementRowDTO, dto.CustomerStatementHeaderDTO, error) {

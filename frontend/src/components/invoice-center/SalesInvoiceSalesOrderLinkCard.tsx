@@ -42,8 +42,10 @@ export const SalesInvoiceSalesOrderLinkCard: React.FC<Props> = ({
     }).format(amount);
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString();
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr || dateStr.startsWith("0001-01-01")) return "-";
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? "-" : d.toLocaleDateString();
   };
 
   return (
@@ -58,7 +60,7 @@ export const SalesInvoiceSalesOrderLinkCard: React.FC<Props> = ({
           <div className="flex justify-between">
             <span className="text-gray-600">Order Number</span>
             <span className="font-medium text-indigo-700">
-              {salesOrder.sales_order_number}
+              {salesOrder.sales_order_number || "SO-Linked"}
             </span>
           </div>
           <div className="flex justify-between">
@@ -68,7 +70,9 @@ export const SalesInvoiceSalesOrderLinkCard: React.FC<Props> = ({
           <div className="flex items-center justify-between">
             <span className="text-gray-600">Status</span>
             <Badge variant="outline" className="bg-white text-xs">
-              {salesOrder.order_status.replace("_", " ").toUpperCase()}
+              {salesOrder.order_status
+                ? salesOrder.order_status.replace(/_/g, " ").toUpperCase()
+                : "OPEN"}
             </Badge>
           </div>
 

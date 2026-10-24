@@ -189,7 +189,17 @@ export interface CustomerBalanceReportRow {
   current_balance: number;
   available_credit: number;
   credit_status: string;
+  receivable_account_code?: string;
+  receivable_account_name?: string;
   status: string;
+}
+
+export interface CustomerBalanceReportSummary {
+  total_customers: number;
+  total_credit_limit: number;
+  total_current_balance: number;
+  total_available_credit: number;
+  customers_over_credit_limit: number;
 }
 
 export interface CustomerStatementReportHeader {
@@ -380,6 +390,7 @@ export interface SalesByProductReportRow {
   stock_total_cost: number;
   gross_profit: number;
   gross_profit_percent: number;
+  percentage_of_total?: number;
 }
 
 export interface CollectionSummaryReportRow {

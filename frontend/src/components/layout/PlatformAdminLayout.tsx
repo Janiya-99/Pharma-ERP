@@ -96,6 +96,7 @@ const PlatformAdminLayout = () => {
       icon: FileDown,
       children: [
         { name: "All Manuals & Downloads", path: "/platform-admin/documentation" },
+        { name: "Statutory Audit & Fixes", path: "/platform-admin/system-fixes-audit" },
         { name: "Login Credentials PDF", path: "/platform-admin/documentation?category=credentials" },
         { name: "Complete Master Volume", path: "/platform-admin/documentation?category=manuals" },
       ],
@@ -115,6 +116,7 @@ const PlatformAdminLayout = () => {
       name: "Logs & Audit",
       icon: Shield,
       children: [
+        { name: "System Fixes & Audit", path: "/platform-admin/system-fixes-audit" },
         { name: "Blocked IPs & Security", path: "/platform-admin/blocked-ips" },
         { name: "Login Logs", path: "/platform-admin/login-logs" },
         { name: "Audit Trails", path: "/platform-admin/audit-logs" },

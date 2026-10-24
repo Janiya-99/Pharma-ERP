@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../../auth/AuthContext';
 import { financeApi } from '../../../../api/financeApi';
+import { useDebounce } from '../../../../hooks/useDebounce';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import DataTable from '../../../../components/common/DataTable';
@@ -33,6 +34,8 @@ const BankBookReportPage = () => {
     date_to: "",
     branch_id: activeBranch?.id ? String(activeBranch.id) : ""
   });
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const fetchReportWithParams = useCallback(async (activeFilters: any) => {
     if (!activeFilters?.bank_account_id && !activeFilters?.account_id) {
@@ -84,7 +87,6 @@ const BankBookReportPage = () => {
           branch_id: activeBranch?.id ? String(activeBranch.id) : ""
         };
         setFilters(initial);
-        fetchReportWithParams(initial);
       }
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -99,6 +101,12 @@ const BankBookReportPage = () => {
     fetchFiltersData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
+
+  useEffect(() => {
+    if (debouncedFilters.bank_account_id || debouncedFilters.account_id) {
+      fetchReportWithParams(debouncedFilters);
+    }
+  }, [debouncedFilters, fetchReportWithParams]);
 
   const handleFilterChange = (key: unknown, value: unknown) => {
     setFilters((prev: any) => ({ ...prev, [key as string]: value }));
@@ -133,6 +141,30 @@ const BankBookReportPage = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = `bank-book-${new Date().getTime()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    if (!data) return;
+    const transactions = data.transactions || data.ledger_lines || [];
+    const headers = ['Date', 'Source Type', 'Source No', 'Ref No', 'Description', 'Receipts (Debit)', 'Payments (Credit)', 'Running Balance'];
+    const rows = transactions.map((t: any) => [
+      t.transaction_date ? format(new Date(t.transaction_date), 'yyyy-MM-dd') : '',
+      `"${t.source_type || ''}"`,
+      `"${t.source_number || ''}"`,
+      `"${t.reference_number || ''}"`,
+      `"${(t.description || '').replace(/"/g, '""')}"`,
+      (t.debit_amount ?? t.debit ?? 0),
+      (t.credit_amount ?? t.credit ?? 0),
+      (t.running_balance ?? 0)
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bank-book-${new Date().getTime()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -179,12 +211,12 @@ const BankBookReportPage = () => {
     {
       header: <div className="text-right">Receipts (Dr)</div>,
       accessor: "debit",
-      cell: (row: any) => <ReportAmountCell amount={row.debit} />
+      cell: (row: any) => <ReportAmountCell amount={row.debit_amount ?? row.debit} />
     },
     {
       header: <div className="text-right">Payments (Cr)</div>,
       accessor: "credit",
-      cell: (row: any) => <ReportAmountCell amount={row.credit} />
+      cell: (row: any) => <ReportAmountCell amount={row.credit_amount ?? row.credit} />
     },
     {
       header: <div className="text-right">Balance</div>,
@@ -216,7 +248,18 @@ const BankBookReportPage = () => {
           <Label>Bank Account</Label>
           <Select 
             value={filters.bank_account_id} 
-            onValueChange={(val: string) => handleFilterChange('bank_account_id', val)}
+            onValueChange={(val: string) => {
+              const selectedBa = (bankAccounts || []).find((b: any) => String(b.id) === val);
+              if (selectedBa && selectedBa.chart_account_id) {
+                setFilters((prev: any) => ({
+                  ...prev,
+                  bank_account_id: val,
+                  account_id: String(selectedBa.chart_account_id)
+                }));
+              } else {
+                handleFilterChange('bank_account_id', val);
+              }
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select Bank Account" />
@@ -274,7 +317,7 @@ const BankBookReportPage = () => {
             {data.bank_name && <p className="text-slate-500 text-xs mt-1">Bank: {data.bank_name} | Acc: {data.account_number}</p>}
           </div>
 
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} onExportCsv={handleExportCsv} isRefreshing={loading} />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />

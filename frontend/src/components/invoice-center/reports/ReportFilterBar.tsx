@@ -5,9 +5,10 @@ import { Filter, RefreshCcw } from "lucide-react";
 
 interface ReportFilterBarProps {
   children: React.ReactNode;
-  onApply: () => void;
+  onApply?: () => void;
   onReset: () => void;
   isLoading?: boolean;
+  showApplyButton?: boolean;
 }
 
 export const ReportFilterBar: React.FC<ReportFilterBarProps> = ({
@@ -15,6 +16,7 @@ export const ReportFilterBar: React.FC<ReportFilterBarProps> = ({
   onApply,
   onReset,
   isLoading = false,
+  showApplyButton = false,
 }) => {
   return (
     <Card className="bg-white">
@@ -33,14 +35,16 @@ export const ReportFilterBar: React.FC<ReportFilterBarProps> = ({
               <RefreshCcw className="mr-2 h-4 w-4" />
               Reset
             </Button>
-            <Button
-              onClick={onApply}
-              disabled={isLoading}
-              className="w-full bg-navy-600 text-white hover:bg-navy-700 md:w-auto"
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              Apply Filters
-            </Button>
+            {showApplyButton && onApply ? (
+              <Button
+                onClick={onApply}
+                disabled={isLoading}
+                className="w-full bg-navy-600 text-white hover:bg-navy-700 md:w-auto"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Apply Filters
+              </Button>
+            ) : null}
           </div>
         </div>
       </CardContent>

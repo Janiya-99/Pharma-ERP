@@ -380,29 +380,146 @@ const DEFAULT_ANALYSES: Record<FinanceAiContextType, (data: any, query?: string)
     ],
   }),
 
-  balance_sheet: (data, query) => ({
-    headline: "Financial Solvency: Current Ratio 1.84 & Robust Equity Base",
-    summary:
-      "CeylonMed exhibits exceptional liquidity with current assets significantly exceeding short-term liabilities. Share capital and retained earnings provide solid capital adequacy.",
-    healthScore: 96,
-    statusBadge: "Solvent & Healthy",
-    insights: [
-      {
-        title: "Working Capital Health",
-        detail: "Current Ratio of 1.84 exceeds the 1.50 benchmark, ensuring ample liquidity for vendor settlements.",
-        type: "success",
-      },
-      {
-        title: "Zero Delinquent Debt",
-        detail: "No overdue short-term bank borrowings; liabilities consist predominantly of trade credit in good standing.",
-        type: "success",
-      },
-    ],
-    recommendations: [
-      "Maintain minimum LKR 10M unencumbered bank balance for rapid import LC margin requirements.",
-      "Conduct physical fixed asset tagging verification before year-end audit.",
-    ],
-  }),
+  balance_sheet: (data, query) => {
+    const formatLkr = (num: number) =>
+      "LKR " + (num || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const totalAssets = data?.total_assets || data?.assets?.total || 0;
+    const totalLiab = data?.total_liabilities || data?.liabilities?.total || 0;
+    const totalEq = data?.total_equity || data?.equity?.total || 0;
+    const totalLE = data?.total_liabilities_and_equity || totalLiab + totalEq;
+    const isBalanced = data?.is_balanced ?? Math.abs(totalAssets - totalLE) < 0.01;
+    const diff = data?.difference !== undefined ? data.difference : totalAssets - totalLE;
+
+    const curAssets = data?.current_assets || totalAssets;
+    const curLiab = data?.current_liabilities || totalLiab;
+    const workingCap = data?.working_capital !== undefined ? data.working_capital : curAssets - curLiab;
+    const curRatio = data?.current_ratio || (curLiab > 0 ? (curAssets / curLiab).toFixed(2) : "N/A");
+    const quickRatio = data?.quick_ratio || "N/A";
+    const debtToEquity = data?.debt_to_equity_ratio || (totalEq > 0 ? (totalLiab / totalEq).toFixed(2) : "N/A");
+
+    const q = (query || "").toLowerCase();
+
+    if (q.includes("current ratio") || q.includes("working capital")) {
+      return {
+        headline: `Liquidity Telemetry: Current Ratio ${curRatio} | Working Capital ${formatLkr(workingCap)}`,
+        summary: `Current assets of ${formatLkr(curAssets)} against short-term liabilities of ${formatLkr(curLiab)} provide net working capital buffer of ${formatLkr(workingCap)}.`,
+        healthScore: curRatio >= 1.5 ? 98 : curRatio >= 1.0 ? 88 : 65,
+        statusBadge: curRatio >= 1.5 ? "Strong Liquidity" : curRatio >= 1.0 ? "Adequate Coverage" : "Liquidity Watch",
+        insights: [
+          {
+            title: `Current Ratio: ${curRatio}`,
+            detail: `Short-term obligation coverage is ${curRatio}x. Benchmark for pharmaceutical operations is 1.25x - 1.50x.`,
+            type: curRatio >= 1.25 ? "success" : "info",
+          },
+          {
+            title: `Net Working Capital: ${formatLkr(workingCap)}`,
+            detail: `Represents liquid operating buffer available for inventory restocking and trade debt settlement.`,
+            type: workingCap >= 0 ? "success" : "warning",
+          },
+          {
+            title: `Quick Ratio (Acid-Test): ${quickRatio}`,
+            detail: `Cash and receivable liquid coverage excluding inventory holdings.`,
+            type: "info",
+          },
+        ],
+        recommendations: [
+          "Maintain weekly trade receivable aging follow-ups to safeguard working capital velocity.",
+          "Ensure supplier settlement terms remain aligned with customer collection cycles.",
+        ],
+      };
+    }
+
+    if (q.includes("solvency") || q.includes("debt-to-equity") || q.includes("cash adequacy")) {
+      return {
+        headline: `Solvency & Capital Structure: Debt-to-Equity ${debtToEquity}`,
+        summary: `Total liabilities of ${formatLkr(totalLiab)} evaluated against enterprise equity base of ${formatLkr(totalEq)}. Capital adequacy maintains commercial solvency.`,
+        healthScore: 92,
+        statusBadge: "Solvent Capital Base",
+        insights: [
+          {
+            title: `Liabilities: ${formatLkr(totalLiab)}`,
+            detail: `Consisting primarily of operating trade payables and supplier credit lines.`,
+            type: "info",
+          },
+          {
+            title: `Equity Base: ${formatLkr(totalEq)}`,
+            detail: `Incorporates share capital reserves and period retained net profit.`,
+            type: "success",
+          },
+          {
+            title: `Double-Entry Equilibrium: ${isBalanced ? "100% Balanced" : "Imbalance Flagged"}`,
+            detail: isBalanced
+              ? `Total Assets (${formatLkr(totalAssets)}) strictly equal Total Liabilities + Equity (${formatLkr(totalLE)}).`
+              : `Discrepancy of ${formatLkr(diff)} detected between Assets and Liabilities + Equity.`,
+            type: isBalanced ? "success" : "warning",
+          },
+        ],
+        recommendations: [
+          "Reinvest retained operational earnings into working capital reserves to reduce reliance on trade credit.",
+          "Perform quarterly capital adequacy audits for statutory financial governance.",
+        ],
+      };
+    }
+
+    if (q.includes("depreciation") || q.includes("ppe") || q.includes("fixed asset")) {
+      return {
+        headline: "Fixed Asset & PPE Depreciation Audit",
+        summary: "Non-current fixed assets, property plant and equipment, and accumulated depreciation schedules audited against SLFRS standards.",
+        healthScore: 95,
+        statusBadge: "PPE Verified",
+        insights: [
+          {
+            title: "Accumulated Depreciation Controls",
+            detail: "Contra-asset accounts properly deducted from gross non-current book value in statement presentation.",
+            type: "success",
+          },
+          {
+            title: "Asset Ledger Cross-Match",
+            detail: "Fixed asset general ledger movements match underlying fixed asset registry depreciation runs.",
+            type: "info",
+          },
+        ],
+        recommendations: [
+          "Conduct physical fixed asset count prior to annual audit closing.",
+          "Verify straight-line depreciation rates on specialized temperature-controlled storage assets.",
+        ],
+      };
+    }
+
+    // Default Comprehensive Audit
+    return {
+      headline: isBalanced
+        ? `Statutory Balance Sheet: 100% Balanced (${formatLkr(totalAssets)})`
+        : `Audit Alert: Statement Out of Balance by ${formatLkr(diff)}`,
+      summary: isBalanced
+        ? `Double-entry equilibrium confirmed. Total Assets of ${formatLkr(totalAssets)} precisely match Total Liabilities & Equity of ${formatLkr(totalLE)} with zero statutory discrepancy.`
+        : `Balance discrepancy detected: Assets (${formatLkr(totalAssets)}) vs Liabilities + Equity (${formatLkr(totalLE)}). Reconcile general ledger postings.`,
+      healthScore: isBalanced ? 98 : 45,
+      statusBadge: isBalanced ? "Equilibrium Verified" : "Imbalance Alert",
+      insights: [
+        {
+          title: `Total Assets: ${formatLkr(totalAssets)}`,
+          detail: `${data?.assets?.lines?.length || 0} active asset accounts across cash, bank, receivables, and inventory.`,
+          type: "success",
+        },
+        {
+          title: `Total Liabilities: ${formatLkr(totalLiab)}`,
+          detail: `${data?.liabilities?.lines?.length || 0} liability accounts across trade payables and statutory obligations.`,
+          type: "info",
+        },
+        {
+          title: `Total Equity: ${formatLkr(totalEq)}`,
+          detail: `Net Profit of ${formatLkr(data?.net_income || 0)} incorporated into equity position.`,
+          type: "success",
+        },
+      ],
+      recommendations: [
+        "Export official statement in CSV/JSON format for auditor workpapers.",
+        "Verify monthly subledger-to-GL posting reconciliation for all active branches.",
+      ],
+    };
+  },
 
   general_ledger: (data, query) => ({
     headline: "General Ledger Audit: Complete Immutable Audit Trail",

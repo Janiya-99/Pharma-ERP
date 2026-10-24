@@ -27,6 +27,8 @@ import {
   FinancePostingStatusReportRow,
 } from "@/types/invoice-center-reports";
 import { normalizeReportEnvelope } from "@/utils/reportResponse";
+import { useRef } from 'react';
+import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import {
   UploadCloud,
@@ -44,6 +46,8 @@ export const FinancePostingStatusReportPage: React.FC = () => {
     finance_post_status: "all",
   });
 
+  const debouncedFilters = useDebounce(filters, 300);
+
   const [data, setData] = useState<{
     summary: any;
     rows: FinancePostingStatusReportRow[];
@@ -57,12 +61,12 @@ export const FinancePostingStatusReportPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = async (overrideFilters?: FinancePostingStatusReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
 
-      const cleanFilters = { ...filters };
+      const cleanFilters = { ...(overrideFilters || filters) };
       if (cleanFilters.document_type === "all")
         delete cleanFilters.document_type;
       if (cleanFilters.finance_post_status === "all")
@@ -93,16 +97,24 @@ export const FinancePostingStatusReportPage: React.FC = () => {
     }
   };
 
+  const prevFiltersRef = useRef(filters);
   useEffect(() => {
-    fetchData();
-  }, [filters.page]);
+    const prev = prevFiltersRef.current;
+    prevFiltersRef.current = filters;
+    const nonPageChanged = Object.keys(filters).some(
+      (k) => k !== "page" && (filters as any)[k] !== (prev as any)[k]
+    );
+    if (nonPageChanged && filters.page !== 1) {
+      setFilters((p) => ({ ...p, page: 1 }));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData(debouncedFilters);
+  }, [debouncedFilters]);
 
   const handleApplyFilters = () => {
-    if (filters.page === 1) {
-      fetchData();
-    } else {
-      setFilters((prev) => ({ ...prev, page: 1 }));
-    }
+    fetchData(filters);
   };
 
   const handleResetFilters = () => {
@@ -113,7 +125,6 @@ export const FinancePostingStatusReportPage: React.FC = () => {
       document_type: "all",
       finance_post_status: "all",
     });
-    setTimeout(() => handleApplyFilters(), 0);
   };
 
   const handlePageChange = (newPage: number) => {

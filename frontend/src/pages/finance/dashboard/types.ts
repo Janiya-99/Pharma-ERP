@@ -42,12 +42,16 @@ export interface AgingBucket {
 
 export interface ReceivablesSummary {
   total_outstanding: number;
+  overdue_amount?: number;
+  overdue_count?: number;
   collection_rate: number;
   aging: AgingBucket[];
 }
 
 export interface PayablesSummary {
   total_payable: number;
+  overdue_amount?: number;
+  overdue_count?: number;
   supplier_count: number;
   payment_due_count: number;
   aging: AgingBucket[];
@@ -116,4 +120,7 @@ export interface FinanceDashboardResponse {
   pending_approvals: PendingApproval[];
   liquidity: LiquiditySummary;
   period_status: PeriodStatus;
+  alerts?: FinancialAlertItem[];
+  top_customers?: TopEntityItem[];
+  top_suppliers?: TopEntityItem[];
 }

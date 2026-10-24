@@ -13,6 +13,7 @@ import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
+import { useDebounce } from '../../../../hooks/useDebounce';
 
 const SOURCE_TYPES = [
   'opening_balance',
@@ -40,15 +41,17 @@ const DayBookReportPage = () => {
     branch_id: activeBranch?.id || ""
   });
 
-  const fetchReport = useCallback(async () => {
-    if (!filters.date_from || !filters.date_to) {
-      toast.error("Date range is required");
+  const debouncedFilters = useDebounce(filters, 300);
+
+  const fetchReport = useCallback(async (customFilters?: any) => {
+    const activeF = customFilters || filters;
+    if (!activeF.date_from || !activeF.date_to) {
       return;
     }
 
     setLoading(true);
     try {
-      const params = { ...filters };
+      const params = { ...activeF };
       Object.keys(params).forEach((key: any) => {
         if (params[key] === "") delete params[key];
       });
@@ -63,18 +66,18 @@ const DayBookReportPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, []);
 
   useEffect(() => {
-    fetchReport();
-  }, [activeBranch]);
+    fetchReport(debouncedFilters);
+  }, [debouncedFilters, fetchReport, activeBranch]);
 
   const handleFilterChange = (key: any, value: any) => {
     setFilters((prev: any) => ({ ...prev, [key]: value }));
   };
 
   const handleApplyFilters = () => {
-    fetchReport();
+    fetchReport(filters);
   };
 
   const handleClearFilters = () => {
@@ -84,7 +87,6 @@ const DayBookReportPage = () => {
       source_type: "",
       branch_id: activeBranch?.id || ""
     });
-    setData(null);
   };
 
   const handleExportJson = () => {
@@ -251,9 +253,9 @@ const DayBookReportPage = () => {
       {!data && !loading && (
         <div className="bg-white  rounded-lg shadow p-8 text-center border border-gray-200 ">
           <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 ">Run Report</h3>
+          <h3 className="mt-4 text-lg font-medium text-gray-900 ">No Data</h3>
           <p className="mt-2 text-sm text-gray-500 ">
-            Click Apply Filters to view the day book.
+            No transactions found for the selected date range and filters.
           </p>
         </div>
       )}

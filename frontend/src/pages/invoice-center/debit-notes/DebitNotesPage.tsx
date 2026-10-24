@@ -199,7 +199,7 @@ const DebitNotesPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>CN No</TableHead>
+                <TableHead>Debit Note No</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Type</TableHead>

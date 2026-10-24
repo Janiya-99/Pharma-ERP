@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -2399,7 +2400,23 @@ function ReportPage({
 }) {
   const context = useInventoryContext();
   const references = useReferenceData();
-  const [filters, setFilters] = useState<ApiRecord>({ warehouse_id: "", product_id: "", status: "" });
+  const [searchParams] = useSearchParams();
+  const urlFilter = searchParams.get("filter") || searchParams.get("status") || "";
+  const [filters, setFilters] = useState<ApiRecord>(() => {
+    const init: ApiRecord = {
+      warehouse_id: searchParams.get("warehouse_id") || "",
+      product_id: searchParams.get("product_id") || "",
+      status: "",
+    };
+    if (urlFilter === "low_stock" || urlFilter === "low-stock") {
+      init.low_stock_only = "true";
+      init.status = "low_stock";
+    } else if (urlFilter === "out_of_stock" || urlFilter === "out-of-stock") {
+      init.out_of_stock_only = "true";
+      init.status = "out_of_stock";
+    }
+    return init;
+  });
   const params = { company_id: context.companyId, branch_id: context.branchId, ...extraParams, ...compact(filters) };
   const report = useBackendList(loader, params, !!context.companyId);
   const warehouseOptions = [{ label: "All Warehouses", value: "all" }, ...makeOptions(references.refs.warehouses, ["warehouse_name"])];
@@ -2442,6 +2459,23 @@ function ReportPage({
     }
   };
 
+  const displayRows = useMemo(() => {
+    let rows = report.rows;
+    if (filters.status === "low_stock" || filters.low_stock_only === "true") {
+      rows = rows.filter((r) => {
+        const avail = Number(valueOf(r, ["quantity_available"], 0));
+        const reorder = Number(valueOf(r, ["product.reorder_level", "reorder_level"], 0));
+        return avail <= reorder;
+      });
+    } else if (filters.status === "out_of_stock" || filters.out_of_stock_only === "true") {
+      rows = rows.filter((r) => {
+        const avail = Number(valueOf(r, ["quantity_available"], 0));
+        return avail === 0;
+      });
+    }
+    return rows;
+  }, [report.rows, filters.status, filters.low_stock_only, filters.out_of_stock_only]);
+
   return (
     <InventoryPage
       title={title}
@@ -2449,10 +2483,15 @@ function ReportPage({
       icon={icon}
       actions={
         <div className="flex items-center gap-2">
+          {filters.status && (
+            <span className="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
+              Filtered: {filters.status.replace("_", " ")}
+            </span>
+          )}
           <Button
             variant="outline"
             onClick={() =>
-              setFilters({ warehouse_id: "", product_id: "", date_from: "", date_to: "", status: "" })
+              setFilters({ warehouse_id: "", product_id: "", date_from: "", date_to: "", status: "", low_stock_only: "", out_of_stock_only: "" })
             }
           >
             Clear Filters
@@ -2514,7 +2553,7 @@ function ReportPage({
           />
         </CardContent>
       </Card>
-      <DataGrid loading={report.loading} error={report.error} data={report.rows} columns={columns} />
+      <DataGrid loading={report.loading} error={report.error} data={displayRows} columns={columns} />
     </InventoryPage>
   );
 }
@@ -2526,13 +2565,70 @@ export function StockBalanceReportPage() {
       description="Current available, reserved, and valued stock by product, batch, and warehouse."
       loader={inventoryApi.getStockBalances}
       columns={[
-        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
+        {
+          header: "Product",
+          render: (row) => {
+            const name = valueOf(row, ["product.product_name", "product_name"]);
+            const avail = Number(valueOf(row, ["quantity_available"], 0));
+            const reorder = Number(valueOf(row, ["product.reorder_level", "reorder_level"], 0));
+            const isOut = avail === 0;
+            const isLow = !isOut && reorder > 0 && avail <= reorder;
+            return (
+              <div className="flex flex-col gap-0.5">
+                <span className={`font-semibold ${isOut ? "text-rose-700 font-bold" : isLow ? "text-amber-700 font-bold" : "text-slate-800"}`}>
+                  {name}
+                </span>
+                {isOut && <span className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-1.5 py-0.2 rounded w-fit">Out of Stock</span>}
+                {isLow && <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded w-fit">Low Stock (Reorder: {reorder})</span>}
+              </div>
+            );
+          },
+        },
+        { header: "Batch", render: (row) => <span className="font-mono text-xs text-slate-600">{valueOf(row, ["product_batch.batch_number", "batch_number"])}</span> },
         { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
-        { header: "On Hand", render: (row) => valueOf(row, ["quantity_on_hand"]) },
-        { header: "Available", render: (row) => valueOf(row, ["quantity_available"]) },
+        { header: "On Hand", render: (row) => <span className="font-medium text-slate-700">{valueOf(row, ["quantity_on_hand"])}</span> },
+        {
+          header: "Available",
+          render: (row) => {
+            const avail = Number(valueOf(row, ["quantity_available"], 0));
+            const reorder = Number(valueOf(row, ["product.reorder_level", "reorder_level"], 0));
+            if (avail === 0) {
+              return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                  0
+                </span>
+              );
+            }
+            if (reorder > 0 && avail <= reorder) {
+              return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                  {avail}
+                </span>
+              );
+            }
+            return (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                {avail}
+              </span>
+            );
+          },
+        },
         { header: "Allocated", render: (row) => valueOf(row, ["quantity_allocated"]) },
-        { header: "Stock Value", render: (row) => valueOf(row, ["total_stock_value", "stock_value"]) },
+        { header: "Stock Value", render: (row) => <span className="font-mono font-bold text-slate-900">{valueOf(row, ["total_stock_value", "stock_value"])}</span> },
+        {
+          header: "Status",
+          render: (row) => {
+            const avail = Number(valueOf(row, ["quantity_available"], 0));
+            const reorder = Number(valueOf(row, ["product.reorder_level", "reorder_level"], 0));
+            if (avail === 0) {
+              return <StatusBadge status="Out of Stock" />;
+            }
+            if (reorder > 0 && avail <= reorder) {
+              return <StatusBadge status="Low Stock" />;
+            }
+            return <StatusBadge status="In Stock" />;
+          },
+        },
       ]}
     />
   );

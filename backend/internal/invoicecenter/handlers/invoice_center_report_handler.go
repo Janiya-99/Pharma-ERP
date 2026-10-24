@@ -70,14 +70,14 @@ func (h *InvoiceCenterReportHandler) GetCustomerBalances(c *gin.Context) {
 		return
 	}
 
-	rows, pagination, err := h.service.GetCustomerBalanceReport(db, companyID, filters)
+	rows, summary, pagination, err := h.service.GetCustomerBalanceReport(db, companyID, filters)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, controlDto.ErrorResponse("Failed to generate report", err.Error()))
 		return
 	}
 
 	data := dto.ReportResponseDTO{
-		Summary: map[string]interface{}{},
+		Summary: summary,
 		Rows:    rows,
 	}
 	c.JSON(http.StatusOK, controlDto.PaginatedResponse("Customer balances loaded successfully", data, pagination))

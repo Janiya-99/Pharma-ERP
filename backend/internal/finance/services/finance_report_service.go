@@ -1,7 +1,9 @@
 package services
 
 import (
+	"errors"
 	"math"
+	"sort"
 	"strings"
 
 	"github.com/pixandco/erp-phrma/internal/finance/dto"
@@ -178,7 +180,7 @@ func (s *FinanceReportService) GetProfitLossReport(companyID uint64, req dto.Pro
 }
 
 func (s *FinanceReportService) GetBalanceSheetReport(companyID uint64, req dto.BalanceSheetReportRequest) (*dto.BalanceSheetReportResponse, error) {
-	// A balance sheet is essentially a trial balance up to AsOfDate
+	// A balance sheet is essentially a cumulative financial position up to AsOfDate
 	tbReq := dto.TrialBalanceReportRequest{
 		FinancialYearID: req.FinancialYearID,
 		DateTo:          req.AsOfDate,
@@ -190,12 +192,22 @@ func (s *FinanceReportService) GetBalanceSheetReport(companyID uint64, req dto.B
 		return nil, err
 	}
 
+	return s.CalculateBalanceSheet(rawLines), nil
+}
+
+func (s *FinanceReportService) CalculateBalanceSheet(rawLines []repositories.TrialBalanceRawLine) *dto.BalanceSheetReportResponse {
 	var response dto.BalanceSheetReportResponse
 	response.Assets.Name = "Assets"
+	response.Assets.Lines = make([]dto.TrialBalanceLine, 0)
 	response.Liabilities.Name = "Liabilities"
+	response.Liabilities.Lines = make([]dto.TrialBalanceLine, 0)
 	response.Equity.Name = "Equity"
+	response.Equity.Lines = make([]dto.TrialBalanceLine, 0)
 
 	var netIncome float64
+	var currentAssets, nonCurrentAssets float64
+	var currentLiabilities, nonCurrentLiabilities float64
+	var inventoryAmount float64
 
 	for _, raw := range rawLines {
 		netDebit := raw.OpeningDebit + raw.PeriodDebit
@@ -208,16 +220,30 @@ func (s *FinanceReportService) GetBalanceSheetReport(companyID uint64, req dto.B
 			closingCredit = netCredit - netDebit
 		}
 
-		line := dto.TrialBalanceLine{
-			AccountCode:   raw.AccountCode,
-			AccountName:   raw.AccountName,
-			ClosingDebit:  closingDebit,
-			ClosingCredit: closingCredit,
+		// Skip accounts with zero net movement and balance
+		if closingDebit == 0 && closingCredit == 0 {
+			continue
 		}
 
-		if raw.ClassificationType == "Profit & Loss" {
-			// Accumulate to Net Income
-			if raw.NormalBalance == "credit" {
+		code := strings.TrimSpace(raw.AccountCode)
+		name := strings.TrimSpace(raw.AccountName)
+		clsType := strings.TrimSpace(raw.ClassificationType)
+		clsName := strings.TrimSpace(raw.ClassificationName)
+		normBal := strings.ToLower(strings.TrimSpace(raw.NormalBalance))
+		if normBal == "" {
+			normBal = strings.ToLower(strings.TrimSpace(raw.CoaNormalBalance))
+		}
+
+		// 1. Profit & Loss items (Revenues: 4xxxx, Expenses: 5xxxx-8xxxx) accumulate into Net Profit
+		isPL := strings.EqualFold(clsType, "Profit & Loss") ||
+			strings.HasPrefix(code, "4") ||
+			strings.HasPrefix(code, "5") ||
+			strings.HasPrefix(code, "6") ||
+			strings.HasPrefix(code, "7") ||
+			strings.HasPrefix(code, "8")
+
+		if isPL {
+			if strings.HasPrefix(code, "4") || normBal == "credit" {
 				netIncome += (closingCredit - closingDebit)
 			} else {
 				netIncome -= (closingDebit - closingCredit)
@@ -225,50 +251,179 @@ func (s *FinanceReportService) GetBalanceSheetReport(companyID uint64, req dto.B
 			continue
 		}
 
-		val := math.Abs(closingCredit - closingDebit)
+		line := dto.TrialBalanceLine{
+			AccountID:          raw.AccountID,
+			AccountCode:        raw.AccountCode,
+			AccountName:        raw.AccountName,
+			ClassificationName: raw.ClassificationName,
+			OpeningDebit:       raw.OpeningDebit,
+			OpeningCredit:      raw.OpeningCredit,
+			PeriodDebit:        raw.PeriodDebit,
+			PeriodCredit:       raw.PeriodCredit,
+			ClosingDebit:       closingDebit,
+			ClosingCredit:      closingCredit,
+		}
 
-		if raw.NormalBalance == "debit" {
+		// 2. Check Asset accounts (1xxxx or classification Assets)
+		isAsset := strings.HasPrefix(code, "1") ||
+			strings.EqualFold(clsName, "Assets") ||
+			strings.Contains(strings.ToLower(clsName), "asset") ||
+			strings.Contains(strings.ToLower(clsName), "receivable") ||
+			strings.Contains(strings.ToLower(clsName), "inventory") ||
+			strings.Contains(strings.ToLower(clsName), "cash")
+
+		// 3. Check Equity accounts (3xxxx or Retained Earnings / Capital)
+		isEquity := strings.HasPrefix(code, "3") ||
+			strings.Contains(strings.ToLower(clsName), "equity") ||
+			strings.Contains(strings.ToLower(clsName), "capital") ||
+			strings.Contains(strings.ToLower(name), "retained earnings") ||
+			strings.Contains(strings.ToLower(name), "share capital")
+
+		// 4. Check Liability accounts (2xxxx or classification Liabilities)
+		isLiability := strings.HasPrefix(code, "2") ||
+			strings.Contains(strings.ToLower(clsName), "liabilit") ||
+			strings.Contains(strings.ToLower(clsName), "payable")
+
+		if isAsset {
+			isContraAsset := strings.Contains(strings.ToLower(name), "accumulated depreciation") ||
+				(strings.HasPrefix(code, "15") && normBal == "credit")
+
+			var val float64
+			if isContraAsset {
+				val = -(closingCredit - closingDebit)
+				line.Balance = val
+				line.Category = "Non-Current Assets"
+				nonCurrentAssets += val
+			} else {
+				val = closingDebit - closingCredit
+				line.Balance = val
+				if strings.HasPrefix(code, "15") || strings.Contains(strings.ToLower(clsName), "non current") || strings.Contains(strings.ToLower(clsName), "property") {
+					line.Category = "Non-Current Assets"
+					nonCurrentAssets += val
+				} else {
+					line.Category = "Current Assets"
+					currentAssets += val
+					if strings.HasPrefix(code, "12") || strings.Contains(strings.ToLower(name), "inventory") {
+						inventoryAmount += val
+					}
+				}
+			}
+
 			response.Assets.Lines = append(response.Assets.Lines, line)
 			response.Assets.Total += val
-		} else {
-			if raw.ClassificationType == "Equity" || raw.AccountName == "Retained Earnings" {
-				response.Equity.Lines = append(response.Equity.Lines, line)
-				response.Equity.Total += val
+
+		} else if isLiability {
+			val := closingCredit - closingDebit
+			line.Balance = val
+			if strings.HasPrefix(code, "25") || strings.Contains(strings.ToLower(clsName), "non current") || strings.Contains(strings.ToLower(name), "long term") {
+				line.Category = "Non-Current Liabilities"
+				nonCurrentLiabilities += val
 			} else {
+				line.Category = "Current Liabilities"
+				currentLiabilities += val
+			}
+
+			response.Liabilities.Lines = append(response.Liabilities.Lines, line)
+			response.Liabilities.Total += val
+
+		} else if isEquity {
+			val := closingCredit - closingDebit
+			line.Balance = val
+			line.Category = "Equity"
+			response.Equity.Lines = append(response.Equity.Lines, line)
+			response.Equity.Total += val
+
+		} else {
+			// Fallback by normal balance sign
+			if normBal == "debit" {
+				val := closingDebit - closingCredit
+				line.Balance = val
+				line.Category = "Current Assets"
+				response.Assets.Lines = append(response.Assets.Lines, line)
+				response.Assets.Total += val
+				currentAssets += val
+			} else {
+				val := closingCredit - closingDebit
+				line.Balance = val
+				line.Category = "Current Liabilities"
 				response.Liabilities.Lines = append(response.Liabilities.Lines, line)
 				response.Liabilities.Total += val
+				currentLiabilities += val
 			}
 		}
 	}
 
-	response.NetIncome = netIncome
-	// Add net income to equity
-	response.Equity.Total += netIncome
+	response.NetIncome = math.Round(netIncome*100) / 100
 
-	return &response, nil
+	// Incorporate Net Profit / (Loss) as a distinct transparent line in Equity
+	response.Equity.Lines = append(response.Equity.Lines, dto.TrialBalanceLine{
+		AccountCode:   "PL-NET",
+		AccountName:   "Net Profit / (Loss) for the Period",
+		Category:      "Equity",
+		Balance:       response.NetIncome,
+		ClosingDebit:  math.Max(0, -response.NetIncome),
+		ClosingCredit: math.Max(0, response.NetIncome),
+	})
+	response.Equity.Total += response.NetIncome
+
+	// Round totals to 2 decimal places
+	response.Assets.Total = math.Round(response.Assets.Total*100) / 100
+	response.Liabilities.Total = math.Round(response.Liabilities.Total*100) / 100
+	response.Equity.Total = math.Round(response.Equity.Total*100) / 100
+
+	response.TotalAssets = response.Assets.Total
+	response.TotalLiabilities = response.Liabilities.Total
+	response.TotalEquity = response.Equity.Total
+	response.TotalLiabilitiesAndEquity = math.Round((response.TotalLiabilities+response.TotalEquity)*100) / 100
+
+	diff := math.Round((response.TotalAssets-response.TotalLiabilitiesAndEquity)*100) / 100
+	response.Difference = diff
+	response.IsBalanced = math.Abs(diff) < 0.01
+
+	response.CurrentAssets = math.Round(currentAssets*100) / 100
+	response.NonCurrentAssets = math.Round(nonCurrentAssets*100) / 100
+	response.CurrentLiabilities = math.Round(currentLiabilities*100) / 100
+	response.NonCurrentLiabilities = math.Round(nonCurrentLiabilities*100) / 100
+	response.WorkingCapital = math.Round((currentAssets-currentLiabilities)*100) / 100
+
+	if currentLiabilities > 0 {
+		response.CurrentRatio = math.Round((currentAssets/currentLiabilities)*100) / 100
+		quickAssets := currentAssets - inventoryAmount
+		response.QuickRatio = math.Round((quickAssets/currentLiabilities)*100) / 100
+	}
+	if response.TotalEquity > 0 {
+		response.DebtToEquityRatio = math.Round((response.TotalLiabilities/response.TotalEquity)*100) / 100
+	}
+
+	return &response
 }
 
 func (s *FinanceReportService) GetAccountLedgerReport(companyID uint64, req dto.AccountLedgerReportRequest) (*dto.AccountLedgerReportResponse, error) {
-	// Fetch Account Details
 	acc, err := s.coaRepo.FindByID(companyID, req.AccountID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Fetch Opening Balance
 	obDebit, obCredit, err := s.repo.GetOpeningBalanceForAccount(companyID, req.AccountID, req.DateFrom)
 	if err != nil {
 		return nil, err
 	}
 
 	var openingBalance float64
-	if acc.AccountClassification.NormalBalance == "debit" {
+	accNormBal := acc.AccountClassification.NormalBalance
+	if accNormBal == "" {
+		accNormBal = acc.NormalBalance
+	}
+	if accNormBal == "" {
+		accNormBal = "Debit"
+	}
+
+	if strings.EqualFold(accNormBal, "debit") {
 		openingBalance = obDebit - obCredit
 	} else {
 		openingBalance = obCredit - obDebit
 	}
 
-	// Fetch Ledger Lines
 	filters := map[string]interface{}{"account_id": req.AccountID}
 	if req.FinancialYearID != nil {
 		filters["financial_year_id"] = *req.FinancialYearID
@@ -280,24 +435,55 @@ func (s *FinanceReportService) GetAccountLedgerReport(companyID uint64, req dto.
 		filters["branch_id"] = *req.BranchID
 	}
 
-	entries, _, err := s.glRepo.List(companyID, filters, "", req.DateFrom, req.DateTo, 1, 10000)
+	entries, _, err := s.glRepo.List(companyID, filters, "", req.DateFrom, req.DateTo, 1, 100000)
 	if err != nil {
 		return nil, err
 	}
 
+	return s.CalculateAccountLedger(acc, openingBalance, entries), nil
+}
+
+func (s *FinanceReportService) CalculateAccountLedger(
+	acc *models.ChartOfAccount,
+	openingBalance float64,
+	entries []models.GeneralLedgerEntry,
+) *dto.AccountLedgerReportResponse {
 	var response dto.AccountLedgerReportResponse
+
+	accNormBal := acc.AccountClassification.NormalBalance
+	if accNormBal == "" {
+		accNormBal = acc.NormalBalance
+	}
+	if accNormBal == "" {
+		accNormBal = "Debit"
+	}
+
 	response.AccountDetails = map[string]interface{}{
+		"account_id":     acc.ID,
 		"account_code":   acc.AccountCode,
 		"account_name":   acc.AccountName,
-		"normal_balance": acc.AccountClassification.NormalBalance,
+		"normal_balance": accNormBal,
 	}
 	response.OpeningBalance = openingBalance
 
+	// Sort entries in chronological order (oldest first) so running balance progresses forward in time
+	sortedEntries := make([]models.GeneralLedgerEntry, len(entries))
+	copy(sortedEntries, entries)
+	sort.Slice(sortedEntries, func(i, j int) bool {
+		if sortedEntries[i].TransactionDate.Equal(sortedEntries[j].TransactionDate) {
+			return sortedEntries[i].ID < sortedEntries[j].ID
+		}
+		return sortedEntries[i].TransactionDate.Before(sortedEntries[j].TransactionDate)
+	})
+
 	var totalDebit, totalCredit float64
 	runningBal := openingBalance
+	isDebit := strings.EqualFold(accNormBal, "debit")
 
-	for _, e := range entries {
-		if acc.AccountClassification.NormalBalance == "debit" {
+	response.LedgerLines = make([]dto.GeneralLedgerEntryResponse, 0, len(sortedEntries))
+
+	for _, e := range sortedEntries {
+		if isDebit {
 			runningBal += (e.DebitAmount - e.CreditAmount)
 		} else {
 			runningBal += (e.CreditAmount - e.DebitAmount)
@@ -313,6 +499,8 @@ func (s *FinanceReportService) GetAccountLedgerReport(companyID uint64, req dto.
 			Description:     e.Description,
 			DebitAmount:     e.DebitAmount,
 			CreditAmount:    e.CreditAmount,
+			Debit:           e.DebitAmount,
+			Credit:          e.CreditAmount,
 			RunningBalance:  runningBal,
 		})
 
@@ -324,10 +512,28 @@ func (s *FinanceReportService) GetAccountLedgerReport(companyID uint64, req dto.
 	response.TotalCredit = totalCredit
 	response.ClosingBalance = runningBal
 
-	return &response, nil
+	return &response
 }
 
 func (s *FinanceReportService) GetCashBankBookReport(companyID uint64, req dto.CashBankBookReportRequest) (*dto.CashBankBookReportResponse, error) {
+	// If account_id is not provided, resolve from bank_account_id or cash_account_id
+	if req.AccountID == 0 && req.BankAccountID != nil && *req.BankAccountID > 0 {
+		var chartAccID uint64
+		if err := s.repo.DB().Table("bank_accounts").Where("company_id = ? AND id = ?", companyID, *req.BankAccountID).Pluck("chart_account_id", &chartAccID).Error; err == nil && chartAccID > 0 {
+			req.AccountID = chartAccID
+		}
+	}
+	if req.AccountID == 0 && req.CashAccountID != nil && *req.CashAccountID > 0 {
+		var chartAccID uint64
+		if err := s.repo.DB().Table("cash_accounts").Where("company_id = ? AND id = ?", companyID, *req.CashAccountID).Pluck("linked_ledger_account_id", &chartAccID).Error; err == nil && chartAccID > 0 {
+			req.AccountID = chartAccID
+		}
+	}
+
+	if req.AccountID == 0 {
+		return nil, errors.New("account_id is required")
+	}
+
 	acc, err := s.coaRepo.FindByID(companyID, req.AccountID)
 	if err != nil {
 		return nil, err
@@ -339,7 +545,15 @@ func (s *FinanceReportService) GetCashBankBookReport(companyID uint64, req dto.C
 	}
 
 	var openingBalance float64
-	if acc.AccountClassification.NormalBalance == "debit" {
+	accNormBal := acc.AccountClassification.NormalBalance
+	if accNormBal == "" {
+		accNormBal = acc.NormalBalance
+	}
+	if accNormBal == "" {
+		accNormBal = "Debit"
+	}
+
+	if strings.EqualFold(accNormBal, "debit") {
 		openingBalance = obDebit - obCredit
 	} else {
 		openingBalance = obCredit - obDebit
@@ -355,23 +569,58 @@ func (s *FinanceReportService) GetCashBankBookReport(companyID uint64, req dto.C
 		return nil, err
 	}
 
+	return s.CalculateCashBankBook(acc, openingBalance, entries), nil
+}
+
+func (s *FinanceReportService) CalculateCashBankBook(
+	acc *models.ChartOfAccount,
+	openingBalance float64,
+	entries []models.GeneralLedgerEntry,
+) *dto.CashBankBookReportResponse {
 	var response dto.CashBankBookReportResponse
+
+	accNormBal := acc.AccountClassification.NormalBalance
+	if accNormBal == "" {
+		accNormBal = acc.NormalBalance
+	}
+	if accNormBal == "" {
+		accNormBal = "Debit"
+	}
+
 	response.AccountDetails = map[string]interface{}{
+		"account_id":     acc.ID,
 		"account_code":   acc.AccountCode,
 		"account_name":   acc.AccountName,
-		"normal_balance": acc.AccountClassification.NormalBalance,
+		"normal_balance": accNormBal,
 	}
 	response.OpeningBalance = openingBalance
 
+	// Sort entries in chronological order (oldest first) so running balance progresses forward in time
+	sortedEntries := make([]models.GeneralLedgerEntry, len(entries))
+	copy(sortedEntries, entries)
+	sort.Slice(sortedEntries, func(i, j int) bool {
+		if sortedEntries[i].TransactionDate.Equal(sortedEntries[j].TransactionDate) {
+			return sortedEntries[i].ID < sortedEntries[j].ID
+		}
+		return sortedEntries[i].TransactionDate.Before(sortedEntries[j].TransactionDate)
+	})
+
 	var totalReceipts, totalPayments float64
 	runningBal := openingBalance
+	isDebit := strings.EqualFold(accNormBal, "debit")
 
-	for _, e := range entries {
-		if acc.AccountClassification.NormalBalance == "debit" {
+	response.Transactions = make([]dto.GeneralLedgerEntryResponse, 0, len(sortedEntries))
+
+	for _, e := range sortedEntries {
+		if isDebit {
+			// For Bank & Cash (Asset) accounts:
+			// Debit = Inflow / Deposit / Receipt (increases cash)
+			// Credit = Outflow / Disbursement / Payment (decreases cash)
 			runningBal += (e.DebitAmount - e.CreditAmount)
 			totalReceipts += e.DebitAmount
 			totalPayments += e.CreditAmount
 		} else {
+			// For credit-normal accounts (e.g. Bank Overdraft)
 			runningBal += (e.CreditAmount - e.DebitAmount)
 			totalReceipts += e.CreditAmount
 			totalPayments += e.DebitAmount
@@ -387,15 +636,19 @@ func (s *FinanceReportService) GetCashBankBookReport(companyID uint64, req dto.C
 			Description:     e.Description,
 			DebitAmount:     e.DebitAmount,
 			CreditAmount:    e.CreditAmount,
+			Debit:           e.DebitAmount,
+			Credit:          e.CreditAmount,
 			RunningBalance:  runningBal,
 		})
 	}
 
 	response.TotalReceipts = totalReceipts
 	response.TotalPayments = totalPayments
+	response.TotalDebit = totalReceipts
+	response.TotalCredit = totalPayments
 	response.ClosingBalance = runningBal
 
-	return &response, nil
+	return &response
 }
 
 func (s *FinanceReportService) GetDayBookReport(companyID uint64, req dto.DayBookReportRequest) (*dto.DayBookReportResponse, error) {

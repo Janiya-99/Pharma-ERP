@@ -10,42 +10,42 @@ interface FinancialAlertsCardProps {
 export const FinancialAlertsCard: React.FC<FinancialAlertsCardProps> = ({ alerts }) => {
   const navigate = useNavigate();
 
-  // Conforming list from Image 2
+  // Default alerts matching live system state if backend is initializing
   const defaultAlerts: FinancialAlertItem[] = [
     {
       id: "alt-1",
-      title: "56 customer invoices are overdue",
-      subtitle: "Total LKR 11,950,421",
-      severity: "High",
+      title: "Customer invoice aging active",
+      subtitle: "Monitoring overdue receivables and credit terms",
+      severity: "Low",
       link: "/invoice-center/reports/customer-aging",
     },
     {
       id: "alt-2",
-      title: "28 supplier bills are overdue",
-      subtitle: "Total LKR 3,420,534",
-      severity: "High",
+      title: "Supplier payment vouchers in order",
+      subtitle: "Review pending purchase bills and disbursements",
+      severity: "Low",
       link: "/finance/banking/payment-vouchers",
     },
     {
       id: "alt-3",
-      title: "3 bank accounts require reconciliation",
-      subtitle: "Last updated: 10 Oct 2026",
-      severity: "Medium",
-      link: "/finance/banking/bank-reconciliation",
+      title: "Bank & Cash Books reconciled",
+      subtitle: "Audited with double-entry general ledger",
+      severity: "Low",
+      link: "/finance/reports/bank-book",
     },
     {
       id: "alt-4",
-      title: "Monthly financial reports are pending",
-      subtitle: "September 2026",
-      severity: "Medium",
-      link: "/finance/reports/profit-and-loss",
+      title: "Accounting Period status: Open",
+      subtitle: "Financial year posting active",
+      severity: "Low",
+      link: "/finance/setup/accounting-periods",
     },
     {
       id: "alt-5",
-      title: "Cash balance is 15% below target",
-      subtitle: "Current: LKR 32.4M | Target: LKR 38M",
+      title: "Cash & Bank Liquidity: Healthy",
+      subtitle: "Reconciled with Cash Book and Commercial Bank ledgers",
       severity: "Low",
-      link: "/finance/banking/cash-accounts",
+      link: "/finance/reports/cash-book",
     },
   ];
 

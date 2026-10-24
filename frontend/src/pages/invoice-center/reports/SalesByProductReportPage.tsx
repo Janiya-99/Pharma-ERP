@@ -20,6 +20,8 @@ import {
   SalesByProductReportRow,
 } from "@/types/invoice-center-reports";
 import { normalizeReportEnvelope } from "@/utils/reportResponse";
+import { useRef } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import { Package, Hash, Coins, Percent } from "lucide-react";
 
@@ -30,6 +32,8 @@ export const SalesByProductReportPage: React.FC = () => {
     search: "",
     posted_only: true,
   });
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const [data, setData] = useState<{
     summary: any;
@@ -44,12 +48,13 @@ export const SalesByProductReportPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = async (overrideFilters?: SalesByProductReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
 
-      const res = await invoiceCenterApi.getSalesByProductReport(filters);
+      const activeFilters = overrideFilters || filters;
+      const res = await invoiceCenterApi.getSalesByProductReport(activeFilters);
       setData(normalizeReportEnvelope<any, SalesByProductReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
@@ -72,16 +77,24 @@ export const SalesByProductReportPage: React.FC = () => {
     }
   };
 
+  const prevFiltersRef = useRef(filters);
   useEffect(() => {
-    fetchData();
-  }, [filters.page]);
+    const prev = prevFiltersRef.current;
+    prevFiltersRef.current = filters;
+    const nonPageChanged = Object.keys(filters).some(
+      (k) => k !== "page" && (filters as any)[k] !== (prev as any)[k]
+    );
+    if (nonPageChanged && filters.page !== 1) {
+      setFilters((p) => ({ ...p, page: 1 }));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData(debouncedFilters);
+  }, [debouncedFilters]);
 
   const handleApplyFilters = () => {
-    if (filters.page === 1) {
-      fetchData();
-    } else {
-      setFilters((prev) => ({ ...prev, page: 1 }));
-    }
+    fetchData(filters);
   };
 
   const handleResetFilters = () => {
@@ -93,7 +106,6 @@ export const SalesByProductReportPage: React.FC = () => {
       date_from: "",
       date_to: "",
     });
-    setTimeout(() => handleApplyFilters(), 0);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -144,7 +156,7 @@ export const SalesByProductReportPage: React.FC = () => {
       header: "% of Total",
       cell: (row) => (
         <span className="text-slate-500">
-          {Number(row.percentage_of_total).toFixed(2)}%
+          {Number(row.percentage_of_total || 0).toFixed(2)}%
         </span>
       ),
       align: "right",

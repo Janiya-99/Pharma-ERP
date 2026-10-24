@@ -8,6 +8,7 @@ import {
 } from "@/components/invoice-center/reports/ReportDataTable";
 import { ReportPermissionState } from "@/components/invoice-center/reports/ReportPermissionState";
 import { ReportExportActions } from "@/components/invoice-center/reports/ReportExportActions";
+import { ReportErrorState } from "@/components/invoice-center/reports/ReportErrorState";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,15 +28,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { useDebounce } from "@/hooks/useDebounce";
+
+const getDefaultDateRange = () => {
+  const today = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const formatDate = (d: Date) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  return {
+    date_from: formatDate(startOfMonth),
+    date_to: formatDate(today),
+  };
+};
+
 export const CustomerStatementReportPage: React.FC = () => {
+  const defaultDates = getDefaultDateRange();
   const [filters, setFilters] = useState<
     Omit<CustomerStatementReportParams, "customer_id"> & { customer_id: string }
   >({
     customer_id: "",
-    date_from: "",
-    date_to: "",
+    date_from: defaultDates.date_from,
+    date_to: defaultDates.date_to,
     include_unposted: false,
   });
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const [data, setData] = useState<{
     header: CustomerStatementReportHeader;
@@ -44,18 +62,24 @@ export const CustomerStatementReportPage: React.FC = () => {
   const [customers, setCustomers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchStatement = async (custId: string, customFilters?: typeof filters) => {
     if (!custId) {
-      toast.error("Customer is required");
+      return;
+    }
+
+    const activeFilters = customFilters || filters;
+    if (activeFilters.date_from && activeFilters.date_to && activeFilters.date_from > activeFilters.date_to) {
+      toast.error("Date From cannot be later than Date To.");
       return;
     }
 
     try {
       setIsLoading(true);
       setHasPermission(true);
+      setErrorMessage(null);
 
-      const activeFilters = customFilters || filters;
       const payload = {
         ...activeFilters,
         customer_id: parseInt(custId, 10),
@@ -77,9 +101,9 @@ export const CustomerStatementReportPage: React.FC = () => {
       if (err.response?.status === 403) {
         setHasPermission(false);
       } else {
-        toast.error(
-          err.response?.data?.message || "Failed to load report data"
-        );
+        const msg = err.response?.data?.message || err.response?.data?.errors || "Failed to load report data";
+        setErrorMessage(msg);
+        toast.error(msg);
       }
     } finally {
       setIsLoading(false);
@@ -87,7 +111,7 @@ export const CustomerStatementReportPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Load customers for dropdown and auto-load the first customer's statement
+    // Load customers for dropdown and set first customer
     const loadCustomers = async () => {
       try {
         const res = await invoiceCenterApi.getCustomers({ limit: 1000 });
@@ -96,7 +120,6 @@ export const CustomerStatementReportPage: React.FC = () => {
         if (list.length > 0 && !filters.customer_id) {
           const firstId = String(list[0].id);
           setFilters((prev) => ({ ...prev, customer_id: firstId }));
-          fetchStatement(firstId);
         }
       } catch (err) {
         console.error("Failed to load customers", err);
@@ -104,6 +127,12 @@ export const CustomerStatementReportPage: React.FC = () => {
     };
     loadCustomers();
   }, []);
+
+  useEffect(() => {
+    if (debouncedFilters.customer_id) {
+      fetchStatement(debouncedFilters.customer_id, debouncedFilters);
+    }
+  }, [debouncedFilters]);
 
   const fetchData = async () => {
     fetchStatement(filters.customer_id);
@@ -114,13 +143,14 @@ export const CustomerStatementReportPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
-    setFilters({
-      customer_id: "",
-      date_from: "",
-      date_to: "",
+    const defaultRange = getDefaultDateRange();
+    setFilters((prev) => ({
+      customer_id: prev.customer_id,
+      date_from: defaultRange.date_from,
+      date_to: defaultRange.date_to,
       include_unposted: false,
-    });
-    setData(null);
+    }));
+    setErrorMessage(null);
   };
 
   const formatMoney = (val: number) => {
@@ -130,8 +160,25 @@ export const CustomerStatementReportPage: React.FC = () => {
     }).format(val || 0);
   };
 
+  const formatReportDate = (val?: string) => {
+    if (!val || val.startsWith("0001-01-01") || val === "null" || val === "undefined") {
+      return "-";
+    }
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return "-";
+    return d.toLocaleDateString("en-LK", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
+  };
+
   const columns: ColumnDef<CustomerStatementReportLine>[] = [
-    { header: "Date", accessorKey: "transaction_date" },
+    {
+      header: "Date",
+      accessorKey: "transaction_date",
+      cell: (row) => formatReportDate(row.transaction_date),
+    },
     { header: "Type", accessorKey: "document_type" },
     { header: "Doc No.", accessorKey: "document_number" },
     { header: "Reference", accessorKey: "reference_number" },
@@ -182,11 +229,12 @@ export const CustomerStatementReportPage: React.FC = () => {
       description="View detailed transaction history and running balances for a specific customer."
       actions={
         <ReportExportActions
-          data={data}
+          data={data?.lines || []}
+          columns={columns}
           filename={`customer-statement-${filters.customer_id}-${
             new Date().toISOString().split("T")[0]
           }`}
-          disabled={isLoading || !data}
+          disabled={isLoading || !data || !data.lines || data.lines.length === 0}
         />
       }
       filters={
@@ -210,11 +258,17 @@ export const CustomerStatementReportPage: React.FC = () => {
                 <SelectValue placeholder="Select a customer" />
               </SelectTrigger>
               <SelectContent>
-                {customers.map((c) => (
-                  <SelectItem key={c.id} value={c.id.toString()}>
-                    {c.customer_code} - {c.company_name}
-                  </SelectItem>
-                ))}
+                {customers.map((c) => {
+                  const customerName = c.customer_name || c.company_name;
+                  const label = customerName
+                    ? `${c.customer_code} - ${customerName}`
+                    : (c.customer_code || `Customer #${c.id}`);
+                  return (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {label}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
@@ -363,8 +417,13 @@ export const CustomerStatementReportPage: React.FC = () => {
                 <div>
                   <p className="text-slate-500 text-sm font-medium">Period</p>
                   <p className="text-slate-700 mt-1 text-lg font-medium">
-                    {data.header.date_from ? data.header.date_from : "Start"} to{" "}
-                    {data.header.date_to ? data.header.date_to : "Present"}
+                    {data.header.date_from && !data.header.date_from.startsWith("0001-01-01")
+                      ? formatReportDate(data.header.date_from)
+                      : "Start"}{" "}
+                    to{" "}
+                    {data.header.date_to && !data.header.date_to.startsWith("0001-01-01")
+                      ? formatReportDate(data.header.date_to)
+                      : "Present"}
                   </p>
                 </div>
               </div>
@@ -373,16 +432,24 @@ export const CustomerStatementReportPage: React.FC = () => {
         ) : null
       }
       table={
-        <ReportDataTable
-          columns={columns}
-          data={data?.lines || []}
-          isLoading={isLoading}
-          emptyMessage={
-            !filters.customer_id
-              ? "Select a customer and apply filters to view the statement."
-              : "No transactions found for the selected period."
-          }
-        />
+        errorMessage ? (
+          <ReportErrorState
+            error={errorMessage}
+            onRetry={() => fetchStatement(filters.customer_id)}
+            onReset={handleResetFilters}
+          />
+        ) : (
+          <ReportDataTable
+            columns={columns}
+            data={data?.lines || []}
+            isLoading={isLoading}
+            emptyMessage={
+              !filters.customer_id
+                ? "Select a customer from the filters above to view the statement."
+                : "No transactions found for the selected period."
+            }
+          />
+        )
       }
     />
   );

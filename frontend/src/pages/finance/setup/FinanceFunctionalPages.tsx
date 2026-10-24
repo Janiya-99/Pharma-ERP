@@ -89,11 +89,11 @@ export const TaxSettingsPage = () => (
       deactivateApi: financeApi.deactivateTaxSetting,
       statusFilter: true,
       fields: [
-        { name: "tax_code", label: "Tax Code", type: "text", required: true, table: true, placeholder: "VAT15" },
-        { name: "tax_name", label: "Tax Name", type: "text", required: true, table: true, placeholder: "VAT 15%" },
-        { name: "tax_rate", label: "Tax Rate", type: "number", required: true, table: true, defaultValue: 0 },
+        { name: "tax_code", label: "Tax Code", type: "text", required: true, table: true, placeholder: "e.g. VAT18, SSCL2.5" },
+        { name: "tax_name", label: "Tax Name", type: "text", required: true, table: true, placeholder: "e.g. Value Added Tax (18%)" },
+        { name: "tax_rate", label: "Tax Rate (%)", type: "number", required: true, table: true, defaultValue: 0, placeholder: "e.g. 18 for 18%, 2.5 for 2.5%, 0 for exempt" },
         accountField("tax_account_id", "Tax Account", false),
-        { name: "description", label: "Description", type: "textarea" },
+        { name: "description", label: "Description", type: "textarea", placeholder: "Tax scope, applicability, and notes" },
         statusField,
       ],
     }}

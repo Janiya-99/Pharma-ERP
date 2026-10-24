@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../../auth/AuthContext';
 import { financeApi } from '../../../../api/financeApi';
+import { useDebounce } from '../../../../hooks/useDebounce';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import DataTable from '../../../../components/common/DataTable';
@@ -36,6 +37,8 @@ const JournalRegisterReportPage = () => {
     branch_id: activeBranch?.id || ""
   });
 
+  const debouncedFilters = useDebounce(filters, 300);
+
   const fetchFiltersData = async () => {
     try {
       const [fyRes, apRes] = await Promise.all([
@@ -56,10 +59,10 @@ const JournalRegisterReportPage = () => {
     }
   };
 
-  const fetchReport = useCallback(async () => {
+  const fetchReport = useCallback(async (overrideFilters?: any) => {
     setLoading(true);
     try {
-      const params = { ...filters };
+      const params = { ...(overrideFilters || filters) };
       Object.keys(params).forEach((key: any) => {
         if (params[key] === "") delete params[key];
       });
@@ -68,7 +71,7 @@ const JournalRegisterReportPage = () => {
       if (response.data?.success) {
         setData(response.data.data || []);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to fetch journal register report");
       setData([]);
     } finally {
@@ -78,9 +81,12 @@ const JournalRegisterReportPage = () => {
 
   useEffect(() => {
     fetchFiltersData();
-    fetchReport();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
+
+  useEffect(() => {
+    fetchReport(debouncedFilters);
+  }, [debouncedFilters, fetchReport]);
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters((prev: any) => ({ ...prev, [key]: value }));
@@ -101,7 +107,6 @@ const JournalRegisterReportPage = () => {
       search: "",
       branch_id: activeBranch?.id || ""
     });
-    setTimeout(() => fetchReport(), 0);
   };
 
   const handleExportJson = () => {

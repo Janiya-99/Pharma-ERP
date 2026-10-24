@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SalesByCustomerReportParams, SalesByCustomerReportRow } from "@/types/invoice-center-reports";
 import { normalizeReportEnvelope } from "@/utils/reportResponse";
+import { useRef } from 'react';
+import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import { Users, FileText, Coins, CreditCard } from "lucide-react";
 
@@ -22,17 +24,20 @@ export const SalesByCustomerReportPage: React.FC = () => {
     posted_only: true,
   });
   
+  const debouncedFilters = useDebounce(filters, 300);
+
   const [data, setData] = useState<{ summary: any, rows: SalesByCustomerReportRow[] } | null>(null);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10, totalPages: 1 });
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = async (overrideFilters?: SalesByCustomerReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
       
-      const res = await invoiceCenterApi.getSalesByCustomerReport(filters);
+      const activeFilters = overrideFilters || filters;
+      const res = await invoiceCenterApi.getSalesByCustomerReport(activeFilters);
       setData(normalizeReportEnvelope<any, SalesByCustomerReportRow>(res.data?.data));
       if (res.data?.pagination) {
         setPagination({
@@ -53,16 +58,24 @@ export const SalesByCustomerReportPage: React.FC = () => {
     }
   };
 
+  const prevFiltersRef = useRef(filters);
   useEffect(() => {
-    fetchData();
-  }, [filters.page]);
+    const prev = prevFiltersRef.current;
+    prevFiltersRef.current = filters;
+    const nonPageChanged = Object.keys(filters).some(
+      (k) => k !== "page" && (filters as any)[k] !== (prev as any)[k]
+    );
+    if (nonPageChanged && filters.page !== 1) {
+      setFilters((p) => ({ ...p, page: 1 }));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData(debouncedFilters);
+  }, [debouncedFilters]);
 
   const handleApplyFilters = () => {
-    if (filters.page === 1) {
-      fetchData();
-    } else {
-      setFilters(prev => ({ ...prev, page: 1 }));
-    }
+    fetchData(filters);
   };
 
   const handleResetFilters = () => {
@@ -70,7 +83,6 @@ export const SalesByCustomerReportPage: React.FC = () => {
       page: 1, limit: 10, search: "", 
       posted_only: true, date_from: "", date_to: ""
     });
-    setTimeout(() => handleApplyFilters(), 0);
   };
 
   const handlePageChange = (newPage: number) => {

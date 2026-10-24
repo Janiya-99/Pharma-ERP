@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { CustomerReceiptRegisterReportParams, CustomerReceiptRegisterReportRow } from "@/types/invoice-center-reports";
 import { normalizeReportEnvelope } from "@/utils/reportResponse";
+import { useRef } from 'react';
+import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import { Banknote, Coins, CreditCard } from "lucide-react";
 
@@ -27,17 +29,19 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
     finance_post_status: "all",
   });
   
+  const debouncedFilters = useDebounce(filters, 300);
+
   const [data, setData] = useState<{ summary: any, rows: CustomerReceiptRegisterReportRow[] } | null>(null);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10, totalPages: 1 });
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = async (overrideFilters?: CustomerReceiptRegisterReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
       
-      const cleanFilters = { ...filters };
+      const cleanFilters = { ...(overrideFilters || filters) };
       if (cleanFilters.payment_method === "all") delete cleanFilters.payment_method;
       if (cleanFilters.approval_status === "all") delete cleanFilters.approval_status;
       if (cleanFilters.posted_status === "all") delete cleanFilters.posted_status;
@@ -65,16 +69,24 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
     }
   };
 
+  const prevFiltersRef = useRef(filters);
   useEffect(() => {
-    fetchData();
-  }, [filters.page]);
+    const prev = prevFiltersRef.current;
+    prevFiltersRef.current = filters;
+    const nonPageChanged = Object.keys(filters).some(
+      (k) => k !== "page" && (filters as any)[k] !== (prev as any)[k]
+    );
+    if (nonPageChanged && filters.page !== 1) {
+      setFilters((p) => ({ ...p, page: 1 }));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData(debouncedFilters);
+  }, [debouncedFilters]);
 
   const handleApplyFilters = () => {
-    if (filters.page === 1) {
-      fetchData();
-    } else {
-      setFilters(prev => ({ ...prev, page: 1 }));
-    }
+    fetchData(filters);
   };
 
   const handleResetFilters = () => {
@@ -83,7 +95,6 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
       payment_method: "all", approval_status: "all", 
       posted_status: "all", receipt_status: "all", finance_post_status: "all" 
     });
-    setTimeout(() => handleApplyFilters(), 0);
   };
 
   const handlePageChange = (newPage: number) => {

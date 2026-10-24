@@ -128,6 +128,10 @@ export const controlCenterNavigation: ControlCenterNavigationGroup[] = [
         route: "/control-center/security-settings",
         permission: "control.security_settings.view",
       },
+      {
+        label: "System Fixes & Audit",
+        route: "/control-center/system-fixes-audit",
+      },
     ],
   },
 ];

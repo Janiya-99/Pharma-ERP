@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { invoiceCenterApi } from "@/api/invoiceCenterApi";
+import { useDebounce } from "@/hooks/useDebounce";
 import { ReportPageShell } from "@/components/invoice-center/reports/ReportPageShell";
 import { ReportSummaryCards, SummaryCardItem } from "@/components/invoice-center/reports/ReportSummaryCards";
 import { ReportFilterBar } from "@/components/invoice-center/reports/ReportFilterBar";
@@ -32,15 +33,17 @@ export const InvoiceCenterReportsDashboardPage: React.FC = () => {
     date_to: "",
   });
   
+  const debouncedFilters = useDebounce(filters, 300);
+
   const [data, setData] = useState<DashboardSummaryReport | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (activeFilters = filters) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
-      const res = await invoiceCenterApi.getInvoiceCenterDashboardSummary(filters);
+      const res = await invoiceCenterApi.getInvoiceCenterDashboardSummary(activeFilters);
       setData(res.data?.data || null);
     } catch (err: any) {
       if (err.response?.status === 403) {
@@ -54,17 +57,15 @@ export const InvoiceCenterReportsDashboardPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Only load if active software is INVOICE_CENTER, handled by routes
-    fetchDashboardData();
-  }, []);
+    fetchDashboardData(debouncedFilters);
+  }, [debouncedFilters]);
 
   const handleApplyFilters = () => {
-    fetchDashboardData();
+    fetchDashboardData(filters);
   };
 
   const handleResetFilters = () => {
     setFilters({ date_from: "", date_to: "" });
-    setTimeout(fetchDashboardData, 0);
   };
 
   if (!hasPermission) {

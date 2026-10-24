@@ -63,8 +63,12 @@ type SalesInvoiceLineResponse struct {
 	WarehouseLocationID *uint64                `json:"warehouse_location_id"`
 	WarehouseLocation   map[string]interface{} `json:"warehouse_location,omitempty"`
 	ProductID           uint64                 `json:"product_id"`
+	ProductCode         string                 `json:"product_code"`
+	ProductName         string                 `json:"product_name"`
 	Product             map[string]interface{} `json:"product"`
 	ProductBatchID      *uint64                `json:"product_batch_id"`
+	BatchNumber         string                 `json:"batch_number"`
+	ExpiryDate          string                 `json:"expiry_date"`
 	Batch               map[string]interface{} `json:"batch,omitempty"`
 	Quantity            float64                `json:"quantity"`
 	UnitPrice           float64                `json:"unit_price"`

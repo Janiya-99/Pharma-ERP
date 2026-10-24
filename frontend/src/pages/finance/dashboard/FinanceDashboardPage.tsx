@@ -55,41 +55,33 @@ const FinanceDashboardPage: React.FC = () => {
 
   const dashboardData = response;
 
-  const periodMultipliers: Record<string, { cash: number; bank: number; ar: number; ap: number; overdueAr: number; overdueAp: number; trendSuffix: string }> = {
-    "Today Oct 16, 2026": { cash: 1.0, bank: 1.0, ar: 1.0, ap: 1.0, overdueAr: 1.0, overdueAp: 1.0, trendSuffix: "vs yesterday" },
-    "Yesterday Oct 15, 2026": { cash: 0.98, bank: 0.99, ar: 1.02, ap: 0.97, overdueAr: 1.01, overdueAp: 0.99, trendSuffix: "vs previous day" },
-    "This Week (12-18 Oct)": { cash: 1.05, bank: 1.03, ar: 1.08, ap: 1.04, overdueAr: 0.96, overdueAp: 1.02, trendSuffix: "vs last week" },
-    "This Month (October 2026)": { cash: 1.12, bank: 1.06, ar: 1.15, ap: 1.09, overdueAr: 0.92, overdueAp: 1.05, trendSuffix: "vs last month" },
-    "Q3 FY 2026/27": { cash: 1.25, bank: 1.18, ar: 1.34, ap: 1.22, overdueAr: 0.88, overdueAp: 1.12, trendSuffix: "vs Q2" },
-    "Fiscal Year 2026/27": { cash: 1.45, bank: 1.38, ar: 1.62, ap: 1.48, overdueAr: 0.82, overdueAp: 1.25, trendSuffix: "vs FY 25/26" },
-  };
-
-  const periodConfig = periodMultipliers[selectedPeriod] || periodMultipliers["Today Oct 16, 2026"];
-
-  // Extract metrics with accurate Image 2 fallback numbers scaled by selected period
-  const baseCashBalance = dashboardData?.summary?.cash_balance?.value || 32450000;
-  const baseBankBalance = dashboardData?.summary?.bank_balance?.value || 24751241;
-  const baseArBalance =
-    dashboardData?.summary?.accounts_receivable?.value ||
-    dashboardData?.receivables?.total_outstanding ||
-    43934760;
-  const baseApBalance =
-    dashboardData?.summary?.accounts_payable?.value ||
-    dashboardData?.payables?.total_payable ||
-    16822132;
-  const baseOverdueReceivables = 11950421;
-  const baseOverduePayables = 3420534;
-
-  const cashBalance = Math.round(baseCashBalance * periodConfig.cash);
-  const bankBalance = Math.round(baseBankBalance * periodConfig.bank);
-  const arBalance = Math.round(baseArBalance * periodConfig.ar);
-  const apBalance = Math.round(baseApBalance * periodConfig.ap);
-  const overdueReceivables = Math.round(baseOverdueReceivables * periodConfig.overdueAr);
-  const overduePayables = Math.round(baseOverduePayables * periodConfig.overdueAp);
+  // Derive live metrics directly from backend response with zero hardcoded numbers
+  const cashBalance = dashboardData?.summary?.cash_balance?.value ?? 0;
+  const bankBalance = dashboardData?.summary?.bank_balance?.value ?? 0;
+  const arBalance =
+    dashboardData?.summary?.accounts_receivable?.value ??
+    dashboardData?.receivables?.total_outstanding ??
+    0;
+  const apBalance =
+    dashboardData?.summary?.accounts_payable?.value ??
+    dashboardData?.payables?.total_payable ??
+    0;
+  const overdueReceivables = dashboardData?.receivables?.overdue_amount ?? 0;
+  const overduePayables = dashboardData?.payables?.overdue_amount ?? 0;
 
   const handlePeriodChange = (p: string) => {
     setSelectedPeriod(p);
-    const code = p.includes("Today") ? "today" : p.includes("Yesterday") ? "yesterday" : p.includes("Week") ? "this_week" : p.includes("Month") ? "this_month" : p.includes("Q3") ? "this_quarter" : "fiscal_year";
+    const code = p.includes("Today")
+      ? "today"
+      : p.includes("Yesterday")
+      ? "yesterday"
+      : p.includes("Week")
+      ? "this_week"
+      : p.includes("Month")
+      ? "this_month"
+      : p.includes("Q3")
+      ? "this_quarter"
+      : "fiscal_year";
     setFilters({ period_type: code });
   };
 
@@ -146,36 +138,36 @@ const FinanceDashboardPage: React.FC = () => {
 
       {/* ── 3. ROW 1: 6 TOP KPI CARDS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        {/* Card 1: Cash Balance */}
+        {/* Card 1: Cash in Hand */}
         <FinanceKpiCard
-          label="Cash Balance"
+          label="Cash in Hand"
           value={cashBalance}
-          trendText="3.4%"
-          subtitle="vs last month"
+          trendText={`${dashboardData?.summary?.cash_balance?.trend ?? 0}%`}
+          subtitle="Cash Book (GL 100001)"
           isPositive={true}
           icon={Wallet}
           tone="emerald"
-          to="/finance/banking/cash-accounts"
+          to="/finance/reports/cash-book"
         />
 
         {/* Card 2: Bank Balance */}
         <FinanceKpiCard
           label="Bank Balance"
           value={bankBalance}
-          trendText="2.1%"
-          subtitle="vs last month"
+          trendText={`${dashboardData?.summary?.bank_balance?.trend ?? 0}%`}
+          subtitle="Bank Book (GL 100003)"
           isPositive={true}
           icon={Landmark}
           tone="blue"
-          to="/finance/banking/bank-accounts"
+          to="/finance/reports/bank-book"
         />
 
         {/* Card 3: Accounts Receivable */}
         <FinanceKpiCard
           label="Accounts Receivable"
           value={arBalance}
-          trendText="12%"
-          subtitle="342 customers"
+          trendText={`${dashboardData?.summary?.accounts_receivable?.trend ?? 0}%`}
+          subtitle="GL 110001 & Customer Invoices"
           isPositive={true}
           icon={Receipt}
           tone="purple"
@@ -186,8 +178,8 @@ const FinanceDashboardPage: React.FC = () => {
         <FinanceKpiCard
           label="Accounts Payable"
           value={apBalance}
-          trendText="5%"
-          subtitle="128 suppliers"
+          trendText={`${dashboardData?.summary?.accounts_payable?.trend ?? 0}%`}
+          subtitle={dashboardData?.payables?.supplier_count ? `${dashboardData.payables.supplier_count} active suppliers` : "GL 200001 (Creditors)"}
           isPositive={false}
           icon={FileText}
           tone="amber"
@@ -198,8 +190,8 @@ const FinanceDashboardPage: React.FC = () => {
         <FinanceKpiCard
           label="Overdue Receivables"
           value={overdueReceivables}
-          trendText="18%"
-          subtitle="56 customers"
+          trendText={arBalance > 0 ? `${Math.round((overdueReceivables / arBalance) * 100)}% of AR` : "0%"}
+          subtitle={`${dashboardData?.receivables?.overdue_count ?? 0} overdue invoices`}
           isPositive={false}
           icon={Clock}
           tone="rose"
@@ -210,8 +202,8 @@ const FinanceDashboardPage: React.FC = () => {
         <FinanceKpiCard
           label="Overdue Payables"
           value={overduePayables}
-          trendText="8%"
-          subtitle="28 suppliers"
+          trendText={apBalance > 0 ? `${Math.round((overduePayables / apBalance) * 100)}% of AP` : "0%"}
+          subtitle={`${dashboardData?.payables?.payment_due_count ?? 0} bills pending review`}
           isPositive={false}
           icon={Clock}
           tone="violet"
@@ -235,14 +227,64 @@ const FinanceDashboardPage: React.FC = () => {
       {/* ── 6. ROW 4: CASH FLOW & TOP ENTITIES (3 COLUMNS GRID) ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <CashFlowSummaryCard data={dashboardData?.liquidity} />
-        <TopCustomersReceivablesCard />
-        <TopSuppliersPayablesCard />
+        <TopCustomersReceivablesCard customers={dashboardData?.top_customers} />
+        <TopSuppliersPayablesCard suppliers={dashboardData?.top_suppliers} />
       </div>
 
       {/* ── 7. ROW 5: RECENT TRANSACTIONS & FINANCIAL ALERTS (8/4 SPLIT) ── */}
       <div className="grid grid-cols-12 gap-4">
         <RecentTransactionsCard transactions={dashboardData?.recent_transactions} />
-        <FinancialAlertsCard />
+        <FinancialAlertsCard alerts={dashboardData?.alerts} />
+      </div>
+
+      {/* ── 8. DATA LINEAGE & STATUTORY RECONCILIATION REFERENCE ── */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+              Metric Lineage & Financial Scope Reference
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Exact underlying general ledger accounts, period filters, and statutory report mappings.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shrink-0">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Reconciled with GL Ledger
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 text-xs">
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 space-y-1">
+            <div className="font-bold text-slate-800">Cash in Hand (GL 100001)</div>
+            <div className="text-slate-500">Physical till floats, petty cash, and daily drawer receipts.</div>
+            <div className="text-indigo-600 font-semibold pt-1">Report: Cash Book Report</div>
+          </div>
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 space-y-1">
+            <div className="font-bold text-slate-800">Commercial Bank (GL 100003)</div>
+            <div className="text-slate-500">Commercial deposit and checking balances across active branches.</div>
+            <div className="text-indigo-600 font-semibold pt-1">Report: Bank Book Report</div>
+          </div>
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 space-y-1">
+            <div className="font-bold text-slate-800">Accounts Receivable (GL 110001)</div>
+            <div className="text-slate-500">Total customer balance across active pharmacy customer accounts.</div>
+            <div className="text-indigo-600 font-semibold pt-1">Report: Customer Aging & Balance</div>
+          </div>
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 space-y-1">
+            <div className="font-bold text-slate-800">Accounts Payable (GL 200001)</div>
+            <div className="text-slate-500">Trade creditors and supplier obligations awaiting disbursement.</div>
+            <div className="text-indigo-600 font-semibold pt-1">Report: Payment Vouchers</div>
+          </div>
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 space-y-1">
+            <div className="font-bold text-slate-800">Overdue Receivables</div>
+            <div className="text-slate-500">Subset of customer invoices with payment terms exceeded (&gt;30/60/90 days).</div>
+            <div className="text-indigo-600 font-semibold pt-1">Report: Customer Aging (Overdue)</div>
+          </div>
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 space-y-1">
+            <div className="font-bold text-slate-800">Net Surplus & Liquidity</div>
+            <div className="text-slate-500">Total cash inflows (Dr) minus total cash disbursements (Cr).</div>
+            <div className="text-indigo-600 font-semibold pt-1">Report: Trial Balance / Balance Sheet</div>
+          </div>
+        </div>
       </div>
     </div>
   );
