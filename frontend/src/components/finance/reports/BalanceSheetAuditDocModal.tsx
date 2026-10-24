@@ -317,15 +317,19 @@ export const BalanceSheetAuditDocModal: React.FC<BalanceSheetAuditDocModalProps>
               <div className="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/30">
                 <h4 className="font-bold text-indigo-950 text-xs flex items-center gap-1.5">
                   <Code2 className="w-4 h-4 text-indigo-600" />
-                  Automated Go Unit Tests Passed (0.049s)
+                  Automated Go Unit Tests Passed (0.009s)
                 </h4>
                 <p className="text-slate-600 text-[11px] mt-1">
-                  Three automated tests in <code>internal/finance/services/balance_sheet_test.go</code> permanently guard against regressions:
+                  Four automated tests in <code>internal/finance/services/balance_sheet_test.go</code> permanently guard against regressions:
                 </p>
                 <ul className="mt-2 space-y-1 text-[11px] text-slate-700">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span><code>TestCalculateBalanceSheet_ClassificationsAndReconciliation</code>: Reconciles exact 190.57M figures.</span>
+                    <span><code>TestCalculateBalanceSheet_LiveReconciledLedger</code>: Reconciles live LKR 132,588,165.30 ledger figures.</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span><code>TestCalculateBalanceSheet_ClassificationsAndReconciliation</code>: Reconciles trial balance classification mapping.</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
