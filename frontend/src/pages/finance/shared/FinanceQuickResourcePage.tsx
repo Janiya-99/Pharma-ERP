@@ -614,8 +614,47 @@ export function FinanceQuickResourcePage({
                         );
                       }
 
-                      // 4. Currency amounts
-                      if (field.type === "number" && (field.name.includes("amount") || field.name.includes("cost") || field.name.includes("balance") || field.name.includes("rate"))) {
+                      // 4. Tax rates & Percentages
+                      const isRateField = field.name.includes("rate") || field.name.includes("percentage") || field.label.includes("%") || field.label.toLowerCase().includes("rate");
+                      if (field.type === "number" && isRateField) {
+                        const rawVal = row[field.name];
+                        if (rawVal === null || rawVal === undefined || rawVal === "") {
+                          return (
+                            <TableCell key={field.name} className="py-2.5">
+                              <span className="text-slate-400 font-medium text-xs">-</span>
+                            </TableCell>
+                          );
+                        }
+                        const numVal = Number(rawVal);
+                        if (isNaN(numVal)) {
+                          return (
+                            <TableCell key={field.name} className="py-2.5">
+                              <span className="text-slate-400 font-medium text-xs">-</span>
+                            </TableCell>
+                          );
+                        }
+                        if (numVal === 0) {
+                          return (
+                            <TableCell key={field.name} className="py-2.5">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                                <span>0%</span>
+                                <span className="text-[10px] font-normal text-emerald-600">(Zero-Rated / Exempt)</span>
+                              </span>
+                            </TableCell>
+                          );
+                        }
+                        const formattedPercent = `${parseFloat(numVal.toFixed(4))}%`;
+                        return (
+                          <TableCell key={field.name} className="py-2.5">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold font-mono bg-blue-50 text-blue-700 border border-blue-200/70">
+                              {formattedPercent}
+                            </span>
+                          </TableCell>
+                        );
+                      }
+
+                      // 5. Currency amounts
+                      if (field.type === "number" && (field.name.includes("amount") || field.name.includes("cost") || field.name.includes("balance") || field.name.includes("price") || field.name.includes("total"))) {
                         const numVal = Number(row[field.name]) || 0;
                         const isDebit = field.name.includes("debit");
                         const isCredit = field.name.includes("credit");
@@ -624,10 +663,10 @@ export function FinanceQuickResourcePage({
                             <span className={`font-mono text-xs font-semibold ${
                               numVal > 0 
                                 ? isDebit 
-                                  ? "text-indigo-600 font-bold" 
-                                  : isCredit 
-                                  ? "text-emerald-600 font-bold" 
-                                  : "text-slate-800" 
+                                ? "text-indigo-600 font-bold" 
+                                : isCredit 
+                                ? "text-emerald-600 font-bold" 
+                                : "text-slate-800" 
                                 : "text-slate-300"
                             }`}>
                               {numVal !== 0 ? `LKR ${numVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "-"}
@@ -879,15 +918,29 @@ function renderField(
       </Select>
     );
   }
+  if (field.type === "number") {
+    const isRate = field.name.includes("rate") || field.name.includes("percentage") || field.label.includes("%") || field.label.toLowerCase().includes("rate");
+    return (
+      <div className="relative">
+        <Input
+          type="number"
+          step="any"
+          value={value ?? ""}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={field.placeholder || `Enter ${field.label}`}
+          className={isRate ? "pr-8 font-mono" : "font-mono"}
+        />
+        {isRate && (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 select-none">
+            %
+          </span>
+        )}
+      </div>
+    );
+  }
   return (
     <Input
-      type={
-        field.type === "number"
-          ? "number"
-          : field.type === "date"
-          ? "date"
-          : "text"
-      }
+      type={field.type === "date" ? "date" : "text"}
       value={value || ""}
       onChange={(event) => onChange(event.target.value)}
       placeholder={field.placeholder || `Enter ${field.label}`}

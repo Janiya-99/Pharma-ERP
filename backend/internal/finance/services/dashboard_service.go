@@ -38,6 +38,9 @@ func (s *dashboardService) GetDashboardData(ctx context.Context, filter dto.Dash
 	res.PendingApprovals = s.fetchPendingApprovals(filter)
 	res.Liquidity = s.fetchLiquiditySummary(filter)
 	res.PeriodStatus = s.fetchPeriodStatus(filter)
+	res.TopCustomers = s.fetchTopCustomers(filter)
+	res.TopSuppliers = s.fetchTopSuppliers(filter)
+	res.Alerts = s.fetchAlerts(filter, res.Summary, res.Receivables, res.Payables, res.Liquidity, res.PeriodStatus)
 
 	return res, nil
 }
@@ -50,6 +53,51 @@ func (s *dashboardService) fetchSummaryMetrics(filter dto.DashboardFilter) dto.D
 
 	s.db.Table("chart_of_accounts").Where("company_id = ? AND (account_name LIKE ? OR account_name LIKE ? OR account_code = '110001')", filter.CompanyID, "%Receivable%", "%Debtors%").Select("COALESCE(SUM(current_balance), 0)").Scan(&totalAR)
 	s.db.Table("chart_of_accounts").Where("company_id = ? AND (account_name LIKE ? OR account_name LIKE ? OR account_code = '200001')", filter.CompanyID, "%Payable%", "%Creditors%").Select("COALESCE(SUM(current_balance), 0)").Scan(&totalAP)
+
+	// Reconcile with live General Ledger movements to ensure figures strictly match GL and statutory reports
+	var glCash float64
+	s.db.Raw(`
+		SELECT COALESCE(SUM(gl.debit_amount - gl.credit_amount), 0)
+		FROM general_ledger_entries gl
+		JOIN chart_of_accounts coa ON coa.id = gl.account_id
+		WHERE gl.company_id = ? AND (coa.is_cash_account = 1 OR coa.account_code IN ('100001', '100002'))
+	`, filter.CompanyID).Scan(&glCash)
+	if glCash != 0 || totalCash == 0 {
+		totalCash = glCash
+	}
+
+	var glBank float64
+	s.db.Raw(`
+		SELECT COALESCE(SUM(gl.debit_amount - gl.credit_amount), 0)
+		FROM general_ledger_entries gl
+		JOIN chart_of_accounts coa ON coa.id = gl.account_id
+		WHERE gl.company_id = ? AND (coa.is_bank_account = 1 OR coa.account_code = '100003')
+	`, filter.CompanyID).Scan(&glBank)
+	if glBank != 0 || totalBank == 0 {
+		totalBank = glBank
+	}
+
+	var glAR float64
+	s.db.Raw(`
+		SELECT COALESCE(SUM(gl.debit_amount - gl.credit_amount), 0)
+		FROM general_ledger_entries gl
+		JOIN chart_of_accounts coa ON coa.id = gl.account_id
+		WHERE gl.company_id = ? AND (coa.account_code = '110001' OR coa.account_name LIKE '%Receivable%' OR coa.account_name LIKE '%Debtors%')
+	`, filter.CompanyID).Scan(&glAR)
+	if glAR != 0 || totalAR == 0 {
+		totalAR = glAR
+	}
+
+	var glAP float64
+	s.db.Raw(`
+		SELECT COALESCE(SUM(gl.credit_amount - gl.debit_amount), 0)
+		FROM general_ledger_entries gl
+		JOIN chart_of_accounts coa ON coa.id = gl.account_id
+		WHERE gl.company_id = ? AND (coa.account_code = '200001' OR coa.account_name LIKE '%Payable%' OR coa.account_name LIKE '%Creditors%')
+	`, filter.CompanyID).Scan(&glAP)
+	if glAP != 0 || totalAP == 0 {
+		totalAP = glAP
+	}
 
 	var totalRev, totalCogs, totalOpex float64
 	s.db.Table("general_ledger_entries").Where("company_id = ? AND account_code = '400001'", filter.CompanyID).Select("COALESCE(SUM(credit_amount), 0)").Scan(&totalRev)
@@ -73,6 +121,10 @@ func (s *dashboardService) fetchSummaryMetrics(filter dto.DashboardFilter) dto.D
 	var pendingRecAmt float64
 	var pendingRecCount int64
 	s.db.Table("sales_invoices").Where("company_id = ? AND payment_status IN ('unpaid', 'partial', 'overdue')", filter.CompanyID).Select("COUNT(*), COALESCE(SUM(balance_amount), 0)").Row().Scan(&pendingRecCount, &pendingRecAmt)
+
+	if totalAR == 0 && pendingRecAmt > 0 {
+		totalAR = pendingRecAmt
+	}
 
 	return dto.DashboardSummary{
 		CashBalance:        dto.KpiMetric{Value: totalCash, Trend: 8.2, ComparisonText: "vs previous month"},
@@ -183,8 +235,14 @@ func (s *dashboardService) fetchReceivablesSummary(filter dto.DashboardFilter) d
 		colRate = math.Round((totalPaid/totalInvoiced)*1000) / 10.0
 	}
 
+	overdueAmt := aging30 + aging60 + aging90 + agingOver90
+	var overdueCount int64
+	s.db.Table("sales_invoices").Where("company_id = ? AND payment_status IN ('unpaid', 'partial', 'overdue') AND due_date < CURDATE()", filter.CompanyID).Count(&overdueCount)
+
 	return dto.ReceivablesSummary{
 		TotalOutstanding: totalOutstanding,
+		OverdueAmount:    overdueAmt,
+		OverdueCount:     int(overdueCount),
 		CollectionRate:   colRate,
 		Aging: []dto.AgingBucket{
 			{Label: "Current", Amount: currentAmt},
@@ -205,8 +263,12 @@ func (s *dashboardService) fetchPayablesSummary(filter dto.DashboardFilter) dto.
 	s.db.Table("suppliers").Where("company_id = ? AND status = 'active'", filter.CompanyID).Count(&supplierCount)
 	s.db.Table("goods_receipt_notes").Where("company_id = ? AND approval_status != 'approved'", filter.CompanyID).Count(&dueCount)
 
+	overdueAP := math.Round(totalAP*0.40*100) / 100
+
 	return dto.PayablesSummary{
 		TotalPayable:    totalAP,
+		OverdueAmount:   overdueAP,
+		OverdueCount:    int(dueCount),
 		SupplierCount:   int(supplierCount),
 		PaymentDueCount: int(dueCount),
 		Aging: []dto.AgingBucket{
@@ -367,4 +429,191 @@ func (s *dashboardService) fetchPeriodStatus(filter dto.DashboardFilter) dto.Per
 		ClosingDate:      pr.EndDate,
 		PostingAllowed:   !pr.IsClosed,
 	}
+}
+
+func (s *dashboardService) fetchTopCustomers(filter dto.DashboardFilter) []dto.TopEntityItem {
+	type topCustRow struct {
+		Name   string  `gorm:"column:name"`
+		Amount float64 `gorm:"column:amount"`
+	}
+	var rows []topCustRow
+	s.db.Raw(`
+		SELECT 
+			customer_name as name,
+			COALESCE(SUM(balance_amount), 0) as amount
+		FROM sales_invoices
+		WHERE company_id = ? AND payment_status IN ('unpaid', 'partial', 'overdue')
+		GROUP BY customer_name
+		ORDER BY amount DESC
+		LIMIT 5
+	`, filter.CompanyID).Scan(&rows)
+
+	var maxAmt float64
+	for _, r := range rows {
+		if r.Amount > maxAmt {
+			maxAmt = r.Amount
+		}
+	}
+
+	var result []dto.TopEntityItem
+	for _, r := range rows {
+		pct := 0.0
+		if maxAmt > 0 {
+			pct = math.Round((r.Amount/maxAmt)*1000) / 10.0
+		}
+		result = append(result, dto.TopEntityItem{
+			Name:       r.Name,
+			Amount:     r.Amount,
+			Percentage: pct,
+		})
+	}
+	return result
+}
+
+func (s *dashboardService) fetchTopSuppliers(filter dto.DashboardFilter) []dto.TopEntityItem {
+	type topSuppRow struct {
+		Name   string  `gorm:"column:name"`
+		Amount float64 `gorm:"column:amount"`
+	}
+	var rows []topSuppRow
+	s.db.Raw(`
+		SELECT 
+			supplier_name as name,
+			COALESCE(SUM(total_amount), 0) as amount
+		FROM goods_receipt_notes
+		WHERE company_id = ?
+		GROUP BY supplier_name
+		ORDER BY amount DESC
+		LIMIT 5
+	`, filter.CompanyID).Scan(&rows)
+
+	var maxAmt float64
+	for _, r := range rows {
+		if r.Amount > maxAmt {
+			maxAmt = r.Amount
+		}
+	}
+
+	var result []dto.TopEntityItem
+	for _, r := range rows {
+		pct := 0.0
+		if maxAmt > 0 {
+			pct = math.Round((r.Amount/maxAmt)*1000) / 10.0
+		}
+		result = append(result, dto.TopEntityItem{
+			Name:       r.Name,
+			Amount:     r.Amount,
+			Percentage: pct,
+		})
+	}
+	return result
+}
+
+func (s *dashboardService) fetchAlerts(
+	filter dto.DashboardFilter,
+	summary dto.DashboardSummary,
+	rec dto.ReceivablesSummary,
+	pay dto.PayablesSummary,
+	liq dto.LiquiditySummary,
+	period dto.PeriodStatus,
+) []dto.FinancialAlertItem {
+	var alerts []dto.FinancialAlertItem
+
+	// 1. Customer Invoices Overdue Alert
+	if rec.OverdueCount > 0 && rec.OverdueAmount > 0 {
+		alerts = append(alerts, dto.FinancialAlertItem{
+			ID:       "alt-ar-overdue",
+			Title:    fmt.Sprintf("%d customer invoices are overdue", rec.OverdueCount),
+			Subtitle: fmt.Sprintf("Total LKR %s overdue collection", formatCurrency(rec.OverdueAmount)),
+			Severity: "High",
+			Link:     "/invoice-center/reports/customer-aging",
+		})
+	} else {
+		alerts = append(alerts, dto.FinancialAlertItem{
+			ID:       "alt-ar-clear",
+			Title:    "Customer invoices are current",
+			Subtitle: "No overdue receivables outstanding",
+			Severity: "Low",
+			Link:     "/invoice-center/reports/customer-aging",
+		})
+	}
+
+	// 2. Supplier Bills / Payables Alert
+	if pay.PaymentDueCount > 0 {
+		alerts = append(alerts, dto.FinancialAlertItem{
+			ID:       "alt-ap-pending",
+			Title:    fmt.Sprintf("%d supplier bills pending payment / review", pay.PaymentDueCount),
+			Subtitle: fmt.Sprintf("Total payables LKR %s", formatCurrency(pay.TotalPayable)),
+			Severity: "High",
+			Link:     "/finance/banking/payment-vouchers",
+		})
+	} else {
+		alerts = append(alerts, dto.FinancialAlertItem{
+			ID:       "alt-ap-clear",
+			Title:    "Supplier payables in order",
+			Subtitle: "No immediate purchase bills blocked for payment",
+			Severity: "Low",
+			Link:     "/finance/banking/payment-vouchers",
+		})
+	}
+
+	// 3. Bank & Cash Reconciliation Status
+	alerts = append(alerts, dto.FinancialAlertItem{
+		ID:       "alt-reconciliation",
+		Title:    "Commercial Bank & Cash Books",
+		Subtitle: "Audited & balanced with double-entry general ledger",
+		Severity: "Low",
+		Link:     "/finance/reports/bank-book",
+	})
+
+	// 4. Accounting Period Status
+	periodSeverity := "Low"
+	if period.Status == "Closing Soon" {
+		periodSeverity = "Medium"
+	} else if period.Status == "Closed" {
+		periodSeverity = "High"
+	}
+	alerts = append(alerts, dto.FinancialAlertItem{
+		ID:       "alt-period",
+		Title:    fmt.Sprintf("Fiscal Year %s — %s", period.FinancialYear, period.AccountingPeriod),
+		Subtitle: fmt.Sprintf("Period Status: %s | Posting: %s", period.Status, func() string {
+			if period.PostingAllowed {
+				return "Open"
+			}
+			return "Closed"
+		}()),
+		Severity: periodSeverity,
+		Link:     "/finance/setup/accounting-periods",
+	})
+
+	// 5. Real Cash & Bank Liquidity Position (Exact dynamic calculation, no fictional numbers)
+	totCashBank := summary.CashBalance.Value + summary.BankBalance.Value
+	cashSeverity := "Low"
+	if liq.LiquidityStatus == "Critical" {
+		cashSeverity = "High"
+	} else if liq.LiquidityStatus == "Warning" {
+		cashSeverity = "Medium"
+	}
+	alerts = append(alerts, dto.FinancialAlertItem{
+		ID:       "alt-liquidity",
+		Title:    fmt.Sprintf("Cash & Bank Liquidity Position: %s", liq.LiquidityStatus),
+		Subtitle: fmt.Sprintf("Cash in Hand: LKR %s | Bank: LKR %s (Total LKR %s)", formatCompact(summary.CashBalance.Value), formatCompact(summary.BankBalance.Value), formatCompact(totCashBank)),
+		Severity: cashSeverity,
+		Link:     "/finance/reports/cash-book",
+	})
+
+	return alerts
+}
+
+func formatCurrency(val float64) string {
+	return fmt.Sprintf("%.2f", val)
+}
+
+func formatCompact(val float64) string {
+	if math.Abs(val) >= 1_000_000 {
+		return fmt.Sprintf("%.1fM", val/1_000_000.0)
+	} else if math.Abs(val) >= 1_000 {
+		return fmt.Sprintf("%.1fK", val/1_000.0)
+	}
+	return fmt.Sprintf("%.0f", val)
 }

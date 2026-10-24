@@ -21,7 +21,8 @@ docs/balance-sheet-audit/
 ├── BALANCE_SHEET_FIX_AUDIT_REPORT.md        # Balance Sheet statutory audit & engineering report
 ├── RECONCILIATION_PROOF.md                  # Account-by-account double-entry ledger reconciliation
 ├── SYSTEM_CHANGELOG.md                      # Balance Sheet engineering changelog & test suites
-└── FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md# FIN-02 Bank & Cash Book reconciliation audit
+├── FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md# FIN-02 Bank & Cash Book reconciliation audit
+└── FIN_03_AND_04_AUDIT_REPORT.md            # FIN-03 Dashboard KPIs & FIN-04 Tax Settings report
 ```
 
 ---
@@ -45,17 +46,27 @@ docs/balance-sheet-audit/
 | **2.3** | **False Green "Balanced" Badge** displayed when unbalanced. | Backend DTO omitted equilibrium fields; frontend evaluated `0 - 0 < 0.01 = true`. | Added `TotalAssets`, `TotalLiabilitiesAndEquity`, `Difference`, and `IsBalanced` to backend DTO; frontend computes real status badge. | Accurate status: Red alert when out of balance; Green verified checkmark when truly balanced (`Difference == 0.00`). |
 | **2.4** | **Missing Net Profit line in Equity**. | Net income from P&L was accumulated into total balance but omitted from `Equity.Lines`. | Explicit line item `PL-NET Net Profit / (Loss) for the Period` automatically appended to Equity lines. | Equity clearly traces **LKR 6,424,977.26** back to the Statement of Profit and Loss. |
 
+### 3. FIN-03 & FIN-04: Dashboard KPIs & Tax Settings Formatting
+| # | Issue Identified | Root Cause | Engineering Resolution | Statutory Verification |
+|---|---|---|---|---|
+| **3.1** | **Cash showed 5M while Alert showed 32.4M**. | Alert was a static hardcoded mock string (`32.4M`), and dashboard defaulted to 32.45M fallback. | Backend now generates dynamic alerts based on live GL cash (5.0M) and bank (88.1M) balances. | Dashboard alert matches Cash Book and GL ledger exactly. |
+| **3.2** | **AR showed 4.55M while Overdue AR showed 11.95M**. | Overdue AR had hardcoded `11950421` fallback in UI. | Overdue AR is computed dynamically from sales invoices where `due_date < CURDATE()`. | Overdue AR is mathematically consistent with total receivables. |
+| **3.3** | **Tax Rates formatted as Currency (`LKR 18.00`)**. | `field.name.includes("rate")` was included in currency formatter. | Extracted percentage formatter rendering `18%`, `2.5%`, etc. | Displays proper percentages across all tax rates. |
+| **3.4** | **Zero-Rated Taxes displayed as dash (`-`)**. | Zero numeric rate defaulted to empty placeholder. | Formatted with explicit badge `0% (Zero-Rated / Exempt)`. | Legitimate zero-rated/exempt settings clearly visible. |
+
 ---
 
 ## Detailed Documents in this Folder
 
-1. **[FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md](./FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md)**  
+1. **[FIN_03_AND_04_AUDIT_REPORT.md](./FIN_03_AND_04_AUDIT_REPORT.md)**  
+   Statutory audit report for Finance Dashboard KPIs, metric lineage, and tax percentage formatting.
+2. **[FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md](./FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md)**  
    Full statutory audit for Bank Book and Cash Book reconciliation, column dash fixes, sign conventions, and chronological running-balance calculations.
-2. **[BALANCE_SHEET_FIX_AUDIT_REPORT.md](./BALANCE_SHEET_FIX_AUDIT_REPORT.md)**  
+3. **[BALANCE_SHEET_FIX_AUDIT_REPORT.md](./BALANCE_SHEET_FIX_AUDIT_REPORT.md)**  
    Statutory audit report for the Balance Sheet equilibrium, LKAS 1 structure, and financial intelligence indicators.
-3. **[RECONCILIATION_PROOF.md](./RECONCILIATION_PROOF.md)**  
+4. **[RECONCILIATION_PROOF.md](./RECONCILIATION_PROOF.md)**  
    Mathematical theorem and account-by-account double-entry ledger proof for all general ledger accounts.
-4. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
+5. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
    Engineering changelog detailing all modified files, schema queries, and automated unit test suites.
 
 ---

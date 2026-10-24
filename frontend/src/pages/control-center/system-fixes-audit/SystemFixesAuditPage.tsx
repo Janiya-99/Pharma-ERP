@@ -82,6 +82,14 @@ export const SystemFixesAuditPage: React.FC = () => {
       description: "Mathematical theorem, account balances, and arithmetic proof of Assets = Liabilities + Equity."
     },
     {
+      name: "FIN_03_AND_04_AUDIT_REPORT.md",
+      path: "docs/balance-sheet-audit/FIN_03_AND_04_AUDIT_REPORT.md",
+      publicUrl: "FIN_03_AND_04_AUDIT_REPORT.md",
+      title: "FIN-03 & FIN-04 Dashboard KPIs & Tax Settings Report",
+      size: "7.2 KB",
+      description: "Full RCA and resolution for cash/AR alert discrepancies, metric lineage, and percentage formatting."
+    },
+    {
       name: "SYSTEM_CHANGELOG.md",
       path: "docs/balance-sheet-audit/SYSTEM_CHANGELOG.md",
       publicUrl: "SYSTEM_CHANGELOG.md",

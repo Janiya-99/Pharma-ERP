@@ -14,16 +14,8 @@ export const TopCustomersReceivablesCard: React.FC<TopCustomersReceivablesCardPr
   const navigate = useNavigate();
 
   // Conforming list from Image 2
-  const defaultCustomers: TopEntityItem[] = [
-    { name: "Lanka Care Clinics", amount: 8450000, percentage: 85 },
-    { name: "City General Hospital", amount: 6212400, percentage: 68 },
-    { name: "Medicare Pharmacy Network", amount: 5934120, percentage: 64 },
-    { name: "HealthPlus Distributors", amount: 4812300, percentage: 52 },
-    { name: "Sunrise Medical Center", amount: 3420100, percentage: 38 },
-  ];
-
-  const list = customers && customers.length > 0 ? customers : defaultCustomers;
-  const maxVal = Math.max(...list.map((c) => c.amount), 8450000);
+  const list = customers || [];
+  const maxVal = list.length > 0 ? Math.max(...list.map((c) => c.amount), 1) : 1;
 
   const handleNavigate = () => {
     navigate("/invoice-center/reports/customer-aging");
@@ -48,32 +40,38 @@ export const TopCustomersReceivablesCard: React.FC<TopCustomersReceivablesCardPr
 
       {/* List */}
       <div className="space-y-3.5 pt-3">
-        {list.map((item, idx) => {
-          const progress = Math.min(Math.round((item.amount / maxVal) * 100), 100);
-          return (
-            <div
-              key={idx}
-              onClick={handleNavigate}
-              className="group cursor-pointer rounded-lg p-1 transition-colors hover:bg-slate-50/70"
-            >
-              <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-700 group-hover:text-blue-600 transition-colors truncate pr-2">
-                  {item.name}
-                </span>
-                <span className="text-slate-900 font-bold tabular-nums shrink-0">
-                  {formatLKR(item.amount).replace("LKR ", "")}
-                </span>
+        {list.length === 0 ? (
+          <div className="py-6 text-center text-xs font-medium text-slate-400">
+            No customers currently have outstanding balances.
+          </div>
+        ) : (
+          list.map((item, idx) => {
+            const progress = Math.min(Math.round((item.amount / maxVal) * 100), 100);
+            return (
+              <div
+                key={idx}
+                onClick={handleNavigate}
+                className="group cursor-pointer rounded-lg p-1 transition-colors hover:bg-slate-50/70"
+              >
+                <div className="flex items-center justify-between text-xs font-semibold mb-1">
+                  <span className="text-slate-700 group-hover:text-blue-600 transition-colors truncate pr-2">
+                    {item.name}
+                  </span>
+                  <span className="text-slate-900 font-bold tabular-nums shrink-0">
+                    {formatLKR(item.amount).replace("LKR ", "")}
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-blue-500 transition-all duration-500"
+                    style={{ width: `${Math.max(progress, 8)}%` }}
+                  />
+                </div>
               </div>
-              {/* Progress bar */}
-              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-blue-500 transition-all duration-500"
-                  style={{ width: `${Math.max(progress, 8)}%` }}
-                />
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

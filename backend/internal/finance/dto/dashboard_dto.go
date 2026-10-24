@@ -53,12 +53,16 @@ type AgingBucket struct {
 
 type ReceivablesSummary struct {
 	TotalOutstanding float64       `json:"total_outstanding"`
+	OverdueAmount    float64       `json:"overdue_amount"`
+	OverdueCount     int           `json:"overdue_count"`
 	CollectionRate   float64       `json:"collection_rate"`
 	Aging            []AgingBucket `json:"aging"`
 }
 
 type PayablesSummary struct {
 	TotalPayable    float64       `json:"total_payable"`
+	OverdueAmount   float64       `json:"overdue_amount"`
+	OverdueCount    int           `json:"overdue_count"`
 	SupplierCount   int           `json:"supplier_count"`
 	PaymentDueCount int           `json:"payment_due_count"`
 	Aging           []AgingBucket `json:"aging"`
@@ -102,14 +106,32 @@ type PeriodStatus struct {
 	PostingAllowed   bool   `json:"posting_allowed"`
 }
 
+type FinancialAlertItem struct {
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
+	Severity string `json:"severity"` // "High", "Medium", "Low"
+	Link     string `json:"link"`
+}
+
+type TopEntityItem struct {
+	Name       string  `json:"name"`
+	Amount     float64 `json:"amount"`
+	Percentage float64 `json:"percentage"`
+	Code       string  `json:"code,omitempty"`
+}
+
 type DashboardResponse struct {
-	Summary             DashboardSummary    `json:"summary"`
-	Trend               []TrendPoint        `json:"trend"`
-	ExpenseDistribution []ExpenseCategory   `json:"expense_distribution"`
-	Receivables         ReceivablesSummary  `json:"receivables"`
-	Payables            PayablesSummary     `json:"payables"`
-	RecentTransactions  []RecentTransaction `json:"recent_transactions"`
-	PendingApprovals    []PendingApproval   `json:"pending_approvals"`
-	Liquidity           LiquiditySummary    `json:"liquidity"`
-	PeriodStatus        PeriodStatus        `json:"period_status"`
+	Summary             DashboardSummary     `json:"summary"`
+	Trend               []TrendPoint         `json:"trend"`
+	ExpenseDistribution []ExpenseCategory    `json:"expense_distribution"`
+	Receivables         ReceivablesSummary   `json:"receivables"`
+	Payables            PayablesSummary      `json:"payables"`
+	RecentTransactions  []RecentTransaction  `json:"recent_transactions"`
+	PendingApprovals    []PendingApproval    `json:"pending_approvals"`
+	Liquidity           LiquiditySummary     `json:"liquidity"`
+	PeriodStatus        PeriodStatus         `json:"period_status"`
+	Alerts              []FinancialAlertItem `json:"alerts"`
+	TopCustomers        []TopEntityItem      `json:"top_customers"`
+	TopSuppliers        []TopEntityItem      `json:"top_suppliers"`
 }
