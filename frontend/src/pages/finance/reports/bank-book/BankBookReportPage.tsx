@@ -87,6 +87,8 @@ const BankBookReportPage = () => {
           branch_id: activeBranch?.id ? String(activeBranch.id) : ""
         };
         setFilters(initial);
+        // Directly load report with initial filters (bypasses 300ms debounce)
+        fetchReportWithParams(initial);
       }
     } catch (error) {
       console.error("Failed to load filters data", error);

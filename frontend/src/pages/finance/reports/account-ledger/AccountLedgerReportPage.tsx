@@ -83,12 +83,15 @@ const AccountLedgerReportPage = () => {
       const defaultAccount = accList.find((a: any) => a.is_bank_account || a.is_cash_account) || accList[0];
 
       if (defaultAccount && !filters.account_id) {
-        setFilters((prev: any) => ({
-          ...prev,
-          financial_year_id: activeFy ? String(activeFy.id) : prev.financial_year_id,
+        const initial = {
+          ...filters,
+          financial_year_id: activeFy ? String(activeFy.id) : filters.financial_year_id,
           account_id: String(defaultAccount.id),
-          branch_id: activeBranch?.id ? String(activeBranch.id) : prev.branch_id
-        }));
+          branch_id: activeBranch?.id ? String(activeBranch.id) : filters.branch_id
+        };
+        setFilters(initial);
+        // Directly load report (bypasses 300ms debounce)
+        fetchReportWithFilters(initial);
       }
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -99,7 +102,8 @@ const AccountLedgerReportPage = () => {
 
   const fetchReport = useCallback(async () => {
     fetchReportWithFilters(filters);
-  }, [filters, fetchReportWithFilters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchReportWithFilters]);
 
   useEffect(() => {
     fetchFiltersData();
