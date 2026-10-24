@@ -45,15 +45,18 @@ const JournalRegisterReportPage = () => {
         financeApi.getFinancialYears({ limit: 100 }),
         financeApi.getAccountingPeriods({ limit: 100 })
       ]);
+      let initialFilters: any = null;
       if (fyRes.data?.success) {
         const years = fyRes.data.data || [];
         setFinancialYears(years);
         const activeYr = years.find((y: any) => y.is_active) || years[0];
         if (activeYr && !filters.financial_year_id) {
-          setFilters((prev: any) => ({ ...prev, financial_year_id: activeYr.id.toString() }));
+          initialFilters = { ...filters, financial_year_id: activeYr.id.toString() };
+          setFilters(initialFilters);
         }
       }
       if (apRes.data?.success) setAccountingPeriods(apRes.data.data || []);
+      fetchReport(initialFilters || filters);
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
@@ -62,7 +65,7 @@ const JournalRegisterReportPage = () => {
   const fetchReport = useCallback(async (overrideFilters?: any) => {
     setLoading(true);
     try {
-      const params = { ...(overrideFilters || filters) };
+      const params = { ...(overrideFilters || {}) };
       Object.keys(params).forEach((key: any) => {
         if (params[key] === "") delete params[key];
       });
@@ -77,7 +80,8 @@ const JournalRegisterReportPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchFiltersData();
@@ -86,7 +90,8 @@ const JournalRegisterReportPage = () => {
 
   useEffect(() => {
     fetchReport(debouncedFilters);
-  }, [debouncedFilters, fetchReport]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedFilters]);
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters((prev: any) => ({ ...prev, [key]: value }));

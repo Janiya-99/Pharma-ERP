@@ -86,11 +86,14 @@ const BalanceSheetReportPage: React.FC = () => {
 
       const activeFy: any = fyList.find((f: any) => f.is_active || f.is_current || f.status === 'active') || fyList[0];
       if (activeFy && !filters.financial_year_id) {
-        setFilters((prev: any) => ({
-          ...prev,
+        const initial = {
+          ...filters,
           financial_year_id: String(activeFy.id),
-          branch_id: activeBranch?.id ? String(activeBranch.id) : prev.branch_id
-        }));
+          branch_id: activeBranch?.id ? String(activeBranch.id) : filters.branch_id
+        };
+        setFilters(initial);
+        // Directly load report with initial filters (bypasses 300ms debounce delay)
+        fetchReport(initial);
       }
     } catch (error) {
       console.error("Failed to load filters data", error);

@@ -69,8 +69,19 @@ const DayBookReportPage = () => {
   }, []);
 
   useEffect(() => {
+    if (activeBranch?.id) {
+      setFilters((prev: any) => ({ ...prev, branch_id: activeBranch.id }));
+    }
+  }, [activeBranch]);
+
+  useEffect(() => {
+    fetchReport(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     fetchReport(debouncedFilters);
-  }, [debouncedFilters, fetchReport, activeBranch]);
+  }, [debouncedFilters, fetchReport]);
 
   const handleFilterChange = (key: any, value: any) => {
     setFilters((prev: any) => ({ ...prev, [key]: value }));

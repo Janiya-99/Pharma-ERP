@@ -76,6 +76,8 @@ const CashBookReportPage = () => {
           branch_id: activeBranch?.id ? String(activeBranch.id) : ""
         };
         setFilters(initial);
+        // Directly load report (bypasses 300ms debounce)
+        fetchReportWithFilters(initial);
       }
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -84,7 +86,8 @@ const CashBookReportPage = () => {
 
   const fetchReport = useCallback(async () => {
     fetchReportWithFilters(filters);
-  }, [filters, fetchReportWithFilters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchReportWithFilters]);
 
   useEffect(() => {
     fetchFiltersData();
