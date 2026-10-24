@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../../auth/AuthContext';
 import { financeApi } from '../../../../api/financeApi';
+import { useDebounce } from '../../../../hooks/useDebounce';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import DataTable from '../../../../components/common/DataTable';
@@ -38,6 +39,8 @@ const ReceiptRegisterReportPage = () => {
     branch_id: activeBranch?.id || ""
   });
 
+  const debouncedFilters = useDebounce(filters, 300);
+
   const fetchFiltersData = async () => {
     try {
       const [fyRes, apRes] = await Promise.all([
@@ -58,11 +61,11 @@ const ReceiptRegisterReportPage = () => {
     }
   };
 
-  const fetchReport = useCallback(async () => {
+  const fetchReport = useCallback(async (overrideFilters?: any) => {
     setLoading(true);
     try {
-      const params = { ...filters };
-      Object.keys(params).forEach((key: unknown) => {
+      const params = { ...(overrideFilters || filters) };
+      Object.keys(params).forEach((key: any) => {
         if (params[key] === "") delete params[key];
       });
 
@@ -70,7 +73,7 @@ const ReceiptRegisterReportPage = () => {
       if (response.data?.success) {
         setData(response.data.data || []);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to fetch receipt register report");
       setData([]);
     } finally {
@@ -80,12 +83,15 @@ const ReceiptRegisterReportPage = () => {
 
   useEffect(() => {
     fetchFiltersData();
-    fetchReport();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
 
+  useEffect(() => {
+    fetchReport(debouncedFilters);
+  }, [debouncedFilters, fetchReport]);
+
   const handleFilterChange = (key: unknown, value: unknown) => {
-    setFilters((prev: unknown) => ({ ...prev, [key]: value }));
+    setFilters((prev: any) => ({ ...prev, [key as string]: value }));
   };
 
   const handleApplyFilters = () => {
@@ -105,7 +111,6 @@ const ReceiptRegisterReportPage = () => {
       receipt_method: "",
       branch_id: activeBranch?.id || ""
     });
-    setTimeout(() => fetchReport(), 0);
   };
 
   const handleExportJson = () => {

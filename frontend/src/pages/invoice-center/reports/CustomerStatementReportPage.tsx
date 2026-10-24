@@ -27,6 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { useDebounce } from "@/hooks/useDebounce";
+
 export const CustomerStatementReportPage: React.FC = () => {
   const [filters, setFilters] = useState<
     Omit<CustomerStatementReportParams, "customer_id"> & { customer_id: string }
@@ -36,6 +38,8 @@ export const CustomerStatementReportPage: React.FC = () => {
     date_to: "",
     include_unposted: false,
   });
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const [data, setData] = useState<{
     header: CustomerStatementReportHeader;
@@ -47,7 +51,6 @@ export const CustomerStatementReportPage: React.FC = () => {
 
   const fetchStatement = async (custId: string, customFilters?: typeof filters) => {
     if (!custId) {
-      toast.error("Customer is required");
       return;
     }
 
@@ -87,7 +90,7 @@ export const CustomerStatementReportPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Load customers for dropdown and auto-load the first customer's statement
+    // Load customers for dropdown and set first customer
     const loadCustomers = async () => {
       try {
         const res = await invoiceCenterApi.getCustomers({ limit: 1000 });
@@ -96,7 +99,6 @@ export const CustomerStatementReportPage: React.FC = () => {
         if (list.length > 0 && !filters.customer_id) {
           const firstId = String(list[0].id);
           setFilters((prev) => ({ ...prev, customer_id: firstId }));
-          fetchStatement(firstId);
         }
       } catch (err) {
         console.error("Failed to load customers", err);
@@ -104,6 +106,12 @@ export const CustomerStatementReportPage: React.FC = () => {
     };
     loadCustomers();
   }, []);
+
+  useEffect(() => {
+    if (debouncedFilters.customer_id) {
+      fetchStatement(debouncedFilters.customer_id, debouncedFilters);
+    }
+  }, [debouncedFilters]);
 
   const fetchData = async () => {
     fetchStatement(filters.customer_id);
@@ -379,7 +387,7 @@ export const CustomerStatementReportPage: React.FC = () => {
           isLoading={isLoading}
           emptyMessage={
             !filters.customer_id
-              ? "Select a customer and apply filters to view the statement."
+              ? "Select a customer from the filters above to view the statement."
               : "No transactions found for the selected period."
           }
         />

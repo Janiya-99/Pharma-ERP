@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/pixandco/erp-phrma/internal/finance/dto"
 	"github.com/pixandco/erp-phrma/internal/finance/models"
@@ -115,7 +116,7 @@ func (s *GeneralLedgerService) CalculateRunningBalanceTx(tx *gorm.DB, companyID,
 
 	var runningBalance float64 = 0
 	for _, entry := range entries {
-		if entry.NormalBalance == "debit" {
+		if strings.EqualFold(entry.NormalBalance, "debit") {
 			runningBalance += entry.DebitAmount - entry.CreditAmount
 		} else {
 			runningBalance += entry.CreditAmount - entry.DebitAmount

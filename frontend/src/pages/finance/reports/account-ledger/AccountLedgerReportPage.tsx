@@ -15,6 +15,7 @@ import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
+import { useDebounce } from '../../../../hooks/useDebounce';
 
 const AccountLedgerReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
@@ -81,22 +82,20 @@ const AccountLedgerReportPage = () => {
       // Auto-default to first bank/cash account or primary operating account
       const defaultAccount = accList.find((a: any) => a.is_bank_account || a.is_cash_account) || accList[0];
 
-      if (defaultAccount) {
-        const initial = {
-          financial_year_id: activeFy ? String(activeFy.id) : "",
-          accounting_period_id: "",
+      if (defaultAccount && !filters.account_id) {
+        setFilters((prev: any) => ({
+          ...prev,
+          financial_year_id: activeFy ? String(activeFy.id) : prev.financial_year_id,
           account_id: String(defaultAccount.id),
-          date_from: "",
-          date_to: "",
-          branch_id: activeBranch?.id ? String(activeBranch.id) : ""
-        };
-        setFilters(initial);
-        fetchReportWithFilters(initial);
+          branch_id: activeBranch?.id ? String(activeBranch.id) : prev.branch_id
+        }));
       }
     } catch (error) {
       console.error("Failed to load filters data", error);
     }
   };
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const fetchReport = useCallback(async () => {
     fetchReportWithFilters(filters);
@@ -104,8 +103,13 @@ const AccountLedgerReportPage = () => {
 
   useEffect(() => {
     fetchFiltersData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
+
+  useEffect(() => {
+    if (debouncedFilters.account_id) {
+      fetchReportWithFilters(debouncedFilters);
+    }
+  }, [debouncedFilters, fetchReportWithFilters]);
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters((prev: any) => ({ ...prev, [key]: value }));
@@ -139,6 +143,30 @@ const AccountLedgerReportPage = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = `account-ledger-${filters.account_id}-${new Date().getTime()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    if (!data) return;
+    const lines = data.ledger_lines || [];
+    const headers = ['Date', 'Source Type', 'Source No', 'Ref No', 'Description', 'Debit', 'Credit', 'Running Balance'];
+    const rows = lines.map((t: any) => [
+      t.transaction_date ? format(new Date(t.transaction_date), 'yyyy-MM-dd') : '',
+      `"${t.source_type || ''}"`,
+      `"${t.source_number || ''}"`,
+      `"${t.reference_number || ''}"`,
+      `"${(t.description || '').replace(/"/g, '""')}"`,
+      (t.debit_amount ?? t.debit ?? 0),
+      (t.credit_amount ?? t.credit ?? 0),
+      (t.running_balance ?? 0)
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `account-ledger-${filters.account_id}-${new Date().getTime()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -185,12 +213,12 @@ const AccountLedgerReportPage = () => {
     {
       header: <div className="text-right">Debit</div>,
       accessor: "debit",
-      cell: (row: any) => <ReportAmountCell amount={row.debit} />
+      cell: (row: any) => <ReportAmountCell amount={row.debit_amount ?? row.debit} />
     },
     {
       header: <div className="text-right">Credit</div>,
       accessor: "credit",
-      cell: (row: any) => <ReportAmountCell amount={row.credit} />
+      cell: (row: any) => <ReportAmountCell amount={row.credit_amount ?? row.credit} />
     },
     {
       header: <div className="text-right">Balance</div>,
@@ -299,7 +327,7 @@ const AccountLedgerReportPage = () => {
             {data.branch_name && <p className="text-slate-500 mt-1 text-xs">Branch: {data.branch_name}</p>}
           </div>
 
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} onExportCsv={handleExportCsv} isRefreshing={loading} />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />
@@ -324,7 +352,7 @@ const AccountLedgerReportPage = () => {
           <AlertCircle className="mx-auto h-12 w-12 text-slate-400" />
           <h3 className="mt-4 text-lg font-medium text-slate-900">Select Account</h3>
           <p className="mt-2 text-sm text-slate-500">
-            Select an account from the filters above and click Apply Filters to inspect its general ledger postings.
+            Select an account from the filters above to inspect its general ledger postings.
           </p>
         </div>
       )}

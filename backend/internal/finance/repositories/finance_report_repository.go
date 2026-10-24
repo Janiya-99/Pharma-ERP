@@ -21,7 +21,9 @@ type TrialBalanceRawLine struct {
 	AccountName        string  `gorm:"column:account_name"`
 	ClassificationID   uint64  `gorm:"column:classification_id"`
 	ClassificationType string  `gorm:"column:classification_type"`
+	ClassificationName string  `gorm:"column:classification_name"`
 	NormalBalance      string  `gorm:"column:normal_balance"`
+	CoaNormalBalance   string  `gorm:"column:coa_normal_balance"`
 	OpeningDebit       float64 `gorm:"column:opening_debit"`
 	OpeningCredit      float64 `gorm:"column:opening_credit"`
 	PeriodDebit        float64 `gorm:"column:period_debit"`
@@ -43,8 +45,10 @@ func (r *FinanceReportRepository) GetTrialBalanceReport(
 			coa.account_code,
 			coa.account_name,
 			coa.account_classification_id as classification_id,
-			c.type as classification_type,
-			c.normal_balance,
+			COALESCE(c.type, '') as classification_type,
+			COALESCE(c.name, '') as classification_name,
+			COALESCE(c.normal_balance, coa.normal_balance, 'Debit') as normal_balance,
+			coa.normal_balance as coa_normal_balance,
 			SUM(CASE WHEN ? AND gl.transaction_date < ? THEN gl.debit_amount ELSE 0 END) as opening_debit,
 			SUM(CASE WHEN ? AND gl.transaction_date < ? THEN gl.credit_amount ELSE 0 END) as opening_credit,
 			SUM(CASE WHEN (NOT ? OR gl.transaction_date >= ?) AND (NOT ? OR gl.transaction_date <= ?) THEN gl.debit_amount ELSE 0 END) as period_debit,
@@ -55,14 +59,15 @@ func (r *FinanceReportRepository) GetTrialBalanceReport(
 			hasDateFrom, req.DateFrom, hasDateTo, req.DateTo,
 			hasDateFrom, req.DateFrom, hasDateTo, req.DateTo).
 		Joins("JOIN chart_of_accounts coa ON gl.account_id = coa.id").
-		Joins("JOIN account_classifications c ON coa.account_classification_id = c.id").
+		Joins("LEFT JOIN account_classifications c ON coa.account_classification_id = c.id").
 		Where("gl.company_id = ? AND gl.financial_year_id = ?", companyID, req.FinancialYearID)
 
 	if req.BranchID != nil {
 		query = query.Where("gl.branch_id = ?", *req.BranchID)
 	}
 
-	query = query.Group("gl.account_id, coa.account_code, coa.account_name, coa.account_classification_id, c.type, c.normal_balance")
+	query = query.Group("gl.account_id, coa.account_code, coa.account_name, coa.account_classification_id, c.type, c.name, c.normal_balance, coa.normal_balance").
+		Order("coa.account_code ASC")
 
 	var results []TrialBalanceRawLine
 	if err := query.Find(&results).Error; err != nil {

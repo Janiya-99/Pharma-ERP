@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../../auth/AuthContext';
 import { financeApi } from '../../../../api/financeApi';
+import { useDebounce } from '../../../../hooks/useDebounce';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import DataTable from '../../../../components/common/DataTable';
@@ -31,6 +32,8 @@ const CashBookReportPage = () => {
     date_to: "",
     branch_id: activeBranch?.id ? String(activeBranch.id) : ""
   });
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const fetchReportWithFilters = useCallback(async (activeFilters: any) => {
     if (!activeFilters?.account_id) {
@@ -73,7 +76,6 @@ const CashBookReportPage = () => {
           branch_id: activeBranch?.id ? String(activeBranch.id) : ""
         };
         setFilters(initial);
-        fetchReportWithFilters(initial);
       }
     } catch (error) {
       console.error("Failed to load filters data", error);
@@ -88,6 +90,12 @@ const CashBookReportPage = () => {
     fetchFiltersData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
+
+  useEffect(() => {
+    if (debouncedFilters.account_id) {
+      fetchReportWithFilters(debouncedFilters);
+    }
+  }, [debouncedFilters, fetchReportWithFilters]);
 
   const handleFilterChange = (key: unknown, value: unknown) => {
     setFilters((prev: any) => ({ ...prev, [key as string]: value }));
@@ -120,6 +128,30 @@ const CashBookReportPage = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = `cash-book-${filters.account_id}-${new Date().getTime()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    if (!data) return;
+    const transactions = data.transactions || data.ledger_lines || [];
+    const headers = ['Date', 'Source Type', 'Source No', 'Ref No', 'Description', 'Receipts (Debit)', 'Payments (Credit)', 'Running Balance'];
+    const rows = transactions.map((t: any) => [
+      t.transaction_date ? format(new Date(t.transaction_date), 'yyyy-MM-dd') : '',
+      `"${t.source_type || ''}"`,
+      `"${t.source_number || ''}"`,
+      `"${t.reference_number || ''}"`,
+      `"${(t.description || '').replace(/"/g, '""')}"`,
+      (t.debit_amount ?? t.debit ?? 0),
+      (t.credit_amount ?? t.credit ?? 0),
+      (t.running_balance ?? 0)
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cash-book-${filters.account_id}-${new Date().getTime()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -166,12 +198,12 @@ const CashBookReportPage = () => {
     {
       header: <div className="text-right">Receipts (Dr)</div>,
       accessor: "debit",
-      cell: (row: any) => <ReportAmountCell amount={row.debit} />
+      cell: (row: any) => <ReportAmountCell amount={row.debit_amount ?? row.debit} />
     },
     {
       header: <div className="text-right">Payments (Cr)</div>,
       accessor: "credit",
-      cell: (row: any) => <ReportAmountCell amount={row.credit} />
+      cell: (row: any) => <ReportAmountCell amount={row.credit_amount ?? row.credit} />
     },
     {
       header: <div className="text-right">Balance</div>,
@@ -244,7 +276,7 @@ const CashBookReportPage = () => {
             {data.branch_name && <p className="text-slate-500 text-xs mt-1">Branch: {data.branch_name}</p>}
           </div>
 
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} onExportCsv={handleExportCsv} isRefreshing={loading} />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />

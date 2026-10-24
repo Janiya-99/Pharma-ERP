@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import RebuildLedgerModal from './RebuildLedgerModal';
 import { FinanceAiPromptBar } from '../shared/FinanceAiPromptBar';
+import { useDebounce } from '../../../hooks/useDebounce';
 
 const SOURCE_TYPES = [
   'opening_balance',
@@ -75,13 +76,15 @@ const GeneralLedgerPage = () => {
     }
   };
 
-  const fetchLedgerEntries = useCallback(async (page: unknown = 1) => {
+  const debouncedFilters = useDebounce(filters, 300);
+
+  const fetchLedgerEntries = useCallback(async (page: unknown = 1, currentFilters: any = filters) => {
     setLoading(true);
     try {
       const params = {
         page,
         limit: pagination.limit,
-        ...filters
+        ...currentFilters
       };
       
       // Clean empty string params
@@ -96,26 +99,28 @@ const GeneralLedgerPage = () => {
           setPagination(response.data.pagination);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to fetch general ledger entries");
       setData([]);
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.limit]);
+  }, [pagination.limit]);
 
   useEffect(() => {
     fetchFiltersData();
-    fetchLedgerEntries(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBranch]);
 
+  useEffect(() => {
+    fetchLedgerEntries(1, debouncedFilters);
+  }, [debouncedFilters, fetchLedgerEntries]);
+
   const handleFilterChange = (key: unknown, value: unknown) => {
-    setFilters((prev: unknown) => ({ ...prev, [key]: value }));
+    setFilters((prev: unknown) => ({ ...prev, [key as string]: value }));
   };
 
   const handleApplyFilters = () => {
-    fetchLedgerEntries(1);
+    fetchLedgerEntries(1, filters);
   };
 
   const handleClearFilters = () => {
@@ -129,9 +134,6 @@ const GeneralLedgerPage = () => {
       search: "",
       branch_id: activeBranch?.id || ""
     });
-    setTimeout(() => {
-      fetchLedgerEntries(1);
-    }, 0);
   };
 
   const columns = [

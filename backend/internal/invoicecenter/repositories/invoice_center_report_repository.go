@@ -10,7 +10,7 @@ import (
 
 type InvoiceCenterReportRepository interface {
 	GetDashboardSummary(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) (dto.DashboardSummaryReportDTO, error)
-	GetCustomerBalanceSummary(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, int64, error)
+	GetCustomerBalanceSummary(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, int64, dto.CustomerBalanceSummaryDTO, error)
 	GetCustomerStatementTransactions(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerStatementRowDTO, dto.CustomerStatementHeaderDTO, error)
 	GetCustomerAging(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerAgingRowDTO, int64, error)
 	GetSalesOrderRegister(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.SalesOrderRegisterRowDTO, int64, dto.SalesOrderRegisterSummaryDTO, error)
@@ -192,54 +192,85 @@ func (r *invoiceCenterReportRepository) GetDashboardSummary(db *gorm.DB, company
 	return summary, nil
 }
 
-func (r *invoiceCenterReportRepository) GetCustomerBalanceSummary(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, int64, error) {
-	query := db.Table("customers").Where("company_id = ? AND deleted_at IS NULL", companyID)
+func (r *invoiceCenterReportRepository) GetCustomerBalanceSummary(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerBalanceRowDTO, int64, dto.CustomerBalanceSummaryDTO, error) {
+	baseQuery := db.Table("customers").Where("company_id = ? AND deleted_at IS NULL", companyID)
 
 	// Customers are company-level in the current schema. Branch filtering applies
 	// to document reports, not to the customer master balance summary.
 	if filters.CustomerID != nil {
-		query = query.Where("id = ?", *filters.CustomerID)
+		baseQuery = baseQuery.Where("id = ?", *filters.CustomerID)
 	}
 	if filters.CustomerCategoryID != nil {
-		query = query.Where("customer_category_id = ?", *filters.CustomerCategoryID)
+		baseQuery = baseQuery.Where("customer_category_id = ?", *filters.CustomerCategoryID)
 	}
-	if filters.CustomerType != nil {
-		query = query.Where("customer_type = ?", *filters.CustomerType)
+	if filters.CustomerType != nil && *filters.CustomerType != "" && *filters.CustomerType != "all" {
+		baseQuery = baseQuery.Where("customer_type = ?", *filters.CustomerType)
 	}
-	if filters.Status != nil {
-		query = query.Where("status = ?", *filters.Status)
+	if filters.Status != nil && *filters.Status != "" && *filters.Status != "all" {
+		baseQuery = baseQuery.Where("status = ?", *filters.Status)
 	}
 	if filters.OverCreditLimit != nil && *filters.OverCreditLimit {
-		query = query.Where("current_balance > credit_limit AND credit_limit > 0")
+		baseQuery = baseQuery.Where("current_balance > credit_limit AND credit_limit > 0")
 	}
 	if filters.Search != "" {
 		search := "%" + filters.Search + "%"
-		query = query.Where("(LOWER(customer_code) LIKE LOWER(?) OR LOWER(customer_name) LIKE LOWER(?) OR LOWER(primary_email) LIKE LOWER(?))", search, search, search)
+		baseQuery = baseQuery.Where("(LOWER(customer_code) LIKE LOWER(?) OR LOWER(customer_name) LIKE LOWER(?) OR LOWER(primary_email) LIKE LOWER(?))", search, search, search)
 	}
 
 	var total int64
-	query.Count(&total)
+	baseQuery.Count(&total)
 
-	offset := (filters.Page - 1) * filters.Limit
-	query = query.Limit(filters.Limit).Offset(offset).Order("customer_name ASC")
+	type SummaryAgg struct {
+		TotalCreditLimit     float64
+		TotalCurrentBalance  float64
+		TotalAvailableCredit float64
+		OverLimitCount       int64
+	}
+	var agg SummaryAgg
+	baseQuery.Select(`
+		COALESCE(SUM(credit_limit), 0) as total_credit_limit,
+		COALESCE(SUM(current_balance), 0) as total_current_balance,
+		COALESCE(SUM(CASE WHEN credit_limit > 0 THEN GREATEST(credit_limit - current_balance, 0) ELSE 0 END), 0) as total_available_credit,
+		COALESCE(SUM(CASE WHEN current_balance > credit_limit AND credit_limit > 0 THEN 1 ELSE 0 END), 0) as over_limit_count
+	`).Scan(&agg)
+
+	summary := dto.CustomerBalanceSummaryDTO{
+		TotalCustomers:           total,
+		TotalCreditLimit:         agg.TotalCreditLimit,
+		TotalCurrentBalance:      agg.TotalCurrentBalance,
+		TotalAvailableCredit:     agg.TotalAvailableCredit,
+		CustomersOverCreditLimit: agg.OverLimitCount,
+	}
+
+	page := filters.Page
+	if page < 1 {
+		page = 1
+	}
+	limit := filters.Limit
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
 
 	var rows []dto.CustomerBalanceRowDTO
-	err := query.Select(`
+	err := baseQuery.Limit(limit).Offset(offset).Order("customer_name ASC").Select(`
 		customer_code, 
 		customer_name, 
-		(SELECT name FROM customer_categories WHERE id = customers.customer_category_id) as customer_category,
+		COALESCE((SELECT name FROM customer_categories WHERE id = customers.customer_category_id), '') as customer_category,
 		customer_type, 
 		primary_contact_number, 
 		primary_email, 
 		credit_limit, 
 		credit_days, 
 		current_balance,
-		CASE WHEN credit_limit > 0 THEN credit_limit - current_balance ELSE 0 END as available_credit,
+		CASE WHEN credit_limit > 0 THEN GREATEST(credit_limit - current_balance, 0) ELSE 0 END as available_credit,
 		CASE WHEN credit_limit = 0 THEN 'No Credit Limit' WHEN current_balance > credit_limit THEN 'Over Limit' ELSE 'Within Limit' END as credit_status,
+		COALESCE((SELECT account_code FROM chart_of_accounts WHERE id = customers.receivable_account_id), '') as receivable_account_code,
+		COALESCE((SELECT account_name FROM chart_of_accounts WHERE id = customers.receivable_account_id), '') as receivable_account_name,
 		status
 	`).Scan(&rows).Error
 
-	return rows, total, err
+	return rows, total, summary, err
 }
 
 func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.CustomerStatementRowDTO, dto.CustomerStatementHeaderDTO, error) {
@@ -259,8 +290,10 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 	header.DateTo = filters.DateTo
 
 	statusFilter := "posted_status = 'posted'"
+	statusFilterSI := "si.posted_status = 'posted'"
 	if filters.IncludeUnposted != nil && *filters.IncludeUnposted {
 		statusFilter = "1=1" // All statuses except deleted
+		statusFilterSI = "1=1"
 	}
 
 	branchFilter := ""
@@ -314,7 +347,7 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 			si.posted_status as operational_status, si.finance_post_status
 		FROM sales_invoices si
 		LEFT JOIN sales_orders so ON so.id = si.sales_order_id
-		WHERE si.customer_id = ? AND si.company_id = ? AND si.deleted_at IS NULL AND si.` + statusFilter + branchFilterSI + dateFilterSI + `
+		WHERE si.customer_id = ? AND si.company_id = ? AND si.deleted_at IS NULL AND ` + statusFilterSI + branchFilterSI + dateFilterSI + `
 		
 		UNION ALL
 		
@@ -404,19 +437,19 @@ func (r *invoiceCenterReportRepository) GetCustomerAging(db *gorm.DB, companyID 
 		branchJoin = fmt.Sprintf(" AND si.branch_id = %d", *filters.BranchID)
 	}
 
-	agingQuery := fmt.Sprintf(`
+	agingQuery := `
 		SELECT 
 			c.id as customer_id,
 			c.customer_code,
 			c.customer_name,
 			c.credit_limit,
 			c.current_balance,
-			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) <= 0 THEN si.balance_amount ELSE 0 END), 0) as 'current',
-			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 1 AND 30 THEN si.balance_amount ELSE 0 END), 0) as 'days_1_30',
-			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 31 AND 60 THEN si.balance_amount ELSE 0 END), 0) as 'days_31_60',
-			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 61 AND 90 THEN si.balance_amount ELSE 0 END), 0) as 'days_61_90',
-			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) BETWEEN 91 AND 120 THEN si.balance_amount ELSE 0 END), 0) as 'days_91_120',
-			COALESCE(SUM(CASE WHEN DATEDIFF('%%s', COALESCE(si.due_date, si.invoice_date)) > 120 THEN si.balance_amount ELSE 0 END), 0) as 'over_120',
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) <= 0 THEN si.balance_amount ELSE 0 END), 0) as 'current',
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 1 AND 30 THEN si.balance_amount ELSE 0 END), 0) as 'days_1_30',
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 31 AND 60 THEN si.balance_amount ELSE 0 END), 0) as 'days_31_60',
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 61 AND 90 THEN si.balance_amount ELSE 0 END), 0) as 'days_61_90',
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) BETWEEN 91 AND 120 THEN si.balance_amount ELSE 0 END), 0) as 'days_91_120',
+			COALESCE(SUM(CASE WHEN DATEDIFF(?, COALESCE(si.due_date, si.invoice_date)) > 120 THEN si.balance_amount ELSE 0 END), 0) as 'over_120',
 			COALESCE(SUM(si.balance_amount), 0) as 'total_outstanding'
 		FROM customers c
 		LEFT JOIN sales_invoices si ON si.customer_id = c.id 
@@ -424,14 +457,16 @@ func (r *invoiceCenterReportRepository) GetCustomerAging(db *gorm.DB, companyID 
 			AND si.deleted_at IS NULL 
 			AND si.payment_status != 'paid' 
 			AND si.approval_status != 'cancelled'
-			AND si.balance_amount > 0%s
-		WHERE %s
+			AND si.balance_amount > 0` + branchJoin + `
+		WHERE ` + whereClause + `
 		GROUP BY c.id, c.customer_code, c.customer_name, c.credit_limit, c.current_balance
 		ORDER BY total_outstanding DESC, c.customer_name ASC
 		LIMIT ? OFFSET ?
-	`, asOf, asOf, asOf, asOf, asOf, asOf, branchJoin, whereClause)
+	`
 
-	queryArgs := append(args, limit, offset)
+	queryArgs := []interface{}{asOf, asOf, asOf, asOf, asOf, asOf}
+	queryArgs = append(queryArgs, args...)
+	queryArgs = append(queryArgs, limit, offset)
 	var rows []dto.CustomerAgingRowDTO
 	err := db.Raw(agingQuery, queryArgs...).Scan(&rows).Error
 	if err != nil {

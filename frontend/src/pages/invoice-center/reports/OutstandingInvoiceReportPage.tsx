@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { OutstandingInvoiceReportParams, OutstandingInvoiceReportRow } from "@/types/invoice-center-reports";
 import { normalizeReportEnvelope } from "@/utils/reportResponse";
+import { useRef } from 'react';
+import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import { FileText, Coins, AlertTriangle, CalendarDays } from "lucide-react";
 
@@ -24,17 +26,19 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
     as_of_date: new Date().toISOString().split('T')[0],
   });
   
+  const debouncedFilters = useDebounce(filters, 300);
+
   const [data, setData] = useState<{ summary: any, rows: OutstandingInvoiceReportRow[] } | null>(null);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10, totalPages: 1 });
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = async (overrideFilters?: OutstandingInvoiceReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
       
-      const cleanFilters = { ...filters };
+      const cleanFilters = { ...(overrideFilters || filters) };
       if (cleanFilters.payment_status === "all") delete cleanFilters.payment_status;
 
       const res = await invoiceCenterApi.getOutstandingInvoiceReport(cleanFilters);
@@ -58,16 +62,24 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
     }
   };
 
+  const prevFiltersRef = useRef(filters);
   useEffect(() => {
-    fetchData();
-  }, [filters.page]);
+    const prev = prevFiltersRef.current;
+    prevFiltersRef.current = filters;
+    const nonPageChanged = Object.keys(filters).some(
+      (k) => k !== "page" && (filters as any)[k] !== (prev as any)[k]
+    );
+    if (nonPageChanged && filters.page !== 1) {
+      setFilters((p) => ({ ...p, page: 1 }));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData(debouncedFilters);
+  }, [debouncedFilters]);
 
   const handleApplyFilters = () => {
-    if (filters.page === 1) {
-      fetchData();
-    } else {
-      setFilters(prev => ({ ...prev, page: 1 }));
-    }
+    fetchData(filters);
   };
 
   const handleResetFilters = () => {
@@ -75,7 +87,6 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
       page: 1, limit: 10, search: "", 
       payment_status: "all", as_of_date: new Date().toISOString().split('T')[0]
     });
-    setTimeout(() => handleApplyFilters(), 0);
   };
 
   const handlePageChange = (newPage: number) => {

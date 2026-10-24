@@ -25,6 +25,8 @@ type GeneralLedgerEntryResponse struct {
 	Description     string  `json:"description"`
 	DebitAmount     float64 `json:"debit_amount"`
 	CreditAmount    float64 `json:"credit_amount"`
+	Debit           float64 `json:"debit"`
+	Credit          float64 `json:"credit"`
 	RunningBalance  float64 `json:"running_balance"`
 }
 

@@ -22,6 +22,8 @@ import {
   CustomerAgingReportParams,
   CustomerAgingReportRow,
 } from "@/types/invoice-center-reports";
+import { useRef } from 'react';
+import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 
 export const CustomerAgingReportPage: React.FC = () => {
@@ -31,6 +33,8 @@ export const CustomerAgingReportPage: React.FC = () => {
     search: "",
     as_of_date: new Date().toISOString().split("T")[0],
   });
+
+  const debouncedFilters = useDebounce(filters, 300);
 
   const [data, setData] = useState<CustomerAgingReportRow[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
@@ -82,12 +86,13 @@ export const CustomerAgingReportPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = async (overrideFilters?: CustomerAgingReportParams) => {
     try {
       setIsLoading(true);
       setHasPermission(true);
 
-      const res = await invoiceCenterApi.getCustomerAgingReport(filters);
+      const activeFilters = overrideFilters || filters;
+      const res = await invoiceCenterApi.getCustomerAgingReport(activeFilters);
       setData(Array.isArray(res.data?.data?.rows) ? res.data.data.rows : []);
       if (res.data?.pagination) {
         setPagination({
@@ -110,16 +115,24 @@ export const CustomerAgingReportPage: React.FC = () => {
     }
   };
 
+  const prevFiltersRef = useRef(filters);
   useEffect(() => {
-    fetchData();
-  }, [filters.page]);
+    const prev = prevFiltersRef.current;
+    prevFiltersRef.current = filters;
+    const nonPageChanged = Object.keys(filters).some(
+      (k) => k !== "page" && (filters as any)[k] !== (prev as any)[k]
+    );
+    if (nonPageChanged && filters.page !== 1) {
+      setFilters((p) => ({ ...p, page: 1 }));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData(debouncedFilters);
+  }, [debouncedFilters]);
 
   const handleApplyFilters = () => {
-    if (filters.page === 1) {
-      fetchData();
-    } else {
-      setFilters((prev) => ({ ...prev, page: 1 }));
-    }
+    fetchData(filters);
   };
 
   const handleResetFilters = () => {
@@ -131,7 +144,6 @@ export const CustomerAgingReportPage: React.FC = () => {
       search: "",
       as_of_date: new Date().toISOString().split("T")[0],
     });
-    setTimeout(() => handleApplyFilters(), 0);
   };
 
   const handlePageChange = (newPage: number) => {

@@ -30,16 +30,18 @@ type TrialBalanceReportRequest struct {
 }
 
 type TrialBalanceLine struct {
-	AccountID     uint64  `json:"account_id"`
-	AccountCode   string  `json:"account_code"`
-	AccountName   string  `json:"account_name"`
-	Balance       float64 `json:"balance"`
-	OpeningDebit  float64 `json:"opening_debit"`
-	OpeningCredit float64 `json:"opening_credit"`
-	PeriodDebit   float64 `json:"period_debit"`
-	PeriodCredit  float64 `json:"period_credit"`
-	ClosingDebit  float64 `json:"closing_debit"`
-	ClosingCredit float64 `json:"closing_credit"`
+	AccountID          uint64  `json:"account_id"`
+	AccountCode        string  `json:"account_code"`
+	AccountName        string  `json:"account_name"`
+	ClassificationName string  `json:"classification_name,omitempty"`
+	Category           string  `json:"category,omitempty"`
+	Balance            float64 `json:"balance"`
+	OpeningDebit       float64 `json:"opening_debit"`
+	OpeningCredit      float64 `json:"opening_credit"`
+	PeriodDebit        float64 `json:"period_debit"`
+	PeriodCredit       float64 `json:"period_credit"`
+	ClosingDebit       float64 `json:"closing_debit"`
+	ClosingCredit      float64 `json:"closing_credit"`
 }
 
 type TrialBalanceReportResponse struct {
@@ -93,26 +95,44 @@ type BalanceSheetSection struct {
 }
 
 type BalanceSheetReportResponse struct {
-	Assets      BalanceSheetSection `json:"assets"`
-	Liabilities BalanceSheetSection `json:"liabilities"`
-	Equity      BalanceSheetSection `json:"equity"`
-	NetIncome   float64             `json:"net_income"`
+	Assets                    BalanceSheetSection `json:"assets"`
+	Liabilities               BalanceSheetSection `json:"liabilities"`
+	Equity                    BalanceSheetSection `json:"equity"`
+	NetIncome                 float64             `json:"net_income"`
+	TotalAssets               float64             `json:"total_assets"`
+	TotalLiabilities          float64             `json:"total_liabilities"`
+	TotalEquity               float64             `json:"total_equity"`
+	TotalLiabilitiesAndEquity float64             `json:"total_liabilities_and_equity"`
+	Difference                float64             `json:"difference"`
+	IsBalanced                bool                `json:"is_balanced"`
+	CurrentAssets             float64             `json:"current_assets"`
+	NonCurrentAssets          float64             `json:"non_current_assets"`
+	CurrentLiabilities        float64             `json:"current_liabilities"`
+	NonCurrentLiabilities     float64             `json:"non_current_liabilities"`
+	WorkingCapital            float64             `json:"working_capital"`
+	CurrentRatio              float64             `json:"current_ratio"`
+	QuickRatio                float64             `json:"quick_ratio"`
+	DebtToEquityRatio         float64             `json:"debt_to_equity_ratio"`
 }
 
 // Cash/Bank Book Report
 type CashBankBookReportRequest struct {
-	AccountID uint64     `form:"account_id" binding:"required"`
-	BranchID  *uint64    `form:"branch_id"`
-	DateFrom  *time.Time `form:"date_from" time_format:"2006-01-02"`
-	DateTo    *time.Time `form:"date_to" time_format:"2006-01-02"`
+	AccountID     uint64     `form:"account_id"`
+	BankAccountID *uint64    `form:"bank_account_id"`
+	CashAccountID *uint64    `form:"cash_account_id"`
+	BranchID      *uint64    `form:"branch_id"`
+	DateFrom      *time.Time `form:"date_from" time_format:"2006-01-02"`
+	DateTo        *time.Time `form:"date_to" time_format:"2006-01-02"`
 }
 
 type CashBankBookReportResponse struct {
 	AccountDetails map[string]interface{}       `json:"account_details"`
 	OpeningBalance float64                      `json:"opening_balance"`
 	Transactions   []GeneralLedgerEntryResponse `json:"transactions"`
-	TotalReceipts  float64                      `json:"total_receipts"` // Deposits
-	TotalPayments  float64                      `json:"total_payments"` // Withdrawals
+	TotalReceipts  float64                      `json:"total_receipts"` // Deposits / Inflows
+	TotalPayments  float64                      `json:"total_payments"` // Withdrawals / Disbursements
+	TotalDebit     float64                      `json:"total_debit"`    // Receipts (Dr)
+	TotalCredit    float64                      `json:"total_credit"`   // Payments (Cr)
 	ClosingBalance float64                      `json:"closing_balance"`
 }
 

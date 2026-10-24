@@ -22,6 +22,7 @@ import {
   Share2,
 } from "lucide-react";
 import { toast } from "sonner";
+import BalanceSheetAuditDocModal from "../../components/finance/reports/BalanceSheetAuditDocModal";
 
 interface DocItem {
   id: string;
@@ -281,6 +282,48 @@ const DOCUMENTS_CATALOG: DocItem[] = [
     icon: CheckCircle,
     accentColor: "from-amber-600 to-yellow-500",
   },
+  {
+    id: "balance-sheet-statutory-audit",
+    title: "FY2026/2027 Balance Sheet Statutory Audit & Bug Resolution",
+    category: "Audit & Reports",
+    description:
+      "Statutory financial audit, root cause analysis (RCA), and production engineering resolutions for FY2026/2027 Balance Sheet zero asset bug, account misclassification, and double-entry equilibrium.",
+    pdfFilename: "BALANCE_SHEET_FIX_AUDIT_REPORT.md",
+    mdFilename: "BALANCE_SHEET_FIX_AUDIT_REPORT.md",
+    sizeBytes: "12.4 KB",
+    pageCount: "6 Sections",
+    badge: "CRITICAL AUDIT & FIX",
+    featured: true,
+    highlights: [
+      "Total Assets LKR 190,565,999.44 Ledger Equilibrium Restored",
+      "Corrected Trade Debtors, Inventory & Bank Misclassification",
+      "Dynamic LKAS/SLFRS KPI Ribbon & Financial Liquidity Ratios",
+    ],
+    lastUpdated: "October 2026",
+    icon: FileCheck,
+    accentColor: "from-emerald-500 to-teal-600",
+  },
+  {
+    id: "bank-cash-book-reconciliation-audit",
+    title: "FIN-02: Bank Book and Cash Book Reconciliation & Running Balances",
+    category: "Audit & Reports",
+    description:
+      "Statutory treasury audit resolving column dashes, sign convention inversion (-88.1M bank & -5M cash), chronological running balance calculation, and ledger reconciliation.",
+    pdfFilename: "FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md",
+    mdFilename: "FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md",
+    sizeBytes: "8.5 KB",
+    pageCount: "5 Sections",
+    badge: "FIN-02 AUDIT SIGN-OFF",
+    featured: true,
+    highlights: [
+      "Bank Account +88,107,675.10 LKR Reconciled (100% Ledger Match)",
+      "Cash in Hand +5,000,000.00 LKR Reconciled (100% Ledger Match)",
+      "Nonzero Debit/Credit Dash Fix & Chronological Forward Running Balance",
+    ],
+    lastUpdated: "October 2026",
+    icon: FileCheck,
+    accentColor: "from-blue-600 to-cyan-600",
+  },
 ];
 
 const CATEGORIES = [
@@ -301,6 +344,7 @@ export const PlatformDocumentationPage = () => {
     searchParams.get("category") || "All Documents"
   );
   const [previewDoc, setPreviewDoc] = useState<DocItem | null>(null);
+  const [auditModalOpen, setAuditModalOpen] = useState(false);
 
   const filteredDocs = useMemo(() => {
     return DOCUMENTS_CATALOG.filter((doc) => {
@@ -626,6 +670,17 @@ export const PlatformDocumentationPage = () => {
                 </div>
 
                 <div className="flex items-center gap-1.5">
+                  {doc.id === "balance-sheet-statutory-audit" && (
+                    <button
+                      onClick={() => setAuditModalOpen(true)}
+                      title="Open Interactive Audit Report Viewer"
+                      className="px-2.5 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 shadow-sm transition-all"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View</span>
+                    </button>
+                  )}
+
                   {doc.mdFilename && (
                     <button
                       onClick={() => handleDownload(doc.mdFilename!, `${doc.title} (Markdown)`)}
@@ -638,7 +693,7 @@ export const PlatformDocumentationPage = () => {
 
                   <button
                     onClick={() => handleOpenPdf(doc.pdfFilename)}
-                    title="Open PDF in new tab"
+                    title="Open in new tab"
                     className="p-1.5 rounded-md bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-all border border-slate-800"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -649,7 +704,7 @@ export const PlatformDocumentationPage = () => {
                     className="px-2.5 py-1 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1 shadow-sm transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>PDF</span>
+                    <span>Download</span>
                   </button>
                 </div>
               </div>
@@ -663,13 +718,16 @@ export const PlatformDocumentationPage = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-indigo-400" />
-            <h3 className="text-base font-bold text-white">Technical Architecture & Schema Files (Markdown)</h3>
+            <h3 className="text-base font-bold text-white">Technical Architecture, Audits & Schema Files (Markdown)</h3>
           </div>
           <span className="text-xs text-slate-500">Source Markdown Files</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {[
+            { name: "BALANCE_SHEET_FIX_AUDIT_REPORT.md", title: "Balance Sheet Audit & Fix Report", size: "12.4 KB" },
+            { name: "RECONCILIATION_PROOF.md", title: "Double-Entry Reconciliation Proof", size: "4.6 KB" },
+            { name: "SYSTEM_CHANGELOG.md", title: "Engineering System Changelog", size: "5.8 KB" },
             { name: "ARCHITECTURE_GUIDE.md", title: "Complete Architecture Guide", size: "14 KB" },
             { name: "DATABASE_SCHEMA.md", title: "Database Schema Reference", size: "12 KB" },
             { name: "SETUP_GUIDE.md", title: "Server Setup & Runbook", size: "5.4 KB" },
@@ -696,6 +754,12 @@ export const PlatformDocumentationPage = () => {
           ))}
         </div>
       </div>
+
+      {/* In-App Interactive Audit Modal */}
+      <BalanceSheetAuditDocModal
+        isOpen={auditModalOpen}
+        onClose={() => setAuditModalOpen(false)}
+      />
     </div>
   );
 };

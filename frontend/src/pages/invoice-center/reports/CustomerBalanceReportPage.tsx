@@ -7,6 +7,11 @@ import {
   ColumnDef,
 } from "@/components/invoice-center/reports/ReportDataTable";
 import { ReportPermissionState } from "@/components/invoice-center/reports/ReportPermissionState";
+import { ReportErrorState } from "@/components/invoice-center/reports/ReportErrorState";
+import {
+  ReportSummaryCards,
+  SummaryCardItem,
+} from "@/components/invoice-center/reports/ReportSummaryCards";
 import { ReportExportActions } from "@/components/invoice-center/reports/ReportExportActions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +26,17 @@ import { Badge } from "@/components/ui/badge";
 import {
   CustomerBalanceReportParams,
   CustomerBalanceReportRow,
+  CustomerBalanceReportSummary,
 } from "@/types/invoice-center-reports";
+import {
+  Users,
+  CreditCard,
+  Banknote,
+  ShieldCheck,
+  AlertTriangle,
+} from "lucide-react";
+import { useRef } from 'react';
+import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 
 export const CustomerBalanceReportPage: React.FC = () => {
@@ -32,11 +47,26 @@ export const CustomerBalanceReportPage: React.FC = () => {
     status: "all",
   });
 
+  const debouncedFilters = useDebounce(filters, 300);
+
   const [data, setData] = useState<CustomerBalanceReportRow[]>([]);
+  const [summary, setSummary] = useState<CustomerBalanceReportSummary | null>(
+    null
+  );
   const [customers, setCustomers] = useState<any[]>([]);
   const [customerTypeFilter, setCustomerTypeFilter] = useState<string>("all");
   const [creditStatusFilter, setCreditStatusFilter] = useState<string>("all");
   const [minBalanceFilter, setMinBalanceFilter] = useState<string>("all");
+
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [hasPermission, setHasPermission] = useState(true);
 
   useEffect(() => {
     const loadCustomers = async () => {
@@ -50,6 +80,87 @@ export const CustomerBalanceReportPage: React.FC = () => {
     loadCustomers();
   }, []);
 
+  const fetchData = async (overrideFilters?: CustomerBalanceReportParams) => {
+    try {
+      setIsLoading(true);
+      setErrorMessage(null);
+      setHasPermission(true);
+
+      const cleanFilters: Record<string, any> = { ...(overrideFilters || filters) };
+      if (cleanFilters.status === "all") delete cleanFilters.status;
+
+      const res = await invoiceCenterApi.getCustomerBalanceReport(cleanFilters);
+      const reportPayload = res.data?.data;
+      const rows = Array.isArray(reportPayload?.rows) ? reportPayload.rows : [];
+      setData(rows);
+
+      if (reportPayload?.summary) {
+        setSummary(reportPayload.summary);
+      }
+
+      if (res.data?.pagination) {
+        setPagination({
+          total: res.data.pagination.total,
+          page: res.data.pagination.page,
+          limit: res.data.pagination.limit,
+          totalPages: res.data.pagination.total_pages,
+        });
+      }
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        setHasPermission(false);
+      } else {
+        const detailedError =
+          err.response?.data?.errors ||
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to load customer balance report";
+        setErrorMessage(
+          typeof detailedError === "string"
+            ? detailedError
+            : JSON.stringify(detailedError)
+        );
+        toast.error(
+          err.response?.data?.message || "Failed to load report data"
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const prevFiltersRef = useRef(filters);
+  useEffect(() => {
+    const prev = prevFiltersRef.current;
+    prevFiltersRef.current = filters;
+    const nonPageChanged = Object.keys(filters).some(
+      (k) => k !== "page" && (filters as any)[k] !== (prev as any)[k]
+    );
+    if (nonPageChanged && filters.page !== 1) {
+      setFilters((p) => ({ ...p, page: 1 }));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData(debouncedFilters);
+  }, [debouncedFilters]);
+
+  const handleApplyFilters = () => {
+    fetchData(filters);
+  };
+
+  const handleResetFilters = () => {
+    setCustomerTypeFilter("all");
+    setCreditStatusFilter("all");
+    setMinBalanceFilter("all");
+    setErrorMessage(null);
+    setFilters({ page: 1, limit: 10, search: "", status: "all" });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setFilters((prev) => ({ ...prev, page: newPage }));
+  };
+
   const filteredData = useMemo(() => {
     return data.filter((row) => {
       if (
@@ -58,7 +169,11 @@ export const CustomerBalanceReportPage: React.FC = () => {
       ) {
         return false;
       }
-      if (creditStatusFilter !== "all" && row.credit_status !== creditStatusFilter) {
+      if (
+        creditStatusFilter !== "all" &&
+        row.credit_status?.toLowerCase().replace(/ /g, "_") !==
+          creditStatusFilter.toLowerCase().replace(/ /g, "_")
+      ) {
         return false;
       }
       if (minBalanceFilter === "has_balance" && row.current_balance <= 0) {
@@ -74,119 +189,173 @@ export const CustomerBalanceReportPage: React.FC = () => {
     });
   }, [data, customerTypeFilter, creditStatusFilter, minBalanceFilter]);
 
-  const [pagination, setPagination] = useState({
-    total: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 1,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasPermission, setHasPermission] = useState(true);
-
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      setHasPermission(true);
-
-      const cleanFilters = { ...filters };
-      if (cleanFilters.status === "all") delete cleanFilters.status;
-
-      const res = await invoiceCenterApi.getCustomerBalanceReport(cleanFilters);
-      setData(Array.isArray(res.data?.data?.rows) ? res.data.data.rows : []);
-      if (res.data?.pagination) {
-        setPagination({
-          total: res.data.pagination.total,
-          page: res.data.pagination.page,
-          limit: res.data.pagination.limit,
-          totalPages: res.data.pagination.total_pages,
-        });
-      }
-    } catch (err: any) {
-      if (err.response?.status === 403) {
-        setHasPermission(false);
-      } else {
-        toast.error(
-          err.response?.data?.message || "Failed to load report data"
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [filters.page]);
-
-  const handleApplyFilters = () => {
-    if (filters.page === 1) {
-      fetchData();
-    } else {
-      setFilters((prev) => ({ ...prev, page: 1 }));
-    }
-  };
-
-  const handleResetFilters = () => {
-    setCustomerTypeFilter("all");
-    setCreditStatusFilter("all");
-    setMinBalanceFilter("all");
-    setFilters({ page: 1, limit: 10, search: "", status: "all" });
-    setTimeout(() => handleApplyFilters(), 0);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    setFilters((prev) => ({ ...prev, page: newPage }));
-  };
-
   const formatMoney = (val: number) => {
     return new Intl.NumberFormat("en-LK", {
       style: "currency",
       currency: "LKR",
-    }).format(val);
+    }).format(val || 0);
   };
+
+  const summaryCardItems: SummaryCardItem[] = useMemo(() => {
+    return [
+      {
+        title: "Total Customers",
+        value: summary?.total_customers ?? pagination.total,
+        format: "number",
+        icon: <Users className="h-4 w-4 text-blue-600" />,
+      },
+      {
+        title: "Total Credit Limit",
+        value: summary?.total_credit_limit ?? 0,
+        format: "currency",
+        icon: <CreditCard className="h-4 w-4 text-indigo-600" />,
+      },
+      {
+        title: "Total Current Balance",
+        value: summary?.total_current_balance ?? 0,
+        format: "currency",
+        icon: <Banknote className="h-4 w-4 text-amber-600" />,
+      },
+      {
+        title: "Available Credit",
+        value: summary?.total_available_credit ?? 0,
+        format: "currency",
+        icon: <ShieldCheck className="h-4 w-4 text-emerald-600" />,
+      },
+      {
+        title: "Over Credit Limit",
+        value: summary?.customers_over_credit_limit ?? 0,
+        format: "number",
+        icon: <AlertTriangle className="h-4 w-4 text-rose-600" />,
+      },
+    ];
+  }, [summary, pagination.total]);
 
   const columns: ColumnDef<CustomerBalanceReportRow>[] = [
     { header: "Customer Code", accessorKey: "customer_code" },
     { header: "Customer Name", accessorKey: "customer_name" },
+    {
+      header: "Receivable Account",
+      cell: (row) =>
+        row.receivable_account_code ? (
+          <div className="flex flex-col text-xs">
+            <span className="font-semibold text-slate-800">
+              {row.receivable_account_code}
+            </span>
+            <span className="text-slate-500 truncate max-w-[170px]" title={row.receivable_account_name}>
+              {row.receivable_account_name}
+            </span>
+          </div>
+        ) : (
+          <span className="text-xs text-slate-400 italic">Not Mapped</span>
+        ),
+      align: "left",
+    },
     { header: "Category", accessorKey: "customer_category" },
-    { header: "Type", accessorKey: "customer_type" },
+    {
+      header: "Type",
+      cell: (row) => (
+        <span className="capitalize text-slate-700">
+          {row.customer_type || "-"}
+        </span>
+      ),
+    },
     {
       header: "Credit Limit",
-      cell: (row) => formatMoney(row.credit_limit),
+      cell: (row) => (
+        <span className="font-mono text-slate-800 font-medium">
+          {formatMoney(row.credit_limit)}
+        </span>
+      ),
       align: "right",
     },
     {
       header: "Current Balance",
-      cell: (row) => formatMoney(row.current_balance),
+      cell: (row) => (
+        <span
+          className={`font-mono font-semibold ${
+            row.current_balance > row.credit_limit && row.credit_limit > 0
+              ? "text-rose-600 font-bold"
+              : row.current_balance > 0
+              ? "text-amber-700"
+              : "text-slate-700"
+          }`}
+        >
+          {formatMoney(row.current_balance)}
+        </span>
+      ),
       align: "right",
     },
     {
       header: "Available Credit",
-      cell: (row) => formatMoney(row.available_credit),
+      cell: (row) => (
+        <span className="font-mono text-emerald-700 font-medium">
+          {formatMoney(row.available_credit)}
+        </span>
+      ),
       align: "right",
     },
     {
       header: "Credit Status",
-      cell: (row) => (
-        <Badge
-          variant={
-            row.credit_status === "over_limit" ? "destructive" : "secondary"
-          }
-        >
-          {row.credit_status === "over_limit" ? "Over Limit" : "Within Limit"}
-        </Badge>
-      ),
+      cell: (row) => {
+        const isOver = row.credit_status?.toLowerCase().includes("over");
+        const isNoLimit = row.credit_status?.toLowerCase().includes("no");
+        return (
+          <Badge
+            variant={isOver ? "destructive" : isNoLimit ? "outline" : "secondary"}
+            className={
+              isOver
+                ? "bg-rose-100 text-rose-700 hover:bg-rose-100 border-rose-200"
+                : !isNoLimit
+                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+                : "text-slate-500 border-slate-200"
+            }
+          >
+            {row.credit_status}
+          </Badge>
+        );
+      },
       align: "center",
     },
     {
       header: "Status",
       cell: (row) => (
-        <Badge variant={row.status === "active" ? "default" : "secondary"}>
+        <Badge
+          variant={row.status === "active" ? "default" : "secondary"}
+          className={
+            row.status === "active"
+              ? "bg-emerald-600 text-white hover:bg-emerald-600"
+              : "bg-slate-200 text-slate-700 hover:bg-slate-200"
+          }
+        >
           {row.status}
         </Badge>
       ),
       align: "center",
     },
+  ];
+
+  const exportColumns = [
+    { header: "Customer Code", accessorKey: "customer_code" },
+    { header: "Customer Name", accessorKey: "customer_name" },
+    {
+      header: "Receivable Account Code",
+      accessorKey: "receivable_account_code",
+    },
+    {
+      header: "Receivable Account Name",
+      accessorKey: "receivable_account_name",
+    },
+    { header: "Category", accessorKey: "customer_category" },
+    { header: "Customer Type", accessorKey: "customer_type" },
+    { header: "Primary Phone", accessorKey: "primary_contact_number" },
+    { header: "Primary Email", accessorKey: "primary_email" },
+    { header: "Credit Limit (LKR)", accessorKey: "credit_limit" },
+    { header: "Credit Days", accessorKey: "credit_days" },
+    { header: "Current Balance (LKR)", accessorKey: "current_balance" },
+    { header: "Available Credit (LKR)", accessorKey: "available_credit" },
+    { header: "Credit Status", accessorKey: "credit_status" },
+    { header: "Account Status", accessorKey: "status" },
   ];
 
   if (!hasPermission) {
@@ -200,14 +369,23 @@ export const CustomerBalanceReportPage: React.FC = () => {
   return (
     <ReportPageShell
       title="Customer Balances"
-      description="View credit limits, current balances, and available credit for all customers."
+      description="View credit limits, current balances, receivable account mappings, and available credit for all customers."
+      summary={
+        <div className="space-y-2">
+          <ReportSummaryCards
+            items={summaryCardItems}
+            isLoading={isLoading}
+          />
+        </div>
+      }
       actions={
         <ReportExportActions
-          data={data}
+          data={filteredData}
+          columns={exportColumns}
           filename={`customer-balances-${
             new Date().toISOString().split("T")[0]
           }`}
-          disabled={isLoading || data.length === 0}
+          disabled={isLoading || (filteredData.length === 0 && !summary)}
         />
       }
       filters={
@@ -231,8 +409,11 @@ export const CustomerBalanceReportPage: React.FC = () => {
               <SelectContent>
                 <SelectItem value="all">All Customers</SelectItem>
                 {customers.map((c) => (
-                  <SelectItem key={c.id} value={c.customer_code || c.company_name}>
-                    {c.customer_code} - {c.company_name}
+                  <SelectItem
+                    key={c.id}
+                    value={c.customer_code || c.customer_name}
+                  >
+                    {c.customer_code} - {c.customer_name || c.company_name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -322,14 +503,27 @@ export const CustomerBalanceReportPage: React.FC = () => {
         </ReportFilterBar>
       }
       table={
-        <ReportDataTable
-          columns={columns}
-          data={filteredData}
-          isLoading={isLoading}
-          pagination={pagination}
-          onPageChange={handlePageChange}
-        />
+        errorMessage ? (
+          <div className="p-6">
+            <ReportErrorState
+              title="Failed to Generate Customer Balance Report"
+              errorDetails={errorMessage}
+              onRetry={fetchData}
+              onResetFilters={handleResetFilters}
+            />
+          </div>
+        ) : (
+          <ReportDataTable
+            columns={columns}
+            data={filteredData}
+            isLoading={isLoading}
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            emptyMessage="No customer records match your filter criteria. Try adjusting or resetting filters."
+          />
+        )
       }
     />
   );
 };
+export default CustomerBalanceReportPage;

@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/pixandco/erp-phrma/internal/finance/models"
 	"gorm.io/gorm"
@@ -160,11 +161,11 @@ func (r *journalEntryRepository) UpdateAccountBalance(tx *gorm.DB, accountID uin
 	// For Credit normal balance accounts: Credit increases balance, Debit decreases balance
 
 	balanceChange := amount
-	if account.NormalBalance == "Debit" {
+	if strings.EqualFold(account.NormalBalance, "debit") {
 		if !isDebit {
 			balanceChange = -amount
 		}
-	} else if account.NormalBalance == "Credit" {
+	} else if strings.EqualFold(account.NormalBalance, "credit") {
 		if isDebit {
 			balanceChange = -amount
 		}

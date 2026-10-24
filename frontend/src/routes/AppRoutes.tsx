@@ -71,6 +71,7 @@ const SecuritySettingsPage = lazy(() => import("../pages/control-center/security
 const ApprovalSettingsPage = lazy(() => import("../pages/control-center/approval-settings/ApprovalSettingsPage"));
 const DocumentNumberingPage = lazy(() => import("../pages/control-center/document-numbering/DocumentNumberingPage"));
 const GeneralSettingsPage = lazy(() => import("../pages/control-center/settings/GeneralSettingsPage"));
+const SystemFixesAuditPage = lazy(() => import("../pages/control-center/system-fixes-audit/SystemFixesAuditPage"));
 
 // Finance General Ledger & Reports
 const FinanceDashboardPage = lazy(() => import("../pages/finance/dashboard/FinanceDashboardPage"));
@@ -315,6 +316,10 @@ const AppRoutes = () => {
           <Route
             path="/control-center/settings"
             element={<GeneralSettingsPage />}
+          />
+          <Route
+            path="/control-center/system-fixes-audit"
+            element={<SystemFixesAuditPage />}
           />
 
           {/* Finance Module */}

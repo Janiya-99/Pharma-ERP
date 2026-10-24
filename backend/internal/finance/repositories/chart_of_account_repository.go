@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/pixandco/erp-phrma/internal/finance/models"
 	"gorm.io/gorm"
 )
@@ -83,14 +85,14 @@ func (r *ChartOfAccountRepository) UpdateCurrentBalanceWithTx(tx *gorm.DB, accou
 		return err
 	}
 
-	if balanceType == "debit" {
-		if account.NormalBalance == "debit" {
+	if strings.EqualFold(balanceType, "debit") {
+		if strings.EqualFold(account.NormalBalance, "debit") {
 			account.CurrentBalance += amount
 		} else {
 			account.CurrentBalance -= amount
 		}
-	} else if balanceType == "credit" {
-		if account.NormalBalance == "credit" {
+	} else if strings.EqualFold(balanceType, "credit") {
+		if strings.EqualFold(account.NormalBalance, "credit") {
 			account.CurrentBalance += amount
 		} else {
 			account.CurrentBalance -= amount

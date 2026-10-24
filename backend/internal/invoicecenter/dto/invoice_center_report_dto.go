@@ -70,18 +70,28 @@ type DashboardSummaryReportDTO struct {
 
 // 8. Customer Balance Summary Report
 type CustomerBalanceRowDTO struct {
-	CustomerCode         string  `json:"customer_code"`
-	CustomerName         string  `json:"customer_name"`
-	CustomerCategory     string  `json:"customer_category"`
-	CustomerType         string  `json:"customer_type"`
-	PrimaryContactNumber string  `json:"primary_contact_number"`
-	PrimaryEmail         string  `json:"primary_email"`
-	CreditLimit          float64 `json:"credit_limit"`
-	CreditDays           int     `json:"credit_days"`
-	CurrentBalance       float64 `json:"current_balance"`
-	AvailableCredit      float64 `json:"available_credit"`
-	CreditStatus         string  `json:"credit_status"`
-	Status               string  `json:"status"`
+	CustomerCode          string  `json:"customer_code"`
+	CustomerName          string  `json:"customer_name"`
+	CustomerCategory      string  `json:"customer_category"`
+	CustomerType          string  `json:"customer_type"`
+	PrimaryContactNumber  string  `json:"primary_contact_number"`
+	PrimaryEmail          string  `json:"primary_email"`
+	CreditLimit           float64 `json:"credit_limit"`
+	CreditDays            int     `json:"credit_days"`
+	CurrentBalance        float64 `json:"current_balance"`
+	AvailableCredit       float64 `json:"available_credit"`
+	CreditStatus          string  `json:"credit_status"`
+	ReceivableAccountCode string  `json:"receivable_account_code"`
+	ReceivableAccountName string  `json:"receivable_account_name"`
+	Status                string  `json:"status"`
+}
+
+type CustomerBalanceSummaryDTO struct {
+	TotalCustomers           int64   `json:"total_customers"`
+	TotalCreditLimit         float64 `json:"total_credit_limit"`
+	TotalCurrentBalance      float64 `json:"total_current_balance"`
+	TotalAvailableCredit     float64 `json:"total_available_credit"`
+	CustomersOverCreditLimit int64   `json:"customers_over_credit_limit"`
 }
 
 // 9. Customer Statement Report

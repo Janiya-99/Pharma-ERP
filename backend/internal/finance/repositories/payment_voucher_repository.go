@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pixandco/erp-phrma/internal/finance/models"
 	"gorm.io/gorm"
@@ -156,7 +157,7 @@ func (r *paymentVoucherRepository) UpdateAccountBalance(tx *gorm.DB, accountID u
 
 	amountStr := fmt.Sprintf("%.2f", amount)
 
-	if account.NormalBalance == "Debit" {
+	if strings.EqualFold(account.NormalBalance, "debit") {
 		if isDebit {
 			return tx.Model(&account).UpdateColumn("current_balance", gorm.Expr("current_balance + ?", amountStr)).Error
 		} else {
