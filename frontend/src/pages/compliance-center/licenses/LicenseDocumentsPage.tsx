@@ -160,7 +160,13 @@ const LicenseDocumentsPage = () => {
     setLoading(true);
     try {
       const res = await inventoryApi.getProducts({ page: 1, limit: 100 });
-      const rawProducts = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const rawProducts = Array.isArray(res?.data?.data)
+        ? res.data.data
+        : Array.isArray(res?.data?.items)
+        ? res.data.items
+        : Array.isArray(res?.data)
+        ? res.data
+        : [];
 
       // 1. Process statutory premises & facility licenses
       const mappedPremises: LicenseDoc[] = STATUTORY_PREMISES_LICENSES.map((lic) => {
