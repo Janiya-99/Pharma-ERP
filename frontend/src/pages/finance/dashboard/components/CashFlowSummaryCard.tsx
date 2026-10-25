@@ -27,71 +27,17 @@ export const CashFlowSummaryCard: React.FC<CashFlowSummaryCardProps> = ({ data }
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState("This Month");
 
-  const periodDataMap: Record<string, {
-    inflow: number;
-    outflow: number;
-    net: number;
-    inflowTrend: string;
-    outflowTrend: string;
-    netTrend: string;
-    chart: { date: string; Inflow: number; Outflow: number }[];
-  }> = {
-    "This Month": {
-      inflow: 58934210,
-      outflow: 41720430,
-      net: 17213780,
-      inflowTrend: "18%",
-      outflowTrend: "6%",
-      netTrend: "42%",
-      chart: [
-        { date: "1 Oct", Inflow: 4800000, Outflow: 3100000 },
-        { date: "5 Oct", Inflow: 7200000, Outflow: 4800000 },
-        { date: "10 Oct", Inflow: 11400000, Outflow: 6500000 },
-        { date: "15 Oct", Inflow: 9600000, Outflow: 8200000 },
-        { date: "20 Oct", Inflow: 12100000, Outflow: 7300000 },
-        { date: "25 Oct", Inflow: 6800000, Outflow: 5900000 },
-        { date: "30 Oct", Inflow: 7034210, Outflow: 5920430 },
-      ],
-    },
-    "Last Month": {
-      inflow: 52410000,
-      outflow: 39850000,
-      net: 12560000,
-      inflowTrend: "12%",
-      outflowTrend: "4%",
-      netTrend: "28%",
-      chart: [
-        { date: "1 Sep", Inflow: 4200000, Outflow: 2900000 },
-        { date: "5 Sep", Inflow: 6800000, Outflow: 4500000 },
-        { date: "10 Sep", Inflow: 10200000, Outflow: 6100000 },
-        { date: "15 Sep", Inflow: 8900000, Outflow: 7600000 },
-        { date: "20 Sep", Inflow: 11200000, Outflow: 6900000 },
-        { date: "25 Sep", Inflow: 5900000, Outflow: 5600000 },
-        { date: "30 Sep", Inflow: 5210000, Outflow: 6250000 },
-      ],
-    },
-    "This Quarter": {
-      inflow: 174800000,
-      outflow: 121500000,
-      net: 53300000,
-      inflowTrend: "24%",
-      outflowTrend: "8%",
-      netTrend: "45%",
-      chart: [
-        { date: "Aug 26", Inflow: 56200000, Outflow: 38400000 },
-        { date: "Sep 26", Inflow: 58900000, Outflow: 41700000 },
-        { date: "Oct 26", Inflow: 59700000, Outflow: 41400000 },
-      ],
-    },
-  };
+  // Compute strictly from live backend LiquiditySummary data
+  const cashIn = data?.cash_in || 0;
+  const cashOut = data?.cash_out || 0;
+  const netCash = data?.net_surplus ?? (cashIn - cashOut);
+  const outflowRatio = data?.outflow_ratio ?? (cashIn > 0 ? Math.round((cashOut / cashIn) * 100) : 0);
 
-  const currentPeriodConfig = periodDataMap[selectedPeriod] || periodDataMap["This Month"];
-
-  const multiplier = selectedPeriod === "This Quarter" ? 3.0 : selectedPeriod === "Last Month" ? 0.9 : 1.0;
-  const cashIn = data?.cash_in ? Math.round(data.cash_in * multiplier) : currentPeriodConfig.inflow;
-  const cashOut = data?.cash_out ? Math.round(data.cash_out * multiplier) : currentPeriodConfig.outflow;
-  const netCash = data?.net_surplus ? Math.round(data.net_surplus * multiplier) : currentPeriodConfig.net;
-  const cashFlowDailyData = currentPeriodConfig.chart;
+  const cashFlowDailyData = [
+    { date: "Cash In (Dr)", Inflow: cashIn, Outflow: 0 },
+    { date: "Disbursed (Cr)", Inflow: 0, Outflow: cashOut },
+    { date: "Net Surplus", Inflow: Math.max(0, netCash), Outflow: Math.max(0, -netCash) },
+  ];
 
   const formatYAxis = (val: number) => {
     if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
@@ -144,7 +90,7 @@ export const CashFlowSummaryCard: React.FC<CashFlowSummaryCardProps> = ({ data }
             {formatLKR(cashIn)}
           </div>
           <span className="inline-flex items-center text-[10px] font-bold text-emerald-600 mt-0.5">
-            <ArrowUpRight className="h-2.5 w-2.5" /> {currentPeriodConfig.inflowTrend}
+            100% Inflow
           </span>
         </div>
 
@@ -160,7 +106,7 @@ export const CashFlowSummaryCard: React.FC<CashFlowSummaryCardProps> = ({ data }
             {formatLKR(cashOut)}
           </div>
           <span className="inline-flex items-center text-[10px] font-bold text-rose-600 mt-0.5">
-            <ArrowUpRight className="h-2.5 w-2.5" /> {currentPeriodConfig.outflowTrend}
+            {outflowRatio}% of Inflow
           </span>
         </div>
 
@@ -175,8 +121,8 @@ export const CashFlowSummaryCard: React.FC<CashFlowSummaryCardProps> = ({ data }
           <div className="text-sm font-bold text-slate-900 mt-1 truncate">
             {formatLKR(netCash)}
           </div>
-          <span className="inline-flex items-center text-[10px] font-bold text-blue-600 mt-0.5">
-            <ArrowUpRight className="h-2.5 w-2.5" /> {currentPeriodConfig.netTrend}
+          <span className={`inline-flex items-center text-[10px] font-bold mt-0.5 ${netCash >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+            {netCash >= 0 ? "Surplus Position" : "Deficit Position"}
           </span>
         </div>
       </div>

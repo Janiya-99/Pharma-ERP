@@ -1,5 +1,5 @@
-import React from "react";
-import { Loader2, Inbox, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Loader2, Inbox } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -8,13 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { TablePagination } from "./TablePagination";
 
 export interface Column<TData = any> {
   header: string;
   accessor?: string;
   accessorKey?: string;
   id?: string;
-  cell?: (info: { row: { original: TData } }) => React.ReactNode;
+  cell?: (info: { row: { original: TData } } | any) => React.ReactNode;
   cellClassName?: string;
   className?: string;
 }
@@ -25,9 +26,22 @@ export interface DataTableProps<TData = any> {
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
-  pagination?: any;
-  onPaginationChange?: any;
+  emptyMessage?: string;
+  pagination?:
+    | {
+        pageIndex?: number;
+        pageSize?: number;
+        page?: number;
+        limit?: number;
+        [key: string]: any;
+      }
+    | false;
+  onPaginationChange?: (pagination: any) => void;
   pageCount?: number;
+  totalRecords?: number;
+  pageSizeOptions?: number[];
+  defaultPageSize?: number;
+  disablePagination?: boolean;
   onEdit?: (row: TData) => void;
   onDelete?: (row: TData) => void;
   onRowClick?: (row: TData) => void;
@@ -39,18 +53,35 @@ function DataTable<TData = any>({
   loading,
   emptyTitle = "No records found",
   emptyDescription = "",
+  emptyMessage,
   pagination,
   onPaginationChange,
   pageCount,
+  totalRecords,
+  pageSizeOptions = [10, 25, 50, 100],
+  defaultPageSize = 10,
+  disablePagination = false,
   onEdit,
   onDelete,
   onRowClick,
 }: DataTableProps<TData>) {
   const hasActions = Boolean(onEdit || onDelete);
+  const displayEmptyTitle = emptyMessage || emptyTitle;
+
+  // Uncontrolled (client-side) pagination state
+  const [clientPageIndex, setClientPageIndex] = useState(0);
+  const [clientPageSize, setClientPageSize] = useState(defaultPageSize);
+
+  // When data changes or shrinks, ensure clientPageIndex remains in range
+  useEffect(() => {
+    if (data && clientPageIndex > 0 && clientPageIndex * clientPageSize >= data.length) {
+      setClientPageIndex(0);
+    }
+  }, [data, clientPageIndex, clientPageSize]);
 
   if (loading && (!data || data.length === 0)) {
     return (
-      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-sm rounded-xl">
+      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-xs rounded-xl">
         <Table>
           <TableHeader className="border-b border-slate-100 bg-slate-50/50">
             <TableRow className="hover:bg-transparent">
@@ -103,11 +134,17 @@ function DataTable<TData = any>({
   if (!data || data.length === 0) {
     return (
       <div className="glass-card flex flex-col items-center justify-center gap-3 py-20">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: 'rgba(238,242,255,0.5)', border: '1px solid rgba(148,163,184,0.15)' }}>
+        <div
+          className="flex h-14 w-14 items-center justify-center rounded-2xl"
+          style={{
+            background: "rgba(238,242,255,0.5)",
+            border: "1px solid rgba(148,163,184,0.15)",
+          }}
+        >
           <Inbox className="text-slate-400 h-6 w-6" />
         </div>
         <div className="text-center">
-          <p className="text-slate-900 text-sm font-semibold">{emptyTitle}</p>
+          <p className="text-slate-900 text-sm font-semibold">{displayEmptyTitle}</p>
           {emptyDescription && (
             <p className="text-slate-400 mt-1 text-xs">{emptyDescription}</p>
           )}
@@ -121,16 +158,104 @@ function DataTable<TData = any>({
     return key.split(".").reduce((obj: any, k: string) => obj?.[k], row);
   };
 
+  // Determine whether pagination is controlled (server-side) or uncontrolled (client-side)
+  const isControlled = Boolean(pagination && onPaginationChange && pagination !== false);
+  const isPaginationDisabled = disablePagination || pagination === false;
+
+  let activePageIndex = 0;
+  let activePageSize = defaultPageSize;
+  let activeTotalItems = data.length;
+  let activePageCount = 1;
+  let rowsToDisplay = data;
+
+  if (isPaginationDisabled) {
+    rowsToDisplay = data;
+  } else if (isControlled && typeof pagination === "object" && pagination !== null) {
+    activePageIndex =
+      pagination.pageIndex ?? (pagination.page != null ? pagination.page - 1 : 0);
+    activePageSize =
+      pagination.pageSize ?? (pagination.limit != null ? pagination.limit : 10);
+    activeTotalItems =
+      totalRecords ??
+      (pageCount != null ? pageCount * activePageSize : data.length);
+    activePageCount =
+      pageCount ?? Math.max(1, Math.ceil(activeTotalItems / activePageSize));
+    rowsToDisplay = data;
+  } else {
+    activePageIndex = clientPageIndex;
+    activePageSize = clientPageSize;
+    activeTotalItems = data.length;
+    activePageCount = Math.max(1, Math.ceil(activeTotalItems / activePageSize));
+    const start = clientPageIndex * clientPageSize;
+    rowsToDisplay = data.slice(start, start + clientPageSize);
+  }
+
+  const handlePageChange = (newPageIndex: number) => {
+    if (isControlled && typeof pagination === "object" && pagination !== null) {
+      onPaginationChange?.({
+        ...pagination,
+        pageIndex: newPageIndex,
+        page: newPageIndex + 1,
+      });
+    } else {
+      setClientPageIndex(newPageIndex);
+    }
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    if (isControlled && typeof pagination === "object" && pagination !== null) {
+      onPaginationChange?.({
+        ...pagination,
+        pageIndex: 0,
+        page: 1,
+        pageSize: newPageSize,
+        limit: newPageSize,
+      });
+    } else {
+      setClientPageSize(newPageSize);
+      setClientPageIndex(0);
+    }
+  };
+
+  const renderCellContent = (col: Column<TData>, row: any) => {
+    if (col.cell) {
+      const context = {
+        row: {
+          original: row,
+          ...row,
+        },
+        ...row,
+        original: row,
+      };
+      try {
+        return (col.cell as any)(context);
+      } catch {
+        return (col.cell as any)(row);
+      }
+    }
+
+    const accessorPath = col.accessorKey || col.accessor;
+    if (accessorPath) {
+      const val = resolveAccessor(row, accessorPath);
+      if (val === null || val === undefined || val === "") {
+        return <span className="text-slate-300 select-none">—</span>;
+      }
+      return String(val);
+    }
+
+    return <span className="text-slate-300 select-none">—</span>;
+  };
+
   return (
-    <div>
-      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-sm rounded-xl">
+    <div className="w-full">
+      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-xs rounded-xl">
         <Table>
-          <TableHeader className="border-b border-slate-100 bg-slate-50/30">
+          <TableHeader className="border-b border-slate-100 bg-slate-50/40">
             <TableRow className="hover:bg-transparent">
               {columns.map((col, index) => (
                 <TableHead
                   key={col.id || col.accessorKey || col.accessor || index}
-                  className={`text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4.5 text-left text-xs font-semibold uppercase tracking-wider ${
+                  className={`text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${
                     col.className || ""
                   }`}
                 >
@@ -138,48 +263,33 @@ function DataTable<TData = any>({
                 </TableHead>
               ))}
               {hasActions && (
-                <TableHead className="text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4.5 text-right text-xs font-semibold uppercase tracking-wider">
+                <TableHead className="text-slate-500 h-auto whitespace-nowrap border-none px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">
                   Actions
                 </TableHead>
               )}
             </TableRow>
           </TableHeader>
           <TableBody className="divide-slate-100 divide-y">
-            {data.map((row, rowIndex) => (
+            {rowsToDisplay.map((row, rowIndex) => (
               <TableRow
                 key={((row as any).id as string) || rowIndex}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={`group border-none transition-colors duration-150 hover:bg-slate-50/50 ${
+                className={`group border-none transition-colors duration-150 hover:bg-slate-50/60 ${
                   onRowClick ? "cursor-pointer" : ""
                 }`}
               >
-                {columns.map((col, colIndex) => {
-                  const accessorPath = col.accessorKey || col.accessor;
-                  return (
-                    <TableCell
-                      key={
-                        col.id || col.accessorKey || col.accessor || colIndex
-                      }
-                      className={`text-slate-600 border-none px-6 py-4.5 text-sm font-medium ${
-                        col.cellClassName || ""
-                      }`}
-                    >
-                      {col.cell
-                        ? col.cell(row)
-                        : accessorPath
-                        ? (() => {
-                            const val = resolveAccessor(row, accessorPath);
-                            if (val === null || val === undefined || val === "") {
-                              return <span className="text-slate-300 select-none">—</span>;
-                            }
-                            return String(val);
-                          })()
-                        : <span className="text-slate-300 select-none">—</span>}
-                    </TableCell>
-                  );
-                })}
+                {columns.map((col, colIndex) => (
+                  <TableCell
+                    key={col.id || col.accessorKey || col.accessor || colIndex}
+                    className={`text-slate-600 border-none px-6 py-4 text-sm font-medium ${
+                      col.cellClassName || ""
+                    }`}
+                  >
+                    {renderCellContent(col, row)}
+                  </TableCell>
+                ))}
                 {hasActions && (
-                  <TableCell className="border-none px-6 py-4.5 text-sm">
+                  <TableCell className="border-none px-6 py-4 text-sm">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                       {onEdit && (
                         <button
@@ -235,45 +345,20 @@ function DataTable<TData = any>({
             ))}
           </TableBody>
         </Table>
-      </div>
 
-      {/* Pagination */}
-      {pagination &&
-        onPaginationChange &&
-        pageCount != null &&
-        pageCount > 1 && (
-          <div className="mt-3 flex items-center justify-between px-2 py-3">
-            <p className="text-slate-500 text-xs font-medium">
-              Page {pagination.pageIndex + 1} of {pageCount}
-            </p>
-            <div className="flex items-center gap-1.5">
-              <button
-                disabled={pagination.pageIndex === 0}
-                onClick={() =>
-                  onPaginationChange({
-                    ...pagination,
-                    pageIndex: pagination.pageIndex - 1,
-                  })
-                }
-                className="border-slate-200 text-slate-500 hover:bg-slate-50 inline-flex h-8 w-8 items-center justify-center rounded-xl border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                disabled={pagination.pageIndex >= pageCount - 1}
-                onClick={() =>
-                  onPaginationChange({
-                    ...pagination,
-                    pageIndex: pagination.pageIndex + 1,
-                  })
-                }
-                className="border-slate-200 text-slate-500 hover:bg-slate-50 inline-flex h-8 w-8 items-center justify-center rounded-xl border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+        {/* Integrated Pagination */}
+        {!isPaginationDisabled && data.length > 0 && (
+          <TablePagination
+            pageIndex={activePageIndex}
+            pageSize={activePageSize}
+            totalItems={activeTotalItems}
+            pageCount={activePageCount}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            pageSizeOptions={pageSizeOptions}
+          />
         )}
+      </div>
     </div>
   );
 }

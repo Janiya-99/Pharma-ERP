@@ -1,7 +1,7 @@
 import apiClient from "./apiClient";
 
-export const getControlDashboardSummary = async () => {
-  const res = await apiClient.get("/control/dashboard/summary");
+export const getControlDashboardSummary = async (params?: Record<string, unknown>) => {
+  const res = await apiClient.get("/control/dashboard/summary", { params });
   return res.data;
 };
 

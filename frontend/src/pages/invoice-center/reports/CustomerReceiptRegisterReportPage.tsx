@@ -111,6 +111,7 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
     { header: "Customer Name", accessorKey: "customer_name" },
     { 
       header: "Payment Method", 
+      accessorKey: "payment_method",
       cell: (row) => (
         <Badge variant="outline">{row.payment_method}</Badge>
       ),
@@ -118,21 +119,25 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
     },
     { 
       header: "Amount", 
+      accessorKey: "receipt_amount",
       cell: (row) => <span className="font-semibold text-navy-900">{formatMoney(row.receipt_amount)}</span>,
       align: "right"
     },
     { 
       header: "Allocated", 
+      accessorKey: "allocated_amount",
       cell: (row) => formatMoney(row.allocated_amount),
       align: "right"
     },
     { 
       header: "Unallocated", 
+      accessorKey: "unallocated_amount",
       cell: (row) => formatMoney(row.unallocated_amount),
       align: "right"
     },
     { 
       header: "Approval", 
+      accessorKey: "approval_status",
       cell: (row) => (
         <Badge variant={row.approval_status === 'approved' ? 'default' : row.approval_status === 'rejected' ? 'destructive' : 'secondary'}>
           {row.approval_status}
@@ -142,6 +147,7 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
     },
     { 
       header: "Posted", 
+      accessorKey: "posted_status",
       cell: (row) => (
         <Badge variant={row.posted_status === 'posted' ? 'default' : 'secondary'}>
           {row.posted_status}
@@ -150,6 +156,15 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
       align: "center"
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getCustomerReceiptRegister({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -173,9 +188,18 @@ export const CustomerReceiptRegisterReportPage: React.FC = () => {
       description="View all customer receipts, allocations, and statuses."
       actions={
         <ReportExportActions 
+          title="Customer Receipt Register Report"
           data={data} 
+          columns={columns}
           filename={`customer-receipt-register-${new Date().toISOString().split('T')[0]}`} 
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Receipt Count", value: summary.receipt_count || 0 },
+            { title: "Receipt Amount", value: formatMoney(summary.receipt_amount || 0) },
+            { title: "Allocated Amount", value: formatMoney(summary.allocated_amount || 0) },
+            { title: "Unallocated Amount", value: formatMoney(summary.unallocated_amount || 0) },
+          ]}
         />
       }
       filters={

@@ -67,7 +67,6 @@ type UserItem = {
   login_enabled?: boolean;
   role_name?: string;
   role?: { role_name?: string };
-  isMock?: boolean;
 };
 
 type BranchItem = {
@@ -97,99 +96,6 @@ type AccessRecord = {
   role_name?: string;
 };
 
-const mockUsers: UserItem[] = [
-  {
-    id: "mock-1",
-    name: "Janith Samarasinghe",
-    email: "janith@omacxpharma.lk",
-    employee_code: "EMP-001",
-    status: "active",
-    role_name: "Super Admin",
-    login_enabled: true,
-    isMock: true,
-  },
-  {
-    id: "mock-2",
-    name: "Nimal Perera",
-    email: "nimal@omacxpharma.lk",
-    employee_code: "EMP-014",
-    status: "active",
-    role_name: "Accountant",
-    login_enabled: true,
-    isMock: true,
-  },
-  {
-    id: "mock-3",
-    name: "Kasun Silva",
-    email: "kasun@omacxpharma.lk",
-    employee_code: "EMP-027",
-    status: "active",
-    role_name: "Inventory Manager",
-    login_enabled: true,
-    isMock: true,
-  },
-  {
-    id: "mock-4",
-    name: "Amal Fernando",
-    email: "amal@omacxpharma.lk",
-    employee_code: "EMP-038",
-    status: "inactive",
-    role_name: "Viewer",
-    login_enabled: false,
-    isMock: true,
-  },
-];
-
-const fallbackBranches: BranchItem[] = [
-  { id: "main", branch_name: "Main Branch" },
-  { id: "colombo", branch_name: "Colombo Branch" },
-  { id: "kandy", branch_name: "Kandy Branch" },
-  { id: "galle", branch_name: "Galle Branch" },
-  { id: "central-warehouse", branch_name: "Central Warehouse" },
-];
-
-const fallbackSoftware: SoftwareItem[] = [
-  {
-    id: "control",
-    software_name: "Control Center",
-    software_code: "CONTROL_CENTER",
-    description: "Users, roles, branches, and system setup",
-  },
-  {
-    id: "finance",
-    software_name: "Finance",
-    software_code: "FINANCE",
-    description: "Accounting, ledgers, cash, and reports",
-  },
-  {
-    id: "inventory",
-    software_name: "Inventory",
-    software_code: "INVENTORY",
-    description: "Products, stock, warehouses, and transfers",
-  },
-  {
-    id: "invoice",
-    software_name: "Invoice Center",
-    software_code: "INVOICE_CENTER",
-    description: "Invoices, sales orders, and customer billing",
-  },
-  {
-    id: "compliance",
-    software_name: "Compliance Center",
-    software_code: "COMPLIANCE_CENTER",
-    description: "Licenses, recalls, batch holds, and controls",
-  },
-];
-
-const fallbackRoles: RoleItem[] = [
-  { id: "super-admin", role_name: "Super Admin" },
-  { id: "company-admin", role_name: "Company Admin" },
-  { id: "branch-manager", role_name: "Branch Manager" },
-  { id: "accountant", role_name: "Accountant" },
-  { id: "inventory-manager", role_name: "Inventory Manager" },
-  { id: "cashier", role_name: "Cashier" },
-  { id: "viewer", role_name: "Viewer" },
-];
 
 const permissionSummary: Record<string, string[]> = {
   FINANCE: ["View reports", "Create journals", "Approve payments"],
@@ -245,10 +151,9 @@ const statusClasses = (status?: string) => {
 const UserAccessPage = () => {
   const [searchParams] = useSearchParams();
   const [users, setUsers] = useState<UserItem[]>([]);
-  const [branches, setBranches] = useState<BranchItem[]>(fallbackBranches);
-  const [softwareModules, setSoftwareModules] =
-    useState<SoftwareItem[]>(fallbackSoftware);
-  const [roles, setRoles] = useState<RoleItem[]>(fallbackRoles);
+  const [branches, setBranches] = useState<BranchItem[]>([]);
+  const [softwareModules, setSoftwareModules] = useState<SoftwareItem[]>([]);
+  const [roles, setRoles] = useState<RoleItem[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
   const [selectedBranchIds, setSelectedBranchIds] = useState<string[]>([]);
   const [selectedSoftwareIds, setSelectedSoftwareIds] = useState<string[]>([]);
@@ -278,24 +183,24 @@ const UserAccessPage = () => {
 
         if (usersRes.status === "fulfilled") {
           const userList = normaliseList<UserItem>(usersRes.value);
-          setUsers(userList.length > 0 ? userList : mockUsers);
+          setUsers(userList);
         } else {
-          setUsers(mockUsers);
+          setUsers([]);
         }
 
         if (branchesRes.status === "fulfilled") {
           const branchList = normaliseList<BranchItem>(branchesRes.value);
-          if (branchList.length > 0) setBranches(branchList);
+          setBranches(branchList);
         }
 
         if (softwareRes.status === "fulfilled") {
           const softwareList = normaliseList<SoftwareItem>(softwareRes.value);
-          if (softwareList.length > 0) setSoftwareModules(softwareList);
+          setSoftwareModules(softwareList);
         }
 
         if (rolesRes.status === "fulfilled") {
           const roleList = normaliseList<RoleItem>(rolesRes.value);
-          if (roleList.length > 0) setRoles(roleList);
+          setRoles(roleList);
         }
       } finally {
         setLoadingUsers(false);
@@ -342,22 +247,6 @@ const UserAccessPage = () => {
     setAccessEnabled(
       selectedUser.login_enabled !== false && selectedUser.status !== "inactive"
     );
-
-    if (selectedUser.isMock) {
-      setSelectedBranchIds([idKey(branches[0]?.id)].filter(Boolean));
-      setSelectedSoftwareIds(
-        [idKey(softwareModules[0]?.id), idKey(softwareModules[1]?.id)].filter(
-          Boolean
-        )
-      );
-      setSelectedRoleId(
-        idKey(
-          roles.find((role) => roleLabel(role) === selectedUser.role_name)
-            ?.id || roles[0]?.id
-        )
-      );
-      return;
-    }
 
     const fetchUserAccess = async () => {
       setLoadingAccess(true);
@@ -450,11 +339,6 @@ const UserAccessPage = () => {
     if (!selectedUser) return;
     if (!selectedRoleId) {
       setError("Select a role before saving access.");
-      return;
-    }
-
-    if (selectedUser.isMock) {
-      toast.success("Access saved for the sample user.");
       return;
     }
 

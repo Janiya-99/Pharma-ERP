@@ -123,11 +123,13 @@ export const CollectionSummaryReportPage: React.FC = () => {
     { header: "Payment Method", accessorKey: "payment_method" },
     {
       header: "Receipt Count",
+      accessorKey: "receipt_count",
       cell: (row) => <span className="font-medium">{row.receipt_count}</span>,
       align: "center",
     },
     {
       header: "Total Collected",
+      accessorKey: "total_amount",
       cell: (row) => (
         <span className="font-semibold text-navy-900">
           {formatMoney(row.total_amount)}
@@ -137,11 +139,13 @@ export const CollectionSummaryReportPage: React.FC = () => {
     },
     {
       header: "Allocated",
+      accessorKey: "allocated_amount",
       cell: (row) => formatMoney(row.allocated_amount),
       align: "right",
     },
     {
       header: "Unallocated",
+      accessorKey: "unallocated_amount",
       cell: (row) => (
         <span className={row.unallocated_amount > 0 ? "text-amber-600" : ""}>
           {formatMoney(row.unallocated_amount)}
@@ -151,6 +155,7 @@ export const CollectionSummaryReportPage: React.FC = () => {
     },
     {
       header: "% of Total",
+      accessorKey: "percentage_of_total",
       cell: (row) => (
         <span className="text-slate-500">
           {Number(row.percentage_of_total).toFixed(2)}%
@@ -159,6 +164,15 @@ export const CollectionSummaryReportPage: React.FC = () => {
       align: "right",
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getCollectionSummary({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -202,11 +216,20 @@ export const CollectionSummaryReportPage: React.FC = () => {
       description="View collected amounts broken down by payment methods."
       actions={
         <ReportExportActions
+          title="Collection Summary Report"
           data={data}
+          columns={columns}
           filename={`collection-summary-${
             new Date().toISOString().split("T")[0]
           }`}
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Total Receipts", value: summary.total_receipts || 0 },
+            { title: "Total Collected", value: formatMoney(summary.total_amount || 0) },
+            { title: "Total Allocated", value: formatMoney(summary.allocated_amount || 0) },
+            { title: "Total Unallocated", value: formatMoney(summary.unallocated_amount || 0) },
+          ]}
         />
       }
       filters={

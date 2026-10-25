@@ -101,21 +101,25 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
     { header: "Customer Name", accessorKey: "customer_name" },
     { 
       header: "Subtotal", 
+      accessorKey: "subtotal_amount",
       cell: (row) => formatMoney(row.subtotal_amount),
       align: "right"
     },
     { 
       header: "Discount", 
+      accessorKey: "discount_amount",
       cell: (row) => formatMoney(row.discount_amount),
       align: "right"
     },
     { 
       header: "Tax", 
+      accessorKey: "tax_amount",
       cell: (row) => formatMoney(row.tax_amount),
       align: "right"
     },
     { 
       header: "Total", 
+      accessorKey: "total_amount",
       cell: (row) => (
         <span className="font-semibold text-navy-900">
           {formatMoney(row.total_amount)}
@@ -125,6 +129,7 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
     },
     { 
       header: "Approval", 
+      accessorKey: "approval_status",
       cell: (row) => (
         <Badge variant={row.approval_status === 'approved' ? 'default' : row.approval_status === 'rejected' ? 'destructive' : 'secondary'}>
           {row.approval_status}
@@ -134,6 +139,7 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
     },
     { 
       header: "Status", 
+      accessorKey: "order_status",
       cell: (row) => (
         <Badge variant={row.order_status === 'closed' ? 'secondary' : 'default'}>
           {row.order_status}
@@ -142,6 +148,15 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
       align: "center"
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getSalesOrderRegister({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -165,9 +180,18 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
       description="View and analyze all sales orders across the organization."
       actions={
         <ReportExportActions 
+          title="Sales Order Register Report"
           data={data} 
+          columns={columns}
           filename={`sales-order-register-${new Date().toISOString().split('T')[0]}`} 
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Order Count", value: summary.order_count || 0 },
+            { title: "Total Amount", value: formatMoney(summary.total_amount || 0) },
+            { title: "Approved Orders", value: summary.approved_count || 0 },
+            { title: "Pending Orders", value: summary.pending_count || 0 },
+          ]}
         />
       }
       filters={

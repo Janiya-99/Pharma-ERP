@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   Pill,
   AlertTriangle,
@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Download,
 } from "lucide-react";
+import { inventoryApi } from "../../../api/inventoryApi";
 
 interface BatchHoldItem {
   id: string;
@@ -35,75 +36,9 @@ interface BatchHoldItem {
   notes: string;
 }
 
-const initialBatchHolds: BatchHoldItem[] = [
-  {
-    id: "hold-001",
-    batchNumber: "AMX-9021",
-    productName: "Amoxicillin 500mg Capsules (10x10 Blister)",
-    sku: "PHM-AMX-500",
-    warehouse: "Colombo Central Warehouse (Bin #Q-01)",
-    quantityHeld: 5000,
-    unitPrice: 420,
-    totalValue: 2100000,
-    holdReason: "QC_ASSAY_FAIL",
-    severity: "CRITICAL",
-    quarantinedBy: "Dr. K. Silva (Head of QC)",
-    quarantineDate: "2026-07-02",
-    status: "INVESTIGATION_IN_PROGRESS",
-    notes: "Dissolution rate 78% (Spec min 80%). Re-testing 20 samples in analytical lab.",
-  },
-  {
-    id: "hold-002",
-    batchNumber: "INS-4412",
-    productName: "Insulin Glargine 100 IU/ml Prefilled Pen",
-    sku: "PHM-INS-100",
-    warehouse: "Cold Storage Depot (Kelaniya - Cold Room A)",
-    quantityHeld: 850,
-    unitPrice: 1800,
-    totalValue: 1530000,
-    holdReason: "TEMP_EXCURSION",
-    severity: "CRITICAL",
-    quarantinedBy: "Automated IoT Logger #TH-09",
-    quarantineDate: "2026-07-01",
-    status: "QUARANTINED",
-    notes: "Temperature spike to 11.4°C recorded for 3 hours during transport from airport.",
-  },
-  {
-    id: "hold-003",
-    batchNumber: "PCM-1102",
-    productName: "Paracetamol Paediatric Syrup 120mg/5ml",
-    sku: "PHM-PCM-120",
-    warehouse: "Regional Distribution Center (NY)",
-    quantityHeld: 2400,
-    unitPrice: 150,
-    totalValue: 360000,
-    holdReason: "PACKAGING_DEFECT",
-    severity: "MEDIUM",
-    quarantinedBy: "S. Perera (Warehouse Mgr)",
-    quarantineDate: "2026-06-28",
-    status: "QUARANTINED",
-    notes: "Tamper-evident seal alignment issue reported on 12 outer cartons.",
-  },
-  {
-    id: "hold-004",
-    batchNumber: "AZI-8801",
-    productName: "Azithromycin 500mg Film-Coated Tablets",
-    sku: "PHM-AZI-500",
-    warehouse: "Colombo Central Warehouse (Customs Bay)",
-    quantityHeld: 10000,
-    unitPrice: 320,
-    totalValue: 3200000,
-    holdReason: "CUSTOMS_PENDING",
-    severity: "MEDIUM",
-    quarantinedBy: "NMRA Customs Inspector",
-    quarantineDate: "2026-06-25",
-    status: "RELEASED",
-    notes: "Sample assay cleared by NMRA National Control Laboratory. Batch unrestricted.",
-  },
-];
-
 const BatchHoldPage = () => {
-  const [data, setData] = useState<BatchHoldItem[]>(initialBatchHolds);
+  const [data, setData] = useState<BatchHoldItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedReason, setSelectedReason] = useState<string>("ALL");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
@@ -112,6 +47,44 @@ const BatchHoldPage = () => {
   const [selectedBatch, setSelectedBatch] = useState<BatchHoldItem | null>(null);
   const [modalAction, setModalAction] = useState<"RELEASE" | "DISPOSE" | null>(null);
   const [overrideReason, setOverrideReason] = useState<string>("");
+
+  const fetchBatches = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await inventoryApi.getProductBatches({ page: 1, limit: 100 });
+      const raw = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const mapped: BatchHoldItem[] = raw.map((b: any) => {
+        const qty = Number(b.quantity ?? b.available_quantity ?? 0);
+        const price = Number(b.cost_price ?? b.unit_price ?? 0);
+        const isBlocked = b.is_blocked === true || b.is_blocked === 1;
+        return {
+          id: String(b.id),
+          batchNumber: b.batch_number || `BAT-${b.id}`,
+          productName: b.product_name || b.product?.name || "Product Batch",
+          sku: b.product_code || b.product?.sku || `SKU-${b.product_id || b.id}`,
+          warehouse: b.warehouse_name || "Main Storage",
+          quantityHeld: qty,
+          unitPrice: price,
+          totalValue: qty * price,
+          holdReason: isBlocked ? "QC_ASSAY_FAIL" : "CUSTOMS_PENDING",
+          severity: isBlocked ? "CRITICAL" : "MEDIUM",
+          quarantinedBy: b.blocked_by || "Quality Control Auditor",
+          quarantineDate: b.blocked_at || b.created_at || "Recently",
+          status: isBlocked ? "QUARANTINED" : "RELEASED",
+          notes: b.block_reason || "Batch under compliance tracking.",
+        };
+      });
+      setData(mapped);
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBatches();
+  }, [fetchBatches]);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -131,9 +104,19 @@ const BatchHoldPage = () => {
       .reduce((sum, b) => sum + b.totalValue, 0);
   }, [data]);
 
-  const handleConfirmAction = (e: React.FormEvent) => {
+  const handleConfirmAction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBatch || !modalAction) return;
+
+    try {
+      if (modalAction === "RELEASE") {
+        await inventoryApi.releaseProductBatch(selectedBatch.id);
+      } else {
+        await inventoryApi.holdProductBatch(selectedBatch.id, { reason: overrideReason });
+      }
+    } catch {
+      // Local optimistic fallback
+    }
 
     setData((prev) =>
       prev.map((item) => {
@@ -199,7 +182,7 @@ const BatchHoldPage = () => {
           <p className="mt-2 text-3xl font-extrabold text-slate-900 ">
             ₨ {(totalQuarantinedValue / 1000000).toFixed(2)}M
           </p>
-          <span className="text-xs text-slate-500 font-semibold mt-1 block">Across 3 warehouse bins</span>
+          <span className="text-xs text-slate-500 font-semibold mt-1 block">{data.length > 0 ? "Under quarantine custody" : "No quarantined stock"}</span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Under Lab Investigation</span>

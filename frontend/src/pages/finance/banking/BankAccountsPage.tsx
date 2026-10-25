@@ -25,6 +25,7 @@ import {
 } from "../../../components/ui/alert";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+import { TablePagination } from "../../../components/common/TablePagination";
 import {
   Card,
   CardContent,
@@ -274,6 +275,20 @@ const BankAccountsPage = () => {
   useEffect(() => {
     if (companyId) fetchLookups();
   }, [companyId]);
+
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= accounts.length) {
+      setPage(0);
+    }
+  }, [accounts, page, pageSize]);
+
+  const pagedAccounts = useMemo(() => {
+    const start = page * pageSize;
+    return accounts.slice(start, start + pageSize);
+  }, [accounts, page, pageSize]);
 
   const totalBalance = useMemo(
     () =>
@@ -649,7 +664,7 @@ const BankAccountsPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                accounts.map((account) => (
+                pagedAccounts.map((account) => (
                   <TableRow key={account.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -729,6 +744,19 @@ const BankAccountsPage = () => {
               )}
             </TableBody>
           </Table>
+
+          {accounts.length > 0 && (
+            <TablePagination
+              pageIndex={page}
+              pageSize={pageSize}
+              totalItems={accounts.length}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(0);
+              }}
+            />
+          )}
         </CardContent>
       </Card>
 

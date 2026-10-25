@@ -8,6 +8,7 @@ import ReportFilterCard from '../../../../components/finance/reports/ReportFilte
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
 import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
 import BalanceStatusBadge from '../../../../components/finance/reports/BalanceStatusBadge';
+import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { BalanceSheetAuditDocModal } from '../../../../components/finance/reports/BalanceSheetAuditDocModal';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
@@ -178,13 +179,58 @@ const BalanceSheetReportPage: React.FC = () => {
     csv += `"EQUILIBRIUM VARIANCE (DIFF)","","","",${data.difference || 0}\r\n`;
     csv += `"BALANCED STATUS","","","",${data.is_balanced ? "BALANCED" : "IMBALANCE"}\r\n`;
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `balance-sheet-${new Date().getTime()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = () => {
+    if (!data) return;
+    const headers = ['Section', 'Account Code', 'Account Name', 'Category', 'Amount (LKR)'];
+    const rows: (string | number)[][] = [];
+
+    // Assets
+    (data.assets?.lines || []).forEach((line: any) => {
+      const amt = line.balance !== undefined ? line.balance : (line.closing_debit || 0);
+      rows.push(['Assets', line.account_code || '', line.account_name || '', line.category || 'Asset', formatCurrency(amt)]);
+    });
+    rows.push(['Assets Total', '', 'TOTAL ASSETS', '', formatCurrency(data.total_assets || data.assets?.total || 0)]);
+
+    // Liabilities
+    (data.liabilities?.lines || []).forEach((line: any) => {
+      const amt = line.balance !== undefined ? line.balance : (line.closing_credit || 0);
+      rows.push(['Liabilities', line.account_code || '', line.account_name || '', line.category || 'Liability', formatCurrency(amt)]);
+    });
+    rows.push(['Liabilities Total', '', 'TOTAL LIABILITIES', '', formatCurrency(data.total_liabilities || data.liabilities?.total || 0)]);
+
+    // Equity
+    (data.equity?.lines || []).forEach((line: any) => {
+      const amt = line.balance !== undefined ? line.balance : (line.closing_credit || 0);
+      rows.push(['Equity', line.account_code || '', line.account_name || '', line.category || 'Equity', formatCurrency(amt)]);
+    });
+    rows.push(['Equity Total', '', 'TOTAL EQUITY', '', formatCurrency(data.total_equity || data.equity?.total || 0)]);
+
+    rows.push(['Total Liab + Equity', '', 'TOTAL LIABILITIES & EQUITY', '', formatCurrency(data.total_liabilities_and_equity || 0)]);
+    rows.push(['Equilibrium', '', `Status: ${data.is_balanced ? 'BALANCED' : 'IMBALANCE'}`, '', `Diff: ${formatCurrency(data.difference || 0)}`]);
+
+    exportToPdf({
+      title: 'Statement of Financial Position (Balance Sheet)',
+      filename: `balance-sheet-${filters.financial_year_id || 'all'}-${new Date().getTime()}`,
+      subtitle: `As of Date: ${filters.as_of_date || 'End of Year'} | Branch: ${activeBranch?.name || 'All Branches'}`,
+      headers,
+      rows,
+      alignments: ['left', 'left', 'left', 'left', 'right'],
+      summary: [
+        { title: 'Total Assets', value: formatCurrency(data.total_assets || data.assets?.total || 0) },
+        { title: 'Total Liabilities', value: formatCurrency(data.total_liabilities || data.liabilities?.total || 0) },
+        { title: 'Total Equity', value: formatCurrency(data.total_equity || data.equity?.total || 0) },
+        { title: 'Balanced Status', value: data.is_balanced ? 'BALANCED (0.00)' : `IMBALANCE (${formatCurrency(data.difference || 0)})` },
+      ],
+    });
   };
 
   const canView =
@@ -464,6 +510,8 @@ const BalanceSheetReportPage: React.FC = () => {
               onRefresh={fetchReport} 
               onExportJson={handleExportJson} 
               onExportCsv={handleExportCsv}
+              onExportPdf={handleExportPdf}
+              onPrint={() => window.print()}
               isRefreshing={loading} 
             />
             <div className="self-end sm:self-center mb-4">

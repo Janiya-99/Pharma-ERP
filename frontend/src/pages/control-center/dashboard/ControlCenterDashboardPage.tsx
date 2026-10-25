@@ -140,221 +140,21 @@ const ConcentricRings: React.FC<{ modulesCount: number; totalModules: number }> 
   );
 };
 
-// Telemetry Area Chart Data
-const telemetryData = [
-  { day: "Mon", users: 11200, transactions: 18400, api: 42000 },
-  { day: "Tue", users: 14800, transactions: 24200, api: 56000 },
-  { day: "Wed", users: 15600, transactions: 26800, api: 61000 },
-  { day: "Thu", users: 18430, transactions: 31200, api: 74000 },
-  { day: "Fri", users: 16900, transactions: 28500, api: 68000 },
-  { day: "Sat", users: 9400, transactions: 15400, api: 38000 },
-  { day: "Sun", users: 8200, transactions: 12800, api: 31000 },
-];
-
-// Role Privilege Donut Chart Data
-const roleDistributionData = [
-  { name: "Administrators", percentage: 28, count: 352, color: "#3b82f6" },
-  { name: "Managers", percentage: 24, count: 299, color: "#6366f1" },
-  { name: "Pharmacists", percentage: 20, count: 250, color: "#06b6d4" },
-  { name: "Sales Staff", percentage: 16, count: 200, color: "#f43f5e" },
-  { name: "Warehouse", percentage: 8, count: 100, color: "#f59e0b" },
-  { name: "View Only", percentage: 4, count: 47, color: "#10b981" },
-];
-
-// Module Adoption List
-const moduleAdoptionList = [
-  { name: "Inventory", rate: "92%", color: "bg-blue-500" },
-  { name: "Sales & Distribution", rate: "78%", color: "bg-indigo-500" },
-  { name: "Purchasing", rate: "64%", color: "bg-sky-500" },
-  { name: "Finance", rate: "56%", color: "bg-cyan-500" },
-  { name: "Reports", rate: "48%", color: "bg-teal-500" },
-  { name: "Administration", rate: "32%", color: "bg-slate-400" },
-  { name: "HR & Payroll", rate: "24%", color: "bg-rose-400" },
-  { name: "Others", rate: "12%", color: "bg-slate-300" },
-];
-
-// Security Governance Events
-const securityEvents = [
-  {
-    id: 1,
-    severity: "CRITICAL",
-    description: "Multiple failed login attempts",
-    user: "john.doe",
-    ip: "192.168.1.105",
-    time: "Today 10:24",
-  },
-  {
-    id: 2,
-    severity: "WARNING",
-    description: "Elevated user permissions assigned",
-    user: "system.admin",
-    ip: "203.0.113.42",
-    time: "Today 09:17",
-  },
-  {
-    id: 3,
-    severity: "INFO",
-    description: "New API access key generated",
-    user: "api_user",
-    ip: "198.51.100.27",
-    time: "Yesterday 16:03",
-  },
-  {
-    id: 4,
-    severity: "INFO",
-    description: "Record data updated successfully",
-    user: "maria.santos",
-    ip: "203.0.113.88",
-    time: "Jul 6, 2024 14:21",
-  },
-  {
-    id: 5,
-    severity: "SUCCESS",
-    description: "User password reset",
-    user: "support.team",
-    ip: "198.51.100.73",
-    time: "Jul 6, 2024 11:09",
-  },
-];
-
-/* ── Recently Added Documents & PDFs Data ── */
-const recentDocumentsList = [
-  {
-    id: "doc-1",
-    document_number: "SINV-2026-0042",
-    title: "Wholesale Pharmaceutical Consignment Invoice",
-    category: "invoices",
-    counterparty: "Homagama Medical Supplies (Pvt) Ltd",
-    date: "2026-10-15 14:32",
-    amount: "LKR 1,285,000.00",
-    size: "182 KB",
-    type: "Sales Invoice",
-    badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
-    status: "Signed & Verified",
-    statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
-    printPath: "/print/sales-invoice/1"
-  },
-  {
-    id: "doc-2",
-    document_number: "GRN-2026-0018",
-    title: "Goods Received & Cold-Chain Quarantine Receipt",
-    category: "grn",
-    counterparty: "State Pharmaceuticals Manufacturing (SPMC)",
-    date: "2026-10-15 11:15",
-    amount: "5,000 Units Received",
-    size: "214 KB",
-    type: "Goods Receipt Note",
-    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    status: "QA Inspection Passed",
-    statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
-    printPath: "/inventory/grns"
-  },
-  {
-    id: "doc-3",
-    document_number: "RCP-2026-0091",
-    title: "Official Electronic Settlement Receipt",
-    category: "receipts",
-    counterparty: "Asiri Surgical Hospital PLC",
-    date: "2026-10-15 09:45",
-    amount: "LKR 1,850,000.00",
-    size: "145 KB",
-    type: "Customer Receipt",
-    badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
-    status: "Reconciled (RTGS)",
-    statusColor: "text-indigo-700 bg-indigo-50 border-indigo-200",
-    printPath: "/print/customer-receipt/1"
-  },
-  {
-    id: "doc-4",
-    document_number: "PV-2026-0033",
-    title: "Vendor Batch Settlement Payment Voucher",
-    category: "vouchers",
-    counterparty: "Hemas Healthcare Distribution",
-    date: "2026-10-14 16:20",
-    amount: "LKR 1,250,000.00",
-    size: "160 KB",
-    type: "Payment Voucher",
-    badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
-    status: "Authorized by CFO",
-    statusColor: "text-purple-700 bg-purple-50 border-purple-200",
-    printPath: "/admin/finance/payment-vouchers"
-  },
-  {
-    id: "doc-5",
-    document_number: "RPT-PNL-2026-Q3",
-    title: "Comprehensive Income & Profit/Loss Statement",
-    category: "reports",
-    counterparty: "Finance & Accounting Division",
-    date: "2026-10-15 17:00",
-    amount: "LKR 88,600,000.00 Turnover",
-    size: "420 KB",
-    type: "Financial Report",
-    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
-    status: "Audited Ledger Data",
-    statusColor: "text-amber-700 bg-amber-50 border-amber-200",
-    printPath: "/finance/reports/profit-and-loss"
-  },
-  {
-    id: "doc-6",
-    document_number: "RET-2026-0005",
-    title: "Customer Return & Condition Assessment Slip",
-    category: "invoices",
-    counterparty: "Lanka Hospitals Pharmacy",
-    date: "2026-10-14 10:10",
-    amount: "LKR 45,000.00 Credit",
-    size: "138 KB",
-    type: "Credit Note",
-    badgeColor: "bg-rose-50 text-rose-700 border-rose-200",
-    status: "Credit Note Issued",
-    statusColor: "text-rose-700 bg-rose-50 border-rose-200",
-    printPath: "/print/credit-note/1"
-  },
-  {
-    id: "doc-7",
-    document_number: "OST-2026-0001",
-    title: "Opening Stock Physical Verification Certificate",
-    category: "reports",
-    counterparty: "Colombo Central Medical Depot",
-    date: "2026-10-12 18:00",
-    amount: "LKR 45,200,000.00 Valuation",
-    size: "310 KB",
-    type: "Audit Certificate",
-    badgeColor: "bg-teal-50 text-teal-700 border-teal-200",
-    status: "Chartered Sign-off",
-    statusColor: "text-teal-700 bg-teal-50 border-teal-200",
-    printPath: "/inventory/opening-stock"
-  },
-  {
-    id: "doc-8",
-    document_number: "AUD-NMRA-2026",
-    title: "GDP Quality Standard & Temperature Log Export",
-    category: "reports",
-    counterparty: "National Medicines Regulatory Authority (NMRA)",
-    date: "2026-10-15 18:30",
-    amount: "100% Parameter Pass",
-    size: "1.2 MB",
-    type: "Compliance Bundle",
-    badgeColor: "bg-slate-50 text-slate-700 border-slate-200",
-    status: "NMRA Validated",
-    statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
-    printPath: "/compliance/records"
-  }
-];
-
 /* ── Main Dashboard Component ── */
 const ControlCenterDashboardPage: React.FC = () => {
   const [telemetryTab, setTelemetryTab] = useState<"users" | "transactions" | "api">("users");
   const [stats, setStats] = useState({
-    total_branches: 5,
-    total_users: 1,
-    activated_modules: 4,
+    total_branches: 0,
+    total_users: 0,
+    activated_modules: 0,
     total_modules: 6,
     security_alerts: 0,
   });
-  const [telemetry, setTelemetry] = useState(telemetryData);
-  const [roleDistribution, setRoleDistribution] = useState(roleDistributionData);
-  const [moduleAdoptions, setModuleAdoptions] = useState(moduleAdoptionList);
-  const [events, setEvents] = useState(securityEvents);
+  const [telemetry, setTelemetry] = useState<Array<{ day: string; users: number; transactions: number; api: number }>>([]);
+  const [roleDistribution, setRoleDistribution] = useState<Array<{ name: string; percentage: number; count: number; color: string }>>([]);
+  const [moduleAdoptions, setModuleAdoptions] = useState<Array<{ name: string; rate: string; color: string }>>([]);
+  const [events, setEvents] = useState<Array<any>>([]);
+  const [recentDocs, setRecentDocs] = useState<Array<any>>([]);
   const [blockedIPs, setBlockedIPs] = useState<Array<{
     ip: string;
     reason: string;
@@ -387,7 +187,7 @@ const ControlCenterDashboardPage: React.FC = () => {
   const [selectedDocCategory, setSelectedDocCategory] = useState("all");
   const [docSearchQuery, setDocSearchQuery] = useState("");
 
-  const handleDownloadSingle = (doc: typeof recentDocumentsList[0]) => {
+  const handleDownloadSingle = (doc: any) => {
     toast.success(`Downloading ${doc.document_number} (${doc.type})...`);
     const element = document.createElement("a");
     const file = new Blob([
@@ -418,9 +218,9 @@ const ControlCenterDashboardPage: React.FC = () => {
       `CEYLON MED GLOBAL PHARMA ERP - MASTER COMPLIANCE DOCUMENT BUNDLE\n` +
       `=================================================================\n` +
       `Export Timestamp: ${new Date().toISOString()}\n` +
-      `Total Documents:  ${recentDocumentsList.length}\n` +
+      `Total Documents:  ${recentDocs.length}\n` +
       `Integrity Hash:   SHA256-CEYLON-MED-ARCHIVE-SECURE-2026\n\n` +
-      recentDocumentsList.map((d, i) => `${i + 1}. [${d.type}] ${d.document_number} | ${d.title} | ${d.counterparty} | ${d.amount} | ${d.status}`).join("\n")
+      recentDocs.map((d, i) => `${i + 1}. [${d.type}] ${d.document_number} | ${d.title} | ${d.counterparty} | ${d.amount} | ${d.status}`).join("\n")
     ], { type: "text/plain;charset=utf-8" });
     element.href = URL.createObjectURL(file);
     element.download = `CEYLON_MED_ALL_DOCUMENTS_${new Date().toISOString().split("T")[0]}.txt`;
@@ -429,43 +229,151 @@ const ControlCenterDashboardPage: React.FC = () => {
     document.body.removeChild(element);
   };
 
-  const filteredDocs = recentDocumentsList.filter((doc) => {
+  const filteredDocs = recentDocs.filter((doc) => {
     const matchesCategory =
       selectedDocCategory === "all" || doc.category === selectedDocCategory;
     const matchesSearch =
-      doc.document_number.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
-      doc.title.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
-      doc.counterparty.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
-      doc.type.toLowerCase().includes(docSearchQuery.toLowerCase());
+      doc.document_number?.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
+      doc.title?.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
+      doc.counterparty?.toLowerCase().includes(docSearchQuery.toLowerCase()) ||
+      doc.type?.toLowerCase().includes(docSearchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const fetchSummary = useCallback(async () => {
+  type AuditRangeType = "7D" | "30D" | "THIS_MONTH" | "ALL" | "CUSTOM";
+  const [auditDateRange, setAuditDateRange] = useState<AuditRangeType>("7D");
+  const [customAuditStart, setCustomAuditStart] = useState<string>("");
+  const [customAuditEnd, setCustomAuditEnd] = useState<string>("");
+  const [auditSeverityFilter, setAuditSeverityFilter] = useState<string>("ALL");
+  const [showDateRangePicker, setShowDateRangePicker] = useState<boolean>(false);
+  const [showSecurityFilterMenu, setShowSecurityFilterMenu] = useState<boolean>(false);
+
+  const getAuditFilterDates = (range: AuditRangeType, customStart?: string, customEnd?: string) => {
+    const today = new Date();
+    const toISODate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    if (range === "7D") {
+      const start = new Date(today);
+      start.setDate(today.getDate() - 6);
+      return { audit_date_from: toISODate(start), audit_date_to: toISODate(today) };
+    }
+    if (range === "30D") {
+      const start = new Date(today);
+      start.setDate(today.getDate() - 29);
+      return { audit_date_from: toISODate(start), audit_date_to: toISODate(today) };
+    }
+    if (range === "THIS_MONTH") {
+      const start = new Date(today.getFullYear(), today.getMonth(), 1);
+      return { audit_date_from: toISODate(start), audit_date_to: toISODate(today) };
+    }
+    if (range === "CUSTOM") {
+      return {
+        audit_date_from: customStart || "",
+        audit_date_to: customEnd || "",
+      };
+    }
+    return { audit_date_from: "", audit_date_to: "" };
+  };
+
+  const getAuditDateRangeLabel = () => {
+    const today = new Date();
+    const formatDate = (d: Date) =>
+      d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+    switch (auditDateRange) {
+      case "7D": {
+        const start = new Date(today);
+        start.setDate(today.getDate() - 6);
+        return `${formatDate(start)} - ${formatDate(today)}`;
+      }
+      case "30D": {
+        const start = new Date(today);
+        start.setDate(today.getDate() - 29);
+        return `${formatDate(start)} - ${formatDate(today)}`;
+      }
+      case "THIS_MONTH": {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        return `${formatDate(start)} - ${formatDate(today)}`;
+      }
+      case "ALL":
+        return "All Historical Events";
+      case "CUSTOM": {
+        if (customAuditStart && customAuditEnd) {
+          return `${customAuditStart} to ${customAuditEnd}`;
+        }
+        return "Custom Date Range";
+      }
+      default:
+        return formatDate(today);
+    }
+  };
+
+  const fetchSummary = useCallback(async (
+    range = auditDateRange,
+    sev = auditSeverityFilter,
+    cStart = customAuditStart,
+    cEnd = customAuditEnd
+  ) => {
     try {
-      const res = await getControlDashboardSummary();
+      const dateParams = getAuditFilterDates(range, cStart, cEnd);
+      const params: Record<string, unknown> = {};
+      if (dateParams.audit_date_from) params.audit_date_from = dateParams.audit_date_from;
+      if (dateParams.audit_date_to) params.audit_date_to = dateParams.audit_date_to;
+      if (sev && sev !== "ALL") params.audit_severity = sev;
+
+      const res = await getControlDashboardSummary(params);
       if (res?.data) {
         const d = res.data;
         setStats({
-          total_branches: d.total_branches ?? 5,
-          total_users: d.total_users ?? 1,
-          activated_modules: d.activated_modules ?? 4,
+          total_branches: d.total_branches ?? 0,
+          total_users: d.total_users ?? 0,
+          activated_modules: d.activated_modules ?? 0,
           total_modules: d.total_modules ?? 6,
           security_alerts: d.security_alerts ?? 0,
         });
-        if (d.telemetry && d.telemetry.length > 0) setTelemetry(d.telemetry);
-        if (d.role_distribution && d.role_distribution.length > 0) setRoleDistribution(d.role_distribution);
-        if (d.module_adoption && d.module_adoption.length > 0) setModuleAdoptions(d.module_adoption);
-        if (d.security_events && d.security_events.length > 0) setEvents(d.security_events);
+        setTelemetry(d.telemetry || []);
+        setRoleDistribution(d.role_distribution || []);
+        setModuleAdoptions(d.module_adoption || []);
+        setEvents(d.security_events || []);
         if (d.blocked_ips) setBlockedIPs(d.blocked_ips);
+        if (d.recent_documents) setRecentDocs(d.recent_documents);
       }
     } catch (err) {
       console.error("Failed to load control center dashboard summary", err);
     }
-  }, []);
+  }, [auditDateRange, auditSeverityFilter, customAuditStart, customAuditEnd]);
 
   useEffect(() => {
     fetchSummary();
   }, [fetchSummary]);
+
+  const filteredEvents = events.filter((ev) => {
+    if (auditSeverityFilter !== "ALL" && ev.severity !== auditSeverityFilter) {
+      return false;
+    }
+    if (auditDateRange === "ALL") return true;
+
+    if (ev.created_at) {
+      const evDate = new Date(ev.created_at);
+      const dateParams = getAuditFilterDates(auditDateRange, customAuditStart, customAuditEnd);
+      if (dateParams.audit_date_from) {
+        const fromDate = new Date(dateParams.audit_date_from);
+        fromDate.setHours(0, 0, 0, 0);
+        if (evDate < fromDate) return false;
+      }
+      if (dateParams.audit_date_to) {
+        const toDate = new Date(dateParams.audit_date_to);
+        toDate.setHours(23, 59, 59, 999);
+        if (evDate > toDate) return false;
+      }
+    }
+    return true;
+  });
 
   return (
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
@@ -535,10 +443,8 @@ const ControlCenterDashboardPage: React.FC = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <div className="text-3xl font-extrabold text-blue-600 tracking-tight">{stats.total_branches}</div>
-              <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 mt-1">
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>+10%</span>
-                <span className="font-normal text-slate-400 ml-0.5">vs last month</span>
+              <div className="flex items-center gap-1 text-xs text-slate-500 font-medium mt-1">
+                <span>Configured branches</span>
               </div>
             </div>
             <SparklineBars data={[35, 45, 60, 50, 75, 65, 85, 100]} color="bg-blue-400" />
@@ -567,10 +473,8 @@ const ControlCenterDashboardPage: React.FC = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <div className="text-3xl font-extrabold text-purple-600 tracking-tight">{stats.total_users.toLocaleString()}</div>
-              <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 mt-1">
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>+12%</span>
-                <span className="font-normal text-slate-400 ml-0.5">vs last month</span>
+              <div className="flex items-center gap-1 text-xs text-slate-500 font-medium mt-1">
+                <span>Active tenant users</span>
               </div>
             </div>
             <SparklineBars data={[40, 55, 45, 70, 60, 80, 90, 100]} color="bg-purple-400" />
@@ -599,9 +503,8 @@ const ControlCenterDashboardPage: React.FC = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <div className="text-3xl font-extrabold text-emerald-600 tracking-tight">{stats.activated_modules}</div>
-              <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 mt-1">
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>+2 new modules</span>
+              <div className="flex items-center gap-1 text-xs text-slate-500 font-medium mt-1">
+                <span>{stats.activated_modules} of {stats.total_modules || 6} licensed</span>
               </div>
             </div>
             <SparklineBars data={[50, 50, 65, 65, 80, 80, 100, 100]} color="bg-emerald-400" />
@@ -630,10 +533,8 @@ const ControlCenterDashboardPage: React.FC = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <div className="text-3xl font-extrabold text-rose-600 tracking-tight">{stats.security_alerts}</div>
-              <div className="flex items-center gap-1 text-xs font-bold text-rose-600 mt-1">
-                <TrendingDown className="h-3.5 w-3.5" />
-                <span>-25%</span>
-                <span className="font-normal text-slate-400 ml-0.5">vs yesterday</span>
+              <div className="flex items-center gap-1 text-xs text-slate-500 font-medium mt-1">
+                <span>System security alerts</span>
               </div>
             </div>
             <SparklineBars data={[100, 90, 75, 60, 45, 55, 40, 30]} color="bg-rose-400" />
@@ -751,7 +652,7 @@ const ControlCenterDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
             <span className="text-slate-500 flex items-center gap-1.5 font-medium">
               <Users className="h-3.5 w-3.5 text-blue-500" />
-              Peak concurrency: <strong className="text-slate-800">18,430</strong> users on Thu 10:24 AM
+              Active concurrency: <strong className="text-slate-800">{Math.max(stats.total_users, 1)}</strong> session{stats.total_users !== 1 ? 's' : ''}
             </span>
             <Link
               to="/control-center/login-history"
@@ -897,14 +798,135 @@ const ControlCenterDashboardPage: React.FC = () => {
               </div>
 
               {/* Table Controls */}
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-100 hover:bg-blue-100 transition-colors">
-                  Security Filters (3)
-                </button>
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-600 cursor-pointer">
-                  <Calendar className="h-3 w-3 text-slate-400" />
-                  <span>Jul 1, 2024 - Jul 7, 2024</span>
-                  <ChevronDown className="h-3 w-3 text-slate-400" />
+              <div className="flex items-center gap-2 relative">
+                {/* Security Severity Filter Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setShowSecurityFilterMenu(!showSecurityFilterMenu);
+                      setShowDateRangePicker(false);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                      auditSeverityFilter !== "ALL"
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100"
+                    }`}
+                  >
+                    <Filter className="h-3 w-3" />
+                    Security Filters {auditSeverityFilter !== "ALL" ? `(${auditSeverityFilter})` : "(All)"}
+                  </button>
+                  {showSecurityFilterMenu && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in-50">
+                      <div className="px-3 py-1 text-[10px] font-bold uppercase text-slate-400">Filter by Severity</div>
+                      {["ALL", "CRITICAL", "WARNING", "SUCCESS", "INFO"].map((sev) => (
+                        <button
+                          key={sev}
+                          onClick={() => {
+                            setAuditSeverityFilter(sev);
+                            setShowSecurityFilterMenu(false);
+                            fetchSummary(auditDateRange, sev);
+                          }}
+                          className={`w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-slate-50 flex items-center justify-between ${
+                            auditSeverityFilter === sev ? "text-blue-600 bg-blue-50/50" : "text-slate-700"
+                          }`}
+                        >
+                          <span>{sev === "ALL" ? "All Severities" : sev}</span>
+                          {auditSeverityFilter === sev && <Check className="h-3.5 w-3.5 text-blue-600" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Dynamic Date Range Filter Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setShowDateRangePicker(!showDateRangePicker);
+                      setShowSecurityFilterMenu(false);
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-medium text-slate-700 transition-colors shadow-xs"
+                  >
+                    <Calendar className="h-3 w-3 text-slate-400" />
+                    <span className="font-semibold">{getAuditDateRangeLabel()}</span>
+                    <ChevronDown className="h-3 w-3 text-slate-400" />
+                  </button>
+
+                  {showDateRangePicker && (
+                    <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-50 animate-in fade-in-50">
+                      <div className="text-[10px] font-bold uppercase text-slate-400 mb-2">Select Audit Date Range</div>
+                      <div className="space-y-1 mb-3">
+                        {[
+                          { id: "7D", label: "Last 7 Days (Default)" },
+                          { id: "30D", label: "Last 30 Days" },
+                          { id: "THIS_MONTH", label: "This Month" },
+                          { id: "ALL", label: "All Time / Historical Data" },
+                          { id: "CUSTOM", label: "Custom Range..." },
+                        ].map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={() => {
+                              const range = opt.id as AuditRangeType;
+                              setAuditDateRange(range);
+                              if (range !== "CUSTOM") {
+                                setShowDateRangePicker(false);
+                                fetchSummary(range, auditSeverityFilter);
+                              }
+                            }}
+                            className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between ${
+                              auditDateRange === opt.id
+                                ? "bg-blue-50 text-blue-700 font-bold"
+                                : "text-slate-700 hover:bg-slate-50"
+                            }`}
+                          >
+                            <span>{opt.label}</span>
+                            {auditDateRange === opt.id && <Check className="h-3.5 w-3.5 text-blue-600" />}
+                          </button>
+                        ))}
+                      </div>
+
+                      {auditDateRange === "CUSTOM" && (
+                        <div className="border-t border-slate-100 pt-3 space-y-2">
+                          <div>
+                            <label className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Start Date</label>
+                            <input
+                              type="date"
+                              value={customAuditStart}
+                              onChange={(e) => setCustomAuditStart(e.target.value)}
+                              className="w-full text-xs rounded-lg border border-slate-200 px-2 py-1.5 focus:outline-blue-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold uppercase text-slate-400 block mb-1">End Date</label>
+                            <input
+                              type="date"
+                              value={customAuditEnd}
+                              onChange={(e) => setCustomAuditEnd(e.target.value)}
+                              className="w-full text-xs rounded-lg border border-slate-200 px-2 py-1.5 focus:outline-blue-500"
+                            />
+                          </div>
+                          <div className="flex justify-end gap-2 pt-1">
+                            <button
+                              onClick={() => setShowDateRangePicker(false)}
+                              className="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-700"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              disabled={!customAuditStart || !customAuditEnd}
+                              onClick={() => {
+                                setShowDateRangePicker(false);
+                                fetchSummary("CUSTOM", auditSeverityFilter, customAuditStart, customAuditEnd);
+                              }}
+                              className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 disabled:opacity-50"
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -923,34 +945,68 @@ const ControlCenterDashboardPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {events.map((ev) => (
-                    <tr key={ev.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
-                            ev.severity === "CRITICAL"
-                              ? "bg-rose-100 text-rose-700"
-                              : ev.severity === "WARNING"
-                              ? "bg-amber-100 text-amber-700"
-                              : ev.severity === "SUCCESS"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-blue-100 text-blue-700"
-                          }`}
-                        >
-                          {ev.severity}
-                        </span>
-                      </td>
-                      <td className="py-3 font-semibold text-slate-800">{ev.description}</td>
-                      <td className="py-3 text-slate-600 font-mono text-[11px]">{ev.user}</td>
-                      <td className="py-3 text-slate-500 font-mono text-[11px]">{ev.ip}</td>
-                      <td className="py-3 text-slate-400">{ev.time}</td>
-                      <td className="py-3 text-right">
-                        <button className="text-slate-400 hover:text-slate-600 p-1">
-                          <MoreHorizontal className="h-3.5 w-3.5" />
-                        </button>
+                  {filteredEvents.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-slate-500">
+                        <div className="flex flex-col items-center justify-center gap-1.5">
+                          <p className="font-semibold text-xs text-slate-600">
+                            No security events found for the selected range ({getAuditDateRangeLabel()}).
+                          </p>
+                          {auditDateRange !== "ALL" && (
+                            <button
+                              onClick={() => {
+                                setAuditDateRange("ALL");
+                                fetchSummary("ALL", auditSeverityFilter);
+                              }}
+                              className="text-xs font-bold text-blue-600 hover:text-blue-800 underline mt-1"
+                            >
+                              View All Historical Records →
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredEvents.map((ev) => (
+                      <tr key={ev.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-3">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
+                              ev.severity === "CRITICAL"
+                                ? "bg-rose-100 text-rose-700"
+                                : ev.severity === "WARNING"
+                                ? "bg-amber-100 text-amber-700"
+                                : ev.severity === "SUCCESS"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {ev.severity}
+                          </span>
+                        </td>
+                        <td className="py-3 font-semibold text-slate-800">{ev.description}</td>
+                        <td className="py-3 text-slate-600 font-mono text-[11px]">{ev.user}</td>
+                        <td className="py-3 text-slate-500 font-mono text-[11px]">{ev.ip}</td>
+                        <td className="py-3 text-slate-500 font-medium">
+                          {ev.time}
+                          {ev.created_at && new Date(ev.created_at).getFullYear() < new Date().getFullYear() && (
+                            <span className="ml-1.5 text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold uppercase">
+                              Historical
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 text-right">
+                          <Link
+                            to="/control-center/access-audit"
+                            className="text-slate-400 hover:text-blue-600 p-1 inline-block"
+                            title="Inspect in Access Audit"
+                          >
+                            <MoreHorizontal className="h-3.5 w-3.5" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -958,12 +1014,14 @@ const ControlCenterDashboardPage: React.FC = () => {
 
           {/* Table Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-slate-100 text-xs">
-            <span className="text-slate-400">Showing {events.length} recent security & governance events</span>
+            <span className="text-slate-400">
+              Showing {filteredEvents.length} security & governance event{filteredEvents.length === 1 ? "" : "s"} • {getAuditDateRangeLabel()}
+            </span>
             <Link
-              to="/control-center/audit-logs"
+              to="/control-center/access-audit"
               className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"
             >
-              View all audit logs →
+              View detailed access audit logs →
             </Link>
           </div>
         </div>
@@ -1369,7 +1427,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                   Document Archive & Compliance Export Center
                 </h3>
                 <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                  {recentDocumentsList.length} Active Records
+                  {recentDocs.length} Active Records
                 </span>
                 <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <Shield className="h-3 w-3" /> GDP & NMRA Audited
@@ -1389,7 +1447,7 @@ const ControlCenterDashboardPage: React.FC = () => {
               <FolderDown className="h-4 w-4" />
               <span>Download All Documents</span>
               <span className="px-1.5 py-0.2 rounded-md bg-white/20 text-[10px] font-mono">
-                {recentDocumentsList.length}
+                {recentDocs.length}
               </span>
             </button>
           </div>
@@ -1400,12 +1458,12 @@ const ControlCenterDashboardPage: React.FC = () => {
           {/* Category Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
             {[
-              { id: "all", label: "All Documents", count: recentDocumentsList.length },
-              { id: "invoices", label: "Invoices & Credits", count: recentDocumentsList.filter(d => d.category === "invoices").length },
-              { id: "grn", label: "Goods Receipts (GRN)", count: recentDocumentsList.filter(d => d.category === "grn").length },
-              { id: "receipts", label: "Customer Receipts", count: recentDocumentsList.filter(d => d.category === "receipts").length },
-              { id: "vouchers", label: "Payment Vouchers", count: recentDocumentsList.filter(d => d.category === "vouchers").length },
-              { id: "reports", label: "Audited Reports", count: recentDocumentsList.filter(d => d.category === "reports").length },
+              { id: "all", label: "All Documents", count: recentDocs.length },
+              { id: "invoices", label: "Invoices & Credits", count: recentDocs.filter(d => d.category === "invoices").length },
+              { id: "grn", label: "Goods Receipts (GRN)", count: recentDocs.filter(d => d.category === "grn").length },
+              { id: "receipts", label: "Customer Receipts", count: recentDocs.filter(d => d.category === "receipts").length },
+              { id: "vouchers", label: "Payment Vouchers", count: recentDocs.filter(d => d.category === "vouchers").length },
+              { id: "reports", label: "Audited Reports", count: recentDocs.filter(d => d.category === "reports").length },
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -1538,7 +1596,7 @@ const ControlCenterDashboardPage: React.FC = () => {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-400">Showing {filteredDocs.length} of {recentDocumentsList.length} documents</span>
+            <span className="text-slate-400">Showing {filteredDocs.length} of {recentDocs.length} documents</span>
             <button
               onClick={handleDownloadAll}
               className="text-blue-600 hover:text-blue-700 font-bold hover:underline cursor-pointer"

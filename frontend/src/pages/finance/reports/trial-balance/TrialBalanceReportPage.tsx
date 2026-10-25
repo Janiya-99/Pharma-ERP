@@ -9,6 +9,7 @@ import ReportFilterCard from '../../../../components/finance/reports/ReportFilte
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
 import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
 import BalanceStatusBadge from '../../../../components/finance/reports/BalanceStatusBadge';
+import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
@@ -137,6 +138,82 @@ const TrialBalanceReportPage = () => {
     a.download = `trial-balance-${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    if (!data) return;
+    const lines = data.lines || [];
+    const headers = ['Account Code', 'Account Name', 'Opening Dr', 'Opening Cr', 'Period Dr', 'Period Cr', 'Closing Dr', 'Closing Cr'];
+    const rows = lines.map((l: any) => [
+      `"${l.account_code || ''}"`,
+      `"${(l.account_name || '').replace(/"/g, '""')}"`,
+      (l.opening_debit ?? 0),
+      (l.opening_credit ?? 0),
+      (l.period_debit ?? 0),
+      (l.period_credit ?? 0),
+      (l.closing_debit ?? 0),
+      (l.closing_credit ?? 0)
+    ]);
+    const summaryRow = [
+      '"TOTAL"',
+      '""',
+      (data.total_opening_debit ?? 0),
+      (data.total_opening_credit ?? 0),
+      (data.total_period_debit ?? 0),
+      (data.total_period_credit ?? 0),
+      (data.total_closing_debit ?? 0),
+      (data.total_closing_credit ?? 0)
+    ];
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(',')), summaryRow.join(',')].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trial-balance-${filters.financial_year_id || 'all'}-${new Date().getTime()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = () => {
+    if (!data) return;
+    const lines = data.lines || [];
+    const formatCurrency = (val: number) => (val || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const headers = ['Code', 'Account Name', 'Opening Dr', 'Opening Cr', 'Period Dr', 'Period Cr', 'Closing Dr', 'Closing Cr'];
+    const rows = lines.map((l: any) => [
+      l.account_code || '',
+      l.account_name || '',
+      formatCurrency(l.opening_debit),
+      formatCurrency(l.opening_credit),
+      formatCurrency(l.period_debit),
+      formatCurrency(l.period_credit),
+      formatCurrency(l.closing_debit),
+      formatCurrency(l.closing_credit),
+    ]);
+    rows.push([
+      'TOTAL',
+      'EQUILIBRIUM TOTALS',
+      formatCurrency(data.total_opening_debit),
+      formatCurrency(data.total_opening_credit),
+      formatCurrency(data.total_period_debit),
+      formatCurrency(data.total_period_credit),
+      formatCurrency(data.total_closing_debit),
+      formatCurrency(data.total_closing_credit),
+    ]);
+
+    exportToPdf({
+      title: 'Trial Balance Report',
+      filename: `trial-balance-${filters.financial_year_id || 'all'}-${new Date().getTime()}`,
+      subtitle: `Period: ${filters.date_from || 'Start'} to ${filters.date_to || 'End'} | Branch: ${activeBranch?.name || 'All Branches'}`,
+      headers,
+      rows,
+      alignments: ['left', 'left', 'right', 'right', 'right', 'right', 'right', 'right'],
+      summary: [
+        { title: 'Total Closing Debit', value: formatCurrency(data.total_closing_debit) },
+        { title: 'Total Closing Credit', value: formatCurrency(data.total_closing_credit) },
+        { title: 'Equilibrium Variance', value: formatCurrency(Math.abs((data.total_closing_debit || 0) - (data.total_closing_credit || 0))) },
+        { title: 'Status', value: (data.is_balanced ?? (Math.abs((data.total_closing_debit || 0) - (data.total_closing_credit || 0)) < 0.01)) ? 'BALANCED' : 'IMBALANCE' },
+      ],
+    });
   };
 
   const canView =
@@ -313,7 +390,14 @@ const TrialBalanceReportPage = () => {
       {data && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex justify-between items-end mb-4">
-            <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+            <ReportToolbar 
+              onRefresh={fetchReport} 
+              onExportJson={handleExportJson} 
+              onExportCsv={handleExportCsv}
+              onExportPdf={handleExportPdf}
+              onPrint={() => window.print()}
+              isRefreshing={loading} 
+            />
             <div className="mb-4">
                <BalanceStatusBadge isBalanced={data.is_balanced ?? (Math.abs((data.total_closing_debit || 0) - (data.total_closing_credit || 0)) < 0.01)} />
             </div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   RotateCcw,
   AlertTriangle,
@@ -16,6 +16,7 @@ import {
   FileText,
   RefreshCw,
 } from "lucide-react";
+import { inventoryApi } from "../../../api/inventoryApi";
 
 interface RecallNotice {
   id: string;
@@ -34,59 +35,9 @@ interface RecallNotice {
   reason: string;
 }
 
-const initialRecalls: RecallNotice[] = [
-  {
-    id: "rec-001",
-    recallNumber: "RCL-2026-004",
-    productName: "Paracetamol Paediatric Syrup 120mg/5ml (100ml Bottle)",
-    batchNumber: "PCM-1102",
-    sku: "PHM-PCM-120",
-    recallClass: "CLASS_II",
-    initiator: "MANUFACTURER_VOLUNTARY",
-    issueDate: "2026-07-01",
-    totalDistributed: 5000,
-    recoveredQty: 4100,
-    notifiedCustomers: 48,
-    totalCustomers: 50,
-    status: "RECOVERY_IN_PROGRESS",
-    reason: "Potential crystallization of active ingredient reported in cold climates. Reversible hazard.",
-  },
-  {
-    id: "rec-002",
-    recallNumber: "RCL-2026-003",
-    productName: "Ciprofloxacin IV Infusion 200mg/100ml (Glass Vial)",
-    batchNumber: "CIP-8819",
-    sku: "PHM-CIP-200",
-    recallClass: "CLASS_I",
-    initiator: "NMRA_MANDATE",
-    issueDate: "2026-06-20",
-    totalDistributed: 1200,
-    recoveredQty: 1200,
-    notifiedCustomers: 18,
-    totalCustomers: 18,
-    status: "CLOSED_VERIFIED",
-    reason: "Particulate matter observed in routine hospital sterility sampling. Serious health risk alert.",
-  },
-  {
-    id: "rec-003",
-    recallNumber: "RCL-2026-002",
-    productName: "Omeprazole 20mg Enteric-Coated Capsules",
-    batchNumber: "OMP-3301",
-    sku: "PHM-OMP-020",
-    recallClass: "CLASS_III",
-    initiator: "INTERNAL_QC",
-    issueDate: "2026-06-15",
-    totalDistributed: 10000,
-    recoveredQty: 8950,
-    notifiedCustomers: 110,
-    totalCustomers: 112,
-    status: "RECOVERY_IN_PROGRESS",
-    reason: "Minor carton printing discrepancy (incorrect barcode digit). Product potency and safety unaffected.",
-  },
-];
-
 const BatchRecallPage = () => {
-  const [data, setData] = useState<RecallNotice[]>(initialRecalls);
+  const [data, setData] = useState<RecallNotice[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedClass, setSelectedClass] = useState<string>("ALL");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
@@ -94,6 +45,43 @@ const BatchRecallPage = () => {
   // Modal State for logging recovery
   const [selectedRecall, setSelectedRecall] = useState<RecallNotice | null>(null);
   const [additionalQty, setAdditionalQty] = useState<string>("");
+
+  const fetchRecalls = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await inventoryApi.getProductBatches({ page: 1, limit: 100 });
+      const raw = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const blockedOnly = raw.filter((b: any) => b.is_blocked === true || b.is_blocked === 1);
+      const mapped: RecallNotice[] = blockedOnly.map((b: any) => {
+        const distQty = Number(b.quantity || b.initial_quantity || 1000);
+        return {
+          id: String(b.id),
+          recallNumber: `RCL-${new Date().getFullYear()}-${String(b.id).padStart(3, "0")}`,
+          productName: b.product_name || b.product?.name || "Pharmaceutical Item",
+          batchNumber: b.batch_number || `BAT-${b.id}`,
+          sku: b.product_code || b.product?.sku || `SKU-${b.product_id || b.id}`,
+          recallClass: "CLASS_I",
+          initiator: "NMRA_MANDATE",
+          issueDate: b.blocked_at ? new Date(b.blocked_at).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+          totalDistributed: distQty,
+          recoveredQty: distQty,
+          notifiedCustomers: 0,
+          totalCustomers: 0,
+          status: "OPEN_URGENT",
+          reason: b.block_reason || "Regulatory safety recall & quarantine.",
+        };
+      });
+      setData(mapped);
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRecalls();
+  }, [fetchRecalls]);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -130,6 +118,10 @@ const BatchRecallPage = () => {
     setSelectedRecall(null);
     setAdditionalQty("");
   };
+
+  const totalDist = data.reduce((sum, r) => sum + r.totalDistributed, 0);
+  const totalRec = data.reduce((sum, r) => sum + r.recoveredQty, 0);
+  const recRate = totalDist > 0 ? ((totalRec / totalDist) * 100).toFixed(1) : "0.0";
 
   return (
     <div className="w-full space-y-8 animate-in fade-in-50 duration-300">
@@ -170,22 +162,25 @@ const BatchRecallPage = () => {
           <p className="mt-2 text-3xl font-extrabold text-slate-900 ">
             {data.filter((r) => r.status !== "CLOSED_VERIFIED").length}
           </p>
-          <span className="text-xs text-rose-600 font-semibold mt-1 block">2 open notices</span>
+          <span className="text-xs text-rose-600 font-semibold mt-1 block">
+            {data.filter((r) => r.status !== "CLOSED_VERIFIED").length} open notice(s)
+          </span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Class I Critical Alerts</span>
           <p className="mt-2 text-3xl font-extrabold text-rose-600 ">
             {data.filter((r) => r.recallClass === "CLASS_I").length}
           </p>
-          <span className="text-xs text-slate-400 font-medium mt-1 block">100% recovered & closed</span>
+          <span className="text-xs text-slate-400 font-medium mt-1 block">
+            {data.filter((r) => r.recallClass === "CLASS_I").length > 0 ? "Immediate life hazard alerts" : "Zero active Class I alerts"}
+          </span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Units in Field vs Recovered</span>
           <p className="mt-2 text-3xl font-extrabold text-indigo-600 ">
-            {data.reduce((sum, r) => sum + r.recoveredQty, 0).toLocaleString()} /{" "}
-            {data.reduce((sum, r) => sum + r.totalDistributed, 0).toLocaleString()}
+            {totalRec.toLocaleString()} / {totalDist.toLocaleString()}
           </p>
-          <span className="text-xs text-emerald-600 font-semibold mt-1 block">88.5% overall recovery rate</span>
+          <span className="text-xs text-emerald-600 font-semibold mt-1 block">{recRate}% overall recovery rate</span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Notified Customers</span>

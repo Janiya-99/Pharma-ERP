@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../../auth/AuthContext";
+import React, { useState, useEffect, useCallback } from "react";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
 import { useNavigate } from "react-router-dom";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
@@ -8,8 +7,6 @@ import {
   CreditCard,
   RefreshCw,
   ArrowRight,
-  TrendingUp,
-  TrendingDown,
   FileText,
   Receipt,
   Plus,
@@ -20,14 +17,11 @@ import {
   Download,
   Search,
   Eye,
-  MoreVertical,
-  CheckCircle2,
-  Check,
-  Send,
-  AlertCircle,
-  BarChart3,
   Percent,
   ChevronDown,
+  Inbox,
+  AlertCircle,
+  Send,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -77,216 +71,161 @@ const SparklineBars: React.FC<{ color: string }> = ({ color }) => (
   </div>
 );
 
-/* ── Invoicing vs Collections Trend (Apr - Oct 2026) ── */
-const trendData = [
-  { month: "Apr 2026", Invoiced: 16.2, Collected: 14.5 },
-  { month: "May 2026", Invoiced: 17.8, Collected: 15.6 },
-  { month: "Jun 2026", Invoiced: 19.4, Collected: 17.2 },
-  { month: "Jul 2026", Invoiced: 18.2, Collected: 17.0 },
-  { month: "Aug 2026", Invoiced: 21.0, Collected: 18.2 },
-  { month: "Sep 2026", Invoiced: 21.8, Collected: 18.4 },
-  { month: "Oct 2026", Invoiced: 22.4, Collected: 18.6 },
-];
+interface InvoiceTrendItem {
+  month: string;
+  "Invoiced Amount": number;
+  "Collected Receipts": number;
+  "Collection Ratio": number;
+}
 
-/* ── AR Aging Donut Data ── */
-const agingData = [
-  { name: "Current (0-30 days)", value: 16874000, pct: 52, color: "#10B981" },
-  { name: "1 - 30 days", value: 7788000, pct: 24, color: "#3B82F6" },
-  { name: "31 - 60 days", value: 3894000, pct: 12, color: "#F59E0B" },
-  { name: "61 - 90 days", value: 2596000, pct: 8, color: "#F97316" },
-  { name: "90+ days", value: 1298000, pct: 4, color: "#EF4444" },
-];
+interface AgingDistributionItem {
+  bucket: string;
+  value: number;
+}
 
-/* ── Immediate Attention Accounts ── */
-const initialAccounts = [
-  {
-    id: 1,
-    code: "CUS-1008",
-    name: "MediCare Pharmacy Network",
-    segment: "Retail",
-    creditLimit: 5000000,
-    currentBalance: 4760000,
-    agingBucket: "90+ days",
-    risk: "High",
-    lastPayment: "Aug 28, 2026 (32 days ago)",
-    overdue: true,
-  },
-  {
-    id: 2,
-    code: "CUS-1021",
-    name: "City General Hospital",
-    segment: "Hospital",
-    creditLimit: 12000000,
-    currentBalance: 11340000,
-    agingBucket: "61 - 90 days",
-    risk: "High",
-    lastPayment: "Aug 31, 2026 (29 days ago)",
-    overdue: true,
-  },
-  {
-    id: 3,
-    code: "CUS-1043",
-    name: "HealthPlus Distributors",
-    segment: "Distributor",
-    creditLimit: 10000000,
-    currentBalance: 6980000,
-    agingBucket: "31 - 60 days",
-    risk: "Medium",
-    lastPayment: "Sep 12, 2026 (17 days ago)",
-    overdue: true,
-  },
-  {
-    id: 4,
-    code: "CUS-1078",
-    name: "Lanka Care Clinics",
-    segment: "Clinic",
-    creditLimit: 3000000,
-    currentBalance: 1920000,
-    agingBucket: "1 - 30 days",
-    risk: "Low",
-    lastPayment: "Sep 28, 2026 (1 day ago)",
-    overdue: false,
-  },
-  {
-    id: 5,
-    code: "CUS-1102",
-    name: "Sunrise Medical Center",
-    segment: "Hospital",
-    creditLimit: 8000000,
-    currentBalance: 2450000,
-    agingBucket: "31 - 60 days",
-    risk: "Medium",
-    lastPayment: "Sep 14, 2026 (15 days ago)",
-    overdue: true,
-  },
-];
+interface CriticalCustomerItem {
+  id: number;
+  customer_code: string;
+  customer_name: string;
+  customer_type: string;
+  credit_limit: number;
+  current_balance: number;
+  status: string;
+}
 
-/* ── Recent Collections Activity ── */
-const recentCollections = [
-  { id: 1, initials: "GW", name: "Greenlife Wholesalers", date: "Oct 16, 2026", amount: 1250000, bg: "bg-blue-100 text-blue-700" },
-  { id: 2, initials: "CH", name: "City General Hospital", date: "Oct 15, 2026", amount: 3600000, bg: "bg-teal-100 text-teal-700" },
-  { id: 3, initials: "MP", name: "MediCare Pharmacy", date: "Oct 14, 2026", amount: 980000, bg: "bg-indigo-100 text-indigo-700" },
-  { id: 4, initials: "LC", name: "Lanka Care Clinics", date: "Oct 13, 2026", amount: 450000, bg: "bg-purple-100 text-purple-700" },
-  { id: 5, initials: "SD", name: "Sunshine Distributors", date: "Oct 12, 2026", amount: 2100000, bg: "bg-amber-100 text-amber-700" },
-];
+interface DashboardSummaryData {
+  total_customers: number;
+  active_customers: number;
+  inactive_customers: number;
+  blocked_customers: number;
+  on_hold_customers: number;
+  customers_over_credit_limit: number;
+  total_credit_limit: number;
+  total_customer_balance: number;
+  total_customer_categories: number;
+  draft_sales_orders: number;
+  draft_sales_invoices: number;
+  unpaid_sales_invoices: number;
+  unallocated_customer_receipts: number;
+  invoice_trends: InvoiceTrendItem[];
+  aging_distribution: AgingDistributionItem[];
+  critical_customers: CriticalCustomerItem[];
+}
 
-/* ── Top Overdue Customers ── */
-const topOverdue = [
-  { name: "City General Hospital", amount: 11340000, pct: 100 },
-  { name: "HealthPlus Distributors", amount: 6980000, pct: 62 },
-  { name: "MediCare Pharmacy Network", amount: 4760000, pct: 42 },
-  { name: "Sunrise Medical Center", amount: 2450000, pct: 22 },
-  { name: "Global Pharma Ltd", amount: 1980000, pct: 18 },
-];
-
-/* ── Payment Method Breakdown ── */
-const paymentMethods = [
-  { name: "Bank Transfer", pct: 45, amount: 8370000, color: "#3B82F6" },
-  { name: "Cheque", pct: 28, amount: 5208000, color: "#06B6D4" },
-  { name: "Cash", pct: 15, amount: 2790000, color: "#10B981" },
-  { name: "Credit Card", pct: 8, amount: 1488000, color: "#F59E0B" },
-  { name: "Other", pct: 4, amount: 744000, color: "#8B5CF6" },
-];
-
-/* ── Upcoming Invoice Due Dates ── */
-const upcomingInvoices = [
-  { customer: "Lanka Care Clinics", inv: "INV-10456", due: "Oct 18, 2026", amount: 750000 },
-  { customer: "Sunrise Medical", inv: "INV-10462", due: "Oct 19, 2026", amount: 1250000 },
-  { customer: "HealthLine Pharm", inv: "INV-10471", due: "Oct 20, 2026", amount: 980000 },
-  { customer: "CarePlus Hospital", inv: "INV-10480", due: "Oct 21, 2026", amount: 1760000 },
-  { customer: "Wellness Distributors", inv: "INV-10483", due: "Oct 22, 2026", amount: 640000 },
-];
-
-/* ── Collector Performance ── */
-const collectors = [
-  { name: "Nirmal Perera", collected: 8450000, target: 10000000, pct: 84, color: "bg-emerald-500" },
-  { name: "Samanthi Silva", collected: 6780000, target: 8000000, pct: 85, color: "bg-blue-500" },
-  { name: "Kasun Fernando", collected: 4320000, target: 6000000, pct: 72, color: "bg-amber-500" },
-  { name: "Tharindu Jayasuriya", collected: 3050000, target: 5000000, pct: 61, color: "bg-orange-500" },
-  { name: "Other Team", collected: 2000000, target: 4000000, pct: 50, color: "bg-rose-500" },
-];
+const AGING_COLORS: Record<string, string> = {
+  "Current (0-30 Days)": "#10B981",
+  "31-60 Days Overdue": "#3B82F6",
+  "61-90 Days Overdue": "#F59E0B",
+  "90+ Days Critical": "#EF4444",
+};
 
 export default function InvoiceCenterDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<"month" | "last_month" | "quarter" | "year">("month");
 
-  const periodConfig = {
-    month: {
-      label: "This Month",
-      subtext: "Oct 1 – Oct 31, 2026",
-      arBalance: "LKR 32,450,000",
-      customers: "342",
-      overdue: "12",
-      creditGranted: "LKR 85,000,000",
-      collectionRate: "78.4%",
-      dso: "32 days",
-      unapplied: "LKR 2,450,000",
-      dueWeek: "LKR 5,780,000",
-    },
-    last_month: {
-      label: "Last Month",
-      subtext: "Sep 1 – Sep 30, 2026",
-      arBalance: "LKR 30,850,000",
-      customers: "338",
-      overdue: "9",
-      creditGranted: "LKR 82,400,000",
-      collectionRate: "73.2%",
-      dso: "36 days",
-      unapplied: "LKR 3,120,000",
-      dueWeek: "LKR 6,240,000",
-    },
-    quarter: {
-      label: "This Quarter",
-      subtext: "Jul 1 – Oct 31, 2026",
-      arBalance: "LKR 94,620,000",
-      customers: "354",
-      overdue: "18",
-      creditGranted: "LKR 89,500,000",
-      collectionRate: "81.6%",
-      dso: "29 days",
-      unapplied: "LKR 4,890,000",
-      dueWeek: "LKR 8,450,000",
-    },
-    year: {
-      label: "This Year (YTD)",
-      subtext: "Jan 1 – Oct 31, 2026",
-      arBalance: "LKR 268,400,000",
-      customers: "386",
-      overdue: "24",
-      creditGranted: "LKR 112,000,000",
-      collectionRate: "83.1%",
-      dso: "28 days",
-      unapplied: "LKR 9,650,000",
-      dueWeek: "LKR 12,300,000",
-    },
-  };
+  const [summaryData, setSummaryData] = useState<DashboardSummaryData | null>(null);
+  const [recentReceipts, setRecentReceipts] = useState<any[]>([]);
+  const [upcomingInvoices, setUpcomingInvoices] = useState<any[]>([]);
 
-  const currentCfg = periodConfig[selectedPeriod];
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [summaryRes, receiptsRes, invoicesRes] = await Promise.allSettled([
+        invoiceCenterApi.getDashboardSummary(),
+        invoiceCenterApi.getCustomerReceipts({ limit: 5 }),
+        invoiceCenterApi.getSalesInvoices({ payment_status: "unpaid", limit: 5 }),
+      ]);
+
+      if (summaryRes.status === "fulfilled" && summaryRes.value?.data?.data) {
+        setSummaryData(summaryRes.value.data.data);
+      } else if (summaryRes.status === "fulfilled" && summaryRes.value?.data) {
+        setSummaryData(summaryRes.value.data);
+      }
+
+      if (receiptsRes.status === "fulfilled" && receiptsRes.value?.data?.data) {
+        setRecentReceipts(Array.isArray(receiptsRes.value.data.data) ? receiptsRes.value.data.data : []);
+      } else if (receiptsRes.status === "fulfilled" && Array.isArray(receiptsRes.value?.data)) {
+        setRecentReceipts(receiptsRes.value.data);
+      }
+
+      if (invoicesRes.status === "fulfilled" && invoicesRes.value?.data?.data) {
+        setUpcomingInvoices(Array.isArray(invoicesRes.value.data.data) ? invoicesRes.value.data.data : []);
+      } else if (invoicesRes.status === "fulfilled" && Array.isArray(invoicesRes.value?.data)) {
+        setUpcomingInvoices(invoicesRes.value.data);
+      }
+    } catch (err) {
+      console.error("Failed to load invoice center dashboard data:", err);
+      toast.error("Failed to load live dashboard data");
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
+    fetchDashboardData().then(() => {
       toast.success("Invoice & receivables metrics updated");
-    }, 600);
+    });
   };
 
-  const filteredAccounts = initialAccounts.filter((acc) => {
-    if (activeTab === "overdue" && !acc.overdue) return false;
-    if (activeTab === "high_risk" && acc.risk !== "High") return false;
-    if (activeTab === "due_soon" && !acc.agingBucket.includes("30")) return false;
-    if (searchQuery && !acc.name.toLowerCase().includes(searchQuery.toLowerCase()) && !acc.code.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
+  const periodLabels = {
+    month: { label: "This Month", subtext: "Current Billing Cycle" },
+    last_month: { label: "Last Month", subtext: "Prior Billing Cycle" },
+    quarter: { label: "This Quarter", subtext: "Quarter to Date" },
+    year: { label: "This Year (YTD)", subtext: "Year to Date" },
+  };
+
+  const currentCfg = periodLabels[selectedPeriod];
+
+  // Derive real totals
+  const totalArBalance = summaryData?.total_customer_balance ?? 0;
+  const totalCustomers = summaryData?.total_customers ?? 0;
+  const overdueInvoices = summaryData?.unpaid_sales_invoices ?? 0;
+  const totalCreditLimit = summaryData?.total_credit_limit ?? 0;
+  const unappliedReceipts = summaryData?.unallocated_customer_receipts ?? 0;
+
+  // Chart data
+  const trendData = summaryData?.invoice_trends?.map((item) => ({
+    month: item.month,
+    Invoiced: Number(((item["Invoiced Amount"] || 0) / 1000000).toFixed(2)),
+    Collected: Number(((item["Collected Receipts"] || 0) / 1000000).toFixed(2)),
+  })) ?? [];
+
+  const rawAging = summaryData?.aging_distribution ?? [];
+  const totalAgingVal = rawAging.reduce((acc, b) => acc + (b.value || 0), 0);
+  const agingData = rawAging.map((b) => ({
+    name: b.bucket,
+    value: b.value || 0,
+    pct: totalAgingVal > 0 ? Math.round(((b.value || 0) / totalAgingVal) * 100) : 0,
+    color: AGING_COLORS[b.bucket] || "#64748B",
+  }));
+
+  // Critical accounts
+  const criticalAccounts = summaryData?.critical_customers ?? [];
+  const filteredAccounts = criticalAccounts.filter((acc) => {
+    if (activeTab === "overdue" && acc.current_balance <= 0) return false;
+    if (activeTab === "high_risk" && acc.current_balance <= (acc.credit_limit || 0)) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!acc.customer_name?.toLowerCase().includes(q) && !acc.customer_code?.toLowerCase().includes(q)) {
+        return false;
+      }
     }
     return true;
   });
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* ── 1. TITLE CARD (Matching Screenshot) ── */}
+      {/* ── 1. TITLE CARD ── */}
       <PageTitleCard
         title="Invoice & Receivables Center"
         description="Monitor invoices, collections, customer balances, and aging risk in real-time."
@@ -314,28 +253,28 @@ export default function InvoiceCenterDashboard() {
                   className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "month" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
                 >
                   <span>This Month</span>
-                  <span className="text-[10px] text-slate-400 font-normal">Oct 1 – Oct 31, 2026</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Current Billing Cycle</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setSelectedPeriod("last_month")}
                   className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "last_month" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
                 >
                   <span>Last Month</span>
-                  <span className="text-[10px] text-slate-400 font-normal">Sep 1 – Sep 30, 2026</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Prior Billing Cycle</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setSelectedPeriod("quarter")}
                   className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "quarter" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
                 >
                   <span>This Quarter</span>
-                  <span className="text-[10px] text-slate-400 font-normal">Jul 1 – Oct 31, 2026</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Quarter to Date</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setSelectedPeriod("year")}
                   className={`flex flex-col items-start px-3 py-2 rounded-lg cursor-pointer text-xs ${selectedPeriod === "year" ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 text-slate-700"}`}
                 >
                   <span>This Year (YTD)</span>
-                  <span className="text-[10px] text-slate-400 font-normal">Jan 1 – Oct 31, 2026</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Year to Date</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -343,7 +282,8 @@ export default function InvoiceCenterDashboard() {
             {/* Refresh Button */}
             <button
               onClick={handleRefresh}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer"
+              disabled={isRefreshing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-blue-600" : "text-slate-400"}`} />
               <span>Refresh</span>
@@ -361,7 +301,7 @@ export default function InvoiceCenterDashboard() {
         }
       />
 
-      {/* ── 2. TOP 8 KPI METRIC CARDS (Exact values & layout from photo with report deep-links) ── */}
+      {/* ── 2. TOP 8 KPI METRIC CARDS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3.5">
         {/* Card 1: Total AR Balance */}
         <div
@@ -375,12 +315,14 @@ export default function InvoiceCenterDashboard() {
               <DollarSign className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.arBalance}</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">
+            LKR {totalArBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-emerald-600 flex items-center gap-0.5">
-              ↑ 12.5% <span className="font-normal text-slate-400">vs last month</span>
+            <span className="font-semibold text-slate-500">
+              Live Ledger Balance
             </span>
-            <SparklineCurve color="#10B981" up={true} />
+            <SparklineCurve color="#10B981" up={totalArBalance >= 0} />
           </div>
         </div>
 
@@ -396,10 +338,10 @@ export default function InvoiceCenterDashboard() {
               <Users className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.customers}</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{totalCustomers}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-blue-600 flex items-center gap-0.5">
-              ↑ 6.2% <span className="font-normal text-slate-400">active customers</span>
+            <span className="font-semibold text-slate-500">
+              {summaryData?.active_customers ?? 0} active
             </span>
             <SparklineBars color="bg-blue-400" />
           </div>
@@ -417,12 +359,12 @@ export default function InvoiceCenterDashboard() {
               <FileText className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-rose-600 mt-2">{currentCfg.overdue}</p>
+          <p className="text-lg font-extrabold text-rose-600 mt-2">{overdueInvoices}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-rose-600 flex items-center gap-0.5">
-              ↑ 33.3% <span className="font-normal text-slate-400">requires attention</span>
+            <span className="font-semibold text-rose-600">
+              Requires attention
             </span>
-            <SparklineCurve color="#EF4444" up={true} />
+            <SparklineCurve color="#EF4444" up={overdueInvoices > 0} />
           </div>
         </div>
 
@@ -438,53 +380,51 @@ export default function InvoiceCenterDashboard() {
               <CreditCard className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.creditGranted}</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">
+            LKR {totalCreditLimit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-purple-600 flex items-center gap-0.5">
-              ↑ 4.1% <span className="font-normal text-slate-400">across 210 accounts</span>
+            <span className="font-semibold text-slate-500">
+              Across customer accounts
             </span>
             <SparklineBars color="bg-purple-400" />
           </div>
         </div>
 
-        {/* Card 5: Collection Rate */}
+        {/* Card 5: Draft Orders */}
         <div
-          onClick={() => navigate("/invoice-center/reports/collection-summary")}
-          title="Click to view Collection Summary Report"
+          onClick={() => navigate("/invoice-center/sales-orders")}
+          title="Click to view Sales Orders"
           className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal-300 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-teal-600 transition-colors">Collection Rate</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-teal-600 transition-colors">Draft Sales Orders</span>
             <div className="h-7 w-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Percent className="h-4 w-4" />
+              <FileText className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.collectionRate}</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{summaryData?.draft_sales_orders ?? 0}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-emerald-600 flex items-center gap-0.5">
-              ↑ 6.8% <span className="font-normal text-slate-400">vs last month</span>
-            </span>
+            <span className="font-semibold text-slate-500">Pending approval</span>
             <SparklineCurve color="#10B981" up={true} />
           </div>
         </div>
 
-        {/* Card 6: DSO */}
+        {/* Card 6: Draft Invoices */}
         <div
-          onClick={() => navigate("/invoice-center/reports/customer-aging")}
-          title="Click to view DSO & Aging Risk"
+          onClick={() => navigate("/invoice-center/sales-invoices")}
+          title="Click to view Sales Invoices"
           className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-sky-300 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-sky-600 transition-colors">DSO</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-sky-600 transition-colors">Draft Invoices</span>
             <div className="h-7 w-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Clock className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.dso}</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{summaryData?.draft_sales_invoices ?? 0}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-sky-600 flex items-center gap-0.5">
-              ↓ 18.5% <span className="font-normal text-slate-400">vs last month</span>
-            </span>
+            <span className="font-semibold text-slate-500">Unposted drafts</span>
             <SparklineCurve color="#0284C7" up={false} />
           </div>
         </div>
@@ -496,37 +436,33 @@ export default function InvoiceCenterDashboard() {
           className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-amber-300 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-amber-600 transition-colors">Unapplied Payments</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-amber-600 transition-colors">Unapplied Receipts</span>
             <div className="h-7 w-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Receipt className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.unapplied}</p>
+          <p className="text-lg font-extrabold text-slate-900 mt-2">{unappliedReceipts}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-amber-600 flex items-center gap-0.5">
-              ↑ 12.1% <span className="font-normal text-slate-400">needs allocation</span>
-            </span>
-            <SparklineCurve color="#F59E0B" up={true} />
+            <span className="font-semibold text-amber-600">Needs allocation</span>
+            <SparklineCurve color="#F59E0B" up={unappliedReceipts > 0} />
           </div>
         </div>
 
-        {/* Card 8: Due This Week */}
+        {/* Card 8: Over Credit Limit */}
         <div
-          onClick={() => navigate("/invoice-center/reports/outstanding-invoices")}
-          title="Click to view Invoices Due This Week"
+          onClick={() => navigate("/invoice-center/customers")}
+          title="Click to view Customers Over Credit Limit"
           className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-indigo-600 transition-colors">Due This Week</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-indigo-600 transition-colors">Over Credit Limit</span>
             <div className="h-7 w-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Calendar className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
             </div>
           </div>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{currentCfg.dueWeek}</p>
+          <p className="text-lg font-extrabold text-rose-600 mt-2">{summaryData?.customers_over_credit_limit ?? 0}</p>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10.5px]">
-            <span className="font-bold text-indigo-600 flex items-center gap-0.5">
-              ↓ 22.3% <span className="font-normal text-slate-400">in 18 invoices</span>
-            </span>
+            <span className="font-semibold text-slate-500">Accounts flagged</span>
             <SparklineCurve color="#6366F1" up={false} />
           </div>
         </div>
@@ -540,57 +476,52 @@ export default function InvoiceCenterDashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
-                  <BarChart3 className="h-4 w-4" />
+                  <Percent className="h-4 w-4" />
                 </div>
                 <h3 className="text-sm font-bold text-slate-900">Invoicing vs Collections</h3>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">Monthly trend of invoice issuance vs cash collections</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-3 text-xs font-semibold">
-                <span className="flex items-center gap-1.5 text-blue-600">
-                  <span className="h-2 w-2 rounded-full bg-blue-500" />
-                  Invoiced: <strong className="text-slate-800">LKR 22.4M</strong>
-                </span>
-                <span className="flex items-center gap-1.5 text-emerald-600">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                  Collected: <strong className="text-slate-800">LKR 18.6M</strong>
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => navigate("/invoice-center/reports/collection-summary")}
-                className="px-2.5 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors cursor-pointer"
-                title="Open Collection Summary Report"
-              >
-                Collection Report →
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/invoice-center/reports/collection-summary")}
+              className="px-2.5 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors cursor-pointer"
+              title="Open Collection Summary Report"
+            >
+              Collection Report →
+            </button>
           </div>
 
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="invGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#64748B" }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#64748B" }} tickFormatter={(v) => `${v}M`} domain={[0, 25]} />
-                <Tooltip
-                  formatter={(val: any) => [`LKR ${val}M`, ""]}
-                  contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: 8, fontSize: 12 }}
-                />
-                <Area type="monotone" dataKey="Invoiced" stroke="#3B82F6" strokeWidth={2.5} fillOpacity={1} fill="url(#invGradient)" dot={{ r: 3, fill: "#3B82F6" }} />
-                <Area type="monotone" dataKey="Collected" stroke="#10B981" strokeWidth={2.5} fillOpacity={1} fill="url(#colGradient)" dot={{ r: 3, fill: "#10B981" }} />
-              </AreaChart>
-            </ResponsiveContainer>
+            {trendData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="invGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#64748B" }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#64748B" }} tickFormatter={(v) => `${v}M`} />
+                  <Tooltip
+                    formatter={(val: any) => [`LKR ${val}M`, ""]}
+                    contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: 8, fontSize: 12 }}
+                  />
+                  <Area type="monotone" dataKey="Invoiced" stroke="#3B82F6" strokeWidth={2.5} fillOpacity={1} fill="url(#invGradient)" dot={{ r: 3, fill: "#3B82F6" }} />
+                  <Area type="monotone" dataKey="Collected" stroke="#10B981" strokeWidth={2.5} fillOpacity={1} fill="url(#colGradient)" dot={{ r: 3, fill: "#10B981" }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-slate-400">
+                <Inbox className="h-8 w-8 mb-2 stroke-1" />
+                <p className="text-xs">No trend history recorded yet</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -617,44 +548,61 @@ export default function InvoiceCenterDashboard() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-            {/* Donut Chart with Center LKR 32.45M */}
+            {/* Donut Chart */}
             <div className="sm:col-span-5 relative flex items-center justify-center h-44">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={agingData}
-                    innerRadius={50}
-                    outerRadius={68}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {agingData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(val: any) => [`LKR ${(val / 1000000).toFixed(2)}M`, ""]} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-[10px] uppercase font-bold text-slate-400">Total AR</span>
-                <span className="text-sm font-extrabold text-slate-900">LKR 32.45M</span>
-              </div>
+              {totalAgingVal > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={agingData}
+                        innerRadius={50}
+                        outerRadius={68}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {agingData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(val: any) => [`LKR ${(Number(val) / 1000000).toFixed(2)}M`, ""]} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                    <span className="text-[10px] uppercase font-bold text-slate-400">Total AR</span>
+                    <span className="text-xs font-extrabold text-slate-900">
+                      LKR {(totalAgingVal / 1000000).toFixed(2)}M
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center text-slate-400">
+                  <Inbox className="h-6 w-6 mb-1 stroke-1" />
+                  <span className="text-[10px]">No aging balances</span>
+                </div>
+              )}
             </div>
 
             {/* Aging Legend Breakdown */}
             <div className="sm:col-span-7 space-y-1.5 text-xs">
-              {agingData.map((item) => (
-                <div key={item.name} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                    <span className="text-slate-600 truncate text-[11px]">{item.name}</span>
+              {agingData.length > 0 ? (
+                agingData.map((item) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                      <span className="text-slate-600 truncate text-[11px]">{item.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-semibold text-slate-900 text-[11px]">
+                        LKR {Number(item.value).toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400 w-7 text-right">{item.pct}%</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="font-semibold text-slate-900 text-[11px]">LKR {(item.value / 1000).toLocaleString()}</span>
-                    <span className="text-[10px] font-bold text-slate-400 w-7 text-right">{item.pct}%</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-xs text-slate-400 text-center py-4">No aging categories found</p>
+              )}
             </div>
           </div>
         </div>
@@ -672,13 +620,13 @@ export default function InvoiceCenterDashboard() {
               {[
                 { label: "Log Customer Payment", path: "/invoice-center/customer-receipts/create", icon: Receipt, color: "text-emerald-600" },
                 { label: "Create Credit Note", path: "/invoice-center/credit-notes/create", icon: FileText, color: "text-blue-600" },
-                { label: "Send Payment Reminder", action: () => toast.success("Payment reminder dispatches sent to 12 overdue accounts"), icon: Send, color: "text-amber-600" },
-                { label: "Start Dunning Cycle", action: () => toast.info("Dunning automation initiated for >60 days overdue accounts"), icon: AlertCircle, color: "text-rose-600" },
-                { label: "Reconcile Receipts", path: "/finance/banking/bank-reconciliation", icon: RefreshCw, color: "text-cyan-600" },
+                { label: "Create Debit Note", path: "/invoice-center/debit-notes/create", icon: FileText, color: "text-purple-600" },
+                { label: "Customer Aging Report", path: "/invoice-center/reports/customer-aging", icon: Clock, color: "text-amber-600" },
+                { label: "Bank Reconciliation", path: "/finance/banking/bank-reconciliation", icon: RefreshCw, color: "text-cyan-600" },
               ].map((btn, i) => (
                 <button
                   key={i}
-                  onClick={() => (btn.path ? navigate(btn.path) : btn.action?.())}
+                  onClick={() => navigate(btn.path)}
                   className="w-full flex items-center justify-between p-2.5 rounded-xl border border-slate-100 hover:border-slate-200 bg-slate-50/70 hover:bg-slate-100/80 text-left transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -704,17 +652,16 @@ export default function InvoiceCenterDashboard() {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Accounts Requiring Immediate Attention</h3>
-                <p className="text-xs text-slate-500">Customers with overdue balances, credit risks, or payment issues</p>
+                <p className="text-xs text-slate-500">Customers with high outstanding balances or credit risks</p>
               </div>
             </div>
 
             {/* Filter Tabs */}
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
               {[
-                { id: "all", label: "All (12)" },
-                { id: "overdue", label: "Overdue (12)" },
-                { id: "high_risk", label: "High Risk (5)" },
-                { id: "due_soon", label: "Due Soon (8)" },
+                { id: "all", label: `All (${criticalAccounts.length})` },
+                { id: "overdue", label: "With Balance" },
+                { id: "high_risk", label: "Over Credit Limit" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -740,15 +687,6 @@ export default function InvoiceCenterDashboard() {
                   className="pl-8 pr-3 py-1 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
-
-              {/* Export */}
-              <button
-                onClick={() => toast.success("Accounts list exported to Excel")}
-                className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 cursor-pointer"
-              >
-                <Download className="h-3 w-3" />
-                <span>Export</span>
-              </button>
             </div>
           </div>
 
@@ -757,82 +695,64 @@ export default function InvoiceCenterDashboard() {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-slate-200/80 bg-slate-50/70 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="py-2.5 px-3 w-8">
-                    <input type="checkbox" className="rounded border-slate-300" />
-                  </th>
                   <th className="py-2.5 px-3">Customer</th>
                   <th className="py-2.5 px-3">Segment</th>
                   <th className="py-2.5 px-3 text-right">Credit Limit</th>
                   <th className="py-2.5 px-3 text-right">Current Balance</th>
-                  <th className="py-2.5 px-3">Aging Bucket</th>
-                  <th className="py-2.5 px-3">Risk</th>
-                  <th className="py-2.5 px-3">Last Payment</th>
+                  <th className="py-2.5 px-3">Status</th>
                   <th className="py-2.5 px-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredAccounts.map((acc) => (
-                  <tr key={acc.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-3">
-                      <input type="checkbox" className="rounded border-slate-300" />
-                    </td>
-                    <td className="py-3 px-3">
-                      <div className="font-bold text-slate-900">{acc.name}</div>
-                      <div className="text-[11px] text-slate-400 font-mono">{acc.code}</div>
-                    </td>
-                    <td className="py-3 px-3">
-                      <span className="px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                        {acc.segment}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 text-right font-medium text-slate-600">
-                      LKR {acc.creditLimit.toLocaleString()}
-                    </td>
-                    <td className="py-3 px-3 text-right font-bold text-rose-600">
-                      LKR {acc.currentBalance.toLocaleString()}
-                    </td>
-                    <td className="py-3 px-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold ${
-                          acc.agingBucket.includes("90")
-                            ? "bg-rose-50 text-rose-700 border border-rose-200"
-                            : acc.agingBucket.includes("61")
-                            ? "bg-orange-50 text-orange-700 border border-orange-200"
-                            : acc.agingBucket.includes("31")
-                            ? "bg-amber-50 text-amber-700 border border-amber-200"
-                            : "bg-blue-50 text-blue-700 border border-blue-200"
-                        }`}
-                      >
-                        {acc.agingBucket}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold ${
-                          acc.risk === "High"
-                            ? "bg-rose-100 text-rose-800"
-                            : acc.risk === "Medium"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-emerald-100 text-emerald-800"
-                        }`}
-                      >
-                        {acc.risk}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 text-slate-600 text-[11px]">
-                      {acc.lastPayment}
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      <button
-                        onClick={() => navigate(`/invoice-center/customers/${acc.id}`)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5 text-slate-400" />
-                        <span>View</span>
-                      </button>
+                {filteredAccounts.length > 0 ? (
+                  filteredAccounts.map((acc) => (
+                    <tr key={acc.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3 px-3">
+                        <div className="font-bold text-slate-900">{acc.customer_name}</div>
+                        <div className="text-[11px] text-slate-400 font-mono">{acc.customer_code}</div>
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                          {acc.customer_type || "Standard"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-right font-medium text-slate-600">
+                        LKR {(acc.credit_limit || 0).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3 text-right font-bold text-rose-600">
+                        LKR {(acc.current_balance || 0).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-3">
+                        <span
+                          className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold ${
+                            acc.status === "active"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : acc.status === "blocked"
+                              ? "bg-rose-50 text-rose-700 border border-rose-200"
+                              : "bg-amber-50 text-amber-700 border border-amber-200"
+                          }`}
+                        >
+                          {acc.status || "active"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <button
+                          onClick={() => navigate(`/invoice-center/customers/${acc.id}`)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer"
+                        >
+                          <Eye className="h-3.5 w-3.5 text-slate-400" />
+                          <span>View</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-400">
+                      No accounts requiring attention found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -858,171 +778,128 @@ export default function InvoiceCenterDashboard() {
             <p className="text-xs text-slate-500 mb-4">Latest customer payments received</p>
 
             <div className="space-y-3">
-              {recentCollections.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${item.bg}`}>
-                      {item.initials}
+              {recentReceipts.length > 0 ? (
+                recentReceipts.map((item: any, idx: number) => (
+                  <div key={item.id || idx} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0">
+                        {item.customer_name ? item.customer_name.slice(0, 2).toUpperCase() : "CR"}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-900 truncate">
+                          {item.customer_name || item.receipt_number || "Payment"}
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          {item.payment_method || "Payment"} • {item.receipt_date || "Recent"}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 truncate">{item.name}</p>
-                      <p className="text-[11px] text-slate-400">Payment received • {item.date}</p>
-                    </div>
+                    <span className="text-xs font-extrabold text-emerald-600 shrink-0">
+                      LKR {Number(item.receipt_amount || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
                   </div>
-                  <span className="text-xs font-extrabold text-emerald-600 shrink-0">
-                    LKR {item.amount.toLocaleString()}
-                  </span>
+                ))
+              ) : (
+                <div className="py-8 text-center text-slate-400">
+                  <Inbox className="h-6 w-6 mx-auto mb-1 stroke-1" />
+                  <p className="text-xs">No recent collections recorded</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── 5. BOTTOM ROW: 4 KPI Breakdown Cards (Exact layout from photo) ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-        {/* Card 1: Top Overdue Customers */}
+      {/* ── 5. BOTTOM ROW: Real Breakdown Cards ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
+        {/* Card 1: Top Critical Balances */}
         <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
-                <BarChart3 className="h-4 w-4" />
+                <Users className="h-4 w-4" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900">Top Overdue Customers</h3>
+              <h3 className="text-sm font-bold text-slate-900">Highest Outstanding Customer Balances</h3>
             </div>
             <button onClick={() => navigate("/invoice-center/customers")} className="text-xs font-semibold text-blue-600 hover:text-blue-700">
               View All
             </button>
           </div>
-          <p className="text-xs text-slate-500 mb-4">Top 5 customers by overdue balance</p>
+          <p className="text-xs text-slate-500 mb-4">Accounts ordered by current outstanding balance</p>
 
           <div className="space-y-3">
-            {topOverdue.map((cust, idx) => (
-              <div key={idx} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-2 text-slate-700 font-medium truncate">
-                    <span className="h-5 w-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0">
-                      {idx + 1}
+            {criticalAccounts.length > 0 ? (
+              criticalAccounts.slice(0, 5).map((cust, idx) => (
+                <div key={cust.id || idx} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-2 text-slate-700 font-medium truncate">
+                      <span className="h-5 w-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <span className="truncate">{cust.customer_name}</span>
                     </span>
-                    <span className="truncate">{cust.name}</span>
-                  </span>
-                  <span className="font-bold text-slate-900 shrink-0">LKR {cust.amount.toLocaleString()}</span>
-                </div>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-rose-400 rounded-full" style={{ width: `${cust.pct}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Card 2: Payment Method Breakdown Donut */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-sky-50 text-sky-600">
-                  <Percent className="h-4 w-4" />
-                </div>
-                <h3 className="text-sm font-bold text-slate-900">Payment Method Breakdown</h3>
-              </div>
-              <span className="px-2 py-0.5 text-[10.5px] font-medium text-slate-600 bg-slate-100 rounded-lg">
-                This Month
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mb-3">Collection receipts by payment method</p>
-
-            <div className="flex items-center gap-3">
-              <div className="relative flex items-center justify-center h-32 w-32 shrink-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={paymentMethods} innerRadius={38} outerRadius={52} paddingAngle={2} dataKey="pct">
-                      {paymentMethods.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                  <span className="text-[11px] font-extrabold text-slate-900">LKR 18.6M</span>
-                  <span className="text-[9px] uppercase text-slate-400 font-bold">Total</span>
-                </div>
-              </div>
-
-              <div className="space-y-1.5 flex-1 min-w-0 text-xs">
-                {paymentMethods.map((pm) => (
-                  <div key={pm.name} className="flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-slate-600 truncate text-[11px]">
-                      <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: pm.color }} />
-                      <span className="truncate">{pm.name}</span>
+                    <span className="font-bold text-slate-900 shrink-0">
+                      LKR {Number(cust.current_balance || 0).toLocaleString()}
                     </span>
-                    <span className="font-semibold text-slate-900 text-[11px]">{pm.pct}%</span>
                   </div>
-                ))}
+                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-rose-400 rounded-full"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          cust.credit_limit > 0
+                            ? Math.round((cust.current_balance / cust.credit_limit) * 100)
+                            : 50
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="py-6 text-center text-slate-400">
+                <p className="text-xs">No customer balances recorded</p>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Card 3: Upcoming Invoice Due Dates */}
+        {/* Card 2: Upcoming Unpaid Invoices */}
         <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
                 <Calendar className="h-4 w-4" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900">Upcoming Invoice Due Dates</h3>
+              <h3 className="text-sm font-bold text-slate-900">Unpaid Invoices Awaiting Settlement</h3>
             </div>
             <button onClick={() => navigate("/invoice-center/sales-invoices")} className="text-xs font-semibold text-blue-600 hover:text-blue-700">
               View All
             </button>
           </div>
-          <p className="text-xs text-slate-500 mb-3">Invoices due in the next 7 days</p>
+          <p className="text-xs text-slate-500 mb-3">Recent sales invoices requiring collection</p>
 
           <div className="space-y-2 text-xs">
-            {upcomingInvoices.map((inv, idx) => (
-              <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-slate-50/70 border border-slate-100">
-                <div className="min-w-0">
-                  <p className="font-bold text-slate-800 truncate text-[11.5px]">{inv.customer}</p>
-                  <p className="text-[10px] text-slate-400 font-mono">{inv.inv} • Due {inv.due}</p>
+            {upcomingInvoices.length > 0 ? (
+              upcomingInvoices.map((inv: any, idx: number) => (
+                <div key={inv.id || idx} className="flex items-center justify-between p-2 rounded-lg bg-slate-50/70 border border-slate-100">
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-800 truncate text-[11.5px]">{inv.customer_name || "Customer"}</p>
+                    <p className="text-[10px] text-slate-400 font-mono">
+                      {inv.invoice_number} • Due {inv.due_date || "Immediate"}
+                    </p>
+                  </div>
+                  <span className="font-bold text-slate-900 text-[11.5px] shrink-0">
+                    LKR {Number(inv.balance_amount ?? inv.total_amount ?? 0).toLocaleString()}
+                  </span>
                 </div>
-                <span className="font-bold text-slate-900 text-[11.5px] shrink-0">
-                  LKR {inv.amount.toLocaleString()}
-                </span>
+              ))
+            ) : (
+              <div className="py-6 text-center text-slate-400">
+                <p className="text-xs">No pending invoices found</p>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Card 4: Collection Performance */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <span className="text-amber-500 font-bold">🏆</span>
-              <h3 className="text-sm font-bold text-slate-900">Collection Performance</h3>
-            </div>
-            <span className="px-2 py-0.5 text-[10.5px] font-medium text-slate-600 bg-slate-100 rounded-lg">
-              By Collector
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mb-3">Collector achievement vs targets</p>
-
-          <div className="space-y-3">
-            {collectors.map((c, idx) => (
-              <div key={idx} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-800 text-[11.5px] truncate">{c.name}</span>
-                  <span className="font-bold text-slate-900 text-[11.5px]">{c.pct}%</span>
-                </div>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div className={`h-full ${c.color} rounded-full`} style={{ width: `${c.pct}%` }} />
-                </div>
-                <div className="flex justify-between text-[10px] text-slate-400">
-                  <span>LKR {c.collected.toLocaleString()}</span>
-                  <span>Target: LKR {c.target.toLocaleString()}</span>
-                </div>
-              </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

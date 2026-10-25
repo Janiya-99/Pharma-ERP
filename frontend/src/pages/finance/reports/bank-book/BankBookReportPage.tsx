@@ -11,6 +11,7 @@ import ReportSummaryCard from '../../../../components/finance/reports/ReportSumm
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
 import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
 import SourceTypeBadge from '../../../../components/finance/reports/SourceTypeBadge';
+import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
@@ -162,13 +163,44 @@ const BankBookReportPage = () => {
       (t.running_balance ?? 0)
     ]);
     const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `bank-book-${new Date().getTime()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = () => {
+    if (!data) return;
+    const transactions = data.transactions || data.ledger_lines || [];
+    const headers = ['Date', 'Source Type', 'Source No', 'Ref No', 'Description', 'Receipts', 'Payments', 'Balance'];
+    const rows = transactions.map((t: any) => [
+      t.transaction_date ? format(new Date(t.transaction_date), 'yyyy-MM-dd') : '',
+      t.source_type || '',
+      t.source_number || '',
+      t.reference_number || '',
+      t.description || '',
+      Number(t.debit_amount ?? t.debit ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      Number(t.credit_amount ?? t.credit ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      Number(t.running_balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+    ]);
+
+    exportToPdf({
+      title: `Bank Book - ${data.account_code || data.account_details?.account_code || ''} ${data.account_name || data.account_details?.account_name || ''}`,
+      filename: `bank-book-${filters.bank_account_id || filters.account_id || 'all'}-${new Date().getTime()}`,
+      subtitle: data.bank_name || data.branch_name ? `Bank: ${data.bank_name || ''} | Branch: ${data.branch_name || ''}` : undefined,
+      headers,
+      rows,
+      alignments: ['left', 'center', 'left', 'left', 'left', 'right', 'right', 'right'],
+      summary: [
+        { title: 'Opening Balance', value: Number(data.opening_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+        { title: 'Total Receipts', value: Number(data.total_receipts || data.total_debit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+        { title: 'Total Payments', value: Number(data.total_payments || data.total_credit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+        { title: 'Closing Balance', value: Number(data.closing_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+      ],
+    });
   };
 
   const canView =
@@ -319,7 +351,14 @@ const BankBookReportPage = () => {
             {data.bank_name && <p className="text-slate-500 text-xs mt-1">Bank: {data.bank_name} | Acc: {data.account_number}</p>}
           </div>
 
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} onExportCsv={handleExportCsv} isRefreshing={loading} />
+          <ReportToolbar 
+            onRefresh={fetchReport} 
+            onExportJson={handleExportJson} 
+            onExportCsv={handleExportCsv} 
+            onExportPdf={handleExportPdf}
+            onPrint={() => window.print()}
+            isRefreshing={loading} 
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />

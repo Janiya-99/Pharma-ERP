@@ -28,88 +28,25 @@ export const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"all" | "receipts" | "payments" | "journals">("all");
 
-  // Conforming default data from Image 2
-  const defaultItems: TransactionRowItem[] = [
-    {
-      id: "tx-1",
-      date: "16 Oct 2026",
-      type: "Customer Receipt",
-      refNo: "CR-2026-1087",
-      particulars: "Lanka Care Clinics",
-      amount: 1250000,
-      isCredit: true,
-      status: "Completed",
-      category: "receipt",
-      route: "/finance/banking/receipt-vouchers",
-    },
-    {
-      id: "tx-2",
-      date: "16 Oct 2026",
-      type: "Supplier Payment",
-      refNo: "SP-2026-0456",
-      particulars: "Global Pharma Supplies",
-      amount: 850000,
-      isCredit: false,
-      status: "Completed",
-      category: "payment",
-      route: "/finance/banking/payment-vouchers",
-    },
-    {
-      id: "tx-3",
-      date: "15 Oct 2026",
-      type: "Customer Invoice",
-      refNo: "INV-2026-2314",
-      particulars: "City General Hospital",
-      amount: 2400000,
-      isCredit: true,
-      status: "Sent",
-      category: "invoice",
-      route: "/invoice-center/sales-invoices",
-    },
-    {
-      id: "tx-4",
-      date: "15 Oct 2026",
-      type: "Purchase Bill",
-      refNo: "PB-2026-1123",
-      particulars: "MediCore Distributors",
-      amount: 1320500,
-      isCredit: false,
-      status: "Pending",
-      category: "bill",
-      route: "/finance/banking/payment-vouchers",
-    },
-    {
-      id: "tx-5",
-      date: "14 Oct 2026",
-      type: "Journal Entry",
-      refNo: "JE-2026-0098",
-      particulars: "Bank Charges",
-      amount: 12500,
-      isCredit: false,
-      status: "Completed",
-      category: "journal",
-      route: "/finance/general-ledger/journal-entry",
-    },
-  ];
-
-  // Map backend transactions if available, otherwise use defaults
+  // Map live backend transactions directly without mock fallbacks
   const items: TransactionRowItem[] =
     transactions && transactions.length > 0
       ? transactions.map((t, idx) => {
-          const isCredit = t.credit > 0 || t.type.toLowerCase().includes("receipt");
-          const amt = t.credit > 0 ? t.credit : t.debit > 0 ? t.debit : 50000;
-          const cat = t.type.toLowerCase().includes("receipt")
+          const isCredit = t.credit > 0 || (t.type && t.type.toLowerCase().includes("receipt"));
+          const amt = t.credit > 0 ? t.credit : t.debit > 0 ? t.debit : 0;
+          const typeLower = (t.type || "").toLowerCase();
+          const cat = typeLower.includes("receipt")
             ? "receipt"
-            : t.type.toLowerCase().includes("payment")
+            : typeLower.includes("payment")
             ? "payment"
-            : t.type.toLowerCase().includes("journal")
+            : typeLower.includes("journal")
             ? "journal"
             : "invoice";
           return {
             id: `api-tx-${idx}`,
-            date: t.date || "16 Oct 2026",
-            type: t.type || "Journal Entry",
-            refNo: t.voucher || t.reference || `TX-2026-${1000 + idx}`,
+            date: t.date || "-",
+            type: t.type || "General Ledger",
+            refNo: t.voucher || t.reference || `TX-${1000 + idx}`,
             particulars: t.account || "General Ledger Entry",
             amount: amt,
             isCredit,
@@ -118,7 +55,7 @@ export const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
             route: cat === "receipt" ? "/finance/banking/receipt-vouchers" : "/finance/banking/payment-vouchers",
           };
         })
-      : defaultItems;
+      : [];
 
   // Filter based on active tab
   const filteredItems = items.filter((item) => {
@@ -199,7 +136,14 @@ export const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100/70">
-            {filteredItems.map((row) => (
+            {filteredItems.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="py-10 text-center text-xs text-slate-400 font-medium">
+                  No recent financial transactions found for the selected category.
+                </td>
+              </tr>
+            ) : (
+              filteredItems.map((row) => (
               <tr
                 key={row.id}
                 className="hover:bg-slate-50/80 transition-colors group cursor-default"
@@ -262,7 +206,7 @@ export const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
                   </div>
                 </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>

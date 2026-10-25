@@ -10,6 +10,7 @@ import {
   SalesOrderStatusBadge,
 } from "../../../components/invoice-center";
 import { Button } from "../../../components/ui/button";
+import { TablePagination } from "../../../components/common/TablePagination";
 import {
   Card,
   CardContent,
@@ -74,6 +75,19 @@ const SalesOrdersPage: React.FC = () => {
   const [filters, setFilters] = useState<SalesOrderListParams>(emptyFilters);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= orders.length) {
+      setPage(0);
+    }
+  }, [orders, page, pageSize]);
+
+  const pagedOrders = React.useMemo(() => {
+    const start = page * pageSize;
+    return orders.slice(start, start + pageSize);
+  }, [orders, page, pageSize]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -344,7 +358,7 @@ const SalesOrdersPage: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  orders.map((order) => (
+                  pagedOrders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">
                         {order.sales_order_number}
@@ -408,6 +422,19 @@ const SalesOrdersPage: React.FC = () => {
                 )}
               </TableBody>
             </Table>
+
+            {orders.length > 0 && (
+              <TablePagination
+                pageIndex={page}
+                pageSize={pageSize}
+                totalItems={orders.length}
+                onPageChange={setPage}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(newSize);
+                  setPage(0);
+                }}
+              />
+            )}
           </CardContent>
         </Card>
       </div>

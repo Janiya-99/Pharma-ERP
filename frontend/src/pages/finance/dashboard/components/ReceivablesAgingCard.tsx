@@ -11,54 +11,24 @@ interface ReceivablesAgingCardProps {
 export const ReceivablesAgingCard: React.FC<ReceivablesAgingCardProps> = ({ data }) => {
   const navigate = useNavigate();
 
-  // Conforming default data from Image 2
-  const defaultTotal = 43934760;
-  const defaultBuckets = [
-    { label: "Current (0-30 days)", amount: 24120000, share: 55, color: "#3B82F6" },
-    { label: "31 - 60 days", amount: 9842120, share: 22, color: "#06B6D4" },
-    { label: "61 - 90 days", amount: 5271430, share: 12, color: "#F59E0B" },
-    { label: "91 - 120 days", amount: 2934850, share: 7, color: "#8B5CF6" },
-    { label: "> 120 days", amount: 1766360, share: 4, color: "#EF4444" },
-  ];
+  // Compute strictly from live backend ReceivablesSummary data
+  const totalOutstanding = data?.total_outstanding || 0;
+  const colors = ["#3B82F6", "#06B6D4", "#F59E0B", "#8B5CF6", "#EF4444"];
 
-  const totalOutstanding = data?.total_outstanding ? data.total_outstanding : defaultTotal;
-
-  // Process data if provided by backend, otherwise use exact Image 2 buckets
-  const buckets =
-    data && data.aging && data.aging.length > 0 && data.total_outstanding > 0
-      ? [
-          {
-            label: "Current (0-30 days)",
-            amount: data.aging[0]?.amount || 0,
-            share: Math.round(((data.aging[0]?.amount || 0) / data.total_outstanding) * 100),
-            color: "#3B82F6",
-          },
-          {
-            label: "31 - 60 days",
-            amount: data.aging[1]?.amount || 0,
-            share: Math.round(((data.aging[1]?.amount || 0) / data.total_outstanding) * 100),
-            color: "#06B6D4",
-          },
-          {
-            label: "61 - 90 days",
-            amount: data.aging[2]?.amount || 0,
-            share: Math.round(((data.aging[2]?.amount || 0) / data.total_outstanding) * 100),
-            color: "#F59E0B",
-          },
-          {
-            label: "91 - 120 days",
-            amount: data.aging[3]?.amount || 0,
-            share: Math.round(((data.aging[3]?.amount || 0) / data.total_outstanding) * 100),
-            color: "#8B5CF6",
-          },
-          {
-            label: "> 120 days",
-            amount: data.aging[4]?.amount || 0,
-            share: Math.round(((data.aging[4]?.amount || 0) / data.total_outstanding) * 100),
-            color: "#EF4444",
-          },
-        ]
-      : defaultBuckets;
+  const buckets = (data?.aging && data.aging.length > 0)
+    ? data.aging.map((b, idx) => ({
+        label: b.label || `Bucket ${idx + 1}`,
+        amount: b.amount || 0,
+        share: totalOutstanding > 0 ? Math.round(((b.amount || 0) / totalOutstanding) * 100) : 0,
+        color: colors[idx % colors.length],
+      }))
+    : [
+        { label: "Current (0-30 days)", amount: 0, share: 0, color: "#3B82F6" },
+        { label: "31 - 60 days", amount: 0, share: 0, color: "#06B6D4" },
+        { label: "61 - 90 days", amount: 0, share: 0, color: "#F59E0B" },
+        { label: "91 - 120 days", amount: 0, share: 0, color: "#8B5CF6" },
+        { label: "> 120 days", amount: 0, share: 0, color: "#EF4444" },
+      ];
 
   const handleNavigate = () => {
     navigate("/invoice-center/reports/customer-aging");

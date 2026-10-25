@@ -104,21 +104,25 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
     { header: "Customer Name", accessorKey: "customer_name" },
     { 
       header: "Total", 
+      accessorKey: "total_amount",
       cell: (row) => formatMoney(row.total_amount),
       align: "right"
     },
     { 
       header: "Paid", 
+      accessorKey: "paid_amount",
       cell: (row) => formatMoney(row.paid_amount),
       align: "right"
     },
     { 
       header: "Balance", 
+      accessorKey: "balance_amount",
       cell: (row) => <span className="font-semibold text-navy-900">{formatMoney(row.balance_amount)}</span>,
       align: "right"
     },
     { 
       header: "Payment", 
+      accessorKey: "payment_status",
       cell: (row) => (
         <Badge variant={row.payment_status === 'unpaid' ? 'destructive' : row.payment_status === 'partially_paid' ? 'secondary' : 'default'}>
           {row.payment_status}
@@ -128,6 +132,7 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
     },
     { 
       header: "Days Overdue", 
+      accessorKey: "days_overdue",
       cell: (row) => (
         <span className={row.days_overdue > 0 ? "text-red-600 font-semibold" : "text-slate-500"}>
           {row.days_overdue > 0 ? `${row.days_overdue} days` : 'Not Due'}
@@ -137,6 +142,15 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
       align: "right"
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getOutstandingInvoices({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -160,9 +174,18 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
       description="View all unpaid or partially paid invoices and track overdue payments."
       actions={
         <ReportExportActions 
+          title="Outstanding Invoices Report"
           data={data} 
+          columns={columns}
           filename={`outstanding-invoices-${new Date().toISOString().split('T')[0]}`} 
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Invoice Count", value: summary.invoice_count || 0 },
+            { title: "Total Balance", value: formatMoney(summary.balance_amount || 0) },
+            { title: "Overdue Amount", value: formatMoney(summary.overdue_amount || 0) },
+            { title: "Not Due Amount", value: formatMoney(summary.not_due_amount || 0) },
+          ]}
         />
       }
       filters={

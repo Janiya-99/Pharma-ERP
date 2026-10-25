@@ -9,6 +9,7 @@ import ReportPageHeader from '../../../../components/finance/reports/ReportPageH
 import ReportFilterCard from '../../../../components/finance/reports/ReportFilterCard';
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
 import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
+import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
@@ -127,6 +128,62 @@ const ReceiptRegisterReportPage = () => {
     a.download = `receipt-register-${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    const list = (Array.isArray(data) ? data : data?.lines) || [];
+    if (!list.length) return;
+    const headers = ['Receipt No', 'Date', 'Ref No', 'Type', 'Received From', 'Total Amount', 'Approval Status', 'Posted Status', 'Created By'];
+    const rows = list.map((r: any) => [
+      `"${r.receipt_number || ''}"`,
+      `"${r.receipt_date ? format(new Date(r.receipt_date), 'yyyy-MM-dd') : ''}"`,
+      `"${r.reference_number || ''}"`,
+      `"${r.receipt_type || ''}"`,
+      `"${(r.received_from || '').replace(/"/g, '""')}"`,
+      (r.total_amount ?? 0),
+      `"${r.approval_status || ''}"`,
+      `"${r.posted_status || ''}"`,
+      `"${r.created_by_name || ''}"`
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `receipt-register-${new Date().getTime()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = () => {
+    const list = (Array.isArray(data) ? data : data?.lines) || [];
+    if (!list.length) return;
+    const formatCurrency = (val: number) => (val || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const headers = ['Receipt No', 'Date', 'Ref No', 'Type', 'Received From', 'Amount (LKR)', 'Status'];
+    const rows = list.map((r: any) => [
+      r.receipt_number || '',
+      r.receipt_date ? format(new Date(r.receipt_date), 'yyyy-MM-dd') : '',
+      r.reference_number || '',
+      r.receipt_type || '',
+      r.received_from || '',
+      formatCurrency(r.total_amount),
+      r.approval_status || ''
+    ]);
+
+    const totalAmount = list.reduce((sum: number, r: any) => sum + (Number(r.total_amount) || 0), 0);
+
+    exportToPdf({
+      title: 'Receipt Register Report',
+      filename: `receipt-register-${new Date().getTime()}`,
+      subtitle: `Branch: ${activeBranch?.name || 'All'} | Records: ${list.length}`,
+      headers,
+      rows,
+      alignments: ['left', 'center', 'left', 'left', 'left', 'right', 'center'],
+      summary: [
+        { title: 'Total Receipts', value: String(list.length) },
+        { title: 'Total Received', value: formatCurrency(totalAmount) },
+      ],
+    });
   };
 
   if (
@@ -351,7 +408,14 @@ const ReceiptRegisterReportPage = () => {
 
       {data && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+          <ReportToolbar 
+            onRefresh={fetchReport} 
+            onExportJson={handleExportJson} 
+            onExportCsv={handleExportCsv}
+            onExportPdf={handleExportPdf}
+            onPrint={() => window.print()}
+            isRefreshing={loading} 
+          />
 
           <div className="bg-white  rounded-lg shadow border border-gray-200  overflow-hidden">
             <DataTable

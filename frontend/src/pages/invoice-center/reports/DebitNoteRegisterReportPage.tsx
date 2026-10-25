@@ -148,21 +148,25 @@ export const DebitNoteRegisterReportPage: React.FC = () => {
     { header: "Inv No.", accessorKey: "sales_invoice_number" },
     {
       header: "Type",
+      accessorKey: "debit_note_type",
       cell: (row) => <Badge variant="outline">{row.debit_note_type}</Badge>,
       align: "center",
     },
     {
       header: "Subtotal",
+      accessorKey: "subtotal_amount",
       cell: (row) => formatMoney(row.subtotal_amount),
       align: "right",
     },
     {
       header: "Tax",
+      accessorKey: "tax_amount",
       cell: (row) => formatMoney(row.tax_amount),
       align: "right",
     },
     {
       header: "Total",
+      accessorKey: "total_amount",
       cell: (row) => (
         <span className="font-semibold text-navy-900">
           {formatMoney(row.total_amount)}
@@ -172,6 +176,7 @@ export const DebitNoteRegisterReportPage: React.FC = () => {
     },
     {
       header: "Approval",
+      accessorKey: "approval_status",
       cell: (row) => (
         <Badge
           variant={
@@ -189,6 +194,7 @@ export const DebitNoteRegisterReportPage: React.FC = () => {
     },
     {
       header: "Posted",
+      accessorKey: "posted_status",
       cell: (row) => (
         <Badge
           variant={row.posted_status === "posted" ? "default" : "secondary"}
@@ -199,6 +205,15 @@ export const DebitNoteRegisterReportPage: React.FC = () => {
       align: "center",
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getDebitNoteRegister({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -242,11 +257,20 @@ export const DebitNoteRegisterReportPage: React.FC = () => {
       description="View all debit notes and their statuses."
       actions={
         <ReportExportActions
+          title="Debit Note Register Report"
           data={data}
+          columns={columns}
           filename={`debit-note-register-${
             new Date().toISOString().split("T")[0]
           }`}
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Debit Note Count", value: summary.debit_note_count || 0 },
+            { title: "Total Amount", value: formatMoney(summary.total_amount || 0) },
+            { title: "Finance Posted", value: summary.finance_posted_count || 0 },
+            { title: "Finance Unposted", value: summary.finance_unposted_count || 0 },
+          ]}
         />
       }
       filters={

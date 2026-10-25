@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   Trash2,
   FileCheck,
@@ -16,6 +16,7 @@ import {
   FileText,
   Plus,
 } from "lucide-react";
+import { inventoryApi } from "../../../api/inventoryApi";
 
 interface DisposalOrder {
   id: string;
@@ -35,62 +36,9 @@ interface DisposalOrder {
   notes: string;
 }
 
-const initialDisposals: DisposalOrder[] = [
-  {
-    id: "dsp-001",
-    orderNumber: "DISP-2026-041",
-    productName: "Insulin Glargine 100 IU/ml (Expired Stock)",
-    batchNumber: "INS-4412",
-    sku: "PHM-INS-100",
-    warehouse: "Cold Storage Depot (Kelaniya)",
-    quantityExpired: 1400,
-    unitCost: 1800,
-    writeOffValue: 2520000,
-    disposalMethod: "BIOMEDICAL_INCINERATION",
-    witnessAuthority: "Dr. R. Alwis (NMRA Authorized Inspector)",
-    scheduledDate: "2026-07-15",
-    certificateNumber: "PENDING-WITNESS",
-    status: "SCHEDULED_CONFIRMED",
-    notes: "Cold chain failure stock transferred to quarantine disposal bay. Incineration booked at Western Province Facility.",
-  },
-  {
-    id: "dsp-002",
-    orderNumber: "DISP-2026-040",
-    productName: "Amoxicillin Trihydrate 250mg Suspension (Expired)",
-    batchNumber: "AMX-1190",
-    sku: "PHM-AMX-250",
-    warehouse: "Colombo Central Warehouse (HQ)",
-    quantityExpired: 3200,
-    unitCost: 380,
-    writeOffValue: 1216000,
-    disposalMethod: "BIOMEDICAL_INCINERATION",
-    witnessAuthority: "S. Gunawardena (Public Health Inspector - PHI)",
-    scheduledDate: "2026-07-18",
-    certificateNumber: "PENDING-WITNESS",
-    status: "AWAITING_WITNESS",
-    notes: "Expired routine warehouse stock. PHI notification letter dispatched via courier.",
-  },
-  {
-    id: "dsp-003",
-    orderNumber: "DISP-2026-039",
-    productName: "Ceftriaxone Sodium Injection 1g Vial",
-    batchNumber: "CEF-7701",
-    sku: "PHM-CEF-100",
-    warehouse: "Regional Distribution Center (NY)",
-    quantityExpired: 850,
-    unitCost: 950,
-    writeOffValue: 807500,
-    disposalMethod: "VENDOR_RETURN",
-    witnessAuthority: "Manufacturer Quality Rep",
-    scheduledDate: "2026-06-28",
-    certificateNumber: "CERT-DEST-8809",
-    status: "DESTROYED_VERIFIED",
-    notes: "Voluntary return for vendor destruction. Signed certificate archived in regulatory records.",
-  },
-];
-
 const ExpiryDisposalPage = () => {
-  const [data, setData] = useState<DisposalOrder[]>(initialDisposals);
+  const [data, setData] = useState<DisposalOrder[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedMethod, setSelectedMethod] = useState<string>("ALL");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
@@ -98,6 +46,53 @@ const ExpiryDisposalPage = () => {
   // Modal State for Uploading Certificate
   const [selectedOrder, setSelectedOrder] = useState<DisposalOrder | null>(null);
   const [certNumberInput, setCertNumberInput] = useState<string>("");
+
+  const fetchDisposals = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await inventoryApi.getProductBatches({ page: 1, limit: 100 });
+      const raw = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const now = new Date();
+      // Filter batches that are expired or blocked for quality/expiry
+      const expiredOrBlocked = raw.filter((b: any) => {
+        if (b.is_blocked) return true;
+        if (!b.expiry_date) return false;
+        return new Date(b.expiry_date) <= now;
+      });
+
+      const mapped: DisposalOrder[] = expiredOrBlocked.map((b: any) => {
+        const qty = Number(b.quantity || b.current_quantity || 0);
+        const cost = Number(b.unit_cost || b.cost_price || b.purchase_price || 0);
+        const writeOff = qty * cost;
+        return {
+          id: String(b.id),
+          orderNumber: `DISP-${new Date().getFullYear()}-${String(b.id).padStart(3, "0")}`,
+          productName: b.product_name || b.product?.name || "Expired Stock",
+          batchNumber: b.batch_number || `BAT-${b.id}`,
+          sku: b.product_code || b.product?.sku || `SKU-${b.product_id || b.id}`,
+          warehouse: b.warehouse_name || b.warehouse?.name || "Main Warehouse",
+          quantityExpired: qty,
+          unitCost: cost,
+          writeOffValue: writeOff,
+          disposalMethod: "BIOMEDICAL_INCINERATION",
+          witnessAuthority: "NMRA / PHI Authorized Inspector",
+          scheduledDate: b.expiry_date ? new Date(b.expiry_date).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+          certificateNumber: "PENDING-WITNESS",
+          status: "AWAITING_WITNESS",
+          notes: b.block_reason || "Stock expired and transferred for verified disposal.",
+        };
+      });
+      setData(mapped);
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDisposals();
+  }, [fetchDisposals]);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -178,7 +173,9 @@ const ExpiryDisposalPage = () => {
           <p className="mt-2 text-3xl font-extrabold text-purple-600 ">
             {data.filter((d) => d.status !== "DESTROYED_VERIFIED").length}
           </p>
-          <span className="text-xs text-purple-600 font-semibold mt-1 block">2 active orders</span>
+          <span className="text-xs text-purple-600 font-semibold mt-1 block">
+            {data.filter((d) => d.status !== "DESTROYED_VERIFIED").length} active order(s)
+          </span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Pending Write-off Value</span>
@@ -245,8 +242,13 @@ const ExpiryDisposalPage = () => {
 
       {/* ── Disposal Orders List ── */}
       <div className="space-y-4">
-        {filteredData.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200  bg-white  p-12 text-center text-slate-500">
+        {loading ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500">
+            <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-purple-600 border-t-transparent mb-2" />
+            <p className="text-sm font-medium">Loading disposal orders...</p>
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500">
             No expiry disposal orders match your search criteria.
           </div>
         ) : (

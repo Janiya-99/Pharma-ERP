@@ -17,6 +17,7 @@ import { getBranches } from "../../../api/controlApi";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+import { TablePagination } from "../../../components/common/TablePagination";
 import {
   Card,
   CardContent,
@@ -224,6 +225,19 @@ export function FinanceQuickResourcePage({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState({ search: "", status: "all" });
   const [showDrawerAiPrompt, setShowDrawerAiPrompt] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= rows.length) {
+      setPage(0);
+    }
+  }, [rows, page, pageSize]);
+
+  const pagedRows = useMemo(() => {
+    const start = page * pageSize;
+    return rows.slice(start, start + pageSize);
+  }, [rows, page, pageSize]);
 
   const tableFields = useMemo(
     () => config.fields.filter((field) => field.table),
@@ -568,7 +582,7 @@ export function FinanceQuickResourcePage({
                   </TableCell>
                 </TableRow>
               ) : (
-                rows.map((row) => (
+                pagedRows.map((row) => (
                   <TableRow key={row.id}>
                     {tableFields.map((field) => {
                       // 1. Account fields
@@ -739,6 +753,19 @@ export function FinanceQuickResourcePage({
               )}
             </TableBody>
           </Table>
+
+          {rows.length > 0 && (
+            <TablePagination
+              pageIndex={page}
+              pageSize={pageSize}
+              totalItems={rows.length}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(0);
+              }}
+            />
+          )}
         </CardContent>
       </Card>
 

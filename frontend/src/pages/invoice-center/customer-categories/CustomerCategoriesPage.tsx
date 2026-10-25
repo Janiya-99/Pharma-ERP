@@ -11,6 +11,7 @@ import {
   RefreshCw,
   AlertCircle,
 } from "lucide-react";
+import { TablePagination } from "../../../components/common/TablePagination";
 
 interface Category {
   id: number;
@@ -36,6 +37,19 @@ const CustomerCategoriesPage: React.FC = () => {
     category: null,
   });
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= categories.length) {
+      setPage(0);
+    }
+  }, [categories, page, pageSize]);
+
+  const pagedCategories = React.useMemo(() => {
+    const start = page * pageSize;
+    return categories.slice(start, start + pageSize);
+  }, [categories, page, pageSize]);
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -180,7 +194,7 @@ const CustomerCategoriesPage: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                categories.map((cat) => (
+                pagedCategories.map((cat) => (
                   <tr
                     key={cat.id}
                     className="transition-colors hover:bg-gray-50/80 "
@@ -246,6 +260,19 @@ const CustomerCategoriesPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {categories.length > 0 && (
+          <TablePagination
+            pageIndex={page}
+            pageSize={pageSize}
+            totalItems={categories.length}
+            onPageChange={setPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setPage(0);
+            }}
+          />
+        )}
       </div>
 
       <CustomerCategoryFormModal
