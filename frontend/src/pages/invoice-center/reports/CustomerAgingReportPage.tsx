@@ -38,6 +38,7 @@ export const CustomerAgingReportPage: React.FC = () => {
     limit: 10,
     search: "",
     as_of_date: new Date().toISOString().split("T")[0],
+    risk_profile: "all",
   });
 
   const debouncedFilters = useDebounce(filters, 300);
@@ -59,29 +60,24 @@ export const CustomerAgingReportPage: React.FC = () => {
     loadCustomers();
   }, []);
 
-  const filteredData = useMemo(() => {
-    return data.filter((row) => {
-      if (
-        riskFilter === "overdue" &&
-        row.days_61_90 <= 0 &&
-        row.days_91_120 <= 0 &&
-        row.over_120 <= 0
-      ) {
-        return false;
-      }
-      if (riskFilter === "critical" && row.over_120 <= 0) {
-        return false;
-      }
-      if (riskFilter === "current" && row.current <= 0 && row.days_1_30 <= 0) {
-        return false;
-      }
-      const minBal = Number(minBalanceFilter) || 0;
-      if (minBal > 0 && row.total_outstanding < minBal) {
-        return false;
-      }
-      return true;
-    });
-  }, [data, riskFilter, minBalanceFilter]);
+  const handleRiskFilterChange = (val: string) => {
+    setRiskFilter(val);
+    setFilters((prev) => ({
+      ...prev,
+      page: 1,
+      risk_profile: val === "all" ? undefined : val,
+    }));
+  };
+
+  const handleMinBalanceChange = (val: string) => {
+    setMinBalanceFilter(val);
+    const num = Number(val) || 0;
+    setFilters((prev) => ({
+      ...prev,
+      page: 1,
+      min_balance: num > 0 ? num : undefined,
+    }));
+  };
 
   const [pagination, setPagination] = useState({
     total: 0,
@@ -127,8 +123,13 @@ export const CustomerAgingReportPage: React.FC = () => {
       setHasPermission(true);
       setErrorMessage(null);
 
-      const activeFilters = overrideFilters || filters;
-      const res = await invoiceCenterApi.getCustomerAgingReport(activeFilters);
+      const cleanFilters: any = { ...(overrideFilters || filters) };
+      if (cleanFilters.risk_profile === "all") delete cleanFilters.risk_profile;
+      if (!cleanFilters.min_balance) delete cleanFilters.min_balance;
+      if (!cleanFilters.search) delete cleanFilters.search;
+      if (!cleanFilters.as_of_date) delete cleanFilters.as_of_date;
+
+      const res = await invoiceCenterApi.getCustomerAgingReport(cleanFilters);
       setData(Array.isArray(res.data?.data?.rows) ? res.data.data.rows : []);
       if (res.data?.pagination) {
         setPagination({
@@ -180,6 +181,7 @@ export const CustomerAgingReportPage: React.FC = () => {
       limit: 10,
       search: "",
       as_of_date: new Date().toISOString().split("T")[0],
+      risk_profile: "all",
     });
   };
 
@@ -259,33 +261,18 @@ export const CustomerAgingReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getCustomerAgingReport({
+    const cleanFilters: any = {
       ...filters,
       page: 1,
       limit: 10000,
-    });
-    const allRows = Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
-    return allRows.filter((row: CustomerAgingReportRow) => {
-      if (
-        riskFilter === "overdue" &&
-        row.days_61_90 <= 0 &&
-        row.days_91_120 <= 0 &&
-        row.over_120 <= 0
-      ) {
-        return false;
-      }
-      if (riskFilter === "critical" && row.over_120 <= 0) {
-        return false;
-      }
-      if (riskFilter === "current" && row.current <= 0 && row.days_1_30 <= 0) {
-        return false;
-      }
-      const minBal = Number(minBalanceFilter) || 0;
-      if (minBal > 0 && row.total_outstanding < minBal) {
-        return false;
-      }
-      return true;
-    });
+    };
+    if (cleanFilters.risk_profile === "all") delete cleanFilters.risk_profile;
+    if (!cleanFilters.min_balance) delete cleanFilters.min_balance;
+    if (!cleanFilters.search) delete cleanFilters.search;
+    if (!cleanFilters.as_of_date) delete cleanFilters.as_of_date;
+
+    const res = await invoiceCenterApi.getCustomerAgingReport(cleanFilters);
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
   };
 
   if (!hasPermission) {
@@ -304,10 +291,10 @@ export const CustomerAgingReportPage: React.FC = () => {
         <ReportExportActions
           title="Customer Aging Report"
           subtitle={`As of Date: ${filters.as_of_date || new Date().toISOString().split("T")[0]}`}
-          data={filteredData}
+          data={data}
           columns={columns}
           filename={`customer-aging-${new Date().toISOString().split("T")[0]}`}
-          disabled={isLoading || (filteredData.length === 0 && (!pagination || pagination.total === 0))}
+          disabled={isLoading || (data.length === 0 && (!pagination || pagination.total === 0))}
           onFetchAll={handleFetchAllForExport}
           summaryCards={[
             { title: "Total Accounts", value: summaryTotals.totalAccounts },
@@ -432,7 +419,7 @@ export const CustomerAgingReportPage: React.FC = () => {
             <Label htmlFor="risk_filter">Aging Risk</Label>
             <Select
               value={riskFilter}
-              onValueChange={(val) => setRiskFilter(val)}
+              onValueChange={handleRiskFilterChange}
             >
               <SelectTrigger id="risk_filter">
                 <SelectValue placeholder="All Risk Profiles" />
@@ -449,7 +436,7 @@ export const CustomerAgingReportPage: React.FC = () => {
             <Label htmlFor="min_balance">Min Outstanding</Label>
             <Select
               value={minBalanceFilter}
-              onValueChange={(val) => setMinBalanceFilter(val)}
+              onValueChange={handleMinBalanceChange}
             >
               <SelectTrigger id="min_balance">
                 <SelectValue placeholder="All Balances" />
@@ -477,7 +464,7 @@ export const CustomerAgingReportPage: React.FC = () => {
         ) : (
           <ReportDataTable
             columns={columns}
-            data={filteredData}
+            data={data}
             isLoading={isLoading}
             pagination={pagination}
             onPageChange={handlePageChange}

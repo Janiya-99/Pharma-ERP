@@ -207,8 +207,13 @@ export const CreditNoteRegisterReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getCreditNoteRegister({
-      ...filters,
+    const cleanFilters = { ...filters };
+    if (cleanFilters.credit_note_type === "all") delete cleanFilters.credit_note_type;
+    if (cleanFilters.approval_status === "all") delete cleanFilters.approval_status;
+    if (cleanFilters.posted_status === "all") delete cleanFilters.posted_status;
+    if (cleanFilters.finance_post_status === "all") delete cleanFilters.finance_post_status;
+    const res = await invoiceCenterApi.getCreditNoteRegisterReport({
+      ...cleanFilters,
       page: 1,
       limit: 10000,
     });

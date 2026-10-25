@@ -45,6 +45,7 @@ export const CustomerBalanceReportPage: React.FC = () => {
     limit: 10,
     search: "",
     status: "all",
+    customer_type: "all",
   });
 
   const debouncedFilters = useDebounce(filters, 300);
@@ -54,7 +55,6 @@ export const CustomerBalanceReportPage: React.FC = () => {
     null
   );
   const [customers, setCustomers] = useState<any[]>([]);
-  const [customerTypeFilter, setCustomerTypeFilter] = useState<string>("all");
   const [creditStatusFilter, setCreditStatusFilter] = useState<string>("all");
   const [minBalanceFilter, setMinBalanceFilter] = useState<string>("all");
 
@@ -88,6 +88,11 @@ export const CustomerBalanceReportPage: React.FC = () => {
 
       const cleanFilters: Record<string, any> = { ...(overrideFilters || filters) };
       if (cleanFilters.status === "all") delete cleanFilters.status;
+      if (cleanFilters.customer_type === "all") delete cleanFilters.customer_type;
+      if (!cleanFilters.over_credit_limit) delete cleanFilters.over_credit_limit;
+      if (!cleanFilters.has_balance) delete cleanFilters.has_balance;
+      if (!cleanFilters.min_balance) delete cleanFilters.min_balance;
+      if (!cleanFilters.search) delete cleanFilters.search;
 
       const res = await invoiceCenterApi.getCustomerBalanceReport(cleanFilters);
       const reportPayload = res.data?.data;
@@ -150,44 +155,45 @@ export const CustomerBalanceReportPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
-    setCustomerTypeFilter("all");
     setCreditStatusFilter("all");
     setMinBalanceFilter("all");
     setErrorMessage(null);
-    setFilters({ page: 1, limit: 10, search: "", status: "all" });
+    setFilters({ page: 1, limit: 10, search: "", status: "all", customer_type: "all" });
   };
 
   const handlePageChange = (newPage: number) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  const filteredData = useMemo(() => {
-    return data.filter((row) => {
-      if (
-        customerTypeFilter !== "all" &&
-        row.customer_type?.toLowerCase() !== customerTypeFilter.toLowerCase()
-      ) {
-        return false;
+  const handleCreditStatusChange = (val: string) => {
+    setCreditStatusFilter(val);
+    setFilters((prev) => ({
+      ...prev,
+      page: 1,
+      over_credit_limit: val === "over_limit" ? true : undefined,
+    }));
+  };
+
+  const handleMinBalanceChange = (val: string) => {
+    setMinBalanceFilter(val);
+    setFilters((prev) => {
+      const next = { ...prev, page: 1 };
+      if (val === "has_balance") {
+        next.has_balance = true;
+        delete next.min_balance;
+      } else if (val === "500000") {
+        next.min_balance = 500000;
+        delete next.has_balance;
+      } else if (val === "1000000") {
+        next.min_balance = 1000000;
+        delete next.has_balance;
+      } else {
+        delete next.min_balance;
+        delete next.has_balance;
       }
-      if (
-        creditStatusFilter !== "all" &&
-        row.credit_status?.toLowerCase().replace(/ /g, "_") !==
-          creditStatusFilter.toLowerCase().replace(/ /g, "_")
-      ) {
-        return false;
-      }
-      if (minBalanceFilter === "has_balance" && row.current_balance <= 0) {
-        return false;
-      }
-      if (minBalanceFilter === "500000" && row.current_balance < 500000) {
-        return false;
-      }
-      if (minBalanceFilter === "1000000" && row.current_balance < 1000000) {
-        return false;
-      }
-      return true;
+      return next;
     });
-  }, [data, customerTypeFilter, creditStatusFilter, minBalanceFilter]);
+  };
 
   const formatMoney = (val: number) => {
     return new Intl.NumberFormat("en-LK", {
@@ -359,35 +365,17 @@ export const CustomerBalanceReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getCustomerBalances({
-      ...filters,
-      page: 1,
-      limit: 10000,
-    });
-    const allRows = Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
-    return allRows.filter((c: any) => {
-      if (
-        creditRiskFilter === "over_limit" &&
-        (c.current_balance || 0) <= (c.credit_limit || 0)
-      ) {
-        return false;
-      }
-      if (creditRiskFilter === "near_limit") {
-        const ratio =
-          c.credit_limit > 0 ? (c.current_balance || 0) / c.credit_limit : 0;
-        if (ratio < 0.8 || ratio >= 1.0) return false;
-      }
-      if (creditRiskFilter === "safe") {
-        const ratio =
-          c.credit_limit > 0 ? (c.current_balance || 0) / c.credit_limit : 0;
-        if (ratio >= 0.8) return false;
-      }
-      const minBal = Number(minBalanceFilter) || 0;
-      if (minBal > 0 && (c.current_balance || 0) < minBal) {
-        return false;
-      }
-      return true;
-    });
+    const cleanFilters: Record<string, any> = { ...filters, page: 1, limit: 10000 };
+    if (cleanFilters.status === "all") delete cleanFilters.status;
+    if (cleanFilters.customer_type === "all") delete cleanFilters.customer_type;
+    if (!cleanFilters.over_credit_limit) delete cleanFilters.over_credit_limit;
+    if (!cleanFilters.has_balance) delete cleanFilters.has_balance;
+    if (!cleanFilters.min_balance) delete cleanFilters.min_balance;
+    if (!cleanFilters.search) delete cleanFilters.search;
+
+    const res = await invoiceCenterApi.getCustomerBalanceReport(cleanFilters);
+    const reportPayload = res.data?.data;
+    return Array.isArray(reportPayload?.rows) ? reportPayload.rows : [];
   };
 
   if (!hasPermission) {
@@ -413,12 +401,12 @@ export const CustomerBalanceReportPage: React.FC = () => {
       actions={
         <ReportExportActions
           title="Customer Balances Report"
-          data={filteredData}
+          data={data}
           columns={exportColumns}
           filename={`customer-balances-${
             new Date().toISOString().split("T")[0]
           }`}
-          disabled={isLoading || (filteredData.length === 0 && !summary)}
+          disabled={isLoading || (data.length === 0 && !summary)}
           onFetchAll={handleFetchAllForExport}
           summaryCards={[
             { title: "Total Customers", value: summary?.total_customers || 0 },
@@ -498,8 +486,10 @@ export const CustomerBalanceReportPage: React.FC = () => {
           <div className="space-y-1">
             <Label htmlFor="customer_type">Customer Type</Label>
             <Select
-              value={customerTypeFilter}
-              onValueChange={(val) => setCustomerTypeFilter(val)}
+              value={filters.customer_type || "all"}
+              onValueChange={(val) =>
+                setFilters((prev) => ({ ...prev, customer_type: val, page: 1 }))
+              }
             >
               <SelectTrigger id="customer_type">
                 <SelectValue placeholder="All Types" />
@@ -517,7 +507,7 @@ export const CustomerBalanceReportPage: React.FC = () => {
             <Label htmlFor="credit_status">Credit Status</Label>
             <Select
               value={creditStatusFilter}
-              onValueChange={(val) => setCreditStatusFilter(val)}
+              onValueChange={handleCreditStatusChange}
             >
               <SelectTrigger id="credit_status">
                 <SelectValue placeholder="All Credit" />
@@ -533,7 +523,7 @@ export const CustomerBalanceReportPage: React.FC = () => {
             <Label htmlFor="min_balance">Balance Filter</Label>
             <Select
               value={minBalanceFilter}
-              onValueChange={(val) => setMinBalanceFilter(val)}
+              onValueChange={handleMinBalanceChange}
             >
               <SelectTrigger id="min_balance">
                 <SelectValue placeholder="All Balances" />
@@ -561,7 +551,7 @@ export const CustomerBalanceReportPage: React.FC = () => {
         ) : (
           <ReportDataTable
             columns={columns}
-            data={filteredData}
+            data={data}
             isLoading={isLoading}
             pagination={pagination}
             onPageChange={handlePageChange}

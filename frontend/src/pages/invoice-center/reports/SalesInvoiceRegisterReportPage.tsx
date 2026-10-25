@@ -216,8 +216,16 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getSalesInvoiceRegister({
-      ...filters,
+    const cleanFilters: any = { ...filters };
+    if (!cleanFilters.date_from) delete cleanFilters.date_from;
+    if (!cleanFilters.date_to) delete cleanFilters.date_to;
+    if (cleanFilters.branch_id === "all" || !cleanFilters.branch_id) delete cleanFilters.branch_id;
+    if (cleanFilters.approval_status === "all") delete cleanFilters.approval_status;
+    if (cleanFilters.posted_status === "all") delete cleanFilters.posted_status;
+    if (cleanFilters.payment_status === "all") delete cleanFilters.payment_status;
+    if (cleanFilters.finance_post_status === "all") delete cleanFilters.finance_post_status;
+    const res = await invoiceCenterApi.getSalesInvoiceRegisterReport({
+      ...cleanFilters,
       page: 1,
       limit: 10000,
     });

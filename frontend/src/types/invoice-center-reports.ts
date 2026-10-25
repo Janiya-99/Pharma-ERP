@@ -62,6 +62,8 @@ export interface CustomerBalanceReportParams extends ReportPaginationParams {
   customer_type?: string;
   status?: string;
   over_credit_limit?: boolean;
+  min_balance?: number;
+  has_balance?: boolean;
   search?: string;
 }
 
@@ -79,6 +81,8 @@ export interface CustomerAgingReportParams extends ReportPaginationParams {
   as_of_date?: string;
   customer_category_id?: number;
   customer_type?: string;
+  risk_profile?: string;
+  min_balance?: number;
   search?: string;
 }
 

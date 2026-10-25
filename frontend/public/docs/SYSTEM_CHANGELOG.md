@@ -248,3 +248,7 @@
 * **Field Preservation:** Ensured default fields are retained if the API returns an empty format field list.
 * **Line Item Extraction:** Robust fallback for `document?.lines || document?.sales_invoice_lines || document?.items || document?.allocations || document?.order_lines || document?.grn_items || []`.
 
+### 8.9 IC-08 / React Error #310: Report Data Table Hook Ordering Fix (`ReportDataTable.tsx`)
+* **Root Cause Rectified:** In [ReportDataTable.tsx](file:///home/janith/Projects/pixandco-web/erp/frontend/src/components/invoice-center/reports/ReportDataTable.tsx), `useMemo` for `displayRows` was declared *after* the early return conditions (`if (isLoading)` and `if (rows.length === 0)`). When `isLoading` transitioned from `true` to `false`, React detected more hooks than during the previous render, throwing `Minified React error #310` ("Rendered more hooks than during the previous render") at runtime.
+* **Engineering Fix:** Hoisted all hook invocations (`useState`, `useMemo(rows)`, `isControlled`, `useMemo(displayRows)`, and `useEffect`) to the very top of `ReportDataTable` unconditionally before any early returns, strictly adhering to React's Rules of Hooks.
+

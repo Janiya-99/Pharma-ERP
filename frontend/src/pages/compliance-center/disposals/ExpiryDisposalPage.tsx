@@ -15,8 +15,12 @@ import {
   Shield,
   FileText,
   Plus,
+  FileSpreadsheet,
 } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { TablePagination } from "../../../components/common/TablePagination";
+import { exportToCsv, exportToPdf } from "../../../utils/reportExportUtils";
+import { toast } from "sonner";
 
 interface DisposalOrder {
   id: string;
@@ -106,6 +110,86 @@ const ExpiryDisposalPage = () => {
     });
   }, [data, selectedMethod, selectedStatus, searchQuery]);
 
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [searchQuery, selectedMethod, selectedStatus]);
+
+  const pagedData = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredData.slice(start, start + pageSize);
+  }, [filteredData, pageIndex, pageSize]);
+
+  const handleExportCsv = () => {
+    const headers = [
+      "Order #",
+      "Product Name",
+      "Batch #",
+      "SKU",
+      "Warehouse",
+      "Quantity Expired",
+      "Unit Cost",
+      "Write-off Value",
+      "Disposal Method",
+      "Witness Authority",
+      "Scheduled Date",
+      "Certificate #",
+      "Status",
+    ];
+    const rows = filteredData.map((d) => [
+      d.orderNumber,
+      d.productName,
+      d.batchNumber,
+      d.sku,
+      d.warehouse,
+      d.quantityExpired,
+      d.unitCost,
+      d.writeOffValue,
+      d.disposalMethod,
+      d.witnessAuthority,
+      d.scheduledDate,
+      d.certificateNumber,
+      d.status,
+    ]);
+    exportToCsv("expiry-disposal-register", headers, rows);
+    toast.success("Excel report exported successfully");
+  };
+
+  const handleExportPdf = () => {
+    const headers = [
+      "Order #",
+      "Product Name",
+      "Batch #",
+      "Warehouse",
+      "Qty Expired",
+      "Write-Off Val",
+      "Method",
+      "Witness",
+      "Status",
+    ];
+    const rows = filteredData.map((d) => [
+      d.orderNumber,
+      d.productName,
+      d.batchNumber,
+      d.warehouse,
+      String(d.quantityExpired),
+      `₨ ${d.writeOffValue.toLocaleString()}`,
+      d.disposalMethod.replace("_", " "),
+      d.witnessAuthority,
+      d.status,
+    ]);
+    exportToPdf({
+      title: "Pharmaceutical Expiry & Disposal Register",
+      filename: "expiry-disposal-register",
+      headers,
+      rows,
+      orientation: "landscape",
+    });
+    toast.success("PDF report generated successfully");
+  };
+
   const totalPendingValue = useMemo(() => {
     return data
       .filter((d) => d.status !== "DESTROYED_VERIFIED")
@@ -158,7 +242,21 @@ const ExpiryDisposalPage = () => {
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExportCsv}
+            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 transition-all"
+          >
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+            Export Excel
+          </button>
+          <button
+            onClick={handleExportPdf}
+            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 transition-all"
+          >
+            <FileText className="h-4 w-4 text-rose-600" />
+            Export PDF
+          </button>
           <button className="flex h-10 items-center gap-2 rounded-xl bg-purple-600 px-5 text-sm font-semibold text-white shadow-md shadow-purple-600/20 hover:bg-purple-700 transition-all">
             <Plus className="h-4 w-4" />
             New Disposal Order
@@ -252,7 +350,7 @@ const ExpiryDisposalPage = () => {
             No expiry disposal orders match your search criteria.
           </div>
         ) : (
-          filteredData.map((item) => (
+          pagedData.map((item) => (
             <div
               key={item.id}
               className={`rounded-2xl border bg-white  p-6 shadow-sm transition-all ${
@@ -340,6 +438,20 @@ const ExpiryDisposalPage = () => {
             </div>
           ))
         )}
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <TablePagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={filteredData.length}
+          pageCount={Math.max(1, Math.ceil(filteredData.length / pageSize))}
+          onPageChange={setPageIndex}
+          onPageSizeChange={(sz) => {
+            setPageSize(sz);
+            setPageIndex(0);
+          }}
+        />
       </div>
 
       {/* ── Modal: Upload Sign-off Certificate ── */}

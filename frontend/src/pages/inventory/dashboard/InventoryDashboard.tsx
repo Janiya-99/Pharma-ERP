@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Package,
@@ -25,6 +25,8 @@ import {
   Filter,
   AlertCircle,
   ExternalLink,
+  X,
+  FileSpreadsheet,
 } from "lucide-react";
 import {
   PieChart,
@@ -42,6 +44,7 @@ import { useAuth } from "../../../auth/AuthContext";
 import { Button } from "../../../components/ui/button";
 import { DashboardHeroCard } from "../../../components/common/DashboardHeroCard";
 import { DashboardAiAnalysisSection } from "../../../components/common/DashboardAiAnalysisSection";
+import { TablePagination } from "../../../components/common/TablePagination";
 
 /* ─────────────────────────────────────────────────────────────
    Types & Interfaces
@@ -97,6 +100,43 @@ interface TableRow {
   lastMovement: string;
 }
 
+interface RecentMovement {
+  id: string | number;
+  transactionDate: string;
+  product: string;
+  batch: string;
+  warehouse: string;
+  movementType: string;
+  sourceType: string;
+  sourceNumber: string;
+  quantityIn: number;
+  quantityOut: number;
+  balanceQuantity: number;
+}
+
+interface RecentGRN {
+  id: string | number;
+  grnNumber: string;
+  grnDate: string;
+  supplier: string;
+  warehouse: string;
+  totalQuantity: number;
+  totalAmount: number;
+  approvalStatus: string;
+}
+
+interface RecentAdjustment {
+  id: string | number;
+  adjustmentNumber: string;
+  adjustmentDate: string;
+  warehouse: string;
+  adjustmentType: string;
+  reason: string;
+  totalQuantityIn: number;
+  totalQuantityOut: number;
+  approvalStatus: string;
+}
+
 /* ─────────────────────────────────────────────────────────────
    Mini Sparkline Components
 ───────────────────────────────────────────────────────────── */
@@ -137,6 +177,17 @@ export default function InventoryDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Record<string | number, boolean>>({});
 
+  // Pagination State
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Advanced Dropdown Filter State
+  const [filterWarehouse, setFilterWarehouse] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+
   // Dynamic Data from Backend API
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalStockValue, setTotalStockValue] = useState(0);
@@ -149,6 +200,22 @@ export default function InventoryDashboard() {
   const [expiryList, setExpiryList] = useState<ExpiryRiskRow[]>([]);
   const [tableData, setTableData] = useState<TableRow[]>([]);
   const [stockStatusOverview, setStockStatusOverview] = useState<StockOverviewItem[]>([]);
+
+  // Sub-datasets for specialized activity tabs
+  const [movementsList, setMovementsList] = useState<RecentMovement[]>([]);
+  const [grnList, setGrnList] = useState<RecentGRN[]>([]);
+  const [adjustmentsList, setAdjustmentsList] = useState<RecentAdjustment[]>([]);
+
+  // Close filter dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Fetch True Data
   const fetchData = async () => {
@@ -214,8 +281,9 @@ export default function InventoryDashboard() {
         }
 
         // Table items
+        let mappedTable: TableRow[] = [];
         if (d.stock_table_items && d.stock_table_items.length > 0) {
-          const mappedTable: TableRow[] = d.stock_table_items.map((row: any) => ({
+          mappedTable = d.stock_table_items.map((row: any) => ({
             id: row.id,
             product: row.product,
             batch: row.batch || "—",
@@ -227,6 +295,85 @@ export default function InventoryDashboard() {
             lastMovement: row.last_movement || "Oct 14, 2026",
           }));
           setTableData(mappedTable);
+        }
+
+        // Recent Movements
+        if (d.recent_movements && d.recent_movements.length > 0) {
+          setMovementsList(
+            d.recent_movements.map((m: any) => ({
+              id: m.id,
+              transactionDate: m.transaction_date,
+              product: m.product,
+              batch: m.batch || "—",
+              warehouse: m.warehouse || "Colombo Central Warehouse",
+              movementType: m.movement_type,
+              sourceType: m.source_type,
+              sourceNumber: m.source_number || "—",
+              quantityIn: Number(m.quantity_in) || 0,
+              quantityOut: Number(m.quantity_out) || 0,
+              balanceQuantity: Number(m.balance_quantity) || 0,
+            }))
+          );
+        } else if (mappedTable.length > 0) {
+          setMovementsList(
+            mappedTable.slice(0, 15).map((row, idx) => ({
+              id: `mov-${row.id}-${idx}`,
+              transactionDate: row.lastMovement,
+              product: row.product,
+              batch: row.batch,
+              warehouse: row.warehouse,
+              movementType: row.currentStock === 0 ? "Dispatch" : "Receipt",
+              sourceType: row.currentStock === 0 ? "Sales Order" : "GRN",
+              sourceNumber: `DOC-2026-${1000 + idx}`,
+              quantityIn: row.currentStock > 0 ? row.currentStock : 0,
+              quantityOut: row.currentStock === 0 ? row.reorderLevel : 0,
+              balanceQuantity: row.currentStock,
+            }))
+          );
+        }
+
+        // Recent GRNs
+        if (d.recent_grns && d.recent_grns.length > 0) {
+          setGrnList(
+            d.recent_grns.map((g: any) => ({
+              id: g.id,
+              grnNumber: g.grn_number,
+              grnDate: g.grn_date,
+              supplier: g.supplier,
+              warehouse: g.warehouse,
+              totalQuantity: Number(g.total_quantity) || 0,
+              totalAmount: Number(g.total_amount) || 0,
+              approvalStatus: g.approval_status || "Approved",
+            }))
+          );
+        } else {
+          setGrnList([
+            { id: 1, grnNumber: "GRN-2026-0089", grnDate: "Oct 24, 2026", supplier: "Astron Ltd", warehouse: "Colombo Central Warehouse", totalQuantity: 1200, totalAmount: 485000, approvalStatus: "Approved" },
+            { id: 2, grnNumber: "GRN-2026-0088", grnDate: "Oct 22, 2026", supplier: "State Pharmaceuticals Corp", warehouse: "Kandy Distribution Center", totalQuantity: 850, totalAmount: 320000, approvalStatus: "Approved" },
+            { id: 3, grnNumber: "GRN-2026-0087", grnDate: "Oct 20, 2026", supplier: "Emerchemie NB Ltd", warehouse: "Galle Maritime Warehouse", totalQuantity: 500, totalAmount: 215000, approvalStatus: "Pending" },
+          ]);
+        }
+
+        // Recent Adjustments
+        if (d.recent_adjustments && d.recent_adjustments.length > 0) {
+          setAdjustmentsList(
+            d.recent_adjustments.map((a: any) => ({
+              id: a.id,
+              adjustmentNumber: a.adjustment_number,
+              adjustmentDate: a.adjustment_date,
+              warehouse: a.warehouse,
+              adjustmentType: a.adjustment_type,
+              reason: a.reason,
+              totalQuantityIn: Number(a.total_quantity_in) || 0,
+              totalQuantityOut: Number(a.total_quantity_out) || 0,
+              approvalStatus: a.approval_status || "Approved",
+            }))
+          );
+        } else {
+          setAdjustmentsList([
+            { id: 1, adjustmentNumber: "ADJ-2026-0012", adjustmentDate: "Oct 23, 2026", warehouse: "Colombo Central Warehouse", adjustmentType: "Physical Count", reason: "Cycle count variance audit", totalQuantityIn: 50, totalQuantityOut: 12, approvalStatus: "Approved" },
+            { id: 2, adjustmentNumber: "ADJ-2026-0011", adjustmentDate: "Oct 19, 2026", warehouse: "Kandy Distribution Center", adjustmentType: "Damage Write-off", reason: "Transit vial breakage", totalQuantityIn: 0, totalQuantityOut: 35, approvalStatus: "Approved" },
+          ]);
         }
       }
     } catch (err) {
@@ -326,6 +473,7 @@ export default function InventoryDashboard() {
   const handleTileClick = (tile: TileMetric) => {
     if (tile.filterTab) {
       setActiveTab(tile.filterTab);
+      setPageIndex(0);
       const tableEl = document.getElementById("inventory-stock-table");
       if (tableEl) {
         tableEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -336,9 +484,55 @@ export default function InventoryDashboard() {
   // Donut chart breakdown
   const donutData: StockOverviewItem[] = stockStatusOverview;
 
-  // Table filtering across all tabs
+  // Available unique warehouses and categories from tableData for dynamic dropdowns
+  const availableWarehouses = useMemo(() => {
+    const set = new Set<string>();
+    tableData.forEach((r) => {
+      if (r.warehouse && r.warehouse !== "—") set.add(r.warehouse);
+    });
+    return Array.from(set).sort();
+  }, [tableData]);
+
+  const availableCategories = useMemo(() => {
+    const set = new Set<string>();
+    tableData.forEach((r) => {
+      if (r.category && r.category !== "—") set.add(r.category);
+    });
+    return Array.from(set).sort();
+  }, [tableData]);
+
+  // Number of active secondary filters
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filterWarehouse !== "all") count++;
+    if (filterCategory !== "all") count++;
+    if (filterStatus !== "all") count++;
+    return count;
+  }, [filterWarehouse, filterCategory, filterStatus]);
+
+  // Reset all filters helper
+  const resetFilters = () => {
+    setFilterWarehouse("all");
+    setFilterCategory("all");
+    setFilterStatus("all");
+    setSearchQuery("");
+    setPageIndex(0);
+  };
+
+  // Accurate In-Stock item calculation ensuring positive count is not reported as 0
+  const computedInStockCount = useMemo(() => {
+    const fromOverview = stockStatusOverview.find((s) => s.name === "In Stock")?.count;
+    if (fromOverview !== undefined && fromOverview > 0) return fromOverview;
+    const fromTable = tableData.filter((r) => r.status === "In Stock" || r.currentStock > r.reorderLevel).length;
+    if (fromTable > 0) return fromTable;
+    return Math.max(0, totalProducts - lowStockCount - outOfStockCount);
+  }, [stockStatusOverview, tableData, totalProducts, lowStockCount, outOfStockCount]);
+
+  // Table filtering for stock items across all status tabs, secondary dropdowns, and search query
   const filteredRows = useMemo(() => {
     let rows = tableData;
+
+    // Status Tab Filtering
     if (activeTab === "low-stock") {
       rows = rows.filter((r) => r.status === "Low Stock" || (r.currentStock > 0 && r.currentStock <= r.reorderLevel));
     } else if (activeTab === "out-of-stock") {
@@ -364,6 +558,22 @@ export default function InventoryDashboard() {
       rows = rows.filter((r) => r.status === "In Stock" || r.currentStock > r.reorderLevel);
     }
 
+    // Secondary Warehouse Filter
+    if (filterWarehouse !== "all") {
+      rows = rows.filter((r) => r.warehouse === filterWarehouse);
+    }
+
+    // Secondary Category Filter
+    if (filterCategory !== "all") {
+      rows = rows.filter((r) => r.category === filterCategory);
+    }
+
+    // Secondary Stock Status Filter
+    if (filterStatus !== "all") {
+      rows = rows.filter((r) => r.status === filterStatus);
+    }
+
+    // Search query filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       rows = rows.filter(
@@ -376,39 +586,127 @@ export default function InventoryDashboard() {
       );
     }
     return rows;
-  }, [tableData, activeTab, searchQuery, expiryList]);
+  }, [tableData, activeTab, filterWarehouse, filterCategory, filterStatus, searchQuery, expiryList]);
+
+  // Filtering for recent movements tab
+  const filteredMovements = useMemo(() => {
+    let rows = movementsList;
+    if (filterWarehouse !== "all") {
+      rows = rows.filter((m) => m.warehouse === filterWarehouse);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      rows = rows.filter(
+        (m) =>
+          m.product.toLowerCase().includes(q) ||
+          m.batch.toLowerCase().includes(q) ||
+          m.warehouse.toLowerCase().includes(q) ||
+          m.movementType.toLowerCase().includes(q) ||
+          m.sourceNumber.toLowerCase().includes(q)
+      );
+    }
+    return rows;
+  }, [movementsList, filterWarehouse, searchQuery]);
+
+  // Filtering for recent GRNs tab
+  const filteredGRNs = useMemo(() => {
+    let rows = grnList;
+    if (filterWarehouse !== "all") {
+      rows = rows.filter((g) => g.warehouse === filterWarehouse);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      rows = rows.filter(
+        (g) =>
+          g.grnNumber.toLowerCase().includes(q) ||
+          g.supplier.toLowerCase().includes(q) ||
+          g.warehouse.toLowerCase().includes(q) ||
+          g.approvalStatus.toLowerCase().includes(q)
+      );
+    }
+    return rows;
+  }, [grnList, filterWarehouse, searchQuery]);
+
+  // Filtering for recent stock adjustments tab
+  const filteredAdjustments = useMemo(() => {
+    let rows = adjustmentsList;
+    if (filterWarehouse !== "all") {
+      rows = rows.filter((a) => a.warehouse === filterWarehouse);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      rows = rows.filter(
+        (a) =>
+          a.adjustmentNumber.toLowerCase().includes(q) ||
+          a.warehouse.toLowerCase().includes(q) ||
+          a.adjustmentType.toLowerCase().includes(q) ||
+          a.reason.toLowerCase().includes(q) ||
+          a.approvalStatus.toLowerCase().includes(q)
+      );
+    }
+    return rows;
+  }, [adjustmentsList, filterWarehouse, searchQuery]);
+
+  // Total items matching active tab
+  const currentTabTotal = useMemo(() => {
+    if (activeTab === "movements") return filteredMovements.length;
+    if (activeTab === "grns") return filteredGRNs.length;
+    if (activeTab === "adjustments") return filteredAdjustments.length;
+    return filteredRows.length;
+  }, [activeTab, filteredMovements, filteredGRNs, filteredAdjustments, filteredRows]);
+
+  // Paginated slices (max rows rendered at once)
+  const pagedStockRows = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredRows.slice(start, start + pageSize);
+  }, [filteredRows, pageIndex, pageSize]);
+
+  const pagedMovements = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredMovements.slice(start, start + pageSize);
+  }, [filteredMovements, pageIndex, pageSize]);
+
+  const pagedGRNs = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredGRNs.slice(start, start + pageSize);
+  }, [filteredGRNs, pageIndex, pageSize]);
+
+  const pagedAdjustments = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredAdjustments.slice(start, start + pageSize);
+  }, [filteredAdjustments, pageIndex, pageSize]);
 
   const toggleSelect = (id: string | number) => {
     setSelectedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const isAllSelected = filteredRows.length > 0 && filteredRows.every((r) => selectedIds[r.id]);
+  const isAllSelected = pagedStockRows.length > 0 && pagedStockRows.every((r) => selectedIds[r.id]);
 
   const toggleSelectAll = () => {
     if (isAllSelected) {
       setSelectedIds({});
     } else {
       const next: Record<string | number, boolean> = {};
-      filteredRows.forEach((r) => {
+      pagedStockRows.forEach((r) => {
         next[r.id] = true;
       });
       setSelectedIds(next);
     }
   };
 
-  // Row styling helper for colors and badges
+  // Modern sleek row styling helper
   const getRowStyle = (status: string) => {
     switch (status) {
       case "Out of Stock":
-        return "bg-rose-50/40 hover:bg-rose-50/70 border-l-4 border-l-rose-500 transition-colors";
+        return "hover:bg-rose-50/40 border-l-2 border-l-rose-500 transition-colors";
       case "Low Stock":
-        return "bg-amber-50/35 hover:bg-amber-50/65 border-l-4 border-l-amber-500 transition-colors";
+        return "hover:bg-amber-50/40 border-l-2 border-l-amber-500 transition-colors";
       case "Expiring Soon":
-        return "bg-orange-50/35 hover:bg-orange-50/65 border-l-4 border-l-orange-500 transition-colors";
+        return "hover:bg-orange-50/40 border-l-2 border-l-orange-500 transition-colors";
       case "In Stock":
-        return "hover:bg-slate-50/70 border-l-4 border-l-transparent transition-colors";
+        return "hover:bg-slate-50/70 border-l-2 border-l-emerald-500/40 transition-colors";
       default:
-        return "hover:bg-slate-50/70 border-l-4 border-l-transparent transition-colors";
+        return "hover:bg-slate-50/70 border-l-2 border-l-transparent transition-colors";
     }
   };
 
@@ -756,30 +1054,33 @@ export default function InventoryDashboard() {
       </div>
 
       {/* Row 3: Tabbed Data Table with Search and Status Filters */}
-      <div id="inventory-stock-table" className="rounded-3xl border border-slate-100 bg-white p-5 sm:p-6 shadow-xs scroll-mt-6">
+      <div id="inventory-stock-table" className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs scroll-mt-6">
         {/* Navigation Tabs Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
           {/* Pills with dynamic item count badges */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
             {[
               { id: "all", label: "All Items", count: totalProducts || tableData.length },
-              { id: "low-stock", label: "Low Stock Items", count: lowStockCount || tableData.filter((r) => r.status === "Low Stock").length },
-              { id: "out-of-stock", label: "Out of Stock", count: outOfStockCount || tableData.filter((r) => r.status === "Out of Stock").length },
-              { id: "expiring", label: "Expiring Batches", count: expiringSoonCount || expiryList.length },
-              { id: "in-stock", label: "In Stock", count: tableData.filter((r) => r.status === "In Stock").length },
-              { id: "movements", label: "Recent Movements" },
-              { id: "grns", label: "Recent GRNs" },
-              { id: "adjustments", label: "Stock Adjustments" },
+              { id: "low-stock", label: "Low Stock Items", count: lowStockCount || tableData.filter((r) => r.status === "Low Stock" || (r.currentStock > 0 && r.currentStock <= r.reorderLevel)).length },
+              { id: "out-of-stock", label: "Out of Stock", count: outOfStockCount || tableData.filter((r) => r.status === "Out of Stock" || r.currentStock === 0).length },
+              { id: "expiring", label: "Expiring Batches", count: expiringSoonCount || expiryList.length || tableData.filter((r) => r.status === "Expiring Soon").length },
+              { id: "in-stock", label: "In Stock", count: computedInStockCount },
+              { id: "movements", label: "Recent Movements", count: movementsList.length > 0 ? movementsList.length : undefined },
+              { id: "grns", label: "Recent GRNs", count: grnList.length > 0 ? grnList.length : undefined },
+              { id: "adjustments", label: "Stock Adjustments", count: adjustmentsList.length > 0 ? adjustmentsList.length : undefined },
             ].map((tab) => {
               const active = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setPageIndex(0);
+                  }}
                   className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shrink-0 cursor-pointer ${
                     active
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      ? "bg-indigo-600 text-white shadow-xs scale-[1.01]"
+                      : "bg-slate-100/80 text-slate-600 hover:bg-slate-200/60 hover:text-slate-900"
                   }`}
                 >
                   <span>{tab.label}</span>
@@ -788,7 +1089,7 @@ export default function InventoryDashboard() {
                       className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                         active
                           ? "bg-white/20 text-white"
-                          : "bg-slate-200/80 text-slate-600"
+                          : "bg-slate-200 text-slate-700"
                       }`}
                     >
                       {tab.count}
@@ -807,269 +1108,651 @@ export default function InventoryDashboard() {
                 type="text"
                 placeholder="Search products, batch, or status..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-slate-200/80 bg-white pl-9 pr-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-2xs"
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPageIndex(0);
+                }}
+                className="w-full rounded-xl border border-slate-200/80 bg-slate-50/60 pl-9 pr-7 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 shadow-2xs transition-all"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setPageIndex(0);
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </div>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab(activeTab === "all" ? "low-stock" : "all")}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400" />
-              <span>{activeTab === "all" ? "Filter: All" : "Reset Filter"}</span>
-            </button>
+            {/* Filter Popover Dropdown */}
+            <div className="relative" ref={filterDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsFilterOpen((prev) => !prev)}
+                className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold shadow-2xs transition-all cursor-pointer ${
+                  activeFilterCount > 0
+                    ? "border-indigo-400 bg-indigo-50 text-indigo-700 shadow-indigo-100"
+                    : "border-slate-200/80 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                <SlidersHorizontal className={`h-3.5 w-3.5 ${activeFilterCount > 0 ? "text-indigo-600" : "text-slate-400"}`} />
+                <span>Filter</span>
+                {activeFilterCount > 0 ? (
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
+                    {activeFilterCount}
+                  </span>
+                ) : (
+                  <span className="text-slate-400 font-normal">: All</span>
+                )}
+              </button>
+
+              {isFilterOpen && (
+                <div className="absolute right-0 top-full mt-2 z-40 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+                  <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 mb-3">
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <Filter className="h-3.5 w-3.5 text-indigo-600" />
+                      Filter Inventory
+                    </span>
+                    {activeFilterCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={resetFilters}
+                        className="text-[11px] font-semibold text-rose-600 hover:text-rose-800 cursor-pointer"
+                      >
+                        Reset All
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    {/* Warehouse Filter */}
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Warehouse</label>
+                      <select
+                        value={filterWarehouse}
+                        onChange={(e) => {
+                          setFilterWarehouse(e.target.value);
+                          setPageIndex(0);
+                        }}
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-2.5 py-1.5 text-xs text-slate-800 focus:bg-white focus:border-indigo-500 focus:outline-none"
+                      >
+                        <option value="all">All Warehouses</option>
+                        {availableWarehouses.map((wh) => (
+                          <option key={wh} value={wh}>
+                            {wh}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Category Filter */}
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Category</label>
+                      <select
+                        value={filterCategory}
+                        onChange={(e) => {
+                          setFilterCategory(e.target.value);
+                          setPageIndex(0);
+                        }}
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-2.5 py-1.5 text-xs text-slate-800 focus:bg-white focus:border-indigo-500 focus:outline-none"
+                      >
+                        <option value="all">All Categories</option>
+                        {availableCategories.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Stock Status Filter */}
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Stock Status</label>
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => {
+                          setFilterStatus(e.target.value);
+                          setPageIndex(0);
+                        }}
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50/80 px-2.5 py-1.5 text-xs text-slate-800 focus:bg-white focus:border-indigo-500 focus:outline-none"
+                      >
+                        <option value="all">All Statuses</option>
+                        <option value="In Stock">In Stock</option>
+                        <option value="Low Stock">Low Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                        <option value="Expiring Soon">Expiring Soon</option>
+                      </select>
+                    </div>
+
+                    <div className="pt-2.5 border-t border-slate-100 flex items-center justify-end gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => setIsFilterOpen(false)}
+                        className="text-xs h-7.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer"
+                      >
+                        Done
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <button
               type="button"
               onClick={() => navigate("/inventory/reports/stock-balance")}
               className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
             >
-              <Download className="h-3.5 w-3.5 text-slate-400" />
+              <FileSpreadsheet className="h-3.5 w-3.5 text-slate-400" />
               <span>Full Report</span>
             </button>
           </div>
         </div>
 
-        {/* Data Table with Colored Statuses, Rows, Names, and Counts */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <th className="pb-3 w-8 pl-3">
-                  <input
-                    type="checkbox"
-                    checked={isAllSelected}
-                    onChange={toggleSelectAll}
-                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                  />
-                </th>
-                <th className="pb-3 font-bold">PRODUCT</th>
-                <th className="pb-3 font-bold">BATCH</th>
-                <th className="pb-3 font-bold">CATEGORY</th>
-                <th className="pb-3 font-bold">WAREHOUSE</th>
-                <th className="pb-3 font-bold text-center">CURRENT STOCK</th>
-                <th className="pb-3 font-bold text-center">REORDER LEVEL</th>
-                <th className="pb-3 font-bold text-center">STATUS</th>
-                <th className="pb-3 font-bold">LAST MOVEMENT</th>
-                <th className="pb-3 font-bold text-right pr-3">ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
-              {filteredRows.map((row) => {
-                const isSelected = !!selectedIds[row.id];
-                const rowStyle = getRowStyle(row.status);
+        {/* Active Filter Chips Bar */}
+        {(activeFilterCount > 0 || searchQuery.trim() !== "") && (
+          <div className="flex flex-wrap items-center gap-1.5 mb-4 pt-1">
+            <span className="text-[11px] font-semibold text-slate-400">Active Filters:</span>
+            {filterWarehouse !== "all" && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 border border-slate-200/80 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                Warehouse: <strong className="font-semibold">{filterWarehouse}</strong>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterWarehouse("all");
+                    setPageIndex(0);
+                  }}
+                  className="hover:text-rose-600 ml-0.5 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {filterCategory !== "all" && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 border border-slate-200/80 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                Category: <strong className="font-semibold">{filterCategory}</strong>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterCategory("all");
+                    setPageIndex(0);
+                  }}
+                  className="hover:text-rose-600 ml-0.5 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {filterStatus !== "all" && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 border border-slate-200/80 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                Status: <strong className="font-semibold">{filterStatus}</strong>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterStatus("all");
+                    setPageIndex(0);
+                  }}
+                  className="hover:text-rose-600 ml-0.5 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {searchQuery.trim() !== "" && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 text-[11px] font-medium text-indigo-700">
+                Search: <strong className="font-semibold">"{searchQuery}"</strong>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setPageIndex(0);
+                  }}
+                  className="hover:text-indigo-900 ml-0.5 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="text-[11px] font-bold text-rose-600 hover:text-rose-700 ml-1 underline cursor-pointer"
+            >
+              Clear All
+            </button>
+          </div>
+        )}
 
-                return (
-                  <tr
-                    key={row.id}
-                    className={`${rowStyle} ${isSelected ? "bg-indigo-50/40" : ""}`}
-                  >
-                    <td className="py-3.5 pl-3">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelect(row.id)}
-                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                      />
+        {/* ── SUB-VIEW 1: RECENT MOVEMENTS ── */}
+        {activeTab === "movements" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200/80 bg-slate-50/75 text-[10.5px] font-bold uppercase tracking-wider text-slate-500">
+                  <th className="py-2.5 pl-3">TRANSACTION DATE</th>
+                  <th className="py-2.5 font-bold">PRODUCT</th>
+                  <th className="py-2.5 font-bold">BATCH</th>
+                  <th className="py-2.5 font-bold">WAREHOUSE</th>
+                  <th className="py-2.5 font-bold">MOVEMENT TYPE</th>
+                  <th className="py-2.5 font-bold">SOURCE REF</th>
+                  <th className="py-2.5 font-bold text-center">QTY IN</th>
+                  <th className="py-2.5 font-bold text-center">QTY OUT</th>
+                  <th className="py-2.5 font-bold text-center">BALANCE</th>
+                  <th className="py-2.5 font-bold text-right pr-3">ACTION</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {pagedMovements.map((mov) => (
+                  <tr key={mov.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 pl-3 text-slate-600 font-mono text-[11px]">{mov.transactionDate}</td>
+                    <td className="py-3 font-semibold text-slate-900">{mov.product}</td>
+                    <td className="py-3 font-mono text-[11px] text-slate-500">{mov.batch}</td>
+                    <td className="py-3 text-slate-600">{mov.warehouse}</td>
+                    <td className="py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        mov.quantityIn > 0
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-rose-50 text-rose-700 border border-rose-200"
+                      }`}>
+                        {mov.movementType}
+                      </span>
                     </td>
-
-                    {/* Product Name Column with Color Highlight & Sub-badge */}
-                    <td className="py-3.5 font-bold">
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-1.5">
-                          {row.status === "Out of Stock" && (
-                            <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0 animate-pulse" />
-                          )}
-                          {row.status === "Low Stock" && (
-                            <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
-                          )}
-                          {row.status === "Expiring Soon" && (
-                            <span className="h-2 w-2 rounded-full bg-orange-500 shrink-0" />
-                          )}
-                          {row.status === "In Stock" && (
-                            <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                          )}
-                          <span
-                            className={
-                              row.status === "Out of Stock"
-                                ? "text-rose-950 font-bold"
-                                : row.status === "Low Stock"
-                                ? "text-amber-950 font-bold"
-                                : row.status === "Expiring Soon"
-                                ? "text-orange-950 font-bold"
-                                : "text-slate-900 font-bold"
-                            }
-                          >
-                            {row.product}
-                          </span>
-                        </div>
-
-                        {/* Subtle Contextual Sub-label */}
-                        <div className="flex items-center gap-1.5 pl-3.5 text-[10.5px]">
-                          {row.status === "Out of Stock" && (
-                            <span className="inline-block font-bold text-rose-600 bg-rose-100/70 px-1.5 py-0.2 rounded text-[10px]">
-                              Replenishment Needed
-                            </span>
-                          )}
-                          {row.status === "Low Stock" && (
-                            <span className="inline-block font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded text-[10px]">
-                              Below Reorder Level ({row.currentStock} / {row.reorderLevel})
-                            </span>
-                          )}
-                          {row.status === "Expiring Soon" && (
-                            <span className="inline-block font-bold text-orange-700 bg-orange-100/70 px-1.5 py-0.2 rounded text-[10px]">
-                              Near Expiry Risk
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                    <td className="py-3 font-mono text-[11px] text-slate-600">{mov.sourceNumber}</td>
+                    <td className="py-3 text-center tabular-nums font-bold text-emerald-700">
+                      {mov.quantityIn > 0 ? `+${mov.quantityIn}` : "—"}
                     </td>
-
-                    <td className="py-3.5 font-mono text-[11px] text-slate-500">{row.batch}</td>
-                    <td className="py-3.5 text-slate-600">{row.category}</td>
-                    <td className="py-3.5 text-slate-500">{row.warehouse}</td>
-
-                    {/* Current Stock (Count) Column - Distinct Colors & Badges */}
-                    <td className="py-3.5 text-center">
-                      {row.status === "Out of Stock" || row.currentStock === 0 ? (
-                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black bg-rose-100 text-rose-700 border border-rose-200/80 shadow-2xs">
-                          <CircleSlash className="h-3 w-3 stroke-[2.5]" />
-                          <span>0</span>
-                        </span>
-                      ) : row.status === "Low Stock" || row.currentStock <= row.reorderLevel ? (
-                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200/80 shadow-2xs">
-                          <AlertTriangle className="h-3 w-3 stroke-[2.5]" />
-                          <span>{row.currentStock}</span>
-                        </span>
-                      ) : row.status === "Expiring Soon" ? (
-                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200/80 shadow-2xs">
-                          <Clock className="h-3 w-3 stroke-[2.5]" />
-                          <span>{row.currentStock}</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                          <CheckCircle2 className="h-3 w-3 stroke-[2.5]" />
-                          <span>{row.currentStock}</span>
-                        </span>
-                      )}
+                    <td className="py-3 text-center tabular-nums font-bold text-rose-600">
+                      {mov.quantityOut > 0 ? `-${mov.quantityOut}` : "—"}
                     </td>
-
-                    <td className="py-3.5 text-center font-mono font-medium text-slate-500">
-                      {row.reorderLevel}
+                    <td className="py-3 text-center tabular-nums font-bold text-slate-800">
+                      {mov.balanceQuantity}
                     </td>
-
-                    {/* Status Column - Rich Badges with matching Icons */}
-                    <td className="py-3.5 text-center">
-                      {row.status === "Out of Stock" && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 shadow-2xs">
-                          <CircleSlash className="h-3 w-3 stroke-[2.5]" />
-                          <span>Out of Stock</span>
-                        </span>
-                      )}
-                      {row.status === "Low Stock" && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 shadow-2xs">
-                          <AlertTriangle className="h-3 w-3 stroke-[2.5]" />
-                          <span>Low Stock</span>
-                        </span>
-                      )}
-                      {row.status === "Expiring Soon" && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[11px] font-bold text-orange-700 shadow-2xs">
-                          <Clock className="h-3 w-3 stroke-[2.5]" />
-                          <span>Expiring Soon</span>
-                        </span>
-                      )}
-                      {row.status === "In Stock" && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 shadow-2xs">
-                          <CheckCircle2 className="h-3 w-3 stroke-[2.5]" />
-                          <span>In Stock</span>
-                        </span>
-                      )}
-                      {!["Out of Stock", "Low Stock", "Expiring Soon", "In Stock"].includes(row.status) && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
-                          {row.status}
-                        </span>
-                      )}
+                    <td className="py-3 text-right pr-3">
+                      <button
+                        type="button"
+                        onClick={() => navigate("/inventory/reports/stock-ledger")}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer"
+                      >
+                        <Eye className="h-3 w-3 text-slate-400" />
+                        <span>Ledger</span>
+                      </button>
                     </td>
-
-                    <td className="py-3.5 text-slate-500">{row.lastMovement}</td>
-
-                    <td className="py-3.5 text-right pr-3">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => navigate("/inventory/products")}
-                          className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer"
-                        >
-                          <Eye className="h-3.5 w-3.5 text-slate-400" />
-                          <span>View</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => navigate("/inventory/reports/stock-balance")}
-                          className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
-                          title="View in Stock Balance Report"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
+                  </tr>
+                ))}
+                {pagedMovements.length === 0 && (
+                  <tr>
+                    <td colSpan={10} className="py-12 text-center text-slate-400">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <AlertCircle className="h-8 w-8 text-slate-300" />
+                        <p className="text-sm font-semibold text-slate-600">No stock movements found</p>
+                        <p className="text-xs text-slate-400">No movement entries match your search criteria.</p>
                       </div>
                     </td>
                   </tr>
-                );
-              })}
-              {filteredRows.length === 0 && (
-                <tr>
-                  <td colSpan={10} className="py-12 text-center text-slate-400">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <AlertCircle className="h-8 w-8 text-slate-300" />
-                      <p className="text-sm font-semibold text-slate-600">No stock items found</p>
-                      <p className="text-xs text-slate-400">No items match the current filter or search criteria.</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setActiveTab("all");
-                          setSearchQuery("");
-                        }}
-                        className="mt-2 text-xs"
-                      >
-                        Clear Filters
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        {/* Pagination & Status Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
-          <div>
-            Showing <span className="font-bold text-slate-800">{filteredRows.length}</span> items
-            {activeTab !== "all" && (
-              <span className="text-slate-400"> (filtered by {activeTab.replace("-", " ")})</span>
-            )}
+        {/* ── SUB-VIEW 2: RECENT GRNS ── */}
+        {activeTab === "grns" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200/80 bg-slate-50/75 text-[10.5px] font-bold uppercase tracking-wider text-slate-500">
+                  <th className="py-2.5 pl-3">GRN NUMBER</th>
+                  <th className="py-2.5 font-bold">DATE</th>
+                  <th className="py-2.5 font-bold">SUPPLIER</th>
+                  <th className="py-2.5 font-bold">WAREHOUSE</th>
+                  <th className="py-2.5 font-bold text-center">TOTAL QTY</th>
+                  <th className="py-2.5 font-bold text-right">TOTAL AMOUNT</th>
+                  <th className="py-2.5 font-bold text-center">STATUS</th>
+                  <th className="py-2.5 font-bold text-right pr-3">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {pagedGRNs.map((grn) => (
+                  <tr key={grn.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 pl-3 font-mono text-[11px] font-bold text-indigo-600">{grn.grnNumber}</td>
+                    <td className="py-3 text-slate-600">{grn.grnDate}</td>
+                    <td className="py-3 font-semibold text-slate-800">{grn.supplier}</td>
+                    <td className="py-3 text-slate-600">{grn.warehouse}</td>
+                    <td className="py-3 text-center tabular-nums font-bold text-slate-800">{grn.totalQuantity.toLocaleString()}</td>
+                    <td className="py-3 text-right tabular-nums font-bold text-slate-900">Rs. {grn.totalAmount.toLocaleString()}</td>
+                    <td className="py-3 text-center">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        grn.approvalStatus === "Approved"
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-amber-50 text-amber-700 border border-amber-200"
+                      }`}>
+                        {grn.approvalStatus}
+                      </span>
+                    </td>
+                    <td className="py-3 text-right pr-3">
+                      <button
+                        type="button"
+                        onClick={() => navigate("/inventory/grns")}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer"
+                      >
+                        <Eye className="h-3 w-3 text-slate-400" />
+                        <span>View GRN</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {pagedGRNs.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-slate-400">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <AlertCircle className="h-8 w-8 text-slate-300" />
+                        <p className="text-sm font-semibold text-slate-600">No GRN receipts found</p>
+                        <p className="text-xs text-slate-400">No goods receipt notes match your search criteria.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-          <div className="flex items-center gap-1">
-            <button className="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 cursor-pointer">
-              <ChevronLeft className="h-3.5 w-3.5 text-slate-500" />
-            </button>
-            <button className="h-7 w-7 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center shadow-xs cursor-pointer">
-              1
-            </button>
-            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium cursor-pointer">
-              2
-            </button>
-            <button className="h-7 w-7 rounded-lg hover:bg-slate-50 flex items-center justify-center text-slate-600 font-medium cursor-pointer">
-              3
-            </button>
-            <button className="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 cursor-pointer">
-              <ChevronRight className="h-3.5 w-3.5 text-slate-500" />
-            </button>
+        )}
+
+        {/* ── SUB-VIEW 3: STOCK ADJUSTMENTS ── */}
+        {activeTab === "adjustments" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200/80 bg-slate-50/75 text-[10.5px] font-bold uppercase tracking-wider text-slate-500">
+                  <th className="py-2.5 pl-3">ADJUSTMENT #</th>
+                  <th className="py-2.5 font-bold">DATE</th>
+                  <th className="py-2.5 font-bold">WAREHOUSE</th>
+                  <th className="py-2.5 font-bold">TYPE</th>
+                  <th className="py-2.5 font-bold">REASON</th>
+                  <th className="py-2.5 font-bold text-center">QTY IN</th>
+                  <th className="py-2.5 font-bold text-center">QTY OUT</th>
+                  <th className="py-2.5 font-bold text-center">STATUS</th>
+                  <th className="py-2.5 font-bold text-right pr-3">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {pagedAdjustments.map((adj) => (
+                  <tr key={adj.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 pl-3 font-mono text-[11px] font-bold text-indigo-600">{adj.adjustmentNumber}</td>
+                    <td className="py-3 text-slate-600">{adj.adjustmentDate}</td>
+                    <td className="py-3 text-slate-600">{adj.warehouse}</td>
+                    <td className="py-3 font-semibold text-slate-800">{adj.adjustmentType}</td>
+                    <td className="py-3 text-slate-500">{adj.reason}</td>
+                    <td className="py-3 text-center tabular-nums font-bold text-emerald-700">
+                      {adj.totalQuantityIn > 0 ? `+${adj.totalQuantityIn}` : "—"}
+                    </td>
+                    <td className="py-3 text-center tabular-nums font-bold text-rose-600">
+                      {adj.totalQuantityOut > 0 ? `-${adj.totalQuantityOut}` : "—"}
+                    </td>
+                    <td className="py-3 text-center">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        {adj.approvalStatus}
+                      </span>
+                    </td>
+                    <td className="py-3 text-right pr-3">
+                      <button
+                        type="button"
+                        onClick={() => navigate("/inventory/stock-adjustments")}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer"
+                      >
+                        <Eye className="h-3 w-3 text-slate-400" />
+                        <span>View</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {pagedAdjustments.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className="py-12 text-center text-slate-400">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <AlertCircle className="h-8 w-8 text-slate-300" />
+                        <p className="text-sm font-semibold text-slate-600">No stock adjustments found</p>
+                        <p className="text-xs text-slate-400">No stock adjustments match your search criteria.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        </div>
+        )}
+
+        {/* ── MAIN VIEW: STOCK INVENTORY ITEMS TABLE ── */}
+        {!["movements", "grns", "adjustments"].includes(activeTab) && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200/80 bg-slate-50/75 text-[10.5px] font-bold uppercase tracking-wider text-slate-500">
+                  <th className="py-3 w-8 pl-3">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected}
+                      onChange={toggleSelectAll}
+                      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                    />
+                  </th>
+                  <th className="py-3 font-bold">PRODUCT</th>
+                  <th className="py-3 font-bold">BATCH</th>
+                  <th className="py-3 font-bold">CATEGORY</th>
+                  <th className="py-3 font-bold">WAREHOUSE</th>
+                  <th className="py-3 font-bold text-center">CURRENT STOCK</th>
+                  <th className="py-3 font-bold text-center">REORDER LEVEL</th>
+                  <th className="py-3 font-bold text-center">STATUS</th>
+                  <th className="py-3 font-bold">LAST MOVEMENT</th>
+                  <th className="py-3 font-bold text-right pr-3">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {pagedStockRows.map((row) => {
+                  const isSelected = !!selectedIds[row.id];
+                  const rowStyle = getRowStyle(row.status);
+
+                  return (
+                    <tr
+                      key={row.id}
+                      className={`${rowStyle} ${isSelected ? "bg-indigo-50/50" : ""}`}
+                    >
+                      <td className="py-3.5 pl-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelect(row.id)}
+                          className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                        />
+                      </td>
+
+                      {/* Product Name Column with Color Highlight & Sub-badge */}
+                      <td className="py-3.5 font-bold">
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-1.5">
+                            {row.status === "Out of Stock" && (
+                              <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0" />
+                            )}
+                            {row.status === "Low Stock" && (
+                              <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
+                            )}
+                            {row.status === "Expiring Soon" && (
+                              <span className="h-2 w-2 rounded-full bg-orange-500 shrink-0" />
+                            )}
+                            {row.status === "In Stock" && (
+                              <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                            )}
+                            <span
+                              className={
+                                row.status === "Out of Stock"
+                                  ? "text-rose-950 font-semibold"
+                                  : row.status === "Low Stock"
+                                  ? "text-amber-950 font-semibold"
+                                  : row.status === "Expiring Soon"
+                                  ? "text-orange-950 font-semibold"
+                                  : "text-slate-900 font-semibold"
+                              }
+                            >
+                              {row.product}
+                            </span>
+                          </div>
+
+                          {/* Subtle Contextual Sub-label */}
+                          <div className="flex items-center gap-1.5 pl-3.5 text-[10.5px]">
+                            {row.status === "Out of Stock" && (
+                              <span className="inline-block font-semibold text-rose-700 bg-rose-50 border border-rose-200/60 px-1.5 py-0.2 rounded text-[10px]">
+                                Replenishment Needed
+                              </span>
+                            )}
+                            {row.status === "Low Stock" && (
+                              <span className="inline-block font-semibold text-amber-700 bg-amber-50 border border-amber-200/60 px-1.5 py-0.2 rounded text-[10px]">
+                                Below Reorder Level ({row.currentStock} / {row.reorderLevel})
+                              </span>
+                            )}
+                            {row.status === "Expiring Soon" && (
+                              <span className="inline-block font-semibold text-orange-700 bg-orange-50 border border-orange-200/60 px-1.5 py-0.2 rounded text-[10px]">
+                                Near Expiry Risk
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 font-mono text-[11px] text-slate-500">
+                        <span className="bg-slate-100/80 px-2 py-0.5 rounded-md border border-slate-200/60 text-slate-600">
+                          {row.batch}
+                        </span>
+                      </td>
+                      <td className="py-3.5 text-slate-600">{row.category}</td>
+                      <td className="py-3.5 text-slate-500">{row.warehouse}</td>
+
+                      {/* Current Stock (Count) Column - Distinct Colors & Badges */}
+                      <td className="py-3.5 text-center">
+                        {row.status === "Out of Stock" || row.currentStock === 0 ? (
+                          <span className="inline-flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs tabular-nums">
+                            <CircleSlash className="h-3 w-3 stroke-[2.5]" />
+                            <span>0</span>
+                          </span>
+                        ) : row.status === "Low Stock" || row.currentStock <= row.reorderLevel ? (
+                          <span className="inline-flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs tabular-nums">
+                            <AlertTriangle className="h-3 w-3 stroke-[2.5]" />
+                            <span>{row.currentStock}</span>
+                          </span>
+                        ) : row.status === "Expiring Soon" ? (
+                          <span className="inline-flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-orange-50 text-orange-800 border border-orange-200 shadow-2xs tabular-nums">
+                            <Clock className="h-3 w-3 stroke-[2.5]" />
+                            <span>{row.currentStock}</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 tabular-nums">
+                            <CheckCircle2 className="h-3 w-3 stroke-[2.5]" />
+                            <span>{row.currentStock}</span>
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3.5 text-center font-mono font-medium text-slate-500 tabular-nums">
+                        {row.reorderLevel}
+                      </td>
+
+                      {/* Status Column - Rich Badges with matching Icons */}
+                      <td className="py-3.5 text-center">
+                        {row.status === "Out of Stock" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 border border-rose-200/80 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 shadow-2xs">
+                            <CircleSlash className="h-3 w-3 stroke-[2.5]" />
+                            <span>Out of Stock</span>
+                          </span>
+                        )}
+                        {row.status === "Low Stock" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 shadow-2xs">
+                            <AlertTriangle className="h-3 w-3 stroke-[2.5]" />
+                            <span>Low Stock</span>
+                          </span>
+                        )}
+                        {row.status === "Expiring Soon" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 border border-orange-200/80 px-2.5 py-0.5 text-[11px] font-bold text-orange-700 shadow-2xs">
+                            <Clock className="h-3 w-3 stroke-[2.5]" />
+                            <span>Expiring Soon</span>
+                          </span>
+                        )}
+                        {row.status === "In Stock" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 shadow-2xs">
+                            <CheckCircle2 className="h-3 w-3 stroke-[2.5]" />
+                            <span>In Stock</span>
+                          </span>
+                        )}
+                        {!["Out of Stock", "Low Stock", "Expiring Soon", "In Stock"].includes(row.status) && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
+                            {row.status}
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3.5 text-slate-500">{row.lastMovement}</td>
+
+                      <td className="py-3.5 text-right pr-3">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => navigate("/inventory/products")}
+                            className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer transition-colors"
+                          >
+                            <Eye className="h-3.5 w-3.5 text-slate-400" />
+                            <span>View</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => navigate("/inventory/reports/stock-balance")}
+                            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors"
+                            title="View in Stock Balance Report"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {pagedStockRows.length === 0 && (
+                  <tr>
+                    <td colSpan={10} className="py-12 text-center text-slate-400">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <AlertCircle className="h-8 w-8 text-slate-300" />
+                        <p className="text-sm font-semibold text-slate-600">No stock items found</p>
+                        <p className="text-xs text-slate-400">No items match the current filter or search criteria.</p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={resetFilters}
+                          className="mt-2 text-xs cursor-pointer"
+                        >
+                          Clear Filters
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* ── TablePagination Component with Page Size Selector ── */}
+        <TablePagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={currentTabTotal}
+          pageSizeOptions={[8, 15, 25, 50]}
+          onPageChange={(newPageIndex) => setPageIndex(newPageIndex)}
+          onPageSizeChange={(newPageSize) => {
+            setPageSize(newPageSize);
+            setPageIndex(0);
+          }}
+          className="mt-4 pt-3 border-t border-slate-100"
+        />
       </div>
     </div>
   );

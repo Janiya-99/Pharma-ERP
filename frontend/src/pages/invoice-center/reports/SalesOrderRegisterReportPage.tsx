@@ -150,8 +150,11 @@ export const SalesOrderRegisterReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getSalesOrderRegister({
-      ...filters,
+    const cleanFilters = { ...filters };
+    if (cleanFilters.approval_status === "all") delete cleanFilters.approval_status;
+    if (cleanFilters.order_status === "all") delete cleanFilters.order_status;
+    const res = await invoiceCenterApi.getSalesOrderRegisterReport({
+      ...cleanFilters,
       page: 1,
       limit: 10000,
     });

@@ -28,6 +28,9 @@ type ReportFilterDTO struct {
 	DueDateTo          *time.Time `form:"due_date_to" time_format:"2006-01-02"`
 	AsOfDate           *time.Time `form:"as_of_date" time_format:"2006-01-02"`
 	OverCreditLimit    *bool      `form:"over_credit_limit"`
+	MinBalance         *float64   `form:"min_balance"`
+	HasBalance         *bool      `form:"has_balance"`
+	RiskProfile        *string    `form:"risk_profile"`
 	IncludeUnposted    *bool      `form:"include_unposted"`
 	PostedOnly         *bool      `form:"posted_only"`
 	Search             string     `form:"search"`

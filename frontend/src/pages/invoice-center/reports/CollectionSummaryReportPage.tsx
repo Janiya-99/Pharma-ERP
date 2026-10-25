@@ -166,7 +166,7 @@ export const CollectionSummaryReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getCollectionSummary({
+    const res = await invoiceCenterApi.getCollectionSummaryReport({
       ...filters,
       page: 1,
       limit: 10000,

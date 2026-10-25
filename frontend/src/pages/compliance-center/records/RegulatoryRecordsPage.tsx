@@ -20,10 +20,14 @@ import {
   Plus,
   RefreshCw,
   X,
+  FileSpreadsheet,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getAuditLogs } from "../../../api/controlApi";
+import { TablePagination } from "../../../components/common/TablePagination";
+import { exportToCsv } from "../../../utils/reportExportUtils";
+import { toast } from "sonner";
 
 export type RegulatoryCategory =
   | "ALL"
@@ -282,6 +286,45 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
       return matchesCategory && matchesSearch;
     });
   }, [data, selectedCategory, searchQuery]);
+
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [searchQuery, selectedCategory]);
+
+  const pagedRecords = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredData.slice(start, start + pageSize);
+  }, [filteredData, pageIndex, pageSize]);
+
+  const handleExportCsv = () => {
+    const headers = [
+      "Record #",
+      "Timestamp",
+      "Category",
+      "Subject",
+      "Authority",
+      "Officer",
+      "Facility",
+      "Status",
+      "SHA-256 Hash",
+    ];
+    const rows = filteredData.map((r) => [
+      r.recordNumber,
+      r.timestamp,
+      r.category,
+      r.subject,
+      r.authority,
+      r.performedBy,
+      r.facility,
+      r.status,
+      r.sha256Hash,
+    ]);
+    exportToCsv("regulatory-records-dossier", headers, rows);
+    toast.success("Excel dossier exported successfully");
+  };
 
   // Handle creating new Deviation or CAPA
   const handleCreateRecord = (e: React.FormEvent) => {
@@ -545,6 +588,14 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
             Initiate CAPA
           </button>
           <button
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+            className="flex h-10 items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+          >
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+            Export Excel
+          </button>
+          <button
             onClick={exportFullDossierPdf}
             className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all shadow-xs cursor-pointer"
           >
@@ -669,7 +720,7 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
                   </td>
                 </tr>
               ) : (
-                filteredData.map((row) => (
+                pagedRecords.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-4">
                       <p className="font-mono font-bold text-xs text-indigo-600">{row.recordNumber}</p>
@@ -723,6 +774,19 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Strip */}
+        <TablePagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={filteredData.length}
+          pageCount={Math.max(1, Math.ceil(filteredData.length / pageSize))}
+          onPageChange={setPageIndex}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPageIndex(0);
+          }}
+        />
       </div>
 
       {/* ── Modal: Inspect Dossier & Metadata ── */}

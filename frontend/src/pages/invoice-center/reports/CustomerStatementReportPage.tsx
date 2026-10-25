@@ -135,7 +135,7 @@ export const CustomerStatementReportPage: React.FC = () => {
   }, [debouncedFilters]);
 
   const fetchData = async () => {
-    fetchStatement(filters.customer_id);
+    fetchStatement(filters.customer_id, filters);
   };
 
   const handleApplyFilters = () => {

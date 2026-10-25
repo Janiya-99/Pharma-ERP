@@ -73,6 +73,43 @@ type StockTableItem struct {
 	LastMovement string  `json:"last_movement"`
 }
 
+type RecentMovementItem struct {
+	ID              uint64  `json:"id"`
+	TransactionDate string  `json:"transaction_date"`
+	Product         string  `json:"product"`
+	Batch           string  `json:"batch"`
+	Warehouse       string  `json:"warehouse"`
+	MovementType    string  `json:"movement_type"`
+	SourceType      string  `json:"source_type"`
+	SourceNumber    string  `json:"source_number"`
+	QuantityIn      float64 `json:"quantity_in"`
+	QuantityOut     float64 `json:"quantity_out"`
+	BalanceQuantity float64 `json:"balance_quantity"`
+}
+
+type RecentGRNItem struct {
+	ID             uint64  `json:"id"`
+	GRNNumber      string  `json:"grn_number"`
+	GRNDate        string  `json:"grn_date"`
+	Supplier       string  `json:"supplier"`
+	Warehouse      string  `json:"warehouse"`
+	TotalQuantity  float64 `json:"total_quantity"`
+	TotalAmount    float64 `json:"total_amount"`
+	ApprovalStatus string  `json:"approval_status"`
+}
+
+type RecentAdjustmentItem struct {
+	ID               uint64  `json:"id"`
+	AdjustmentNumber string  `json:"adjustment_number"`
+	AdjustmentDate   string  `json:"adjustment_date"`
+	Warehouse        string  `json:"warehouse"`
+	AdjustmentType   string  `json:"adjustment_type"`
+	Reason           string  `json:"reason"`
+	TotalQuantityIn  float64 `json:"total_quantity_in"`
+	TotalQuantityOut float64 `json:"total_quantity_out"`
+	ApprovalStatus   string  `json:"approval_status"`
+}
+
 type StockStatusOverview struct {
 	InStock         int64   `json:"in_stock"`
 	InStockPct      float64 `json:"in_stock_pct"`
@@ -256,7 +293,7 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 		LIMIT 10
 	`, companyID).Scan(&expiryRiskItems)
 
-	// Low Stock / Table Items
+	// Low Stock / Table Items (fetch up to 500 rows ordered with critical stocks first)
 	var stockTableItems []StockTableItem
 	db.Raw(`
 		SELECT p.id, p.product_name as product, COALESCE(pb.batch_number, '—') as batch,
@@ -276,9 +313,55 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 		LEFT JOIN product_categories pc ON p.product_category_id = pc.id
 		LEFT JOIN warehouses w ON sb.warehouse_id = w.id
 		WHERE p.company_id = ? AND p.status = 'active'
-		ORDER BY current_stock ASC
-		LIMIT 50
+		ORDER BY CASE WHEN COALESCE(sb.quantity_available, 0) = 0 THEN 1 WHEN COALESCE(sb.quantity_available, 0) <= p.reorder_level THEN 2 ELSE 3 END, p.product_name ASC
+		LIMIT 500
 	`, companyID).Scan(&stockTableItems)
+
+	// Recent Stock Movements (Ledger entries)
+	var recentMovements []RecentMovementItem
+	db.Raw(`
+		SELECT sle.id, DATE_FORMAT(sle.transaction_date, '%b %d, %Y') as transaction_date,
+		       p.product_name as product, COALESCE(pb.batch_number, '—') as batch,
+		       COALESCE(w.warehouse_name, 'Main Warehouse') as warehouse,
+		       sle.movement_type, sle.source_type, COALESCE(sle.source_number, '—') as source_number,
+		       sle.quantity_in, sle.quantity_out, sle.balance_quantity
+		FROM stock_ledger_entries sle
+		JOIN products p ON p.id = sle.product_id
+		LEFT JOIN product_batches pb ON pb.id = sle.product_batch_id
+		LEFT JOIN warehouses w ON w.id = sle.warehouse_id
+		WHERE sle.company_id = ?
+		ORDER BY sle.transaction_date DESC, sle.id DESC
+		LIMIT 25
+	`, companyID).Scan(&recentMovements)
+
+	// Recent Goods Receipt Notes (GRNs)
+	var recentGRNs []RecentGRNItem
+	db.Raw(`
+		SELECT grn.id, grn.grn_number, DATE_FORMAT(grn.grn_date, '%b %d, %Y') as grn_date,
+		       COALESCE(s.supplier_name, 'Supplier') as supplier,
+		       COALESCE(w.warehouse_name, 'Main Warehouse') as warehouse,
+		       grn.total_quantity, grn.total_amount, grn.approval_status
+		FROM goods_receipt_notes grn
+		LEFT JOIN suppliers s ON s.id = grn.supplier_id
+		LEFT JOIN warehouses w ON w.id = grn.warehouse_id
+		WHERE grn.company_id = ?
+		ORDER BY grn.grn_date DESC, grn.id DESC
+		LIMIT 25
+	`, companyID).Scan(&recentGRNs)
+
+	// Recent Stock Adjustments
+	var recentAdjustments []RecentAdjustmentItem
+	db.Raw(`
+		SELECT sa.id, sa.adjustment_number, DATE_FORMAT(sa.adjustment_date, '%b %d, %Y') as adjustment_date,
+		       COALESCE(w.warehouse_name, 'Main Warehouse') as warehouse,
+		       sa.adjustment_type, COALESCE(sa.reason, 'Correction') as reason,
+		       sa.total_quantity_in, sa.total_quantity_out, sa.approval_status
+		FROM stock_adjustments sa
+		LEFT JOIN warehouses w ON w.id = sa.warehouse_id
+		WHERE sa.company_id = ?
+		ORDER BY sa.adjustment_date DESC, sa.id DESC
+		LIMIT 25
+	`, companyID).Scan(&recentAdjustments)
 
 	// Stock Status Overview
 	var inactiveCount int64
@@ -328,6 +411,15 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 	if stockTableItems == nil {
 		stockTableItems = []StockTableItem{}
 	}
+	if recentMovements == nil {
+		recentMovements = []RecentMovementItem{}
+	}
+	if recentGRNs == nil {
+		recentGRNs = []RecentGRNItem{}
+	}
+	if recentAdjustments == nil {
+		recentAdjustments = []RecentAdjustmentItem{}
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -351,6 +443,9 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 			"batch_alerts":           batchAlerts,
 			"stock_trends":           stockTrends,
 			"top_moving_products":    topProducts,
+			"recent_movements":       recentMovements,
+			"recent_grns":            recentGRNs,
+			"recent_adjustments":     recentAdjustments,
 		},
 	})
 }

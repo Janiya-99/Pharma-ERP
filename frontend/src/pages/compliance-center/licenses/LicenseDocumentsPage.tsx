@@ -27,8 +27,12 @@ import {
   FileText,
   Clock,
   ArrowUpDown,
+  FileSpreadsheet,
 } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { TablePagination } from "../../../components/common/TablePagination";
+import { exportToCsv, exportToPdf } from "../../../utils/reportExportUtils";
+import { toast } from "sonner";
 
 interface LicenseDoc {
   id: string;
@@ -394,15 +398,83 @@ const LicenseDocumentsPage = () => {
     []
   );
 
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [searchQuery, selectedCategory, selectedStatus]);
+
   const table = useReactTable({
     data: filteredData,
     columns,
-    state: { sorting },
+    state: { sorting, pagination },
     onSortingChange: setSorting,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    autoResetPageIndex: true,
   });
+
+  const handleExportCsv = () => {
+    const headers = [
+      "License #",
+      "Title",
+      "Category",
+      "Authority",
+      "Facility",
+      "Issue Date",
+      "Expiry Date",
+      "Days Left",
+      "Validity",
+      "Status",
+    ];
+    const rows = filteredData.map((d) => [
+      d.licenseNumber,
+      d.title,
+      d.category,
+      d.authority,
+      d.facility,
+      d.issueDate,
+      d.expiryDate,
+      d.daysRemaining,
+      d.validityStatus,
+      d.status,
+    ]);
+    exportToCsv("licenses-regulatory-permits", headers, rows);
+    toast.success("Excel report exported successfully");
+  };
+
+  const handleExportPdf = () => {
+    const headers = [
+      "License #",
+      "Title",
+      "Category",
+      "Authority",
+      "Facility",
+      "Expiry Date",
+      "Days Left",
+      "Validity",
+    ];
+    const rows = filteredData.map((d) => [
+      d.licenseNumber,
+      d.title,
+      d.category,
+      d.authority,
+      d.facility,
+      d.expiryDate,
+      String(d.daysRemaining),
+      d.validityStatus,
+    ]);
+    exportToPdf({
+      title: "License Documents & Regulatory Permits",
+      filename: "licenses-regulatory-permits",
+      headers,
+      rows,
+      orientation: "landscape",
+    });
+    toast.success("PDF report generated successfully");
+  };
 
   const handleRegisterLicense = (e: React.FormEvent) => {
     e.preventDefault();
@@ -461,10 +533,26 @@ const LicenseDocumentsPage = () => {
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+            className="flex h-10 items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
+          >
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+            Export Excel
+          </button>
+          <button
+            onClick={handleExportPdf}
+            disabled={filteredData.length === 0}
+            className="flex h-10 items-center gap-2 rounded-xl border border-rose-200 bg-white px-4 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
+          >
+            <FileText className="h-4 w-4 text-rose-600" />
+            Export PDF
+          </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all"
+            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Register New License
@@ -591,27 +679,14 @@ const LicenseDocumentsPage = () => {
         </div>
 
         {/* Pagination Strip */}
-        <div className="flex items-center justify-between border-t border-slate-200  px-5 py-4 text-xs">
-          <span className="text-slate-500  font-medium">
-            Showing {table.getRowModel().rows.length} of {filteredData.length} licenses
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="rounded-lg border border-slate-200  px-3 py-1.5 font-semibold text-slate-600  hover:bg-slate-50 disabled:opacity-50 transition-colors"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="rounded-lg border border-slate-200  px-3 py-1.5 font-semibold text-slate-600  hover:bg-slate-50 disabled:opacity-50 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        <TablePagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageSize={table.getState().pagination.pageSize}
+          totalItems={filteredData.length}
+          pageCount={table.getPageCount()}
+          onPageChange={(page) => table.setPageIndex(page)}
+          onPageSizeChange={(size) => table.setPageSize(size)}
+        />
       </div>
 
       {/* ── Modal: Register New License ── */}

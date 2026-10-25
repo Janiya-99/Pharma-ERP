@@ -16,8 +16,12 @@ import {
   Plus,
   RefreshCw,
   Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { TablePagination } from "../../../components/common/TablePagination";
+import { exportToCsv, exportToPdf } from "../../../utils/reportExportUtils";
+import { toast } from "sonner";
 
 interface BatchHoldItem {
   id: string;
@@ -98,6 +102,82 @@ const BatchHoldPage = () => {
     });
   }, [data, selectedReason, selectedStatus, searchQuery]);
 
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [searchQuery, selectedReason, selectedStatus]);
+
+  const pagedData = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredData.slice(start, start + pageSize);
+  }, [filteredData, pageIndex, pageSize]);
+
+  const handleExportCsv = () => {
+    const headers = [
+      "Batch #",
+      "Product Name",
+      "SKU",
+      "Warehouse",
+      "Held Qty",
+      "Unit Price",
+      "Total Value",
+      "Hold Reason",
+      "Severity",
+      "Quarantined By",
+      "Date",
+      "Status",
+    ];
+    const rows = filteredData.map((b) => [
+      b.batchNumber,
+      b.productName,
+      b.sku,
+      b.warehouse,
+      b.quantityHeld,
+      b.unitPrice,
+      b.totalValue,
+      b.holdReason,
+      b.severity,
+      b.quarantinedBy,
+      b.quarantineDate,
+      b.status,
+    ]);
+    exportToCsv("batch-quarantine-hold-register", headers, rows);
+    toast.success("Excel report exported successfully");
+  };
+
+  const handleExportPdf = () => {
+    const headers = [
+      "Batch #",
+      "Product Name",
+      "Warehouse",
+      "Held Qty",
+      "Total Value",
+      "Hold Reason",
+      "Severity",
+      "Status",
+    ];
+    const rows = filteredData.map((b) => [
+      b.batchNumber,
+      b.productName,
+      b.warehouse,
+      String(b.quantityHeld),
+      `Rs. ${b.totalValue.toLocaleString()}`,
+      b.holdReason,
+      b.severity,
+      b.status,
+    ]);
+    exportToPdf({
+      title: "Batch Quarantine & Quality Hold Register",
+      filename: "batch-quarantine-hold-register",
+      headers,
+      rows,
+      orientation: "landscape",
+    });
+    toast.success("PDF report generated successfully");
+  };
+
   const totalQuarantinedValue = useMemo(() => {
     return data
       .filter((b) => b.status === "QUARANTINED" || b.status === "INVESTIGATION_IN_PROGRESS")
@@ -160,10 +240,22 @@ const BatchHoldPage = () => {
         </div>
 
         {/* Header Actions */}
-        <div className="flex items-center gap-3">
-          <button className="flex h-10 items-center gap-2 rounded-xl border border-slate-200  bg-white  px-4 text-sm font-semibold text-slate-700  hover:bg-slate-50 transition-all shadow-xs">
-            <Download className="h-4 w-4 text-slate-500" />
-            Export Quarantine Log
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+            className="flex h-10 items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+          >
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+            Export Excel
+          </button>
+          <button
+            onClick={handleExportPdf}
+            disabled={filteredData.length === 0}
+            className="flex h-10 items-center gap-2 rounded-xl border border-rose-200 bg-white px-4 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+          >
+            <FileText className="h-4 w-4 text-rose-600" />
+            Export PDF
           </button>
         </div>
       </div>
@@ -249,7 +341,7 @@ const BatchHoldPage = () => {
             No batch hold records match your search criteria.
           </div>
         ) : (
-          filteredData.map((item) => (
+          pagedData.map((item) => (
             <div
               key={item.id}
               className={`rounded-2xl border bg-white  p-6 shadow-sm transition-all ${
@@ -365,6 +457,23 @@ const BatchHoldPage = () => {
               </div>
             </div>
           ))
+        )}
+
+        {/* Pagination Strip */}
+        {filteredData.length > 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+            <TablePagination
+              pageIndex={pageIndex}
+              pageSize={pageSize}
+              totalItems={filteredData.length}
+              pageCount={Math.max(1, Math.ceil(filteredData.length / pageSize))}
+              onPageChange={setPageIndex}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPageIndex(0);
+              }}
+            />
+          </div>
         )}
       </div>
 

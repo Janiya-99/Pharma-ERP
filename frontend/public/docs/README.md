@@ -25,7 +25,8 @@ docs/balance-sheet-audit/
 ├── INVOICE_CENTER_AUDIT_REPORT.md           # Invoice Center & receivables statutory audit (IC-01 to IC-07)
 ├── FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md# FIN-02 Bank & Cash Book reconciliation audit
 ├── FIN_03_AND_04_AUDIT_REPORT.md            # FIN-03 Dashboard KPIs & FIN-04 Tax Settings report
-└── CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md # Control Center (CC-01-03, AUTH-01) & Export audit
+├── CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md # Control Center (CC-01-03, AUTH-01) & Export audit
+└── COMPLIANCE_AND_QA_INVESTIGATION_AUDIT_REPORT.md  # Compliance (COM-01-03), Inventory (S-01), & QA Report
 ```
 
 ---
@@ -89,6 +90,18 @@ docs/balance-sheet-audit/
 | **7.1** | **Report Exports truncating to current page size instead of full dataset**. | Previous exports only captured the current DOM table page (10 or 25 rows) rather than the entire filtered dataset. | Created `reportExportUtils.ts` fetching complete unpaginated dataset for both PDF (`jspdf`) and Excel (`xlsx`). | Full, complete datasets exported with corporate formatting and audit totals. |
 | **7.2** | **Standardized Reusable Table Pagination**. | Reports lacked uniform pagination controls across modules. | Created `TablePagination.tsx` with page size selection (`10`, `25`, `50`, `100`) and integrated across all reports. | Uniform, responsive pagination across all commercial and financial reporting screens. |
 
+### 8. Compliance, Statutory Licensure & QA Integrity Engine
+| # | Issue Identified | Root Cause | Engineering Resolution | Statutory Verification |
+|---|---|---|---|---|
+| **8.1** | **License WHL-4402/2026 displayed ACTIVE / 361 days remaining despite expiry on 30 June 2026 (COM-01)**. | Static mock days remaining without dynamic date calculation; conflated administrative status with calculated validity. | Developed `calculateLicenseValidity()` computing elapsed days against current date (22 Oct 2026); separated Admin status from validity. | Accurately calculates 114 days expired; prominent red EXPIRED badge; KPI counts verified. |
+| **8.2** | **Deviations and CAPA menus routed to Recalls and Disposals (COM-02)**. | Missing dedicated frontend routes; sidebar links hardcoded to incorrect destinations. | Added dedicated routes `/compliance-center/deviations` and `/compliance-center/capa`, tabbed register, and modal dialogs with SHA-256 hash generation. | Full separation of quality deviations, CAPA actions, batch holds, recalls, and disposals. |
+| **8.3** | **Viewing Cash Book/Bank Book logged as AUDIT_CHECK under Internal Quality Audit (COM-03)**. | Backend audit logger unconditionally assigned actionType `AUDIT_CHECK` and quality audit authority. | Categorized events by `software_code`: finance views map to `FINANCIAL_GOVERNANCE` under `Finance Directorate & Fiscal Audit` with actual user name. | Normal financial report views distinguished from regulatory inspections; zero blank user fields. |
+| **8.4** | **Quarantined batch BAT-QUAR-RECALL-65 showed 250 units as Available (S-01)**. | Conflated physical inventory with commercially saleable available stock; sales order lookups included held batches. | Decoupled physical on-hand (`250.000`) from saleable available (`0.000`), excluded hold/quarantine status from lookup queries, added Holding Status badges. | Held inventory completely blocked from saleable checkout; non-saleable hold clearly labeled. |
+| **8.5** | **Download Certified PDF in regulatory dossier was an alert placeholder (S-04)**. | Placeholder alert in UI without PDF generation logic. | Built formal `jsPDF` + `jspdf-autotable` certified PDF generator with SHA-256 hash stamp, 21 CFR Part 11 / cGMP certification, and signature blocks. | Emits formal certified tamper-evident PDF dossiers. |
+| **8.6** | **CFO access restricted on Customer Aging Report (S-05)**. | Permission ID `230` assigned only to Super Admin role. | Assigned permission ID `230` to `role_id = 2` (CFO) and `role_id = 3` (Senior Accountant). | CFO accesses Customer Aging Report cleanly without permission errors. |
+| **8.7** | **Master-data inconsistencies in generic names & departments (S-06)**. | Gentamicin linked to generic `Amoxicillin Trihydrate`; duplicate department code `ADMIN`. | Created generic `GEN_GENTA` ("Gentamicin Sulfate"), renamed department ID 2 to `EXEC` ("Executive Management & Governance"), synced enterprise seeds. | Clean master data; zero duplicate department codes. |
+| **8.8** | **Document & Proforma Invoice print engine gaps (S-07)**. | Lacked loaders for proforma invoices and GRN; crashed on non-standard line item keys. | Registered `proforma_invoice` (with invoice/order fallback) and `grn`, implemented multi-key line item extraction (`lines`, `sales_invoice_lines`, `items`, `allocations`). | Clean, verified print layouts across sales invoices, proformas, and GRNs. |
+
 ---
 
 ## Detailed Documents in this Folder
@@ -105,7 +118,9 @@ docs/balance-sheet-audit/
    Statutory audit report for Finance Dashboard KPIs, metric lineage, and tax percentage formatting.
 6. **[CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md](./CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md)**  
    Statutory audit for Control Center Governance (CC-01 to CC-03), Authentication identity (AUTH-01), and full dataset PDF/Excel exports.
-7. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
+7. **[COMPLIANCE_AND_QA_INVESTIGATION_AUDIT_REPORT.md](./COMPLIANCE_AND_QA_INVESTIGATION_AUDIT_REPORT.md)**  
+   Statutory audit report for NMRA Licensure (COM-01), Deviations & CAPA (COM-02), Audit Trail (COM-03), Quarantined Stock Isolation (S-01), Certified Dossier PDF (S-04), CFO Permissions (S-05), Master Data (S-06), and Universal Print (S-07).
+8. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
    Engineering changelog detailing all modified files, schema queries, and automated unit test suites.
 
 ---

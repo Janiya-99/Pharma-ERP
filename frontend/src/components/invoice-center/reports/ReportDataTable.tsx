@@ -49,6 +49,20 @@ export function ReportDataTable<T>({
 
   const rows = useMemo(() => (Array.isArray(data) ? data : []), [data]);
 
+  const isControlled = Boolean(pagination && onPageChange);
+
+  const displayRows = useMemo(() => {
+    if (disablePagination || isControlled) {
+      return rows;
+    }
+    const start = clientPageIndex * clientPageSize;
+    return rows.slice(start, start + clientPageSize);
+  }, [disablePagination, isControlled, rows, clientPageIndex, clientPageSize]);
+
+  useEffect(() => {
+    setClientPageIndex(0);
+  }, [data]);
+
   useEffect(() => {
     if (clientPageIndex > 0 && clientPageIndex * clientPageSize >= rows.length) {
       setClientPageIndex(0);
@@ -64,16 +78,6 @@ export function ReportDataTable<T>({
   if (rows.length === 0) {
     return <ReportEmptyState message={emptyMessage} />;
   }
-
-  const isControlled = Boolean(pagination && onPageChange);
-
-  const displayRows = useMemo(() => {
-    if (disablePagination || isControlled) {
-      return rows;
-    }
-    const start = clientPageIndex * clientPageSize;
-    return rows.slice(start, start + clientPageSize);
-  }, [disablePagination, isControlled, rows, clientPageIndex, clientPageSize]);
 
   return (
     <div className="space-y-3">

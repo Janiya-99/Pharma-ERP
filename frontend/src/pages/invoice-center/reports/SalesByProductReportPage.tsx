@@ -168,7 +168,7 @@ export const SalesByProductReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getSalesByProduct({
+    const res = await invoiceCenterApi.getSalesByProductReport({
       ...filters,
       page: 1,
       limit: 10000,

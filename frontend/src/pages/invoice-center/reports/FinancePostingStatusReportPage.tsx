@@ -181,8 +181,11 @@ export const FinancePostingStatusReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getFinancePostingStatus({
-      ...filters,
+    const cleanFilters = { ...filters };
+    if (cleanFilters.document_type === "all") delete cleanFilters.document_type;
+    if (cleanFilters.finance_post_status === "all") delete cleanFilters.finance_post_status;
+    const res = await invoiceCenterApi.getFinancePostingStatusReport({
+      ...cleanFilters,
       page: 1,
       limit: 10000,
     });

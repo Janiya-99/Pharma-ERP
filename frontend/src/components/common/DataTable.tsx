@@ -72,7 +72,11 @@ function DataTable<TData = any>({
   const [clientPageIndex, setClientPageIndex] = useState(0);
   const [clientPageSize, setClientPageSize] = useState(defaultPageSize);
 
-  // When data changes or shrinks, ensure clientPageIndex remains in range
+  // Reset clientPageIndex when data changes or shrinks
+  useEffect(() => {
+    setClientPageIndex(0);
+  }, [data]);
+
   useEffect(() => {
     if (data && clientPageIndex > 0 && clientPageIndex * clientPageSize >= data.length) {
       setClientPageIndex(0);
