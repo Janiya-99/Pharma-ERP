@@ -384,26 +384,21 @@ const Topbar = () => {
                 <TooltipContent
                   side="bottom"
                   sideOffset={8}
-                  className="z-50 rounded-xl border border-slate-800 bg-slate-950/95 px-3 py-2 text-white shadow-2xl backdrop-blur-md max-w-[240px]"
+                  className="z-50 flex items-center gap-2 whitespace-nowrap rounded-lg border border-slate-800 bg-slate-950/95 px-3 py-1.5 text-xs text-white shadow-xl backdrop-blur-md pointer-events-none"
                 >
-                  <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-800">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-white">
-                      <Icon className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
-                      {m.name}
+                  <Icon className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                  <span className="font-semibold text-white">{m.name}</span>
+                  <span className="text-slate-500 text-[10px]">•</span>
+                  <span className="text-slate-300 text-[11px]">{m.desc}</span>
+                  {isCurrent ? (
+                    <span className="ml-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/30">
+                      Active
                     </span>
-                    {isCurrent ? (
-                      <span className="rounded-md bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/30">
-                        Current
-                      </span>
-                    ) : (
-                      <span className="rounded-md bg-indigo-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-indigo-300 border border-indigo-500/30">
-                        Click to Switch
-                      </span>
-                    )}
-                  </div>
-                  <p className="pt-1.5 text-[11px] leading-relaxed text-slate-300">
-                    {m.desc}
-                  </p>
+                  ) : (
+                    <span className="ml-1 rounded bg-indigo-500/20 px-1.5 py-0.5 text-[9px] font-medium text-indigo-300 border border-indigo-500/30">
+                      Click to switch
+                    </span>
+                  )}
                 </TooltipContent>
               </Tooltip>
             );

@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import DataTable from '../../../../components/common/DataTable';
 import ReportPageHeader from '../../../../components/finance/reports/ReportPageHeader';
+import ReportActions from '../../../../components/finance/reports/ReportActions';
 import ReportFilterCard from '../../../../components/finance/reports/ReportFilterCard';
 import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { Input } from '../../../../components/ui/input';
@@ -318,58 +319,15 @@ const ReceiptRegisterReportPage = () => {
         title="Receipt Register" 
         description="Comprehensive audit register of all incoming cash receipts, customer collections, and bank deposits." 
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => fetchReport()} 
-              disabled={loading}
-              className="h-8.5 gap-1.5 text-xs bg-white text-slate-700 hover:bg-slate-50 border-slate-200 shadow-2xs font-semibold cursor-pointer"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleExportCsv} 
-              disabled={loading || list.length === 0}
-              className="h-8.5 gap-1.5 text-xs bg-white text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 border-emerald-200 shadow-2xs font-semibold cursor-pointer"
-            >
-              <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
-              Export Excel
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleExportPdf} 
-              disabled={loading || list.length === 0}
-              className="h-8.5 gap-1.5 text-xs bg-white text-rose-700 hover:text-rose-800 hover:bg-rose-50 border-rose-200 shadow-2xs font-semibold cursor-pointer"
-            >
-              <FileText className="h-3.5 w-3.5 text-rose-600" />
-              Export PDF
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleExportJson} 
-              disabled={loading || list.length === 0}
-              className="h-8.5 gap-1.5 text-xs bg-white text-blue-700 hover:text-blue-800 hover:bg-blue-50 border-blue-200 shadow-2xs font-semibold cursor-pointer"
-            >
-              <FileJson className="h-3.5 w-3.5 text-blue-600" />
-              Export JSON
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => window.print()}
-              disabled={loading || list.length === 0}
-              className="h-8.5 gap-1.5 text-xs bg-white text-slate-700 hover:bg-slate-50 border-slate-200 shadow-2xs font-semibold cursor-pointer hidden sm:flex"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              Print
-            </Button>
-          </div>
+          <ReportActions
+            onRefresh={() => fetchReport()}
+            onExportCsv={handleExportCsv}
+            onExportPdf={handleExportPdf}
+            onExportJson={handleExportJson}
+            onPrint={() => window.print()}
+            loading={loading}
+            disabled={list.length === 0}
+          />
         }
       />
 
