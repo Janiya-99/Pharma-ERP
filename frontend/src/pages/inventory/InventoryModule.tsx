@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Edit,
   Eye,
+  FileSpreadsheet,
   FileText,
   Loader2,
   MoreHorizontal,
@@ -32,6 +33,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageTitleCard } from "@/components/common/PageTitleCard";
 import { InlineAiFormPrompt } from "@/components/common/InlineAiFormPrompt";
+import { TablePagination } from "@/components/common/TablePagination";
+import { exportToCsv, exportToPdf } from "@/utils/reportExportUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -93,6 +96,7 @@ type FieldConfig = {
 type TableColumn = {
   header: string;
   render: (row: ApiRecord) => React.ReactNode;
+  exportValue?: (row: ApiRecord) => string | number;
 };
 
 type SetupConfig = {
@@ -429,19 +433,74 @@ function DataGrid({
   loading,
   error,
   emptyText = "No records found.",
+  defaultPageSize = 10,
 }: {
   columns: TableColumn[];
   data: ApiRecord[];
   loading?: boolean;
   error?: string;
   emptyText?: string;
+  defaultPageSize?: number;
 }) {
-  if (loading) {
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+
+  useEffect(() => {
+    if (pageIndex > 0 && pageIndex * pageSize >= data.length) {
+      setPageIndex(0);
+    }
+  }, [data.length, pageIndex, pageSize]);
+
+  const pagedData = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return data.slice(start, start + pageSize);
+  }, [data, pageIndex, pageSize]);
+
+  if (loading && data.length === 0) {
     return (
-      <div className="grid gap-3">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} className="h-14 rounded-xl" />
-        ))}
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {/* Top animated linear progress bar */}
+        <div className="h-0.5 w-full bg-slate-100 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-600 animate-pulse w-full" />
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-50/80 hover:bg-slate-50/80 border-b border-slate-100">
+              {columns.map((column) => (
+                <TableHead key={column.header} className="px-4 text-xs font-semibold uppercase tracking-normal text-slate-500">
+                  {column.header}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody className="divide-y divide-slate-100 relative">
+            {Array.from({ length: 6 }).map((_, rIdx) => (
+              <TableRow key={rIdx} className="hover:bg-transparent">
+                {columns.map((col, cIdx) => (
+                  <TableCell key={col.header} className="px-4 py-3.5">
+                    <Skeleton
+                      className="h-3.5 rounded-md"
+                      style={{
+                        width: `${Math.max(45, ((rIdx + cIdx) * 23 + 45) % 85)}%`,
+                      }}
+                    />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {/* Centered Modern Floating Loading Badge */}
+        <div className="absolute inset-0 top-10 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[1px] z-10 transition-all">
+          <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-3 shadow-xl ring-1 ring-slate-900/5">
+            <Loader2 className="h-5 w-5 animate-spin text-indigo-600 shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-slate-800">Loading Report Records...</span>
+              <span className="text-[11px] text-slate-400">Querying stock balances & inventory ledger</span>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -457,7 +516,24 @@ function DataGrid({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      {/* Top animated linear progress bar during background loading / filter updates */}
+      {loading && (
+        <div className="absolute top-0 inset-x-0 h-0.5 bg-slate-100 overflow-hidden z-20">
+          <div className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-600 animate-pulse w-full" />
+        </div>
+      )}
+
+      {/* Floating loading badge if updating with data */}
+      {loading && (
+        <div className="absolute inset-0 top-10 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px] z-20 pointer-events-none transition-all">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-2.5 shadow-xl ring-1 ring-slate-900/5">
+            <Loader2 className="h-4 w-4 animate-spin text-indigo-600 shrink-0" />
+            <span className="text-xs font-bold text-slate-800">Updating report data...</span>
+          </div>
+        </div>
+      )}
+
       <Table>
         <TableHeader>
           <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
@@ -476,7 +552,7 @@ function DataGrid({
               </TableCell>
             </TableRow>
           ) : (
-            data.map((row, index) => (
+            pagedData.map((row, index) => (
               <TableRow key={getId(row) || index} className="hover:bg-indigo-50/30">
                 {columns.map((column) => (
                   <TableCell key={column.header} className="px-4 py-3 text-sm tracking-normal text-slate-700">
@@ -488,6 +564,18 @@ function DataGrid({
           )}
         </TableBody>
       </Table>
+      {data.length > 0 && (
+        <TablePagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={data.length}
+          onPageChange={setPageIndex}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPageIndex(0);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -759,24 +847,82 @@ function validateForm(fields: FieldConfig[], form: ApiRecord) {
   return errors;
 }
 
-function useReferenceData() {
+const inventoryRefsCache: Record<string, { data: any; timestamp: number }> = {};
+const reportFilterRefsCache: Record<string, { warehouses: ApiRecord[]; products: ApiRecord[]; timestamp: number }> = {};
+
+function useReportFilterReferences() {
   const context = useInventoryContext();
-  const [refs, setRefs] = useState({
-    categories: [] as ApiRecord[],
-    units: [] as ApiRecord[],
-    dosageForms: [] as ApiRecord[],
-    genericNames: [] as ApiRecord[],
-    manufacturers: [] as ApiRecord[],
-    suppliers: [] as ApiRecord[],
-    products: [] as ApiRecord[],
-    warehouses: [] as ApiRecord[],
-    batches: [] as ApiRecord[],
-    grns: [] as ApiRecord[],
+  const cacheKey = `${context.companyId || ""}_${context.branchId || ""}`;
+
+  const [refs, setRefs] = useState<{ warehouses: ApiRecord[]; products: ApiRecord[] }>(() => {
+    if (cacheKey && reportFilterRefsCache[cacheKey] && Date.now() - reportFilterRefsCache[cacheKey].timestamp < 5 * 60 * 1000) {
+      return {
+        warehouses: reportFilterRefsCache[cacheKey].warehouses,
+        products: reportFilterRefsCache[cacheKey].products,
+      };
+    }
+    return { warehouses: [], products: [] };
   });
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (force = false) => {
     if (!context.companyId) return;
-    const params = { limit: 1000, company_id: context.companyId, branch_id: context.branchId };
+    if (!force && reportFilterRefsCache[cacheKey] && Date.now() - reportFilterRefsCache[cacheKey].timestamp < 5 * 60 * 1000) {
+      setRefs(reportFilterRefsCache[cacheKey]);
+      return;
+    }
+    try {
+      const params = { limit: 500, company_id: context.companyId, branch_id: context.branchId };
+      const [warehouses, products] = await Promise.all([
+        inventoryApi.getWarehouses(params),
+        inventoryApi.getProducts(params),
+      ]);
+      const data = {
+        warehouses: unwrapList(warehouses),
+        products: unwrapList(products),
+        timestamp: Date.now(),
+      };
+      reportFilterRefsCache[cacheKey] = data;
+      setRefs(data);
+    } catch (err) {
+      console.warn("Failed to load report filter references", err);
+    }
+  }, [context.companyId, context.branchId, cacheKey]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { refs, refresh };
+}
+
+function useReferenceData() {
+  const context = useInventoryContext();
+  const cacheKey = `${context.companyId || ""}_${context.branchId || ""}`;
+  const [refs, setRefs] = useState(() => {
+    if (cacheKey && inventoryRefsCache[cacheKey] && Date.now() - inventoryRefsCache[cacheKey].timestamp < 3 * 60 * 1000) {
+      return inventoryRefsCache[cacheKey].data;
+    }
+    return {
+      categories: [] as ApiRecord[],
+      units: [] as ApiRecord[],
+      dosageForms: [] as ApiRecord[],
+      genericNames: [] as ApiRecord[],
+      manufacturers: [] as ApiRecord[],
+      suppliers: [] as ApiRecord[],
+      products: [] as ApiRecord[],
+      warehouses: [] as ApiRecord[],
+      batches: [] as ApiRecord[],
+      grns: [] as ApiRecord[],
+    };
+  });
+
+  const refresh = useCallback(async (force = false) => {
+    if (!context.companyId) return;
+    if (!force && inventoryRefsCache[cacheKey] && Date.now() - inventoryRefsCache[cacheKey].timestamp < 3 * 60 * 1000) {
+      setRefs(inventoryRefsCache[cacheKey].data);
+      return;
+    }
+    const params = { limit: 500, company_id: context.companyId, branch_id: context.branchId };
     try {
       const [
         categories,
@@ -801,7 +947,7 @@ function useReferenceData() {
         inventoryApi.getProductBatches(params),
         inventoryApi.getGRNs(params),
       ]);
-      setRefs({
+      const nextRefs = {
         categories: unwrapList(categories),
         units: unwrapList(units),
         dosageForms: unwrapList(dosageForms),
@@ -812,11 +958,13 @@ function useReferenceData() {
         warehouses: unwrapList(warehouses),
         batches: unwrapList(batches),
         grns: unwrapList(grns),
-      });
+      };
+      inventoryRefsCache[cacheKey] = { data: nextRefs, timestamp: Date.now() };
+      setRefs(nextRefs);
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
-  }, [context.companyId, context.branchId]);
+  }, [context.companyId, context.branchId, cacheKey]);
 
   useEffect(() => {
     refresh();
@@ -2399,7 +2547,7 @@ function ReportPage({
   extraParams?: ApiRecord;
 }) {
   const context = useInventoryContext();
-  const references = useReferenceData();
+  const references = useReportFilterReferences();
   const [searchParams] = useSearchParams();
   const urlFilter = searchParams.get("filter") || searchParams.get("status") || "";
   const [filters, setFilters] = useState<ApiRecord>(() => {
@@ -2417,7 +2565,7 @@ function ReportPage({
     }
     return init;
   });
-  const params = { company_id: context.companyId, branch_id: context.branchId, ...extraParams, ...compact(filters) };
+  const params = { company_id: context.companyId, branch_id: context.branchId, limit: 500, ...extraParams, ...compact(filters) };
   const report = useBackendList(loader, params, !!context.companyId);
   const warehouseOptions = [{ label: "All Warehouses", value: "all" }, ...makeOptions(references.refs.warehouses, ["warehouse_name"])];
   const productOptions = [{ label: "All Products", value: "all" }, ...makeOptions(references.refs.products, ["product_name"])];
@@ -2476,13 +2624,57 @@ function ReportPage({
     return rows;
   }, [report.rows, filters.status, filters.low_stock_only, filters.out_of_stock_only]);
 
+  const handleExportCsv = () => {
+    try {
+      const headers = columns.map((c) => c.header);
+      const rows = displayRows.map((row) => {
+        return columns.map((c) => {
+          if (c.exportValue) {
+            return c.exportValue(row);
+          }
+          const defaultKey = c.header.toLowerCase().replace(/ /g, "_");
+          return valueOf(row, [defaultKey, c.header.toLowerCase()], "—");
+        });
+      });
+      exportToCsv(`${title.toLowerCase().replace(/ /g, "-")}-report`, headers, rows);
+      toast.success("Excel report exported successfully");
+    } catch {
+      toast.error("Failed to export Excel report");
+    }
+  };
+
+  const handleExportPdf = () => {
+    try {
+      const headers = columns.map((c) => c.header);
+      const rows = displayRows.map((row) => {
+        return columns.map((c) => {
+          if (c.exportValue) {
+            return String(c.exportValue(row));
+          }
+          const defaultKey = c.header.toLowerCase().replace(/ /g, "_");
+          return valueOf(row, [defaultKey, c.header.toLowerCase()], "—");
+        });
+      });
+      exportToPdf({
+        title: `${title} Report`,
+        filename: `${title.toLowerCase().replace(/ /g, "-")}-report`,
+        headers,
+        rows,
+        orientation: headers.length > 6 ? "landscape" : "portrait",
+      });
+      toast.success("PDF report generated successfully");
+    } catch {
+      toast.error("Failed to export PDF report");
+    }
+  };
+
   return (
     <InventoryPage
       title={title}
       description={description}
       icon={icon}
       actions={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {filters.status && (
             <span className="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
               Filtered: {filters.status.replace("_", " ")}
@@ -2490,13 +2682,34 @@ function ReportPage({
           )}
           <Button
             variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            disabled={report.loading || displayRows.length === 0}
+            className="gap-1.5 border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+          >
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+            Export Excel
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportPdf}
+            disabled={report.loading || displayRows.length === 0}
+            className="gap-1.5 border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800"
+          >
+            <FileText className="h-4 w-4 text-rose-600" />
+            Export PDF
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() =>
               setFilters({ warehouse_id: "", product_id: "", date_from: "", date_to: "", status: "", low_stock_only: "", out_of_stock_only: "" })
             }
           >
             Clear Filters
           </Button>
-          <Button variant="outline" onClick={report.refresh}>
+          <Button variant="outline" size="sm" onClick={report.refresh}>
             Refresh
           </Button>
         </div>
@@ -2567,6 +2780,7 @@ export function StockBalanceReportPage() {
       columns={[
         {
           header: "Product",
+          exportValue: (r) => valueOf(r, ["product.product_name", "product_name"]),
           render: (row) => {
             const name = valueOf(row, ["product.product_name", "product_name"]);
             const avail = Number(valueOf(row, ["quantity_available"], 0));
@@ -2584,11 +2798,24 @@ export function StockBalanceReportPage() {
             );
           },
         },
-        { header: "Batch", render: (row) => <span className="font-mono text-xs text-slate-600">{valueOf(row, ["product_batch.batch_number", "batch_number"])}</span> },
-        { header: "Warehouse", render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]) },
-        { header: "On Hand", render: (row) => <span className="font-medium text-slate-700">{valueOf(row, ["quantity_on_hand"])}</span> },
+        {
+          header: "Batch",
+          exportValue: (r) => valueOf(r, ["product_batch.batch_number", "batch_number"]),
+          render: (row) => <span className="font-mono text-xs text-slate-600">{valueOf(row, ["product_batch.batch_number", "batch_number"])}</span>,
+        },
+        {
+          header: "Warehouse",
+          exportValue: (r) => valueOf(r, ["warehouse.warehouse_name", "warehouse_name"]),
+          render: (row) => valueOf(row, ["warehouse.warehouse_name", "warehouse_name"]),
+        },
+        {
+          header: "On Hand",
+          exportValue: (r) => valueOf(r, ["quantity_on_hand"]),
+          render: (row) => <span className="font-medium text-slate-700">{valueOf(row, ["quantity_on_hand"])}</span>,
+        },
         {
           header: "Available",
+          exportValue: (r) => valueOf(r, ["quantity_available"], "0"),
           render: (row) => {
             const avail = Number(valueOf(row, ["quantity_available"], 0));
             const reorder = Number(valueOf(row, ["product.reorder_level", "reorder_level"], 0));
@@ -2613,10 +2840,19 @@ export function StockBalanceReportPage() {
             );
           },
         },
-        { header: "Allocated", render: (row) => valueOf(row, ["quantity_allocated"]) },
-        { header: "Stock Value", render: (row) => <span className="font-mono font-bold text-slate-900">{valueOf(row, ["total_stock_value", "stock_value"])}</span> },
+        {
+          header: "Allocated",
+          exportValue: (r) => valueOf(r, ["quantity_allocated"]),
+          render: (row) => valueOf(row, ["quantity_allocated"]),
+        },
+        {
+          header: "Stock Value",
+          exportValue: (r) => valueOf(r, ["total_stock_value", "stock_value"], "0"),
+          render: (row) => <span className="font-mono font-bold text-slate-900">{valueOf(row, ["total_stock_value", "stock_value"])}</span>,
+        },
         {
           header: "Status",
+          exportValue: (r) => (Number(valueOf(r, ["quantity_available"], 0)) === 0 ? "Out of Stock" : "In Stock"),
           render: (row) => {
             const avail = Number(valueOf(row, ["quantity_available"], 0));
             const reorder = Number(valueOf(row, ["product.reorder_level", "reorder_level"], 0));
@@ -2641,14 +2877,46 @@ export function StockLedgerReportPage() {
       description="Every stock movement with references, in quantities, out quantities, and running balance."
       loader={inventoryApi.getStockLedgerEntries}
       columns={[
-        { header: "Date", render: (row) => normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")) },
-        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-        { header: "Batch", render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]) },
-        { header: "Movement Type", render: (row) => valueOf(row, ["movement_type", "source_type"]) },
-        { header: "Reference", render: (row) => valueOf(row, ["reference_number", "source_number"]) },
-        { header: "In Qty", render: (row) => valueOf(row, ["quantity_in"], "0") },
-        { header: "Out Qty", render: (row) => valueOf(row, ["quantity_out"], "0") },
-        { header: "Balance", render: (row) => valueOf(row, ["balance_quantity", "running_balance"]) },
+        {
+          header: "Date",
+          exportValue: (r) => normalizeDate(valueOf(r, ["transaction_date", "created_at"], "")),
+          render: (row) => normalizeDate(valueOf(row, ["transaction_date", "created_at"], "")),
+        },
+        {
+          header: "Product",
+          exportValue: (r) => valueOf(r, ["product.product_name", "product_name"]),
+          render: (row) => valueOf(row, ["product.product_name", "product_name"]),
+        },
+        {
+          header: "Batch",
+          exportValue: (r) => valueOf(r, ["product_batch.batch_number", "batch_number"]),
+          render: (row) => valueOf(row, ["product_batch.batch_number", "batch_number"]),
+        },
+        {
+          header: "Movement Type",
+          exportValue: (r) => valueOf(r, ["movement_type", "source_type"]),
+          render: (row) => valueOf(row, ["movement_type", "source_type"]),
+        },
+        {
+          header: "Reference",
+          exportValue: (r) => valueOf(r, ["reference_number", "source_number"]),
+          render: (row) => valueOf(row, ["reference_number", "source_number"]),
+        },
+        {
+          header: "In Qty",
+          exportValue: (r) => valueOf(r, ["quantity_in"], "0"),
+          render: (row) => valueOf(row, ["quantity_in"], "0"),
+        },
+        {
+          header: "Out Qty",
+          exportValue: (r) => valueOf(r, ["quantity_out"], "0"),
+          render: (row) => valueOf(row, ["quantity_out"], "0"),
+        },
+        {
+          header: "Balance",
+          exportValue: (r) => valueOf(r, ["balance_quantity", "running_balance"]),
+          render: (row) => valueOf(row, ["balance_quantity", "running_balance"]),
+        },
       ]}
     />
   );
@@ -2662,12 +2930,36 @@ export function ExpiryReportPage() {
       loader={inventoryApi.getExpiryReport}
       extraParams={{ days: 90 }}
       columns={[
-        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name"]) },
-        { header: "Batch", render: (row) => valueOf(row, ["batch_number", "product_batch.batch_number"]) },
-        { header: "Expiry Date", render: (row) => normalizeDate(valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")) },
-        { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"], "—") },
-        { header: "Selling Price", render: (row) => valueOf(row, ["selling_price"], "—") },
-        { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status || "monitor"} /> },
+        {
+          header: "Product",
+          exportValue: (r) => valueOf(r, ["product.product_name", "product_name"]),
+          render: (row) => valueOf(row, ["product.product_name", "product_name"]),
+        },
+        {
+          header: "Batch",
+          exportValue: (r) => valueOf(r, ["batch_number", "product_batch.batch_number"]),
+          render: (row) => valueOf(row, ["batch_number", "product_batch.batch_number"]),
+        },
+        {
+          header: "Expiry Date",
+          exportValue: (r) => normalizeDate(valueOf(r, ["expiry_date", "product_batch.expiry_date"], "")),
+          render: (row) => normalizeDate(valueOf(row, ["expiry_date", "product_batch.expiry_date"], "")),
+        },
+        {
+          header: "Purchase Rate",
+          exportValue: (r) => valueOf(r, ["purchase_rate"], "—"),
+          render: (row) => valueOf(row, ["purchase_rate"], "—"),
+        },
+        {
+          header: "Selling Price",
+          exportValue: (r) => valueOf(r, ["selling_price"], "—"),
+          render: (row) => valueOf(row, ["selling_price"], "—"),
+        },
+        {
+          header: "Status",
+          exportValue: (r) => (r.is_blocked ? "On Hold" : r.batch_status || r.status || "monitor"),
+          render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status || "monitor"} />,
+        },
       ]}
     />
   );
@@ -2680,13 +2972,41 @@ export function BatchReportPage() {
       description="Batch movement summary with received quantity, sold quantity, balance, and status."
       loader={inventoryApi.getBatchReport}
       columns={[
-        { header: "Product", render: (row) => valueOf(row, ["product.product_name", "product_name", "product_id"]) },
-        { header: "Batch Number", render: (row) => valueOf(row, ["batch_number"]) },
-        { header: "Manufacture Date", render: (row) => normalizeDate(row.manufacture_date) || "—" },
-        { header: "Expiry Date", render: (row) => normalizeDate(row.expiry_date) || "—" },
-        { header: "Purchase Rate", render: (row) => valueOf(row, ["purchase_rate"]) },
-        { header: "Selling Price", render: (row) => valueOf(row, ["selling_price"]) },
-        { header: "Status", render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} /> },
+        {
+          header: "Product",
+          exportValue: (r) => valueOf(r, ["product.product_name", "product_name", "product_id"]),
+          render: (row) => valueOf(row, ["product.product_name", "product_name", "product_id"]),
+        },
+        {
+          header: "Batch Number",
+          exportValue: (r) => valueOf(r, ["batch_number"]),
+          render: (row) => valueOf(row, ["batch_number"]),
+        },
+        {
+          header: "Manufacture Date",
+          exportValue: (r) => normalizeDate(row.manufacture_date) || "—",
+          render: (row) => normalizeDate(row.manufacture_date) || "—",
+        },
+        {
+          header: "Expiry Date",
+          exportValue: (r) => normalizeDate(row.expiry_date) || "—",
+          render: (row) => normalizeDate(row.expiry_date) || "—",
+        },
+        {
+          header: "Purchase Rate",
+          exportValue: (r) => valueOf(r, ["purchase_rate"]),
+          render: (row) => valueOf(row, ["purchase_rate"]),
+        },
+        {
+          header: "Selling Price",
+          exportValue: (r) => valueOf(r, ["selling_price"]),
+          render: (row) => valueOf(row, ["selling_price"]),
+        },
+        {
+          header: "Status",
+          exportValue: (r) => (r.is_blocked ? "On Hold" : r.batch_status || r.status),
+          render: (row) => <StatusBadge status={row.is_blocked ? "On Hold" : row.batch_status || row.status} />,
+        },
       ]}
     />
   );

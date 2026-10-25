@@ -62,6 +62,8 @@ export interface CustomerBalanceReportParams extends ReportPaginationParams {
   customer_type?: string;
   status?: string;
   over_credit_limit?: boolean;
+  min_balance?: number;
+  has_balance?: boolean;
   search?: string;
 }
 
@@ -79,6 +81,8 @@ export interface CustomerAgingReportParams extends ReportPaginationParams {
   as_of_date?: string;
   customer_category_id?: number;
   customer_type?: string;
+  risk_profile?: string;
+  min_balance?: number;
   search?: string;
 }
 
@@ -163,6 +167,7 @@ export interface CollectionSummaryReportParams extends ReportPaginationParams {
   date_from?: string;
   date_to?: string;
   posted_only?: boolean;
+  group_by?: "method" | "receipt" | string;
   search?: string;
 }
 
@@ -394,35 +399,68 @@ export interface SalesByProductReportRow {
 }
 
 export interface CollectionSummaryReportRow {
-  receipt_date: string;
-  receipt_number: string;
-  customer_code: string;
-  customer_name: string;
   payment_method: string;
-  receipt_amount: number;
-  allocated_amount: number;
-  unallocated_amount: number;
-  reference_number: string;
-  bank_reference_number: string;
-  cheque_number: string;
-  finance_post_status: string;
   receipt_count?: number;
   total_amount?: number;
+  receipt_amount?: number;
+  allocated_amount?: number;
+  unallocated_amount?: number;
   percentage_of_total?: number;
+  receipt_date?: string;
+  receipt_number?: string;
+  customer_code?: string;
+  customer_name?: string;
+  reference_number?: string;
+  bank_reference_number?: string;
+  cheque_number?: string;
+  finance_post_status?: string;
+}
+
+export interface CollectionSummaryReportSummary {
+  receipt_count?: number;
+  total_receipts?: number;
+  receipt_amount?: number;
+  total_amount?: number;
+  total_collected?: number;
+  allocated_amount?: number;
+  total_allocated?: number;
+  unallocated_amount?: number;
+  total_unallocated?: number;
+  cash_amount?: number;
+  bank_transfer_amount?: number;
+  cheque_amount?: number;
+  card_amount?: number;
+  online_amount?: number;
+  other_amount?: number;
 }
 
 export interface FinancePostingStatusReportRow {
   document_type: string;
   document_number: string;
   document_date: string;
-  branch: string;
+  branch?: string;
   customer: string;
+  customer_name?: string;
   document_amount: number;
   operational_posted_status: string;
   finance_post_status: string;
   finance_reference_number: string;
+  journal_entry_number?: string;
   finance_posted_by: string;
-  finance_posted_at: string;
+  finance_posted_at?: string;
+  posted_date?: string;
+}
+
+export interface FinancePostingStatusReportSummary {
+  document_count?: number;
+  total_documents?: number;
+  finance_posted_count?: number;
+  posted_count?: number;
+  finance_unposted_count?: number;
+  unposted_count?: number;
+  finance_failed_count?: number;
+  failed_count?: number;
+  total_amount?: number;
 }
 
 export interface ApiResponse<T> {

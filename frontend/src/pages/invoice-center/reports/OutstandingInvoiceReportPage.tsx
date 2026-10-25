@@ -144,8 +144,10 @@ export const OutstandingInvoiceReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getOutstandingInvoices({
-      ...filters,
+    const cleanFilters = { ...filters };
+    if (cleanFilters.payment_status === "all") delete cleanFilters.payment_status;
+    const res = await invoiceCenterApi.getOutstandingInvoiceReport({
+      ...cleanFilters,
       page: 1,
       limit: 10000,
     });

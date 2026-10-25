@@ -152,3 +152,103 @@
   * Total Liabilities + Equity: **`LKR 132,588,165.30`**
   * Discrepancy: **`0.00 (Zero Variance)`**
   * Balance Sheet Status: **`Balanced (Verified)`**
+
+---
+
+## 6. Control Center Governance & Authentication Modifications
+
+### 6.1 AUTH-01: Admin Quick-Login Alignment (`LoginPage.tsx`)
+* Aligned quick-login shortcut buttons with true enterprise user profiles:
+  * `Admin (Dr. Kalinga Silva)` (`admin@ceylonmed.lk`, Super Admin)
+  * `CFO (Ruwani)` (`cfo@ceylonmed.lk`, Chief Financial Officer)
+  * `Accountant (Chaminda)` (`accountant@ceylonmed.lk`, Senior Accountant)
+* Added descriptive title tooltips displaying role and organizational tier.
+
+### 6.2 CC-01: Company Profile & General Settings Synchronization (`GeneralSettingsPage.tsx`)
+* Removed hardcoded `OMACX` initial states and mock fallbacks (`corporate@omacx.lk`, `TIN-889021445-LK`).
+* Dynamically bound to active tenant context (`useAuth().company`) and `/control/company` (`Ceylon MedEx Pharmaceuticals (Pvt) Ltd`).
+* Linked setting save action to synchronize both key-value store (`publishSetting`) and company master table (`updateCompanyProfile` + `refreshContext()`).
+
+### 6.3 CC-02: Dashboard Audit Dynamic Date Filtering (`ControlCenterDashboardPage.tsx` & `dashboard_handler.go`)
+* Replaced static `Jul 1, 2024 - Jul 7, 2024` badge with dynamic range selector:
+  * Last 7 Days (Default, e.g. `Oct 19, 2026 - Oct 25, 2026`).
+  * Last 30 Days.
+  * This Month.
+  * All Time / Historical Data.
+  * Custom Date Range with Start/End pickers.
+* Updated backend `dashboard_handler.go` to scan `a.created_at` timestamp and accept query parameters `audit_date_from`, `audit_date_to`, and `audit_severity`.
+* Bound table rendering directly to `filteredEvents` and added an empty-state shortcut to historical logs.
+
+### 6.4 CC-03: Access Audit Temporal Filtering (`AccessAuditPage.tsx`)
+* Enforced strict timeframe cutoffs in `filteredEvents` (`24H`, `7D`, `30D`, `CUSTOM`) to eliminate older events (e.g. July 4, 2026) leaking into "Last 24 Hours".
+* Forwarded date boundaries (`date_from`, `date_to`) to `/control/audit-logs`.
+* Added "Historical Log" badge for events older than 30 days and added "All Time (Historical Archive)" option.
+* Enforced strict descending chronological sorting (`newest first`).
+* Normalized verification engine string from `"OMACX_RBAC_V2"` to `"CEYLONMED_RBAC_V2"`.
+
+---
+
+## 7. Universal Report Export Engine & Table Pagination
+
+### 7.1 Full Dataset Export Engine (`reportExportUtils.ts`)
+* Engineered unified export utility supporting complete multi-page PDF generation (`jspdf` + `jspdf-autotable`) and Excel spreadsheets (`xlsx`).
+* Standardized corporate layout: Header, Generation Timestamp, Filter Metadata, Table Grid, and Summary Totals.
+* Ensured full dataset exports (fetching complete unpaginated datasets) rather than truncating to the active paginated DOM view.
+
+### 7.2 Standardized Pagination Component (`TablePagination.tsx`)
+* Implemented reusable client-side pagination component with page size selector (`10`, `25`, `50`, `100`), page number indicators, and record counts.
+* Integrated across all 14 commercial and financial report data tables.
+
+---
+
+## 8. Compliance, Statutory Licensure & QA Integrity Engine
+
+### 8.1 COM-01: NMRA License Validity & Expiry Calculation (`LicenseDocumentsPage.tsx`)
+* **Accurate Temporal Calculation Engine:** Built `calculateLicenseValidity` utility computing calendar day differences against UTC midnight, properly accounting for leap years and elapsed time.
+* **Statutory Operating Licensure Integration:** Added premise operating licenses including `WHL-4402/2026` ("NMRA Wholesale Dealer Operating License" for Colombo Central Medical Warehouse, expired 2026-06-30).
+* **Administrative Status vs. Calculated Validity:** Differentiated administrative registration status (`ACTIVE`) from dynamic calculated validity (`EXPIRED`). Highlighted expired permits with `"Expired X days ago"` in bold red, eliminating false "ACTIVE / 361 days remaining" badges.
+* **Dynamic KPI Card Binding:** Linked summary KPI cards directly to computed `validityStatus`.
+
+### 8.2 COM-02: Quality Deviations & CAPA Workflows (`Sidebar.tsx`, `AppRoutes.tsx`, `RegulatoryRecordsPage.tsx`)
+* **Sidebar Menu Re-architecture:** Corrected routing in `Sidebar.tsx`:
+  * `Licenses & Permits` -> `/compliance-center/licenses`
+  * `Batch Quarantine Holds` -> `/compliance-center/batch-holds`
+  * `Product Recalls` -> `/compliance-center/recalls`
+  * `Expiry & Disposal` -> `/compliance-center/disposals`
+  * `Deviations` -> `/compliance-center/deviations`
+  * `CAPA` -> `/compliance-center/capa`
+  * `Regulatory Records` -> `/compliance-center/records`
+* **Dedicated Route Mapping:** Added routes in `AppRoutes.tsx` for `/compliance-center/deviations` and `/compliance-center/capa`.
+* **Dedicated Tabbed Register:** Built pill tab filter in `RegulatoryRecordsPage.tsx` supporting quick switching between Deviations, CAPA, Quality Holds, Recalls, and Disposals, with interactive modal workflows for logging new Deviations and CAPA actions.
+
+### 8.3 COM-03: Regulatory Audit Trail Event Mapping (`dashboard_handler.go`, `RegulatoryRecordsPage.tsx`, `complianceApi.ts`)
+* **Event Classification Engine:** Updated `dashboard_handler.go` to categorize audit rows by `software_code` and action prefix. Financial statement views (Balance Sheet, Cash/Bank Book) are mapped to `FINANCIAL_GOVERNANCE` under `Finance Directorate & Fiscal Audit` with the actual user and action description, ending mislabeling as QC audits.
+* **Frontend Scope Mapping:** Updated `RegulatoryRecordsPage.tsx` and `complianceApi.ts` to display accurate authorities, origin facilities, and actual executing officers.
+
+### 8.4 S-01: Quarantined & On-Hold Stock Segregation (`inventory_lookup_repository.go`, `StockBalancesPage.tsx`, DB `stock_balances`)
+* **Availability vs On-Hand Decoupling:** Separated physical on-hand quantity from saleable available inventory. Updated database `stock_balances` setting `quantity_available = 0.000` for quarantined batch 275 (`BAT-QUAR-RECALL-65`).
+* **Sales Order Lookup Exclusions:** Modified `inventory_lookup_repository.go` to strictly exclude batches with status `quarantined`, `on_hold`, or `hold`, and exclude warehouses with type `quarantine` or `disposal` from saleable stock lookups.
+* **Enhanced Inventory UI:** Updated `StockBalancesPage.tsx` to display `Holding Status` badges (`Quarantine / On Hold`, `Saleable`, `Expired`) and explicitly mark non-saleable held stock as `0 (Non-Saleable Hold)`.
+
+### 8.5 S-04: Certified Compliance Audit PDF Export (`RegulatoryRecordsPage.tsx`)
+* **Cryptographic PDF Engine:** Replaced placeholder alert with full `jsPDF` + `jspdf-autotable` implementation exporting formal tamper-evident dossiers.
+* **Certificate Features:** Includes corporate header, NMRA statutory metadata, WORM compliance assurance, SHA-256 cryptographic hash signature, legal cGMP/GDP certification clause, and QA Director / Qualified Person signature lines.
+* **Full Dossier Export:** Added master ledger export to PDF in landscape mode for regulatory inspections.
+
+### 8.6 S-05: CFO Role Permissions for Customer Aging (`role_permissions`)
+* **Permission Granting:** Assigned permission `230` (`invoice_center.reports.customer_aging.view`) to `role_id = 2` (FINANCE_DIRECTOR / CFO) and `role_id = 3` (SENIOR_ACCOUNTANT) in `erp_ceylonmed.role_permissions`.
+
+### 8.7 S-06: Master Data Reconciliation (Gentamicin, Departments, Designations)
+* **Generic Name Realignment:** Created generic name `GEN_GENTA` ("Gentamicin Sulfate") and updated Gentamicin Sulfate 40mg/ml (`id = 65`) in `erp_ceylonmed.products`.
+* **Department Deduplication:** Renamed duplicate department `id = 2` to `EXEC` ("Executive Management & Governance") and `id = 1` to "General Administration & Operations".
+* **Enterprise User Realignment:** Synchronized all 12 users with exact departments and designations in both `erp_ceylonmed.users` and `scripts/seed_enterprise_users.py`.
+
+### 8.8 S-07: Document & Proforma Invoice Print Engine (`DocumentPrintPage.tsx`)
+* **Proforma & GRN Loaders:** Added `proforma_invoice` (with fallback between sales invoice and sales order) and `grn` (`inventoryApi.getGRNById`) to `documentLoaders`.
+* **Field Preservation:** Ensured default fields are retained if the API returns an empty format field list.
+* **Line Item Extraction:** Robust fallback for `document?.lines || document?.sales_invoice_lines || document?.items || document?.allocations || document?.order_lines || document?.grn_items || []`.
+
+### 8.9 IC-08 / React Error #310: Report Data Table Hook Ordering Fix (`ReportDataTable.tsx`)
+* **Root Cause Rectified:** In [ReportDataTable.tsx](file:///home/janith/Projects/pixandco-web/erp/frontend/src/components/invoice-center/reports/ReportDataTable.tsx), `useMemo` for `displayRows` was declared *after* the early return conditions (`if (isLoading)` and `if (rows.length === 0)`). When `isLoading` transitioned from `true` to `false`, React detected more hooks than during the previous render, throwing `Minified React error #310` ("Rendered more hooks than during the previous render") at runtime.
+* **Engineering Fix:** Hoisted all hook invocations (`useState`, `useMemo(rows)`, `isControlled`, `useMemo(displayRows)`, and `useEffect`) to the very top of `ReportDataTable` unconditionally before any early returns, strictly adhering to React's Rules of Hooks.
+

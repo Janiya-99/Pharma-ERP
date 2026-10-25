@@ -29,7 +29,7 @@ func (r *InventoryLookupRepository) FindProducts(db *gorm.DB, companyID uint64, 
 
 func (r *InventoryLookupRepository) FindProductBatches(db *gorm.DB, companyID uint64, productID *uint64, allowExpired bool) ([]invmodels.ProductBatch, error) {
 	var batches []invmodels.ProductBatch
-	query := db.Where("company_id = ? AND is_blocked = ? AND batch_status NOT IN ?", companyID, false, []string{"blocked", "recalled", "disposed", "inactive"})
+	query := db.Where("company_id = ? AND is_blocked = ? AND batch_status NOT IN ?", companyID, false, []string{"blocked", "recalled", "disposed", "inactive", "quarantined", "on_hold", "hold"})
 	if productID != nil {
 		query = query.Where("product_id = ?", *productID)
 	}
@@ -46,7 +46,8 @@ func (r *InventoryLookupRepository) FindStockAvailability(db *gorm.DB, companyID
 	var balances []invmodels.StockBalance
 	query := db.Model(&invmodels.StockBalance{}).
 		Where("stock_balances.company_id = ? AND stock_balances.branch_id = ? AND stock_balances.quantity_available > 0", companyID, branchID).
-		Joins("JOIN products ON products.id = stock_balances.product_id AND products.company_id = stock_balances.company_id AND products.status = ?", "active")
+		Joins("JOIN products ON products.id = stock_balances.product_id AND products.company_id = stock_balances.company_id AND products.status = ?", "active").
+		Joins("JOIN warehouses ON warehouses.id = stock_balances.warehouse_id AND warehouses.warehouse_type NOT IN ('quarantine', 'disposal')")
 
 	if productID != nil {
 		query = query.Where("stock_balances.product_id = ?", *productID)
@@ -62,7 +63,7 @@ func (r *InventoryLookupRepository) FindStockAvailability(db *gorm.DB, companyID
 	}
 
 	query = query.Joins("LEFT JOIN product_batches ON product_batches.id = stock_balances.product_batch_id")
-	query = query.Where("(stock_balances.product_batch_id IS NULL OR (product_batches.is_blocked = ? AND product_batches.batch_status NOT IN ?))", false, []string{"blocked", "recalled", "disposed", "inactive"})
+	query = query.Where("(stock_balances.product_batch_id IS NULL OR (product_batches.is_blocked = ? AND product_batches.batch_status NOT IN ?))", false, []string{"blocked", "recalled", "disposed", "inactive", "quarantined", "on_hold", "hold"})
 	if !allowExpired {
 		now := time.Now()
 		query = query.Where("(stock_balances.product_batch_id IS NULL OR (product_batches.batch_status != ? AND (product_batches.expiry_date IS NULL OR product_batches.expiry_date >= ?)))", "expired", now)

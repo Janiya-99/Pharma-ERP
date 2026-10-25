@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../../../../auth/AuthContext';
 import { financeApi } from '../../../../api/financeApi';
 import { useDebounce } from '../../../../hooks/useDebounce';
@@ -63,10 +63,14 @@ const JournalRegisterReportPage = () => {
     }
   };
 
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
+
   const fetchReport = useCallback(async (overrideFilters?: any) => {
     setLoading(true);
     try {
-      const params = { ...(overrideFilters || {}) };
+      const activeFilters = overrideFilters !== undefined ? overrideFilters : filtersRef.current;
+      const params = { ...(activeFilters || {}) };
       Object.keys(params).forEach((key: any) => {
         if (params[key] === "") delete params[key];
       });
@@ -81,7 +85,6 @@ const JournalRegisterReportPage = () => {
     } finally {
       setLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -91,7 +94,7 @@ const JournalRegisterReportPage = () => {
 
   useEffect(() => {
     fetchReport(debouncedFilters);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedFilters]);
 
   const handleFilterChange = (key: string, value: any) => {
@@ -99,7 +102,7 @@ const JournalRegisterReportPage = () => {
   };
 
   const handleApplyFilters = () => {
-    fetchReport();
+    fetchReport(filters);
   };
 
   const handleClearFilters = () => {

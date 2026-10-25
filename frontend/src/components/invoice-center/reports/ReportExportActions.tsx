@@ -26,6 +26,7 @@ export interface ReportExportActionsProps {
   disabled?: boolean;
   onFetchAll?: () => Promise<any[]>;
   summaryCards?: Array<{ title: string; value: string | number }>;
+  showPrint?: boolean;
 }
 
 export const ReportExportActions: React.FC<ReportExportActionsProps> = ({
@@ -37,6 +38,7 @@ export const ReportExportActions: React.FC<ReportExportActionsProps> = ({
   disabled = false,
   onFetchAll,
   summaryCards,
+  showPrint = false,
 }) => {
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
@@ -346,22 +348,24 @@ export const ReportExportActions: React.FC<ReportExportActionsProps> = ({
         Export PDF
       </Button>
 
-      {/* 3. Print / PDF Button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handlePrint}
-        disabled={disabled || isBusy}
-        className="border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer"
-        title="Print full report with all pages"
-      >
-        {loadingAction === "print" ? (
-          <Loader2 className="mr-1.5 h-4 w-4 animate-spin text-slate-600" />
-        ) : (
-          <Printer className="mr-1.5 h-4 w-4 text-slate-600" />
-        )}
-        Print
-      </Button>
+      {/* 3. Print Button (Optional) */}
+      {showPrint && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handlePrint}
+          disabled={disabled || isBusy}
+          className="border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs cursor-pointer"
+          title="Print full report with all pages"
+        >
+          {loadingAction === "print" ? (
+            <Loader2 className="mr-1.5 h-4 w-4 animate-spin text-slate-600" />
+          ) : (
+            <Printer className="mr-1.5 h-4 w-4 text-slate-600" />
+          )}
+          Print
+        </Button>
+      )}
 
       {/* 4. JSON Export Button */}
       <Button

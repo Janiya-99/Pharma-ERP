@@ -25,6 +25,23 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    if (config.params && typeof config.params === "object" && !(config.params instanceof URLSearchParams)) {
+      const cleanParams: Record<string, any> = {};
+      Object.entries(config.params).forEach(([key, val]) => {
+        if (
+          val !== "" &&
+          val !== undefined &&
+          val !== null &&
+          val !== "all" &&
+          val !== "__none__"
+        ) {
+          cleanParams[key] = val;
+        }
+      });
+      config.params = cleanParams;
+    }
+
     return config;
   },
   (error: any) => Promise.reject(error)

@@ -7,6 +7,8 @@ export interface ReportToolbarProps {
   onExportJson?: () => void;
   onExportCsv?: () => void;
   onExportPdf?: () => void;
+  onPrint?: () => void;
+  showPrint?: boolean;
   isExportingPdf?: boolean;
   isRefreshing?: boolean;
   extraActions?: React.ReactNode;
@@ -17,12 +19,15 @@ const ReportToolbar: React.FC<ReportToolbarProps> = ({
   onExportJson,
   onExportCsv,
   onExportPdf,
+  onPrint,
+  showPrint = false,
   isExportingPdf,
   isRefreshing,
   extraActions,
 }) => {
   const handlePrint = () => {
-    window.print();
+    if (onPrint) onPrint();
+    else window.print();
   };
 
   return (
@@ -33,18 +38,14 @@ const ReportToolbar: React.FC<ReportToolbarProps> = ({
           Refresh
         </Button>
       )}
-      <Button variant="outline" size="sm" onClick={handlePrint} className="h-8 gap-1.5 text-xs shadow-2xs cursor-pointer">
-        <Printer className="w-3.5 h-3.5" />
-        Print
-      </Button>
       {onExportCsv && (
-        <Button variant="outline" size="sm" onClick={onExportCsv} className="h-8 gap-1.5 text-xs shadow-2xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 cursor-pointer">
+        <Button variant="outline" size="sm" onClick={onExportCsv} className="h-8 gap-1.5 text-xs shadow-2xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 border-emerald-200 cursor-pointer font-semibold">
           <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-          Export CSV / Excel
+          Export Excel
         </Button>
       )}
       {onExportPdf && (
-        <Button variant="outline" size="sm" onClick={onExportPdf} disabled={isExportingPdf} className="h-8 gap-1.5 text-xs shadow-2xs text-rose-700 hover:text-rose-800 hover:bg-rose-50 cursor-pointer">
+        <Button variant="outline" size="sm" onClick={onExportPdf} disabled={isExportingPdf} className="h-8 gap-1.5 text-xs shadow-2xs text-rose-700 hover:text-rose-800 hover:bg-rose-50 border-rose-200 cursor-pointer font-semibold">
           {isExportingPdf ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-600" />
           ) : (
@@ -53,8 +54,14 @@ const ReportToolbar: React.FC<ReportToolbarProps> = ({
           Export PDF
         </Button>
       )}
+      {showPrint && (
+        <Button variant="outline" size="sm" onClick={handlePrint} className="h-8 gap-1.5 text-xs shadow-2xs cursor-pointer">
+          <Printer className="w-3.5 h-3.5" />
+          Print
+        </Button>
+      )}
       {onExportJson && (
-        <Button variant="outline" size="sm" onClick={onExportJson} className="h-8 gap-1.5 text-xs shadow-2xs cursor-pointer">
+        <Button variant="outline" size="sm" onClick={onExportJson} className="h-8 gap-1.5 text-xs shadow-2xs cursor-pointer text-slate-600">
           <Download className="w-3.5 h-3.5" />
           Export JSON
         </Button>

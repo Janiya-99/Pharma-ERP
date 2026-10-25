@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   CustomerStatementReportParams,
@@ -20,6 +21,7 @@ import {
   CustomerStatementReportHeader,
 } from "@/types/invoice-center-reports";
 import { toast } from "sonner";
+import { FileText } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -30,28 +32,16 @@ import {
 
 import { useDebounce } from "@/hooks/useDebounce";
 
-const getDefaultDateRange = () => {
-  const today = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const formatDate = (d: Date) =>
-    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  return {
-    date_from: formatDate(startOfMonth),
-    date_to: formatDate(today),
-  };
-};
-
 export const CustomerStatementReportPage: React.FC = () => {
-  const defaultDates = getDefaultDateRange();
   const [filters, setFilters] = useState<
     Omit<CustomerStatementReportParams, "customer_id"> & { customer_id: string }
   >({
     customer_id: "",
-    date_from: defaultDates.date_from,
-    date_to: defaultDates.date_to,
+    date_from: "",
+    date_to: "",
     include_unposted: false,
   });
+  const [datePreset, setDatePreset] = useState<string>("all_time");
 
   const debouncedFilters = useDebounce(filters, 300);
 
@@ -63,6 +53,51 @@ export const CustomerStatementReportPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handlePresetChange = (val: string) => {
+    setDatePreset(val);
+    const today = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const formatDate = (d: Date) =>
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    if (val === "this_month") {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      setFilters((prev) => ({
+        ...prev,
+        date_from: formatDate(startOfMonth),
+        date_to: formatDate(today),
+      }));
+    } else if (val === "last_month") {
+      const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      setFilters((prev) => ({
+        ...prev,
+        date_from: formatDate(startOfLastMonth),
+        date_to: formatDate(endOfLastMonth),
+      }));
+    } else if (val === "this_year") {
+      const startOfYear = new Date(today.getFullYear(), 0, 1);
+      setFilters((prev) => ({
+        ...prev,
+        date_from: formatDate(startOfYear),
+        date_to: formatDate(today),
+      }));
+    } else if (val === "last_12_months") {
+      const lastYear = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+      setFilters((prev) => ({
+        ...prev,
+        date_from: formatDate(lastYear),
+        date_to: formatDate(today),
+      }));
+    } else if (val === "all_time") {
+      setFilters((prev) => ({
+        ...prev,
+        date_from: "",
+        date_to: "",
+      }));
+    }
+  };
 
   const fetchStatement = async (custId: string, customFilters?: typeof filters) => {
     if (!custId) {
@@ -80,10 +115,12 @@ export const CustomerStatementReportPage: React.FC = () => {
       setHasPermission(true);
       setErrorMessage(null);
 
-      const payload = {
+      const payload: any = {
         ...activeFilters,
         customer_id: parseInt(custId, 10),
       };
+      if (!payload.date_from) delete payload.date_from;
+      if (!payload.date_to) delete payload.date_to;
 
       const res = await invoiceCenterApi.getCustomerStatementReport(
         payload as any
@@ -135,7 +172,7 @@ export const CustomerStatementReportPage: React.FC = () => {
   }, [debouncedFilters]);
 
   const fetchData = async () => {
-    fetchStatement(filters.customer_id);
+    fetchStatement(filters.customer_id, filters);
   };
 
   const handleApplyFilters = () => {
@@ -143,11 +180,11 @@ export const CustomerStatementReportPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
-    const defaultRange = getDefaultDateRange();
+    setDatePreset("all_time");
     setFilters((prev) => ({
       customer_id: prev.customer_id,
-      date_from: defaultRange.date_from,
-      date_to: defaultRange.date_to,
+      date_from: "",
+      date_to: "",
       include_unposted: false,
     }));
     setErrorMessage(null);
@@ -221,12 +258,16 @@ export const CustomerStatementReportPage: React.FC = () => {
 
   const handleFetchAllForExport = async () => {
     if (!filters.customer_id) return [];
-    const res = await invoiceCenterApi.getCustomerStatement({
+    const cleanFilters: any = {
       ...filters,
+      customer_id: parseInt(filters.customer_id, 10),
       page: 1,
       limit: 10000,
-    });
-    return Array.isArray(res.data?.data?.lines) ? res.data.data.lines : [];
+    };
+    if (!cleanFilters.date_from) delete cleanFilters.date_from;
+    if (!cleanFilters.date_to) delete cleanFilters.date_to;
+    const res = await invoiceCenterApi.getCustomerStatementReport(cleanFilters);
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
   };
 
   if (!hasPermission) {
@@ -237,7 +278,7 @@ export const CustomerStatementReportPage: React.FC = () => {
     );
   }
 
-  const selectedCustomer = customers.find(c => c.id === filters.customer_id);
+  const selectedCustomer = customers.find(c => c.id.toString() === filters.customer_id);
 
   return (
     <ReportPageShell
@@ -276,7 +317,6 @@ export const CustomerStatementReportPage: React.FC = () => {
               value={filters.customer_id}
               onValueChange={(val) => {
                 setFilters((prev) => ({ ...prev, customer_id: val }));
-                fetchStatement(val);
               }}
             >
               <SelectTrigger id="customer_id">
@@ -303,10 +343,12 @@ export const CustomerStatementReportPage: React.FC = () => {
               id="date_from"
               type="date"
               value={filters.date_from || ""}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, date_from: e.target.value }))
-              }
-             placeholder="Enter Date From" />
+              onChange={(e) => {
+                setDatePreset("custom");
+                setFilters((prev) => ({ ...prev, date_from: e.target.value }));
+              }}
+              placeholder="Enter Date From"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="date_to">Date To</Label>
@@ -314,74 +356,29 @@ export const CustomerStatementReportPage: React.FC = () => {
               id="date_to"
               type="date"
               value={filters.date_to || ""}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, date_to: e.target.value }))
-              }
+              onChange={(e) => {
+                setDatePreset("custom");
+                setFilters((prev) => ({ ...prev, date_to: e.target.value }));
+              }}
               placeholder="Enter Date To"
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="date_preset">Date Preset</Label>
             <Select
-              value="custom"
-              onValueChange={(val) => {
-                const today = new Date();
-                const pad = (n: number) => String(n).padStart(2, "0");
-                const formatDate = (d: Date) =>
-                  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-
-                if (val === "this_month") {
-                  const startOfMonth = new Date(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    1
-                  );
-                  setFilters((prev) => ({
-                    ...prev,
-                    date_from: formatDate(startOfMonth),
-                    date_to: formatDate(today),
-                  }));
-                } else if (val === "last_month") {
-                  const startOfLastMonth = new Date(
-                    today.getFullYear(),
-                    today.getMonth() - 1,
-                    1
-                  );
-                  const endOfLastMonth = new Date(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    0
-                  );
-                  setFilters((prev) => ({
-                    ...prev,
-                    date_from: formatDate(startOfLastMonth),
-                    date_to: formatDate(endOfLastMonth),
-                  }));
-                } else if (val === "this_year") {
-                  const startOfYear = new Date(today.getFullYear(), 0, 1);
-                  setFilters((prev) => ({
-                    ...prev,
-                    date_from: formatDate(startOfYear),
-                    date_to: formatDate(today),
-                  }));
-                } else if (val === "all_time") {
-                  setFilters((prev) => ({
-                    ...prev,
-                    date_from: "",
-                    date_to: "",
-                  }));
-                }
-              }}
+              value={datePreset}
+              onValueChange={handlePresetChange}
             >
               <SelectTrigger id="date_preset">
                 <SelectValue placeholder="Quick Range" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="custom">Quick Range...</SelectItem>
+                <SelectItem value="all_time">All Time</SelectItem>
                 <SelectItem value="this_month">This Month</SelectItem>
                 <SelectItem value="last_month">Last Month</SelectItem>
                 <SelectItem value="this_year">Year to Date (YTD)</SelectItem>
-                <SelectItem value="all_time">All Time</SelectItem>
+                <SelectItem value="last_12_months">Last 12 Months</SelectItem>
+                <SelectItem value="custom">Custom Range</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -443,12 +440,12 @@ export const CustomerStatementReportPage: React.FC = () => {
                   <p className="text-slate-500 text-sm font-medium">Period</p>
                   <p className="text-slate-700 mt-1 text-lg font-medium">
                     {data.header.date_from && !data.header.date_from.startsWith("0001-01-01")
-                      ? formatReportDate(data.header.date_from)
-                      : "Start"}{" "}
-                    to{" "}
-                    {data.header.date_to && !data.header.date_to.startsWith("0001-01-01")
-                      ? formatReportDate(data.header.date_to)
-                      : "Present"}
+                      ? `${formatReportDate(data.header.date_from)} to ${
+                          data.header.date_to && !data.header.date_to.startsWith("0001-01-01")
+                            ? formatReportDate(data.header.date_to)
+                            : "Present"
+                        }`
+                      : "All Time"}
                   </p>
                 </div>
               </div>
@@ -463,6 +460,54 @@ export const CustomerStatementReportPage: React.FC = () => {
             onRetry={() => fetchStatement(filters.customer_id)}
             onReset={handleResetFilters}
           />
+        ) : data && data.lines.length === 0 && (filters.date_from || filters.date_to) ? (
+          <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+              <FileText className="h-7 w-7" />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-800">
+              No Transactions in Selected Period
+            </h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+              {data.header?.opening_balance !== 0 ? (
+                <>
+                  This customer has an active balance of{" "}
+                  <strong className="text-slate-700">
+                    {formatMoney(data.header.opening_balance)}
+                  </strong>
+                  , but there were no new invoices, receipts, or notes recorded between{" "}
+                  <span className="font-medium text-slate-700">
+                    {formatReportDate(filters.date_from) !== "-" ? formatReportDate(filters.date_from) : "Start"}
+                  </span>{" "}
+                  and{" "}
+                  <span className="font-medium text-slate-700">
+                    {formatReportDate(filters.date_to) !== "-" ? formatReportDate(filters.date_to) : "Present"}
+                  </span>
+                  .
+                </>
+              ) : (
+                "There are no transactions recorded for this customer in the selected date range."
+              )}
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-white text-navy-800 hover:bg-slate-50 border-slate-300 shadow-sm"
+                onClick={() => handlePresetChange("all_time")}
+              >
+                View All Customer Transactions
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-600 hover:text-slate-900"
+                onClick={() => handlePresetChange("this_year")}
+              >
+                Year to Date (YTD)
+              </Button>
+            </div>
+          </div>
         ) : (
           <ReportDataTable
             columns={columns}
@@ -471,7 +516,7 @@ export const CustomerStatementReportPage: React.FC = () => {
             emptyMessage={
               !filters.customer_id
                 ? "Select a customer from the filters above to view the statement."
-                : "No transactions found for the selected period."
+                : "No transactions found for this customer."
             }
           />
         )

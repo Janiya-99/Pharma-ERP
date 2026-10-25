@@ -15,8 +15,12 @@ import {
   Package,
   FileText,
   RefreshCw,
+  FileSpreadsheet,
 } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { TablePagination } from "../../../components/common/TablePagination";
+import { exportToCsv, exportToPdf } from "../../../utils/reportExportUtils";
+import { toast } from "sonner";
 
 interface RecallNotice {
   id: string;
@@ -95,6 +99,85 @@ const BatchRecallPage = () => {
     });
   }, [data, selectedClass, selectedStatus, searchQuery]);
 
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [searchQuery, selectedClass, selectedStatus]);
+
+  const pagedData = useMemo(() => {
+    const start = pageIndex * pageSize;
+    return filteredData.slice(start, start + pageSize);
+  }, [filteredData, pageIndex, pageSize]);
+
+  const handleExportCsv = () => {
+    const headers = [
+      "Recall #",
+      "Product Name",
+      "Batch #",
+      "SKU",
+      "Recall Class",
+      "Initiator",
+      "Issue Date",
+      "Distributed Qty",
+      "Recovered Qty",
+      "Recovery %",
+      "Status",
+      "Reason",
+    ];
+    const rows = filteredData.map((r) => {
+      const pct = r.totalDistributed > 0 ? ((r.recoveredQty / r.totalDistributed) * 100).toFixed(1) : "0.0";
+      return [
+        r.recallNumber,
+        r.productName,
+        r.batchNumber,
+        r.sku,
+        r.recallClass,
+        r.initiator,
+        r.issueDate,
+        r.totalDistributed,
+        r.recoveredQty,
+        `${pct}%`,
+        r.status,
+        r.reason,
+      ];
+    });
+    exportToCsv("batch-recalls-field-alerts", headers, rows);
+    toast.success("Excel report exported successfully");
+  };
+
+  const handleExportPdf = () => {
+    const headers = [
+      "Recall #",
+      "Product Name",
+      "Batch #",
+      "Recall Class",
+      "Issue Date",
+      "Distributed",
+      "Recovered",
+      "Status",
+    ];
+    const rows = filteredData.map((r) => [
+      r.recallNumber,
+      r.productName,
+      r.batchNumber,
+      r.recallClass,
+      r.issueDate,
+      String(r.totalDistributed),
+      String(r.recoveredQty),
+      r.status,
+    ]);
+    exportToPdf({
+      title: "Product Recalls & Field Alerts Register",
+      filename: "batch-recalls-field-alerts",
+      headers,
+      rows,
+      orientation: "landscape",
+    });
+    toast.success("PDF report generated successfully");
+  };
+
   const handleLogRecovery = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRecall || !additionalQty) return;
@@ -147,8 +230,24 @@ const BatchRecallPage = () => {
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-3">
-          <button className="flex h-10 items-center gap-2 rounded-xl bg-rose-600 px-5 text-sm font-semibold text-white shadow-md shadow-rose-600/20 hover:bg-rose-700 transition-all">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+            className="flex h-10 items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+          >
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+            Export Excel
+          </button>
+          <button
+            onClick={handleExportPdf}
+            disabled={filteredData.length === 0}
+            className="flex h-10 items-center gap-2 rounded-xl border border-rose-200 bg-white px-4 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+          >
+            <FileText className="h-4 w-4 text-rose-600" />
+            Export PDF
+          </button>
+          <button className="flex h-10 items-center gap-2 rounded-xl bg-rose-600 px-5 text-sm font-semibold text-white shadow-md shadow-rose-600/20 hover:bg-rose-700 transition-all cursor-pointer">
             <Plus className="h-4 w-4" />
             Initiate Recall Notice
           </button>
@@ -238,7 +337,7 @@ const BatchRecallPage = () => {
             No product recall records match your search criteria.
           </div>
         ) : (
-          filteredData.map((item) => {
+          pagedData.map((item) => {
             const recoveryPct = Math.round((item.recoveredQty / item.totalDistributed) * 100);
             return (
               <div
@@ -344,6 +443,20 @@ const BatchRecallPage = () => {
             );
           })
         )}
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <TablePagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={filteredData.length}
+          pageCount={Math.max(1, Math.ceil(filteredData.length / pageSize))}
+          onPageChange={setPageIndex}
+          onPageSizeChange={(sz) => {
+            setPageSize(sz);
+            setPageIndex(0);
+          }}
+        />
       </div>
 
       {/* ── Modal: Log Recovered Stock ── */}

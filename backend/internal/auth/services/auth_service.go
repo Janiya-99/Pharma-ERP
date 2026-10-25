@@ -309,16 +309,30 @@ func (s *AuthService) SwitchBranch(userID uint64, reqBranchID uint64, activeSoft
 }
 
 func (s *AuthService) SwitchSoftware(userID uint64, activeBranchID uint64, reqSoftwareCode string, platformCompany platformModels.PlatformCompany) (*dto.LoginResponse, error) {
-	// 1. Find software module by software_code
+	// Load user first to verify role and permissions
+	var user models.User
+	if err := s.db.Where("id = ?", userID).First(&user).Error; err != nil {
+		return nil, errors.New("User not found")
+	}
+
+	// Normalize software code aliases (e.g. COMPLIANCE <-> COMPLIANCE_CENTER, LOGISTICS -> INVENTORY)
+	normalizedCode := reqSoftwareCode
+	if normalizedCode == "LOGISTICS" {
+		normalizedCode = "INVENTORY"
+	}
+
+	// 1. Find software module by software_code (with alias support)
 	var reqSoftware models.SoftwareModule
-	if err := s.db.Where("software_code = ? AND status = ?", reqSoftwareCode, "active").First(&reqSoftware).Error; err != nil {
+	if err := s.db.Where("(software_code = ? OR (software_code IN ('COMPLIANCE', 'COMPLIANCE_CENTER') AND ? IN ('COMPLIANCE', 'COMPLIANCE_CENTER'))) AND status = ?", normalizedCode, normalizedCode, "active").First(&reqSoftware).Error; err != nil {
 		return nil, errors.New("You do not have access to this software")
 	}
 
-	// 2. Check user software access
-	var sa models.UserSoftwareAccess
-	if err := s.db.Preload("Software").Where("user_id = ? AND software_id = ? AND status = ? AND can_access = ?", userID, reqSoftware.ID, "active", true).First(&sa).Error; err != nil {
-		return nil, errors.New("You do not have access to this software")
+	// 2. Check user software access (super admins have unrestricted access to all software modules)
+	if user.UserType != "super_admin" {
+		var sa models.UserSoftwareAccess
+		if err := s.db.Preload("Software").Where("user_id = ? AND software_id = ? AND status = ? AND can_access = ?", userID, reqSoftware.ID, "active", true).First(&sa).Error; err != nil {
+			return nil, errors.New("You do not have access to this software")
+		}
 	}
 
 	// Load active branch
@@ -326,9 +340,6 @@ func (s *AuthService) SwitchSoftware(userID uint64, activeBranchID uint64, reqSo
 	if err := s.db.Where("id = ? AND status = ?", activeBranchID, "active").First(&activeBranch).Error; err != nil {
 		return nil, errors.New("Active branch is invalid")
 	}
-
-	var user models.User
-	s.db.Where("id = ?", userID).First(&user)
 
 	var branchAccesses []models.UserBranchAccess
 	s.db.Preload("Branch").Where("user_id = ? AND status = ?", user.ID, "active").Find(&branchAccesses)
@@ -342,7 +353,7 @@ func (s *AuthService) SwitchSoftware(userID uint64, activeBranchID uint64, reqSo
 		CompanyCode:        platformCompany.CompanyCode,
 		CompanyID:          user.CompanyID,
 		ActiveBranchID:     activeBranchID,
-		ActiveSoftwareCode: reqSoftwareCode,
+		ActiveSoftwareCode: reqSoftware.SoftwareCode,
 	}
 
 	token, err := security.GenerateToken(claims)

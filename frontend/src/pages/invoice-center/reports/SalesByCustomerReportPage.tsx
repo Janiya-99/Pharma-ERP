@@ -143,7 +143,7 @@ export const SalesByCustomerReportPage: React.FC = () => {
   ];
 
   const handleFetchAllForExport = async () => {
-    const res = await invoiceCenterApi.getSalesByCustomer({
+    const res = await invoiceCenterApi.getSalesByCustomerReport({
       ...filters,
       page: 1,
       limit: 10000,

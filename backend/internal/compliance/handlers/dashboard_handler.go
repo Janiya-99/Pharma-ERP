@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,7 @@ type RegulatoryActionItem struct {
 	Authority string `json:"authority"`
 	Status    string `json:"status"`
 	Notes     string `json:"notes"`
+	User      string `json:"user"`
 }
 
 func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
@@ -162,41 +164,100 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 
 	// 8. Live Regulatory Audit Trail
 	type auditRow struct {
-		ID        uint64    `gorm:"column:id"`
-		Action    string    `gorm:"column:action"`
-		Entity    string    `gorm:"column:entity_name"`
-		User      string    `gorm:"column:user_name"`
-		CreatedAt time.Time `gorm:"column:created_at"`
+		ID           uint64    `gorm:"column:id"`
+		SoftwareCode string    `gorm:"column:software_code"`
+		Action       string    `gorm:"column:action"`
+		Entity       string    `gorm:"column:entity_name"`
+		User         string    `gorm:"column:user_name"`
+		CreatedAt    time.Time `gorm:"column:created_at"`
 	}
 	var auditRows []auditRow
 	db.Raw(`
-		SELECT a.id, a.action, a.entity_name, COALESCE(u.name, 'Regulatory Officer') as user_name, a.created_at
+		SELECT a.id, COALESCE(a.software_code, '') as software_code, a.action, a.entity_name, 
+		       COALESCE(u.name, 'Regulatory Officer') as user_name, a.created_at
 		FROM audit_logs a
 		LEFT JOIN users u ON u.id = a.user_id
 		WHERE a.company_id = ?
 		ORDER BY a.created_at DESC
-		LIMIT 5
+		LIMIT 10
 	`, companyID).Scan(&auditRows)
 
 	recentRegulatoryActions := make([]RegulatoryActionItem, 0)
 	for _, ar := range auditRows {
 		actionType := "AUDIT_CHECK"
+		authority := "Internal Quality Audit & Regulatory Affairs"
 		status := "COMPLETED"
-		if ar.Action == "LOGIN" {
+		cleanAction := ar.Action
+		notes := fmt.Sprintf("Audited by %s with cryptographic traceability", ar.User)
+
+		upperAction := strings.ToUpper(ar.Action)
+		upperCode := strings.ToUpper(ar.SoftwareCode)
+
+		if upperCode == "FINANCE" || strings.HasPrefix(upperAction, "FINANCE_") {
+			actionType = "FINANCIAL_GOVERNANCE"
+			authority = "Finance Directorate & Fiscal Audit"
+			notes = fmt.Sprintf("Fiscal control audit logged by %s", ar.User)
+			if strings.Contains(upperAction, "BALANCE_SHEET") {
+				cleanAction = "Balance Sheet Audit Inspection"
+			} else if strings.Contains(upperAction, "TRIAL_BALANCE") {
+				cleanAction = "Trial Balance Audit Review"
+			} else if strings.Contains(upperAction, "PROFIT_LOSS") {
+				cleanAction = "Profit & Loss Statement Review"
+			} else if strings.Contains(upperAction, "CASH_BANK") {
+				cleanAction = "Cash & Bank Register Verification"
+			} else if strings.Contains(upperAction, "LEDGER") {
+				cleanAction = "General Ledger Inspection"
+			} else if strings.Contains(upperAction, "DAY_BOOK") {
+				cleanAction = "Day Book Transaction Verification"
+			} else if strings.Contains(upperAction, "PAYMENT") {
+				cleanAction = "Payment Register Fiscal Audit"
+			} else if strings.Contains(upperAction, "RECEIPT") {
+				cleanAction = "Receipt Register Verification"
+			} else {
+				cleanAction = "Financial Statement Inspection"
+			}
+		} else if strings.Contains(upperAction, "HOLD") || strings.Contains(upperAction, "QUARANTINE") {
+			actionType = "QUARANTINE_HOLD"
+			authority = "Quality Assurance & Batch Release"
+			cleanAction = "Batch Quarantine Hold Logged"
+			notes = fmt.Sprintf("Quarantine action executed by %s", ar.User)
+		} else if strings.Contains(upperAction, "RECALL") {
+			actionType = "PRODUCT_RECALL"
+			authority = "NMRA / QA Pharmacovigilance"
+			cleanAction = "Product Recall Notification"
+			notes = fmt.Sprintf("Recall protocol enforced by %s", ar.User)
+		} else if strings.Contains(upperAction, "DISPOSAL") || strings.Contains(upperAction, "DESTROY") {
+			actionType = "DISPOSAL_WITNESS"
+			authority = "Ministry of Health & Environmental Authority"
+			cleanAction = "Witnessed Stock Disposal"
+			notes = fmt.Sprintf("Disposal witnessed by %s", ar.User)
+		} else if strings.Contains(upperAction, "LICENSE") || strings.Contains(upperAction, "PERMIT") {
+			actionType = "REGULATORY_FILING"
+			authority = "National Medicines Regulatory Authority (NMRA)"
+			cleanAction = "Premises / Drug License Registered"
+			notes = fmt.Sprintf("Regulatory filing submitted by %s", ar.User)
+		} else if upperCode == "CONTROL_CENTER" || strings.Contains(upperAction, "USER") || strings.Contains(upperAction, "POLICY") || strings.Contains(upperAction, "SECURITY") || strings.Contains(upperAction, "COMPANY") || strings.Contains(upperAction, "DEPARTMENT") {
+			actionType = "SECURITY_GOVERNANCE"
+			authority = "Enterprise Security & System Administration"
+			cleanAction = "System Policy & Governance Update"
+			notes = fmt.Sprintf("Security configuration updated by %s", ar.User)
+		} else if upperAction == "LOGIN" {
 			actionType = "USER_ACCESS"
-		} else if ar.Action == "REPORT_VIEW" || ar.Action == "FINANCE_REPORT" {
-			actionType = "GOVERNANCE"
+			authority = "Enterprise Identity & Access Management"
+			cleanAction = "User Authentication"
+			notes = fmt.Sprintf("Session authenticated for %s", ar.User)
 		}
 
 		recentRegulatoryActions = append(recentRegulatoryActions, RegulatoryActionItem{
-			ID:        fmt.Sprintf("REG-2026-%03d", ar.ID),
+			ID:        fmt.Sprintf("REG-2026-%04d", ar.ID),
 			Timestamp: ar.CreatedAt.Format("02 Jan, 15:04"),
 			Type:      actionType,
 			Target:    ar.Entity,
-			Action:    ar.Action,
-			Authority: "Internal Quality Audit",
+			Action:    cleanAction,
+			Authority: authority,
 			Status:    status,
-			Notes:     fmt.Sprintf("Audited by %s with cryptographic traceability", ar.User),
+			Notes:     notes,
+			User:      ar.User,
 		})
 	}
 

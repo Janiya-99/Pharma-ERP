@@ -104,6 +104,22 @@ export const SystemFixesAuditPage: React.FC = () => {
       title: "IC-01 to IC-07 Invoice Center Audit Report",
       size: "8.9 KB",
       description: "Complete RCA and engineering resolutions for Customer Balance & Aging reports, Sales Invoice Register missing October records, statement date defaults, and dropdown trailing hyphens."
+    },
+    {
+      name: "CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+      path: "docs/balance-sheet-audit/CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+      publicUrl: "CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+      title: "Control Center & Universal Report Export Audit Report",
+      size: "10.2 KB",
+      description: "Comprehensive statutory audit resolving Admin quick-login identity (AUTH-01), General Settings company synchronization (CC-01), Dashboard Audit date ranges (CC-02), Access Audit 24h filtering (CC-03), and full dataset PDF/Excel exports."
+    },
+    {
+      name: "COMPLIANCE_AND_QA_INVESTIGATION_AUDIT_REPORT.md",
+      path: "docs/balance-sheet-audit/COMPLIANCE_AND_QA_INVESTIGATION_AUDIT_REPORT.md",
+      publicUrl: "COMPLIANCE_AND_QA_INVESTIGATION_AUDIT_REPORT.md",
+      title: "Compliance, Inventory & Statutory QA Audit Report",
+      size: "9.6 KB",
+      description: "Authoritative statutory audit resolving NMRA license expiry math (COM-01), Deviations & CAPA workflows (COM-02), audit trail event mapping (COM-03), quarantined stock isolation (S-01), certified PDF export (S-04), CFO permissions (S-05), master data realignment (S-06), and universal print formats (S-07)."
     }
   ];
 

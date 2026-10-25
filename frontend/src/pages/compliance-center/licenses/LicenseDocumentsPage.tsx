@@ -27,8 +27,19 @@ import {
   FileText,
   Clock,
   ArrowUpDown,
+  FileSpreadsheet,
 } from "lucide-react";
 import { inventoryApi } from "../../../api/inventoryApi";
+import { TablePagination } from "../../../components/common/TablePagination";
+import { exportToCsv, exportToPdf } from "../../../utils/reportExportUtils";
+import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../components/ui/tooltip";
 
 interface LicenseDoc {
   id: string;
@@ -39,9 +50,93 @@ interface LicenseDoc {
   issueDate: string;
   expiryDate: string;
   daysRemaining: number;
+  adminStatus: "ACTIVE" | "SUSPENDED" | "RENEWAL_PENDING" | "REVOKED";
+  validityStatus: "ACTIVE" | "EXPIRING_SOON" | "EXPIRED";
   status: "ACTIVE" | "EXPIRING_SOON" | "EXPIRED" | "RENEWAL_PENDING";
   category: "NMRA" | "IRAS" | "HEALTH_MUNICIPAL" | "DANGEROUS_DRUGS";
 }
+
+const STATUTORY_PREMISES_LICENSES: Array<Omit<LicenseDoc, "daysRemaining" | "validityStatus" | "status">> = [
+  {
+    id: "lic-whl-4402",
+    licenseNumber: "WHL-4402/2026",
+    title: "NMRA Wholesale Dealer Operating License (Central Hub)",
+    authority: "National Medicines Regulatory Authority (NMRA)",
+    facility: "Colombo Central Medical Warehouse (WH_COL_MAIN)",
+    issueDate: "2025-07-01",
+    expiryDate: "2026-06-30", // Expired on 30 June 2026
+    adminStatus: "ACTIVE",
+    category: "NMRA",
+  },
+  {
+    id: "lic-whl-kdy-1092",
+    licenseNumber: "WHL-KDY-1092/2026",
+    title: "Kandy Regional Distribution Facility — Wholesale Operating License",
+    authority: "National Medicines Regulatory Authority (NMRA)",
+    facility: "Kandy Central Distribution Warehouse",
+    issueDate: "2026-04-15",
+    expiryDate: "2027-04-15",
+    adminStatus: "ACTIVE",
+    category: "NMRA",
+  },
+  {
+    id: "lic-whl-biy-7731",
+    licenseNumber: "WHL-BIY-7731/2026",
+    title: "Biyagama Cold Chain Vaccines Facility — Specialized Storage Permit",
+    authority: "National Medicines Regulatory Authority (NMRA)",
+    facility: "Biyagama Cold Chain Vaccines Facility",
+    issueDate: "2025-09-01",
+    expiryDate: "2027-08-30",
+    adminStatus: "ACTIVE",
+    category: "NMRA",
+  },
+  {
+    id: "lic-iras-col-89",
+    licenseNumber: "IRAS-COL-2026/89",
+    title: "Corporate Tax Clearance & Fiscal Compliance Certificate",
+    authority: "Inland Revenue Department (IRD / IRAS)",
+    facility: "Ceylon MedEx Corporate Headquarters (Colombo 03)",
+    issueDate: "2026-01-01",
+    expiryDate: "2026-12-31",
+    adminStatus: "ACTIVE",
+    category: "IRAS",
+  },
+  {
+    id: "lic-mnc-cmb-8820",
+    licenseNumber: "MNC-CMB-8820",
+    title: "Municipal Dangerous Goods & Flammables Storage Permit",
+    authority: "Colombo Municipal Council Health & Fire Dept",
+    facility: "Central Quality Control & Quarantine Holding",
+    issueDate: "2025-11-15",
+    expiryDate: "2026-11-15", // Approaching expiry (< 30 days relative to Oct 25)
+    adminStatus: "ACTIVE",
+    category: "HEALTH_MUNICIPAL",
+  },
+];
+
+export const calculateLicenseValidity = (expiryDateStr: string, adminStatus: string = "ACTIVE") => {
+  const now = new Date();
+  const expDate = new Date(expiryDateStr);
+
+  // Use calendar day boundary calculation
+  const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const expUtc = Date.UTC(expDate.getFullYear(), expDate.getMonth(), expDate.getDate());
+  const diffDays = Math.round((expUtc - nowUtc) / (1000 * 60 * 60 * 24));
+
+  let validityStatus: "ACTIVE" | "EXPIRING_SOON" | "EXPIRED" = "ACTIVE";
+  if (diffDays < 0) {
+    validityStatus = "EXPIRED";
+  } else if (diffDays <= 30) {
+    validityStatus = "EXPIRING_SOON";
+  }
+
+  let status: LicenseDoc["status"] = validityStatus;
+  if (adminStatus === "RENEWAL_PENDING" || adminStatus === "RENEWAL_SUBMITTED") {
+    status = "RENEWAL_PENDING";
+  }
+
+  return { daysRemaining: diffDays, validityStatus, status };
+};
 
 const LicenseDocumentsPage = () => {
   const [data, setData] = useState<LicenseDoc[]>([]);
@@ -66,23 +161,25 @@ const LicenseDocumentsPage = () => {
     try {
       const res = await inventoryApi.getProducts({ page: 1, limit: 100 });
       const rawProducts = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
-      const now = new Date();
 
-      const mapped: LicenseDoc[] = rawProducts.map((p: any) => {
+      // 1. Process statutory premises & facility licenses
+      const mappedPremises: LicenseDoc[] = STATUTORY_PREMISES_LICENSES.map((lic) => {
+        const { daysRemaining, validityStatus, status } = calculateLicenseValidity(lic.expiryDate, lic.adminStatus);
+        return {
+          ...lic,
+          daysRemaining,
+          validityStatus,
+          status,
+        };
+      });
+
+      // 2. Process product formulations licenses
+      const mappedProducts: LicenseDoc[] = rawProducts.map((p: any) => {
         const licNo = p.nmra_registration_number || `REG-${p.product_code || p.id}`;
         const expDateStr = p.nmra_expiry_date
           ? new Date(p.nmra_expiry_date).toISOString().split("T")[0]
-          : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-        const expDate = new Date(expDateStr);
-        const diffTime = expDate.getTime() - now.getTime();
-        const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        let status: LicenseDoc["status"] = "ACTIVE";
-        if (daysRemaining < 0) {
-          status = "EXPIRED";
-        } else if (daysRemaining <= 30) {
-          status = "EXPIRING_SOON";
-        }
+          : "2028-12-31";
+        const { daysRemaining, validityStatus, status } = calculateLicenseValidity(expDateStr, "ACTIVE");
 
         return {
           id: String(p.id),
@@ -90,17 +187,51 @@ const LicenseDocumentsPage = () => {
           title: `${p.product_name || "Pharmaceutical Item"} - NMRA Registration Certificate`,
           authority: "National Medicines Regulatory Authority (NMRA)",
           facility: p.manufacturer?.name || "Colombo Central Warehouse (HQ)",
-          issueDate: p.created_at ? new Date(p.created_at).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+          issueDate: p.created_at ? new Date(p.created_at).toISOString().split("T")[0] : "2025-01-01",
           expiryDate: expDateStr,
           daysRemaining,
+          adminStatus: "ACTIVE",
+          validityStatus,
           status,
           category: "NMRA",
         };
       });
 
-      setData(mapped);
+      // 3. Load locally registered licenses if any
+      let localSaved: LicenseDoc[] = [];
+      try {
+        const savedStr = localStorage.getItem("ceylonmed_registered_licenses");
+        if (savedStr) {
+          const parsed = JSON.parse(savedStr);
+          if (Array.isArray(parsed)) {
+            localSaved = parsed.map((item: any) => {
+              const { daysRemaining, validityStatus, status } = calculateLicenseValidity(item.expiryDate, item.adminStatus || "ACTIVE");
+              return {
+                ...item,
+                daysRemaining,
+                validityStatus,
+                status,
+              };
+            });
+          }
+        }
+      } catch {
+        // ignore
+      }
+
+      setData([...localSaved, ...mappedPremises, ...mappedProducts]);
     } catch {
-      setData([]);
+      // Fallback to premises licenses if products API fails
+      const fallbackPremises: LicenseDoc[] = STATUTORY_PREMISES_LICENSES.map((lic) => {
+        const { daysRemaining, validityStatus, status } = calculateLicenseValidity(lic.expiryDate, lic.adminStatus);
+        return {
+          ...lic,
+          daysRemaining,
+          validityStatus,
+          status,
+        };
+      });
+      setData(fallbackPremises);
     } finally {
       setLoading(false);
     }
@@ -121,6 +252,187 @@ const LicenseDocumentsPage = () => {
       return matchesStatus && matchesCategory && matchesSearch;
     });
   }, [data, selectedStatus, selectedCategory, searchQuery]);
+
+  // Renewal Modal State
+  const [renewTarget, setRenewTarget] = useState<LicenseDoc | null>(null);
+  const [renewYears, setRenewYears] = useState<number>(1);
+  const [renewNotes, setRenewNotes] = useState<string>("");
+
+  const handleOpenRenewModal = useCallback((lic: LicenseDoc) => {
+    setRenewTarget(lic);
+    setRenewYears(1);
+    setRenewNotes("");
+  }, []);
+
+  const handleConfirmRenewal = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!renewTarget) return;
+
+    const currentExp = new Date(renewTarget.expiryDate);
+    const newExp = new Date(currentExp);
+    newExp.setFullYear(newExp.getFullYear() + renewYears);
+    const newExpStr = newExp.toISOString().split("T")[0];
+    const { daysRemaining, validityStatus, status } = calculateLicenseValidity(newExpStr, "ACTIVE");
+
+    const updatedDoc: LicenseDoc = {
+      ...renewTarget,
+      expiryDate: newExpStr,
+      daysRemaining,
+      validityStatus,
+      status,
+      adminStatus: "ACTIVE",
+    };
+
+    const updated = data.map((item) => (item.id === renewTarget.id ? updatedDoc : item));
+    setData(updated);
+
+    try {
+      const existingStr = localStorage.getItem("ceylonmed_registered_licenses");
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      const filteredExisting = existing.filter((item: any) => item.id !== renewTarget.id);
+      localStorage.setItem("ceylonmed_registered_licenses", JSON.stringify([updatedDoc, ...filteredExisting]));
+    } catch {
+      // ignore
+    }
+
+    setRenewTarget(null);
+    toast.success(`License ${renewTarget.licenseNumber} successfully renewed until ${newExpStr}!`);
+  };
+
+  const handleDownloadCertificate = useCallback((lic: LicenseDoc) => {
+    try {
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      // Outer Decorative Border
+      doc.setDrawColor(72, 84, 204);
+      doc.setLineWidth(1.5);
+      doc.rect(10, 10, pageWidth - 20, 277);
+
+      doc.setDrawColor(203, 213, 225);
+      doc.setLineWidth(0.5);
+      doc.rect(12, 12, pageWidth - 24, 273);
+
+      // Header Band
+      doc.setFillColor(30, 27, 75);
+      doc.rect(12, 12, pageWidth - 24, 38, "F");
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.text("CEYLON MEDEX PHARMACEUTICALS", pageWidth / 2, 23, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(199, 210, 254);
+      doc.text("REGULATORY COMPLIANCE & STATUTORY AUTHORIZATION CERTIFICATE", pageWidth / 2, 31, { align: "center" });
+
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text("Democratic Socialist Republic of Sri Lanka • National Health & Drug Regulatory Framework", pageWidth / 2, 39, { align: "center" });
+
+      // Certificate Title & License Pill
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(30, 41, 59);
+      doc.text("CERTIFICATE OF STATUTORY REGISTRATION", pageWidth / 2, 59, { align: "center" });
+
+      doc.setFillColor(238, 242, 255);
+      doc.roundedRect(pageWidth / 2 - 45, 65, 90, 11, 3, 3, "F");
+      doc.setTextColor(72, 84, 204);
+      doc.setFontSize(11);
+      doc.text(lic.licenseNumber, pageWidth / 2, 72.5, { align: "center" });
+
+      // Scope & Description
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(71, 85, 105);
+      const splitTitle = doc.splitTextToSize(lic.title, 160);
+      doc.text(splitTitle, pageWidth / 2, 85, { align: "center" });
+
+      // Table Details
+      const standing =
+        lic.validityStatus === "ACTIVE"
+          ? "ACTIVE & FULLY COMPLIANT"
+          : lic.validityStatus === "EXPIRING_SOON"
+          ? "EXPIRING SOON"
+          : "EXPIRED / RENEWAL REQUIRED";
+
+      const details = [
+        ["Issuing Authority", lic.authority],
+        ["Registered Facility", lic.facility],
+        ["Regulatory Category", lic.category],
+        ["Date of Issue", lic.issueDate],
+        ["Date of Expiration", lic.expiryDate],
+        ["Current Compliance Standing", standing],
+        ["Administrative Status", lic.adminStatus || "ACTIVE ON FILE"],
+        ["Days Remaining", `${lic.daysRemaining} calendar day(s)`],
+      ];
+
+      autoTable(doc, {
+        startY: 100,
+        margin: { left: 20, right: 20 },
+        body: details,
+        theme: "striped",
+        styles: { fontSize: 9.5, cellPadding: 3.8, textColor: [30, 41, 59] },
+        columnStyles: {
+          0: { fontStyle: "bold", cellWidth: 55, textColor: [51, 65, 85] },
+          1: { cellWidth: "auto" },
+        },
+        headStyles: { fillColor: [72, 84, 204] },
+      });
+
+      const finalY = (doc as any).lastAutoTable?.finalY || 175;
+
+      // Declaration
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("STATUTORY DECLARATION & AUDIT VERIFICATION", 20, finalY + 18);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.text(
+        "This official electronic certificate verifies that the establishment and operational scope detailed above holds authorized statutory standing under the regulations of the National Medicines Regulatory Authority (NMRA). Issued by Ceylon MedEx Global ERP Compliance Center.",
+        20,
+        finalY + 25,
+        { maxWidth: pageWidth - 40 }
+      );
+
+      // Signature lines
+      const sigY = finalY + 46;
+      doc.setDrawColor(203, 213, 225);
+      doc.line(25, sigY, 75, sigY);
+      doc.line(pageWidth - 75, sigY, pageWidth - 25, sigY);
+
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(51, 65, 85);
+      doc.text("Dr. Kalinga Silva", 50, sigY + 5, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 116, 139);
+      doc.text("Managing Director / Authorized Signatory", 50, sigY + 10, { align: "center" });
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(51, 65, 85);
+      doc.text("Regulatory Affairs Director", pageWidth - 50, sigY + 5, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 116, 139);
+      doc.text("Statutory Compliance Division", pageWidth - 50, sigY + 10, { align: "center" });
+
+      // Footer stamp
+      doc.setFontSize(7);
+      doc.setTextColor(148, 163, 184);
+      const stamp = `VERIFIED CERTIFICATE • ID: ${lic.id.toUpperCase()} • ISSUED: ${new Date().toISOString()} • CEYLON MEDEX ERP`;
+      doc.text(stamp, pageWidth / 2, 280, { align: "center" });
+
+      doc.save(`License-Certificate-${lic.licenseNumber.replace(/[\/\\]/g, "_")}.pdf`);
+      toast.success(`Official certificate downloaded for ${lic.licenseNumber}`);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      toast.error("Failed to generate license certificate PDF");
+    }
+  }, []);
 
   const columns = useMemo<ColumnDef<LicenseDoc>[]>(
     () => [
@@ -202,34 +514,57 @@ const LicenseDocumentsPage = () => {
       },
       {
         accessorKey: "status",
-        header: "Status",
+        header: "Status & Validity",
         cell: ({ row }) => {
           const st = row.original.status;
-          if (st === "ACTIVE") {
+          const adminSt = row.original.adminStatus;
+          const isExpired = row.original.daysRemaining < 0;
+
+          if (isExpired) {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700   border border-emerald-200/60  px-2.5 py-0.5 text-[11px] font-bold">
-                <CheckCircle2 className="h-3 w-3" /> ACTIVE
-              </span>
+              <div className="flex flex-col gap-1 items-start">
+                <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200/60 px-2.5 py-0.5 text-[11px] font-bold">
+                  <XCircle className="h-3 w-3" /> EXPIRED
+                </span>
+                <span className="text-[10px] font-medium text-slate-500">
+                  Admin: {adminSt || "Active on File"}
+                </span>
+              </div>
             );
           }
           if (st === "EXPIRING_SOON") {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700   border border-amber-200/60  px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
-                <AlertTriangle className="h-3 w-3" /> EXPIRING SOON
-              </span>
+              <div className="flex flex-col gap-1 items-start">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
+                  <AlertTriangle className="h-3 w-3" /> EXPIRING SOON
+                </span>
+                <span className="text-[10px] font-medium text-slate-500">
+                  Admin: {adminSt || "Active"}
+                </span>
+              </div>
             );
           }
           if (st === "RENEWAL_PENDING") {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 text-indigo-700   border border-indigo-200/60  px-2.5 py-0.5 text-[11px] font-bold">
-                <RefreshCw className="h-3 w-3 animate-spin" /> RENEWAL IN PROGRESS
-              </span>
+              <div className="flex flex-col gap-1 items-start">
+                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60 px-2.5 py-0.5 text-[11px] font-bold">
+                  <RefreshCw className="h-3 w-3 animate-spin" /> RENEWAL IN PROGRESS
+                </span>
+                <span className="text-[10px] font-medium text-slate-500">
+                  Admin: {adminSt || "Renewal Submitted"}
+                </span>
+              </div>
             );
           }
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700   border border-rose-200/60  px-2.5 py-0.5 text-[11px] font-bold">
-              <XCircle className="h-3 w-3" /> EXPIRED
-            </span>
+            <div className="flex flex-col gap-1 items-start">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-2.5 py-0.5 text-[11px] font-bold">
+                <CheckCircle2 className="h-3 w-3" /> ACTIVE
+              </span>
+              <span className="text-[10px] font-medium text-slate-400">
+                Admin: {adminSt || "Active"}
+              </span>
+            </div>
           );
         },
       },
@@ -238,33 +573,126 @@ const LicenseDocumentsPage = () => {
         header: () => <span className="text-right block pr-4">Actions</span>,
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-2 pr-4">
-            <button className="rounded-lg border border-slate-200  p-1.5 text-slate-600  hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Download Certificate PDF">
-              <Download className="h-4 w-4" />
-            </button>
-            <button className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors shadow-2xs">
-              Renew License
-            </button>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadCertificate(row.original)}
+                  className="rounded-lg border border-slate-200 p-1.5 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all cursor-pointer shadow-2xs"
+                  aria-label="Download Certificate PDF"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-1.5 text-xs text-white shadow-xl">
+                Download Official Certificate PDF
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => handleOpenRenewModal(row.original)}
+                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-2xs cursor-pointer"
+                >
+                  Renew License
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-1.5 text-xs text-white shadow-xl">
+                Submit Renewal & Extension
+              </TooltipContent>
+            </Tooltip>
           </div>
         ),
       },
     ],
-    []
+    [handleDownloadCertificate, handleOpenRenewModal]
   );
+
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [searchQuery, selectedCategory, selectedStatus]);
 
   const table = useReactTable({
     data: filteredData,
     columns,
-    state: { sorting },
+    state: { sorting, pagination },
     onSortingChange: setSorting,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    autoResetPageIndex: true,
   });
+
+  const handleExportCsv = () => {
+    const headers = [
+      "License #",
+      "Title",
+      "Category",
+      "Authority",
+      "Facility",
+      "Issue Date",
+      "Expiry Date",
+      "Days Left",
+      "Validity",
+      "Status",
+    ];
+    const rows = filteredData.map((d) => [
+      d.licenseNumber,
+      d.title,
+      d.category,
+      d.authority,
+      d.facility,
+      d.issueDate,
+      d.expiryDate,
+      d.daysRemaining,
+      d.validityStatus,
+      d.status,
+    ]);
+    exportToCsv("licenses-regulatory-permits", headers, rows);
+    toast.success("Excel report exported successfully");
+  };
+
+  const handleExportPdf = () => {
+    const headers = [
+      "License #",
+      "Title",
+      "Category",
+      "Authority",
+      "Facility",
+      "Expiry Date",
+      "Days Left",
+      "Validity",
+    ];
+    const rows = filteredData.map((d) => [
+      d.licenseNumber,
+      d.title,
+      d.category,
+      d.authority,
+      d.facility,
+      d.expiryDate,
+      String(d.daysRemaining),
+      d.validityStatus,
+    ]);
+    exportToPdf({
+      title: "License Documents & Regulatory Permits",
+      filename: "licenses-regulatory-permits",
+      headers,
+      rows,
+      orientation: "landscape",
+    });
+    toast.success("PDF report generated successfully");
+  };
 
   const handleRegisterLicense = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle || !newNumber) return;
     const expStr = selectedDate ? selectedDate.toISOString().split("T")[0] : "2027-06-30";
+    const { daysRemaining, validityStatus, status } = calculateLicenseValidity(expStr, "ACTIVE");
     const newDoc: LicenseDoc = {
       id: `lic-${Date.now()}`,
       licenseNumber: newNumber,
@@ -273,11 +701,21 @@ const LicenseDocumentsPage = () => {
       facility: newFacility,
       issueDate: new Date().toISOString().split("T")[0],
       expiryDate: expStr,
-      daysRemaining: 365,
-      status: "ACTIVE",
+      daysRemaining,
+      adminStatus: "ACTIVE",
+      validityStatus,
+      status,
       category: newCategory as any,
     };
-    setData([newDoc, ...data]);
+    const updated = [newDoc, ...data];
+    setData(updated);
+    try {
+      const existingStr = localStorage.getItem("ceylonmed_registered_licenses");
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      localStorage.setItem("ceylonmed_registered_licenses", JSON.stringify([newDoc, ...existing]));
+    } catch {
+      // ignore
+    }
     setIsModalOpen(false);
     setNewTitle("");
     setNewNumber("");
@@ -307,10 +745,45 @@ const LicenseDocumentsPage = () => {
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                disabled={filteredData.length === 0}
+                className="flex h-10 items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
+              >
+                <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+                Export Excel
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-1.5 text-xs text-white shadow-xl">
+              Download CSV/Excel Spreadsheet
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                disabled={filteredData.length === 0}
+                className="flex h-10 items-center gap-2 rounded-xl border border-rose-200 bg-white px-4 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
+              >
+                <FileText className="h-4 w-4 text-rose-600" />
+                Export PDF
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-1.5 text-xs text-white shadow-xl">
+              Export Regulatory Register Report (PDF)
+            </TooltipContent>
+          </Tooltip>
+
           <button
+            type="button"
             onClick={() => setIsModalOpen(true)}
-            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all"
+            className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Register New License
@@ -330,21 +803,21 @@ const LicenseDocumentsPage = () => {
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Active & Compliant</span>
           <p className="mt-2 text-3xl font-extrabold text-emerald-600 ">
-            {data.filter((l) => l.status === "ACTIVE").length}
+            {data.filter((l) => l.validityStatus === "ACTIVE").length}
           </p>
           <span className="text-xs text-emerald-600 font-semibold mt-1 block">Good standing</span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Expiring / Renewal Needed</span>
           <p className="mt-2 text-3xl font-extrabold text-amber-600 ">
-            {data.filter((l) => l.status === "EXPIRING_SOON" || l.status === "RENEWAL_PENDING").length}
+            {data.filter((l) => l.validityStatus === "EXPIRING_SOON" || l.status === "RENEWAL_PENDING").length}
           </p>
           <span className="text-xs text-amber-600 font-semibold mt-1 block">Action required &lt; 30 days</span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Expired / Lapsed</span>
           <p className="mt-2 text-3xl font-extrabold text-rose-600 ">
-            {data.filter((l) => l.status === "EXPIRED").length}
+            {data.filter((l) => l.validityStatus === "EXPIRED").length}
           </p>
           <span className="text-xs text-rose-600 font-semibold mt-1 block">Requires immediate reinstatement</span>
         </div>
@@ -437,27 +910,14 @@ const LicenseDocumentsPage = () => {
         </div>
 
         {/* Pagination Strip */}
-        <div className="flex items-center justify-between border-t border-slate-200  px-5 py-4 text-xs">
-          <span className="text-slate-500  font-medium">
-            Showing {table.getRowModel().rows.length} of {filteredData.length} licenses
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="rounded-lg border border-slate-200  px-3 py-1.5 font-semibold text-slate-600  hover:bg-slate-50 disabled:opacity-50 transition-colors"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="rounded-lg border border-slate-200  px-3 py-1.5 font-semibold text-slate-600  hover:bg-slate-50 disabled:opacity-50 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        <TablePagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageSize={table.getState().pagination.pageSize}
+          totalItems={filteredData.length}
+          pageCount={table.getPageCount()}
+          onPageChange={(page) => table.setPageIndex(page)}
+          onPageSizeChange={(size) => table.setPageSize(size)}
+        />
       </div>
 
       {/* ── Modal: Register New License ── */}
@@ -572,6 +1032,93 @@ const LicenseDocumentsPage = () => {
                   className="rounded-xl bg-indigo-600 px-5 py-2 text-xs font-semibold text-white hover:bg-indigo-700 shadow-sm"
                 >
                   Register License
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Renew License ── */}
+      {renewTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-in fade-in-50">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="rounded-xl bg-indigo-50 p-2 text-indigo-600 border border-indigo-100">
+                  <RefreshCw className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Renew Regulatory License</h3>
+                  <p className="text-xs text-indigo-600 font-mono font-bold mt-0.5">{renewTarget.licenseNumber}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRenewTarget(null)}
+                className="rounded-lg p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmRenewal} className="space-y-4 text-sm">
+              <div className="rounded-xl bg-slate-50 p-3.5 border border-slate-200/80 space-y-1.5">
+                <p className="text-xs font-semibold text-slate-800">{renewTarget.title}</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
+                  <span>Authority: <strong className="text-slate-700">{renewTarget.authority}</strong></span>
+                  <span>Current Expiry: <strong className="text-slate-700">{renewTarget.expiryDate}</strong></span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                  Extension Period
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3].map((yrs) => (
+                    <button
+                      key={yrs}
+                      type="button"
+                      onClick={() => setRenewYears(yrs)}
+                      className={`h-10 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                        renewYears === yrs
+                          ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/20"
+                          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+                      }`}
+                    >
+                      +{yrs} Year{yrs > 1 ? "s" : ""}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                  Renewal Application / Gazette Tracking Reference
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. NMRA/REN-2026/0891 or IRD-EXT-442"
+                  value={renewNotes}
+                  onChange={(e) => setRenewNotes(e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setRenewTarget(null)}
+                  className="rounded-xl bg-slate-100 px-5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-indigo-600 px-5 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-600/20 cursor-pointer"
+                >
+                  Confirm & Renew License
                 </button>
               </div>
             </form>

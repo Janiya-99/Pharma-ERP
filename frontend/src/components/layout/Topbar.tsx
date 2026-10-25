@@ -47,6 +47,11 @@ import {
   Dialog,
   DialogContent,
 } from "../ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 // Map path segments to human-readable breadcrumb names
 const formatSegment = (s: string) => {
@@ -95,7 +100,7 @@ const ALL_MODULES = [
     code: "COMPLIANCE_CENTER",
     name: "Compliance Center",
     icon: ShieldCheck,
-    route: "/compliance/dashboard",
+    route: "/compliance-center/dashboard",
     desc: "NMRA Regulations, QA Pass Rates & Audits",
   },
   {
@@ -207,11 +212,15 @@ const Topbar = () => {
   const currentPath = location.pathname;
   let activeModuleCode = "CONTROL_CENTER";
   if (currentPath.startsWith("/finance")) activeModuleCode = "FINANCE";
+  else if (currentPath.startsWith("/inventory/warehouses")) activeModuleCode = "LOGISTICS";
   else if (currentPath.startsWith("/inventory")) activeModuleCode = "INVENTORY";
   else if (currentPath.startsWith("/invoice-center")) activeModuleCode = "INVOICE_CENTER";
   else if (currentPath.startsWith("/compliance")) activeModuleCode = "COMPLIANCE_CENTER";
   else if (currentPath.startsWith("/control-center")) activeModuleCode = "CONTROL_CENTER";
-  else if (activeSoftware?.software_code) activeModuleCode = activeSoftware.software_code;
+  else if (activeSoftware?.software_code) {
+    activeModuleCode = activeSoftware.software_code;
+    if (activeModuleCode === "COMPLIANCE") activeModuleCode = "COMPLIANCE_CENTER";
+  }
 
   const activeModule = ALL_MODULES.find((m) => m.code === activeModuleCode) || ALL_MODULES[0];
   const ActiveIcon = activeModule.icon;
@@ -238,8 +247,9 @@ const Topbar = () => {
   const handleSwitchModule = (code: string, route: string) => {
     // Navigate immediately to the target module route with zero lag
     navigate(route);
-    if (code !== "LOGISTICS" && switchActiveSoftware) {
-      switchActiveSoftware(code).catch((err) => console.error("Error switching active software:", err));
+    const targetCode = code === "LOGISTICS" ? "INVENTORY" : code === "COMPLIANCE" ? "COMPLIANCE_CENTER" : code;
+    if (switchActiveSoftware) {
+      switchActiveSoftware(targetCode).catch((err) => console.error("Error switching active software:", err));
     }
   };
 
@@ -307,13 +317,20 @@ const Topbar = () => {
 
           {/* Breadcrumb Links */}
           <div className="hidden min-w-0 items-center gap-1.5 text-xs sm:flex">
-            <NavLink
-              to="/"
-              className="text-slate-400 hover:text-blue-600 transition-colors flex items-center"
-              title="Home"
-            >
-              <Home className="h-3.5 w-3.5" />
-            </NavLink>
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                <NavLink
+                  to="/"
+                  className="text-slate-400 hover:text-blue-600 transition-colors flex items-center p-1 rounded-md hover:bg-slate-100"
+                  aria-label="Home"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                </NavLink>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="rounded-lg bg-slate-900 px-2 py-1 text-[11px] text-white shadow-lg">
+                Home Dashboard
+              </TooltipContent>
+            </Tooltip>
             {breadcrumbs.map((crumb, i) => (
               <React.Fragment key={i}>
                 <span className="text-slate-300 font-semibold select-none">&gt;</span>
@@ -334,41 +351,61 @@ const Topbar = () => {
           </div>
         </div>
 
-        {/* 2. CENTER: Hover-Expanding Module Switcher Rail */}
-        <div className="hidden lg:flex items-center p-1 rounded-lg bg-slate-100/80 border border-slate-200/70 gap-0.5 shrink-0">
+        {/* 2. CENTER: Executive Segmented Module Switcher Rail with Modern Tooltips */}
+        <div className="hidden lg:flex items-center p-1 rounded-xl bg-slate-100/90 border border-slate-200/80 shadow-2xs gap-1 shrink-0">
           {permittedModules.map((m) => {
             const Icon = m.icon;
             const isCurrent = m.code === activeModule.code;
             return (
-              <div key={m.code} className="relative group">
-                <button
-                  onClick={() => handleSwitchModule(m.code, m.route)}
-                  className={`flex items-center h-8 px-2.5 rounded-md text-xs font-medium transition-all duration-300 cursor-pointer ${
-                    isCurrent
-                      ? "bg-white text-indigo-700 shadow-xs border border-slate-200/90 font-semibold"
-                      : "text-slate-600 hover:text-indigo-600 hover:bg-white/80"
-                  }`}
-                  aria-label={m.name}
-                >
-                  <Icon className={`h-4 w-4 shrink-0 transition-transform duration-200 ${isCurrent ? "text-indigo-600" : "text-slate-500 group-hover:text-indigo-600 group-hover:scale-110"}`} />
-                  <span
-                    className={`whitespace-nowrap transition-all duration-300 ease-out overflow-hidden ${
+              <Tooltip key={m.code} delayDuration={80}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchModule(m.code, m.route)}
+                    className={`flex items-center h-8.5 rounded-lg text-xs transition-all duration-150 cursor-pointer select-none ${
                       isCurrent
-                        ? "max-w-[130px] ml-1.5 opacity-100"
-                        : "max-w-0 opacity-0 group-hover:max-w-[130px] group-hover:ml-1.5 group-hover:opacity-100"
+                        ? "bg-white text-indigo-700 shadow-xs border border-slate-200/90 font-semibold px-3"
+                        : "text-slate-600 hover:text-indigo-600 hover:bg-white/80 font-medium px-2.5"
                     }`}
+                    aria-label={m.name}
                   >
-                    {m.name}
-                  </span>
-                </button>
-
-                {/* Hover Descriptive Badge / Tooltip explaining what the module is */}
-                <div className="pointer-events-none absolute left-1/2 -bottom-9 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 px-2.5 py-1 text-[11px] font-medium text-white shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-50 flex items-center gap-1.5">
-                  <span className="font-semibold text-white">{m.name}</span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-slate-300 text-[10px]">{m.desc}</span>
-                </div>
-              </div>
+                    <Icon
+                      className={`h-4 w-4 shrink-0 transition-colors ${
+                        isCurrent ? "text-indigo-600" : "text-slate-500 hover:text-indigo-600"
+                      }`}
+                    />
+                    {isCurrent && (
+                      <span className="ml-1.5 whitespace-nowrap text-xs font-semibold text-slate-800 tracking-tight">
+                        {m.name}
+                      </span>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="bottom"
+                  sideOffset={8}
+                  className="z-50 rounded-xl border border-slate-800 bg-slate-950/95 px-3 py-2 text-white shadow-2xl backdrop-blur-md max-w-[240px]"
+                >
+                  <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-800">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-white">
+                      <Icon className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                      {m.name}
+                    </span>
+                    {isCurrent ? (
+                      <span className="rounded-md bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/30">
+                        Current
+                      </span>
+                    ) : (
+                      <span className="rounded-md bg-indigo-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-indigo-300 border border-indigo-500/30">
+                        Click to Switch
+                      </span>
+                    )}
+                  </div>
+                  <p className="pt-1.5 text-[11px] leading-relaxed text-slate-300">
+                    {m.desc}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             );
           })}
         </div>
@@ -490,13 +527,20 @@ const Topbar = () => {
           <div className="h-5 w-px bg-slate-200/80 mx-0.5 hidden lg:block" />
 
           {/* Quick Search */}
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-            title="Quick Search (Ctrl + K)"
-          >
-            <Search className="h-4 w-4" />
-          </button>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+                aria-label="Quick Search (Ctrl + K)"
+              >
+                <Search className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="rounded-lg bg-slate-900 px-2.5 py-1 text-[11px] text-white shadow-lg">
+              Quick Search (Ctrl+K)
+            </TooltipContent>
+          </Tooltip>
 
           {/* Notifications Dropdown */}
           <DropdownMenu>
@@ -604,13 +648,20 @@ const Topbar = () => {
           </DropdownMenu>
 
           {/* AI Copilot & Help */}
-          <button
-            onClick={() => toggleCopilot()}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-            title="AI Copilot & Help"
-          >
-            <HelpCircle className="h-4 w-4" />
-          </button>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => toggleCopilot()}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+                aria-label="AI Copilot & Help"
+              >
+                <HelpCircle className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="rounded-lg bg-slate-900 px-2.5 py-1 text-[11px] text-white shadow-lg">
+              Pharma AI Copilot (Ctrl+J)
+            </TooltipContent>
+          </Tooltip>
 
           {/* User Profile Dropdown */}
           <DropdownMenu>
@@ -674,14 +725,21 @@ const Topbar = () => {
           </DropdownMenu>
 
           {/* Logout Button */}
-          <button
-            onClick={logoutUser}
-            className="flex items-center gap-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200/80 px-2.5 py-1.5 text-xs font-semibold shadow-xs hover:shadow-sm active:scale-95 transition-all cursor-pointer"
-            title="Sign out of Pharma ERP"
-          >
-            <LogOut className="h-3.5 w-3.5 text-rose-500" />
-            <span className="hidden sm:inline">Logout</span>
-          </button>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={logoutUser}
+                className="flex items-center gap-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200/80 px-2.5 py-1.5 text-xs font-semibold shadow-xs hover:shadow-sm active:scale-95 transition-all cursor-pointer"
+                aria-label="Sign out of Pharma ERP"
+              >
+                <LogOut className="h-3.5 w-3.5 text-rose-500" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="rounded-lg bg-slate-900 px-2.5 py-1 text-[11px] text-white shadow-lg">
+              Sign out of Pharma ERP
+            </TooltipContent>
+          </Tooltip>
         </div>
       </header>
 

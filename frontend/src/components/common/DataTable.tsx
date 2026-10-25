@@ -72,7 +72,11 @@ function DataTable<TData = any>({
   const [clientPageIndex, setClientPageIndex] = useState(0);
   const [clientPageSize, setClientPageSize] = useState(defaultPageSize);
 
-  // When data changes or shrinks, ensure clientPageIndex remains in range
+  // Reset clientPageIndex when data changes or shrinks
+  useEffect(() => {
+    setClientPageIndex(0);
+  }, [data]);
+
   useEffect(() => {
     if (data && clientPageIndex > 0 && clientPageIndex * clientPageSize >= data.length) {
       setClientPageIndex(0);
@@ -81,7 +85,12 @@ function DataTable<TData = any>({
 
   if (loading && (!data || data.length === 0)) {
     return (
-      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-xs rounded-xl">
+      <div className="relative glass-table overflow-hidden bg-white border border-slate-100 shadow-xs rounded-xl">
+        {/* Top animated linear progress bar */}
+        <div className="h-0.5 w-full bg-slate-100 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-600 animate-pulse w-full" />
+        </div>
+
         <Table>
           <TableHeader className="border-b border-slate-100 bg-slate-50/50">
             <TableRow className="hover:bg-transparent">
@@ -102,7 +111,7 @@ function DataTable<TData = any>({
               )}
             </TableRow>
           </TableHeader>
-          <TableBody className="divide-slate-100 divide-y">
+          <TableBody className="divide-slate-100 divide-y relative">
             {Array.from({ length: 6 }).map((_, rIdx) => (
               <TableRow key={rIdx} className="border-none animate-pulse">
                 {columns.map((col, cIdx) => (
@@ -127,6 +136,17 @@ function DataTable<TData = any>({
             ))}
           </TableBody>
         </Table>
+
+        {/* Centered Modern Floating Loading Badge */}
+        <div className="absolute inset-0 top-12 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[1px] z-10 transition-all">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-2.5 shadow-xl ring-1 ring-slate-900/5">
+            <Loader2 className="h-4 w-4 animate-spin text-indigo-600 shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-slate-800">Loading Records...</span>
+              <span className="text-[11px] text-slate-400">Querying transactions and ledger entries</span>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -248,7 +268,24 @@ function DataTable<TData = any>({
 
   return (
     <div className="w-full">
-      <div className="glass-table overflow-hidden bg-white border border-slate-100 shadow-xs rounded-xl">
+      <div className="relative glass-table overflow-hidden bg-white border border-slate-100 shadow-xs rounded-xl">
+        {/* Top animated linear progress bar during background loading / pagination */}
+        {loading && (
+          <div className="absolute top-0 inset-x-0 h-0.5 bg-slate-100 overflow-hidden z-20">
+            <div className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-600 animate-pulse w-full" />
+          </div>
+        )}
+
+        {/* Floating loading badge if updating with data */}
+        {loading && (
+          <div className="absolute inset-0 top-12 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px] z-20 pointer-events-none transition-all">
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-2.5 shadow-xl ring-1 ring-slate-900/5">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-600 shrink-0" />
+              <span className="text-xs font-bold text-slate-800">Updating records...</span>
+            </div>
+          </div>
+        )}
+
         <Table>
           <TableHeader className="border-b border-slate-100 bg-slate-50/40">
             <TableRow className="hover:bg-transparent">
