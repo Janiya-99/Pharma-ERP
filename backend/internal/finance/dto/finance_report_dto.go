@@ -146,13 +146,20 @@ type DayBookReportRequest struct {
 
 type DayBookGroup struct {
 	TransactionDate string                       `json:"transaction_date"`
+	Date            string                       `json:"date"`
 	Entries         []GeneralLedgerEntryResponse `json:"entries"`
+	Lines           []GeneralLedgerEntryResponse `json:"lines"`
 	TotalDebit      float64                      `json:"total_debit"`
 	TotalCredit     float64                      `json:"total_credit"`
 }
 
 type DayBookReportResponse struct {
-	Groups []DayBookGroup `json:"groups"`
+	Groups            []DayBookGroup `json:"groups"`
+	Days              []DayBookGroup `json:"days"`
+	TotalDebit        float64        `json:"total_debit"`
+	TotalCredit       float64        `json:"total_credit"`
+	TotalTransactions int            `json:"total_transactions"`
+	TotalDays         int            `json:"total_days"`
 }
 
 // Registers Request
