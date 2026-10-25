@@ -47,6 +47,8 @@ type JournalEntry struct {
 	Lines     []JournalEntryLine     `gorm:"foreignKey:JournalEntryID" json:"lines,omitempty"`
 	Approvals []JournalEntryApproval `gorm:"foreignKey:JournalEntryID" json:"approvals,omitempty"`
 	Reversals []JournalEntryReversal `gorm:"foreignKey:OriginalJournalEntryID" json:"reversal_info,omitempty"`
+
+	CreatedByName string `gorm:"-" json:"created_by_name"`
 }
 
 func (JournalEntry) TableName() string {

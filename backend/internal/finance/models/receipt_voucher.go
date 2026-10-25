@@ -43,4 +43,7 @@ type ReceiptVoucher struct {
 	FinancialYear     *FinancialYear    `gorm:"foreignKey:FinancialYearID;references:ID" json:"financial_year,omitempty"`
 	AccountingPeriod  *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID;references:ID" json:"accounting_period,omitempty"`
 	ReceivedToAccount *ChartOfAccount   `gorm:"foreignKey:ReceivedToAccountID" json:"received_to_account,omitempty"`
+
+	CreatedByName         string `gorm:"-" json:"created_by_name"`
+	ReceivedToAccountName string `gorm:"-" json:"received_to_account_name"`
 }
