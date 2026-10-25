@@ -324,7 +324,7 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 	}
 
 	// Calculate opening balance before DateFrom if DateFrom is provided
-	if filters.DateFrom != nil {
+	if filters.DateFrom != nil && !filters.DateFrom.IsZero() {
 		df := filters.DateFrom.Format("2006-01-02")
 		var prevInvoices, prevDebit, prevCredit, prevReceipts float64
 
@@ -341,14 +341,14 @@ func (r *invoiceCenterReportRepository) GetCustomerStatementTransactions(db *gor
 	dateFilterCN := ""
 	dateFilterCR := ""
 
-	if filters.DateFrom != nil {
+	if filters.DateFrom != nil && !filters.DateFrom.IsZero() {
 		df := filters.DateFrom.Format("2006-01-02")
 		dateFilterSI += fmt.Sprintf(" AND si.invoice_date >= '%s'", df)
 		dateFilterDN += fmt.Sprintf(" AND debit_note_date >= '%s'", df)
 		dateFilterCN += fmt.Sprintf(" AND credit_note_date >= '%s'", df)
 		dateFilterCR += fmt.Sprintf(" AND receipt_date >= '%s'", df)
 	}
-	if filters.DateTo != nil {
+	if filters.DateTo != nil && !filters.DateTo.IsZero() {
 		dt := filters.DateTo.Format("2006-01-02")
 		dateFilterSI += fmt.Sprintf(" AND si.invoice_date <= '%s'", dt)
 		dateFilterDN += fmt.Sprintf(" AND debit_note_date <= '%s'", dt)
