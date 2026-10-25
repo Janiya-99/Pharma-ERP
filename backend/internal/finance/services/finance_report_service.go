@@ -52,12 +52,15 @@ func (s *FinanceReportService) GetTrialBalanceReport(companyID uint64, req dto.T
 		}
 
 		line := dto.TrialBalanceLine{
-			AccountCode:   raw.AccountCode,
-			AccountName:   raw.AccountName,
-			OpeningDebit:  raw.OpeningDebit,
-			OpeningCredit: raw.OpeningCredit,
-			PeriodDebit:   raw.PeriodDebit,
-			PeriodCredit:  raw.PeriodCredit,
+			AccountID:          raw.AccountID,
+			AccountCode:        raw.AccountCode,
+			AccountName:        raw.AccountName,
+			ClassificationName: raw.ClassificationName,
+			Category:           raw.ClassificationType,
+			OpeningDebit:       raw.OpeningDebit,
+			OpeningCredit:      raw.OpeningCredit,
+			PeriodDebit:        raw.PeriodDebit,
+			PeriodCredit:       raw.PeriodCredit,
 		}
 
 		// Calculate closing balances
