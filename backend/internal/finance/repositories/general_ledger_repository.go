@@ -44,7 +44,8 @@ func (r *GeneralLedgerRepository) List(companyID uint64, filters map[string]inte
 		query = query.Where("transaction_date >= ?", *dateFrom)
 	}
 	if dateTo != nil {
-		query = query.Where("transaction_date <= ?", *dateTo)
+		endOfDay := time.Date(dateTo.Year(), dateTo.Month(), dateTo.Day(), 23, 59, 59, 999999999, dateTo.Location())
+		query = query.Where("transaction_date <= ?", endOfDay)
 	}
 
 	if search != "" {

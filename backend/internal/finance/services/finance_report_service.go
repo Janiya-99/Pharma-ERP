@@ -682,7 +682,7 @@ func (s *FinanceReportService) GetDayBookReport(companyID uint64, req dto.DayBoo
 		}
 
 		group := groupsMap[dateStr]
-		group.Entries = append(group.Entries, dto.GeneralLedgerEntryResponse{
+		entry := dto.GeneralLedgerEntryResponse{
 			ID:              e.ID,
 			TransactionDate: dateStr,
 			SourceType:      e.SourceType,
@@ -692,15 +692,27 @@ func (s *FinanceReportService) GetDayBookReport(companyID uint64, req dto.DayBoo
 			Description:     e.Description,
 			DebitAmount:     e.DebitAmount,
 			CreditAmount:    e.CreditAmount,
-		})
+		}
+		group.Entries = append(group.Entries, entry)
+		group.Lines = append(group.Lines, entry)
+		group.Date = dateStr
 		group.TotalDebit += e.DebitAmount
 		group.TotalCredit += e.CreditAmount
 	}
 
 	var response dto.DayBookReportResponse
+	response.Groups = make([]dto.DayBookGroup, 0, len(orderedDates))
+	response.Days = make([]dto.DayBookGroup, 0, len(orderedDates))
+
 	for _, dateStr := range orderedDates {
-		response.Groups = append(response.Groups, *groupsMap[dateStr])
+		g := *groupsMap[dateStr]
+		response.Groups = append(response.Groups, g)
+		response.Days = append(response.Days, g)
+		response.TotalDebit += g.TotalDebit
+		response.TotalCredit += g.TotalCredit
+		response.TotalTransactions += len(g.Entries)
 	}
+	response.TotalDays = len(orderedDates)
 
 	return &response, nil
 }
