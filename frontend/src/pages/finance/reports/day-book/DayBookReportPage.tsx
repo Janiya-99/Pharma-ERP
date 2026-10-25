@@ -5,6 +5,7 @@ import { getBranches } from '../../../../api/controlApi';
 import { toast } from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
 import ReportPageHeader from '../../../../components/finance/reports/ReportPageHeader';
+import ReportActions from '../../../../components/finance/reports/ReportActions';
 import ReportFilterCard from '../../../../components/finance/reports/ReportFilterCard';
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
 import SourceTypeBadge from '../../../../components/finance/reports/SourceTypeBadge';
@@ -492,48 +493,14 @@ const DayBookReportPage: React.FC = () => {
         title="Day Book" 
         description="Chronological audit register of all nominal general ledger vouchers, cash/bank transactions, and journal entries."
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => fetchReport()} 
-              disabled={loading}
-              className="h-8.5 gap-1.5 text-xs bg-white text-slate-700 hover:bg-slate-50 border-slate-200 shadow-2xs font-semibold cursor-pointer"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleExportCsv} 
-              disabled={loading || filteredDays.length === 0}
-              className="h-8.5 gap-1.5 text-xs bg-white text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 border-emerald-200 shadow-2xs font-semibold cursor-pointer"
-            >
-              <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
-              Export Excel
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleExportPdf} 
-              disabled={loading || filteredDays.length === 0}
-              className="h-8.5 gap-1.5 text-xs bg-white text-rose-700 hover:text-rose-800 hover:bg-rose-50 border-rose-200 shadow-2xs font-semibold cursor-pointer"
-            >
-              <FileText className="h-3.5 w-3.5 text-rose-600" />
-              Export PDF
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handlePrint}
-              disabled={loading || filteredDays.length === 0}
-              className="h-8.5 gap-1.5 text-xs bg-white text-slate-700 hover:bg-slate-50 border-slate-200 shadow-2xs font-semibold cursor-pointer hidden sm:flex"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              Print
-            </Button>
-          </div>
+          <ReportActions
+            onRefresh={() => fetchReport()}
+            onExportCsv={handleExportCsv}
+            onExportPdf={handleExportPdf}
+            onPrint={handlePrint}
+            loading={loading}
+            disabled={filteredDays.length === 0}
+          />
         }
       />
 

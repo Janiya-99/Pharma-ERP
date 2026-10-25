@@ -8,7 +8,7 @@ import ReportPageHeader from '../../../../components/finance/reports/ReportPageH
 import ReportFilterCard from '../../../../components/finance/reports/ReportFilterCard';
 import ReportSummaryCard from '../../../../components/finance/reports/ReportSummaryCard';
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
-import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
+import ReportActions from '../../../../components/finance/reports/ReportActions';
 import SourceTypeBadge from '../../../../components/finance/reports/SourceTypeBadge';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
@@ -268,6 +268,17 @@ const AccountLedgerReportPage = () => {
       <ReportPageHeader 
         title="Account Ledger" 
         description="Detailed chronological record of all debit and credit postings for an account." 
+        actions={
+          <ReportActions
+            onRefresh={fetchReport}
+            onExportCsv={handleExportCsv}
+            onExportPdf={handleExportPdf}
+            onExportJson={handleExportJson}
+            onPrint={() => window.print()}
+            loading={loading}
+            disabled={!data}
+          />
+        }
       />
 
       {/* AI Copilot Prompting Bar */}
@@ -362,8 +373,6 @@ const AccountLedgerReportPage = () => {
             <h2 className="text-xl font-bold text-slate-900">{data.account_code || (data.account_details?.account_code)} - {data.account_name || (data.account_details?.account_name)}</h2>
             {data.branch_name && <p className="text-slate-500 mt-1 text-xs">Branch: {data.branch_name}</p>}
           </div>
-
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} onExportCsv={handleExportCsv} onExportPdf={handleExportPdf} isRefreshing={loading} />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />

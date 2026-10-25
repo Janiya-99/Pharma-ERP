@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast';
 import ReportPageHeader from '../../../../components/finance/reports/ReportPageHeader';
 import ReportFilterCard from '../../../../components/finance/reports/ReportFilterCard';
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
-import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
+import ReportActions from '../../../../components/finance/reports/ReportActions';
 import BalanceStatusBadge from '../../../../components/finance/reports/BalanceStatusBadge';
 import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { BalanceSheetAuditDocModal } from '../../../../components/finance/reports/BalanceSheetAuditDocModal';
@@ -328,15 +328,26 @@ const BalanceSheetReportPage: React.FC = () => {
         title="Balance Sheet" 
         description="Snapshot of enterprise assets, liabilities, and equity capital position under SLFRS / LKAS guidelines."
         actions={
-          <button
-            type="button"
-            onClick={() => setIsAuditModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-xs transition-all shadow-2xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-            title="View Technical Resolution & Ledger Reconciliation Audit"
-          >
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span>Audit Fix Documentation</span>
-          </button>
+          <ReportActions
+            onRefresh={fetchReport}
+            onExportCsv={handleExportCsv}
+            onExportPdf={handleExportPdf}
+            onExportJson={handleExportJson}
+            onPrint={() => window.print()}
+            loading={loading}
+            disabled={!data}
+            extraActions={
+              <button
+                type="button"
+                onClick={() => setIsAuditModalOpen(true)}
+                className="inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-xs transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
+                title="View Technical Resolution & Ledger Reconciliation Audit"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Audit Fix Doc</span>
+              </button>
+            }
+          />
         }
       />
 
@@ -504,19 +515,9 @@ const BalanceSheetReportPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Toolbar & Balance Badge */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-            <ReportToolbar 
-              onRefresh={fetchReport} 
-              onExportJson={handleExportJson} 
-              onExportCsv={handleExportCsv}
-              onExportPdf={handleExportPdf}
-              onPrint={() => window.print()}
-              isRefreshing={loading} 
-            />
-            <div className="self-end sm:self-center mb-4">
-              <BalanceStatusBadge isBalanced={isBalanced} difference={diff} />
-            </div>
+          {/* Balance Status Badge */}
+          <div className="flex justify-end pt-2 pb-1">
+            <BalanceStatusBadge isBalanced={isBalanced} difference={diff} />
           </div>
 
           {/* Statement of Financial Position Document */}

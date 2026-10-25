@@ -203,11 +203,11 @@ export const PageTitleCard: React.FC<PageTitleCardProps> = ({
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
             <button
               type="button"
               onClick={() => openCopilot("summary")}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10 hover:from-purple-600/20 hover:via-indigo-600/20 hover:to-blue-600/20 border border-indigo-200/80 text-indigo-700 font-semibold text-xs transition-all shadow-2xs hover:shadow-xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 h-8.5 rounded-lg bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 hover:from-purple-100/70 hover:via-indigo-100/70 hover:to-blue-100/70 border border-indigo-200/90 text-indigo-700 font-semibold text-xs transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
               title="View AI Page Summary & SOP Documentation"
             >
               <Sparkles className="h-3.5 w-3.5 text-indigo-600 animate-pulse" />
