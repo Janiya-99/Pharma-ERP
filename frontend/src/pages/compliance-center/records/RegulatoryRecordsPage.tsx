@@ -28,115 +28,18 @@ import { getAuditLogs } from "../../../api/controlApi";
 import { TablePagination } from "../../../components/common/TablePagination";
 import { exportToCsv } from "../../../utils/reportExportUtils";
 import { toast } from "sonner";
-
-export type RegulatoryCategory =
-  | "ALL"
-  | "DEVIATION_REPORT"
-  | "CAPA_ACTION"
-  | "LICENSE_ACTION"
-  | "QUARANTINE_HOLD"
-  | "RECALL_NOTICE"
-  | "DISPOSAL_WITNESS"
-  | "NMRA_INSPECTION"
-  | "FINANCE_GOVERNANCE"
-  | "SYSTEM_AUDIT";
-
-export interface RegulatoryRecord {
-  id: string;
-  recordNumber: string;
-  timestamp: string;
-  category: RegulatoryCategory;
-  subject: string;
-  authority: string;
-  facility: string;
-  performedBy: string;
-  sha256Hash: string;
-  status: "VERIFIED_IMMUTABLE" | "ARCHIVED_SEALED" | "INVESTIGATION" | "CAPA_INITIATED" | "RESOLVED";
-  metadata: Record<string, string | number>;
-}
+import {
+  RegulatoryCategory,
+  RegulatoryRecord,
+  DEFAULT_DEVIATIONS_AND_CAPA,
+  generateSha256,
+  downloadCertifiedPdf,
+  InspectionDossierModal,
+} from "./complianceRecordsShared";
 
 interface Props {
   initialCategory?: RegulatoryCategory | string;
 }
-
-const DEFAULT_DEVIATIONS_AND_CAPA: RegulatoryRecord[] = [
-  {
-    id: "dev-0042",
-    recordNumber: "DEV-2026-0042",
-    timestamp: "2026-10-24 09:15:00 UTC",
-    category: "DEVIATION_REPORT",
-    subject: "Quality Deviation: Cold-Chain Walk-in Refrigerator 02 Temperature Excursion (+8.9°C for 32 mins during grid power transfer)",
-    authority: "Internal Quality Assurance Department",
-    facility: "Colombo Central Medical Warehouse (Cold-Chain Hub)",
-    performedBy: "Dr. Nimal Senanayake (Quality Assurance Manager)",
-    sha256Hash: "e4f8b92d6c1a7051834927cb51a9e3381fa4d0b138e617d9834b67039a85ef12",
-    status: "INVESTIGATION",
-    metadata: {
-      "Deviation Type": "Unplanned Environmental Excursion",
-      "Severity Level": "MAJOR",
-      "Immediate Action Taken": "Automatic generator transfer activated, batches quarantined for stability verification",
-      "CAPA Reference": "CAPA-2026-0019",
-      "Regulatory Notification": "NMRA Good Distribution Practices (GDP) Cell",
-    },
-  },
-  {
-    id: "dev-0038",
-    recordNumber: "DEV-2026-0038",
-    timestamp: "2026-10-22 14:30:00 UTC",
-    category: "DEVIATION_REPORT",
-    subject: "Quality Deviation: Particulate Defect on Blister Foil Packaging for Amoxicillin 500mg Batch BAT-AMX-2026-04",
-    authority: "Quality Control Laboratory & NMRA",
-    facility: "Colombo Central Warehouse (Packaging Hall 1)",
-    performedBy: "Tharindu Wickramasinghe (Lead Pharmacist & QC)",
-    sha256Hash: "c9831a29f847120dbef628490a183572d4a1b0928e75c6130948b819273c5da4",
-    status: "CAPA_INITIATED",
-    metadata: {
-      "Deviation Type": "Primary Packaging Visual Non-Conformance",
-      "Severity Level": "CRITICAL",
-      "Immediate Action Taken": "Batch BAT-AMX-2026-04 quarantined immediately; supplier batch foil-88 halted",
-      "CAPA Reference": "CAPA-2026-0017",
-      "NMRA Regulatory Filing": "REG-2026-QC-0881",
-    },
-  },
-  {
-    id: "capa-0019",
-    recordNumber: "CAPA-2026-0019",
-    timestamp: "2026-10-24 11:45:00 UTC",
-    category: "CAPA_ACTION",
-    subject: "CAPA: Install Redundant Digital IoT Temperature Sensors & Automatic SMS/Email Fail-safe Alarm on Walk-in Refrigerator 02",
-    authority: "QA & Compliance Oversight Committee",
-    facility: "Colombo Central Medical Warehouse",
-    performedBy: "Dr. Nimal Senanayake (Quality Assurance Manager)",
-    sha256Hash: "92b740ef821cd3894751029abce74910283b749501a2846938d61749b9281045",
-    status: "RESOLVED",
-    metadata: {
-      "CAPA Classification": "Preventive & Corrective Action",
-      "Target Completion": "2026-11-15",
-      "Verification Method": "72-Hour continuous temperature logger validation assay",
-      "Linked Deviation": "DEV-2026-0042",
-      "Assigned Lead": "Dr. Nimal Senanayake (QA Manager)",
-    },
-  },
-  {
-    id: "capa-0017",
-    recordNumber: "CAPA-2026-0017",
-    timestamp: "2026-10-23 08:00:00 UTC",
-    category: "CAPA_ACTION",
-    subject: "CAPA: Enforce Supplier Certificate of Analysis (CoA) Tensile & Pinhole Testing for Blister Packaging Materials",
-    authority: "QA & Compliance Committee & NMRA",
-    facility: "Colombo Central Medical Warehouse",
-    performedBy: "Tharindu Wickramasinghe (Lead Pharmacist & QC)",
-    sha256Hash: "51834927cb51a9e3381fa4d0b138e617d9834b67039a85ef12e4f8b92d6c1a70",
-    status: "RESOLVED",
-    metadata: {
-      "CAPA Classification": "Corrective Action & Supplier Quality Audit",
-      "Target Completion": "2026-11-01",
-      "Verification Method": "Pre-shipment batch sample testing and vacuum leak integrity test",
-      "Linked Deviation": "DEV-2026-0038",
-      "Assigned Lead": "Tharindu Wickramasinghe (SLMC-8941)",
-    },
-  },
-];
 
 export default function RegulatoryRecordsPage({ initialCategory }: Props) {
   const [searchParams] = useSearchParams();
@@ -155,7 +58,7 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
   const [newRootCause, setNewRootCause] = useState("");
   const [newOfficer, setNewOfficer] = useState("Dr. Nimal Senanayake (Quality Assurance Manager)");
 
-  // Sync initial category from props or URL query (?tab=deviations, ?tab=capa, etc.)
+  // Sync initial category from props or URL query
   useEffect(() => {
     const tabParam = searchParams.get("tab")?.toLowerCase();
     if (tabParam === "deviations" || tabParam === "dev" || initialCategory === "DEVIATIONS") {
@@ -176,15 +79,6 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
       setSelectedCategory(initialCategory);
     }
   }, [searchParams, initialCategory]);
-
-  const generateSha256 = (seed: string) => {
-    let hash = "";
-    for (let i = 0; i < 64; i++) {
-      const charCode = (seed.charCodeAt(i % seed.length) * 31 + i * 17) % 16;
-      hash += charCode.toString(16);
-    }
-    return hash;
-  };
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
@@ -326,7 +220,6 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
     toast.success("Excel dossier exported successfully");
   };
 
-  // Handle creating new Deviation or CAPA
   const handleCreateRecord = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
@@ -364,133 +257,9 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
     setNewTitle("");
     setNewRootCause("");
     setSelectedCategory(dialogType === "DEVIATION" ? "DEVIATION_REPORT" : "CAPA_ACTION");
+    toast.success(`Record ${recNumber} created and timestamped`);
   };
 
-  // ── CERTIFIED PDF EXPORT (S-04) ──
-  const downloadCertifiedPdf = (record: RegulatoryRecord) => {
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    // Top Header Banner
-    doc.setFillColor(30, 41, 59); // slate-800
-    doc.rect(0, 0, 210, 32, "F");
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("CEYLON MEDEX PHARMACEUTICALS (PVT) LTD", 14, 13);
-
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.text("NMRA Licensed Importer & Wholesale Distributor • Regulatory Affairs Directorate", 14, 19);
-
-    doc.setFontSize(8);
-    doc.setTextColor(148, 163, 184);
-    doc.text("WORM Compliant Immutability Engine • National Medicines Regulatory Authority Compliance", 14, 25);
-
-    // Title Section
-    doc.setTextColor(15, 23, 42);
-    doc.setFontSize(13);
-    doc.setFont("helvetica", "bold");
-    doc.text("REGULATORY COMPLIANCE DOSSIER & AUDIT CERTIFICATE", 14, 42);
-
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text(
-      `Generated: ${new Date().toISOString().replace("T", " ").substring(0, 19)} UTC | Certificate Ref: CERT-${record.recordNumber}`,
-      14,
-      48
-    );
-
-    // Metadata Table
-    const metadataRows = [
-      ["Record Reference Number", record.recordNumber],
-      ["Audit Timestamp (Atomic Clock)", record.timestamp],
-      ["Regulatory Classification", record.category.replace(/_/g, " ")],
-      ["Target Subject / Event", record.subject],
-      ["Supervising Regulatory Authority", record.authority],
-      ["Operating Facility / Scope", record.facility],
-      ["Executed / Certified By", record.performedBy],
-      ["Immutability Status", record.status],
-      ...Object.entries(record.metadata).map(([k, v]) => [k, String(v)]),
-    ];
-
-    autoTable(doc, {
-      startY: 53,
-      head: [["Verification Parameter", "Certified Audit Data Record"]],
-      body: metadataRows,
-      theme: "striped",
-      headStyles: {
-        fillColor: [79, 70, 229], // indigo-600
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-        fontSize: 9,
-      },
-      bodyStyles: {
-        fontSize: 8.5,
-        textColor: [30, 41, 59],
-      },
-      columnStyles: {
-        0: { fontStyle: "bold", cellWidth: 65 },
-        1: { cellWidth: 115 },
-      },
-    });
-
-    const finalY = (doc as any).lastAutoTable?.finalY || 160;
-
-    // Cryptographic Proof Box
-    doc.setFillColor(241, 245, 249);
-    doc.setDrawColor(203, 213, 225);
-    doc.roundedRect(14, finalY + 8, 182, 34, 3, 3, "FD");
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text("SHA-256 CRYPTOGRAPHIC INTEGRITY PROOF (WORM ASSURANCE)", 20, finalY + 16);
-
-    doc.setFont("courier", "bold");
-    doc.setFontSize(7.5);
-    doc.setTextColor(5, 150, 105); // emerald-600
-    doc.text(record.sha256Hash, 20, finalY + 23);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7.5);
-    doc.setTextColor(100, 116, 139);
-    doc.text(
-      "This irreversible checksum was cryptographically stamped upon initial ledger entry. Any alteration invalidates this certificate.",
-      20,
-      31 + finalY
-    );
-
-    // Certification Statement
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(7.5);
-    doc.setTextColor(71, 85, 105);
-    const certStatement =
-      "This official document certifies that the record described herein has been recorded in Ceylon MedEx's Regulatory Audit Ledger in compliance with National Medicines Regulatory Authority (NMRA) Act No. 5 of 2015, WHO Good Distribution Practices (GDP), and Current Good Manufacturing Practices (cGMP).";
-    doc.text(certStatement, 14, finalY + 48, { maxWidth: 182 });
-
-    // Signatures
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(51, 65, 85);
-
-    doc.line(14, finalY + 68, 75, finalY + 68);
-    doc.text("Head of Regulatory Affairs & QA", 14, finalY + 72);
-    doc.text("Dr. Nimal Senanayake", 14, finalY + 76);
-
-    doc.line(125, finalY + 68, 185, finalY + 68);
-    doc.text("Supervising Pharmacist / QP", 125, finalY + 72);
-    doc.text("Tharindu Wickramasinghe (SLMC-8941)", 125, finalY + 76);
-
-    doc.save(`CERTIFIED_AUDIT_${record.recordNumber}.pdf`);
-  };
-
-  // ── EXPORT FULL DOSSIER TABLE PDF ──
   const exportFullDossierPdf = () => {
     const doc = new jsPDF({
       orientation: "landscape",
@@ -540,6 +309,7 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
     });
 
     doc.save(`REGULATORY_DOSSIER_EXPORT_${new Date().toISOString().slice(0, 10)}.pdf`);
+    toast.success("Regulatory dossier exported to PDF");
   };
 
   return (
@@ -548,12 +318,12 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
       <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-md shadow-indigo-600/20">
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-                Compliance Center • Legal Archives & Audits
+                Compliance Center • Legal Archives & Master Audits
               </p>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                 Regulatory Records & Inspection Archives
@@ -590,7 +360,7 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
           <button
             onClick={handleExportCsv}
             disabled={filteredData.length === 0}
-            className="flex h-10 items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
           >
             <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
             Export Excel
@@ -685,7 +455,7 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => fetchRecords()}
-            className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-indigo-600 font-semibold px-2 py-1"
+            className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-indigo-600 font-semibold px-2 py-1 cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh Live Ledger
           </button>
@@ -748,25 +518,34 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
                     </td>
                     <td className="px-5 py-4 max-w-md">
                       <p className="font-bold text-slate-800 text-xs">{row.subject}</p>
-                      <span className="text-[11px] text-slate-500 block mt-0.5">
-                        Authority: <b>{row.authority}</b> • By: {row.performedBy}
-                      </span>
+                      <span className="text-[11px] text-slate-400 block mt-0.5">{row.authority}</span>
                     </td>
                     <td className="px-5 py-4">
-                      <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/60 max-w-xs truncate">
-                        <Hash className="h-3 w-3 text-emerald-500 shrink-0" />
-                        <span className="truncate" title={row.sha256Hash}>
-                          {row.sha256Hash}
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-200">
+                          {row.sha256Hash.substring(0, 16)}...
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                          SEALED
                         </span>
                       </div>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button
-                        onClick={() => setSelectedRecord(row)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5" /> Inspect Dossier
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => setSelectedRecord(row)}
+                          className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold px-2.5 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-50 transition-colors cursor-pointer"
+                        >
+                          <Eye className="h-3.5 w-3.5" /> Inspect Dossier
+                        </button>
+                        <button
+                          onClick={() => downloadCertifiedPdf(row)}
+                          title="Download Certified PDF Certificate"
+                          className="text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg border border-transparent hover:border-slate-200 transition-colors cursor-pointer"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -775,132 +554,28 @@ export default function RegulatoryRecordsPage({ initialCategory }: Props) {
           </table>
         </div>
 
-        {/* Pagination Strip */}
-        <TablePagination
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          totalItems={filteredData.length}
-          pageCount={Math.max(1, Math.ceil(filteredData.length / pageSize))}
-          onPageChange={setPageIndex}
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            setPageIndex(0);
-          }}
-        />
+        {/* Pagination */}
+        <div className="border-t border-slate-200 px-4 py-3 bg-slate-50/50">
+          <TablePagination
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            pageCount={Math.ceil(filteredData.length / pageSize)}
+            totalItems={filteredData.length}
+            onPageChange={setPageIndex}
+            onPageSizeChange={setPageSize}
+          />
+        </div>
       </div>
 
-      {/* ── Modal: Inspect Dossier & Metadata ── */}
-      {selectedRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-in fade-in-50">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600">
-                  <BookOpen className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Regulatory Inspection Dossier</h3>
-                  <p className="text-xs text-slate-400">
-                    {selectedRecord.recordNumber} • {selectedRecord.timestamp}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedRecord(null)}
-                className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              <div className="rounded-xl bg-slate-50 p-4 border border-slate-100 space-y-2">
-                <h4 className="font-bold uppercase tracking-wider text-[11px] text-indigo-600">
-                  Record Overview
-                </h4>
-                <p className="text-sm font-bold text-slate-800">{selectedRecord.subject}</p>
-                <div className="grid grid-cols-2 gap-2 pt-2 text-slate-600">
-                  <p>
-                    <b>Category:</b> {selectedRecord.category.replace(/_/g, " ")}
-                  </p>
-                  <p>
-                    <b>Facility Scope:</b> {selectedRecord.facility}
-                  </p>
-                  <p>
-                    <b>Authority:</b> {selectedRecord.authority}
-                  </p>
-                  <p>
-                    <b>Executed By:</b> {selectedRecord.performedBy}
-                  </p>
-                </div>
-              </div>
-
-              {/* Cryptographic Proof */}
-              <div className="rounded-xl bg-emerald-50/50 p-4 border border-emerald-200/60 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-emerald-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4" /> SHA-256 Cryptographic Assurance
-                  </span>
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-bold text-[10px] text-emerald-800">
-                    VERIFIED IMMUTABLE
-                  </span>
-                </div>
-                <p className="font-mono text-[11px] text-slate-700 break-all bg-white p-2.5 rounded-lg border border-emerald-200/40">
-                  {selectedRecord.sha256Hash}
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  This hash signature confirms that this regulatory record has not been altered since timestamping.
-                </p>
-              </div>
-
-              {/* Metadata Payload */}
-              <div className="space-y-2">
-                <h4 className="font-bold uppercase tracking-wider text-[11px] text-slate-500">
-                  Regulatory Metadata Payload
-                </h4>
-                <div className="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100 overflow-hidden">
-                  {Object.entries(selectedRecord.metadata).map(([key, val]) => (
-                    <div key={key} className="flex items-center justify-between px-4 py-2.5">
-                      <span className="font-semibold text-slate-600">{key}</span>
-                      <span className="font-bold text-slate-900 font-mono">{val}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-              <button
-                onClick={() => {
-                  navigator.clipboard?.writeText(selectedRecord.sha256Hash);
-                  alert(`Copied SHA-256 Hash to clipboard:\n${selectedRecord.sha256Hash}`);
-                }}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
-              >
-                <Share2 className="h-3.5 w-3.5" /> Copy SHA-256 Hash
-              </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedRecord(null)}
-                  className="rounded-xl bg-slate-100 px-5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 cursor-pointer"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => downloadCertifiedPdf(selectedRecord)}
-                  className="rounded-xl bg-indigo-600 px-5 py-2 text-xs font-semibold text-white hover:bg-indigo-700 shadow-sm flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Download className="h-3.5 w-3.5" /> Download Certified PDF
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── Redesigned Inspection Dossier Modal ── */}
+      <InspectionDossierModal
+        record={selectedRecord}
+        onClose={() => setSelectedRecord(null)}
+      />
 
       {/* ── Modal: Create Deviation or CAPA ── */}
       {isDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-in fade-in-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in-50">
           <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">

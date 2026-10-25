@@ -187,6 +187,8 @@ const BatchHoldPage = lazy(() => import("../pages/compliance-center/batch-holds/
 const BatchRecallPage = lazy(() => import("../pages/compliance-center/recalls/BatchRecallPage"));
 const ExpiryDisposalPage = lazy(() => import("../pages/compliance-center/disposals/ExpiryDisposalPage"));
 const RegulatoryRecordsPage = lazy(() => import("../pages/compliance-center/records/RegulatoryRecordsPage"));
+const DeviationsRegisterPage = lazy(() => import("../pages/compliance-center/deviations/DeviationsRegisterPage"));
+const CapaManagementPage = lazy(() => import("../pages/compliance-center/capa/CapaManagementPage"));
 
 const PlatformProtectedRoute = ({
   children,
@@ -1147,11 +1149,11 @@ const AppRoutes = () => {
           />
           <Route
             path="/compliance-center/deviations"
-            element={<RegulatoryRecordsPage initialCategory="DEVIATIONS" />}
+            element={<DeviationsRegisterPage />}
           />
           <Route
             path="/compliance-center/capa"
-            element={<RegulatoryRecordsPage initialCategory="CAPA" />}
+            element={<CapaManagementPage />}
           />
         </Route>
         <Route
