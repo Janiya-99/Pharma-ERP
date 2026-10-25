@@ -15,6 +15,7 @@ import {
   MoreHorizontal,
   Package,
   Plus,
+  RefreshCw,
   Repeat,
   RotateCcw,
   Search,
@@ -524,13 +525,13 @@ function DataGrid({
         </div>
       )}
 
-      {/* Floating loading badge if updating with data */}
+      {/* Non-intrusive syncing indicator when updating data in background */}
       {loading && (
-        <div className="absolute inset-0 top-10 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px] z-20 pointer-events-none transition-all">
-          <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-2.5 shadow-xl ring-1 ring-slate-900/5">
-            <Loader2 className="h-4 w-4 animate-spin text-indigo-600 shrink-0" />
-            <span className="text-xs font-bold text-slate-800">Updating report data...</span>
-          </div>
+        <div className="absolute top-2.5 right-3 z-20 pointer-events-none">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-indigo-700 bg-white/90 backdrop-blur-md border border-indigo-100 px-2.5 py-1 rounded-full shadow-sm">
+            <Loader2 className="h-3 w-3 animate-spin text-indigo-600 shrink-0" />
+            Syncing...
+          </span>
         </div>
       )}
 
@@ -2531,6 +2532,145 @@ export function SalesReturnsPage() {
   return <WorkflowPage kind="salesReturn" />;
 }
 
+// ==========================================
+// High-Performance Reports In-Memory Cache & Prefetcher
+// ==========================================
+interface ReportCacheEntry {
+  rows: ApiRecord[];
+  timestamp: number;
+}
+
+const reportDataCache = new Map<string, ReportCacheEntry>();
+const reportInFlightRequests = new Map<string, Promise<ApiRecord[]>>();
+
+function makeReportCacheKey(title: string, params: ApiRecord): string {
+  const sortedParams: Record<string, any> = {};
+  Object.keys(params)
+    .sort()
+    .forEach((key) => {
+      sortedParams[key] = params[key];
+    });
+  return `${title}::${params.company_id || ""}::${params.branch_id || ""}::${JSON.stringify(sortedParams)}`;
+}
+
+async function requestReportData(
+  title: string,
+  loader: (params: ApiRecord) => Promise<any>,
+  params: ApiRecord,
+  force = false
+): Promise<ApiRecord[]> {
+  const cacheKey = makeReportCacheKey(title, params);
+  const cached = reportDataCache.get(cacheKey);
+
+  // Return fresh cache (valid for 5 minutes) if not forced
+  if (!force && cached && Date.now() - cached.timestamp < 300_000) {
+    return cached.rows;
+  }
+
+  // Deduplicate concurrent requests
+  if (reportInFlightRequests.has(cacheKey)) {
+    return reportInFlightRequests.get(cacheKey)!;
+  }
+
+  const promise = (async () => {
+    try {
+      const response = await loader(params);
+      const rows = unwrapList(response);
+      reportDataCache.set(cacheKey, { rows, timestamp: Date.now() });
+      return rows;
+    } finally {
+      reportInFlightRequests.delete(cacheKey);
+    }
+  })();
+
+  reportInFlightRequests.set(cacheKey, promise);
+  return promise;
+}
+
+// Prefetch sister reports in background to make tab switching 100% instant
+function prefetchSisterReports(
+  currentTitle: string,
+  companyId: string | number | undefined,
+  branchId: string | number | undefined
+) {
+  if (!companyId) return;
+  const baseParams = { company_id: companyId, branch_id: branchId, limit: 500 };
+
+  const targets = [
+    { title: "Stock Balance", loader: inventoryApi.getStockBalances, params: baseParams },
+    { title: "Stock Ledger", loader: inventoryApi.getStockLedgerEntries, params: baseParams },
+    { title: "Expiry Report", loader: inventoryApi.getExpiryReport, params: { ...baseParams, days: 90, near_expiry_days: 90 } },
+    { title: "Batch Report", loader: inventoryApi.getBatchReport, params: baseParams },
+  ];
+
+  targets.forEach((target, index) => {
+    if (target.title === currentTitle) return;
+    const key = makeReportCacheKey(target.title, target.params);
+    const existing = reportDataCache.get(key);
+    if (!existing || Date.now() - existing.timestamp >= 300_000) {
+      setTimeout(() => {
+        requestReportData(target.title, target.loader, target.params).catch(() => {});
+      }, 100 * (index + 1));
+    }
+  });
+}
+
+function useReportData(
+  title: string,
+  loader: (params: ApiRecord) => Promise<any>,
+  params: ApiRecord,
+  enabled = true
+) {
+  const cacheKey = makeReportCacheKey(title, params);
+  const cached = reportDataCache.get(cacheKey);
+  const isFresh = Boolean(cached && Date.now() - cached.timestamp < 300_000);
+
+  const [rows, setRows] = useState<ApiRecord[]>(() => (cached ? cached.rows : []));
+  const [loading, setLoading] = useState<boolean>(() => !cached && enabled);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const refresh = useCallback(
+    async (force = false) => {
+      if (!enabled) return;
+      const currentCache = reportDataCache.get(cacheKey);
+      if (!currentCache) {
+        setLoading(true);
+      } else {
+        setIsUpdating(true);
+      }
+      setError("");
+      try {
+        const data = await requestReportData(title, loader, params, force);
+        setRows(data);
+      } catch (err) {
+        const message = getErrorMessage(err);
+        setError(message);
+        toast.error(message);
+      } finally {
+        setLoading(false);
+        setIsUpdating(false);
+      }
+    },
+    [enabled, title, loader, cacheKey]
+  );
+
+  useEffect(() => {
+    const current = reportDataCache.get(cacheKey);
+    if (current) {
+      setRows(current.rows);
+      setLoading(false);
+      if (Date.now() - current.timestamp >= 300_000) {
+        refresh(true);
+      }
+    } else {
+      refresh(false);
+    }
+  }, [cacheKey]);
+
+  return { rows, loading, isUpdating, error, refresh: () => refresh(true), setRows };
+}
+
 function ReportPage({
   title,
   description,
@@ -2565,10 +2705,41 @@ function ReportPage({
     }
     return init;
   });
-  const params = { company_id: context.companyId, branch_id: context.branchId, limit: 500, ...extraParams, ...compact(filters) };
-  const report = useBackendList(loader, params, !!context.companyId);
-  const warehouseOptions = [{ label: "All Warehouses", value: "all" }, ...makeOptions(references.refs.warehouses, ["warehouse_name"])];
-  const productOptions = [{ label: "All Products", value: "all" }, ...makeOptions(references.refs.products, ["product_name"])];
+
+  const params = useMemo(() => {
+    const p: ApiRecord = {
+      company_id: context.companyId,
+      branch_id: context.branchId,
+      limit: 500,
+      ...extraParams,
+      ...compact(filters),
+    };
+    if (filters.date_from) {
+      p.transaction_date_from = filters.date_from;
+      p.expiry_date_from = filters.date_from;
+    }
+    if (filters.date_to) {
+      p.transaction_date_to = filters.date_to;
+      p.expiry_date_to = filters.date_to;
+    }
+    return p;
+  }, [context.companyId, context.branchId, JSON.stringify(extraParams), JSON.stringify(filters)]);
+
+  const report = useReportData(title, loader, params, !!context.companyId);
+
+  // Background prefetch the remaining reports so tab switches are instantaneous
+  useEffect(() => {
+    prefetchSisterReports(title, context.companyId, context.branchId);
+  }, [title, context.companyId, context.branchId]);
+
+  const warehouseOptions = useMemo(
+    () => [{ label: "All Warehouses", value: "all" }, ...makeOptions(references.refs.warehouses, ["warehouse_name"])],
+    [references.refs.warehouses]
+  );
+  const productOptions = useMemo(
+    () => [{ label: "All Products", value: "all" }, ...makeOptions(references.refs.products, ["product_name"])],
+    [references.refs.products]
+  );
 
   const setFilter = (name: string, value: string) => {
     setFilters((current) => ({ ...current, [name]: value === "all" ? "" : value }));
@@ -2709,7 +2880,14 @@ function ReportPage({
           >
             Clear Filters
           </Button>
-          <Button variant="outline" size="sm" onClick={report.refresh}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={report.refresh}
+            disabled={report.loading || report.isUpdating}
+            className="gap-1.5"
+          >
+            <RefreshCw className={`h-4 w-4 ${report.loading || report.isUpdating ? "animate-spin text-indigo-600" : ""}`} />
             Refresh
           </Button>
         </div>
@@ -2766,7 +2944,13 @@ function ReportPage({
           />
         </CardContent>
       </Card>
-      <DataGrid loading={report.loading} error={report.error} data={displayRows} columns={columns} />
+      <DataGrid
+        loading={report.loading || report.isUpdating}
+        error={report.error}
+        data={displayRows}
+        columns={columns}
+        defaultPageSize={25}
+      />
     </InventoryPage>
   );
 }
