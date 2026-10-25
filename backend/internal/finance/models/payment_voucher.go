@@ -43,4 +43,7 @@ type PaymentVoucher struct {
 	FinancialYear    *FinancialYear    `gorm:"foreignKey:FinancialYearID;references:ID" json:"financial_year,omitempty"`
 	AccountingPeriod *AccountingPeriod `gorm:"foreignKey:AccountingPeriodID;references:ID" json:"accounting_period,omitempty"`
 	PaidFromAccount  *ChartOfAccount   `gorm:"foreignKey:PaidFromAccountID;references:ID" json:"paid_from_account,omitempty"`
+
+	CreatedByName       string `gorm:"-" json:"created_by_name"`
+	PaidFromAccountName string `gorm:"-" json:"paid_from_account_name"`
 }

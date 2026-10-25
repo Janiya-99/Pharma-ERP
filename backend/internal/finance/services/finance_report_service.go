@@ -744,9 +744,23 @@ func (s *FinanceReportService) GetJournalRegisterReport(companyID uint64, req dt
 	}
 
 	var results []models.JournalEntry
-	if err := query.Find(&results).Error; err != nil {
+	if err := query.Order("journal_date DESC, id DESC").Find(&results).Error; err != nil {
 		return nil, err
 	}
+
+	var userIDs []uint64
+	for _, je := range results {
+		if je.CreatedBy != nil && *je.CreatedBy > 0 {
+			userIDs = append(userIDs, *je.CreatedBy)
+		}
+	}
+	userMap := s.getUserNamesMap(userIDs)
+	for i := range results {
+		if results[i].CreatedBy != nil {
+			results[i].CreatedByName = userMap[*results[i].CreatedBy]
+		}
+	}
+
 	return results, nil
 }
 
@@ -766,10 +780,10 @@ func (s *FinanceReportService) GetPaymentRegisterReport(companyID uint64, req dt
 		query = query.Where("posted_status = ?", *req.PostedStatus)
 	}
 	if req.DateFrom != nil {
-		query = query.Where("voucher_date >= ?", *req.DateFrom)
+		query = query.Where("payment_date >= ?", *req.DateFrom)
 	}
 	if req.DateTo != nil {
-		query = query.Where("voucher_date <= ?", *req.DateTo)
+		query = query.Where("payment_date <= ?", *req.DateTo)
 	}
 	if req.PaymentType != nil && *req.PaymentType != "" {
 		query = query.Where("payment_type = ?", *req.PaymentType)
@@ -779,13 +793,31 @@ func (s *FinanceReportService) GetPaymentRegisterReport(companyID uint64, req dt
 	}
 	if req.Search != nil && *req.Search != "" {
 		search := "%" + *req.Search + "%"
-		query = query.Where("voucher_number LIKE ? OR reference_number LIKE ? OR description LIKE ? OR payee_name LIKE ?", search, search, search, search)
+		query = query.Where("voucher_number LIKE ? OR reference_number LIKE ? OR description LIKE ?", search, search, search)
 	}
 
 	var results []models.PaymentVoucher
-	if err := query.Find(&results).Error; err != nil {
+	if err := query.Preload("PaidFromAccount").Order("payment_date DESC, id DESC").Find(&results).Error; err != nil {
 		return nil, err
 	}
+
+	var userIDs []uint64
+	for _, pv := range results {
+		if pv.CreatedBy != nil && *pv.CreatedBy > 0 {
+			userIDs = append(userIDs, *pv.CreatedBy)
+		}
+	}
+	userMap := s.getUserNamesMap(userIDs)
+
+	for i := range results {
+		if results[i].CreatedBy != nil {
+			results[i].CreatedByName = userMap[*results[i].CreatedBy]
+		}
+		if results[i].PaidFromAccount != nil && results[i].PaidFromAccount.AccountName != "" {
+			results[i].PaidFromAccountName = results[i].PaidFromAccount.AccountName
+		}
+	}
+
 	return results, nil
 }
 
@@ -805,10 +837,10 @@ func (s *FinanceReportService) GetReceiptRegisterReport(companyID uint64, req dt
 		query = query.Where("posted_status = ?", *req.PostedStatus)
 	}
 	if req.DateFrom != nil {
-		query = query.Where("voucher_date >= ?", *req.DateFrom)
+		query = query.Where("receipt_date >= ?", *req.DateFrom)
 	}
 	if req.DateTo != nil {
-		query = query.Where("voucher_date <= ?", *req.DateTo)
+		query = query.Where("receipt_date <= ?", *req.DateTo)
 	}
 	if req.ReceiptType != nil && *req.ReceiptType != "" {
 		query = query.Where("receipt_type = ?", *req.ReceiptType)
@@ -818,14 +850,62 @@ func (s *FinanceReportService) GetReceiptRegisterReport(companyID uint64, req dt
 	}
 	if req.Search != nil && *req.Search != "" {
 		search := "%" + *req.Search + "%"
-		query = query.Where("voucher_number LIKE ? OR reference_number LIKE ? OR description LIKE ? OR payer_name LIKE ?", search, search, search, search)
+		query = query.Where("voucher_number LIKE ? OR reference_number LIKE ? OR description LIKE ?", search, search, search)
 	}
 
 	var results []models.ReceiptVoucher
-	if err := query.Find(&results).Error; err != nil {
+	if err := query.Preload("ReceivedToAccount").Order("receipt_date DESC, id DESC").Find(&results).Error; err != nil {
 		return nil, err
 	}
+
+	var userIDs []uint64
+	for _, rv := range results {
+		if rv.CreatedBy != nil && *rv.CreatedBy > 0 {
+			userIDs = append(userIDs, *rv.CreatedBy)
+		}
+	}
+	userMap := s.getUserNamesMap(userIDs)
+
+	for i := range results {
+		if results[i].CreatedBy != nil {
+			results[i].CreatedByName = userMap[*results[i].CreatedBy]
+		}
+		if results[i].ReceivedToAccount != nil && results[i].ReceivedToAccount.AccountName != "" {
+			results[i].ReceivedToAccountName = results[i].ReceivedToAccount.AccountName
+		}
+	}
+
 	return results, nil
+}
+
+func (s *FinanceReportService) getUserNamesMap(userIDs []uint64) map[uint64]string {
+	userMap := make(map[uint64]string)
+	if len(userIDs) == 0 {
+		return userMap
+	}
+	uniqueMap := make(map[uint64]bool)
+	var deduped []uint64
+	for _, id := range userIDs {
+		if id > 0 && !uniqueMap[id] {
+			uniqueMap[id] = true
+			deduped = append(deduped, id)
+		}
+	}
+	if len(deduped) == 0 {
+		return userMap
+	}
+
+	type UserSummary struct {
+		ID   uint64 `gorm:"column:id"`
+		Name string `gorm:"column:name"`
+	}
+	var users []UserSummary
+	if err := s.repo.DB().Table("users").Where("id IN ?", deduped).Select("id, name").Scan(&users).Error; err == nil {
+		for _, u := range users {
+			userMap[u.ID] = u.Name
+		}
+	}
+	return userMap
 }
 
 func (s *FinanceReportService) AuditLog(companyID uint64, userID uint64, action string, details string) {
