@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/pixandco/erp-phrma/internal/invoicecenter/dto"
@@ -1289,32 +1290,46 @@ func (r *invoiceCenterReportRepository) GetSalesByProduct(db *gorm.DB, companyID
 		whereClause += " AND DATE(si.invoice_date) <= ?"
 		args = append(args, filters.DateTo.Format("2006-01-02"))
 	}
+	if filters.ProductID != nil && *filters.ProductID > 0 {
+		whereClause += " AND sil.product_id = ?"
+		args = append(args, *filters.ProductID)
+	}
+	if filters.ProductCategoryID != nil && *filters.ProductCategoryID > 0 {
+		whereClause += " AND p.product_category_id = ?"
+		args = append(args, *filters.ProductCategoryID)
+	}
+	if filters.PostedOnly != nil && *filters.PostedOnly {
+		whereClause += " AND si.posted_status = 'posted'"
+	}
 	if filters.Search != "" {
 		search := "%" + filters.Search + "%"
-		whereClause += " AND (sil.product_code LIKE ? OR sil.product_name LIKE ? OR sil.batch_number LIKE ?)"
+		whereClause += " AND (p.product_code LIKE ? OR p.product_name LIKE ? OR pb.batch_number LIKE ?)"
 		args = append(args, search, search, search)
 	}
 
 	baseQuery := `
 		SELECT 
-			sil.product_code,
-			sil.product_name,
-			COALESCE(sil.batch_number, '-') as batch_number,
+			COALESCE(p.product_code, '') as product_code,
+			COALESCE(p.product_name, '') as product_name,
+			COALESCE(pc.category_name, '-') as category,
+			COALESCE(GROUP_CONCAT(DISTINCT pb.batch_number ORDER BY pb.batch_number SEPARATOR ', '), '-') as batch_number,
 			COALESCE(SUM(sil.quantity), 0) as quantity_sold,
-			COALESCE(SUM(sil.subtotal_amount), 0) as subtotal_amount,
+			COALESCE(SUM(sil.quantity * sil.unit_price), 0) as subtotal_amount,
 			COALESCE(SUM(sil.discount_amount), 0) as discount_amount,
 			COALESCE(SUM(sil.tax_amount), 0) as tax_amount,
-			COALESCE(SUM(sil.total_amount), 0) as total_sales_amount,
-			COALESCE(AVG(sil.unit_price), 0) as average_unit_price,
-			COALESCE(AVG(p.cost_price), 0) as stock_unit_cost,
-			COALESCE(SUM(sil.quantity * COALESCE(p.cost_price, 0)), 0) as stock_total_cost,
-			COALESCE(SUM(sil.total_amount) - SUM(sil.quantity * COALESCE(p.cost_price, 0)), 0) as gross_profit,
-			CASE WHEN SUM(sil.total_amount) > 0 THEN ROUND(((SUM(sil.total_amount) - SUM(sil.quantity * COALESCE(p.cost_price, 0))) / SUM(sil.total_amount)) * 100, 2) ELSE 0 END as gross_profit_percentage
+			COALESCE(SUM(sil.line_total), 0) as total_sales_amount,
+			COALESCE(SUM(sil.quantity * sil.unit_price) / NULLIF(SUM(sil.quantity), 0), AVG(sil.unit_price), 0) as average_unit_price,
+			COALESCE(SUM(COALESCE(sil.stock_total_cost, sil.quantity * sil.stock_unit_cost, sil.quantity * pb.purchase_rate, 0)) / NULLIF(SUM(sil.quantity), 0), 0) as stock_unit_cost,
+			COALESCE(SUM(COALESCE(sil.stock_total_cost, sil.quantity * sil.stock_unit_cost, sil.quantity * pb.purchase_rate, 0)), 0) as stock_total_cost,
+			COALESCE(SUM(sil.line_total) - SUM(COALESCE(sil.stock_total_cost, sil.quantity * sil.stock_unit_cost, sil.quantity * pb.purchase_rate, 0)), 0) as gross_profit,
+			CASE WHEN SUM(sil.line_total) > 0 THEN ROUND(((SUM(sil.line_total) - SUM(COALESCE(sil.stock_total_cost, sil.quantity * sil.stock_unit_cost, sil.quantity * pb.purchase_rate, 0))) / SUM(sil.line_total)) * 100, 2) ELSE 0 END as gross_profit_percentage
 		FROM sales_invoice_lines sil
 		JOIN sales_invoices si ON si.id = sil.sales_invoice_id
 		LEFT JOIN products p ON p.id = sil.product_id
+		LEFT JOIN product_categories pc ON pc.id = p.product_category_id
+		LEFT JOIN product_batches pb ON pb.id = sil.product_batch_id
 		WHERE ` + whereClause + `
-		GROUP BY sil.product_code, sil.product_name, sil.batch_number
+		GROUP BY p.id, p.product_code, p.product_name, pc.category_name
 	`
 
 	var countTotal int64
@@ -1336,6 +1351,8 @@ func (r *invoiceCenterReportRepository) GetSalesByProduct(db *gorm.DB, companyID
 	if err := db.Raw(summaryQuery, args...).Scan(&summary).Error; err != nil {
 		return nil, 0, summary, err
 	}
+	summary.TotalQuantity = summary.QuantitySold
+	summary.TotalRevenue = summary.TotalSalesAmount
 
 	page := filters.Page
 	if page < 1 {
@@ -1347,11 +1364,18 @@ func (r *invoiceCenterReportRepository) GetSalesByProduct(db *gorm.DB, companyID
 	}
 	offset := (page - 1) * limit
 
-	dataQuery := baseQuery + ` ORDER BY total_sales_amount DESC LIMIT ? OFFSET ?`
+	dataQuery := baseQuery + ` ORDER BY total_sales_amount DESC, product_name ASC LIMIT ? OFFSET ?`
 	paginationArgs := append(args, limit, offset)
 	var rows []dto.SalesByProductRowDTO
 	if err := db.Raw(dataQuery, paginationArgs...).Scan(&rows).Error; err != nil {
 		return nil, 0, summary, err
+	}
+
+	for i := range rows {
+		rows[i].GrossProfitPercent = rows[i].GrossProfitPercentage
+		if summary.TotalSalesAmount > 0 {
+			rows[i].PercentageOfTotal = math.Round((rows[i].TotalSalesAmount/summary.TotalSalesAmount)*10000) / 100
+		}
 	}
 
 	return rows, countTotal, summary, nil
@@ -1366,7 +1390,7 @@ func (r *invoiceCenterReportRepository) GetCollectionSummary(db *gorm.DB, compan
 		args = append(args, *filters.BranchID)
 	}
 	if filters.PaymentMethod != nil && *filters.PaymentMethod != "" && *filters.PaymentMethod != "all" {
-		whereClause += " AND cr.payment_method = ?"
+		whereClause += " AND LOWER(cr.payment_method) = LOWER(?)"
 		args = append(args, *filters.PaymentMethod)
 	}
 	if filters.DateFrom != nil && !filters.DateFrom.IsZero() {
@@ -1377,25 +1401,28 @@ func (r *invoiceCenterReportRepository) GetCollectionSummary(db *gorm.DB, compan
 		whereClause += " AND DATE(cr.receipt_date) <= ?"
 		args = append(args, filters.DateTo.Format("2006-01-02"))
 	}
+	if filters.PostedOnly != nil && *filters.PostedOnly {
+		whereClause += " AND cr.posted_status = 'posted'"
+	}
 	if filters.Search != "" {
 		search := "%" + filters.Search + "%"
-		whereClause += " AND (cr.receipt_number LIKE ? OR c.customer_name LIKE ? OR c.customer_code LIKE ?)"
-		args = append(args, search, search, search)
+		whereClause += " AND (cr.receipt_number LIKE ? OR c.customer_name LIKE ? OR c.customer_code LIKE ? OR cr.payment_method LIKE ?)"
+		args = append(args, search, search, search, search)
 	}
 
 	var summary dto.CollectionSummarySummaryDTO
 	summaryQuery := `
 		SELECT 
 			COUNT(cr.id) as receipt_count,
-			COALESCE(SUM(cr.received_amount), 0) as receipt_amount,
+			COALESCE(SUM(COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0)), 0) as receipt_amount,
 			COALESCE(SUM(cr.allocated_amount), 0) as allocated_amount,
 			COALESCE(SUM(cr.unallocated_amount), 0) as unallocated_amount,
-			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'cash' THEN cr.received_amount ELSE 0 END), 0) as cash_amount,
-			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) IN ('bank_transfer', 'bank transfer', 'wire') THEN cr.received_amount ELSE 0 END), 0) as bank_transfer_amount,
-			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'cheque' THEN cr.received_amount ELSE 0 END), 0) as cheque_amount,
-			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'card' THEN cr.received_amount ELSE 0 END), 0) as card_amount,
-			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'online' THEN cr.received_amount ELSE 0 END), 0) as online_amount,
-			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) NOT IN ('cash', 'bank_transfer', 'bank transfer', 'wire', 'cheque', 'card', 'online') THEN cr.received_amount ELSE 0 END), 0) as other_amount
+			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'cash' THEN COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) ELSE 0 END), 0) as cash_amount,
+			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) IN ('bank_transfer', 'bank transfer', 'wire') THEN COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) ELSE 0 END), 0) as bank_transfer_amount,
+			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'cheque' THEN COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) ELSE 0 END), 0) as cheque_amount,
+			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'card' THEN COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) ELSE 0 END), 0) as card_amount,
+			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) = 'online' THEN COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) ELSE 0 END), 0) as online_amount,
+			COALESCE(SUM(CASE WHEN LOWER(cr.payment_method) NOT IN ('cash', 'bank_transfer', 'bank transfer', 'wire', 'cheque', 'card', 'online') THEN COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) ELSE 0 END), 0) as other_amount
 		FROM customer_receipts cr
 		LEFT JOIN customers c ON c.id = cr.customer_id
 		WHERE ` + whereClause
@@ -1403,6 +1430,11 @@ func (r *invoiceCenterReportRepository) GetCollectionSummary(db *gorm.DB, compan
 	if err := db.Raw(summaryQuery, args...).Scan(&summary).Error; err != nil {
 		return nil, 0, summary, err
 	}
+	summary.TotalReceipts = summary.ReceiptCount
+	summary.TotalAmount = summary.ReceiptAmount
+	summary.TotalCollected = summary.ReceiptAmount
+	summary.TotalAllocated = summary.AllocatedAmount
+	summary.TotalUnallocated = summary.UnallocatedAmount
 
 	page := filters.Page
 	if page < 1 {
@@ -1414,33 +1446,72 @@ func (r *invoiceCenterReportRepository) GetCollectionSummary(db *gorm.DB, compan
 	}
 	offset := (page - 1) * limit
 
-	dataQuery := `
-		SELECT 
-			cr.receipt_date,
-			cr.receipt_number,
-			COALESCE(c.customer_code, '') as customer_code,
-			COALESCE(c.customer_name, '') as customer_name,
-			cr.payment_method,
-			cr.received_amount as receipt_amount,
-			cr.allocated_amount,
-			cr.unallocated_amount,
-			cr.reference_number,
-			cr.bank_reference_number,
-			cr.cheque_number,
-			cr.finance_post_status
-		FROM customer_receipts cr
-		LEFT JOIN customers c ON c.id = cr.customer_id
-		WHERE ` + whereClause + `
-		ORDER BY cr.receipt_date DESC, cr.id DESC
-		LIMIT ? OFFSET ?
-	`
-	paginationArgs := append(args, limit, offset)
 	var rows []dto.CollectionSummaryRowDTO
-	if err := db.Raw(dataQuery, paginationArgs...).Scan(&rows).Error; err != nil {
-		return nil, 0, summary, err
+	var countTotal int64
+
+	if filters.GroupBy != nil && *filters.GroupBy == "receipt" {
+		countTotal = summary.ReceiptCount
+		dataQuery := `
+			SELECT 
+				cr.receipt_date,
+				cr.receipt_number,
+				COALESCE(c.customer_code, '') as customer_code,
+				COALESCE(c.customer_name, '') as customer_name,
+				COALESCE(NULLIF(TRIM(cr.payment_method), ''), 'other') as payment_method,
+				1 as receipt_count,
+				COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) as total_amount,
+				COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) as receipt_amount,
+				cr.allocated_amount,
+				cr.unallocated_amount,
+				cr.reference_number,
+				cr.bank_reference_number,
+				cr.cheque_number,
+				cr.finance_post_status
+			FROM customer_receipts cr
+			LEFT JOIN customers c ON c.id = cr.customer_id
+			WHERE ` + whereClause + `
+			ORDER BY cr.receipt_date DESC, cr.id DESC
+			LIMIT ? OFFSET ?
+		`
+		paginationArgs := append(args, limit, offset)
+		if err := db.Raw(dataQuery, paginationArgs...).Scan(&rows).Error; err != nil {
+			return nil, 0, summary, err
+		}
+	} else {
+		baseGroupQuery := `
+			SELECT 
+				COALESCE(NULLIF(TRIM(cr.payment_method), ''), 'other') as payment_method,
+				COUNT(cr.id) as receipt_count,
+				COALESCE(SUM(COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0)), 0) as total_amount,
+				COALESCE(SUM(COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0)), 0) as receipt_amount,
+				COALESCE(SUM(cr.allocated_amount), 0) as allocated_amount,
+				COALESCE(SUM(cr.unallocated_amount), 0) as unallocated_amount
+			FROM customer_receipts cr
+			LEFT JOIN customers c ON c.id = cr.customer_id
+			WHERE ` + whereClause + `
+			GROUP BY COALESCE(NULLIF(TRIM(cr.payment_method), ''), 'other')
+		`
+		countQuery := "SELECT COUNT(*) FROM (" + baseGroupQuery + ") as sub"
+		if err := db.Raw(countQuery, args...).Scan(&countTotal).Error; err != nil {
+			return nil, 0, summary, err
+		}
+
+		dataQuery := baseGroupQuery + ` ORDER BY total_amount DESC LIMIT ? OFFSET ?`
+		paginationArgs := append(args, limit, offset)
+		if err := db.Raw(dataQuery, paginationArgs...).Scan(&rows).Error; err != nil {
+			return nil, 0, summary, err
+		}
 	}
 
-	return rows, summary.ReceiptCount, summary, nil
+	for i := range rows {
+		if summary.TotalAmount > 0 {
+			rows[i].PercentageOfTotal = math.Round((rows[i].TotalAmount/summary.TotalAmount)*10000) / 100
+		} else {
+			rows[i].PercentageOfTotal = 0
+		}
+	}
+
+	return rows, countTotal, summary, nil
 }
 
 func (r *invoiceCenterReportRepository) GetFinancePostingStatus(db *gorm.DB, companyID uint64, filters dto.ReportFilterDTO) ([]dto.FinancePostingStatusRowDTO, int64, dto.FinancePostingStatusSummaryDTO, error) {
@@ -1449,14 +1520,18 @@ func (r *invoiceCenterReportRepository) GetFinancePostingStatus(db *gorm.DB, com
 			'Sales Invoice' as document_type,
 			si.invoice_number as document_number,
 			si.invoice_date as document_date,
+			si.branch_id,
 			COALESCE(b.branch_name, '') as branch,
 			COALESCE(c.customer_name, '') as customer,
+			COALESCE(c.customer_name, '') as customer_name,
 			si.total_amount as document_amount,
 			si.posted_status as operational_posted_status,
 			si.finance_post_status,
 			COALESCE(si.finance_reference_number, '') as finance_reference_number,
+			COALESCE(si.finance_reference_number, '') as journal_entry_number,
 			COALESCE(u.name, '') as finance_posted_by,
-			si.finance_posted_at
+			si.finance_posted_at,
+			si.finance_posted_at as posted_date
 		FROM sales_invoices si
 		LEFT JOIN customers c ON c.id = si.customer_id
 		LEFT JOIN branches b ON b.id = si.branch_id
@@ -1469,14 +1544,18 @@ func (r *invoiceCenterReportRepository) GetFinancePostingStatus(db *gorm.DB, com
 			'Credit Note' as document_type,
 			cn.credit_note_number as document_number,
 			cn.credit_note_date as document_date,
+			cn.branch_id,
 			COALESCE(b.branch_name, '') as branch,
 			COALESCE(c.customer_name, '') as customer,
+			COALESCE(c.customer_name, '') as customer_name,
 			cn.total_amount as document_amount,
 			cn.posted_status as operational_posted_status,
 			cn.finance_post_status,
 			COALESCE(cn.finance_reference_number, '') as finance_reference_number,
+			COALESCE(cn.finance_reference_number, '') as journal_entry_number,
 			COALESCE(u.name, '') as finance_posted_by,
-			cn.finance_posted_at
+			cn.finance_posted_at,
+			cn.finance_posted_at as posted_date
 		FROM credit_notes cn
 		LEFT JOIN customers c ON c.id = cn.customer_id
 		LEFT JOIN branches b ON b.id = cn.branch_id
@@ -1486,17 +1565,45 @@ func (r *invoiceCenterReportRepository) GetFinancePostingStatus(db *gorm.DB, com
 		UNION ALL
 
 		SELECT 
+			'Debit Note' as document_type,
+			dn.debit_note_number as document_number,
+			dn.debit_note_date as document_date,
+			dn.branch_id,
+			COALESCE(b.branch_name, '') as branch,
+			COALESCE(c.customer_name, '') as customer,
+			COALESCE(c.customer_name, '') as customer_name,
+			dn.total_amount as document_amount,
+			dn.posted_status as operational_posted_status,
+			dn.finance_post_status,
+			COALESCE(dn.finance_reference_number, '') as finance_reference_number,
+			COALESCE(dn.finance_reference_number, '') as journal_entry_number,
+			COALESCE(u.name, '') as finance_posted_by,
+			dn.finance_posted_at,
+			dn.finance_posted_at as posted_date
+		FROM debit_notes dn
+		LEFT JOIN customers c ON c.id = dn.customer_id
+		LEFT JOIN branches b ON b.id = dn.branch_id
+		LEFT JOIN users u ON u.id = dn.finance_posted_by
+		WHERE dn.company_id = ? AND dn.deleted_at IS NULL
+
+		UNION ALL
+
+		SELECT 
 			'Customer Receipt' as document_type,
 			cr.receipt_number as document_number,
 			cr.receipt_date as document_date,
+			cr.branch_id,
 			COALESCE(b.branch_name, '') as branch,
 			COALESCE(c.customer_name, '') as customer,
-			cr.received_amount as document_amount,
+			COALESCE(c.customer_name, '') as customer_name,
+			COALESCE(NULLIF(cr.received_amount, 0), cr.allocated_amount + cr.unallocated_amount, 0) as document_amount,
 			cr.posted_status as operational_posted_status,
 			cr.finance_post_status,
 			COALESCE(cr.finance_reference_number, '') as finance_reference_number,
+			COALESCE(cr.finance_reference_number, '') as journal_entry_number,
 			COALESCE(u.name, '') as finance_posted_by,
-			cr.finance_posted_at
+			cr.finance_posted_at,
+			cr.finance_posted_at as posted_date
 		FROM customer_receipts cr
 		LEFT JOIN customers c ON c.id = cr.customer_id
 		LEFT JOIN branches b ON b.id = cr.branch_id
@@ -1505,20 +1612,36 @@ func (r *invoiceCenterReportRepository) GetFinancePostingStatus(db *gorm.DB, com
 	`
 
 	wrapperQuery := "SELECT * FROM (" + unionQuery + ") as docs WHERE 1=1"
-	args := []interface{}{companyID, companyID, companyID}
+	args := []interface{}{companyID, companyID, companyID, companyID}
 
+	if filters.BranchID != nil && *filters.BranchID > 0 {
+		wrapperQuery += " AND docs.branch_id = ?"
+		args = append(args, *filters.BranchID)
+	}
+	if filters.DateFrom != nil && !filters.DateFrom.IsZero() {
+		wrapperQuery += " AND DATE(docs.document_date) >= ?"
+		args = append(args, filters.DateFrom.Format("2006-01-02"))
+	}
+	if filters.DateTo != nil && !filters.DateTo.IsZero() {
+		wrapperQuery += " AND DATE(docs.document_date) <= ?"
+		args = append(args, filters.DateTo.Format("2006-01-02"))
+	}
 	if filters.FinancePostStatus != nil && *filters.FinancePostStatus != "" && *filters.FinancePostStatus != "all" {
-		wrapperQuery += " AND docs.finance_post_status = ?"
-		args = append(args, *filters.FinancePostStatus)
+		if *filters.FinancePostStatus == "unposted" || *filters.FinancePostStatus == "pending" {
+			wrapperQuery += " AND (docs.finance_post_status IN ('unposted', 'pending') OR docs.finance_post_status IS NULL)"
+		} else {
+			wrapperQuery += " AND LOWER(docs.finance_post_status) = LOWER(?)"
+			args = append(args, *filters.FinancePostStatus)
+		}
 	}
 	if filters.DocumentType != nil && *filters.DocumentType != "" && *filters.DocumentType != "all" {
-		wrapperQuery += " AND LOWER(docs.document_type) = LOWER(?)"
+		wrapperQuery += " AND REPLACE(LOWER(docs.document_type), '_', ' ') = REPLACE(LOWER(?), '_', ' ')"
 		args = append(args, *filters.DocumentType)
 	}
 	if filters.Search != "" {
 		search := "%" + filters.Search + "%"
-		wrapperQuery += " AND (docs.document_number LIKE ? OR docs.customer LIKE ? OR docs.finance_reference_number LIKE ?)"
-		args = append(args, search, search, search)
+		wrapperQuery += " AND (docs.document_number LIKE ? OR docs.customer LIKE ? OR docs.customer_name LIKE ? OR docs.finance_reference_number LIKE ?)"
+		args = append(args, search, search, search, search)
 	}
 
 	var countTotal int64
@@ -1532,12 +1655,17 @@ func (r *invoiceCenterReportRepository) GetFinancePostingStatus(db *gorm.DB, com
 		SELECT 
 			COUNT(sub.document_number) as document_count,
 			COALESCE(SUM(sub.document_amount), 0) as total_amount,
-			COALESCE(SUM(CASE WHEN sub.finance_post_status = 'posted' THEN 1 ELSE 0 END), 0) as posted_count,
-			COALESCE(SUM(CASE WHEN sub.finance_post_status != 'posted' OR sub.finance_post_status IS NULL THEN 1 ELSE 0 END), 0) as unposted_count
+			COALESCE(SUM(CASE WHEN sub.finance_post_status = 'posted' THEN 1 ELSE 0 END), 0) as finance_posted_count,
+			COALESCE(SUM(CASE WHEN sub.finance_post_status != 'posted' OR sub.finance_post_status IS NULL THEN 1 ELSE 0 END), 0) as finance_unposted_count,
+			COALESCE(SUM(CASE WHEN sub.finance_post_status = 'failed' THEN 1 ELSE 0 END), 0) as finance_failed_count
 		FROM (` + wrapperQuery + `) as sub`
 	if err := db.Raw(summaryQuery, args...).Scan(&summary).Error; err != nil {
 		return nil, 0, summary, err
 	}
+	summary.TotalDocuments = summary.DocumentCount
+	summary.PostedCount = summary.FinancePostedCount
+	summary.UnpostedCount = summary.FinanceUnpostedCount
+	summary.FailedCount = summary.FinanceFailedCount
 
 	page := filters.Page
 	if page < 1 {
@@ -1549,11 +1677,23 @@ func (r *invoiceCenterReportRepository) GetFinancePostingStatus(db *gorm.DB, com
 	}
 	offset := (page - 1) * limit
 
-	dataQuery := wrapperQuery + " ORDER BY docs.document_date DESC LIMIT ? OFFSET ?"
+	dataQuery := wrapperQuery + " ORDER BY docs.document_date DESC, docs.document_number DESC LIMIT ? OFFSET ?"
 	paginationArgs := append(args, limit, offset)
 	var rows []dto.FinancePostingStatusRowDTO
 	if err := db.Raw(dataQuery, paginationArgs...).Scan(&rows).Error; err != nil {
 		return nil, 0, summary, err
+	}
+
+	for i := range rows {
+		if rows[i].CustomerName == "" {
+			rows[i].CustomerName = rows[i].Customer
+		}
+		if rows[i].JournalEntryNumber == "" {
+			rows[i].JournalEntryNumber = rows[i].FinanceReferenceNumber
+		}
+		if rows[i].PostedDate == nil {
+			rows[i].PostedDate = rows[i].FinancePostedAt
+		}
 	}
 
 	return rows, countTotal, summary, nil

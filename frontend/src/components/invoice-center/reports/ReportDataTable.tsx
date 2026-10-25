@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Loader2 } from "lucide-react";
 import { ReportEmptyState } from "./ReportEmptyState";
 import { ReportLoadingState } from "./ReportLoadingState";
 import { TablePagination } from "@/components/common/TablePagination";
@@ -69,22 +70,45 @@ export function ReportDataTable<T>({
     }
   }, [rows, clientPageIndex, clientPageSize]);
 
-  if (isLoading) {
+  if (isLoading && rows.length === 0) {
     return (
-      <ReportLoadingState type="table" columns={columns.length} rows={5} />
+      <ReportLoadingState
+        type="table"
+        columns={columns.length}
+        columnHeaders={columns.map((c) => c.header)}
+        rows={6}
+        message="Loading report records..."
+      />
     );
   }
 
-  if (rows.length === 0) {
+  if (!isLoading && rows.length === 0) {
     return <ReportEmptyState message={emptyMessage} />;
   }
 
   return (
     <div className="space-y-3">
-      <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs">
+      <div className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs">
+        {/* Top loading progress bar during refresh */}
+        {isLoading && (
+          <div className="absolute top-0 inset-x-0 h-0.5 bg-slate-100 overflow-hidden z-20">
+            <div className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-600 animate-pulse w-full" />
+          </div>
+        )}
+
+        {/* Floating loading badge if updating with data */}
+        {isLoading && (
+          <div className="absolute inset-0 top-10 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px] z-20 pointer-events-none transition-all">
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-2.5 shadow-xl ring-1 ring-slate-900/5">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-600 shrink-0" />
+              <span className="text-xs font-bold text-slate-800">Updating report data...</span>
+            </div>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-slate-50/70 sticky top-0">
+            <TableHeader className="bg-slate-50/70 sticky top-0 border-b border-slate-100">
               <TableRow>
                 {columns.map((col, index) => (
                   <TableHead

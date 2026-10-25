@@ -29,7 +29,9 @@ func (r *StockRepository) ListBalances(db *gorm.DB, companyID uint64, filters ma
 	}
 
 	var total int64
-	query.Model(&models.StockBalance{}).Count(&total)
+	if err := query.Session(&gorm.Session{}).Model(&models.StockBalance{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
 
 	var balances []models.StockBalance
 	offset := (page - 1) * limit
@@ -53,7 +55,9 @@ func (r *StockRepository) ListLedgerEntries(db *gorm.DB, companyID uint64, filte
 	}
 
 	var total int64
-	query.Model(&models.StockLedgerEntry{}).Count(&total)
+	if err := query.Session(&gorm.Session{}).Model(&models.StockLedgerEntry{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
 
 	var entries []models.StockLedgerEntry
 	offset := (page - 1) * limit

@@ -33,6 +33,7 @@ type ReportFilterDTO struct {
 	RiskProfile        *string    `form:"risk_profile"`
 	IncludeUnposted    *bool      `form:"include_unposted"`
 	PostedOnly         *bool      `form:"posted_only"`
+	GroupBy            *string    `form:"group_by"`
 	Search             string     `form:"search"`
 	Page               int        `form:"page,default=1"`
 	Limit              int        `form:"limit,default=10"`
@@ -363,6 +364,7 @@ type SalesByCustomerSummaryDTO struct {
 type SalesByProductRowDTO struct {
 	ProductCode           string  `json:"product_code"`
 	ProductName           string  `json:"product_name"`
+	Category              string  `json:"category"`
 	BatchNumber           string  `json:"batch_number"`
 	QuantitySold          float64 `json:"quantity_sold"`
 	SubtotalAmount        float64 `json:"subtotal_amount"`
@@ -374,12 +376,16 @@ type SalesByProductRowDTO struct {
 	StockTotalCost        float64 `json:"stock_total_cost"`
 	GrossProfit           float64 `json:"gross_profit"`
 	GrossProfitPercentage float64 `json:"gross_profit_percentage"`
+	GrossProfitPercent    float64 `json:"gross_profit_percent"`
+	PercentageOfTotal     float64 `json:"percentage_of_total"`
 }
 
 type SalesByProductSummaryDTO struct {
 	ProductCount          int64   `json:"product_count"`
 	QuantitySold          float64 `json:"quantity_sold"`
+	TotalQuantity         float64 `json:"total_quantity"`
 	TotalSalesAmount      float64 `json:"total_sales_amount"`
+	TotalRevenue          float64 `json:"total_revenue"`
 	StockTotalCost        float64 `json:"stock_total_cost"`
 	GrossProfit           float64 `json:"gross_profit"`
 	GrossProfitPercentage float64 `json:"gross_profit_percentage"`
@@ -387,25 +393,33 @@ type SalesByProductSummaryDTO struct {
 
 // 19. Collection Summary Report
 type CollectionSummaryRowDTO struct {
-	ReceiptDate         time.Time `json:"receipt_date"`
-	ReceiptNumber       string    `json:"receipt_number"`
-	CustomerCode        string    `json:"customer_code"`
-	CustomerName        string    `json:"customer_name"`
 	PaymentMethod       string    `json:"payment_method"`
+	ReceiptCount        int64     `json:"receipt_count"`
+	TotalAmount         float64   `json:"total_amount"`
 	ReceiptAmount       float64   `json:"receipt_amount"`
 	AllocatedAmount     float64   `json:"allocated_amount"`
 	UnallocatedAmount   float64   `json:"unallocated_amount"`
-	ReferenceNumber     string    `json:"reference_number"`
-	BankReferenceNumber string    `json:"bank_reference_number"`
-	ChequeNumber        string    `json:"cheque_number"`
-	FinancePostStatus   string    `json:"finance_post_status"`
+	PercentageOfTotal   float64   `json:"percentage_of_total"`
+	ReceiptDate         time.Time `json:"receipt_date,omitempty"`
+	ReceiptNumber       string    `json:"receipt_number,omitempty"`
+	CustomerCode        string    `json:"customer_code,omitempty"`
+	CustomerName        string    `json:"customer_name,omitempty"`
+	ReferenceNumber     string    `json:"reference_number,omitempty"`
+	BankReferenceNumber string    `json:"bank_reference_number,omitempty"`
+	ChequeNumber        string    `json:"cheque_number,omitempty"`
+	FinancePostStatus   string    `json:"finance_post_status,omitempty"`
 }
 
 type CollectionSummarySummaryDTO struct {
 	ReceiptCount       int64   `json:"receipt_count"`
+	TotalReceipts      int64   `json:"total_receipts"`
 	ReceiptAmount      float64 `json:"receipt_amount"`
+	TotalAmount        float64 `json:"total_amount"`
+	TotalCollected     float64 `json:"total_collected"`
 	AllocatedAmount    float64 `json:"allocated_amount"`
+	TotalAllocated     float64 `json:"total_allocated"`
 	UnallocatedAmount  float64 `json:"unallocated_amount"`
+	TotalUnallocated   float64 `json:"total_unallocated"`
 	CashAmount         float64 `json:"cash_amount"`
 	BankTransferAmount float64 `json:"bank_transfer_amount"`
 	ChequeAmount       float64 `json:"cheque_amount"`
@@ -419,20 +433,28 @@ type FinancePostingStatusRowDTO struct {
 	DocumentType            string     `json:"document_type"`
 	DocumentNumber          string     `json:"document_number"`
 	DocumentDate            time.Time  `json:"document_date"`
+	BranchID                *uint64    `json:"branch_id,omitempty"`
 	Branch                  string     `json:"branch"`
 	Customer                string     `json:"customer"`
+	CustomerName            string     `json:"customer_name"`
 	DocumentAmount          float64    `json:"document_amount"`
 	OperationalPostedStatus string     `json:"operational_posted_status"`
 	FinancePostStatus       string     `json:"finance_post_status"`
 	FinanceReferenceNumber  string     `json:"finance_reference_number"`
+	JournalEntryNumber      string     `json:"journal_entry_number"`
 	FinancePostedBy         string     `json:"finance_posted_by"`
 	FinancePostedAt         *time.Time `json:"finance_posted_at"`
+	PostedDate              *time.Time `json:"posted_date"`
 }
 
 type FinancePostingStatusSummaryDTO struct {
 	DocumentCount        int64   `json:"document_count"`
+	TotalDocuments       int64   `json:"total_documents"`
 	FinancePostedCount   int64   `json:"finance_posted_count"`
+	PostedCount          int64   `json:"posted_count"`
 	FinanceUnpostedCount int64   `json:"finance_unposted_count"`
+	UnpostedCount        int64   `json:"unposted_count"`
 	FinanceFailedCount   int64   `json:"finance_failed_count"`
+	FailedCount          int64   `json:"failed_count"`
 	TotalAmount          float64 `json:"total_amount"`
 }

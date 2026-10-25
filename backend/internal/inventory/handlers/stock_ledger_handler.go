@@ -22,7 +22,12 @@ func (h *StockLedgerHandler) List(c *gin.Context) {
 	companyDB, _ := c.Get("companyDB")
 	db := companyDB.(*gorm.DB)
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
+	if limit <= 0 {
+		limit = 50
+	} else if limit > 1000 {
+		limit = 1000
+	}
 	search := c.Query("search")
 	filters := map[string]interface{}{}
 	if v := c.Query("branch_id"); v != "" {

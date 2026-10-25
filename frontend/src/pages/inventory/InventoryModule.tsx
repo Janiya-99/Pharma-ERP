@@ -456,12 +456,51 @@ function DataGrid({
     return data.slice(start, start + pageSize);
   }, [data, pageIndex, pageSize]);
 
-  if (loading) {
+  if (loading && data.length === 0) {
     return (
-      <div className="grid gap-3">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} className="h-14 rounded-xl" />
-        ))}
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {/* Top animated linear progress bar */}
+        <div className="h-0.5 w-full bg-slate-100 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-600 animate-pulse w-full" />
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-50/80 hover:bg-slate-50/80 border-b border-slate-100">
+              {columns.map((column) => (
+                <TableHead key={column.header} className="px-4 text-xs font-semibold uppercase tracking-normal text-slate-500">
+                  {column.header}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody className="divide-y divide-slate-100 relative">
+            {Array.from({ length: 6 }).map((_, rIdx) => (
+              <TableRow key={rIdx} className="hover:bg-transparent">
+                {columns.map((col, cIdx) => (
+                  <TableCell key={col.header} className="px-4 py-3.5">
+                    <Skeleton
+                      className="h-3.5 rounded-md"
+                      style={{
+                        width: `${Math.max(45, ((rIdx + cIdx) * 23 + 45) % 85)}%`,
+                      }}
+                    />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {/* Centered Modern Floating Loading Badge */}
+        <div className="absolute inset-0 top-10 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[1px] z-10 transition-all">
+          <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-3 shadow-xl ring-1 ring-slate-900/5">
+            <Loader2 className="h-5 w-5 animate-spin text-indigo-600 shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-slate-800">Loading Report Records...</span>
+              <span className="text-[11px] text-slate-400">Querying stock balances & inventory ledger</span>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -477,7 +516,24 @@ function DataGrid({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      {/* Top animated linear progress bar during background loading / filter updates */}
+      {loading && (
+        <div className="absolute top-0 inset-x-0 h-0.5 bg-slate-100 overflow-hidden z-20">
+          <div className="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-indigo-600 animate-pulse w-full" />
+        </div>
+      )}
+
+      {/* Floating loading badge if updating with data */}
+      {loading && (
+        <div className="absolute inset-0 top-10 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px] z-20 pointer-events-none transition-all">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-2.5 shadow-xl ring-1 ring-slate-900/5">
+            <Loader2 className="h-4 w-4 animate-spin text-indigo-600 shrink-0" />
+            <span className="text-xs font-bold text-slate-800">Updating report data...</span>
+          </div>
+        </div>
+      )}
+
       <Table>
         <TableHeader>
           <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
@@ -791,24 +847,82 @@ function validateForm(fields: FieldConfig[], form: ApiRecord) {
   return errors;
 }
 
-function useReferenceData() {
+const inventoryRefsCache: Record<string, { data: any; timestamp: number }> = {};
+const reportFilterRefsCache: Record<string, { warehouses: ApiRecord[]; products: ApiRecord[]; timestamp: number }> = {};
+
+function useReportFilterReferences() {
   const context = useInventoryContext();
-  const [refs, setRefs] = useState({
-    categories: [] as ApiRecord[],
-    units: [] as ApiRecord[],
-    dosageForms: [] as ApiRecord[],
-    genericNames: [] as ApiRecord[],
-    manufacturers: [] as ApiRecord[],
-    suppliers: [] as ApiRecord[],
-    products: [] as ApiRecord[],
-    warehouses: [] as ApiRecord[],
-    batches: [] as ApiRecord[],
-    grns: [] as ApiRecord[],
+  const cacheKey = `${context.companyId || ""}_${context.branchId || ""}`;
+
+  const [refs, setRefs] = useState<{ warehouses: ApiRecord[]; products: ApiRecord[] }>(() => {
+    if (cacheKey && reportFilterRefsCache[cacheKey] && Date.now() - reportFilterRefsCache[cacheKey].timestamp < 5 * 60 * 1000) {
+      return {
+        warehouses: reportFilterRefsCache[cacheKey].warehouses,
+        products: reportFilterRefsCache[cacheKey].products,
+      };
+    }
+    return { warehouses: [], products: [] };
   });
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (force = false) => {
     if (!context.companyId) return;
-    const params = { limit: 1000, company_id: context.companyId, branch_id: context.branchId };
+    if (!force && reportFilterRefsCache[cacheKey] && Date.now() - reportFilterRefsCache[cacheKey].timestamp < 5 * 60 * 1000) {
+      setRefs(reportFilterRefsCache[cacheKey]);
+      return;
+    }
+    try {
+      const params = { limit: 500, company_id: context.companyId, branch_id: context.branchId };
+      const [warehouses, products] = await Promise.all([
+        inventoryApi.getWarehouses(params),
+        inventoryApi.getProducts(params),
+      ]);
+      const data = {
+        warehouses: unwrapList(warehouses),
+        products: unwrapList(products),
+        timestamp: Date.now(),
+      };
+      reportFilterRefsCache[cacheKey] = data;
+      setRefs(data);
+    } catch (err) {
+      console.warn("Failed to load report filter references", err);
+    }
+  }, [context.companyId, context.branchId, cacheKey]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { refs, refresh };
+}
+
+function useReferenceData() {
+  const context = useInventoryContext();
+  const cacheKey = `${context.companyId || ""}_${context.branchId || ""}`;
+  const [refs, setRefs] = useState(() => {
+    if (cacheKey && inventoryRefsCache[cacheKey] && Date.now() - inventoryRefsCache[cacheKey].timestamp < 3 * 60 * 1000) {
+      return inventoryRefsCache[cacheKey].data;
+    }
+    return {
+      categories: [] as ApiRecord[],
+      units: [] as ApiRecord[],
+      dosageForms: [] as ApiRecord[],
+      genericNames: [] as ApiRecord[],
+      manufacturers: [] as ApiRecord[],
+      suppliers: [] as ApiRecord[],
+      products: [] as ApiRecord[],
+      warehouses: [] as ApiRecord[],
+      batches: [] as ApiRecord[],
+      grns: [] as ApiRecord[],
+    };
+  });
+
+  const refresh = useCallback(async (force = false) => {
+    if (!context.companyId) return;
+    if (!force && inventoryRefsCache[cacheKey] && Date.now() - inventoryRefsCache[cacheKey].timestamp < 3 * 60 * 1000) {
+      setRefs(inventoryRefsCache[cacheKey].data);
+      return;
+    }
+    const params = { limit: 500, company_id: context.companyId, branch_id: context.branchId };
     try {
       const [
         categories,
@@ -833,7 +947,7 @@ function useReferenceData() {
         inventoryApi.getProductBatches(params),
         inventoryApi.getGRNs(params),
       ]);
-      setRefs({
+      const nextRefs = {
         categories: unwrapList(categories),
         units: unwrapList(units),
         dosageForms: unwrapList(dosageForms),
@@ -844,11 +958,13 @@ function useReferenceData() {
         warehouses: unwrapList(warehouses),
         batches: unwrapList(batches),
         grns: unwrapList(grns),
-      });
+      };
+      inventoryRefsCache[cacheKey] = { data: nextRefs, timestamp: Date.now() };
+      setRefs(nextRefs);
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
-  }, [context.companyId, context.branchId]);
+  }, [context.companyId, context.branchId, cacheKey]);
 
   useEffect(() => {
     refresh();
@@ -2431,7 +2547,7 @@ function ReportPage({
   extraParams?: ApiRecord;
 }) {
   const context = useInventoryContext();
-  const references = useReferenceData();
+  const references = useReportFilterReferences();
   const [searchParams] = useSearchParams();
   const urlFilter = searchParams.get("filter") || searchParams.get("status") || "";
   const [filters, setFilters] = useState<ApiRecord>(() => {
@@ -2449,7 +2565,7 @@ function ReportPage({
     }
     return init;
   });
-  const params = { company_id: context.companyId, branch_id: context.branchId, ...extraParams, ...compact(filters) };
+  const params = { company_id: context.companyId, branch_id: context.branchId, limit: 500, ...extraParams, ...compact(filters) };
   const report = useBackendList(loader, params, !!context.companyId);
   const warehouseOptions = [{ label: "All Warehouses", value: "all" }, ...makeOptions(references.refs.warehouses, ["warehouse_name"])];
   const productOptions = [{ label: "All Products", value: "all" }, ...makeOptions(references.refs.products, ["product_name"])];
