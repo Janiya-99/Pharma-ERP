@@ -39,9 +39,93 @@ interface LicenseDoc {
   issueDate: string;
   expiryDate: string;
   daysRemaining: number;
+  adminStatus: "ACTIVE" | "SUSPENDED" | "RENEWAL_PENDING" | "REVOKED";
+  validityStatus: "ACTIVE" | "EXPIRING_SOON" | "EXPIRED";
   status: "ACTIVE" | "EXPIRING_SOON" | "EXPIRED" | "RENEWAL_PENDING";
   category: "NMRA" | "IRAS" | "HEALTH_MUNICIPAL" | "DANGEROUS_DRUGS";
 }
+
+const STATUTORY_PREMISES_LICENSES: Array<Omit<LicenseDoc, "daysRemaining" | "validityStatus" | "status">> = [
+  {
+    id: "lic-whl-4402",
+    licenseNumber: "WHL-4402/2026",
+    title: "NMRA Wholesale Dealer Operating License (Central Hub)",
+    authority: "National Medicines Regulatory Authority (NMRA)",
+    facility: "Colombo Central Medical Warehouse (WH_COL_MAIN)",
+    issueDate: "2025-07-01",
+    expiryDate: "2026-06-30", // Expired on 30 June 2026
+    adminStatus: "ACTIVE",
+    category: "NMRA",
+  },
+  {
+    id: "lic-whl-kdy-1092",
+    licenseNumber: "WHL-KDY-1092/2026",
+    title: "Kandy Regional Distribution Facility — Wholesale Operating License",
+    authority: "National Medicines Regulatory Authority (NMRA)",
+    facility: "Kandy Central Distribution Warehouse",
+    issueDate: "2026-04-15",
+    expiryDate: "2027-04-15",
+    adminStatus: "ACTIVE",
+    category: "NMRA",
+  },
+  {
+    id: "lic-whl-biy-7731",
+    licenseNumber: "WHL-BIY-7731/2026",
+    title: "Biyagama Cold Chain Vaccines Facility — Specialized Storage Permit",
+    authority: "National Medicines Regulatory Authority (NMRA)",
+    facility: "Biyagama Cold Chain Vaccines Facility",
+    issueDate: "2025-09-01",
+    expiryDate: "2027-08-30",
+    adminStatus: "ACTIVE",
+    category: "NMRA",
+  },
+  {
+    id: "lic-iras-col-89",
+    licenseNumber: "IRAS-COL-2026/89",
+    title: "Corporate Tax Clearance & Fiscal Compliance Certificate",
+    authority: "Inland Revenue Department (IRD / IRAS)",
+    facility: "Ceylon MedEx Corporate Headquarters (Colombo 03)",
+    issueDate: "2026-01-01",
+    expiryDate: "2026-12-31",
+    adminStatus: "ACTIVE",
+    category: "IRAS",
+  },
+  {
+    id: "lic-mnc-cmb-8820",
+    licenseNumber: "MNC-CMB-8820",
+    title: "Municipal Dangerous Goods & Flammables Storage Permit",
+    authority: "Colombo Municipal Council Health & Fire Dept",
+    facility: "Central Quality Control & Quarantine Holding",
+    issueDate: "2025-11-15",
+    expiryDate: "2026-11-15", // Approaching expiry (< 30 days relative to Oct 25)
+    adminStatus: "ACTIVE",
+    category: "HEALTH_MUNICIPAL",
+  },
+];
+
+export const calculateLicenseValidity = (expiryDateStr: string, adminStatus: string = "ACTIVE") => {
+  const now = new Date();
+  const expDate = new Date(expiryDateStr);
+
+  // Use calendar day boundary calculation
+  const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const expUtc = Date.UTC(expDate.getFullYear(), expDate.getMonth(), expDate.getDate());
+  const diffDays = Math.round((expUtc - nowUtc) / (1000 * 60 * 60 * 24));
+
+  let validityStatus: "ACTIVE" | "EXPIRING_SOON" | "EXPIRED" = "ACTIVE";
+  if (diffDays < 0) {
+    validityStatus = "EXPIRED";
+  } else if (diffDays <= 30) {
+    validityStatus = "EXPIRING_SOON";
+  }
+
+  let status: LicenseDoc["status"] = validityStatus;
+  if (adminStatus === "RENEWAL_PENDING" || adminStatus === "RENEWAL_SUBMITTED") {
+    status = "RENEWAL_PENDING";
+  }
+
+  return { daysRemaining: diffDays, validityStatus, status };
+};
 
 const LicenseDocumentsPage = () => {
   const [data, setData] = useState<LicenseDoc[]>([]);
@@ -66,23 +150,25 @@ const LicenseDocumentsPage = () => {
     try {
       const res = await inventoryApi.getProducts({ page: 1, limit: 100 });
       const rawProducts = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
-      const now = new Date();
 
-      const mapped: LicenseDoc[] = rawProducts.map((p: any) => {
+      // 1. Process statutory premises & facility licenses
+      const mappedPremises: LicenseDoc[] = STATUTORY_PREMISES_LICENSES.map((lic) => {
+        const { daysRemaining, validityStatus, status } = calculateLicenseValidity(lic.expiryDate, lic.adminStatus);
+        return {
+          ...lic,
+          daysRemaining,
+          validityStatus,
+          status,
+        };
+      });
+
+      // 2. Process product formulations licenses
+      const mappedProducts: LicenseDoc[] = rawProducts.map((p: any) => {
         const licNo = p.nmra_registration_number || `REG-${p.product_code || p.id}`;
         const expDateStr = p.nmra_expiry_date
           ? new Date(p.nmra_expiry_date).toISOString().split("T")[0]
-          : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-        const expDate = new Date(expDateStr);
-        const diffTime = expDate.getTime() - now.getTime();
-        const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        let status: LicenseDoc["status"] = "ACTIVE";
-        if (daysRemaining < 0) {
-          status = "EXPIRED";
-        } else if (daysRemaining <= 30) {
-          status = "EXPIRING_SOON";
-        }
+          : "2028-12-31";
+        const { daysRemaining, validityStatus, status } = calculateLicenseValidity(expDateStr, "ACTIVE");
 
         return {
           id: String(p.id),
@@ -90,17 +176,51 @@ const LicenseDocumentsPage = () => {
           title: `${p.product_name || "Pharmaceutical Item"} - NMRA Registration Certificate`,
           authority: "National Medicines Regulatory Authority (NMRA)",
           facility: p.manufacturer?.name || "Colombo Central Warehouse (HQ)",
-          issueDate: p.created_at ? new Date(p.created_at).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+          issueDate: p.created_at ? new Date(p.created_at).toISOString().split("T")[0] : "2025-01-01",
           expiryDate: expDateStr,
           daysRemaining,
+          adminStatus: "ACTIVE",
+          validityStatus,
           status,
           category: "NMRA",
         };
       });
 
-      setData(mapped);
+      // 3. Load locally registered licenses if any
+      let localSaved: LicenseDoc[] = [];
+      try {
+        const savedStr = localStorage.getItem("ceylonmed_registered_licenses");
+        if (savedStr) {
+          const parsed = JSON.parse(savedStr);
+          if (Array.isArray(parsed)) {
+            localSaved = parsed.map((item: any) => {
+              const { daysRemaining, validityStatus, status } = calculateLicenseValidity(item.expiryDate, item.adminStatus || "ACTIVE");
+              return {
+                ...item,
+                daysRemaining,
+                validityStatus,
+                status,
+              };
+            });
+          }
+        }
+      } catch {
+        // ignore
+      }
+
+      setData([...localSaved, ...mappedPremises, ...mappedProducts]);
     } catch {
-      setData([]);
+      // Fallback to premises licenses if products API fails
+      const fallbackPremises: LicenseDoc[] = STATUTORY_PREMISES_LICENSES.map((lic) => {
+        const { daysRemaining, validityStatus, status } = calculateLicenseValidity(lic.expiryDate, lic.adminStatus);
+        return {
+          ...lic,
+          daysRemaining,
+          validityStatus,
+          status,
+        };
+      });
+      setData(fallbackPremises);
     } finally {
       setLoading(false);
     }
@@ -202,34 +322,57 @@ const LicenseDocumentsPage = () => {
       },
       {
         accessorKey: "status",
-        header: "Status",
+        header: "Status & Validity",
         cell: ({ row }) => {
           const st = row.original.status;
-          if (st === "ACTIVE") {
+          const adminSt = row.original.adminStatus;
+          const isExpired = row.original.daysRemaining < 0;
+
+          if (isExpired) {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700   border border-emerald-200/60  px-2.5 py-0.5 text-[11px] font-bold">
-                <CheckCircle2 className="h-3 w-3" /> ACTIVE
-              </span>
+              <div className="flex flex-col gap-1 items-start">
+                <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200/60 px-2.5 py-0.5 text-[11px] font-bold">
+                  <XCircle className="h-3 w-3" /> EXPIRED
+                </span>
+                <span className="text-[10px] font-medium text-slate-500">
+                  Admin: {adminSt || "Active on File"}
+                </span>
+              </div>
             );
           }
           if (st === "EXPIRING_SOON") {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700   border border-amber-200/60  px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
-                <AlertTriangle className="h-3 w-3" /> EXPIRING SOON
-              </span>
+              <div className="flex flex-col gap-1 items-start">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 px-2.5 py-0.5 text-[11px] font-bold animate-pulse">
+                  <AlertTriangle className="h-3 w-3" /> EXPIRING SOON
+                </span>
+                <span className="text-[10px] font-medium text-slate-500">
+                  Admin: {adminSt || "Active"}
+                </span>
+              </div>
             );
           }
           if (st === "RENEWAL_PENDING") {
             return (
-              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 text-indigo-700   border border-indigo-200/60  px-2.5 py-0.5 text-[11px] font-bold">
-                <RefreshCw className="h-3 w-3 animate-spin" /> RENEWAL IN PROGRESS
-              </span>
+              <div className="flex flex-col gap-1 items-start">
+                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60 px-2.5 py-0.5 text-[11px] font-bold">
+                  <RefreshCw className="h-3 w-3 animate-spin" /> RENEWAL IN PROGRESS
+                </span>
+                <span className="text-[10px] font-medium text-slate-500">
+                  Admin: {adminSt || "Renewal Submitted"}
+                </span>
+              </div>
             );
           }
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700   border border-rose-200/60  px-2.5 py-0.5 text-[11px] font-bold">
-              <XCircle className="h-3 w-3" /> EXPIRED
-            </span>
+            <div className="flex flex-col gap-1 items-start">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-2.5 py-0.5 text-[11px] font-bold">
+                <CheckCircle2 className="h-3 w-3" /> ACTIVE
+              </span>
+              <span className="text-[10px] font-medium text-slate-400">
+                Admin: {adminSt || "Active"}
+              </span>
+            </div>
           );
         },
       },
@@ -265,6 +408,7 @@ const LicenseDocumentsPage = () => {
     e.preventDefault();
     if (!newTitle || !newNumber) return;
     const expStr = selectedDate ? selectedDate.toISOString().split("T")[0] : "2027-06-30";
+    const { daysRemaining, validityStatus, status } = calculateLicenseValidity(expStr, "ACTIVE");
     const newDoc: LicenseDoc = {
       id: `lic-${Date.now()}`,
       licenseNumber: newNumber,
@@ -273,11 +417,21 @@ const LicenseDocumentsPage = () => {
       facility: newFacility,
       issueDate: new Date().toISOString().split("T")[0],
       expiryDate: expStr,
-      daysRemaining: 365,
-      status: "ACTIVE",
+      daysRemaining,
+      adminStatus: "ACTIVE",
+      validityStatus,
+      status,
       category: newCategory as any,
     };
-    setData([newDoc, ...data]);
+    const updated = [newDoc, ...data];
+    setData(updated);
+    try {
+      const existingStr = localStorage.getItem("ceylonmed_registered_licenses");
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      localStorage.setItem("ceylonmed_registered_licenses", JSON.stringify([newDoc, ...existing]));
+    } catch {
+      // ignore
+    }
     setIsModalOpen(false);
     setNewTitle("");
     setNewNumber("");
@@ -330,21 +484,21 @@ const LicenseDocumentsPage = () => {
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Active & Compliant</span>
           <p className="mt-2 text-3xl font-extrabold text-emerald-600 ">
-            {data.filter((l) => l.status === "ACTIVE").length}
+            {data.filter((l) => l.validityStatus === "ACTIVE").length}
           </p>
           <span className="text-xs text-emerald-600 font-semibold mt-1 block">Good standing</span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Expiring / Renewal Needed</span>
           <p className="mt-2 text-3xl font-extrabold text-amber-600 ">
-            {data.filter((l) => l.status === "EXPIRING_SOON" || l.status === "RENEWAL_PENDING").length}
+            {data.filter((l) => l.validityStatus === "EXPIRING_SOON" || l.status === "RENEWAL_PENDING").length}
           </p>
           <span className="text-xs text-amber-600 font-semibold mt-1 block">Action required &lt; 30 days</span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Expired / Lapsed</span>
           <p className="mt-2 text-3xl font-extrabold text-rose-600 ">
-            {data.filter((l) => l.status === "EXPIRED").length}
+            {data.filter((l) => l.validityStatus === "EXPIRED").length}
           </p>
           <span className="text-xs text-rose-600 font-semibold mt-1 block">Requires immediate reinstatement</span>
         </div>

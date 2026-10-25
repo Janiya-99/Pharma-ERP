@@ -28,7 +28,8 @@ def seed_enterprise():
     sql_dept = """
     INSERT INTO departments (company_id, department_code, department_name, description, status, created_at, updated_at)
     VALUES
-      (1, 'ADMIN', 'Executive Management & Administration', 'Executive oversight, board governance, and enterprise administration', 'active', NOW(), NOW()),
+      (1, 'ADMIN', 'General Administration & Operations', 'General administrative services, facility management, and office operations', 'active', NOW(), NOW()),
+      (1, 'EXEC', 'Executive Management & Governance', 'Executive oversight, board governance, and enterprise administration', 'active', NOW(), NOW()),
       (1, 'FIN', 'Finance & Accounting', 'General ledger, accounts receivable, payables, and fiscal audits', 'active', NOW(), NOW()),
       (1, 'LOG', 'Supply Chain & Warehousing', 'Pharmaceutical inventory, batch quarantine, cold-chain distribution, and logistics', 'active', NOW(), NOW()),
       (1, 'QA', 'Quality Assurance & Regulatory Affairs', 'NMRA compliance, batch recall governance, QC assays, and disposal witnessing', 'active', NOW(), NOW()),
@@ -208,18 +209,18 @@ def seed_enterprise():
 
     users_data = [
         # id, employee_code, name, email, phone, dept_id, des_id, default_branch, user_type, avatar_url, role_id, software_ids, branch_ids
-        (1, 'EMP-001', 'Dr. Kalinga Silva', 'admin@ceylonmed.lk', '+94 77 123 4567', 1, 1, 1, 'super_admin', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face', 1, [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]),
-        (2, 'EMP-002', 'Ruwani Jayawardena', 'cfo@ceylonmed.lk', '+94 77 234 5678', 2, 2, 1, 'company_user', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face', 2, [1, 2, 4], [1, 2, 3, 4, 5]),
-        (3, 'EMP-003', 'Chaminda Bandara', 'accountant@ceylonmed.lk', '+94 77 345 6789', 2, 3, 1, 'company_user', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face', 3, [2], [1, 2]),
-        (4, 'EMP-004', 'Niroshan Perera', 'warehouse.manager@ceylonmed.lk', '+94 77 456 7890', 3, 4, 1, 'company_user', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face', 4, [1, 3], [1, 2, 3, 4, 5]),
-        (5, 'EMP-005', 'Kumara Wickramasinghe', 'storekeeper@ceylonmed.lk', '+94 77 567 8901', 3, 5, 1, 'company_user', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face', 5, [3], [1]),
-        (6, 'EMP-006', 'Dharshani Samarasekara', 'qa.director@ceylonmed.lk', '+94 77 678 9012', 4, 6, 1, 'company_user', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face', 6, [3, 5], [1, 2, 3, 4, 5]),
-        (7, 'EMP-007', 'Dr. Sanduni Fernando', 'qc.officer@ceylonmed.lk', '+94 77 789 0123', 4, 7, 4, 'company_user', 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face', 7, [3, 5], [1, 4]),
-        (8, 'EMP-008', 'Priyantha De Silva', 'sales.director@ceylonmed.lk', '+94 77 890 1234', 5, 8, 1, 'company_user', 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face', 8, [1, 4], [1, 2, 3, 4, 5]),
-        (9, 'EMP-009', 'Anura Gunaratne', 'billing.officer@ceylonmed.lk', '+94 77 901 2345', 5, 9, 1, 'company_user', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face', 9, [4], [1]),
-        (10, 'EMP-010', 'Malik Senanayake', 'auditor@ceylonmed.lk', '+94 77 012 3456', 6, 10, 1, 'company_user', 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&h=200&fit=crop&crop=face', 10, [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]),
-        (11, 'EMP-011', 'Fathima Rizna', 'cashier@ceylonmed.lk', '+94 77 123 7890', 2, 11, 1, 'company_user', 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=200&h=200&fit=crop&crop=face', 11, [2, 4], [1]),
-        (12, 'EMP-012', 'Kasun Jayasuriya', 'medical.rep@ceylonmed.lk', '+94 77 234 8901', 5, 12, 2, 'company_user', 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=face', 12, [4], [2])
+        (1, 'EMP-001', 'Dr. Kalinga Silva', 'admin@ceylonmed.lk', '+94 77 123 4567', 2, 2, 1, 'super_admin', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face', 1, [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]),
+        (2, 'EMP-002', 'Ruwani Jayawardena', 'cfo@ceylonmed.lk', '+94 77 234 5678', 3, 3, 1, 'company_user', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face', 2, [1, 2, 4], [1, 2, 3, 4, 5]),
+        (3, 'EMP-003', 'Chaminda Bandara', 'accountant@ceylonmed.lk', '+94 77 345 6789', 3, 4, 1, 'company_user', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face', 3, [2], [1, 2]),
+        (4, 'EMP-004', 'Niroshan Perera', 'warehouse.manager@ceylonmed.lk', '+94 77 456 7890', 4, 5, 1, 'company_user', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face', 4, [1, 3], [1, 2, 3, 4, 5]),
+        (5, 'EMP-005', 'Kumara Wickramasinghe', 'storekeeper@ceylonmed.lk', '+94 77 567 8901', 4, 6, 1, 'company_user', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face', 5, [3], [1]),
+        (6, 'EMP-006', 'Dharshani Samarasekara', 'qa.director@ceylonmed.lk', '+94 77 678 9012', 5, 7, 1, 'company_user', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face', 6, [3, 5], [1, 2, 3, 4, 5]),
+        (7, 'EMP-007', 'Dr. Sanduni Fernando', 'qc.officer@ceylonmed.lk', '+94 77 789 0123', 5, 8, 4, 'company_user', 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face', 7, [3, 5], [1, 4]),
+        (8, 'EMP-008', 'Priyantha De Silva', 'sales.director@ceylonmed.lk', '+94 77 890 1234', 6, 9, 1, 'company_user', 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face', 8, [1, 4], [1, 2, 3, 4, 5]),
+        (9, 'EMP-009', 'Anura Gunaratne', 'billing.officer@ceylonmed.lk', '+94 77 901 2345', 6, 10, 1, 'company_user', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face', 9, [4], [1]),
+        (10, 'EMP-010', 'Malik Senanayake', 'auditor@ceylonmed.lk', '+94 77 012 3456', 7, 11, 1, 'company_user', 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&h=200&fit=crop&crop=face', 10, [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]),
+        (11, 'EMP-011', 'Fathima Rizna', 'cashier@ceylonmed.lk', '+94 77 123 7890', 3, 12, 1, 'company_user', 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=200&h=200&fit=crop&crop=face', 11, [2, 4], [1]),
+        (12, 'EMP-012', 'Kasun Jayasuriya', 'medical.rep@ceylonmed.lk', '+94 77 234 8901', 6, 13, 2, 'company_user', 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=face', 12, [4], [2])
     ]
 
     user_sqls = []

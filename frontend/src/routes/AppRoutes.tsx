@@ -1145,6 +1145,14 @@ const AppRoutes = () => {
             path="/compliance-center/records"
             element={<RegulatoryRecordsPage />}
           />
+          <Route
+            path="/compliance-center/deviations"
+            element={<RegulatoryRecordsPage initialCategory="DEVIATIONS" />}
+          />
+          <Route
+            path="/compliance-center/capa"
+            element={<RegulatoryRecordsPage initialCategory="CAPA" />}
+          />
         </Route>
         <Route
           path="/invoice-center/sales-orders/:id/print"

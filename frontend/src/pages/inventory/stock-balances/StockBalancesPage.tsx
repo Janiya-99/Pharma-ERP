@@ -39,19 +39,56 @@ const StockBalancesPage = () => {
   const columns = [
     { header: "Product Code", accessorKey: "product.product_code" },
     { header: "Product Name", accessorKey: "product.product_name" },
-    { header: "Batch", accessorKey: "batch.batch_number", cell: ({ row }: { row?: unknown }) => row.original.batch?.batch_number || "-" },
-    { header: "Expiry", accessorKey: "batch.expiry_date", cell: ({ row }: { row?: unknown }) => {
+    { header: "Batch", accessorKey: "batch.batch_number", cell: ({ row }: { row?: any }) => row.original.batch?.batch_number || "-" },
+    { header: "Expiry", accessorKey: "batch.expiry_date", cell: ({ row }: { row?: any }) => {
         if (!row.original.batch?.expiry_date) return "-";
         const isExpired = new Date(row.original.batch.expiry_date) < new Date();
         return <span className={isExpired ? "text-red-600 font-medium" : ""}>{new Date(row.original.batch.expiry_date).toLocaleDateString()}</span>;
     } },
     { header: "Warehouse", accessorKey: "warehouse.warehouse_name" },
-    { header: "Location", accessorKey: "location.location_name", cell: ({ row }: { row?: unknown }) => row.original.location?.location_name || "-" },
-    { header: "Qty On Hand", accessorKey: "quantity_on_hand", cell: ({ row }: { row?: unknown }) => <StockQuantityDisplay quantity={row.original.quantity_on_hand} /> },
-    { header: "Qty Allocated", accessorKey: "quantity_allocated", cell: ({ row }: { row?: unknown }) => <StockQuantityDisplay quantity={row.original.quantity_allocated} /> },
-    { header: "Qty Available", accessorKey: "quantity_available", cell: ({ row }: { row?: unknown }) => <StockQuantityDisplay quantity={row.original.quantity_available} /> },
-    { header: "Avg Cost", accessorKey: "average_cost", cell: ({ row }: { row?: unknown }) => <StockValueDisplay value={row.original.average_cost} /> },
-    { header: "Stock Value", accessorKey: "stock_value", cell: ({ row }: { row?: unknown }) => <StockValueDisplay value={row.original.stock_value} /> },
+    { header: "Holding Status", id: "stock_status", cell: ({ row }: { row?: any }) => {
+        const batch = row.original.batch;
+        const wh = row.original.warehouse;
+        const isQuarantined = batch?.is_blocked || batch?.batch_status === "quarantined" || wh?.warehouse_type === "quarantine";
+        const isExpired = batch?.expiry_date && new Date(batch.expiry_date) < new Date();
+        if (isQuarantined) {
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+              Quarantine / On Hold
+            </span>
+          );
+        }
+        if (isExpired) {
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+              Expired
+            </span>
+          );
+        }
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            Saleable
+          </span>
+        );
+    } },
+    { header: "Qty On Hand (Physical)", accessorKey: "quantity_on_hand", cell: ({ row }: { row?: any }) => <StockQuantityDisplay quantity={row.original.quantity_on_hand} /> },
+    { header: "Qty Allocated", accessorKey: "quantity_allocated", cell: ({ row }: { row?: any }) => <StockQuantityDisplay quantity={row.original.quantity_allocated} /> },
+    { header: "Qty Available (Saleable)", accessorKey: "quantity_available", cell: ({ row }: { row?: any }) => {
+        const batch = row.original.batch;
+        const wh = row.original.warehouse;
+        const isQuarantined = batch?.is_blocked || batch?.batch_status === "quarantined" || wh?.warehouse_type === "quarantine";
+        const saleableQty = isQuarantined ? 0 : Number(row.original.quantity_available || 0);
+        return (
+          <div className="flex flex-col items-end">
+            <StockQuantityDisplay quantity={saleableQty} />
+            {isQuarantined && (
+              <span className="text-[10px] text-amber-700 font-semibold">(Non-Saleable Hold)</span>
+            )}
+          </div>
+        );
+    } },
+    { header: "Avg Cost", accessorKey: "average_cost", cell: ({ row }: { row?: any }) => <StockValueDisplay value={row.original.average_cost} /> },
+    { header: "Stock Value", accessorKey: "stock_value", cell: ({ row }: { row?: any }) => <StockValueDisplay value={row.original.stock_value} /> },
   ];
 
   return (

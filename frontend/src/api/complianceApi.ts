@@ -30,6 +30,7 @@ export interface ComplianceSummary {
     authority: string;
     status: string;
     notes: string;
+    user?: string;
   }>;
 }
 

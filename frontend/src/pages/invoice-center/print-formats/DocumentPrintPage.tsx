@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Printer, Sliders } from "lucide-react";
 import { invoiceCenterApi } from "../../../api/invoiceCenterApi";
+import { inventoryApi } from "../../../api/inventoryApi";
 import { Button } from "../../../components/ui/button";
 import { useAuth } from "../../../auth/AuthContext";
 import type { InvoicePrintFormat } from "../../../types/invoice-center";
@@ -14,9 +15,12 @@ type Props = {
 const documentLoaders: Record<string, (id: string) => Promise<any>> = {
   sales_order: (id) => invoiceCenterApi.getSalesOrderById(id),
   sales_invoice: (id) => invoiceCenterApi.getSalesInvoiceById(id),
+  proforma_invoice: (id) =>
+    invoiceCenterApi.getSalesInvoiceById(id).catch(() => invoiceCenterApi.getSalesOrderById(id)),
   credit_note: (id) => invoiceCenterApi.getCreditNoteById(id),
   debit_note: (id) => invoiceCenterApi.getDebitNoteById(id),
   customer_receipt: (id) => invoiceCenterApi.getCustomerReceiptById(id),
+  grn: (id) => inventoryApi.getGRNById(id),
 };
 
 export default function DocumentPrintPage({ documentType }: Props) {
@@ -38,9 +42,11 @@ export default function DocumentPrintPage({ documentType }: Props) {
     if (loader) {
       setLoading(true);
       loader(id)
-        .then((response) => setDocument(response.data.data))
+        .then((response) => setDocument(response.data?.data || response.data || null))
         .catch(() => setDocument(null))
         .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, [documentType, id]);
 
@@ -64,13 +70,19 @@ export default function DocumentPrintPage({ documentType }: Props) {
         ...(branchId ? { branch_id: branchId } : {}),
       })
       .then((response) => {
-        if (response.data.data) {
+        const defaultFmt = createDefaultPrintFormat(documentType);
+        if (response.data?.data) {
+          const apiFmt = response.data.data;
           setFormat({
-            ...createDefaultPrintFormat(documentType),
-            ...response.data.data,
+            ...defaultFmt,
+            ...apiFmt,
+            fields:
+              apiFmt.fields && apiFmt.fields.length > 0
+                ? apiFmt.fields
+                : defaultFmt.fields,
           });
         } else {
-          setFormat(createDefaultPrintFormat(documentType));
+          setFormat(defaultFmt);
         }
       })
       .catch(() => setFormat(createDefaultPrintFormat(documentType)));
@@ -87,7 +99,14 @@ export default function DocumentPrintPage({ documentType }: Props) {
     documentTypes.find((type) => type.value === documentType)?.label ||
     "Sales Invoice";
 
-  const lines = document?.lines || document?.allocations || [];
+  const lines =
+    document?.lines ||
+    document?.sales_invoice_lines ||
+    document?.items ||
+    document?.allocations ||
+    document?.order_lines ||
+    document?.grn_items ||
+    [];
 
   const formatMoney = (val: any) => {
     const num = Number(val || 0);

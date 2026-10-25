@@ -198,3 +198,53 @@
 ### 7.2 Standardized Pagination Component (`TablePagination.tsx`)
 * Implemented reusable client-side pagination component with page size selector (`10`, `25`, `50`, `100`), page number indicators, and record counts.
 * Integrated across all 14 commercial and financial report data tables.
+
+---
+
+## 8. Compliance, Statutory Licensure & QA Integrity Engine
+
+### 8.1 COM-01: NMRA License Validity & Expiry Calculation (`LicenseDocumentsPage.tsx`)
+* **Accurate Temporal Calculation Engine:** Built `calculateLicenseValidity` utility computing calendar day differences against UTC midnight, properly accounting for leap years and elapsed time.
+* **Statutory Operating Licensure Integration:** Added premise operating licenses including `WHL-4402/2026` ("NMRA Wholesale Dealer Operating License" for Colombo Central Medical Warehouse, expired 2026-06-30).
+* **Administrative Status vs. Calculated Validity:** Differentiated administrative registration status (`ACTIVE`) from dynamic calculated validity (`EXPIRED`). Highlighted expired permits with `"Expired X days ago"` in bold red, eliminating false "ACTIVE / 361 days remaining" badges.
+* **Dynamic KPI Card Binding:** Linked summary KPI cards directly to computed `validityStatus`.
+
+### 8.2 COM-02: Quality Deviations & CAPA Workflows (`Sidebar.tsx`, `AppRoutes.tsx`, `RegulatoryRecordsPage.tsx`)
+* **Sidebar Menu Re-architecture:** Corrected routing in `Sidebar.tsx`:
+  * `Licenses & Permits` -> `/compliance-center/licenses`
+  * `Batch Quarantine Holds` -> `/compliance-center/batch-holds`
+  * `Product Recalls` -> `/compliance-center/recalls`
+  * `Expiry & Disposal` -> `/compliance-center/disposals`
+  * `Deviations` -> `/compliance-center/deviations`
+  * `CAPA` -> `/compliance-center/capa`
+  * `Regulatory Records` -> `/compliance-center/records`
+* **Dedicated Route Mapping:** Added routes in `AppRoutes.tsx` for `/compliance-center/deviations` and `/compliance-center/capa`.
+* **Dedicated Tabbed Register:** Built pill tab filter in `RegulatoryRecordsPage.tsx` supporting quick switching between Deviations, CAPA, Quality Holds, Recalls, and Disposals, with interactive modal workflows for logging new Deviations and CAPA actions.
+
+### 8.3 COM-03: Regulatory Audit Trail Event Mapping (`dashboard_handler.go`, `RegulatoryRecordsPage.tsx`, `complianceApi.ts`)
+* **Event Classification Engine:** Updated `dashboard_handler.go` to categorize audit rows by `software_code` and action prefix. Financial statement views (Balance Sheet, Cash/Bank Book) are mapped to `FINANCIAL_GOVERNANCE` under `Finance Directorate & Fiscal Audit` with the actual user and action description, ending mislabeling as QC audits.
+* **Frontend Scope Mapping:** Updated `RegulatoryRecordsPage.tsx` and `complianceApi.ts` to display accurate authorities, origin facilities, and actual executing officers.
+
+### 8.4 S-01: Quarantined & On-Hold Stock Segregation (`inventory_lookup_repository.go`, `StockBalancesPage.tsx`, DB `stock_balances`)
+* **Availability vs On-Hand Decoupling:** Separated physical on-hand quantity from saleable available inventory. Updated database `stock_balances` setting `quantity_available = 0.000` for quarantined batch 275 (`BAT-QUAR-RECALL-65`).
+* **Sales Order Lookup Exclusions:** Modified `inventory_lookup_repository.go` to strictly exclude batches with status `quarantined`, `on_hold`, or `hold`, and exclude warehouses with type `quarantine` or `disposal` from saleable stock lookups.
+* **Enhanced Inventory UI:** Updated `StockBalancesPage.tsx` to display `Holding Status` badges (`Quarantine / On Hold`, `Saleable`, `Expired`) and explicitly mark non-saleable held stock as `0 (Non-Saleable Hold)`.
+
+### 8.5 S-04: Certified Compliance Audit PDF Export (`RegulatoryRecordsPage.tsx`)
+* **Cryptographic PDF Engine:** Replaced placeholder alert with full `jsPDF` + `jspdf-autotable` implementation exporting formal tamper-evident dossiers.
+* **Certificate Features:** Includes corporate header, NMRA statutory metadata, WORM compliance assurance, SHA-256 cryptographic hash signature, legal cGMP/GDP certification clause, and QA Director / Qualified Person signature lines.
+* **Full Dossier Export:** Added master ledger export to PDF in landscape mode for regulatory inspections.
+
+### 8.6 S-05: CFO Role Permissions for Customer Aging (`role_permissions`)
+* **Permission Granting:** Assigned permission `230` (`invoice_center.reports.customer_aging.view`) to `role_id = 2` (FINANCE_DIRECTOR / CFO) and `role_id = 3` (SENIOR_ACCOUNTANT) in `erp_ceylonmed.role_permissions`.
+
+### 8.7 S-06: Master Data Reconciliation (Gentamicin, Departments, Designations)
+* **Generic Name Realignment:** Created generic name `GEN_GENTA` ("Gentamicin Sulfate") and updated Gentamicin Sulfate 40mg/ml (`id = 65`) in `erp_ceylonmed.products`.
+* **Department Deduplication:** Renamed duplicate department `id = 2` to `EXEC` ("Executive Management & Governance") and `id = 1` to "General Administration & Operations".
+* **Enterprise User Realignment:** Synchronized all 12 users with exact departments and designations in both `erp_ceylonmed.users` and `scripts/seed_enterprise_users.py`.
+
+### 8.8 S-07: Document & Proforma Invoice Print Engine (`DocumentPrintPage.tsx`)
+* **Proforma & GRN Loaders:** Added `proforma_invoice` (with fallback between sales invoice and sales order) and `grn` (`inventoryApi.getGRNById`) to `documentLoaders`.
+* **Field Preservation:** Ensured default fields are retained if the API returns an empty format field list.
+* **Line Item Extraction:** Robust fallback for `document?.lines || document?.sales_invoice_lines || document?.items || document?.allocations || document?.order_lines || document?.grn_items || []`.
+
