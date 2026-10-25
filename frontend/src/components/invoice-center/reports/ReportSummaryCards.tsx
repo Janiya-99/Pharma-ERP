@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight } from "lucide-react";
 
@@ -27,6 +26,8 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({
   items,
   isLoading = false,
 }) => {
+  const navigate = useNavigate();
+
   const formatValue = (
     value: string | number,
     format?: "currency" | "number" | "text"
@@ -43,31 +44,39 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({
     return value;
   };
 
+  const getGridCols = () => {
+    if (!items || items.length === 0) return "grid-cols-1";
+    if (items.length === 1) return "grid-cols-1";
+    if (items.length === 2) return "grid-cols-1 sm:grid-cols-2";
+    if (items.length === 3) return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+    return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
+  };
+
   if (isLoading) {
+    const count = Math.max(items?.length || 4, 4);
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: Math.max(items.length || 4, 4) }).map((_, i) => (
-          <Card key={i} className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <Skeleton className="h-4 w-[100px]" />
-              <Skeleton className="h-4 w-4 rounded-full" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="mb-1 h-7 w-[120px]" />
-              <Skeleton className="h-3 w-[150px]" />
-            </CardContent>
-          </Card>
+      <div className={`grid gap-4 ${getGridCols()}`}>
+        {Array.from({ length: count }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-slate-200/80 bg-white p-5 space-y-3 shadow-2xs"
+          >
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-3.5 w-24 rounded" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
+            </div>
+            <Skeleton className="h-8 w-32 rounded-md" />
+            <Skeleton className="h-3 w-40 rounded" />
+          </div>
         ))}
       </div>
     );
   }
 
-  const navigate = useNavigate();
-
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className={`grid gap-4 ${getGridCols()}`}>
       {items.map((item, index) => {
         const isClickable = Boolean(item.path || item.onClick);
         const handleClick = () => {
@@ -76,31 +85,51 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({
         };
 
         return (
-          <Card 
-            key={index} 
+          <div
+            key={index}
             onClick={isClickable ? handleClick : undefined}
-            className={`border border-slate-200/80 bg-white/80 backdrop-blur-md shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 rounded-2xl group ${isClickable ? 'cursor-pointer hover:border-blue-300 hover:ring-1 hover:ring-blue-100' : ''}`}
+            className={`relative rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-white backdrop-blur-xs p-4 sm:p-5 transition-all duration-300 shadow-2xs hover:shadow-md hover:-translate-y-0.5 group overflow-hidden flex flex-col justify-between ${
+              isClickable
+                ? "cursor-pointer hover:border-indigo-300 hover:ring-2 hover:ring-indigo-100/60"
+                : ""
+            }`}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-slate-500 text-sm font-medium group-hover:text-slate-800 transition-colors">
-                {item.title}
-              </CardTitle>
-              <div className="flex items-center gap-1">
-                {item.icon && <div className="text-slate-400 group-hover:text-blue-600 transition-colors">{item.icon}</div>}
-                {isClickable && (
-                  <ChevronRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-blue-600 transition-colors" />
-                )}
+            {/* Top ambient hover accent line */}
+            <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500/0 to-transparent group-hover:via-indigo-500/80 transition-all duration-500" />
+
+            <div>
+              {/* Header: Title and Icon */}
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider group-hover:text-slate-800 transition-colors leading-tight line-clamp-1">
+                  {item.title}
+                </span>
+                <div className="shrink-0 h-8 w-8 rounded-lg bg-white border border-slate-200/70 flex items-center justify-center text-slate-500 group-hover:scale-105 group-hover:border-indigo-200 group-hover:text-indigo-600 transition-all shadow-2xs">
+                  {item.icon}
+                </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-navy-900">
+
+              {/* Main Metric Value */}
+              <div
+                className={`text-2xl sm:text-[26px] font-extrabold text-slate-900 tracking-tight leading-none mt-3 ${
+                  item.format === "currency" ? "font-mono" : ""
+                }`}
+              >
                 {formatValue(item.value, item.format)}
               </div>
-              {item.subtitle && (
-                <p className="text-slate-500 mt-1 text-xs">{item.subtitle}</p>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Subtitle / Interactive Footer */}
+            {isClickable ? (
+              <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 text-[11px] font-medium text-slate-400 group-hover:text-indigo-600 transition-colors">
+                <span className="truncate">{item.subtitle || "Inspect details"}</span>
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            ) : item.subtitle ? (
+              <p className="text-[11px] text-slate-400 font-medium mt-2 pt-2 border-t border-slate-100/60 truncate">
+                {item.subtitle}
+              </p>
+            ) : null}
+          </div>
         );
       })}
     </div>
