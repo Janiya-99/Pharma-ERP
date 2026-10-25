@@ -6,6 +6,7 @@ import { useAuth } from "../../../auth/AuthContext";
 import { financeApi } from "../../../api/financeApi";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+import { TablePagination } from "../../../components/common/TablePagination";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import {
   Sheet,
@@ -172,6 +173,20 @@ const ChartOfAccountsPage = () => {
   useEffect(() => {
     if (companyId) fetchClassifications();
   }, [companyId]);
+
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= accounts.length) {
+      setPage(0);
+    }
+  }, [accounts, page, pageSize]);
+
+  const pagedAccounts = useMemo(() => {
+    const start = page * pageSize;
+    return accounts.slice(start, start + pageSize);
+  }, [accounts, page, pageSize]);
 
   const rootAccounts = useMemo(() => accounts.filter((account) => !account.parent_account_id), [accounts]);
 
@@ -438,7 +453,7 @@ const ChartOfAccountsPage = () => {
                     <TableCell colSpan={7} className="h-28 text-center text-slate-500">No accounts found.</TableCell>
                   </TableRow>
                 ) : (
-                  accounts.map((account) => (
+                  pagedAccounts.map((account) => (
                     <TableRow key={account.id}>
                       <TableCell className="font-mono text-xs text-slate-600">{account.account_code}</TableCell>
                       <TableCell>
@@ -480,6 +495,19 @@ const ChartOfAccountsPage = () => {
                 )}
               </TableBody>
             </Table>
+
+            {accounts.length > 0 && (
+              <TablePagination
+                pageIndex={page}
+                pageSize={pageSize}
+                totalItems={accounts.length}
+                onPageChange={setPage}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(newSize);
+                  setPage(0);
+                }}
+              />
+            )}
           </CardContent>
         </Card>
       </div>

@@ -185,23 +185,27 @@ export const CustomerStatementReportPage: React.FC = () => {
     { header: "Description", accessorKey: "description" },
     {
       header: "Debit (LKR)",
+      accessorKey: "debit_amount",
       cell: (row) =>
         row.debit_amount > 0 ? formatMoney(row.debit_amount) : "-",
       align: "right",
     },
     {
       header: "Credit (LKR)",
+      accessorKey: "credit_amount",
       cell: (row) =>
         row.credit_amount > 0 ? formatMoney(row.credit_amount) : "-",
       align: "right",
     },
     {
       header: "Running Balance",
+      accessorKey: "running_balance",
       cell: (row) => formatMoney(row.running_balance),
       align: "right",
     },
     {
       header: "Status",
+      accessorKey: "operational_status",
       cell: (row) => (
         <Badge
           variant={
@@ -215,6 +219,16 @@ export const CustomerStatementReportPage: React.FC = () => {
     },
   ];
 
+  const handleFetchAllForExport = async () => {
+    if (!filters.customer_id) return [];
+    const res = await invoiceCenterApi.getCustomerStatement({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.lines) ? res.data.data.lines : [];
+  };
+
   if (!hasPermission) {
     return (
       <div className="p-8">
@@ -223,18 +237,29 @@ export const CustomerStatementReportPage: React.FC = () => {
     );
   }
 
+  const selectedCustomer = customers.find(c => c.id === filters.customer_id);
+
   return (
     <ReportPageShell
       title="Customer Statement"
       description="View detailed transaction history and running balances for a specific customer."
       actions={
         <ReportExportActions
+          title={`Customer Statement - ${data?.header?.customer_name || selectedCustomer?.customer_name || selectedCustomer?.company_name || ""}`}
+          subtitle={`Customer Code: ${data?.header?.customer_code || selectedCustomer?.customer_code || ""}`}
           data={data?.lines || []}
           columns={columns}
           filename={`customer-statement-${filters.customer_id}-${
             new Date().toISOString().split("T")[0]
           }`}
           disabled={isLoading || !data || !data.lines || data.lines.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Opening Balance", value: formatMoney(data?.header?.opening_balance || 0) },
+            { title: "Closing Balance", value: formatMoney(data?.header?.closing_balance || 0) },
+            { title: "Credit Limit", value: formatMoney(data?.header?.credit_limit || 0) },
+            { title: "Credit Days", value: data?.header?.credit_days || 0 },
+          ]}
         />
       }
       filters={

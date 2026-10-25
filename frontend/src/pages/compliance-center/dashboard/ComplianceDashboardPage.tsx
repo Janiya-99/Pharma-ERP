@@ -45,86 +45,7 @@ export const ComplianceDashboardPage = () => {
       }
     } catch (err: any) {
       console.error("Failed to load compliance data:", err);
-      // Fallback mock telemetry matching reference image
-      setData({
-        active_licenses: 65,
-        quarantine_batches_count: 1,
-        quarantine_stock_value: 125000,
-        active_recalls_count: 1,
-        pending_disposals_count: 122,
-        pending_disposals_value: 2800000,
-        total_write_off_value: 3740000,
-        pass_rate_data: [
-          { month: "Apr 2026", "QA Pass Rate (%)": 72.4, "NMRA Compliance Index (%)": 68.2 },
-          { month: "May 2026", "QA Pass Rate (%)": 84.1, "NMRA Compliance Index (%)": 76.5 },
-          { month: "Jun 2026", "QA Pass Rate (%)": 85.0, "NMRA Compliance Index (%)": 81.0 },
-          { month: "Jul 2026", "QA Pass Rate (%)": 92.5, "NMRA Compliance Index (%)": 86.8 },
-          { month: "Aug 2026", "QA Pass Rate (%)": 96.2, "NMRA Compliance Index (%)": 91.4 },
-          { month: "Sep 2026", "QA Pass Rate (%)": 95.8, "NMRA Compliance Index (%)": 92.0 },
-        ],
-        quarantine_reasons_data: [
-          { name: "Quality Deviation", value: 32 },
-          { name: "Packaging Issue", value: 24 },
-          { name: "Specification OOS", value: 20 },
-          { name: "Stability Failure", value: 16 },
-          { name: "Documentation", value: 8 },
-        ],
-        expiry_write_off_data: [
-          { category: "Finished Products", value: 1400000 },
-          { category: "Raw Materials", value: 1050000 },
-          { category: "Packaging Materials", value: 620000 },
-          { category: "In Process", value: 350000 },
-          { category: "Quarantine Stock", value: 200000 },
-          { category: "Recalled Products", value: 120000 },
-        ],
-        recent_regulatory_actions: [
-          {
-            id: "REG-2026-156",
-            timestamp: "16 Oct 2026 14:22",
-            type: "Audit_Check",
-            target: "Paracetamol 500mg (BAT-EXP23-14)",
-            authority: "Internal Quality Audit",
-            status: "COMPLETED",
-            user: "Kalinga Silva",
-          },
-          {
-            id: "REG-2026-155",
-            timestamp: "16 Oct 2026 11:45",
-            type: "Document Review",
-            target: "Amoxicillin 500mg (BAT-EXP24-08)",
-            authority: "NMRA Submission",
-            status: "IN_PROGRESS",
-            user: "Nadeesha Perera",
-          },
-          {
-            id: "REG-2026-154",
-            timestamp: "15 Oct 2026 16:30",
-            type: "Audit_Check",
-            target: "Azithromycin 500mg (BAT-EXP24-20)",
-            authority: "Internal Quality Audit",
-            status: "COMPLETED",
-            user: "Dilshan Fernando",
-          },
-          {
-            id: "REG-2026-153",
-            timestamp: "15 Oct 2026 10:15",
-            type: "CAPA Update",
-            target: "Losartan 50mg (BAT-EXP24-22)",
-            authority: "Regulatory Follow-up",
-            status: "PENDING",
-            user: "Sashini Kumar",
-          },
-          {
-            id: "REG-2026-152",
-            timestamp: "14 Oct 2026 09:50",
-            type: "Audit_Check",
-            target: "Diclofenac 50mg (BAT-EXP24-36)",
-            authority: "Internal Quality Audit",
-            status: "COMPLETED",
-            user: "Kalana Jayasuriya",
-          },
-        ] as any,
-      });
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -134,95 +55,37 @@ export const ComplianceDashboardPage = () => {
     fetchComplianceData();
   }, []);
 
-  const passRateData = data?.pass_rate_data || [
-    { month: "Apr 2026", "QA Pass Rate (%)": 72.4, "NMRA Compliance Index (%)": 68.2 },
-    { month: "May 2026", "QA Pass Rate (%)": 84.1, "NMRA Compliance Index (%)": 76.5 },
-    { month: "Jun 2026", "QA Pass Rate (%)": 85.0, "NMRA Compliance Index (%)": 81.0 },
-    { month: "Jul 2026", "QA Pass Rate (%)": 92.5, "NMRA Compliance Index (%)": 86.8 },
-    { month: "Aug 2026", "QA Pass Rate (%)": 96.2, "NMRA Compliance Index (%)": 91.4 },
-    { month: "Sep 2026", "QA Pass Rate (%)": 95.8, "NMRA Compliance Index (%)": 92.0 },
-  ];
+  const passRateData = (data?.pass_rate_data || []).map((p: any) => ({
+    month: p.month,
+    "QA Pass Rate (%)": Number(p.qc_pass_rate ?? 100),
+    "NMRA Compliance Index (%)": Number(p.nmra_compliance_index ?? 100),
+  }));
 
-  const quarantineReasonsData = data?.quarantine_reasons_data || [
-    { name: "Quality Deviation", value: 32 },
-    { name: "Packaging Issue", value: 24 },
-    { name: "Specification OOS", value: 20 },
-    { name: "Stability Failure", value: 16 },
-    { name: "Documentation", value: 8 },
-  ];
+  const quarantineReasonsData = data?.quarantine_reasons_data || [];
 
-  const productComplianceData = [
-    { name: "Approved", value: 266, percentage: 78, color: "bg-emerald-500", text: "text-emerald-700" },
-    { name: "Under Review", value: 41, percentage: 12, color: "bg-blue-500", text: "text-blue-700" },
-    { name: "Renewal Due", value: 21, percentage: 6, color: "bg-amber-500", text: "text-amber-700" },
-    { name: "Non-Compliant", value: 14, percentage: 4, color: "bg-rose-500", text: "text-rose-700" },
-  ];
+  const activeLicenses = data?.active_licenses || 0;
+  const productComplianceData = activeLicenses > 0
+    ? [
+        { name: "Active / Registered", value: activeLicenses, percentage: 100, color: "bg-emerald-500", text: "text-emerald-700" },
+      ]
+    : [];
 
-  const regulatoryFilingsData = [
-    { month: "Apr", Submitted: 10, "Under Review": 8, Pending: 3 },
-    { month: "May", Submitted: 14, "Under Review": 9, Pending: 4 },
-    { month: "Jun", Submitted: 11, "Under Review": 7, Pending: 4 },
-    { month: "Jul", Submitted: 15, "Under Review": 9, Pending: 5 },
-    { month: "Aug", Submitted: 20, "Under Review": 11, Pending: 6 },
-    { month: "Sep", Submitted: 18, "Under Review": 12, Pending: 6 },
-  ];
+  const regulatoryFilingsData = (data?.pass_rate_data || []).map((p: any) => ({
+    month: p.month ? p.month.split(" ")[0] : "Month",
+    Submitted: 0,
+    "Under Review": 0,
+    Pending: 0,
+  }));
 
-  const writeOffData = [
-    { label: "Finished Products", value: 1400000, display: "Rs. 1.40M", pct: 100 },
-    { label: "Raw Materials", value: 1050000, display: "Rs. 1.05M", pct: 75 },
-    { label: "Packaging Materials", value: 620000, display: "Rs. 0.62M", pct: 44 },
-    { label: "In Process", value: 350000, display: "Rs. 0.35M", pct: 25 },
-    { label: "Quarantine Stock", value: 200000, display: "Rs. 0.20M", pct: 14 },
-    { label: "Recalled Products", value: 120000, display: "Rs. 0.12M", pct: 9 },
-  ];
+  const maxVal = Math.max(...(data?.expiry_write_off_data || []).map((x) => x.value), 1);
+  const writeOffData = (data?.expiry_write_off_data || []).map((item) => ({
+    label: item.category,
+    value: item.value,
+    display: `LKR ${(item.value / 1000000).toFixed(2)}M`,
+    pct: Math.round((item.value / maxVal) * 100),
+  }));
 
-  const auditTrailRecords = data?.recent_regulatory_actions || [
-    {
-      id: "REG-2026-156",
-      timestamp: "16 Oct 2026 14:22",
-      type: "Audit_Check",
-      target: "Paracetamol 500mg (BAT-EXP23-14)",
-      authority: "Internal Quality Audit",
-      status: "COMPLETED",
-      user: "Kalinga Silva",
-    },
-    {
-      id: "REG-2026-155",
-      timestamp: "16 Oct 2026 11:45",
-      type: "Document Review",
-      target: "Amoxicillin 500mg (BAT-EXP24-08)",
-      authority: "NMRA Submission",
-      status: "IN_PROGRESS",
-      user: "Nadeesha Perera",
-    },
-    {
-      id: "REG-2026-154",
-      timestamp: "15 Oct 2026 16:30",
-      type: "Audit_Check",
-      target: "Azithromycin 500mg (BAT-EXP24-20)",
-      authority: "Internal Quality Audit",
-      status: "COMPLETED",
-      user: "Dilshan Fernando",
-    },
-    {
-      id: "REG-2026-153",
-      timestamp: "15 Oct 2026 10:15",
-      type: "CAPA Update",
-      target: "Losartan 50mg (BAT-EXP24-22)",
-      authority: "Regulatory Follow-up",
-      status: "PENDING",
-      user: "Sashini Kumar",
-    },
-    {
-      id: "REG-2026-152",
-      timestamp: "14 Oct 2026 09:50",
-      type: "Audit_Check",
-      target: "Diclofenac 50mg (BAT-EXP24-36)",
-      authority: "Internal Quality Audit",
-      status: "COMPLETED",
-      user: "Kalana Jayasuriya",
-    },
-  ];
+  const auditTrailRecords = data?.recent_regulatory_actions || [];
 
   return (
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
@@ -266,11 +129,10 @@ export const ComplianceDashboardPage = () => {
               Active Registrations
             </span>
             <p className="mt-1 text-3xl font-extrabold text-slate-900 tracking-tight">
-              {loading ? "..." : data?.active_licenses || 65}
+              {loading ? "..." : (data?.active_licenses ?? 0)}
             </p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-emerald-600">
-              <span>↑ 100%</span>
-              <span className="text-slate-500 font-medium">All licenses valid</span>
+            <div className="mt-1 flex items-center gap-1 text-xs font-medium text-slate-500">
+              <span>Active registered formulations</span>
             </div>
           </div>
           {/* Sparkline bars */}
@@ -296,11 +158,10 @@ export const ComplianceDashboardPage = () => {
               Batches Under Quarantine
             </span>
             <p className="mt-1 text-3xl font-extrabold text-slate-900 tracking-tight">
-              {loading ? "..." : data?.quarantine_batches_count ?? 1}
+              {loading ? "..." : (data?.quarantine_batches_count ?? 0)}
             </p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-rose-500">
-              <span>↑ +0.2%</span>
-              <span className="text-slate-500 font-medium">LKR 125,000 value</span>
+            <div className="mt-1 flex items-center gap-1 text-xs font-medium text-slate-500">
+              <span>LKR {(data?.quarantine_stock_value ?? 0).toLocaleString()} value</span>
             </div>
           </div>
           {/* Sparkline bars */}
@@ -326,11 +187,10 @@ export const ComplianceDashboardPage = () => {
               Blocked / Recalled Batches
             </span>
             <p className="mt-1 text-3xl font-extrabold text-slate-900 tracking-tight">
-              {loading ? "..." : data?.active_recalls_count ?? 1}
+              {loading ? "..." : (data?.active_recalls_count ?? 0)}
             </p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-rose-500">
-              <span>↑ +0.1%</span>
-              <span className="text-slate-500 font-medium">Safety quarantine</span>
+            <div className="mt-1 flex items-center gap-1 text-xs font-medium text-slate-500">
+              <span>Safety quarantine recalls</span>
             </div>
           </div>
           {/* Sparkline bars */}
@@ -356,11 +216,10 @@ export const ComplianceDashboardPage = () => {
               Expired & Near-Expiry Batches
             </span>
             <p className="mt-1 text-3xl font-extrabold text-slate-900 tracking-tight">
-              {loading ? "..." : data?.pending_disposals_count || 122}
+              {loading ? "..." : (data?.pending_disposals_count ?? 0)}
             </p>
-            <div className="mt-1 flex items-center gap-1 text-xs font-bold text-rose-500">
-              <span>↑ +12%</span>
-              <span className="text-slate-500 font-medium">LKR 2,800,000 at risk</span>
+            <div className="mt-1 flex items-center gap-1 text-xs font-medium text-slate-500">
+              <span>LKR {(data?.pending_disposals_value ?? 0).toLocaleString()} at risk</span>
             </div>
           </div>
           {/* Sparkline bars */}
@@ -452,36 +311,42 @@ export const ComplianceDashboardPage = () => {
               </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-2">
-              <div className="shrink-0 flex items-center justify-center">
-                <DonutChart
-                  className="h-44 w-44"
-                  data={quarantineReasonsData}
-                  category="value"
-                  index="name"
-                  colors={["blue", "amber", "teal", "rose", "slate"]}
-                  valueFormatter={(val) => `${val}%`}
-                  showLabel={true}
-                  label="4 Factors"
-                />
+            {quarantineReasonsData.length === 0 ? (
+              <div className="py-12 text-center text-xs text-slate-400 font-medium">
+                No active batches currently in quarantine hold.
               </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-2">
+                <div className="shrink-0 flex items-center justify-center">
+                  <DonutChart
+                    className="h-44 w-44"
+                    data={quarantineReasonsData}
+                    category="value"
+                    index="name"
+                    colors={["blue", "amber", "teal", "rose", "slate"]}
+                    valueFormatter={(val) => `${val}%`}
+                    showLabel={true}
+                    label={`${quarantineReasonsData.length} Factors`}
+                  />
+                </div>
 
-              {/* Custom Legend aligned to right */}
-              <div className="w-full sm:w-auto flex-1 space-y-2 text-xs">
-                {quarantineReasonsData.map((item, i) => {
-                  const colors = ["bg-blue-600", "bg-amber-500", "bg-teal-500", "bg-rose-500", "bg-slate-400"];
-                  return (
-                    <div key={i} className="flex items-center justify-between gap-3">
-                      <span className="flex items-center gap-2 text-slate-600 font-medium">
-                        <span className={`h-2.5 w-2.5 rounded-full ${colors[i % colors.length]}`}></span>
-                        {item.name}
-                      </span>
-                      <span className="font-bold text-slate-900">{item.value}%</span>
-                    </div>
-                  );
-                })}
+                {/* Custom Legend aligned to right */}
+                <div className="w-full sm:w-auto flex-1 space-y-2 text-xs">
+                  {quarantineReasonsData.map((item, i) => {
+                    const colors = ["bg-blue-600", "bg-amber-500", "bg-teal-500", "bg-rose-500", "bg-slate-400"];
+                    return (
+                      <div key={i} className="flex items-center justify-between gap-3">
+                        <span className="flex items-center gap-2 text-slate-600 font-medium">
+                          <span className={`h-2.5 w-2.5 rounded-full ${colors[i % colors.length]}`}></span>
+                          {item.name}
+                        </span>
+                        <span className="font-bold text-slate-900">{item.value}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -510,20 +375,26 @@ export const ComplianceDashboardPage = () => {
           </div>
 
           <div className="space-y-3.5 mt-4">
-            {writeOffData.map((item, i) => (
-              <div key={i} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-slate-600">{item.label}</span>
-                  <span className="font-bold text-slate-900">{item.display}</span>
-                </div>
-                <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full transition-all duration-500"
-                    style={{ width: `${item.pct}%` }}
-                  />
-                </div>
+            {writeOffData.length === 0 ? (
+              <div className="py-12 text-center text-xs text-slate-400 font-medium">
+                No expiry write-offs recorded in this period.
               </div>
-            ))}
+            ) : (
+              writeOffData.map((item, i) => (
+                <div key={i} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-slate-600">{item.label}</span>
+                    <span className="font-bold text-slate-900">{item.display}</span>
+                  </div>
+                  <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full transition-all duration-500"
+                      style={{ width: `${item.pct}%` }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -550,36 +421,42 @@ export const ComplianceDashboardPage = () => {
               </select>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-2">
-              <div className="shrink-0 flex items-center justify-center">
-                <DonutChart
-                  className="h-40 w-40"
-                  data={productComplianceData}
-                  category="value"
-                  index="name"
-                  colors={["emerald", "blue", "amber", "rose"]}
-                  valueFormatter={(val) => `${val}`}
-                  showLabel={true}
-                  label="342 Total Products"
-                />
+            {productComplianceData.length === 0 ? (
+              <div className="py-12 text-center text-xs text-slate-400 font-medium">
+                No product formulations registered in database.
               </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-2">
+                <div className="shrink-0 flex items-center justify-center">
+                  <DonutChart
+                    className="h-40 w-40"
+                    data={productComplianceData}
+                    category="value"
+                    index="name"
+                    colors={["emerald", "blue", "amber", "rose"]}
+                    valueFormatter={(val) => `${val}`}
+                    showLabel={true}
+                    label={`${activeLicenses} Formulations`}
+                  />
+                </div>
 
-              {/* Legend with percentages and counts aligned to right */}
-              <div className="w-full sm:w-auto flex-1 space-y-2 text-xs">
-                {productComplianceData.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2 text-slate-600 font-medium">
-                      <span className={`h-2.5 w-2.5 rounded-full ${item.color}`}></span>
-                      {item.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900">{item.percentage}%</span>
-                      <span className="text-slate-400 font-normal w-6 text-right">{item.value}</span>
+                {/* Legend with percentages and counts aligned to right */}
+                <div className="w-full sm:w-auto flex-1 space-y-2 text-xs">
+                  {productComplianceData.map((item, i) => (
+                    <div key={i} className="flex items-center justify-between gap-3">
+                      <span className="flex items-center gap-2 text-slate-600 font-medium">
+                        <span className={`h-2.5 w-2.5 rounded-full ${item.color}`}></span>
+                        {item.name}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900">{item.percentage}%</span>
+                        <span className="text-slate-400 font-normal w-6 text-right">{item.value}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 text-right">
@@ -663,8 +540,14 @@ export const ComplianceDashboardPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
-              {auditTrailRecords.map((row, idx) => (
-                <tr
+              {auditTrailRecords.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-8 text-center text-slate-400 font-medium">
+                    No regulatory audit records found.
+                  </td>
+                </tr>
+              ) : auditTrailRecords.map((row, idx) => (
+                  <tr
                   key={idx}
                   onClick={() => navigate("/compliance-center/records")}
                   className="hover:bg-blue-50/40 transition-colors group cursor-pointer"

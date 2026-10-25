@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ShieldCheck,
   Search,
@@ -16,6 +16,16 @@ import {
   HelpCircle,
   ArrowUpRight,
 } from "lucide-react";
+import { getUsers, getPermissions, getUserAccessMatrix } from "../../../api/controlApi";
+
+interface UserOption {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  branch: string;
+  avatar: string;
+}
 
 interface PermissionRow {
   id: string;
@@ -29,42 +39,122 @@ interface PermissionRow {
   reason: string;
 }
 
-const mockUsers = [
-  { id: "usr-1", name: "Kasun Silva", email: "kasun.s@omacx.lk", role: "Senior Accountant", branch: "Headquarters (HQ)", avatar: "KS" },
-  { id: "usr-2", name: "Nimali Perera", email: "nimali.p@omacx.lk", role: "Inventory Manager", branch: "Central Warehouse", avatar: "NP" },
-  { id: "usr-3", name: "Dr. Amara Dias", email: "amara.d@omacx.lk", role: "Chief Pharmacist", branch: "Headquarters (HQ)", avatar: "AD" },
-  { id: "usr-4", name: "Dinesh Kumar", email: "dinesh.k@omacx.lk", role: "Billing Supervisor", branch: "Regional Depot (NY)", avatar: "DK" },
-];
-
-const mockPermissions: Record<string, PermissionRow[]> = {
-  "usr-1": [
-    { id: "perm-101", code: "FIN_JOURNAL_CREATE", module: "Finance & Ledger", feature: "Journal Entries", roleInherited: "GRANTED", roleName: "Senior Accountant", branchOverride: "NONE", effectiveStatus: "GRANTED", reason: "Inherited from role Senior Accountant" },
-    { id: "perm-102", code: "FIN_JOURNAL_APPROVE", module: "Finance & Ledger", feature: "Journal Entries", roleInherited: "GRANTED", roleName: "Senior Accountant", branchOverride: "NONE", effectiveStatus: "GRANTED", reason: "Inherited from role Senior Accountant" },
-    { id: "perm-103", code: "FIN_PAYMENT_OVERRIDE", module: "Finance & Ledger", feature: "Payment Vouchers", roleInherited: "DENIED", roleName: "Senior Accountant", branchOverride: "GRANTED", effectiveStatus: "GRANTED", reason: "Explicit branch override granted by CFO on 2026-06-15" },
-    { id: "perm-104", code: "INV_STOCK_ADJUST", module: "Inventory", feature: "Stock Adjustment", roleInherited: "NONE", roleName: "-", branchOverride: "NONE", effectiveStatus: "DENIED", reason: "No role or direct grant exists" },
-    { id: "perm-105", code: "INV_BATCH_QUARANTINE", module: "Inventory", feature: "Batch Control", roleInherited: "NONE", roleName: "-", branchOverride: "NONE", effectiveStatus: "DENIED", reason: "No role or direct grant exists" },
-    { id: "perm-106", code: "INVOICE_CREDIT_OVERRIDE", module: "Invoice Center", feature: "Credit Limits", roleInherited: "GRANTED", roleName: "Senior Accountant", branchOverride: "DENIED", effectiveStatus: "DENIED", reason: "Branch override explicitly denied for Headquarters" },
-    { id: "perm-107", code: "COMP_REPORT_EXPORT", module: "Compliance", feature: "Regulatory Reports", roleInherited: "GRANTED", roleName: "Senior Accountant", branchOverride: "NONE", effectiveStatus: "GRANTED", reason: "Inherited from role Senior Accountant" },
-  ],
-  "usr-2": [
-    { id: "perm-201", code: "INV_STOCK_ADJUST", module: "Inventory", feature: "Stock Adjustment", roleInherited: "GRANTED", roleName: "Inventory Manager", branchOverride: "NONE", effectiveStatus: "GRANTED", reason: "Inherited from role Inventory Manager" },
-    { id: "perm-202", code: "INV_BATCH_QUARANTINE", module: "Inventory", feature: "Batch Control", roleInherited: "GRANTED", roleName: "Inventory Manager", branchOverride: "NONE", effectiveStatus: "GRANTED", reason: "Inherited from role Inventory Manager" },
-    { id: "perm-203", code: "INV_WAREHOUSE_CONFIG", module: "Inventory", feature: "Warehouse Setup", roleInherited: "GRANTED", roleName: "Inventory Manager", branchOverride: "NONE", effectiveStatus: "GRANTED", reason: "Inherited from role Inventory Manager" },
-    { id: "perm-204", code: "FIN_JOURNAL_CREATE", module: "Finance & Ledger", feature: "Journal Entries", roleInherited: "NONE", roleName: "-", branchOverride: "NONE", effectiveStatus: "DENIED", reason: "No role or direct grant exists" },
-    { id: "perm-205", code: "INVOICE_CREATE", module: "Invoice Center", feature: "Billing", roleInherited: "NONE", roleName: "-", branchOverride: "GRANTED", effectiveStatus: "GRANTED", reason: "Direct cross-training grant for warehouse dispatch billing" },
-  ],
-};
-
 const EffectiveAccessPage = () => {
-  const [selectedUserId, setSelectedUserId] = useState<string>("usr-1");
+  const [users, setUsers] = useState<UserOption[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [permissions, setPermissions] = useState<PermissionRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedModule, setSelectedModule] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
 
-  const selectedUser = mockUsers.find((u) => u.id === selectedUserId) || mockUsers[0];
-  const userPermissions = mockPermissions[selectedUserId] || mockPermissions["usr-1"];
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const res = await getUsers({ page: 1, limit: 100 });
+        const list = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+        const mappedUsers: UserOption[] = list.map((u: any) => {
+          const name = u.name || u.display_name || u.full_name || "User";
+          const initials = name
+            .split(" ")
+            .map((n: string) => n[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase() || "U";
+          return {
+            id: String(u.id),
+            name,
+            email: u.email || "",
+            role: u.role_name || u.role || "Standard User",
+            branch: u.branch_name || "All Branches",
+            avatar: initials,
+          };
+        });
 
-  const filteredPermissions = userPermissions.filter((item) => {
+        setUsers(mappedUsers);
+        if (mappedUsers.length > 0) {
+          setSelectedUserId(mappedUsers[0].id);
+        }
+      } catch {
+        setUsers([]);
+      }
+    };
+
+    loadUsers();
+  }, []);
+
+  const fetchEffectiveMatrix = useCallback(async (userId: string) => {
+    if (!userId) {
+      setPermissions([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const [permRes, matrixRes] = await Promise.allSettled([
+        getPermissions({ page: 1, limit: 100 }),
+        getUserAccessMatrix(userId),
+      ]);
+
+      const rawPerms = permRes.status === "fulfilled"
+        ? (permRes.value?.data?.items || permRes.value?.data || (Array.isArray(permRes.value) ? permRes.value : []))
+        : [];
+
+      const matrixData = matrixRes.status === "fulfilled"
+        ? (matrixRes.value?.data || matrixRes.value || [])
+        : [];
+
+      const grantedPermIds = new Set<string>();
+      if (Array.isArray(matrixData)) {
+        matrixData.forEach((m: any) => {
+          if (m.permission_id) grantedPermIds.add(String(m.permission_id));
+          if (m.id && m.granted) grantedPermIds.add(String(m.id));
+        });
+      }
+
+      const currentUser = users.find((u) => u.id === userId);
+      const rows: PermissionRow[] = rawPerms.map((p: any) => {
+        const isGranted = grantedPermIds.has(String(p.id)) || p.is_granted === true;
+        return {
+          id: String(p.id),
+          code: p.permission_code || p.code || `PERM_${p.id}`,
+          module: p.software_name || p.module_name || "System",
+          feature: p.permission_name || p.name || p.feature || "Feature Access",
+          roleInherited: isGranted ? "GRANTED" : "NONE",
+          roleName: currentUser?.role || "Assigned Role",
+          branchOverride: "NONE",
+          effectiveStatus: isGranted ? "GRANTED" : "DENIED",
+          reason: isGranted
+            ? `Granted via ${currentUser?.role || "role"} security authorization`
+            : "No active role or branch override permission grant exists",
+        };
+      });
+
+      setPermissions(rows);
+    } catch {
+      setPermissions([]);
+    } finally {
+      setLoading(false);
+      setIsSimulating(false);
+    }
+  }, [users]);
+
+  useEffect(() => {
+    if (selectedUserId) {
+      fetchEffectiveMatrix(selectedUserId);
+    }
+  }, [selectedUserId, fetchEffectiveMatrix]);
+
+  const selectedUser = users.find((u) => u.id === selectedUserId) || users[0] || {
+    id: "",
+    name: "No User Selected",
+    email: "-",
+    role: "-",
+    branch: "-",
+    avatar: "-",
+  };
+
+  const filteredPermissions = permissions.filter((item) => {
     const matchesModule = selectedModule === "ALL" || item.module === selectedModule;
     const matchesSearch =
       item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,13 +163,17 @@ const EffectiveAccessPage = () => {
     return matchesModule && matchesSearch;
   });
 
-  const totalGranted = userPermissions.filter((p) => p.effectiveStatus === "GRANTED").length;
-  const totalDenied = userPermissions.filter((p) => p.effectiveStatus === "DENIED").length;
-  const totalOverrides = userPermissions.filter((p) => p.branchOverride !== "NONE").length;
+  const totalGranted = permissions.filter((p) => p.effectiveStatus === "GRANTED").length;
+  const totalDenied = permissions.filter((p) => p.effectiveStatus === "DENIED").length;
+  const totalOverrides = permissions.filter((p) => p.branchOverride !== "NONE").length;
 
   const handleSimulate = () => {
     setIsSimulating(true);
-    setTimeout(() => setIsSimulating(false), 600);
+    if (selectedUserId) {
+      fetchEffectiveMatrix(selectedUserId);
+    } else {
+      setTimeout(() => setIsSimulating(false), 500);
+    }
   };
 
   return (
@@ -135,11 +229,15 @@ const EffectiveAccessPage = () => {
               onChange={(e) => setSelectedUserId(e.target.value)}
               className="h-11 w-full rounded-xl border border-slate-200  bg-white  px-3.5 text-sm font-semibold text-slate-900  focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs transition-all"
             >
-              {mockUsers.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.name} — {u.role} ({u.branch})
-                </option>
-              ))}
+              {users.length === 0 ? (
+                <option value="">No users available</option>
+              ) : (
+                users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} — {u.role} ({u.branch})
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -258,7 +356,7 @@ const EffectiveAccessPage = () => {
           </div>
           <div className="flex items-center gap-2 text-xs">
             <span className="inline-flex items-center gap-1 rounded-md bg-slate-100  px-2.5 py-1 font-semibold text-slate-600 ">
-              Showing {filteredPermissions.length} of {userPermissions.length} permissions
+              Showing {filteredPermissions.length} of {permissions.length} permissions
             </span>
           </div>
         </div>

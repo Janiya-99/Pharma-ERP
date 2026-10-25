@@ -10,46 +10,8 @@ interface FinancialAlertsCardProps {
 export const FinancialAlertsCard: React.FC<FinancialAlertsCardProps> = ({ alerts }) => {
   const navigate = useNavigate();
 
-  // Default alerts matching live system state if backend is initializing
-  const defaultAlerts: FinancialAlertItem[] = [
-    {
-      id: "alt-1",
-      title: "Customer invoice aging active",
-      subtitle: "Monitoring overdue receivables and credit terms",
-      severity: "Low",
-      link: "/invoice-center/reports/customer-aging",
-    },
-    {
-      id: "alt-2",
-      title: "Supplier payment vouchers in order",
-      subtitle: "Review pending purchase bills and disbursements",
-      severity: "Low",
-      link: "/finance/banking/payment-vouchers",
-    },
-    {
-      id: "alt-3",
-      title: "Bank & Cash Books reconciled",
-      subtitle: "Audited with double-entry general ledger",
-      severity: "Low",
-      link: "/finance/reports/bank-book",
-    },
-    {
-      id: "alt-4",
-      title: "Accounting Period status: Open",
-      subtitle: "Financial year posting active",
-      severity: "Low",
-      link: "/finance/setup/accounting-periods",
-    },
-    {
-      id: "alt-5",
-      title: "Cash & Bank Liquidity: Healthy",
-      subtitle: "Reconciled with Cash Book and Commercial Bank ledgers",
-      severity: "Low",
-      link: "/finance/reports/cash-book",
-    },
-  ];
-
-  const items = alerts && alerts.length > 0 ? alerts : defaultAlerts;
+  // Render live alerts generated dynamically from GL and invoice status
+  const items = alerts || [];
 
   const getSeverityStyle = (severity: FinancialAlertItem["severity"]) => {
     switch (severity) {
@@ -90,7 +52,12 @@ export const FinancialAlertsCard: React.FC<FinancialAlertsCardProps> = ({ alerts
 
       {/* Alerts List */}
       <div className="space-y-3 pt-3">
-        {items.map((alert) => {
+        {items.length === 0 ? (
+          <div className="py-6 text-center text-xs text-slate-400 font-medium">
+            No active financial alerts requiring immediate attention.
+          </div>
+        ) : (
+          items.map((alert) => {
           const style = getSeverityStyle(alert.severity);
           return (
             <div
@@ -116,7 +83,7 @@ export const FinancialAlertsCard: React.FC<FinancialAlertsCardProps> = ({ alerts
               </span>
             </div>
           );
-        })}
+        }))}
       </div>
     </div>
   );

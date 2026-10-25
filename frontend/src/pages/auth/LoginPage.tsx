@@ -244,24 +244,27 @@ const LoginPage = () => {
               <div className="flex flex-wrap gap-1.5">
                 <button
                   type="button"
+                  onClick={() => handleQuickFill("admin@ceylonmed.lk", "CeylonAdmin@2026")}
+                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-indigo-700 hover:bg-indigo-50 rounded-lg border border-indigo-200/80 shadow-2xs transition-colors"
+                  title="Dr. Kalinga Silva • Managing Director (Super Admin)"
+                >
+                  Admin (Dr. Kalinga Silva)
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleQuickFill("cfo@ceylonmed.lk", "CeylonAdmin@2026")}
                   className="px-2.5 py-1 text-[11px] font-bold bg-white text-emerald-700 hover:bg-emerald-50 rounded-lg border border-emerald-200/80 shadow-2xs transition-colors"
+                  title="Ruwani Jayawardena • Chief Financial Officer"
                 >
                   CFO (Ruwani)
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleQuickFill("admin@ceylonmed.lk", "CeylonAdmin@2026")}
-                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-indigo-700 hover:bg-indigo-50 rounded-lg border border-indigo-200/80 shadow-2xs transition-colors"
-                >
-                  Admin (Kavinda)
-                </button>
-                <button
-                  type="button"
                   onClick={() => handleQuickFill("accountant@ceylonmed.lk", "CeylonAdmin@2026")}
                   className="px-2.5 py-1 text-[11px] font-bold bg-white text-blue-700 hover:bg-blue-50 rounded-lg border border-blue-200/80 shadow-2xs transition-colors"
+                  title="Chaminda Bandara • Senior Accountant"
                 >
-                  Accountant (Nuwan)
+                  Accountant (Chaminda)
                 </button>
               </div>
             </div>

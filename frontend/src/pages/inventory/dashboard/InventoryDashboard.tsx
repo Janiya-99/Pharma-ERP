@@ -98,166 +98,6 @@ interface TableRow {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Default Real Database Benchmarks
-───────────────────────────────────────────────────────────── */
-
-const defaultCategoryData: CategoryBarItem[] = [
-  { category: "Antibiotics", value: 12.4, label: "12.4M", color: "#3B82F6" },
-  { category: "Gastro", value: 8.6, label: "8.6M", color: "#60A5FA" },
-  { category: "Cardio", value: 5.2, label: "5.2M", color: "#A855F7" },
-  { category: "Pain Relief", value: 3.9, label: "3.9M", color: "#C084FC" },
-  { category: "Vitamins", value: 2.8, label: "2.8M", color: "#F472B6" },
-  { category: "Others", value: 2.1, label: "2.1M", color: "#FDA4AF" },
-];
-
-const defaultExpiryRisk: ExpiryRiskRow[] = [
-  { product: "Amoxicillin 500mg", batch: "BAT-EXP23-14", expiryDate: "25 Oct 2026", daysLeft: 9, qty: 120 },
-  { product: "Omeprazole 40mg", batch: "BAT-EXP24-08", expiryDate: "02 Nov 2026", daysLeft: 16, qty: 85 },
-  { product: "Diclofenac 50mg", batch: "BAT-EXP24-36", expiryDate: "10 Nov 2026", daysLeft: 24, qty: 210 },
-  { product: "Losartan 50mg", batch: "BAT-EXP24-22", expiryDate: "18 Nov 2026", daysLeft: 32, qty: 150 },
-  { product: "Amlodipine 10mg", batch: "BAT-EXP23-42", expiryDate: "25 Nov 2026", daysLeft: 39, qty: 90 },
-];
-
-const defaultTableData: TableRow[] = [
-  // Out of Stock (Requires Replenishment)
-  {
-    id: 1,
-    product: "Paracetamol 500mg IV Infusion",
-    batch: "BAT-OUT24-01",
-    category: "Pain Relief",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 0,
-    reorderLevel: 50,
-    status: "Out of Stock",
-    lastMovement: "Oct 15, 2026",
-  },
-  {
-    id: 2,
-    product: "Insulin Glargine 100IU/ml Cartridges",
-    batch: "BAT-OUT24-02",
-    category: "Endocrinology",
-    warehouse: "Cold Storage Unit 1",
-    currentStock: 0,
-    reorderLevel: 25,
-    status: "Out of Stock",
-    lastMovement: "Oct 14, 2026",
-  },
-  // Low Stock Items (Below Reorder Level)
-  {
-    id: 3,
-    product: "Omeprazole 40mg IV Injection",
-    batch: "BAT-EXP23-14",
-    category: "Gastrointestinal",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 12,
-    reorderLevel: 50,
-    status: "Low Stock",
-    lastMovement: "Oct 14, 2026",
-  },
-  {
-    id: 4,
-    product: "Azithromycin 500mg Tablets",
-    batch: "BAT-EXP24-20",
-    category: "Antibiotics",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 8,
-    reorderLevel: 30,
-    status: "Low Stock",
-    lastMovement: "Oct 13, 2026",
-  },
-  {
-    id: 5,
-    product: "Losartan Potassium 50mg Tablets",
-    batch: "BAT-EXP24-22",
-    category: "Cardiovascular",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 15,
-    reorderLevel: 40,
-    status: "Low Stock",
-    lastMovement: "Oct 12, 2026",
-  },
-  {
-    id: 6,
-    product: "Diclofenac Sodium 50mg Tablets",
-    batch: "BAT-EXP24-36",
-    category: "Pain Relief",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 20,
-    reorderLevel: 60,
-    status: "Low Stock",
-    lastMovement: "Oct 14, 2026",
-  },
-  // Expiring Soon (Within 90 Days)
-  {
-    id: 7,
-    product: "Amoxicillin 500mg Capsules",
-    batch: "BAT-EXP23-14",
-    category: "Antibiotics",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 120,
-    reorderLevel: 40,
-    status: "Expiring Soon",
-    lastMovement: "Expires in 9 days (25 Oct 2026)",
-  },
-  {
-    id: 8,
-    product: "Omeprazole 40mg Powder for Injection",
-    batch: "BAT-EXP24-08",
-    category: "Gastrointestinal",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 85,
-    reorderLevel: 30,
-    status: "Expiring Soon",
-    lastMovement: "Expires in 16 days (02 Nov 2026)",
-  },
-  // In Stock
-  {
-    id: 9,
-    product: "Metformin Hydrochloride 500mg Tablets",
-    batch: "BAT-MET24-05",
-    category: "Endocrinology",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 450,
-    reorderLevel: 100,
-    status: "In Stock",
-    lastMovement: "Oct 11, 2026",
-  },
-  {
-    id: 10,
-    product: "Amoxicillin + Clavulanic Acid 625mg",
-    batch: "BAT-AUG24-11",
-    category: "Antibiotics",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 320,
-    reorderLevel: 80,
-    status: "In Stock",
-    lastMovement: "Oct 10, 2026",
-  },
-  {
-    id: 11,
-    product: "Cetirizine 10mg Tablets",
-    batch: "BAT-CET24-18",
-    category: "Antihistamines",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 600,
-    reorderLevel: 150,
-    status: "In Stock",
-    lastMovement: "Oct 09, 2026",
-  },
-  {
-    id: 12,
-    product: "Pantoprazole 40mg Gastro-Resistant",
-    batch: "BAT-PAN24-03",
-    category: "Gastrointestinal",
-    warehouse: "Colombo Central Warehouse",
-    currentStock: 280,
-    reorderLevel: 75,
-    status: "In Stock",
-    lastMovement: "Oct 08, 2026",
-  },
-];
-
-/* ─────────────────────────────────────────────────────────────
    Mini Sparkline Components
 ───────────────────────────────────────────────────────────── */
 
@@ -293,29 +133,22 @@ export default function InventoryDashboard() {
 
   // State
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("low-stock");
+  const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Record<string | number, boolean>>({});
 
   // Dynamic Data from Backend API
-  const [totalProducts, setTotalProducts] = useState(65);
-  const [totalStockValue, setTotalStockValue] = useState(34934760);
-  const [lowStockCount, setLowStockCount] = useState(4);
-  const [outOfStockCount, setOutOfStockCount] = useState(2);
-  const [expiringSoonCount, setExpiringSoonCount] = useState(60);
-  const [activeBatchesCount, setActiveBatchesCount] = useState(275);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalStockValue, setTotalStockValue] = useState(0);
+  const [lowStockCount, setLowStockCount] = useState(0);
+  const [outOfStockCount, setOutOfStockCount] = useState(0);
+  const [expiringSoonCount, setExpiringSoonCount] = useState(0);
+  const [activeBatchesCount, setActiveBatchesCount] = useState(0);
 
-  const [categoryData, setCategoryData] = useState<CategoryBarItem[]>(defaultCategoryData);
-  const [expiryList, setExpiryList] = useState<ExpiryRiskRow[]>(defaultExpiryRisk);
-  const [tableData, setTableData] = useState<TableRow[]>(defaultTableData);
-  const [stockStatusOverview, setStockStatusOverview] = useState<StockOverviewItem[]>([
-    { name: "In Stock", count: 59, pct: 90.7, color: "#0EA5E9" },
-    { name: "Low Stock", count: 4, pct: 6.2, color: "#F59E0B" },
-    { name: "Out of Stock", count: 2, pct: 3.1, color: "#EF4444" },
-    { name: "Expiring Soon", count: 60, pct: 15.0, color: "#F97316" },
-    { name: "Blocked / Hold", count: 0, pct: 0, color: "#8B5CF6" },
-    { name: "Inactive", count: 0, pct: 0, color: "#94A3B8" },
-  ]);
+  const [categoryData, setCategoryData] = useState<CategoryBarItem[]>([]);
+  const [expiryList, setExpiryList] = useState<ExpiryRiskRow[]>([]);
+  const [tableData, setTableData] = useState<TableRow[]>([]);
+  const [stockStatusOverview, setStockStatusOverview] = useState<StockOverviewItem[]>([]);
 
   // Fetch True Data
   const fetchData = async () => {
@@ -413,8 +246,6 @@ export default function InventoryDashboard() {
       id: "total-products",
       title: "Total Products",
       value: totalProducts.toLocaleString(),
-      badge: "+3.2%",
-      badgeTone: "green",
       subtext: "Active products",
       icon: Package,
       iconBg: "bg-blue-50",
@@ -441,8 +272,6 @@ export default function InventoryDashboard() {
       id: "low-stock",
       title: "Low Stock Items",
       value: lowStockCount,
-      badge: "+12%",
-      badgeTone: "red",
       subtext: "Below reorder level",
       icon: AlertTriangle,
       iconBg: "bg-amber-50",
@@ -456,8 +285,6 @@ export default function InventoryDashboard() {
       id: "out-of-stock",
       title: "Out of Stock Items",
       value: outOfStockCount,
-      badge: "+4%",
-      badgeTone: "red",
       subtext: "Requires replenishment",
       icon: CircleSlash,
       iconBg: "bg-rose-50",
@@ -471,8 +298,6 @@ export default function InventoryDashboard() {
       id: "expiring",
       title: "Expiring Soon",
       value: expiringSoonCount,
-      badge: "+25%",
-      badgeTone: "red",
       subtext: "Within 90 days",
       icon: Calendar,
       iconBg: "bg-orange-50",
@@ -486,8 +311,6 @@ export default function InventoryDashboard() {
       id: "active-batches",
       title: "Active Batches",
       value: activeBatchesCount,
-      badge: "+8%",
-      badgeTone: "green",
       subtext: "Currently in stock",
       icon: Layers,
       iconBg: "bg-purple-50",
@@ -812,43 +635,50 @@ export default function InventoryDashboard() {
           </div>
 
           <div className="h-56 w-full flex-1">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryData} margin={{ top: 20, right: 10, left: -20, bottom: 5 }}>
-                <XAxis
-                  dataKey="category"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748B", fontSize: 11, fontWeight: 500 }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#94A3B8", fontSize: 10 }}
-                  tickFormatter={(val) => `Rs. ${val}M`}
-                  ticks={[0, 5, 10, 15]}
-                />
-                <Tooltip
-                  cursor={{ fill: "rgba(241, 245, 249, 0.6)" }}
-                  formatter={(value: any) => [`Rs. ${value}M`, "Stock Value"]}
-                  contentStyle={{ borderRadius: "12px", border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}
-                />
-                <Bar
-                  dataKey="value"
-                  radius={[8, 8, 0, 0]}
-                  label={{
-                    position: "top",
-                    fill: "#334155",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    formatter: (v: any) => `${v}M`,
-                  }}
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`bar-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {categoryData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryData} margin={{ top: 20, right: 10, left: -20, bottom: 5 }}>
+                  <XAxis
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748B", fontSize: 11, fontWeight: 500 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#94A3B8", fontSize: 10 }}
+                    tickFormatter={(val) => `Rs. ${val}M`}
+                    ticks={[0, 5, 10, 15]}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(241, 245, 249, 0.6)" }}
+                    formatter={(value: any) => [`Rs. ${value}M`, "Stock Value"]}
+                    contentStyle={{ borderRadius: "12px", border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}
+                  />
+                  <Bar
+                    dataKey="value"
+                    radius={[8, 8, 0, 0]}
+                    label={{
+                      position: "top",
+                      fill: "#334155",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      formatter: (v: any) => `${v}M`,
+                    }}
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`bar-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-slate-400">
+                <Boxes className="h-7 w-7 mb-2 stroke-1 text-slate-300" />
+                <p className="text-xs">No category stock data available</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -883,34 +713,42 @@ export default function InventoryDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 font-medium">
-                {expiryList.slice(0, 5).map((row, i) => {
-                  const daysBadgeTone =
-                    row.daysLeft <= 10
-                      ? "bg-rose-50 text-rose-600 border border-rose-200/50"
-                      : row.daysLeft <= 30
-                      ? "bg-orange-50 text-orange-600 border border-orange-200/50"
-                      : "bg-amber-50 text-amber-600 border border-amber-200/50";
+                {expiryList.length > 0 ? (
+                  expiryList.slice(0, 5).map((row, i) => {
+                    const daysBadgeTone =
+                      row.daysLeft <= 10
+                        ? "bg-rose-50 text-rose-600 border border-rose-200/50"
+                        : row.daysLeft <= 30
+                        ? "bg-orange-50 text-orange-600 border border-orange-200/50"
+                        : "bg-amber-50 text-amber-600 border border-amber-200/50";
 
-                  return (
-                    <tr
-                      key={i}
-                      onClick={() => navigate("/inventory/reports/expiry-report")}
-                      className="hover:bg-indigo-50/40 transition-colors cursor-pointer"
-                    >
-                      <td className="py-2.5 font-bold text-slate-800 hover:text-indigo-600 truncate max-w-[130px]" title={row.product}>
-                        {row.product}
-                      </td>
-                      <td className="py-2.5 text-slate-500 font-mono text-[11px]">{row.batch}</td>
-                      <td className="py-2.5 text-slate-500">{row.expiryDate}</td>
-                      <td className="py-2.5 text-center">
-                        <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${daysBadgeTone}`}>
-                          {row.daysLeft} days
-                        </span>
-                      </td>
-                      <td className="py-2.5 text-right font-bold text-slate-700">{row.qty}</td>
-                    </tr>
-                  );
-                })}
+                    return (
+                      <tr
+                        key={i}
+                        onClick={() => navigate("/inventory/reports/expiry-report")}
+                        className="hover:bg-indigo-50/40 transition-colors cursor-pointer"
+                      >
+                        <td className="py-2.5 font-bold text-slate-800 hover:text-indigo-600 truncate max-w-[130px]" title={row.product}>
+                          {row.product}
+                        </td>
+                        <td className="py-2.5 text-slate-500 font-mono text-[11px]">{row.batch}</td>
+                        <td className="py-2.5 text-slate-500">{row.expiryDate}</td>
+                        <td className="py-2.5 text-center">
+                          <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${daysBadgeTone}`}>
+                            {row.daysLeft} days
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-right font-bold text-slate-700">{row.qty}</td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-slate-400">
+                      No expiring batches recorded
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

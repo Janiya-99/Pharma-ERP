@@ -199,36 +199,43 @@ export const CustomerAgingReportPage: React.FC = () => {
     { header: "Customer Name", accessorKey: "customer_name" },
     {
       header: "Credit Limit",
+      accessorKey: "credit_limit",
       cell: (row) => formatMoney(row.credit_limit),
       align: "right",
     },
     {
       header: "Current",
+      accessorKey: "current",
       cell: (row) => formatMoney(row.current),
       align: "right",
     },
     {
       header: "1-30 Days",
+      accessorKey: "days_1_30",
       cell: (row) => formatMoney(row.days_1_30),
       align: "right",
     },
     {
       header: "31-60 Days",
+      accessorKey: "days_31_60",
       cell: (row) => formatMoney(row.days_31_60),
       align: "right",
     },
     {
       header: "61-90 Days",
+      accessorKey: "days_61_90",
       cell: (row) => formatMoney(row.days_61_90),
       align: "right",
     },
     {
       header: "91-120 Days",
+      accessorKey: "days_91_120",
       cell: (row) => formatMoney(row.days_91_120),
       align: "right",
     },
     {
       header: "> 120 Days",
+      accessorKey: "over_120",
       cell: (row) => (
         <span className={row.over_120 > 0 ? "font-semibold text-red-600" : ""}>
           {formatMoney(row.over_120)}
@@ -243,12 +250,43 @@ export const CustomerAgingReportPage: React.FC = () => {
     },
     {
       header: "Total Outstanding",
+      accessorKey: "total_outstanding",
       cell: (row) => (
         <span className="font-bold">{formatMoney(row.total_outstanding)}</span>
       ),
       align: "right",
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getCustomerAgingReport({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    const allRows = Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+    return allRows.filter((row: CustomerAgingReportRow) => {
+      if (
+        riskFilter === "overdue" &&
+        row.days_61_90 <= 0 &&
+        row.days_91_120 <= 0 &&
+        row.over_120 <= 0
+      ) {
+        return false;
+      }
+      if (riskFilter === "critical" && row.over_120 <= 0) {
+        return false;
+      }
+      if (riskFilter === "current" && row.current <= 0 && row.days_1_30 <= 0) {
+        return false;
+      }
+      const minBal = Number(minBalanceFilter) || 0;
+      if (minBal > 0 && row.total_outstanding < minBal) {
+        return false;
+      }
+      return true;
+    });
+  };
 
   if (!hasPermission) {
     return (
@@ -264,10 +302,20 @@ export const CustomerAgingReportPage: React.FC = () => {
       description="View outstanding balances bucketed by age to track overdue payments."
       actions={
         <ReportExportActions
+          title="Customer Aging Report"
+          subtitle={`As of Date: ${filters.as_of_date || new Date().toISOString().split("T")[0]}`}
           data={filteredData}
           columns={columns}
           filename={`customer-aging-${new Date().toISOString().split("T")[0]}`}
-          disabled={isLoading || filteredData.length === 0}
+          disabled={isLoading || (filteredData.length === 0 && (!pagination || pagination.total === 0))}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Total Accounts", value: summaryTotals.totalAccounts },
+            { title: "Current & < 30d", value: formatMoney(summaryTotals.currentTotal) },
+            { title: "Overdue (31-120d)", value: formatMoney(summaryTotals.overdueTotal) },
+            { title: "Critical (> 120d)", value: formatMoney(summaryTotals.criticalTotal) },
+            { title: "Total Outstanding", value: formatMoney(summaryTotals.totalOutstanding) },
+          ]}
         />
       }
       summary={

@@ -18,6 +18,7 @@ import { financeApi } from "../../../api/financeApi";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+import { TablePagination } from "../../../components/common/TablePagination";
 import {
   Card,
   CardContent,
@@ -121,6 +122,19 @@ const AccountGroupsPage = () => {
     status: "all",
   });
   const [showDrawerAiPrompt, setShowDrawerAiPrompt] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= groups.length) {
+      setPage(0);
+    }
+  }, [groups, page, pageSize]);
+
+  const pagedGroups = useMemo(() => {
+    const start = page * pageSize;
+    return groups.slice(start, start + pageSize);
+  }, [groups, page, pageSize]);
 
   const fetchGroups = async () => {
     if (!companyId) {
@@ -380,7 +394,7 @@ const AccountGroupsPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                groups.map((group) => (
+                pagedGroups.map((group) => (
                   <TableRow key={group.id}>
                     <TableCell className="text-slate-900 font-medium">
                       {group.group_code}
@@ -443,6 +457,19 @@ const AccountGroupsPage = () => {
               )}
             </TableBody>
           </Table>
+
+          {groups.length > 0 && (
+            <TablePagination
+              pageIndex={page}
+              pageSize={pageSize}
+              totalItems={groups.length}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(0);
+              }}
+            />
+          )}
         </CardContent>
       </Card>
 

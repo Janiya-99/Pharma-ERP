@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -28,6 +28,7 @@ import {
   Clock,
   ArrowUpDown,
 } from "lucide-react";
+import { inventoryApi } from "../../../api/inventoryApi";
 
 interface LicenseDoc {
   id: string;
@@ -42,83 +43,9 @@ interface LicenseDoc {
   category: "NMRA" | "IRAS" | "HEALTH_MUNICIPAL" | "DANGEROUS_DRUGS";
 }
 
-const initialLicenses: LicenseDoc[] = [
-  {
-    id: "lic-101",
-    licenseNumber: "WHL-4402/2026",
-    title: "NMRA Wholesale Pharmaceutical Import & Distribution License",
-    authority: "National Medicines Regulatory Authority (NMRA)",
-    facility: "Colombo Central Warehouse (HQ)",
-    issueDate: "2025-07-01",
-    expiryDate: "2026-06-30",
-    daysRemaining: 361,
-    status: "ACTIVE",
-    category: "NMRA",
-  },
-  {
-    id: "lic-102",
-    licenseNumber: "RET-8812/2025",
-    title: "NMRA Retail Pharmacy Operating License",
-    authority: "National Medicines Regulatory Authority (NMRA)",
-    facility: "Union Place Branch",
-    issueDate: "2024-08-15",
-    expiryDate: "2026-07-25",
-    daysRemaining: 21,
-    status: "EXPIRING_SOON",
-    category: "NMRA",
-  },
-  {
-    id: "lic-103",
-    licenseNumber: "DDB-9021/2026",
-    title: "Dangerous Drugs & Controlled Substances Permit (Schedule III)",
-    authority: "National Dangerous Drugs Control Board (NDDCB)",
-    facility: "Cold Storage Depot (Kelaniya)",
-    issueDate: "2025-01-10",
-    expiryDate: "2026-01-09",
-    daysRemaining: -176,
-    status: "EXPIRED",
-    category: "DANGEROUS_DRUGS",
-  },
-  {
-    id: "lic-104",
-    licenseNumber: "IRAS-VAT-0092",
-    title: "Inland Revenue VAT & TIN Registration Certificate",
-    authority: "Inland Revenue Department (IRAS / IRD)",
-    facility: "Corporate HQ",
-    issueDate: "2022-04-01",
-    expiryDate: "2028-03-31",
-    daysRemaining: 635,
-    status: "ACTIVE",
-    category: "IRAS",
-  },
-  {
-    id: "lic-105",
-    licenseNumber: "MOH-SAN-7741",
-    title: "Municipal Sanitary & Health Inspection Certificate",
-    authority: "Colombo Municipal Council (CMC Health Dept)",
-    facility: "Colombo Central Warehouse (HQ)",
-    issueDate: "2025-06-01",
-    expiryDate: "2026-05-31",
-    daysRemaining: 330,
-    status: "ACTIVE",
-    category: "HEALTH_MUNICIPAL",
-  },
-  {
-    id: "lic-106",
-    licenseNumber: "WHL-4489/2025",
-    title: "NMRA Storage & Quality Assurance Facility License",
-    authority: "National Medicines Regulatory Authority (NMRA)",
-    facility: "Regional Distribution Center (NY)",
-    issueDate: "2024-07-10",
-    expiryDate: "2026-07-15",
-    daysRemaining: 11,
-    status: "RENEWAL_PENDING",
-    category: "NMRA",
-  },
-];
-
 const LicenseDocumentsPage = () => {
-  const [data, setData] = useState<LicenseDoc[]>(initialLicenses);
+  const [data, setData] = useState<LicenseDoc[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -133,6 +60,55 @@ const LicenseDocumentsPage = () => {
   const [newCategory, setNewCategory] = useState<string>("NMRA");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000));
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+
+  const fetchLicenses = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await inventoryApi.getProducts({ page: 1, limit: 100 });
+      const rawProducts = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const now = new Date();
+
+      const mapped: LicenseDoc[] = rawProducts.map((p: any) => {
+        const licNo = p.nmra_registration_number || `REG-${p.product_code || p.id}`;
+        const expDateStr = p.nmra_expiry_date
+          ? new Date(p.nmra_expiry_date).toISOString().split("T")[0]
+          : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+        const expDate = new Date(expDateStr);
+        const diffTime = expDate.getTime() - now.getTime();
+        const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        let status: LicenseDoc["status"] = "ACTIVE";
+        if (daysRemaining < 0) {
+          status = "EXPIRED";
+        } else if (daysRemaining <= 30) {
+          status = "EXPIRING_SOON";
+        }
+
+        return {
+          id: String(p.id),
+          licenseNumber: licNo,
+          title: `${p.product_name || "Pharmaceutical Item"} - NMRA Registration Certificate`,
+          authority: "National Medicines Regulatory Authority (NMRA)",
+          facility: p.manufacturer?.name || "Colombo Central Warehouse (HQ)",
+          issueDate: p.created_at ? new Date(p.created_at).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+          expiryDate: expDateStr,
+          daysRemaining,
+          status,
+          category: "NMRA",
+        };
+      });
+
+      setData(mapped);
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLicenses();
+  }, [fetchLicenses]);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -347,7 +323,9 @@ const LicenseDocumentsPage = () => {
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Registered Permits</span>
           <p className="mt-2 text-3xl font-extrabold text-slate-900 ">{data.length}</p>
-          <span className="text-xs text-indigo-600 font-semibold mt-1 block">Across 4 facility locations</span>
+          <span className="text-xs text-indigo-600 font-semibold mt-1 block">
+            Across {new Set(data.map((d) => d.facility)).size} facility location{new Set(data.map((d) => d.facility)).size === 1 ? "" : "s"}
+          </span>
         </div>
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Active & Compliant</span>
@@ -430,7 +408,14 @@ const LicenseDocumentsPage = () => {
               ))}
             </thead>
             <tbody className="divide-y divide-slate-100 ">
-              {table.getRowModel().rows.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={columns.length} className="py-12 text-center text-slate-500">
+                    <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent mb-2" />
+                    <p className="text-sm font-medium">Loading registered licenses...</p>
+                  </td>
+                </tr>
+              ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="py-12 text-center text-slate-500 ">
                     No license documents match your search criteria.

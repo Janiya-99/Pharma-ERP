@@ -167,21 +167,25 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
     { header: "Order No.", accessorKey: "sales_order_number" },
     { 
       header: "Total", 
+      accessorKey: "total_amount",
       cell: (row) => <span className="font-semibold text-navy-900">{formatMoney(row.total_amount)}</span>,
       align: "right"
     },
     { 
       header: "Paid", 
+      accessorKey: "paid_amount",
       cell: (row) => formatMoney(row.paid_amount),
       align: "right"
     },
     { 
       header: "Balance", 
+      accessorKey: "balance_amount",
       cell: (row) => formatMoney(row.balance_amount),
       align: "right"
     },
     { 
       header: "Approval", 
+      accessorKey: "approval_status",
       cell: (row) => (
         <Badge variant={row.approval_status === 'approved' ? 'default' : row.approval_status === 'rejected' ? 'destructive' : 'secondary'}>
           {row.approval_status}
@@ -191,6 +195,7 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
     },
     { 
       header: "Posted", 
+      accessorKey: "posted_status",
       cell: (row) => (
         <Badge variant={row.posted_status === 'posted' ? 'default' : 'secondary'}>
           {row.posted_status}
@@ -200,6 +205,7 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
     },
     { 
       header: "Payment", 
+      accessorKey: "payment_status",
       cell: (row) => (
         <Badge variant={row.payment_status === 'paid' ? 'default' : row.payment_status === 'partially_paid' ? 'secondary' : 'outline'}>
           {row.payment_status}
@@ -208,6 +214,15 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
       align: "center"
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getSalesInvoiceRegister({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -231,10 +246,18 @@ export const SalesInvoiceRegisterReportPage: React.FC = () => {
       description="View all sales invoices, their statuses, and balances."
       actions={
         <ReportExportActions 
+          title="Sales Invoice Register Report"
           data={data?.rows || []} 
           columns={columns}
           filename={`sales-invoice-register-${new Date().toISOString().split('T')[0]}`} 
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Invoice Count", value: summary.invoice_count || 0 },
+            { title: "Total Amount", value: formatMoney(summary.total_amount || 0) },
+            { title: "Paid Amount", value: formatMoney(summary.paid_amount || 0) },
+            { title: "Balance Amount", value: formatMoney(summary.balance_amount || 0) },
+          ]}
         />
       }
       filters={

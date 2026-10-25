@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
+import { TablePagination } from "../../../components/common/TablePagination";
 
 interface Category {
   id: number;
@@ -57,6 +58,19 @@ const CustomersPage: React.FC = () => {
     customer: null,
   });
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= customers.length) {
+      setPage(0);
+    }
+  }, [customers, page, pageSize]);
+
+  const pagedCustomers = React.useMemo(() => {
+    const start = page * pageSize;
+    return customers.slice(start, start + pageSize);
+  }, [customers, page, pageSize]);
 
   const fetchCategories = async () => {
     try {
@@ -277,7 +291,7 @@ const CustomersPage: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                customers.map((cust) => (
+                pagedCustomers.map((cust) => (
                   <tr
                     key={cust.id}
                     className="transition-colors hover:bg-gray-50/80 "
@@ -333,6 +347,19 @@ const CustomersPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {customers.length > 0 && (
+          <TablePagination
+            pageIndex={page}
+            pageSize={pageSize}
+            totalItems={customers.length}
+            onPageChange={setPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setPage(0);
+            }}
+          />
+        )}
       </div>
 
       <ChangeCustomerStatusModal

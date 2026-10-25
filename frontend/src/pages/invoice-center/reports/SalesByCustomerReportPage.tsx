@@ -98,16 +98,19 @@ export const SalesByCustomerReportPage: React.FC = () => {
     { header: "Customer Name", accessorKey: "customer_name" },
     { 
       header: "Invoices", 
+      accessorKey: "invoice_count",
       cell: (row) => <span className="font-medium">{row.invoice_count}</span>,
       align: "center"
     },
     { 
       header: "Total Sales", 
+      accessorKey: "total_sales_amount",
       cell: (row) => <span className="font-semibold text-navy-900">{formatMoney(row.total_sales_amount)}</span>,
       align: "right"
     },
     { 
       header: "CN Amount", 
+      accessorKey: "credit_notes_amount",
       cell: (row) => (
         <span className={row.credit_notes_amount > 0 ? "text-amber-600" : ""}>
           {formatMoney(row.credit_notes_amount)}
@@ -117,16 +120,19 @@ export const SalesByCustomerReportPage: React.FC = () => {
     },
     { 
       header: "DN Amount", 
+      accessorKey: "debit_notes_amount",
       cell: (row) => formatMoney(row.debit_notes_amount),
       align: "right"
     },
     { 
       header: "Receipts", 
+      accessorKey: "receipt_amount",
       cell: (row) => formatMoney(row.receipt_amount),
       align: "right"
     },
     { 
       header: "Net Outstanding", 
+      accessorKey: "net_outstanding",
       cell: (row) => (
         <span className={`font-bold ${row.net_outstanding > 0 ? "text-red-600" : row.net_outstanding < 0 ? "text-emerald-600" : ""}`}>
           {formatMoney(row.net_outstanding)}
@@ -135,6 +141,15 @@ export const SalesByCustomerReportPage: React.FC = () => {
       align: "right"
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getSalesByCustomer({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -158,9 +173,18 @@ export const SalesByCustomerReportPage: React.FC = () => {
       description="View aggregated sales, collections, and outstanding balances per customer."
       actions={
         <ReportExportActions 
+          title="Sales By Customer Report"
           data={data} 
+          columns={columns}
           filename={`sales-by-customer-${new Date().toISOString().split('T')[0]}`} 
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Customers", value: summary.customer_count || 0 },
+            { title: "Invoices", value: summary.invoice_count || 0 },
+            { title: "Total Sales", value: formatMoney(summary.total_sales_amount || 0) },
+            { title: "Net Outstanding", value: formatMoney(summary.balance_amount || 0) },
+          ]}
         />
       }
       filters={

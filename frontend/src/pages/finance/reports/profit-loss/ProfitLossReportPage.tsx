@@ -9,6 +9,7 @@ import ReportAmountCell from '../../../../components/finance/reports/ReportAmoun
 import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
 import ReportSection from '../../../../components/finance/reports/ReportSection';
 import ProfitLossBadge from '../../../../components/finance/reports/ProfitLossBadge';
+import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
@@ -137,6 +138,89 @@ const ProfitLossReportPage = () => {
     a.download = `profit-and-loss-${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    if (!data) return;
+    const formatAmt = (val: number) => (val || 0).toFixed(2);
+
+    let csv = "PROFIT AND LOSS STATEMENT (INCOME STATEMENT)\r\n";
+    csv += `Financial Year ID: ${filters.financial_year_id}\r\n`;
+    csv += `Period: ${filters.date_from || 'Start'} to ${filters.date_to || 'End'}\r\n\r\n`;
+    csv += "Section,Account Code,Account Name,Amount (LKR)\r\n";
+
+    const addSection = (sectionName: string, lines: any[], total: number) => {
+      (lines || []).forEach((l: any) => {
+        csv += `"${sectionName}","${l.account_code || ''}","${(l.account_name || '').replace(/"/g, '""')}",${formatAmt(l.amount || l.balance || 0)}\r\n`;
+      });
+      csv += `"${sectionName} Total","","",${formatAmt(total)}\r\n`;
+    };
+
+    addSection("Revenue", data.revenue?.lines, data.revenue?.total || 0);
+    addSection("Other Income", data.other_income?.lines, data.other_income?.total || 0);
+    const totalIncome = (data.revenue?.total || 0) + (data.other_income?.total || 0);
+    csv += `"TOTAL INCOME","","",${formatAmt(totalIncome)}\r\n\r\n`;
+
+    addSection("Direct Expenses (COGS)", data.direct_expenses?.lines, data.direct_expenses?.total || 0);
+    addSection("Administrative Expenses", data.administrative_expenses?.lines, data.administrative_expenses?.total || 0);
+    addSection("Selling Expenses", data.selling_expenses?.lines, data.selling_expenses?.total || 0);
+    addSection("Finance Expenses", data.finance_expenses?.lines, data.finance_expenses?.total || 0);
+    const totalExpense = (data.direct_expenses?.total || 0) + (data.administrative_expenses?.total || 0) + (data.selling_expenses?.total || 0) + (data.finance_expenses?.total || 0);
+    csv += `"TOTAL EXPENSES","","",${formatAmt(totalExpense)}\r\n\r\n`;
+
+    const netProfit = data.net_profit !== undefined ? data.net_profit : (totalIncome - totalExpense);
+    csv += `"NET PROFIT / (LOSS)","","",${formatAmt(netProfit)}\r\n`;
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `profit-and-loss-${filters.financial_year_id || 'all'}-${new Date().getTime()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = () => {
+    if (!data) return;
+    const formatCurrency = (val: number) => (val || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const headers = ['Category', 'Account Code', 'Account Name', 'Amount (LKR)'];
+    const rows: (string | number)[][] = [];
+
+    const addSectionRows = (sectionName: string, lines: any[], total: number) => {
+      (lines || []).forEach((l: any) => {
+        rows.push([sectionName, l.account_code || '', l.account_name || '', formatCurrency(l.amount || l.balance || 0)]);
+      });
+      rows.push([`${sectionName} Total`, '', `Total ${sectionName}`, formatCurrency(total)]);
+    };
+
+    addSectionRows("Revenue", data.revenue?.lines, data.revenue?.total || 0);
+    addSectionRows("Other Income", data.other_income?.lines, data.other_income?.total || 0);
+    const totalIncome = (data.revenue?.total || 0) + (data.other_income?.total || 0);
+    rows.push(['TOTAL INCOME', '', 'TOTAL REVENUE & INCOME', formatCurrency(totalIncome)]);
+
+    addSectionRows("Direct Expenses (COGS)", data.direct_expenses?.lines, data.direct_expenses?.total || 0);
+    addSectionRows("Administrative Expenses", data.administrative_expenses?.lines, data.administrative_expenses?.total || 0);
+    addSectionRows("Selling Expenses", data.selling_expenses?.lines, data.selling_expenses?.total || 0);
+    addSectionRows("Finance Expenses", data.finance_expenses?.lines, data.finance_expenses?.total || 0);
+    const totalExpense = (data.direct_expenses?.total || 0) + (data.administrative_expenses?.total || 0) + (data.selling_expenses?.total || 0) + (data.finance_expenses?.total || 0);
+    rows.push(['TOTAL EXPENSES', '', 'TOTAL OPERATING EXPENSES', formatCurrency(totalExpense)]);
+
+    const netProfit = data.net_profit !== undefined ? data.net_profit : (totalIncome - totalExpense);
+    rows.push(['NET PROFIT / LOSS', '', `NET ${netProfit >= 0 ? 'PROFIT' : 'LOSS'}`, formatCurrency(netProfit)]);
+
+    exportToPdf({
+      title: 'Statement of Profit or Loss (Income Statement)',
+      filename: `profit-and-loss-${filters.financial_year_id || 'all'}-${new Date().getTime()}`,
+      subtitle: `Period: ${filters.date_from || 'Start'} to ${filters.date_to || 'End'} | Branch: ${activeBranch?.name || 'All Branches'}`,
+      headers,
+      rows,
+      alignments: ['left', 'left', 'left', 'right'],
+      summary: [
+        { title: 'Total Revenue & Income', value: formatCurrency(totalIncome) },
+        { title: 'Total Expenses', value: formatCurrency(totalExpense) },
+        { title: netProfit >= 0 ? 'Net Profit' : 'Net Loss', value: formatCurrency(netProfit) },
+      ],
+    });
   };
 
   const canView =
@@ -300,7 +384,14 @@ const ProfitLossReportPage = () => {
         return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
           <div className="flex justify-between items-end">
-            <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+            <ReportToolbar 
+              onRefresh={fetchReport} 
+              onExportJson={handleExportJson} 
+              onExportCsv={handleExportCsv}
+              onExportPdf={handleExportPdf}
+              onPrint={() => window.print()}
+              isRefreshing={loading} 
+            />
             <div>
                <ProfitLossBadge amount={netProfit} />
             </div>

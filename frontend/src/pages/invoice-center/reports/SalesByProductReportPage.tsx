@@ -133,6 +133,7 @@ export const SalesByProductReportPage: React.FC = () => {
     },
     {
       header: "Quantity Sold",
+      accessorKey: "quantity_sold",
       cell: (row) => (
         <span className="font-medium">{formatNumber(row.quantity_sold)}</span>
       ),
@@ -140,11 +141,13 @@ export const SalesByProductReportPage: React.FC = () => {
     },
     {
       header: "Avg Price",
+      accessorKey: "average_unit_price",
       cell: (row) => formatMoney(row.average_unit_price),
       align: "right",
     },
     {
       header: "Total Revenue",
+      accessorKey: "total_sales_amount",
       cell: (row) => (
         <span className="font-semibold text-navy-900">
           {formatMoney(row.total_sales_amount)}
@@ -154,6 +157,7 @@ export const SalesByProductReportPage: React.FC = () => {
     },
     {
       header: "% of Total",
+      accessorKey: "percentage_of_total",
       cell: (row) => (
         <span className="text-slate-500">
           {Number(row.percentage_of_total || 0).toFixed(2)}%
@@ -162,6 +166,15 @@ export const SalesByProductReportPage: React.FC = () => {
       align: "right",
     },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getSalesByProduct({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -208,11 +221,19 @@ export const SalesByProductReportPage: React.FC = () => {
       description="View product performance, quantities sold, and revenue generated."
       actions={
         <ReportExportActions
+          title="Sales By Product Report"
           data={data}
+          columns={columns}
           filename={`sales-by-product-${
             new Date().toISOString().split("T")[0]
           }`}
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Products Sold", value: summary.product_count || 0 },
+            { title: "Total Quantity", value: formatNumber(summary.total_quantity || 0) },
+            { title: "Total Revenue", value: formatMoney(summary.total_revenue || 0) },
+          ]}
         />
       }
       filters={

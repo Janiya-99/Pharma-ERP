@@ -64,9 +64,6 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 	// 1. Active Licenses & Registered Formulations
 	var activeProductsCount int64
 	db.Table("products").Where("company_id = ? AND status = 'active'", companyID).Count(&activeProductsCount)
-	if activeProductsCount == 0 {
-		activeProductsCount = 65
-	}
 
 	// 2. Batches Under Quarantine
 	var quarantineBatchesCount int64
@@ -78,17 +75,9 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 		Select("COUNT(DISTINCT sb.product_batch_id), COALESCE(SUM(sb.quantity_available * sb.average_cost), 0)").
 		Row().Scan(&quarantineBatchesCount, &quarantineStockValue)
 
-	if quarantineBatchesCount == 0 {
-		quarantineBatchesCount = 1
-		quarantineStockValue = 105000.00
-	}
-
 	// 3. Active Product Recalls / Blocked Batches
 	var blockedBatchesCount int64
 	db.Table("product_batches").Where("company_id = ? AND is_blocked = 1", companyID).Count(&blockedBatchesCount)
-	if blockedBatchesCount == 0 {
-		blockedBatchesCount = 1
-	}
 
 	// 4. Pending Expiry Disposals
 	var expiredBatchesCount int64
@@ -105,33 +94,41 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 
 	// 5. Monthly Trajectory (Pass Rate & Compliance Index)
 	now := time.Now()
+	var totalBatchesCount int64
+	db.Table("product_batches").Where("company_id = ?", companyID).Count(&totalBatchesCount)
+
 	var passRateData []PassRatePoint
 	for i := 5; i >= 0; i-- {
 		t := now.AddDate(0, -i, 0)
 		monthName := t.Format("Jan 2006")
-		qcRate := 98.0 + float64(i%3)*0.5 + 0.2
-		if qcRate > 99.8 {
-			qcRate = 99.4
-		}
-		nmraRate := 98.8 + float64(i%2)*0.6
-		if nmraRate > 99.9 {
-			nmraRate = 99.6
+		startOfMonth := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
+		endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-time.Nanosecond)
+
+		var mTotal int64
+		var mBlocked int64
+		db.Table("product_batches").
+			Where("company_id = ? AND created_at >= ? AND created_at <= ?", companyID, startOfMonth, endOfMonth).
+			Count(&mTotal)
+		db.Table("product_batches").
+			Where("company_id = ? AND is_blocked = 1 AND created_at >= ? AND created_at <= ?", companyID, startOfMonth, endOfMonth).
+			Count(&mBlocked)
+
+		qcRate := 100.0
+		if mTotal > 0 {
+			qcRate = float64(mTotal-mBlocked) / float64(mTotal) * 100.0
+		} else if totalBatchesCount > 0 {
+			qcRate = float64(totalBatchesCount-blockedBatchesCount) / float64(totalBatchesCount) * 100.0
 		}
 
 		passRateData = append(passRateData, PassRatePoint{
 			Month:               monthName,
 			QCPassRate:          qcRate,
-			NMRAComplianceIndex: nmraRate,
+			NMRAComplianceIndex: qcRate,
 		})
 	}
 
 	// 6. Quarantine Root Causes
-	quarantineReasonsData := []QuarantineReasonItem{
-		{Name: "Temperature Excursion (Cold Chain)", Value: 42},
-		{Name: "Near Expiry Quarantine Hold", Value: 35},
-		{Name: "Supplier Voluntary Batch Recall", Value: 15},
-		{Name: "Packaging Seal Verification", Value: 8},
-	}
+	quarantineReasonsData := make([]QuarantineReasonItem, 0)
 
 	// 7. Write-off Value by Therapeutic Category
 	type catRow struct {
@@ -153,7 +150,7 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 		LIMIT 5
 	`, companyID).Scan(&catRows)
 
-	var expiryWriteOffData []CategoryWriteOffItem
+	expiryWriteOffData := make([]CategoryWriteOffItem, 0)
 	var totalWriteOffVal float64
 	for _, cr := range catRows {
 		expiryWriteOffData = append(expiryWriteOffData, CategoryWriteOffItem{
@@ -161,15 +158,6 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 			Value:    cr.Val,
 		})
 		totalWriteOffVal += cr.Val
-	}
-	if len(expiryWriteOffData) == 0 {
-		expiryWriteOffData = []CategoryWriteOffItem{
-			{Category: "Anti-infectives & Antibiotics", Value: 1250000},
-			{Category: "Vaccines & Cold Chain", Value: 980000},
-			{Category: "Cardiovascular & Metabolic", Value: 640000},
-			{Category: "Analgesics & Anti-inflammatory", Value: 420000},
-		}
-		totalWriteOffVal = 3290000
 	}
 
 	// 8. Live Regulatory Audit Trail
@@ -190,7 +178,7 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 		LIMIT 5
 	`, companyID).Scan(&auditRows)
 
-	var recentRegulatoryActions []RegulatoryActionItem
+	recentRegulatoryActions := make([]RegulatoryActionItem, 0)
 	for _, ar := range auditRows {
 		actionType := "AUDIT_CHECK"
 		status := "COMPLETED"
@@ -210,21 +198,6 @@ func (h *ComplianceDashboardHandler) GetSummary(c *gin.Context) {
 			Status:    status,
 			Notes:     fmt.Sprintf("Audited by %s with cryptographic traceability", ar.User),
 		})
-	}
-
-	if len(recentRegulatoryActions) == 0 {
-		recentRegulatoryActions = []RegulatoryActionItem{
-			{
-				ID:        "REG-2026-001",
-				Timestamp: "Today, 10:15",
-				Type:      "BATCH_HOLD",
-				Target:    "Amoxicillin 500mg (Batch #BAT-EXP23-01)",
-				Action:    "Batch Expiry Quarantine",
-				Authority: "Internal QC Lab",
-				Status:    "COMPLETED",
-				Notes:     "Expired batch sealed and recorded in quarantine log.",
-			},
-		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{

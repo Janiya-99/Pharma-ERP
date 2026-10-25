@@ -8,10 +8,12 @@ import ReportFilterCard from '../../../../components/finance/reports/ReportFilte
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
 import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
 import SourceTypeBadge from '../../../../components/finance/reports/SourceTypeBadge';
+import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
+import { TablePagination } from '../../../../components/common/TablePagination';
 import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
 import { useDebounce } from '../../../../hooks/useDebounce';
 
@@ -40,6 +42,17 @@ const DayBookReportPage = () => {
     source_type: "",
     branch_id: activeBranch?.id || ""
   });
+
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+
+  useEffect(() => {
+    if (page > 0 && data?.days && page * pageSize >= data.days.length) {
+      setPage(0);
+    }
+  }, [data?.days, page, pageSize]);
+
+  const pagedDays = (data?.days || []).slice(page * pageSize, (page + 1) * pageSize);
 
   const debouncedFilters = useDebounce(filters, 300);
 
@@ -109,6 +122,96 @@ const DayBookReportPage = () => {
     a.download = `day-book-${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    if (!data || !data.days) return;
+    const headers = ['Date', 'Source Type', 'Source No', 'Account Code', 'Account Name', 'Description', 'Debit', 'Credit'];
+    const rows: string[][] = [];
+
+    data.days.forEach((day: any) => {
+      const dateStr = day.date ? format(new Date(day.date), 'yyyy-MM-dd') : '';
+      (day.lines || []).forEach((line: any) => {
+        rows.push([
+          `"${dateStr}"`,
+          `"${line.source_type || ''}"`,
+          `"${line.source_number || ''}"`,
+          `"${line.account_code || ''}"`,
+          `"${(line.account_name || '').replace(/"/g, '""')}"`,
+          `"${(line.description || '').replace(/"/g, '""')}"`,
+          String(line.debit_amount ?? 0),
+          String(line.credit_amount ?? 0)
+        ]);
+      });
+      rows.push([
+        `"${dateStr} Total"`,
+        '""', '""', '""', '""', '""',
+        String(day.total_debit ?? 0),
+        String(day.total_credit ?? 0)
+      ]);
+    });
+
+    rows.push([
+      '"GRAND TOTAL"',
+      '""', '""', '""', '""', '""',
+      String(data.grand_total_debit ?? 0),
+      String(data.grand_total_credit ?? 0)
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `day-book-${filters.date_from}-to-${filters.date_to}-${new Date().getTime()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = () => {
+    if (!data || !data.days) return;
+    const formatCurrency = (val: number) => (val || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const headers = ['Date', 'Type', 'Source No', 'Account', 'Description', 'Debit', 'Credit'];
+    const rows: (string | number)[][] = [];
+
+    data.days.forEach((day: any) => {
+      const dateStr = day.date ? format(new Date(day.date), 'yyyy-MM-dd') : '';
+      (day.lines || []).forEach((line: any) => {
+        rows.push([
+          dateStr,
+          line.source_type ? line.source_type.replace(/_/g, ' ') : '',
+          line.source_number || '',
+          `${line.account_code || ''} ${line.account_name || ''}`,
+          line.description || '',
+          formatCurrency(line.debit_amount),
+          formatCurrency(line.credit_amount)
+        ]);
+      });
+    });
+
+    rows.push([
+      'GRAND TOTAL',
+      '',
+      '',
+      '',
+      '',
+      formatCurrency(data.grand_total_debit),
+      formatCurrency(data.grand_total_credit)
+    ]);
+
+    exportToPdf({
+      title: 'Day Book Report',
+      filename: `day-book-${filters.date_from}-to-${filters.date_to}-${new Date().getTime()}`,
+      subtitle: `Date Range: ${filters.date_from} to ${filters.date_to} | Source Type: ${filters.source_type || 'All'}`,
+      headers,
+      rows,
+      alignments: ['left', 'left', 'left', 'left', 'left', 'right', 'right'],
+      summary: [
+        { title: 'Grand Total Debit', value: formatCurrency(data.grand_total_debit) },
+        { title: 'Grand Total Credit', value: formatCurrency(data.grand_total_credit) },
+        { title: 'Days Recorded', value: String(data.days.length) },
+      ],
+    });
   };
 
   if (
@@ -184,12 +287,19 @@ const DayBookReportPage = () => {
 
       {data && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+          <ReportToolbar 
+            onRefresh={fetchReport} 
+            onExportJson={handleExportJson} 
+            onExportCsv={handleExportCsv}
+            onExportPdf={handleExportPdf}
+            onPrint={() => window.print()}
+            isRefreshing={loading} 
+          />
 
           <div className="bg-white  rounded-lg shadow border border-gray-200  overflow-hidden mb-6">
             {data.days && data.days.length > 0 ? (
               <div className="divide-y divide-gray-200 ">
-                {(data.days || []).map((day: unknown, idx: unknown) => (
+                {pagedDays.map((day: any, idx: any) => (
                   <div key={idx} className="p-0">
                     <div className="bg-gray-50  px-6 py-3 border-b border-gray-200 ">
                       <h3 className="font-bold text-navy-800 ">
@@ -239,6 +349,20 @@ const DayBookReportPage = () => {
               <div className="p-8 text-center text-gray-500 ">
                 No transactions found for the selected dates.
               </div>
+            )}
+
+            {data.days && data.days.length > 0 && (
+              <TablePagination
+                pageIndex={page}
+                pageSize={pageSize}
+                totalItems={data.days.length}
+                pageSizeOptions={[3, 5, 10, 20]}
+                onPageChange={setPage}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(newSize);
+                  setPage(0);
+                }}
+              />
             )}
             
             {data.days && data.days.length > 0 && (

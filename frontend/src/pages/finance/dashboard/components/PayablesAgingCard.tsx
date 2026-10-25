@@ -11,53 +11,24 @@ interface PayablesAgingCardProps {
 export const PayablesAgingCard: React.FC<PayablesAgingCardProps> = ({ data }) => {
   const navigate = useNavigate();
 
-  // Conforming default data from Image 2
-  const defaultTotal = 16822132;
-  const defaultBuckets = [
-    { label: "Current (0-30 days)", amount: 9420210, share: 56, color: "#3B82F6" },
-    { label: "31 - 60 days", amount: 4310540, share: 26, color: "#06B6D4" },
-    { label: "61 - 90 days", amount: 2182340, share: 13, color: "#F59E0B" },
-    { label: "91 - 120 days", amount: 765520, share: 5, color: "#8B5CF6" },
-    { label: "> 120 days", amount: 143522, share: 1, color: "#EF4444" },
-  ];
+  // Compute strictly from live backend PayablesSummary data
+  const totalPayable = data?.total_payable || 0;
+  const colors = ["#3B82F6", "#06B6D4", "#F59E0B", "#8B5CF6", "#EF4444"];
 
-  const totalPayable = data?.total_payable ? data.total_payable : defaultTotal;
-
-  const buckets =
-    data && data.aging && data.aging.length > 0 && data.total_payable > 0
-      ? [
-          {
-            label: "Current (0-30 days)",
-            amount: data.aging[0]?.amount || 0,
-            share: Math.round(((data.aging[0]?.amount || 0) / data.total_payable) * 100),
-            color: "#3B82F6",
-          },
-          {
-            label: "31 - 60 days",
-            amount: data.aging[1]?.amount || 0,
-            share: Math.round(((data.aging[1]?.amount || 0) / data.total_payable) * 100),
-            color: "#06B6D4",
-          },
-          {
-            label: "61 - 90 days",
-            amount: data.aging[2]?.amount || 0,
-            share: Math.round(((data.aging[2]?.amount || 0) / data.total_payable) * 100),
-            color: "#F59E0B",
-          },
-          {
-            label: "91 - 120 days",
-            amount: data.aging[3]?.amount || 0,
-            share: Math.round(((data.aging[3]?.amount || 0) / data.total_payable) * 100),
-            color: "#8B5CF6",
-          },
-          {
-            label: "> 120 days",
-            amount: data.aging[4]?.amount || 0,
-            share: Math.round(((data.aging[4]?.amount || 0) / data.total_payable) * 100),
-            color: "#EF4444",
-          },
-        ]
-      : defaultBuckets;
+  const buckets = (data?.aging && data.aging.length > 0)
+    ? data.aging.map((b, idx) => ({
+        label: b.label || `Bucket ${idx + 1}`,
+        amount: b.amount || 0,
+        share: totalPayable > 0 ? Math.round(((b.amount || 0) / totalPayable) * 100) : 0,
+        color: colors[idx % colors.length],
+      }))
+    : [
+        { label: "Current (0-30 days)", amount: 0, share: 0, color: "#3B82F6" },
+        { label: "31 - 60 days", amount: 0, share: 0, color: "#06B6D4" },
+        { label: "61 - 90 days", amount: 0, share: 0, color: "#F59E0B" },
+        { label: "91 - 120 days", amount: 0, share: 0, color: "#8B5CF6" },
+        { label: "> 120 days", amount: 0, share: 0, color: "#EF4444" },
+      ];
 
   const handleNavigate = () => {
     navigate("/finance/banking/payment-vouchers");

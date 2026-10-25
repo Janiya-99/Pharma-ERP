@@ -142,6 +142,7 @@ export const FinancePostingStatusReportPage: React.FC = () => {
     { header: "Document No.", accessorKey: "document_number" },
     {
       header: "Type",
+      accessorKey: "document_type",
       cell: (row) => <Badge variant="outline">{row.document_type}</Badge>,
       align: "center",
     },
@@ -149,6 +150,7 @@ export const FinancePostingStatusReportPage: React.FC = () => {
     { header: "Customer Name", accessorKey: "customer_name" },
     {
       header: "Amount",
+      accessorKey: "document_amount",
       cell: (row) => (
         <span className="font-semibold text-navy-900">
           {formatMoney(row.document_amount)}
@@ -158,6 +160,7 @@ export const FinancePostingStatusReportPage: React.FC = () => {
     },
     {
       header: "Posting Status",
+      accessorKey: "finance_post_status",
       cell: (row) => (
         <Badge
           variant={
@@ -176,6 +179,15 @@ export const FinancePostingStatusReportPage: React.FC = () => {
     { header: "Posted Date", accessorKey: "posted_date" },
     { header: "Journal Entry", accessorKey: "journal_entry_number" },
   ];
+
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getFinancePostingStatus({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    return Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+  };
 
   if (!hasPermission) {
     return (
@@ -219,11 +231,20 @@ export const FinancePostingStatusReportPage: React.FC = () => {
       description="View the GL posting status for all operational documents."
       actions={
         <ReportExportActions
+          title="Finance Posting Status Report"
           data={data}
+          columns={columns}
           filename={`finance-posting-status-${
             new Date().toISOString().split("T")[0]
           }`}
           disabled={isLoading || !data || data.rows.length === 0}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Total Documents", value: summary.total_documents || 0 },
+            { title: "Posted to Finance", value: summary.posted_count || 0 },
+            { title: "Unposted Documents", value: summary.unposted_count || 0 },
+            { title: "Failed Postings", value: summary.failed_count || 0 },
+          ]}
         />
       }
       filters={

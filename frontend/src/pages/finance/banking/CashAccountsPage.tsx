@@ -8,6 +8,7 @@ import { getBranches, getUsers } from "../../../api/controlApi";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+import { TablePagination } from "../../../components/common/TablePagination";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import {
   Sheet,
@@ -118,6 +119,19 @@ const CashAccountsPage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState({ search: "", status: "all", branch_id: "all" });
   const [showDrawerAiPrompt, setShowDrawerAiPrompt] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    if (page > 0 && page * pageSize >= accounts.length) {
+      setPage(0);
+    }
+  }, [accounts, page, pageSize]);
+
+  const pagedAccounts = useMemo(() => {
+    const start = page * pageSize;
+    return accounts.slice(start, start + pageSize);
+  }, [accounts, page, pageSize]);
 
   const fetchAccounts = async () => {
     if (!companyId) {
@@ -381,7 +395,7 @@ const CashAccountsPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                accounts.map((account) => (
+                pagedAccounts.map((account) => (
                   <TableRow key={account.id}>
                     <TableCell className="font-semibold text-slate-900">{account.cash_account_name}</TableCell>
                     <TableCell>{account.branch?.branch_name || account.branch_id || "-"}</TableCell>
@@ -419,6 +433,19 @@ const CashAccountsPage = () => {
               )}
             </TableBody>
           </Table>
+
+          {accounts.length > 0 && (
+            <TablePagination
+              pageIndex={page}
+              pageSize={pageSize}
+              totalItems={accounts.length}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(0);
+              }}
+            />
+          )}
         </CardContent>
       </Card>
 

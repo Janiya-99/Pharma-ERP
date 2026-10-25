@@ -16,18 +16,21 @@ import {
   Clock,
   DollarSign,
 } from "lucide-react";
-import { getSettings, publishSetting, triggerManualBackup } from "../../../api/controlApi";
+import { getSettings, publishSetting, triggerManualBackup, getCompanyProfile, updateCompanyProfile } from "../../../api/controlApi";
+import { useAuth } from "../../../auth/AuthContext";
 import SettingsImpactPreview from "../../../components/common/SettingsImpactPreview";
 import { PageTitleCard } from "../../../components/common/PageTitleCard";
 
 const GeneralSettingsPage = () => {
-  // Company Profile
-  const [companyName, setCompanyName] = useState<string>("OMACX Pharmaceuticals & Healthcare PLC");
-  const [tinNumber, setTinNumber] = useState<string>("TIN-889021445-LK");
-  const [address, setAddress] = useState<string>("No. 188, Union Place, Colombo 02, Sri Lanka");
-  const [email, setEmail] = useState<string>("corporate@omacx.lk");
-  const [phone, setPhone] = useState<string>("+94 11 234 5678");
-  const [website, setWebsite] = useState<string>("https://www.omacx.lk");
+  const { company, refreshContext } = useAuth();
+
+  // Company Profile - Default to active tenant company context rather than hardcoded mock
+  const [companyName, setCompanyName] = useState<string>(company?.company_name || "");
+  const [tinNumber, setTinNumber] = useState<string>(company?.tax_number || "");
+  const [address, setAddress] = useState<string>(company?.address || "");
+  const [email, setEmail] = useState<string>(company?.email || "");
+  const [phone, setPhone] = useState<string>(company?.phone || "");
+  const [website, setWebsite] = useState<string>(company?.website || "");
 
   // Localization & Fiscal Year
   const [fiscalStart, setFiscalStart] = useState<string>("APR_1");
@@ -56,39 +59,59 @@ const GeneralSettingsPage = () => {
   useEffect(() => {
     const fetchExistingSettings = async () => {
       try {
-        const res = await getSettings();
-        const items = res?.data || [];
-        if (Array.isArray(items)) {
-          items.forEach((item: any) => {
-            const val = item.setting_value;
-            switch (item.setting_key) {
-              case "company_name": if (val) setCompanyName(String(val)); break;
-              case "tin_number": if (val) setTinNumber(String(val)); break;
-              case "address": if (val) setAddress(String(val)); break;
-              case "email": if (val) setEmail(String(val)); break;
-              case "phone": if (val) setPhone(String(val)); break;
-              case "website": if (val) setWebsite(String(val)); break;
-              case "fiscal_start": if (val) setFiscalStart(String(val)); break;
-              case "currency": if (val) setCurrency(String(val)); break;
-              case "timezone": if (val) setTimezone(String(val)); break;
-              case "date_format": if (val) setDateFormat(String(val)); break;
-              case "number_format": if (val) setNumberFormat(String(val)); break;
-              case "alert_low_stock": setAlertLowStock(Boolean(val)); break;
-              case "alert_expiry": setAlertExpiry(Boolean(val)); break;
-              case "alert_overdue_invoices": setAlertOverdueInvoices(Boolean(val)); break;
-              case "alert_security": setAlertSecurity(Boolean(val)); break;
-              case "expiry_days_warning": if (val) setExpiryDaysWarning(String(val)); break;
-              case "backup_freq": if (val) setBackupFreq(String(val)); break;
-              case "retention_years": if (val) setRetentionYears(String(val)); break;
-            }
-          });
+        const [settingsRes, profileRes] = await Promise.allSettled([
+          getSettings(),
+          getCompanyProfile()
+        ]);
+
+        // First apply official active company profile
+        if (profileRes.status === "fulfilled" && profileRes.value) {
+          const profile = profileRes.value.data || profileRes.value;
+          if (profile && profile.company_name) {
+            setCompanyName(profile.company_name);
+            if (profile.tax_number) setTinNumber(profile.tax_number);
+            if (profile.address) setAddress(profile.address);
+            if (profile.email) setEmail(profile.email);
+            if (profile.phone) setPhone(profile.phone);
+            if (profile.website) setWebsite(profile.website);
+          }
+        }
+
+        // Then apply any published setting overrides
+        if (settingsRes.status === "fulfilled" && settingsRes.value) {
+          const items = settingsRes.value.data || settingsRes.value || [];
+          if (Array.isArray(items)) {
+            items.forEach((item: any) => {
+              const val = item.setting_value;
+              switch (item.setting_key) {
+                case "company_name": if (val) setCompanyName(String(val)); break;
+                case "tin_number": if (val) setTinNumber(String(val)); break;
+                case "address": if (val) setAddress(String(val)); break;
+                case "email": if (val) setEmail(String(val)); break;
+                case "phone": if (val) setPhone(String(val)); break;
+                case "website": if (val) setWebsite(String(val)); break;
+                case "fiscal_start": if (val) setFiscalStart(String(val)); break;
+                case "currency": if (val) setCurrency(String(val)); break;
+                case "timezone": if (val) setTimezone(String(val)); break;
+                case "date_format": if (val) setDateFormat(String(val)); break;
+                case "number_format": if (val) setNumberFormat(String(val)); break;
+                case "alert_low_stock": setAlertLowStock(Boolean(val)); break;
+                case "alert_expiry": setAlertExpiry(Boolean(val)); break;
+                case "alert_overdue_invoices": setAlertOverdueInvoices(Boolean(val)); break;
+                case "alert_security": setAlertSecurity(Boolean(val)); break;
+                case "expiry_days_warning": if (val) setExpiryDaysWarning(String(val)); break;
+                case "backup_freq": if (val) setBackupFreq(String(val)); break;
+                case "retention_years": if (val) setRetentionYears(String(val)); break;
+              }
+            });
+          }
         }
       } catch (err) {
         console.error("Failed to load settings:", err);
       }
     };
     fetchExistingSettings();
-  }, []);
+  }, [company]);
 
   const handleSaveClick = () => {
     setIsPreviewOpen(true);
@@ -119,7 +142,24 @@ const GeneralSettingsPage = () => {
         { setting_group: "BACKUP", setting_key: "retention_years", setting_value: retentionYears, status: "published" },
       ];
 
+      // Save system settings
       await Promise.all(settingsToSave.map((s) => publishSetting(s)));
+
+      // Synchronize company profile so General Settings and Company Profile are never in conflict
+      try {
+        await updateCompanyProfile({
+          company_name: companyName,
+          tax_number: tinNumber,
+          address,
+          email,
+          phone,
+          website,
+        });
+        await refreshContext();
+      } catch (profileErr) {
+        console.warn("Could not sync company profile directly:", profileErr);
+      }
+
       setIsPreviewOpen(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);

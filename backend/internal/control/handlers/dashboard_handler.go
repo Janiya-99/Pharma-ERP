@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -32,12 +33,13 @@ type ModuleAdoptionItem struct {
 }
 
 type SecurityEventItem struct {
-	ID          uint64 `json:"id"`
-	Severity    string `json:"severity"`
-	Description string `json:"description"`
-	User        string `json:"user"`
-	IP          string `json:"ip"`
-	Time        string `json:"time"`
+	ID          uint64     `json:"id"`
+	Severity    string     `json:"severity"`
+	Description string     `json:"description"`
+	User        string     `json:"user"`
+	IP          string     `json:"ip"`
+	Time        string     `json:"time"`
+	CreatedAt   *time.Time `json:"created_at,omitempty"`
 }
 
 type TelemetryItem struct {
@@ -109,20 +111,13 @@ func (h *ControlDashboardHandler) GetSummary(c *gin.Context) {
 
 		var apiCount int64
 		db.Table("audit_logs").Where("company_id = ? AND created_at BETWEEN ? AND ?", companyID, startOfDay, endOfDay).Count(&apiCount)
-		if apiCount == 0 {
-			apiCount = txCount * 3
-		}
-
 		userCount := int(totalUsers)
-		if userCount == 0 {
-			userCount = 1
-		}
 
 		telemetry = append(telemetry, TelemetryItem{
 			Day:          dayName,
-			Users:        userCount * 25,
-			Transactions: int(txCount)*5 + 10,
-			API:          int(apiCount)*12 + 45,
+			Users:        userCount,
+			Transactions: int(txCount),
+			API:          int(apiCount),
 		})
 	}
 
@@ -168,50 +163,86 @@ func (h *ControlDashboardHandler) GetSummary(c *gin.Context) {
 	db.Table("goods_receipt_notes").Where("company_id = ?", companyID).Count(&grnTotal)
 	db.Table("journal_entries").Where("company_id = ?", companyID).Count(&jrnTotal)
 
+	rateOf := func(cnt int64) string {
+		if cnt > 0 {
+			return "Active"
+		}
+		return "0 records"
+	}
+
 	moduleAdoption := []ModuleAdoptionItem{
-		{Name: "Inventory Management", Rate: "100%", Color: "bg-blue-500"},
-		{Name: "Invoice Center & Sales", Rate: "95%", Color: "bg-indigo-500"},
-		{Name: "Procurement (GRN)", Rate: "90%", Color: "bg-sky-500"},
-		{Name: "Finance & Accounting", Rate: "92%", Color: "bg-cyan-500"},
-		{Name: "Control Center & Security", Rate: "100%", Color: "bg-teal-500"},
-		{Name: "Branch & Multi-Tenant", Rate: "100%", Color: "bg-emerald-500"},
+		{Name: "Inventory Management", Rate: rateOf(prodCount), Color: "bg-blue-500"},
+		{Name: "Invoice Center & Sales", Rate: rateOf(soCount), Color: "bg-indigo-500"},
+		{Name: "Procurement (GRN)", Rate: rateOf(grnTotal), Color: "bg-sky-500"},
+		{Name: "Finance & Accounting", Rate: rateOf(jrnTotal), Color: "bg-cyan-500"},
+		{Name: "Control Center & Security", Rate: rateOf(totalUsers), Color: "bg-teal-500"},
+		{Name: "Branch & Multi-Tenant", Rate: rateOf(totalBranches), Color: "bg-emerald-500"},
 	}
 
 	// 8. Security Governance Events
+	auditDateFrom := c.Query("audit_date_from")
+	auditDateTo := c.Query("audit_date_to")
+	auditSeverity := c.Query("audit_severity")
+
 	var secEvents []SecurityEventItem
-	db.Raw(`
-		SELECT a.id,
-		       CASE 
-		         WHEN a.action LIKE '%delete%' OR a.action LIKE '%cancel%' THEN 'CRITICAL'
-		         WHEN a.action LIKE '%assign%' OR a.action LIKE '%update%' THEN 'WARNING'
-		         WHEN a.action LIKE '%login%' OR a.action LIKE '%create%' THEN 'INFO'
-		         ELSE 'SUCCESS'
-		       END as severity,
-		       CONCAT(a.action, ' on ', a.entity_name) as description,
-		       COALESCE(u.name, 'Admin') as user,
-		       COALESCE(a.ip_address, '127.0.0.1') as ip,
-		       DATE_FORMAT(a.created_at, '%b %d, %H:%i') as time
-		FROM audit_logs a
-		LEFT JOIN users u ON u.id = a.user_id
-		WHERE a.company_id = ?
-		ORDER BY a.created_at DESC
-		LIMIT 5
-	`, companyID).Scan(&secEvents)
+	auditQuery := db.Table("audit_logs a").
+		Select(`
+			a.id,
+			CASE 
+			  WHEN a.action LIKE '%delete%' OR a.action LIKE '%cancel%' THEN 'CRITICAL'
+			  WHEN a.action LIKE '%assign%' OR a.action LIKE '%update%' THEN 'WARNING'
+			  WHEN a.action LIKE '%login%' OR a.action LIKE '%create%' THEN 'INFO'
+			  ELSE 'SUCCESS'
+			END as severity,
+			CONCAT(a.action, ' on ', a.entity_name) as description,
+			COALESCE(u.name, 'Admin') as user,
+			COALESCE(a.ip_address, '127.0.0.1') as ip,
+			DATE_FORMAT(a.created_at, '%b %d, %H:%i') as time,
+			a.created_at
+		`).
+		Joins("LEFT JOIN users u ON u.id = a.user_id").
+		Where("a.company_id = ?", companyID)
+
+	if auditDateFrom != "" {
+		auditQuery = auditQuery.Where("DATE(a.created_at) >= ?", auditDateFrom)
+	}
+	if auditDateTo != "" {
+		auditQuery = auditQuery.Where("DATE(a.created_at) <= ?", auditDateTo)
+	}
+	if auditSeverity != "" && auditSeverity != "ALL" {
+		auditQuery = auditQuery.Where(`(CASE 
+			WHEN a.action LIKE '%delete%' OR a.action LIKE '%cancel%' THEN 'CRITICAL' 
+			WHEN a.action LIKE '%assign%' OR a.action LIKE '%update%' THEN 'WARNING' 
+			WHEN a.action LIKE '%login%' OR a.action LIKE '%create%' THEN 'INFO' 
+			ELSE 'SUCCESS' 
+		END) = ?`, auditSeverity)
+	}
+	auditQuery.Order("a.created_at DESC, a.id DESC").Limit(20).Scan(&secEvents)
 
 	if len(secEvents) == 0 {
 		// Fallback to recent login logs
-		db.Raw(`
-			SELECT l.id,
-			       CASE WHEN l.login_status = 'success' THEN 'SUCCESS' ELSE 'WARNING' END as severity,
-			       CONCAT('User Login ', l.login_status) as description,
-			       COALESCE(u.name, l.email) as user,
-			       l.ip_address as ip,
-			       DATE_FORMAT(l.logged_at, '%b %d, %H:%i') as time
-			FROM login_logs l
-			LEFT JOIN users u ON u.id = l.user_id
-			ORDER BY l.logged_at DESC
-			LIMIT 5
-		`).Scan(&secEvents)
+		loginQuery := db.Table("login_logs l").
+			Select(`
+				l.id,
+				CASE WHEN l.login_status = 'success' THEN 'SUCCESS' ELSE 'WARNING' END as severity,
+				CONCAT('User Login ', l.login_status) as description,
+				COALESCE(u.name, l.email) as user,
+				l.ip_address as ip,
+				DATE_FORMAT(l.logged_at, '%b %d, %H:%i') as time,
+				l.logged_at as created_at
+			`).
+			Joins("LEFT JOIN users u ON u.id = l.user_id")
+
+		if auditDateFrom != "" {
+			loginQuery = loginQuery.Where("DATE(l.logged_at) >= ?", auditDateFrom)
+		}
+		if auditDateTo != "" {
+			loginQuery = loginQuery.Where("DATE(l.logged_at) <= ?", auditDateTo)
+		}
+		if auditSeverity != "" && auditSeverity != "ALL" {
+			loginQuery = loginQuery.Where("(CASE WHEN l.login_status = 'success' THEN 'SUCCESS' ELSE 'WARNING' END) = ?", auditSeverity)
+		}
+		loginQuery.Order("l.logged_at DESC, l.id DESC").Limit(20).Scan(&secEvents)
 	}
 
 	if secEvents == nil {
@@ -219,6 +250,67 @@ func (h *ControlDashboardHandler) GetSummary(c *gin.Context) {
 	}
 	if roleDist == nil {
 		roleDist = []RoleDistItem{}
+	}
+
+	type rawDoc struct {
+		ID        uint64    `gorm:"column:id"`
+		DocNum    string    `gorm:"column:doc_num"`
+		Title     string    `gorm:"column:title"`
+		Category  string    `gorm:"column:category"`
+		Party     string    `gorm:"column:party"`
+		CreatedAt time.Time `gorm:"column:created_at"`
+		Amount    float64   `gorm:"column:amount"`
+		DocType   string    `gorm:"column:doc_type"`
+		Status    string    `gorm:"column:status"`
+		PrintPath string    `gorm:"column:print_path"`
+	}
+	var rawDocs []rawDoc
+	db.Raw(`
+		SELECT id, invoice_number as doc_num, 'Sales Invoice' as title, 'invoices' as category,
+		       COALESCE((SELECT customer_name FROM customers WHERE customers.id = sales_invoices.customer_id), 'Customer') as party,
+		       created_at, total_amount as amount, 'Sales Invoice' as doc_type, approval_status as status,
+		       CONCAT('/invoice-center/sales-invoices/', id) as print_path
+		FROM sales_invoices
+		WHERE company_id = ?
+		ORDER BY created_at DESC
+		LIMIT 8
+	`, companyID).Scan(&rawDocs)
+
+	type RecentDocItem struct {
+		ID             string `json:"id"`
+		DocumentNumber string `json:"document_number"`
+		Title          string `json:"title"`
+		Category       string `json:"category"`
+		Counterparty   string `json:"counterparty"`
+		Date           string `json:"date"`
+		Amount         string `json:"amount"`
+		Size           string `json:"size"`
+		Type           string `json:"type"`
+		BadgeColor     string `json:"badgeColor"`
+		Status         string `json:"status"`
+		StatusColor    string `json:"statusColor"`
+		PrintPath      string `json:"printPath"`
+	}
+	var recentDocs []RecentDocItem
+	for _, d := range rawDocs {
+		recentDocs = append(recentDocs, RecentDocItem{
+			ID:             fmt.Sprintf("doc-%d", d.ID),
+			DocumentNumber: d.DocNum,
+			Title:          d.Title,
+			Category:       d.Category,
+			Counterparty:   d.Party,
+			Date:           d.CreatedAt.Format("2006-01-02 15:04"),
+			Amount:         fmt.Sprintf("LKR %.2f", d.Amount),
+			Size:           "128 KB",
+			Type:           d.DocType,
+			BadgeColor:     "bg-blue-50 text-blue-700 border-blue-200",
+			Status:         d.Status,
+			StatusColor:    "text-emerald-700 bg-emerald-50 border-emerald-200",
+			PrintPath:      d.PrintPath,
+		})
+	}
+	if recentDocs == nil {
+		recentDocs = []RecentDocItem{}
 	}
 
 	blockedIPs := fetchBlockedIPs(db)
@@ -237,6 +329,7 @@ func (h *ControlDashboardHandler) GetSummary(c *gin.Context) {
 			"module_adoption":   moduleAdoption,
 			"security_events":   secEvents,
 			"blocked_ips":       blockedIPs,
+			"recent_documents":  recentDocs,
 		},
 	})
 }

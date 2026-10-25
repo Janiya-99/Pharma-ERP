@@ -28,55 +28,17 @@ export const ExpenseDistributionChart: React.FC<ExpenseDistributionChartProps> =
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState("This Quarter");
 
-  // Dynamic datasets per period (matching exact screenshot specifications)
-  const periodDatasets: Record<string, ExpenseCategory[]> = {
-    "This Quarter": [
-      { category: "Cost of Goods Sold", amount: 71700000, share: 80.0 },
-      { category: "Salaries and Wages", amount: 13400000, share: 14.9 },
-      { category: "Rent Expense", amount: 4600000, share: 5.2 },
-    ],
-    "This Month": [
-      { category: "Cost of Goods Sold", amount: 23900000, share: 79.9 },
-      { category: "Salaries and Wages", amount: 4500000, share: 15.1 },
-      { category: "Rent Expense", amount: 1500000, share: 5.0 },
-    ],
-    "Last Month": [
-      { category: "Cost of Goods Sold", amount: 22800000, share: 80.0 },
-      { category: "Salaries and Wages", amount: 4200000, share: 14.7 },
-      { category: "Rent Expense", amount: 1500000, share: 5.3 },
-    ],
-    "YTD": [
-      { category: "Cost of Goods Sold", amount: 214800000, share: 80.0 },
-      { category: "Salaries and Wages", amount: 40300000, share: 15.0 },
-      { category: "Rent Expense", amount: 13400000, share: 5.0 },
-    ],
-  };
+  // Use live data from General Ledger directly without hardcoded mock fallbacks
+  const items = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    const total = data.reduce((acc, c) => acc + (c.amount || 0), 0);
+    return data.map((d) => ({
+      category: d.category || "General Expense",
+      amount: d.amount || 0,
+      share: total > 0 ? parseFloat((((d.amount || 0) / total) * 100).toFixed(1)) : (d.share || 0),
+    }));
+  }, [data]);
 
-  const periodMultiplier: Record<string, number> = {
-    "This Month": 1.0,
-    "Last Month": 0.95,
-    "This Quarter": 3.0,
-    "YTD": 9.0,
-  };
-
-  const rawItems = useMemo(() => {
-    if (data && data.length > 0) {
-      const mult = periodMultiplier[selectedPeriod] || 1.0;
-      const scaled = data.map((d) => ({
-        category: d.category || "General Expense",
-        amount: Math.round((d.amount || 0) * mult),
-        share: d.share || 0,
-      }));
-      const total = scaled.reduce((acc, c) => acc + c.amount, 0);
-      return scaled.map((d) => ({
-        ...d,
-        share: total > 0 ? parseFloat(((d.amount / total) * 100).toFixed(1)) : 0,
-      }));
-    }
-    return periodDatasets[selectedPeriod] || periodDatasets["This Quarter"];
-  }, [data, selectedPeriod]);
-
-  const items = rawItems;
   const totalExpense = items.reduce((acc, curr) => acc + curr.amount, 0);
 
   const formatShortAmount = (val: number) => {
@@ -119,7 +81,13 @@ export const ExpenseDistributionChart: React.FC<ExpenseDistributionChartProps> =
       </div>
 
       {/* Main Content: Donut + Detailed Legend */}
-      <div className="my-auto py-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {items.length === 0 ? (
+        <div className="my-auto py-12 flex flex-col items-center justify-center text-center text-slate-400 text-xs">
+          <p className="font-semibold text-slate-600">No Expense Categories Recorded</p>
+          <p className="text-[11px] text-slate-400 mt-1">Direct Cost of Goods Sold and operating expenses will display here automatically.</p>
+        </div>
+      ) : (
+        <div className="my-auto py-2 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Donut Chart with Center Total */}
         <div className="relative h-[175px] w-[175px] shrink-0">
           <ResponsiveContainer width="100%" height="100%">
@@ -200,6 +168,7 @@ export const ExpenseDistributionChart: React.FC<ExpenseDistributionChartProps> =
           })}
         </div>
       </div>
+      )}
     </div>
   );
 };

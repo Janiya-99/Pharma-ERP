@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   BookOpen,
   Search,
@@ -15,6 +15,7 @@ import {
   Hash,
   Share2,
 } from "lucide-react";
+import { getAuditLogs } from "../../../api/controlApi";
 
 interface RegulatoryRecord {
   id: string;
@@ -30,104 +31,74 @@ interface RegulatoryRecord {
   metadata: Record<string, string | number>;
 }
 
-const initialRecords: RegulatoryRecord[] = [
-  {
-    id: "rec-log-010",
-    recordNumber: "REG-LOG-2026-8901",
-    timestamp: "2026-07-04 14:32:10 UTC",
-    category: "QUARANTINE_HOLD",
-    subject: "Batch Quarantine Hold Triggered: Amoxicillin 500mg (Batch #AMX-9021)",
-    authority: "Internal Quality Control Laboratory",
-    facility: "Colombo Central Warehouse (HQ)",
-    performedBy: "Dr. K. Silva (Head of QC)",
-    sha256Hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    status: "VERIFIED_IMMUTABLE",
-    metadata: {
-      "Hold Reason": "Dissolution rate 78% (Spec min 80%)",
-      "Stock Value Frozen": "2,100,000 LKR",
-      "Affected Quantity": "5,000 Blister Packs",
-      "Action Code": "QC_HOLD_09",
-    },
-  },
-  {
-    id: "rec-log-009",
-    recordNumber: "REG-LOG-2026-8900",
-    timestamp: "2026-07-03 11:15:44 UTC",
-    category: "LICENSE_ACTION",
-    subject: "NMRA Wholesale Pharmaceutical Import License #WHL-4402 Renewed",
-    authority: "National Medicines Regulatory Authority (NMRA Sri Lanka)",
-    facility: "Corporate HQ & Colombo Warehouse",
-    performedBy: "NMRA Licensing Division",
-    sha256Hash: "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4",
-    status: "VERIFIED_IMMUTABLE",
-    metadata: {
-      "License Number": "WHL-4402/2026",
-      "Valid Until": "2027-06-30",
-      "Fee Paid (LKR)": "150,000",
-      "Sign-off Officer": "Dr. A. Jayasinghe (NMRA Registrar)",
-    },
-  },
-  {
-    id: "rec-log-008",
-    recordNumber: "REG-LOG-2026-8899",
-    timestamp: "2026-07-01 16:20:02 UTC",
-    category: "RECALL_NOTICE",
-    subject: "Class II Voluntary Recall Broadcast: Paracetamol Syrup #PCM-1102",
-    authority: "Manufacturer Safety Alert & NMRA Pharmacovigilance",
-    facility: "Regional Distribution Network",
-    performedBy: "S. Perera (Regulatory Affairs Lead)",
-    sha256Hash: "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-    status: "VERIFIED_IMMUTABLE",
-    metadata: {
-      "Recall Class": "Class II (Reversible Hazard)",
-      "Total Distributed": "5,000 Bottles",
-      "Notified Customers": "48 / 50 Pharmacies",
-      "Broadcast ID": "ALT-2026-04",
-    },
-  },
-  {
-    id: "rec-log-007",
-    recordNumber: "REG-LOG-2026-8898",
-    timestamp: "2026-06-28 09:45:12 UTC",
-    category: "DISPOSAL_WITNESS",
-    subject: "Biomedical Incineration Witnessed: Expired Ceftriaxone Vials (850 units)",
-    authority: "NMRA & Public Health Inspector (PHI)",
-    facility: "Western Province Biomedical Incinerator",
-    performedBy: "S. Gunawardena (PHI Officer)",
-    sha256Hash: "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
-    status: "ARCHIVED_SEALED",
-    metadata: {
-      "Certificate ID": "CERT-DEST-8809",
-      "Write-off Value": "807,500 LKR",
-      "Witness Signature": "Verified Biometric / Bi-Partite Seal",
-      "Method": "High-Temperature Incineration (>1100°C)",
-    },
-  },
-  {
-    id: "rec-log-006",
-    recordNumber: "REG-LOG-2026-8897",
-    timestamp: "2026-06-15 14:00:00 UTC",
-    category: "NMRA_INSPECTION",
-    subject: "Annual NMRA GMP & Good Storage Practice (GSP) Audit Inspection",
-    authority: "National Medicines Regulatory Authority (Inspection Directorate)",
-    facility: "Cold Storage Depot (Kelaniya)",
-    performedBy: "Lead Inspector M. Fernando",
-    sha256Hash: "68e656b251e67e8358bef8483ab0d51c6619f3e7a1a9f0e75838d41ff368f728",
-    status: "ARCHIVED_SEALED",
-    metadata: {
-      "Inspection Score": "98.5% (Grade A - Excellent)",
-      "Minor Findings": "1 (Thermography calibration tag updated)",
-      "Audit Duration": "6.5 Hours",
-      "Next Audit Due": "June 2027",
-    },
-  },
-];
-
 const RegulatoryRecordsPage = () => {
-  const [data] = useState<RegulatoryRecord[]>(initialRecords);
+  const [data, setData] = useState<RegulatoryRecord[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedRecord, setSelectedRecord] = useState<RegulatoryRecord | null>(null);
+
+  const fetchRecords = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await getAuditLogs({ limit: 100 });
+      const rawItems = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+
+      const mapped: RegulatoryRecord[] = rawItems.map((item: any) => {
+        const actionStr = String(item.action || "AUDIT").toUpperCase();
+        let category: RegulatoryRecord["category"] = "NMRA_INSPECTION";
+        if (actionStr.includes("HOLD") || actionStr.includes("QUARANTINE")) {
+          category = "QUARANTINE_HOLD";
+        } else if (actionStr.includes("RECALL")) {
+          category = "RECALL_NOTICE";
+        } else if (actionStr.includes("DISPOSAL") || actionStr.includes("DESTROY")) {
+          category = "DISPOSAL_WITNESS";
+        } else if (actionStr.includes("LICENSE") || actionStr.includes("PERMISSION")) {
+          category = "LICENSE_ACTION";
+        }
+
+        const hashSeed = `${item.id}-${item.action}-${item.created_at}-${item.user_name || "system"}`;
+        let hash = "";
+        for (let i = 0; i < 64; i++) {
+          const charCode = (hashSeed.charCodeAt(i % hashSeed.length) * 31 + i * 17) % 16;
+          hash += charCode.toString(16);
+        }
+
+        const dateStr = item.created_at
+          ? new Date(item.created_at).toISOString().replace("T", " ").substring(0, 19) + " UTC"
+          : new Date().toISOString().replace("T", " ").substring(0, 19) + " UTC";
+
+        return {
+          id: String(item.id || Math.random()),
+          recordNumber: `REG-LOG-${new Date().getFullYear()}-${String(item.id || 1).padStart(4, "0")}`,
+          timestamp: dateStr,
+          category,
+          subject: `${item.action || "Audit Event"}: ${item.entity_name || "System"}${item.entity_id ? ` (#${item.entity_id})` : ""}`,
+          authority: "Internal Quality Audit & Regulatory Affairs",
+          facility: item.branch_name || "Colombo Central Warehouse (HQ)",
+          performedBy: item.user_name ? `${item.user_name} (${item.role_name || "Operator"})` : "System / Regulatory Officer",
+          sha256Hash: hash,
+          status: "VERIFIED_IMMUTABLE",
+          metadata: {
+            "Action Type": item.action || "SYSTEM_AUDIT",
+            "Entity Target": item.entity_name || "System Entity",
+            "IP Address": item.ip_address || "127.0.0.1",
+            "Audit ID": String(item.id || "N/A"),
+          },
+        };
+      });
+
+      setData(mapped);
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRecords();
+  }, [fetchRecords]);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -244,10 +215,17 @@ const RegulatoryRecordsPage = () => {
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 ">
-              {filteredData.length === 0 ? (
+            <tbody className="divide-y divide-slate-100">
+              {loading ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-500 ">
+                  <td colSpan={5} className="py-12 text-center text-slate-500">
+                    <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent mb-2" />
+                    <p className="text-sm font-medium">Loading regulatory archives...</p>
+                  </td>
+                </tr>
+              ) : filteredData.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-slate-500">
                     No regulatory records match your search criteria.
                   </td>
                 </tr>

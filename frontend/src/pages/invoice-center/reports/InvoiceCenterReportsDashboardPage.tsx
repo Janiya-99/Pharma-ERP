@@ -117,6 +117,9 @@ export const InvoiceCenterReportsDashboardPage: React.FC = () => {
         <ReportExportActions 
           data={data} 
           filename={`invoice-center-dashboard-${new Date().toISOString().split('T')[0]}`} 
+          title="Invoice Center Reports Dashboard"
+          subtitle={`Generated on ${new Date().toLocaleDateString()}`}
+          summaryCards={[...customerCards, ...salesOrderCards, ...invoiceCards, ...collectionCards]}
           disabled={isLoading || !data}
         />
       }

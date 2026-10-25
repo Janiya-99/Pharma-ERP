@@ -186,7 +186,17 @@ func (h *DashboardHandler) Summary(c *gin.Context) {
 
 		stockVal := totalStockValue
 		if i > 0 {
-			stockVal = totalStockValue * (1.0 - float64(i)*0.03)
+			var postInbound, postOutbound float64
+			db.Table("goods_receipt_notes").
+				Where("company_id = ? AND grn_date > ? AND approval_status != 'cancelled'", companyID, endOfMonth).
+				Select("COALESCE(SUM(total_amount), 0)").Scan(&postInbound)
+			db.Table("sales_invoices").
+				Where("company_id = ? AND invoice_date > ? AND approval_status != 'cancelled'", companyID, endOfMonth).
+				Select("COALESCE(SUM(total_amount), 0)").Scan(&postOutbound)
+			stockVal = totalStockValue - postInbound + postOutbound
+			if stockVal < 0 {
+				stockVal = 0
+			}
 		}
 
 		stockTrends = append(stockTrends, StockTrendItem{

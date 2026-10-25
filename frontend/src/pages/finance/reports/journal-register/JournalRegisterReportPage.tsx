@@ -9,6 +9,7 @@ import ReportPageHeader from '../../../../components/finance/reports/ReportPageH
 import ReportFilterCard from '../../../../components/finance/reports/ReportFilterCard';
 import ReportAmountCell from '../../../../components/finance/reports/ReportAmountCell';
 import ReportToolbar from '../../../../components/finance/reports/ReportToolbar';
+import { exportToPdf } from '../../../../utils/reportExportUtils';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
@@ -123,6 +124,65 @@ const JournalRegisterReportPage = () => {
     a.download = `journal-register-${new Date().getTime()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportCsv = () => {
+    const list = (Array.isArray(data) ? data : data?.lines) || [];
+    if (!list.length) return;
+    const headers = ['Journal No', 'Date', 'Ref No', 'Description', 'Total Debit', 'Total Credit', 'Approval Status', 'Posted Status', 'Created By'];
+    const rows = list.map((r: any) => [
+      `"${r.journal_number || ''}"`,
+      `"${r.journal_date ? format(new Date(r.journal_date), 'yyyy-MM-dd') : ''}"`,
+      `"${r.reference_number || ''}"`,
+      `"${(r.description || '').replace(/"/g, '""')}"`,
+      (r.total_debit ?? 0),
+      (r.total_credit ?? 0),
+      `"${r.approval_status || ''}"`,
+      `"${r.posted_status || ''}"`,
+      `"${r.created_by_name || ''}"`
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `journal-register-${new Date().getTime()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = () => {
+    const list = (Array.isArray(data) ? data : data?.lines) || [];
+    if (!list.length) return;
+    const formatCurrency = (val: number) => (val || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const headers = ['Journal No', 'Date', 'Ref No', 'Description', 'Total Debit', 'Total Credit', 'Approval', 'Posted'];
+    const rows = list.map((r: any) => [
+      r.journal_number || '',
+      r.journal_date ? format(new Date(r.journal_date), 'yyyy-MM-dd') : '',
+      r.reference_number || '',
+      r.description || '',
+      formatCurrency(r.total_debit),
+      formatCurrency(r.total_credit),
+      r.approval_status || '',
+      r.posted_status || ''
+    ]);
+
+    const totalDebit = list.reduce((sum: number, r: any) => sum + (Number(r.total_debit) || 0), 0);
+    const totalCredit = list.reduce((sum: number, r: any) => sum + (Number(r.total_credit) || 0), 0);
+
+    exportToPdf({
+      title: 'Journal Register Report',
+      filename: `journal-register-${new Date().getTime()}`,
+      subtitle: `Branch: ${activeBranch?.name || 'All'} | Records: ${list.length}`,
+      headers,
+      rows,
+      alignments: ['left', 'center', 'left', 'left', 'right', 'right', 'center', 'center'],
+      summary: [
+        { title: 'Total Entries', value: String(list.length) },
+        { title: 'Total Debit', value: formatCurrency(totalDebit) },
+        { title: 'Total Credit', value: formatCurrency(totalCredit) },
+      ],
+    });
   };
 
   if (
@@ -309,7 +369,14 @@ const JournalRegisterReportPage = () => {
 
       {data && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} isRefreshing={loading} />
+          <ReportToolbar 
+            onRefresh={fetchReport} 
+            onExportJson={handleExportJson} 
+            onExportCsv={handleExportCsv}
+            onExportPdf={handleExportPdf}
+            onPrint={() => window.print()}
+            isRefreshing={loading} 
+          />
 
           <div className="bg-white  rounded-lg shadow border border-gray-200  overflow-hidden">
             <DataTable

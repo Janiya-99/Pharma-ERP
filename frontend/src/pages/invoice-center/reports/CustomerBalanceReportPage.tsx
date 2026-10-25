@@ -358,6 +358,38 @@ export const CustomerBalanceReportPage: React.FC = () => {
     { header: "Account Status", accessorKey: "status" },
   ];
 
+  const handleFetchAllForExport = async () => {
+    const res = await invoiceCenterApi.getCustomerBalances({
+      ...filters,
+      page: 1,
+      limit: 10000,
+    });
+    const allRows = Array.isArray(res.data?.data?.rows) ? res.data.data.rows : [];
+    return allRows.filter((c: any) => {
+      if (
+        creditRiskFilter === "over_limit" &&
+        (c.current_balance || 0) <= (c.credit_limit || 0)
+      ) {
+        return false;
+      }
+      if (creditRiskFilter === "near_limit") {
+        const ratio =
+          c.credit_limit > 0 ? (c.current_balance || 0) / c.credit_limit : 0;
+        if (ratio < 0.8 || ratio >= 1.0) return false;
+      }
+      if (creditRiskFilter === "safe") {
+        const ratio =
+          c.credit_limit > 0 ? (c.current_balance || 0) / c.credit_limit : 0;
+        if (ratio >= 0.8) return false;
+      }
+      const minBal = Number(minBalanceFilter) || 0;
+      if (minBal > 0 && (c.current_balance || 0) < minBal) {
+        return false;
+      }
+      return true;
+    });
+  };
+
   if (!hasPermission) {
     return (
       <div className="p-8">
@@ -380,12 +412,20 @@ export const CustomerBalanceReportPage: React.FC = () => {
       }
       actions={
         <ReportExportActions
+          title="Customer Balances Report"
           data={filteredData}
           columns={exportColumns}
           filename={`customer-balances-${
             new Date().toISOString().split("T")[0]
           }`}
           disabled={isLoading || (filteredData.length === 0 && !summary)}
+          onFetchAll={handleFetchAllForExport}
+          summaryCards={[
+            { title: "Total Customers", value: summary?.total_customers || 0 },
+            { title: "Total Outstanding", value: formatMoney(summary?.total_outstanding || 0) },
+            { title: "Total Credit Limit", value: formatMoney(summary?.total_credit_limit || 0) },
+            { title: "Over Limit", value: summary?.customers_over_credit_limit || 0 },
+          ]}
         />
       }
       filters={

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   FileText,
   Search,
@@ -16,11 +16,15 @@ import {
   Eye,
   Lock,
   Unlock,
+  Archive,
+  Clock,
 } from "lucide-react";
+import { getAuditLogs } from "../../../api/controlApi";
 
 interface AuditEvent {
   id: string;
   timestamp: string;
+  rawDate: Date | null;
   user: string;
   email: string;
   role: string;
@@ -31,103 +35,185 @@ interface AuditEvent {
   location: string;
   status: "SUCCESS" | "DENIED" | "FLAGGED";
   details: string;
+  isHistorical?: boolean;
 }
 
-const mockEvents: AuditEvent[] = [
-  {
-    id: "AUD-8801",
-    timestamp: "2026-07-04 16:15:22",
-    user: "Kasun Silva",
-    email: "kasun.s@omacx.lk",
-    role: "Senior Accountant",
-    action: "PERMISSION_CHECK",
-    module: "Finance & Ledger",
-    target: "FIN_PAYMENT_OVERRIDE (Payment Voucher #PV-2026-0188)",
-    ipAddress: "192.168.1.104",
-    location: "Colombo HQ",
-    status: "SUCCESS",
-    details: "Authorized via branch override grant by CFO.",
-  },
-  {
-    id: "AUD-8802",
-    timestamp: "2026-07-04 15:42:10",
-    user: "Dinesh Kumar",
-    email: "dinesh.k@omacx.lk",
-    role: "Billing Supervisor",
-    action: "PERMISSION_CHECK",
-    module: "Invoice Center",
-    target: "INVOICE_CREDIT_OVERRIDE (Customer #CUST-0095)",
-    ipAddress: "192.168.2.45",
-    location: "Regional Depot NY",
-    status: "DENIED",
-    details: "Attempted to bill customer exceeding 100% credit limit without override grant.",
-  },
-  {
-    id: "AUD-8803",
-    timestamp: "2026-07-04 14:18:05",
-    user: "Dr. Amara Dias",
-    email: "amara.d@omacx.lk",
-    role: "Chief Pharmacist",
-    action: "ROLE_ASSIGNMENT",
-    module: "Control Center",
-    target: "Assigned 'Quarantine Inspector' role to Nimali Perera",
-    ipAddress: "10.0.0.12",
-    location: "Colombo HQ",
-    status: "SUCCESS",
-    details: "Role assignment approved by Compliance Committee.",
-  },
-  {
-    id: "AUD-8804",
-    timestamp: "2026-07-04 11:30:44",
-    user: "Unknown IP / System",
-    email: "external.bot@unknown.net",
-    role: "Unauthenticated",
-    action: "LOGIN_ATTEMPT",
-    module: "Auth Gateway",
-    target: "Admin Portal Login Attempt",
-    ipAddress: "45.133.1.89",
-    location: "External / VPN",
-    status: "FLAGGED",
-    details: "Multiple failed login attempts detected. IP blocked for 30 minutes.",
-  },
-  {
-    id: "AUD-8805",
-    timestamp: "2026-07-04 09:12:18",
-    user: "Nimali Perera",
-    email: "nimali.p@omacx.lk",
-    role: "Inventory Manager",
-    action: "SECURITY_POLICY_CHANGE",
-    module: "Inventory",
-    target: "Modified Reorder Thresholds for Amoxicillin 500mg",
-    ipAddress: "192.168.1.115",
-    location: "Central Warehouse",
-    status: "SUCCESS",
-    details: "Threshold updated from 1,000 to 2,500 units.",
-  },
-];
-
 const AccessAuditPage = () => {
+  const [events, setEvents] = useState<AuditEvent[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedAction, setSelectedAction] = useState<string>("ALL");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>("24H");
+  const [customDateFrom, setCustomDateFrom] = useState<string>("");
+  const [customDateTo, setCustomDateTo] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState<AuditEvent | null>(null);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  const filteredEvents = mockEvents.filter((item) => {
-    const matchesAction = selectedAction === "ALL" || item.action === selectedAction;
-    const matchesStatus = selectedStatus === "ALL" || item.status === selectedStatus;
-    const matchesSearch =
-      item.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.target.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.module.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.id.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesAction && matchesStatus && matchesSearch;
-  });
+  const getTimeframeParams = (timeframe: string, customFrom?: string, customTo?: string) => {
+    const today = new Date();
+    const toISODate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    if (timeframe === "24H") {
+      const start = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+      return { date_from: toISODate(start), date_to: toISODate(today) };
+    }
+    if (timeframe === "7D") {
+      const start = new Date(today);
+      start.setDate(today.getDate() - 7);
+      return { date_from: toISODate(start), date_to: toISODate(today) };
+    }
+    if (timeframe === "30D") {
+      const start = new Date(today);
+      start.setDate(today.getDate() - 30);
+      return { date_from: toISODate(start), date_to: toISODate(today) };
+    }
+    if (timeframe === "CUSTOM") {
+      return {
+        date_from: customFrom || "",
+        date_to: customTo || "",
+      };
+    }
+    // "ALL" or historical
+    return {};
+  };
+
+  const fetchLogs = useCallback(async (
+    timeframe = selectedTimeframe,
+    customFrom = customDateFrom,
+    customTo = customDateTo
+  ) => {
+    try {
+      const dateParams = getTimeframeParams(timeframe, customFrom, customTo);
+      const queryParams: Record<string, unknown> = { limit: 100 };
+      if (dateParams.date_from) queryParams.date_from = dateParams.date_from;
+      if (dateParams.date_to) queryParams.date_to = dateParams.date_to;
+
+      const res = await getAuditLogs(queryParams);
+      const rawItems = res?.data?.items || res?.data || (Array.isArray(res) ? res : []);
+      const total = res?.data?.pagination?.total || rawItems.length || 0;
+      setTotalCount(total);
+
+      const nowTime = new Date().getTime();
+      const mapped: AuditEvent[] = rawItems.map((item: any) => {
+        const actionStr = String(item.action || "ACCESS").toUpperCase();
+        let status: "SUCCESS" | "DENIED" | "FLAGGED" = "SUCCESS";
+        if (actionStr.includes("DENIED") || actionStr.includes("BLOCKED") || actionStr.includes("FAIL")) {
+          status = "DENIED";
+        } else if (actionStr.includes("FLAGGED") || actionStr.includes("ANOMALY") || actionStr.includes("SUSPICIOUS")) {
+          status = "FLAGGED";
+        }
+
+        const rawDate = item.created_at ? new Date(item.created_at) : null;
+        const isValidDate = rawDate && !isNaN(rawDate.getTime());
+        const dateStr = isValidDate
+          ? rawDate.toLocaleString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: true,
+            })
+          : "Recently";
+
+        // Mark as historical if older than 30 days from current date
+        const isHistorical = isValidDate && nowTime - rawDate.getTime() > 30 * 24 * 60 * 60 * 1000;
+
+        return {
+          id: item.id ? `AUD-${item.id}` : `AUD-${Math.floor(1000 + Math.random() * 9000)}`,
+          timestamp: dateStr,
+          rawDate: isValidDate ? rawDate : null,
+          user: item.user_name || "System User",
+          email: item.email || item.user_email || "system@ceylonmed.lk",
+          role: item.role_name || "Authorized Operator",
+          action: item.action || "PERMISSION_CHECK",
+          module: item.software_name || item.software_code || "Control Center",
+          target: item.entity_name ? `${item.entity_name} ${item.entity_id ? `(#${item.entity_id})` : ""}` : "System Operation",
+          ipAddress: item.ip_address || "127.0.0.1",
+          location: item.branch_name || "HQ / System",
+          status,
+          details: item.new_values || item.old_values || item.description || "Activity logged securely via audit trail.",
+          isHistorical,
+        };
+      });
+
+      // Strict chronological ordering descending (newest first)
+      mapped.sort((a, b) => (b.rawDate?.getTime() || 0) - (a.rawDate?.getTime() || 0));
+
+      setEvents(mapped);
+    } catch {
+      setEvents([]);
+      setTotalCount(0);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  }, [selectedTimeframe, customDateFrom, customDateTo]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
+
+  const filteredEvents = useMemo(() => {
+    const nowTime = new Date().getTime();
+
+    return events
+      .filter((item) => {
+        const matchesAction = selectedAction === "ALL" || item.action === selectedAction;
+        const matchesStatus = selectedStatus === "ALL" || item.status === selectedStatus;
+        const matchesSearch =
+          item.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.target.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.module.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.id.toLowerCase().includes(searchQuery.toLowerCase());
+
+        if (!matchesAction || !matchesStatus || !matchesSearch) return false;
+
+        // Apply strict client-side timeframe filtering to guarantee older events (e.g. July 4, 2026) never leak into "24H"
+        if (item.rawDate) {
+          const eventTime = item.rawDate.getTime();
+          if (selectedTimeframe === "24H") {
+            const cutoff24h = nowTime - 24 * 60 * 60 * 1000;
+            if (eventTime < cutoff24h) return false;
+          } else if (selectedTimeframe === "7D") {
+            const cutoff7d = nowTime - 7 * 24 * 60 * 60 * 1000;
+            if (eventTime < cutoff7d) return false;
+          } else if (selectedTimeframe === "30D") {
+            const cutoff30d = nowTime - 30 * 24 * 60 * 60 * 1000;
+            if (eventTime < cutoff30d) return false;
+          } else if (selectedTimeframe === "CUSTOM") {
+            if (customDateFrom) {
+              const fromTime = new Date(customDateFrom).setHours(0, 0, 0, 0);
+              if (eventTime < fromTime) return false;
+            }
+            if (customDateTo) {
+              const toTime = new Date(customDateTo).setHours(23, 59, 59, 999);
+              if (eventTime > toTime) return false;
+            }
+          }
+        }
+
+        return true;
+      })
+      .sort((a, b) => (b.rawDate?.getTime() || 0) - (a.rawDate?.getTime() || 0));
+  }, [events, selectedAction, selectedStatus, searchQuery, selectedTimeframe, customDateFrom, customDateTo]);
+
+  const successCount = filteredEvents.filter((e) => e.status === "SUCCESS").length;
+  const deniedCount = filteredEvents.filter((e) => e.status === "DENIED").length;
+  const flaggedCount = filteredEvents.filter((e) => e.status === "FLAGGED").length;
+  const passRate = filteredEvents.length > 0 ? ((successCount / filteredEvents.length) * 100).toFixed(1) : "0.0";
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 700);
+    fetchLogs();
   };
 
   return (
@@ -181,8 +267,10 @@ const AccessAuditPage = () => {
               <FileText className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">14,280</p>
-          <p className="mt-1 text-xs text-slate-400 font-medium">+340 events today</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">
+            {loading ? "..." : totalCount.toLocaleString()}
+          </p>
+          <p className="mt-1 text-xs text-slate-400 font-medium">Logged security telemetry</p>
         </div>
 
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
@@ -194,8 +282,10 @@ const AccessAuditPage = () => {
               <CheckCircle2 className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">98.4%</p>
-          <p className="mt-1 text-xs text-emerald-600  font-medium">14,050 successful verifications</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">
+            {loading ? "..." : events.length > 0 ? `${passRate}%` : "100%"}
+          </p>
+          <p className="mt-1 text-xs text-emerald-600  font-medium">{successCount} successful verifications</p>
         </div>
 
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
@@ -207,8 +297,12 @@ const AccessAuditPage = () => {
               <XCircle className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">194</p>
-          <p className="mt-1 text-xs text-rose-600  font-medium">1.4% unauthorized attempts</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 ">
+            {loading ? "..." : deniedCount}
+          </p>
+          <p className="mt-1 text-xs text-rose-600  font-medium">
+            {deniedCount > 0 ? `${((deniedCount / (events.length || 1)) * 100).toFixed(1)}% unauthorized attempts` : "Zero unauthorized attempts"}
+          </p>
         </div>
 
         <div className="rounded-xl border border-slate-200  bg-white  p-5 shadow-sm">
@@ -220,8 +314,12 @@ const AccessAuditPage = () => {
               <ShieldAlert className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-amber-600 ">36</p>
-          <p className="mt-1 text-xs text-amber-600  font-medium">Flagged IP anomalies / brute force</p>
+          <p className="mt-2 text-3xl font-extrabold text-amber-600 ">
+            {loading ? "..." : flaggedCount}
+          </p>
+          <p className="mt-1 text-xs text-amber-600  font-medium">
+            {flaggedCount > 0 ? "Flagged anomalies detected" : "Zero security anomalies"}
+          </p>
         </div>
       </div>
 
@@ -264,15 +362,50 @@ const AccessAuditPage = () => {
             <option value="FLAGGED">Flagged / Anomaly</option>
           </select>
 
-          <select
-            value={selectedTimeframe}
-            onChange={(e) => setSelectedTimeframe(e.target.value)}
-            className="h-10 rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-          >
-            <option value="24H">Last 24 Hours</option>
-            <option value="7D">Last 7 Days</option>
-            <option value="30D">Last 30 Days</option>
-          </select>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={selectedTimeframe}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSelectedTimeframe(val);
+                if (val !== "CUSTOM") {
+                  fetchLogs(val);
+                }
+              }}
+              className="h-10 rounded-xl border border-slate-200  bg-white  px-3 text-xs font-semibold text-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value="24H">Last 24 Hours (Current)</option>
+              <option value="7D">Last 7 Days</option>
+              <option value="30D">Last 30 Days</option>
+              <option value="ALL">All Time (Historical Archive)</option>
+              <option value="CUSTOM">Custom Date Range...</option>
+            </select>
+
+            {selectedTimeframe === "CUSTOM" && (
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="date"
+                  value={customDateFrom}
+                  onChange={(e) => setCustomDateFrom(e.target.value)}
+                  className="h-10 rounded-xl border border-slate-200 bg-white px-2.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+                <span className="text-xs text-slate-400">to</span>
+                <input
+                  type="date"
+                  value={customDateTo}
+                  onChange={(e) => setCustomDateTo(e.target.value)}
+                  className="h-10 rounded-xl border border-slate-200 bg-white px-2.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+                <button
+                  onClick={() => fetchLogs("CUSTOM", customDateFrom, customDateTo)}
+                  disabled={!customDateFrom || !customDateTo}
+                  className="h-10 px-3 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -295,15 +428,42 @@ const AccessAuditPage = () => {
               {filteredEvents.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500 ">
-                    No audit logs matching the selected filters and search query.
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Clock className="h-8 w-8 text-slate-300 mb-1" />
+                      <p className="font-semibold text-sm text-slate-800">
+                        No audit events found for {selectedTimeframe === "24H" ? "the last 24 hours" : selectedTimeframe === "7D" ? "the last 7 days" : selectedTimeframe === "30D" ? "the last 30 days" : "the selected criteria"}.
+                      </p>
+                      <p className="text-xs text-slate-400 max-w-md">
+                        Prior and seeded activities (such as July 2026 events) are preserved in the historical archive.
+                      </p>
+                      {selectedTimeframe !== "ALL" && (
+                        <button
+                          onClick={() => {
+                            setSelectedTimeframe("ALL");
+                            fetchLogs("ALL");
+                          }}
+                          className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-50 px-3.5 py-2 text-xs font-bold text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors"
+                        >
+                          <Archive className="h-3.5 w-3.5" />
+                          View All Historical Logs Archive →
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ) : (
                 filteredEvents.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50  transition-colors">
                     <td className="px-5 py-4">
-                      <p className="font-mono font-bold text-xs text-indigo-600 ">{row.id}</p>
-                      <span className="text-[11px] text-slate-400 font-mono">{row.timestamp}</span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="font-mono font-bold text-xs text-indigo-600 ">{row.id}</p>
+                        {row.isHistorical && (
+                          <span className="inline-flex items-center rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
+                            Historical Log
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-slate-400 font-mono block mt-0.5">{row.timestamp}</span>
                     </td>
                     <td className="px-4 py-4">
                       <p className="font-semibold text-slate-800 ">{row.user}</p>
@@ -412,7 +572,7 @@ const AccessAuditPage = () => {
                 <div className="rounded-xl bg-slate-900 p-4 font-mono text-xs text-emerald-400">
                   <p>{`{`}</p>
                   <p className="pl-4">{`"status": "${selectedEvent.status}",`}</p>
-                  <p className="pl-4">{`"verification_engine": "OMACX_RBAC_V2",`}</p>
+                  <p className="pl-4">{`"verification_engine": "CEYLONMED_RBAC_V2",`}</p>
                   <p className="pl-4">{`"audit_reason": "${selectedEvent.details}",`}</p>
                   <p className="pl-4">{`"timestamp_utc": "${selectedEvent.timestamp}"`}</p>
                   <p>{`}`}</p>

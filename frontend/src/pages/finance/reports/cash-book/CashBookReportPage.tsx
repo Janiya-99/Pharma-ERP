@@ -16,6 +16,7 @@ import { Label } from '../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import { FinanceAiPromptBar } from '../../shared/FinanceAiPromptBar';
+import { exportToPdf } from '@/utils/reportExportUtils';
 
 const CashBookReportPage = () => {
   const { hasPermission, activeBranch } = useAuth();
@@ -159,6 +160,37 @@ const CashBookReportPage = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportPdf = () => {
+    if (!data) return;
+    const transactions = data.transactions || data.ledger_lines || [];
+    const headers = ['Date', 'Source Type', 'Source No', 'Ref No', 'Description', 'Receipts', 'Payments', 'Balance'];
+    const rows = transactions.map((t: any) => [
+      t.transaction_date ? format(new Date(t.transaction_date), 'yyyy-MM-dd') : '',
+      t.source_type || '',
+      t.source_number || '',
+      t.reference_number || '',
+      t.description || '',
+      Number(t.debit_amount ?? t.debit ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      Number(t.credit_amount ?? t.credit ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      Number(t.running_balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+    ]);
+
+    exportToPdf({
+      title: `Cash Book - ${data.account_code || data.account_details?.account_code || ''} ${data.account_name || data.account_details?.account_name || ''}`,
+      filename: `cash-book-${filters.account_id}-${new Date().getTime()}`,
+      subtitle: data.branch_name ? `Branch: ${data.branch_name}` : undefined,
+      headers,
+      rows,
+      alignments: ['left', 'center', 'left', 'left', 'left', 'right', 'right', 'right'],
+      summary: [
+        { title: 'Opening Balance', value: Number(data.opening_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+        { title: 'Total Receipts', value: Number(data.total_receipts || data.total_debit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+        { title: 'Total Payments', value: Number(data.total_payments || data.total_credit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+        { title: 'Closing Balance', value: Number(data.closing_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) },
+      ],
+    });
+  };
+
   const canView =
     hasPermission("finance.report.cash_book.view") ||
     hasPermission("finance.report.view") ||
@@ -279,7 +311,7 @@ const CashBookReportPage = () => {
             {data.branch_name && <p className="text-slate-500 text-xs mt-1">Branch: {data.branch_name}</p>}
           </div>
 
-          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} onExportCsv={handleExportCsv} isRefreshing={loading} />
+          <ReportToolbar onRefresh={fetchReport} onExportJson={handleExportJson} onExportCsv={handleExportCsv} onExportPdf={handleExportPdf} isRefreshing={loading} />
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <ReportSummaryCard title="Opening Balance" amount={data.opening_balance} />
