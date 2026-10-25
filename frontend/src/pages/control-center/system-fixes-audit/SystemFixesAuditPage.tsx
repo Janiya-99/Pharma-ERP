@@ -104,6 +104,14 @@ export const SystemFixesAuditPage: React.FC = () => {
       title: "IC-01 to IC-07 Invoice Center Audit Report",
       size: "8.9 KB",
       description: "Complete RCA and engineering resolutions for Customer Balance & Aging reports, Sales Invoice Register missing October records, statement date defaults, and dropdown trailing hyphens."
+    },
+    {
+      name: "CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+      path: "docs/balance-sheet-audit/CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+      publicUrl: "CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+      title: "Control Center & Universal Report Export Audit Report",
+      size: "10.2 KB",
+      description: "Comprehensive statutory audit resolving Admin quick-login identity (AUTH-01), General Settings company synchronization (CC-01), Dashboard Audit date ranges (CC-02), Access Audit 24h filtering (CC-03), and full dataset PDF/Excel exports."
     }
   ];
 

@@ -152,3 +152,49 @@
   * Total Liabilities + Equity: **`LKR 132,588,165.30`**
   * Discrepancy: **`0.00 (Zero Variance)`**
   * Balance Sheet Status: **`Balanced (Verified)`**
+
+---
+
+## 6. Control Center Governance & Authentication Modifications
+
+### 6.1 AUTH-01: Admin Quick-Login Alignment (`LoginPage.tsx`)
+* Aligned quick-login shortcut buttons with true enterprise user profiles:
+  * `Admin (Dr. Kalinga Silva)` (`admin@ceylonmed.lk`, Super Admin)
+  * `CFO (Ruwani)` (`cfo@ceylonmed.lk`, Chief Financial Officer)
+  * `Accountant (Chaminda)` (`accountant@ceylonmed.lk`, Senior Accountant)
+* Added descriptive title tooltips displaying role and organizational tier.
+
+### 6.2 CC-01: Company Profile & General Settings Synchronization (`GeneralSettingsPage.tsx`)
+* Removed hardcoded `OMACX` initial states and mock fallbacks (`corporate@omacx.lk`, `TIN-889021445-LK`).
+* Dynamically bound to active tenant context (`useAuth().company`) and `/control/company` (`Ceylon MedEx Pharmaceuticals (Pvt) Ltd`).
+* Linked setting save action to synchronize both key-value store (`publishSetting`) and company master table (`updateCompanyProfile` + `refreshContext()`).
+
+### 6.3 CC-02: Dashboard Audit Dynamic Date Filtering (`ControlCenterDashboardPage.tsx` & `dashboard_handler.go`)
+* Replaced static `Jul 1, 2024 - Jul 7, 2024` badge with dynamic range selector:
+  * Last 7 Days (Default, e.g. `Oct 19, 2026 - Oct 25, 2026`).
+  * Last 30 Days.
+  * This Month.
+  * All Time / Historical Data.
+  * Custom Date Range with Start/End pickers.
+* Updated backend `dashboard_handler.go` to scan `a.created_at` timestamp and accept query parameters `audit_date_from`, `audit_date_to`, and `audit_severity`.
+* Bound table rendering directly to `filteredEvents` and added an empty-state shortcut to historical logs.
+
+### 6.4 CC-03: Access Audit Temporal Filtering (`AccessAuditPage.tsx`)
+* Enforced strict timeframe cutoffs in `filteredEvents` (`24H`, `7D`, `30D`, `CUSTOM`) to eliminate older events (e.g. July 4, 2026) leaking into "Last 24 Hours".
+* Forwarded date boundaries (`date_from`, `date_to`) to `/control/audit-logs`.
+* Added "Historical Log" badge for events older than 30 days and added "All Time (Historical Archive)" option.
+* Enforced strict descending chronological sorting (`newest first`).
+* Normalized verification engine string from `"OMACX_RBAC_V2"` to `"CEYLONMED_RBAC_V2"`.
+
+---
+
+## 7. Universal Report Export Engine & Table Pagination
+
+### 7.1 Full Dataset Export Engine (`reportExportUtils.ts`)
+* Engineered unified export utility supporting complete multi-page PDF generation (`jspdf` + `jspdf-autotable`) and Excel spreadsheets (`xlsx`).
+* Standardized corporate layout: Header, Generation Timestamp, Filter Metadata, Table Grid, and Summary Totals.
+* Ensured full dataset exports (fetching complete unpaginated datasets) rather than truncating to the active paginated DOM view.
+
+### 7.2 Standardized Pagination Component (`TablePagination.tsx`)
+* Implemented reusable client-side pagination component with page size selector (`10`, `25`, `50`, `100`), page number indicators, and record counts.
+* Integrated across all 14 commercial and financial report data tables.

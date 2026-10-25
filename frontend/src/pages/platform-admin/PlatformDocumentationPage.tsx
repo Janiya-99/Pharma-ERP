@@ -366,6 +366,28 @@ const DOCUMENTS_CATALOG: DocItem[] = [
     icon: FileCheck,
     accentColor: "from-emerald-600 to-teal-600",
   },
+  {
+    id: "control-center-report-export-audit",
+    title: "CC & Export: Control Center Governance, Auth & Report Export Audit",
+    category: "Audit & Reports",
+    description:
+      "Statutory governance audit resolving Admin quick-login identity (AUTH-01), Company Profile vs General Settings synchronization (CC-01), Dashboard Audit dynamic date filtering (CC-02), Access Audit 24h temporal isolation (CC-03), and unpaginated PDF/Excel exports.",
+    pdfFilename: "CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+    mdFilename: "CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md",
+    sizeBytes: "10.2 KB",
+    pageCount: "5 Sections",
+    badge: "CC & EXPORT AUDIT SIGN-OFF",
+    featured: true,
+    highlights: [
+      "Admin (Dr. Kalinga Silva), CFO (Ruwani) & Accountant (Chaminda) login identity alignment",
+      "Company Profile (Ceylon MedEx) unified with General Settings and multi-tenant persistence",
+      "Dynamic Dashboard Audit date ranges (7D/30D/Month/Custom) and Access Audit 24h isolation",
+      "Universal full-dataset PDF and Excel report exports with reusable TablePagination",
+    ],
+    lastUpdated: "October 25, 2026",
+    icon: FileCheck,
+    accentColor: "from-blue-600 to-indigo-600",
+  },
 ];
 
 const CATEGORIES = [

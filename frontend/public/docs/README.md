@@ -17,7 +17,6 @@
 
 This folder contains the authoritative statutory audit documentation, root-cause analyses (RCA), mathematical proofs, and engineering changelogs for resolving financial reporting defects across the ERP system:
 
-```
 docs/balance-sheet-audit/
 ├── README.md                                # This index and executive orientation
 ├── BALANCE_SHEET_FIX_AUDIT_REPORT.md        # Balance Sheet statutory audit & engineering report
@@ -25,7 +24,8 @@ docs/balance-sheet-audit/
 ├── SYSTEM_CHANGELOG.md                      # Balance Sheet engineering changelog & test suites
 ├── INVOICE_CENTER_AUDIT_REPORT.md           # Invoice Center & receivables statutory audit (IC-01 to IC-07)
 ├── FIN_02_BANK_AND_CASH_BOOK_AUDIT_REPORT.md# FIN-02 Bank & Cash Book reconciliation audit
-└── FIN_03_AND_04_AUDIT_REPORT.md            # FIN-03 Dashboard KPIs & FIN-04 Tax Settings report
+├── FIN_03_AND_04_AUDIT_REPORT.md            # FIN-03 Dashboard KPIs & FIN-04 Tax Settings report
+└── CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md # Control Center (CC-01-03, AUTH-01) & Export audit
 ```
 
 ---
@@ -75,6 +75,20 @@ docs/balance-sheet-audit/
 | **5.7** | **Customer Selector Trailing Hyphen**. | Customer dropdown labels displayed trailing hyphen (`CUST_MAHARAGAMA_PHARM - `) when `company_name` was undefined. | Updated selector formatting to prioritize `c.customer_name || c.name` with clean `${c.customer_code} - ${c.customer_name}` output. | Clean customer selection across all report filter bars. |
 | **5.8** | **Automatic Report Reloading on Filter Change**. | Reports required manual button clicks, causing desynchronized report states when dropdowns changed. | Implemented debounced (300ms) automatic fetching across all 14 commercial and financial report pages. | Effortless, live data exploration upon changing branch, date, or customer filters. |
 
+### 6. Control Center Governance & Authentication (CC-01 to CC-03, AUTH-01)
+| # | Issue Identified | Root Cause | Engineering Resolution | Statutory Verification |
+|---|---|---|---|---|
+| **6.1** | **Admin quick-login identity mismatch (AUTH-01)**. | Shortcut labeled `Admin (Kavinda)` logged into `admin@ceylonmed.lk` which belongs to `Dr. Kalinga Silva`. | Aligned labels with seeded accounts: `Admin (Dr. Kalinga Silva)`, `CFO (Ruwani)`, `Accountant (Chaminda)`. | Operator identity verified across session tokens and display badges. |
+| **6.2** | **Company Profile displaying Ceylon MedEx while General Settings displayed OMACX (CC-01)**. | `GeneralSettingsPage` had hardcoded `OMACX` state variables instead of binding to `/control/company` and `useAuth()`. | Connected `useAuth().company` and `getCompanyProfile()` dynamically; save syncs `updateCompanyProfile` + `refreshContext()`. | Active company profile accurately unified across all Control Center pages. |
+| **6.3** | **Dashboard Audit Date Range fixed to July 1-7, 2024 above October 2026 events (CC-02)**. | Hardcoded static `Jul 1, 2024 - Jul 7, 2024` badge in table header; backend lacked date filtering. | Replaced with dynamic date range selector (7D, 30D, Month, All, Custom) bound to `filteredEvents` and backend query params. | Date badge and event table dynamically bound to exact identical filter window. |
+| **6.4** | **July 4, 2026 events appearing under Last 24 Hours in Access Audit (CC-03)**. | UI defaulted to `24H`, but `filteredEvents` ignored `selectedTimeframe` and API called without date parameters. | Enforced strict client-side cutoff, passed date bounds to `/control/audit-logs`, added historical badge & archive view. | Recent 24h view strictly contains current events; historical archive isolated. |
+
+### 7. Universal Report Export Engine & Table Pagination
+| # | Issue Identified | Root Cause | Engineering Resolution | Statutory Verification |
+|---|---|---|---|---|
+| **7.1** | **Report Exports truncating to current page size instead of full dataset**. | Previous exports only captured the current DOM table page (10 or 25 rows) rather than the entire filtered dataset. | Created `reportExportUtils.ts` fetching complete unpaginated dataset for both PDF (`jspdf`) and Excel (`xlsx`). | Full, complete datasets exported with corporate formatting and audit totals. |
+| **7.2** | **Standardized Reusable Table Pagination**. | Reports lacked uniform pagination controls across modules. | Created `TablePagination.tsx` with page size selection (`10`, `25`, `50`, `100`) and integrated across all reports. | Uniform, responsive pagination across all commercial and financial reporting screens. |
+
 ---
 
 ## Detailed Documents in this Folder
@@ -89,7 +103,9 @@ docs/balance-sheet-audit/
    Full statutory audit for Bank Book and Cash Book reconciliation, column dash fixes, sign conventions, and chronological running-balance calculations.
 5. **[FIN_03_AND_04_AUDIT_REPORT.md](./FIN_03_AND_04_AUDIT_REPORT.md)**  
    Statutory audit report for Finance Dashboard KPIs, metric lineage, and tax percentage formatting.
-6. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
+6. **[CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md](./CONTROL_CENTER_AND_REPORT_EXPORT_AUDIT_REPORT.md)**  
+   Statutory audit for Control Center Governance (CC-01 to CC-03), Authentication identity (AUTH-01), and full dataset PDF/Excel exports.
+7. **[SYSTEM_CHANGELOG.md](./SYSTEM_CHANGELOG.md)**  
    Engineering changelog detailing all modified files, schema queries, and automated unit test suites.
 
 ---
