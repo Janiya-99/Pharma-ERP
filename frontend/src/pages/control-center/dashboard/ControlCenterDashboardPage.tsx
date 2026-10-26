@@ -8,6 +8,7 @@ import {
   Users,
   Layers,
   AlertTriangle,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
   Calendar,
@@ -247,6 +248,8 @@ const ControlCenterDashboardPage: React.FC = () => {
   const [auditSeverityFilter, setAuditSeverityFilter] = useState<string>("ALL");
   const [showDateRangePicker, setShowDateRangePicker] = useState<boolean>(false);
   const [showSecurityFilterMenu, setShowSecurityFilterMenu] = useState<boolean>(false);
+  const [auditPage, setAuditPage] = useState<number>(1);
+  const [auditPageSize, setAuditPageSize] = useState<number>(6);
 
   const getAuditFilterDates = (range: AuditRangeType, customStart?: string, customEnd?: string) => {
     const today = new Date();
@@ -374,6 +377,13 @@ const ControlCenterDashboardPage: React.FC = () => {
     }
     return true;
   });
+
+  const totalAuditPages = Math.max(1, Math.ceil(filteredEvents.length / auditPageSize));
+  const safeAuditPage = Math.min(auditPage, totalAuditPages);
+  const paginatedEvents = filteredEvents.slice(
+    (safeAuditPage - 1) * auditPageSize,
+    safeAuditPage * auditPageSize
+  );
 
   return (
     <div className="w-full space-y-6 pb-12 font-sans text-slate-800 antialiased">
@@ -791,6 +801,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                           key={sev}
                           onClick={() => {
                             setAuditSeverityFilter(sev);
+                            setAuditPage(1);
                             setShowSecurityFilterMenu(false);
                             fetchSummary(auditDateRange, sev);
                           }}
@@ -836,6 +847,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                             onClick={() => {
                               const range = opt.id as AuditRangeType;
                               setAuditDateRange(range);
+                              setAuditPage(1);
                               if (range !== "CUSTOM") {
                                 setShowDateRangePicker(false);
                                 fetchSummary(range, auditSeverityFilter);
@@ -884,6 +896,7 @@ const ControlCenterDashboardPage: React.FC = () => {
                               disabled={!customAuditStart || !customAuditEnd}
                               onClick={() => {
                                 setShowDateRangePicker(false);
+                                setAuditPage(1);
                                 fetchSummary("CUSTOM", auditSeverityFilter, customAuditStart, customAuditEnd);
                               }}
                               className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 disabled:opacity-50"
@@ -899,23 +912,23 @@ const ControlCenterDashboardPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Clean Data Table */}
-            <div className="overflow-x-auto mt-2">
-              <table className="w-full text-left text-xs">
+            {/* Clean Data Table with Min Width and Proper Cell Padding */}
+            <div className="overflow-x-auto mt-2 rounded-xl border border-slate-100">
+              <table className="w-full text-left text-xs min-w-[720px]">
                 <thead>
-                  <tr className="border-b border-slate-100 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">
-                    <th className="py-2.5">Severity</th>
-                    <th className="py-2.5">Event Description</th>
-                    <th className="py-2.5">Target User</th>
-                    <th className="py-2.5">IP Address</th>
-                    <th className="py-2.5">Timestamp</th>
-                    <th className="py-2.5 text-right">Actions</th>
+                  <tr className="border-b border-slate-200 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60">
+                    <th className="py-2.5 px-3 w-[100px] text-left">Severity</th>
+                    <th className="py-2.5 px-3 min-w-[220px] text-left">Event Description</th>
+                    <th className="py-2.5 px-3 min-w-[130px] text-left">Target User</th>
+                    <th className="py-2.5 px-3 min-w-[120px] text-left">IP Address</th>
+                    <th className="py-2.5 px-3 min-w-[130px] text-left">Timestamp</th>
+                    <th className="py-2.5 px-3 w-[70px] text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filteredEvents.length === 0 ? (
+                  {paginatedEvents.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-slate-500">
+                      <td colSpan={6} className="py-10 text-center text-slate-500">
                         <div className="flex flex-col items-center justify-center gap-1.5">
                           <p className="font-semibold text-xs text-slate-600">
                             No security events found for the selected range ({getAuditDateRangeLabel()}).
@@ -924,9 +937,10 @@ const ControlCenterDashboardPage: React.FC = () => {
                             <button
                               onClick={() => {
                                 setAuditDateRange("ALL");
+                                setAuditPage(1);
                                 fetchSummary("ALL", auditSeverityFilter);
                               }}
-                              className="text-xs font-bold text-blue-600 hover:text-blue-800 underline mt-1"
+                              className="text-xs font-bold text-blue-600 hover:text-blue-800 underline mt-1 cursor-pointer"
                             >
                               View All Historical Records →
                             </button>
@@ -935,41 +949,53 @@ const ControlCenterDashboardPage: React.FC = () => {
                       </td>
                     </tr>
                   ) : (
-                    filteredEvents.map((ev) => (
-                      <tr key={ev.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3">
+                    paginatedEvents.map((ev) => (
+                      <tr key={ev.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-3 px-3">
                           <span
                             className={`inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
                               ev.severity === "CRITICAL"
-                                ? "bg-rose-100 text-rose-700"
+                                ? "bg-rose-100 text-rose-700 border border-rose-200"
                                 : ev.severity === "WARNING"
-                                ? "bg-amber-100 text-amber-700"
+                                ? "bg-amber-100 text-amber-700 border border-amber-200"
                                 : ev.severity === "SUCCESS"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : "bg-blue-100 text-blue-700"
+                                ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                : "bg-blue-100 text-blue-700 border border-blue-200"
                             }`}
                           >
                             {ev.severity}
                           </span>
                         </td>
-                        <td className="py-3 font-semibold text-slate-800">{ev.description}</td>
-                        <td className="py-3 text-slate-600 font-mono text-[11px]">{ev.user}</td>
-                        <td className="py-3 text-slate-500 font-mono text-[11px]">{ev.ip}</td>
-                        <td className="py-3 text-slate-500 font-medium">
-                          {ev.time}
+                        <td className="py-3 px-3">
+                          <div className="font-semibold text-slate-800 max-w-[260px] truncate" title={ev.description}>
+                            {ev.description}
+                          </div>
+                        </td>
+                        <td className="py-3 px-3 whitespace-nowrap">
+                          <span className="text-slate-700 font-medium text-xs">
+                            {ev.user || "System"}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 whitespace-nowrap">
+                          <span className="text-slate-600 font-mono text-[11px] bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60">
+                            {ev.ip || "—"}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 whitespace-nowrap text-slate-500 font-medium text-xs">
+                          <span>{ev.time}</span>
                           {ev.created_at && new Date(ev.created_at).getFullYear() < new Date().getFullYear() && (
                             <span className="ml-1.5 text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold uppercase">
                               Historical
                             </span>
                           )}
                         </td>
-                        <td className="py-3 text-right">
+                        <td className="py-3 px-3 text-right whitespace-nowrap">
                           <Link
                             to="/control-center/access-audit"
-                            className="text-slate-400 hover:text-blue-600 p-1 inline-block"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 inline-flex items-center justify-center transition-colors cursor-pointer"
                             title="Inspect in Access Audit"
                           >
-                            <MoreHorizontal className="h-3.5 w-3.5" />
+                            <MoreHorizontal className="h-4 w-4" />
                           </Link>
                         </td>
                       </tr>
@@ -980,17 +1006,88 @@ const ControlCenterDashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Table Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-100 text-xs">
-            <span className="text-slate-400">
-              Showing {filteredEvents.length} security & governance event{filteredEvents.length === 1 ? "" : "s"} • {getAuditDateRangeLabel()}
-            </span>
-            <Link
-              to="/control-center/access-audit"
-              className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"
-            >
-              View detailed access audit logs →
-            </Link>
+          {/* Table Footer with Interactive Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100 text-xs">
+            <div className="flex items-center gap-2 text-slate-500 text-xs">
+              <span>
+                Showing <strong className="text-slate-800 font-semibold">{filteredEvents.length > 0 ? (safeAuditPage - 1) * auditPageSize + 1 : 0}</strong>–<strong className="text-slate-800 font-semibold">{Math.min(safeAuditPage * auditPageSize, filteredEvents.length)}</strong> of <strong className="text-slate-800 font-semibold">{filteredEvents.length}</strong> events
+              </span>
+              <span className="text-slate-300">•</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-slate-400 text-[11px]">Rows:</span>
+                <select
+                  value={auditPageSize}
+                  onChange={(e) => {
+                    setAuditPageSize(Number(e.target.value));
+                    setAuditPage(1);
+                  }}
+                  className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-2xs"
+                >
+                  <option value={5}>5</option>
+                  <option value={7}>7</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setAuditPage((p) => Math.max(1, p - 1))}
+                disabled={safeAuditPage <= 1}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-medium text-xs shadow-2xs"
+                title="Previous page"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                <span>Prev</span>
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalAuditPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalAuditPages || Math.abs(p - safeAuditPage) <= 1)
+                  .map((p, idx, arr) => {
+                    const prev = arr[idx - 1];
+                    return (
+                      <React.Fragment key={p}>
+                        {prev && p - prev > 1 && <span className="px-1 text-slate-400">…</span>}
+                        <button
+                          type="button"
+                          onClick={() => setAuditPage(p)}
+                          className={`min-w-[28px] h-7 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
+                            safeAuditPage === p
+                              ? "bg-blue-600 text-white shadow-xs"
+                              : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      </React.Fragment>
+                    );
+                  })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setAuditPage((p) => Math.min(totalAuditPages, p + 1))}
+                disabled={safeAuditPage >= totalAuditPages}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-medium text-xs shadow-2xs"
+                title="Next page"
+              >
+                <span>Next</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+
+              <Link
+                to="/control-center/access-audit"
+                className="ml-2 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"
+                title="View full audit log in Access Audit page"
+              >
+                <span>Full Logs</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
         </div>
 
