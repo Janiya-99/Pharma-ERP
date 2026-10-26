@@ -982,9 +982,9 @@ const DayBookReportPage: React.FC = () => {
             {filteredDays.length > pageSize && (
               <div className="p-4 bg-slate-50/50 border-t border-slate-200">
                 <TablePagination
-                  currentPage={page}
+                  pageIndex={page}
                   pageSize={pageSize}
-                  totalCount={filteredDays.length}
+                  totalItems={filteredDays.length}
                   onPageChange={setPage}
                   onPageSizeChange={(newSize) => {
                     setPageSize(newSize);
