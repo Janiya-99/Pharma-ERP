@@ -387,38 +387,6 @@ const ControlCenterDashboardPage: React.FC = () => {
         onRefresh={fetchSummary}
       />
 
-      {/* ── STATUTORY AUDIT & SYSTEM FIXES BANNER ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 p-5 text-white shadow-md border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-start sm:items-center gap-3.5">
-          <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl border border-emerald-500/30 shrink-0">
-            <FileCheck className="h-6 w-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-300 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                Statutory Verified
-              </span>
-              <span className="text-xs text-emerald-200/80 font-medium">System Documentation & Audit Trail</span>
-            </div>
-            <h3 className="text-base font-bold text-white mt-1">
-              System Fixes & Statutory Financial Audit Report
-            </h3>
-            <p className="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
-              Full root cause analyses, mathematical proofs, and engineering resolutions for Balance Sheet, Bank Book, Cash Book, Finance Dashboard KPIs, and Tax Settings.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
-          <Link
-            to="/control-center/system-fixes-audit"
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
-          >
-            <span>View Full Audit Report</span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
-
       {/* ── TOP 4 KPI CARDS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Total Branches */}
@@ -1117,22 +1085,6 @@ const ControlCenterDashboardPage: React.FC = () => {
                   <h4 className="text-xs font-bold text-slate-800 group-hover:text-blue-700">Access Audit Report</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">Check activity and logs</p>
                 </div>
-              </Link>
-
-              <Link
-                to="/control-center/system-fixes-audit"
-                className="col-span-2 p-3 bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/80 hover:border-emerald-300 rounded-xl transition-all duration-200 group flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-white border border-emerald-200/60 text-emerald-600 shadow-2xs group-hover:scale-105 transition-transform">
-                    <FileCheck className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 group-hover:text-emerald-800">System Fixes & Statutory Audit</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Authoritative statutory reconciliation & RCA documentation</p>
-                  </div>
-                </div>
-                <ArrowRight className="h-4 w-4 text-emerald-600 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>

@@ -25,6 +25,8 @@ import {
   CheckCircle2,
   Flame,
   TrendingUp,
+  FileCheck,
+  ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -221,6 +223,38 @@ const PlatformAdminDashboardPage = () => {
           <span>Download Manuals & Docs</span>
           <ArrowUpRight className="h-3.5 w-3.5 text-indigo-400" />
         </Link>
+      </div>
+
+      {/* ── STATUTORY AUDIT & SYSTEM FIXES BANNER ── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 p-5 text-white shadow-xl border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl border border-emerald-500/30 shrink-0">
+            <FileCheck className="h-6 w-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-300 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                Statutory Verified
+              </span>
+              <span className="text-xs text-emerald-200/80 font-medium">System Documentation & Audit Trail</span>
+            </div>
+            <h3 className="text-base font-bold text-white mt-1">
+              System Fixes & Statutory Financial Audit Report
+            </h3>
+            <p className="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
+              Full root cause analyses, mathematical proofs, and engineering resolutions for Balance Sheet, Bank Book, Cash Book, Finance Dashboard KPIs, and Tax Settings.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+          <Link
+            to="/platform-admin/system-fixes-audit"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer whitespace-nowrap"
+          >
+            <span>View Full Audit Report</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
       {/* Subscription Expiration & Locking Alert Banner (when at-risk companies exist) */}

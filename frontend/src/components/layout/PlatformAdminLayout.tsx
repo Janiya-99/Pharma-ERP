@@ -32,7 +32,7 @@ type MenuItem = {
   }[];
 };
 
-const PlatformAdminLayout = () => {
+const PlatformAdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { user, logoutUser } = usePlatformAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -265,7 +265,7 @@ const PlatformAdminLayout = () => {
         <main className="flex-grow overflow-y-auto bg-slate-900 p-6 flex flex-col justify-between">
           <div className="flex-grow">
             <Suspense fallback={<LoadingScreen mode="page" badge="PLATFORM OWNER" />}>
-              <Outlet />
+              {children || <Outlet />}
             </Suspense>
           </div>
           <footer className="mt-8 pt-4 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center bg-slate-900">

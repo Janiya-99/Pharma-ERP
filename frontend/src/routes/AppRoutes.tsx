@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Link } from "react-router-dom";
+import { Shield } from "lucide-react";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import LoadingScreen from "../components/common/LoadingScreen";
@@ -209,6 +210,37 @@ const PlatformProtectedRoute = ({
   return <>{children}</>;
 };
 
+const PlatformSystemFixesAuditRoute = () => {
+  const { isAuthenticated, loading } = usePlatformAuth();
+  if (loading) return <LoadingScreen mode="page" />;
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
+        <header className="h-16 px-6 bg-slate-950 border-b border-slate-800 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <Shield className="h-6 w-6 text-indigo-400" />
+            <span className="font-bold text-lg text-white tracking-wide">Pharma ERP — Platform Audit Trail</span>
+          </div>
+          <Link
+            to="/platform-admin/login"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition-all cursor-pointer"
+          >
+            <span>← Back to Platform Login</span>
+          </Link>
+        </header>
+        <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
+          <SystemFixesAuditPage />
+        </main>
+      </div>
+    );
+  }
+  return (
+    <PlatformAdminLayout>
+      <SystemFixesAuditPage />
+    </PlatformAdminLayout>
+  );
+};
+
 const ModuleSelectionPage = lazy(() => import("../pages/landing/ModuleSelectionPage"));
 
 const AppRoutes = () => {
@@ -321,7 +353,7 @@ const AppRoutes = () => {
           />
           <Route
             path="/control-center/system-fixes-audit"
-            element={<SystemFixesAuditPage />}
+            element={<Navigate to="/platform-admin/system-fixes-audit" replace />}
           />
 
           {/* Finance Module */}
@@ -1210,6 +1242,7 @@ const AppRoutes = () => {
             <Suspense fallback={<LoadingScreen mode="page" />}>
     <Routes>
               <Route path="login" element={<PlatformAdminLoginPage />} />
+              <Route path="system-fixes-audit" element={<PlatformSystemFixesAuditRoute />} />
               <Route
                 path=""
                 element={
