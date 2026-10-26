@@ -349,7 +349,7 @@ const Topbar = () => {
         </div>
 
         {/* 2. CENTER: Executive Segmented Module Switcher Rail with Modern Tooltips */}
-        <div className="hidden lg:flex items-center p-1 rounded-xl bg-slate-100/90 border border-slate-200/80 shadow-2xs gap-1 shrink-0">
+        <div className="hidden lg:flex items-center p-1.5 rounded-xl bg-slate-100/90 border border-slate-200/80 shadow-xs gap-1.5 mx-4 shrink-0">
           {permittedModules.map((m) => {
             const Icon = m.icon;
             const isCurrent = m.code === activeModule.code;
@@ -359,10 +359,10 @@ const Topbar = () => {
                   <button
                     type="button"
                     onClick={() => handleSwitchModule(m.code, m.route)}
-                    className={`flex items-center h-8.5 rounded-lg text-xs transition-all duration-150 cursor-pointer select-none ${
+                    className={`flex items-center justify-center h-9 rounded-lg text-xs transition-all duration-150 cursor-pointer select-none ${
                       isCurrent
-                        ? "bg-white text-indigo-700 shadow-xs border border-slate-200/90 font-semibold px-3"
-                        : "text-slate-600 hover:text-indigo-600 hover:bg-white/80 font-medium px-2.5"
+                        ? "bg-white text-indigo-700 shadow-xs border border-slate-200/90 font-semibold px-3.5 gap-2"
+                        : "w-9 text-slate-500 hover:text-indigo-600 hover:bg-white/80 font-medium"
                     }`}
                     aria-label={m.name}
                   >
@@ -372,7 +372,7 @@ const Topbar = () => {
                       }`}
                     />
                     {isCurrent && (
-                      <span className="ml-1.5 whitespace-nowrap text-xs font-semibold text-slate-800 tracking-tight">
+                      <span className="whitespace-nowrap text-xs font-semibold text-slate-800 tracking-tight">
                         {m.name}
                       </span>
                     )}
@@ -381,18 +381,18 @@ const Topbar = () => {
                 <TooltipContent
                   side="bottom"
                   sideOffset={8}
-                  className="z-50 flex items-center gap-2 whitespace-nowrap rounded-lg border border-slate-800 bg-slate-950/95 px-3 py-1.5 text-xs text-white shadow-xl backdrop-blur-md pointer-events-none"
+                  className="z-50 flex items-center gap-2 whitespace-nowrap rounded-xl border border-slate-800 bg-slate-950/95 px-3.5 py-1.5 text-xs text-white shadow-2xl backdrop-blur-md pointer-events-none select-none"
                 >
                   <Icon className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
-                  <span className="font-semibold text-white">{m.name}</span>
+                  <span className="font-bold text-white text-xs">{m.name}</span>
                   <span className="text-slate-500 text-[10px]">•</span>
-                  <span className="text-slate-300 text-[11px]">{m.desc}</span>
+                  <span className="text-slate-300 text-xs font-normal">{m.desc}</span>
                   {isCurrent ? (
-                    <span className="ml-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/30">
+                    <span className="ml-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-300 border border-emerald-500/30">
                       Active
                     </span>
                   ) : (
-                    <span className="ml-1 rounded bg-indigo-500/20 px-1.5 py-0.5 text-[9px] font-medium text-indigo-300 border border-indigo-500/30">
+                    <span className="ml-1 rounded-full bg-indigo-500/20 px-2 py-0.5 text-[9px] font-medium text-indigo-300 border border-indigo-500/30">
                       Click to switch
                     </span>
                   )}
