@@ -340,10 +340,10 @@ const BalanceSheetReportPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsAuditModalOpen(true)}
-                className="inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-xs transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
+                className="inline-flex items-center gap-2 h-9 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-xs transition-all shadow-xs active:scale-[0.98] cursor-pointer"
                 title="View Technical Resolution & Ledger Reconciliation Audit"
               >
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
                 <span>Audit Fix Doc</span>
               </button>
             }

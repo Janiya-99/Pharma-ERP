@@ -35,17 +35,20 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
 
   const isBtnDisabled = disabled || loading;
 
+  const btnBaseClass =
+    "inline-flex items-center gap-2 h-9 px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-xs active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
+
   return (
-    <div className={`flex items-center gap-2 flex-wrap print:hidden ${className}`}>
+    <div className={`flex items-center gap-2.5 flex-wrap print:hidden ${className}`}>
       {onRefresh && (
         <button
           type="button"
           onClick={onRefresh}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+          className={`${btnBaseClass} bg-white border border-slate-200/90 text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 hover:shadow-sm`}
           title="Refresh Report Data"
         >
-          <RefreshCw className={`h-3.5 w-3.5 text-slate-500 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-4 w-4 text-slate-500 shrink-0 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh</span>
         </button>
       )}
@@ -54,10 +57,10 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
           type="button"
           onClick={onExportCsv}
           disabled={isBtnDisabled}
-          className="inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs hover:bg-emerald-50/60 hover:text-emerald-700 hover:border-emerald-300 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+          className={`${btnBaseClass} bg-white border border-slate-200/90 text-slate-700 hover:bg-emerald-50/80 hover:text-emerald-700 hover:border-emerald-300 hover:shadow-sm`}
           title="Export to Excel Spreadsheet"
         >
-          <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
+          <FileSpreadsheet className="h-4 w-4 text-emerald-600 shrink-0" />
           <span>Export Excel</span>
         </button>
       )}
@@ -66,13 +69,13 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
           type="button"
           onClick={onExportPdf}
           disabled={isBtnDisabled || isExportingPdf}
-          className="inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs hover:bg-rose-50/60 hover:text-rose-700 hover:border-rose-300 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+          className={`${btnBaseClass} bg-white border border-slate-200/90 text-slate-700 hover:bg-rose-50/80 hover:text-rose-700 hover:border-rose-300 hover:shadow-sm`}
           title="Export Statutory PDF Document"
         >
           {isExportingPdf ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
+            <Loader2 className="h-4 w-4 animate-spin text-rose-600 shrink-0" />
           ) : (
-            <FileText className="h-3.5 w-3.5 text-rose-600" />
+            <FileText className="h-4 w-4 text-rose-600 shrink-0" />
           )}
           <span>Export PDF</span>
         </button>
@@ -82,10 +85,10 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
           type="button"
           onClick={onExportJson}
           disabled={isBtnDisabled}
-          className="inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs hover:bg-blue-50/60 hover:text-blue-700 hover:border-blue-300 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+          className={`${btnBaseClass} bg-white border border-slate-200/90 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 hover:border-blue-300 hover:shadow-sm`}
           title="Export JSON Data"
         >
-          <FileJson className="h-3.5 w-3.5 text-blue-600" />
+          <FileJson className="h-4 w-4 text-blue-600 shrink-0" />
           <span>Export JSON</span>
         </button>
       )}
@@ -94,10 +97,10 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
           type="button"
           onClick={handlePrint}
           disabled={isBtnDisabled}
-          className="hidden sm:inline-flex items-center gap-1.5 h-8.5 px-3 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+          className={`hidden sm:inline-flex ${btnBaseClass} bg-white border border-slate-200/90 text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 hover:shadow-sm`}
           title="Print Report"
         >
-          <Printer className="h-3.5 w-3.5 text-slate-500" />
+          <Printer className="h-4 w-4 text-slate-500 shrink-0" />
           <span>Print</span>
         </button>
       )}

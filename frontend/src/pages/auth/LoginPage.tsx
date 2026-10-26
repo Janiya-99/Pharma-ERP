@@ -51,10 +51,6 @@ const LoginPage = () => {
     }
   };
 
-  const handleQuickFill = (email: string, pass: string) => {
-    setFormData({ email, password: pass });
-    setError(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,38 +232,6 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Quick Demo Profiles Helper */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex flex-col gap-1.5">
-              <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
-                Quick Select Account
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill("admin@ceylonmed.lk", "CeylonAdmin@2026")}
-                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-indigo-700 hover:bg-indigo-50 rounded-lg border border-indigo-200/80 shadow-2xs transition-colors"
-                  title="Dr. Kalinga Silva • Managing Director (Super Admin)"
-                >
-                  Admin (Dr. Kalinga Silva)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill("cfo@ceylonmed.lk", "CeylonAdmin@2026")}
-                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-emerald-700 hover:bg-emerald-50 rounded-lg border border-emerald-200/80 shadow-2xs transition-colors"
-                  title="Ruwani Jayawardena • Chief Financial Officer"
-                >
-                  CFO (Ruwani)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill("accountant@ceylonmed.lk", "CeylonAdmin@2026")}
-                  className="px-2.5 py-1 text-[11px] font-bold bg-white text-blue-700 hover:bg-blue-50 rounded-lg border border-blue-200/80 shadow-2xs transition-colors"
-                  title="Chaminda Bandara • Senior Accountant"
-                >
-                  Accountant (Chaminda)
-                </button>
-              </div>
-            </div>
 
             {/* Remember Me & Recovery Options */}
             <div className="flex items-center justify-between pt-0.5">
